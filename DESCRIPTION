@@ -1,16 +1,23 @@
 Package: sceptre
-Title: What the Package Does (One Line, Title Case)
+Title: Robustly Infer Regulatory Relationships in Single-Cell CRISPR Screen Experiments
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Timothy",
+           family = "Barry",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "tbarry2@andrew.cmu.edu")
+Description: SCEPTRE (analysis of single cell perturbation screens via conditional resampling) is a method for single-cell CRISPR screen analysis. SCEPTRE infers gene-perturbation associations by modeling the random assortment of CRISPR guide RNAs among cells instead of modeling gene expression, thereby remaining valid despite confounder presence and arbitrary misspecification of the gene expression model.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports: 
+    sn,
+    VGAM,
+    stats,
+    MASS
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    ggplot2
