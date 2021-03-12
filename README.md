@@ -12,3 +12,10 @@
 assortment of CRISPR guide RNAs among cells instead of modeling gene
 expression, thereby remaining valid despite confounder presence and
 arbitrary misspecification of the gene expression model.
+
+# Installation
+
+Install the package from Github via the following command:
+
+    install.packages("devtools")
+    devtools::install_github("timothy-barry/sceptre")
