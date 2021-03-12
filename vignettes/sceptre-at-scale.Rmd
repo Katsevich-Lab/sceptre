@@ -1,0 +1,15 @@
+---
+title: "SCEPTRE at scale"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SCEPTRE at scale}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette shows how to apply SCEPTRE at scale. First, ensure that you have downloaded and installed the package.
+
+```
+install.packages("devtools")
+devtools::install_github("timothy-barry/sceptre")
+```

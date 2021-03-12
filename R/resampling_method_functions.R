@@ -192,12 +192,14 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' @return If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, return a list containing all of the above, plus the vector of resampled test statistics.
 #' @export
 #' @examples
+#' \dontrun{
 #' data(expressions)
 #' data(gRNA_indicators)
 #' data(covariate_matrix)
 #' result <- run_sceptre_gRNA_gene_pair(expressions,
 #' gRNA_indicators,
 #' covariate_matrix)
+#' }
 run_sceptre_gRNA_gene_pair <- function(expressions, gRNA_indicators, covariate_matrix, side = "left", gene_precomp_size = NULL, B = 500, seed = NULL, reduced_output = TRUE, verbose = TRUE) {
   cat(paste0("Running gRNA precomputation.\n"))
   gRNA_precomp <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix)

@@ -2,7 +2,7 @@ library(ondisc)
 param_funct <- function(param) {
         switch(param,
                # modify the parameters below
-               storage_dir = "/Users/timbarry/Desktop/example",
+               storage_dir = "~/Desktop/",
                n_processors = 40,
                pod_sizes = c(gene = 3, gRNA = 2, pair = 5),
                expression_matrix = ondisc_matrix(system.file("extdata", "expressions.h5", package = "sceptre")),
