@@ -3,5 +3,8 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   sceptre-at-scale: sceptre-at-scale.html
-last_built: 2021-03-12T05:24Z
+last_built: 2021-03-12T18:51Z
+urls:
+  reference: timothy-barry.github.io/sceptre//reference
+  article: timothy-barry.github.io/sceptre//articles
 
