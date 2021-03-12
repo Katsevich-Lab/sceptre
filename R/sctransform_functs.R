@@ -39,16 +39,13 @@ regularize_thetas <- function(genes_log_gmean, theta, theta_regularization = "lo
     problem_idxs <- is.na(theta_out)
     theta_out[problem_idxs] <- theta[problem_idxs]
     attr(theta_out, "outliers") <- outliers
-    out <- theta_out
 
-    print(plot_me)
     if (plot_me) {
       df1 <- data.frame(log_theta = c(dispersion_par, fitted_dispersion_par), mean_gene_exp = c(genes_log_gmean_step1, x_points), regularized = c(rep(FALSE, length(genes_log_gmean_step1)), rep(TRUE, length(x_points))))
-      p1 <- ggplot2::ggplot(data = df1, mapping = aes(x = mean_gene_exp, y = log_theta, col = regularized)) + geom_point() + theme_bw()
+      p1 <- ggplot2::ggplot(data = df1, mapping = ggplot2::aes(x = mean_gene_exp, y = log_theta, col = regularized)) + ggplot2::geom_point() + ggplot2::theme_bw()
       df2 <- data.frame(theta = theta, theta_out = theta_out)
-      p2 <- ggplot2::ggplot(data = df2, mapping = aes(x = theta, y = theta_out)) + geom_point() + theme_bw()
+      p2 <- ggplot2::ggplot(data = df2, mapping = ggplot2::aes(x = theta, y = theta_out)) + ggplot2::geom_point() + ggplot2::theme_bw()
       print(p1); print(p2)
-      out <- list(theta_out, p1, p2)
     }
   }
   return(theta_out)
@@ -74,7 +71,7 @@ is_outlier <- function(y, x, th = 10) {
 #' @noRd
 robust_scale_binned <- function (y, x, breaks) {
   bins <- cut(x = x, breaks = breaks, ordered_result = TRUE)
-  tmp <- aggregate(x = y, by = list(bin = bins), FUN = robust_scale)
+  tmp <- stats::aggregate(x = y, by = list(bin = bins), FUN = robust_scale)
   score <- rep(0, length(x))
   o <- order(bins)
   if (inherits(x = tmp$x, what = "list")) {
