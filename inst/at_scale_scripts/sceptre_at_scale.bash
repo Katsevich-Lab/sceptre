@@ -1,6 +1,5 @@
 #!/bin/bash
-param_file_name="param_file.R"
-param_file=$PWD"/"$param_file_name
+param_file=${1:-$PWD"/param_file.R"}
 
 # 0. Print parameter file being used
 printf "Running SCEPTRE on parameter file $param_file.\n"

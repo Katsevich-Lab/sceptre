@@ -42,10 +42,12 @@ If reduced_output is TRUE, a data frame containing the following columns: p-valu
 Runs SCEPTRE on a given gRNA-gene pair. The function requires as arguments the gene expression vector, the gRNA indicator vector, and the covariate matrix.
 }
 \examples{
+\dontrun{
 data(expressions)
 data(gRNA_indicators)
 data(covariate_matrix)
 result <- run_sceptre_gRNA_gene_pair(expressions,
 gRNA_indicators,
 covariate_matrix)
+}
 }
