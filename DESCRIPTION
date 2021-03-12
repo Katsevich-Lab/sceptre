@@ -16,8 +16,15 @@ Imports:
     sn,
     VGAM,
     stats,
-    MASS
+    MASS,
+    fst,
+    dplyr,
+    magrittr,
+    purrr,
+    bigstatsr
 Depends: 
     R (>= 2.10)
 Suggests: 
-    ggplot2
+    ggplot2,
+    future,
+    furrr
