@@ -7,9 +7,128 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette shows how to apply SCEPTRE at scale. First, ensure that you have downloaded and installed the package.
+This vignette shows how to apply SCEPTRE at scale within a Linux or Unix environment.
+
+# Setup
+
+First, ensure that you have downloaded and installed the package.
 
 ```
 install.packages("devtools")
 devtools::install_github("timothy-barry/sceptre")
 ```
+
+Next, open the terminal and navigate to a directory in which you would like to run the analysis. For example:
+
+```
+# in terminal
+mkdir ~/my_sceptre_dir
+cd ~/my_sceptre_dir
+```
+
+Execute the following command to copy the scripts required to run SCEPTRE into the current directory. Be sure to include the period at the end.
+
+```
+# in terminal
+pkg_dir=$(Rscript -e "cat(find.package('sceptre'))"); cp -r $pkg_dir"/at_scale_scripts" .
+```
+
+This command creates a directory called `at_scale_scripts` containing a bash script `sceptre_at_scale.bash` and an R file `param_file.R`. The bash script `sceptre_at_scale.bash` contains the code to run the analysis, and the R file `param_file.R` stores the parameters to be used in the analysis.
+
+```
+cd at_scale_scripts
+ls
+```
+
+# Parameter file
+
+Let's look at the contents of `param_file.R`:
+
+```{r,eval=FALSE}
+#param_file.R
+library(ondisc)
+library(magrittr)
+param_funct <- function(param) {
+        switch(param,
+               # modify the parameters below
+               storage_dir = "~/my_sceptre_dir/",
+               expression_matrix = system.file("extdata",
+                                               "expressions.h5",
+                                               package = "sceptre") %>% ondisc_matrix(),
+               perturbation_matrix = system.file("extdata",
+                                                 "perturbations.h5",
+                                                 package = "sceptre") %>% ondisc_matrix(),
+               covariate_matrix = system.file("extdata",
+                                              "covariate_matrix.rds",
+                                              package = "sceptre") %>% readRDS(),
+               gene_gRNA_pairs = system.file("extdata",
+                                            "gene_gRNA_pairs.rds",
+                                            package = "sceptre") %>% readRDS(),
+               side = "left",
+               pod_sizes = c(gene = 3, gRNA = 2, pair = 5),
+               regularization_amount = 1,
+               B = 500,
+               seed = 4)
+}
+```
+
+This script contains a single function `param_funct`, which takes the name of a parameter as an argument and returns the value of that parameter. `param_funct` must support the following parameters:
+
+- `storage_dir`: the name of a directory in which to store the intermediate computations and final results.
+
+- `expression_matrix`: the gene expression data, represented as an `ondisc_matrix`.
+
+- `perturbation_matrix`: the gRNA perturbation data, represented as an `ondisc_matrix`.
+
+- `covariate_matrix`: the matrix of cell-specific covariates, represented as a data frame.
+
+- `gene_gRNA_pairs`: a data frame storing the gene-gRNA pairs to analyze. The data frame must contain columns named `gene_id` and `gRNA_id`.
+
+- `side`: the sidedness of the test; "left" performs a left-tailed test, "right" performs a right-tailed test, and "both" performs a two-tailed test. "left" is most appropriate for experiments in which cis-regulatory relationships are tested by perturbing putative enhancers via CRISPRi.
+
+- `pod_sizes`: an integer vector giving the size of the "gene", "gRNA", and "pair" pods. SCEPTRE groups the genes, gRNAs, and gene-gRNA pairs into distinct "pods" and runs computations on these pods in parallel. Smaller pod sizes yield greater parallelization. `pod_sizes` should be a vector of length three with names "gene", "gRNA", and "pair".
+
+- `regularization_amount`: the amount of regularization to apply to the estimated negative binomial size parameters, where 0 corresponds to no regularization at all. A reasonable default choice is 1. Note that `regularization_amount` affects only the power, not the validity, of the test.
+
+- `B`: number of random samples to draw in the conditional randomization test module; a reasonable default choice is 500.
+
+- `seed`: seed to pass to the random number generator; any integer value suffices.
+
+In the above file, `expression_matrix`, `perturbation matrix`, and `covariate_matrix` are example datasets that ship with the `sceptre` package. `expression_matrix` contains gene expression data for five genes; `perturbation_matrix` contains gRNA perturbation data for four gRNAs; and `covariate_matrix` contains cell-specific technical factors. The data, sampled from Gasperini et al. 2019, are recorded across 205,797 cells.
+
+```{r}
+library(sceptre)
+library(ondisc)
+library(magrittr)
+expression_matrix <- system.file("extdata",
+                                 "expressions.h5",
+                                 package = "sceptre") %>% ondisc_matrix()
+expression_matrix
+perturbation_matrix <- system.file("extdata",
+                                   "perturbations.h5",
+                                   package = "sceptre") %>% ondisc_matrix()
+perturbation_matrix
+covariate_matrix <- system.file("extdata",
+                                "covariate_matrix.rds",
+                                package = "sceptre") %>% readRDS()
+head(covariate_matrix)
+```
+
+Finally, `gene_gRNA_pairs` stores all twenty possible pairs of genes and gRNAs.
+
+```{r}
+gene_gRNA_pairs <- system.file("extdata",
+                               "gene_gRNA_pairs.rds",
+                               package = "sceptre") %>% readRDS()
+head(gene_gRNA_pairs)
+```
+
+# Running the analysis
+
+To run the analysis, simply call `bash` on `sceptre_at_scale.bash`, including an `&` to move the process to the background.
+
+```
+# in terminal
+bash sceptre_at_scale.bash &
+```
+
