@@ -8,8 +8,14 @@ Authors@R:
            email = "tbarry2@andrew.cmu.edu"),
            person(given = "Eugene",
            family = "Katsevich",
-           role = "aut",
-           email = "ekatsevi@wharton.upenn.edu"))
+           role = c("aut", "ths"),
+           email = "ekatsevi@wharton.upenn.edu"),
+           person(given = "Xuran",
+           family = "Wang",
+           role = "ctb"),
+           person(given = "Kathryn",
+           family = "Roeder",
+           role = "ths"))
 Description: SCEPTRE (analysis of single cell perturbation screens via conditional resampling) is a method for single-cell CRISPR screen analysis. SCEPTRE infers gene-perturbation associations by modeling the random assortment of CRISPR guide RNAs among cells instead of gene expression, thereby remaining valid despite confounder presence and arbitrary misspecification of the gene expression model.
 License: MIT + file LICENSE
 Encoding: UTF-8
