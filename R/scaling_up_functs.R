@@ -332,5 +332,5 @@ collect_results <- function(results_dir) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)
   all_results <- results_dir %>% paste0("/", to_load) %>% purrr::map(fst::read_fst) %>% purrr::reduce(rbind)
-  fst::write_fst(all_results, paste0(results_dir, "/all_results.fst"))
+  saveRDS(object = all_results, file = paste0(results_dir, "/all_results.rds"))
 }

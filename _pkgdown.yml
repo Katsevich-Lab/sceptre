@@ -1,8 +1,22 @@
 url: timothy-barry.github.io/sceptre/
 
+authors:
+  "Timothy Barry":
+    href: https://timothy-barry.github.io/
+
 development:
   mode: auto
 
 template:
   params:
     bootswatch: lumen
+
+navbar:
+  type: default
+  left:
+  - text: Function reference
+    href: reference/index.html
+  - text: Tutorials
+    menu:
+    - text: "sceptre at scale"
+      href: articles/sceptre-at-scale.html
