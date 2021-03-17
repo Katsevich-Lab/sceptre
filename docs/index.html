@@ -31,30 +31,24 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sceptre</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="reference/index.html">Reference</a>
+  <a href="reference/index.html">Function reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Tutorials
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/sceptre-at-scale.html">SCEPTRE at scale</a>
+      <a href="articles/sceptre-at-scale.html">sceptre at scale</a>
     </li>
   </ul>
 </li>
@@ -72,18 +66,19 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="sceptre-robustly-infer-regulatory-relationships-in-single-cell-crispr-screens-" class="section level1">
+<div id="sceptre-robust-single-cell-crispr-screen-analysis-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#sceptre-robustly-infer-regulatory-relationships-in-single-cell-crispr-screens-" class="anchor"></a><code>sceptre</code>: robustly infer regulatory relationships in single-cell CRISPR screens <img src="reference/figures/hex.jpg" align="right" alt="" width="180">
+<a href="#sceptre-robust-single-cell-crispr-screen-analysis-" class="anchor"></a><code>sceptre</code>: robust single-cell CRISPR screen analysis <img src="reference/figures/hex.jpg" align="right" alt="" width="180">
 </h1></div>
 <!-- badges: start -->
 <!-- badges: end -->
-<p><code>sceptre</code> is an R package for single-cell CRISPR screen analysis. <code>sceptre</code> infers gene-perturbation associations by modeling the random assortment of CRISPR guide RNAs among cells instead of modeling gene expression, thereby remaining valid despite confounder presence and arbitrary misspecification of the gene expression model.</p>
+<p>Single-cell CRISPR screens provide unprecedented insight into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a methodology and associated R package for rigorously identifying regulatory relationships in high multiplicity-of-infection single-cell CRISPR screens. For a given gRNA and gene, <code>sceptre</code> produces a well-calibrated <em>p</em>-value for the null hypothesis that the gRNA has no impact on the expression of the gene. <code>sceptre</code> is robust and reliable: it seamlessly accounts for technical factors (e.g., sequencing batch and sequencing depth) and works well even when the expression model is misspecified.</p>
+<p>Tutorials available on the <a href="https://timothy-barry.github.io/sceptre/">package website</a> demonstrate how to apply <code>sceptre</code> to small and large datasets.</p>
 </div>
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
-<p>Install the package from Github via the following command:</p>
+<p>You can install the development version of the package from Github with the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"timothy-barry/sceptre"</span>)</span></code></pre></div>
 </div>
@@ -101,7 +96,8 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Timothy Barry <br><small class="roles"> Author, maintainer </small>  </li>
+<li>
+<a href="https://timothy-barry.github.io/">Timothy Barry</a> <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Eugene Katsevich <br><small class="roles"> Author, thesis advisor </small>  </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
@@ -112,7 +108,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Timothy Barry, Eugene Katsevich.</p>
+  <p>Developed by <a href="https://timothy-barry.github.io/">Timothy Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
