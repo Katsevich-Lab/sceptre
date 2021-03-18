@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot skew-t — plot_skew_t • sceptre</title>
+<title>Plot resampled test statistics over fitted skew-t distribution — plot_skew_t • sceptre</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Plot skew-t — plot_skew_t" />
+<meta property="og:title" content="Plot resampled test statistics over fitted skew-t distribution — plot_skew_t" />
 <meta property="og:description" content="Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic." />
 
 
@@ -112,7 +112,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot skew-t</h1>
+    <h1>Plot resampled test statistics over fitted skew-t distribution</h1>
     
     <div class="hidden name"><code>plot_skew_t.Rd</code></div>
     </div>
@@ -152,27 +152,13 @@
     <pre class="examples"><div class='input'><span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>expressions</span><span class='op'>)</span>
 <span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>gRNA_indicators</span><span class='op'>)</span>
 <span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>covariate_matrix</span><span class='op'>)</span>
-<span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'><a href='run_sceptre_gRNA_gene_pair.html'>run_sceptre_gRNA_gene_pair</a></span><span class='op'>(</span><span class='va'>expressions</span>,
-<span class='va'>gRNA_indicators</span>,
-<span class='va'>covariate_matrix</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running gRNA precomputation.
-#&gt; Running gene precomputation.
-#&gt; Running resample 100/500.
-#&gt; Running resample 200/500.
-#&gt; Running resample 300/500.
-#&gt; Running resample 400/500.
-#&gt; Running resample 500/500.</div><div class='input'><span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'><a href='run_sceptre_gRNA_gene_pair.html'>run_sceptre_gRNA_gene_pair</a></span><span class='op'>(</span>expressions <span class='op'>=</span> <span class='va'>expressions</span>,
+<span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'><a href='run_sceptre_gRNA_gene_pair.html'>run_sceptre_gRNA_gene_pair</a></span><span class='op'>(</span>expressions <span class='op'>=</span> <span class='va'>expressions</span>,
 gRNA_indicators <span class='op'>=</span> <span class='va'>gRNA_indicators</span>,
 covariate_matrix <span class='op'>=</span> <span class='va'>covariate_matrix</span>,
 reduced_output <span class='op'>=</span> <span class='cn'>FALSE</span>,
-seed <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running gRNA precomputation.
-#&gt; Running gene precomputation.
-#&gt; Running resample 100/500.
-#&gt; Running resample 200/500.
-#&gt; Running resample 300/500.
-#&gt; Running resample 400/500.
-#&gt; Running resample 500/500.</div><div class='input'><span class='fu'>plot_skew_t</span><span class='op'>(</span><span class='va'>result</span><span class='op'>$</span><span class='va'>resampled_z_values</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>z_value</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>skew_t_mle</span><span class='op'>)</span>
+seed <span class='op'>=</span> <span class='fl'>4</span>,
+verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='fu'>plot_skew_t</span><span class='op'>(</span><span class='va'>result</span><span class='op'>$</span><span class='va'>resampled_z_values</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>z_value</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>skew_t_mle</span><span class='op'>)</span>
 </div><div class='img'><img src='plot_skew_t-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
