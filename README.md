@@ -33,3 +33,6 @@ the following command:
 
     install.packages("devtools")
     devtools::install_github("timothy-barry/sceptre")
+
+Browse the source code on Github
+[here](https://github.com/timothy-barry/sceptre).
