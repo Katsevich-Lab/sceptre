@@ -3,6 +3,7 @@
 export(collect_results)
 export(create_and_store_dictionaries)
 export(initialize_directories)
+export(plot_skew_t)
 export(regularize_gene_sizes_at_scale)
 export(run_gRNA_gene_pair_analysis_at_scale)
 export(run_gRNA_precomputation_at_scale)

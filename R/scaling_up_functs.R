@@ -21,9 +21,14 @@ deactivate_sink <- function() {
 
 #' Initialize directories
 #'
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
+#' Initializes the offsite directory structure.
+#'
 #' @param storage_location file path to a directory in which to store the intermediate and final results
 #'
-#' @return named vector containing the file paths of the gene_precomp_dir, gRNA_precomp_dir, results_dir, and log_dir.
+#' @return named vector containing the file paths of gene_precomp_dir, gRNA_precomp_dir, results_dir, and log_dir.
 #' @export
 initialize_directories <- function(storage_location) {
   if (!dir.exists(storage_location)) dir.create(storage_location, recursive = TRUE)
@@ -42,7 +47,6 @@ initialize_directories <- function(storage_location) {
 #'
 #' @param ids the names of elements (gRNAs or genes)
 #' @param pod_size size of the pods
-#' @param precomp_base_filename base name of the file (specified with full file path) in which to store the precomputation.
 #'
 #' @noRd
 create_dictionary <- function(ids, pod_size) {
@@ -61,9 +65,13 @@ create_dictionary <- function(ids, pod_size) {
 
 #' Create and store dictionaries
 #'
-#' We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps. This file creates those dictionaries and stores them in the appropriate locations on disk.
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
 #'
-#' @param gene_gRNA_pairs a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should be "gene_id" and "gRNA_id."
+#' We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps.
+#' This file creates those dictionaries and stores them in the appropriate locations on disk.
+#'
+#' @param gene_gRNA_pairs a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should include "gene_id" and "gRNA_id."
 #' @param gene_precomp_dir the directory in which to store the gene precomputations
 #' @param gRNA_precomp_dir the directory in which to store the gRNA precomputations
 #' @param results_dir the directory in which to store the results
@@ -114,13 +122,17 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 
 #' Run gRNA precomputation at scale
 #'
-#' This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id). It stores the result in the gRNA precomputation directory.
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
+#' This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id).
+#' It stores the result in the gRNA precomputation directory.
 #'
 #' @param pod_id ID of the pod for which to do the precomputation
 #' @param gRNA_precomp_dir file path to the gRNA precomputation directory
-#' @param gRNA_indicator_matrix_fp filepath to the gRNA indicator matrix
+#' @param perturbation_matrix the matrix of perturbations, stored as an ondisc_matrix
 #' @param covariate_matrix the cell-specific covariate matrix
-#' @param cell_subset an integer vector specifying the cells on which to fit the model
+#' @param log_dir file path to the log directory
 #'
 #' @return NULL
 #' @export
@@ -147,7 +159,11 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbat
 
 #' Run_gene_precomputation_at_scale_round_1
 #'
-#' This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate and log geometric mean of each gene. It saves the results in the gene_precomp directory.
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
+#' This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate
+#' and log geometric mean of each gene. It saves the results in the gene_precomp directory.
 #'
 #' @param pod_id pod id
 #' @param gene_precomp_dir location of the gene precomputation directory
@@ -192,6 +208,11 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, e
 
 #' Regularize genes at scale
 #'
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
+#' Regularizes the estimated gene sizes.
+#'
 #' @param gene_precomp_dir location of the gene precomputation directory
 #' @param log_dir location of the directory in which to sink the log file
 #' @param regularization_amount amount of regularization to apply to thetas (>= 0)
@@ -221,14 +242,16 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 
 #' Run gene precomputation at scale round 2
 #'
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
 #' Runs the second round of gene precomputations.
 #'
 #' @param pod_id pod id
 #' @param gene_precomp_dir gene precomp dir
-#' @param cell_gene_expression_matrix cell gene expression matrix
-#' @param ordered_gene_ids ordered gene ids
+#' @param expression_matrix the gene expression matrix, stored as an ondisc_matrix
 #' @param covariate_matrix covariate matrix
-#' @param cell_subset cell subset
+#' @param regularization_amount the amount of regularization to apply to the estimated negative binomial size parameters
 #' @param log_dir directory in which to sink the logs
 #'
 #' @export
@@ -258,18 +281,19 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 
 #' Run gRNA-gene pair analysis at scale
 #'
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
 #' Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
 #'
 #' @param pod_id id of the pod to compute
 #' @param gene_precomp_dir the directory containing the results of the gene precomputation
 #' @param gRNA_precomp_dir the directory containing the results of the gRNA precomputation
 #' @param results_dir directory in which to store the results
-#' @param cell_gene_expression_matrix an FBM containing the cell-by-gene expressions
-#' @param ordered_gene_ids the gene ids of the cell-gene expression matrix
-#' @param gRNA_indicator_matrix_fp a file-path to the gRNA indicator matrix (assumed to be stored as a .fst file)
+#' @param expression_matrix the expression matrix, stored as an ondisc_matrix
+#' @param perturbation_matrix the matrix of perturbations, stored as an ondisc_matrix
 #' @param covariate_matrix the cell-covariate matrix
 #' @param regularization_amount amount of regularuzation to apply to thetas
-#' @param cell_subset (optional) an integer vector containing the cells to subset
 #' @param B number of bootstrap resamples (default 500)
 #' @param log_dir (optional) directory in which to sink the log file
 #' @param seed (optional) seed to pass to the randomization algorithm
@@ -321,10 +345,12 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 
 #' Collect results
 #'
-#' Collates the individual results files into a single result file. An additional column, adjusted p-value (obtained through BH), is added to the data frame.
+#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+#'
+#' Collates the individual results files into a single result file.
 #'
 #' @param results_dir the directory containing the results
-#' @param save_to_disk (boolean) save the collated results to the results directory? (default true)
 #'
 #' @return the collated results data frame.
 #' @export

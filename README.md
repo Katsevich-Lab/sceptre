@@ -22,7 +22,9 @@ misspecified.
 
 Tutorials available on the [package
 website](https://timothy-barry.github.io/sceptre/) demonstrate how to
-apply `sceptre` to small and large datasets.
+apply `sceptre` to small and
+[large](https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html)
+datasets.
 
 # Installation
 

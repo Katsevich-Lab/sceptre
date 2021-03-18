@@ -20,3 +20,14 @@ navbar:
     menu:
     - text: "sceptre at scale"
       href: articles/sceptre-at-scale.html
+    - text: "sceptre on small data"
+      href: articles/sceptre-small-example.html
+
+reference:
+- title: Running a small analysis
+  contents:
+  - run_sceptre_gRNA_gene_pair
+
+- title: Plotting
+  contents:
+  - plot_skew_t

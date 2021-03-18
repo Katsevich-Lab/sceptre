@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • sceptre</title>
+<title>Plot skew-t — plot_skew_t • sceptre</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Plot skew-t — plot_skew_t" />
+<meta property="og:description" content="Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -111,20 +112,73 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Plot skew-t</h1>
+    
+    <div class="hidden name"><code>plot_skew_t.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="sceptre-at-scale.html">`sceptre` at scale</a></dt>
-        <dd></dt>
-        <dt><a href="sceptre-small-example.html">Applying `sceptre` to small a small dataset</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic.</p>
     </div>
+
+    <pre class="usage"><span class='fu'>plot_skew_t</span><span class='op'>(</span><span class='va'>resampled_zvalues</span>, <span class='va'>original_zvalue</span>, <span class='va'>dp</span>, interval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>4</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>resampled_zvalues</th>
+      <td><p>the set of resampled z-values</p></td>
+    </tr>
+    <tr>
+      <th>original_zvalue</th>
+      <td><p>the z value of the original negative binomial fit</p></td>
+    </tr>
+    <tr>
+      <th>dp</th>
+      <td><p>the skew-t fit MLE</p></td>
+    </tr>
+    <tr>
+      <th>interval</th>
+      <td><p>(optional; default c(-4,4)) interval over which to plot the skew-t distribution</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>a ggplot object containing the plot</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>expressions</span><span class='op'>)</span>
+<span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>gRNA_indicators</span><span class='op'>)</span>
+<span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>covariate_matrix</span><span class='op'>)</span>
+<span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'><a href='run_sceptre_gRNA_gene_pair.html'>run_sceptre_gRNA_gene_pair</a></span><span class='op'>(</span><span class='va'>expressions</span>,
+<span class='va'>gRNA_indicators</span>,
+<span class='va'>covariate_matrix</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Running gRNA precomputation.
+#&gt; Running gene precomputation.
+#&gt; Running resample 100/500.
+#&gt; Running resample 200/500.
+#&gt; Running resample 300/500.
+#&gt; Running resample 400/500.
+#&gt; Running resample 500/500.</div><div class='input'><span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'><a href='run_sceptre_gRNA_gene_pair.html'>run_sceptre_gRNA_gene_pair</a></span><span class='op'>(</span>expressions <span class='op'>=</span> <span class='va'>expressions</span>,
+gRNA_indicators <span class='op'>=</span> <span class='va'>gRNA_indicators</span>,
+covariate_matrix <span class='op'>=</span> <span class='va'>covariate_matrix</span>,
+reduced_output <span class='op'>=</span> <span class='cn'>FALSE</span>,
+seed <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Running gRNA precomputation.
+#&gt; Running gene precomputation.
+#&gt; Running resample 100/500.
+#&gt; Running resample 200/500.
+#&gt; Running resample 300/500.
+#&gt; Running resample 400/500.
+#&gt; Running resample 500/500.</div><div class='input'><span class='fu'>plot_skew_t</span><span class='op'>(</span><span class='va'>result</span><span class='op'>$</span><span class='va'>resampled_z_values</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>z_value</span>, <span class='va'>result</span><span class='op'>$</span><span class='va'>skew_t_mle</span><span class='op'>)</span>
+</div><div class='img'><img src='plot_skew_t-1.png' alt='' width='700' height='433' /></div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

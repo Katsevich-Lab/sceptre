@@ -18,16 +18,18 @@ run_gene_precomputation_at_scale_round_2(
 
 \item{gene_precomp_dir}{gene precomp dir}
 
+\item{expression_matrix}{the gene expression matrix, stored as an ondisc_matrix}
+
 \item{covariate_matrix}{covariate matrix}
 
+\item{regularization_amount}{the amount of regularization to apply to the estimated negative binomial size parameters}
+
 \item{log_dir}{directory in which to sink the logs}
-
-\item{cell_gene_expression_matrix}{cell gene expression matrix}
-
-\item{ordered_gene_ids}{ordered gene ids}
-
-\item{cell_subset}{cell subset}
 }
 \description{
+NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+}
+\details{
 Runs the second round of gene precomputations.
 }

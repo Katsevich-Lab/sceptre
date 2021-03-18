@@ -30,10 +30,13 @@ Imports:
     fst,
     dplyr,
     magrittr,
-    purrr
+    purrr,
+    ondisc
 Depends: 
     R (>= 3.5)
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    tidyr,
+    ggplot2
 VignetteBuilder: knitr
