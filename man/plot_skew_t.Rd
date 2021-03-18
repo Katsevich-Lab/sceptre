@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plot_skew_t}
 \alias{plot_skew_t}
-\title{Plot resampled test statistics over skew-t distribution}
+\title{Plot resampled test statistics over fitted skew-t distribution}
 \usage{
 plot_skew_t(resampled_zvalues, original_zvalue, dp, interval = c(-4, 4))
 }

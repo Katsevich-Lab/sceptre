@@ -1,4 +1,4 @@
-#' Plot resampled test statistics over skew-t distribution
+#' Plot resampled test statistics over fitted skew-t distribution
 #'
 #' Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic.
 #'

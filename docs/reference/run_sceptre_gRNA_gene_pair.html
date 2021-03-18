@@ -142,7 +142,7 @@
     </tr>
     <tr>
       <th>gRNA_indicators</th>
-      <td><p>a vector of gRNA inicators</p></td>
+      <td><p>a vector of gRNA indicators</p></td>
     </tr>
     <tr>
       <th>covariate_matrix</th>
@@ -162,7 +162,7 @@
     </tr>
     <tr>
       <th>seed</th>
-      <td><p>(optional; default 4) seed to the random number generator</p></td>
+      <td><p>(optional; default 4) seed of the random number generator</p></td>
     </tr>
     <tr>
       <th>reduced_output</th>
@@ -176,7 +176,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, return a list containing all of the above, plus the vector of resampled test statistics.</p>
+    <p>If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, a list containing all of the above, plus the vector of resampled test statistics.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>expressions</span><span class='op'>)</span>
@@ -184,14 +184,13 @@
 <span class='fu'><a href='data.html'>data</a></span><span class='op'>(</span><span class='va'>covariate_matrix</span><span class='op'>)</span>
 <span class='va'>result</span> <span class='op'>&lt;-</span> <span class='fu'>run_sceptre_gRNA_gene_pair</span><span class='op'>(</span><span class='va'>expressions</span>,
 <span class='va'>gRNA_indicators</span>,
-<span class='va'>covariate_matrix</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running gRNA precomputation.
-#&gt; Running gene precomputation.
-#&gt; Running resample 100/500.
-#&gt; Running resample 200/500.
-#&gt; Running resample 300/500.
-#&gt; Running resample 400/500.
-#&gt; Running resample 500/500.</div></pre>
+<span class='va'>covariate_matrix</span>,
+verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+<span class='va'>result</span>
+</div><div class='output co'>#&gt;     p_value skew_t_fit_success        xi    omega      alpha       nu
+#&gt; 1 0.1952004               TRUE 0.8196897 1.021334 -0.3667235 59745.98
+#&gt;      z_value n_successful_resamples
+#&gt; 1 -0.3037842                    500</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
