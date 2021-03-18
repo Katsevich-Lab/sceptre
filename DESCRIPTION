@@ -31,7 +31,9 @@ Imports:
     dplyr,
     magrittr,
     purrr,
-    ondisc
+    ondisc,
+    Rhdf5lib,
+    rhdf5
 Depends: 
     R (>= 3.5)
 Suggests: 
