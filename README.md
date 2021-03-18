@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![R build
+status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
 
 Single-cell CRISPR screens provide unprecedented insight into gene
