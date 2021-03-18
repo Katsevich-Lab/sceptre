@@ -19,7 +19,7 @@ run_sceptre_gRNA_gene_pair(
 \arguments{
 \item{expressions}{a vector a gene expressions}
 
-\item{gRNA_indicators}{a vector of gRNA inicators}
+\item{gRNA_indicators}{a vector of gRNA indicators}
 
 \item{covariate_matrix}{the data frame of cell-specific covariates}
 
@@ -29,25 +29,25 @@ run_sceptre_gRNA_gene_pair(
 
 \item{B}{(optional; default 500) number of conditional randomization test resamples}
 
-\item{seed}{(optional; default 4) seed to the random number generator}
+\item{seed}{(optional; default 4) seed of the random number generator}
 
 \item{reduced_output}{(optional; default TRUE) return the reduced output?}
 
 \item{verbose}{(optional; default TRUE) print status updates?}
 }
 \value{
-If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, return a list containing all of the above, plus the vector of resampled test statistics.
+If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, a list containing all of the above, plus the vector of resampled test statistics.
 }
 \description{
 Runs SCEPTRE on a given gRNA-gene pair. The function requires as arguments the gene expression vector, the gRNA indicator vector, and the covariate matrix.
 }
 \examples{
-\dontrun{
 data(expressions)
 data(gRNA_indicators)
 data(covariate_matrix)
 result <- run_sceptre_gRNA_gene_pair(expressions,
 gRNA_indicators,
-covariate_matrix)
-}
+covariate_matrix,
+verbose = FALSE)
+result
 }

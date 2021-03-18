@@ -17,12 +17,17 @@ run_gRNA_precomputation_at_scale(
 
 \item{gRNA_precomp_dir}{file path to the gRNA precomputation directory}
 
+\item{perturbation_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
+
 \item{covariate_matrix}{the cell-specific covariate matrix}
 
-\item{gRNA_indicator_matrix_fp}{filepath to the gRNA indicator matrix}
-
-\item{cell_subset}{an integer vector specifying the cells on which to fit the model}
+\item{log_dir}{file path to the log directory}
 }
 \description{
-This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id). It stores the result in the gRNA precomputation directory.
+NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+}
+\details{
+This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id).
+It stores the result in the gRNA precomputation directory.
 }

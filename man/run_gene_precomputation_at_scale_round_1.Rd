@@ -27,5 +27,10 @@ run_gene_precomputation_at_scale_round_1(
 \item{log_dir}{directory in which to sink the log file}
 }
 \description{
-This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate and log geometric mean of each gene. It saves the results in the gene_precomp directory.
+NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+}
+\details{
+This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate
+and log geometric mean of each gene. It saves the results in the gene_precomp directory.
 }

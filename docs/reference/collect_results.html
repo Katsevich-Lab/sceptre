@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Collect results — collect_results" />
-<meta property="og:description" content="Collates the individual results files into a single result file. An additional column, adjusted p-value (obtained through BH), is added to the data frame." />
+<meta property="og:description" content="NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE &quot;AT-SCALE&quot; BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html" />
 
 
 
@@ -91,6 +92,9 @@
     <li>
       <a href="../articles/sceptre-at-scale.html">sceptre at scale</a>
     </li>
+    <li>
+      <a href="../articles/sceptre-small-example.html">sceptre on small data</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -115,7 +119,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Collates the individual results files into a single result file. An additional column, adjusted p-value (obtained through BH), is added to the data frame.</p>
+    <p>NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html</p>
     </div>
 
     <pre class="usage"><span class='fu'>collect_results</span><span class='op'>(</span><span class='va'>results_dir</span><span class='op'>)</span></pre>
@@ -127,15 +132,14 @@
       <th>results_dir</th>
       <td><p>the directory containing the results</p></td>
     </tr>
-    <tr>
-      <th>save_to_disk</th>
-      <td><p>(boolean) save the collated results to the results directory? (default true)</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>the collated results data frame.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Collates the individual results files into a single result file.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

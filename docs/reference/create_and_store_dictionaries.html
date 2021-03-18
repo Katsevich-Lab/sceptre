@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Create and store dictionaries — create_and_store_dictionaries" />
-<meta property="og:description" content="We require a few bookkeeping files (that we call &quot;dictionaries&quot;) for the gRNA and gene precomputation steps. This file creates those dictionaries and stores them in the appropriate locations on disk." />
+<meta property="og:description" content="NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE &quot;AT-SCALE&quot; BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html" />
 
 
 
@@ -91,6 +92,9 @@
     <li>
       <a href="../articles/sceptre-at-scale.html">sceptre at scale</a>
     </li>
+    <li>
+      <a href="../articles/sceptre-small-example.html">sceptre on small data</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -115,7 +119,8 @@
     </div>
 
     <div class="ref-description">
-    <p>We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps. This file creates those dictionaries and stores them in the appropriate locations on disk.</p>
+    <p>NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html</p>
     </div>
 
     <pre class="usage"><span class='fu'>create_and_store_dictionaries</span><span class='op'>(</span>
@@ -131,7 +136,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>gene_gRNA_pairs</th>
-      <td><p>a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should be "gene_id" and "gRNA_id."</p></td>
+      <td><p>a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should include "gene_id" and "gRNA_id."</p></td>
     </tr>
     <tr>
       <th>gene_precomp_dir</th>
@@ -154,6 +159,10 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>an integer vector containing the number of pods in the gene, gRNA, and pairs dictionaries.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps.
+This file creates those dictionaries and stores them in the appropriate locations on disk.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

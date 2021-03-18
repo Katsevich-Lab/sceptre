@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="Run gRNA-gene pair analysis at scale — run_gRNA_gene_pair_analysis_at_scale" />
-<meta property="og:description" content="Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs." />
+<meta property="og:description" content="NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE &quot;AT-SCALE&quot; BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html" />
 
 
 
@@ -91,6 +92,9 @@
     <li>
       <a href="../articles/sceptre-at-scale.html">sceptre at scale</a>
     </li>
+    <li>
+      <a href="../articles/sceptre-small-example.html">sceptre on small data</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -115,7 +119,8 @@
     </div>
 
     <div class="ref-description">
-    <p>Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.</p>
+    <p>NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html</p>
     </div>
 
     <pre class="usage"><span class='fu'>run_gRNA_gene_pair_analysis_at_scale</span><span class='op'>(</span>
@@ -157,6 +162,14 @@
       <td><p>(optional) directory in which to sink the log file</p></td>
     </tr>
     <tr>
+      <th>expression_matrix</th>
+      <td><p>the expression matrix, stored as an ondisc_matrix</p></td>
+    </tr>
+    <tr>
+      <th>perturbation_matrix</th>
+      <td><p>the matrix of perturbations, stored as an ondisc_matrix</p></td>
+    </tr>
+    <tr>
       <th>covariate_matrix</th>
       <td><p>the cell-covariate matrix</p></td>
     </tr>
@@ -176,24 +189,11 @@
       <th>B</th>
       <td><p>number of bootstrap resamples (default 500)</p></td>
     </tr>
-    <tr>
-      <th>cell_gene_expression_matrix</th>
-      <td><p>an FBM containing the cell-by-gene expressions</p></td>
-    </tr>
-    <tr>
-      <th>ordered_gene_ids</th>
-      <td><p>the gene ids of the cell-gene expression matrix</p></td>
-    </tr>
-    <tr>
-      <th>gRNA_indicator_matrix_fp</th>
-      <td><p>a file-path to the gRNA indicator matrix (assumed to be stored as a .fst file)</p></td>
-    </tr>
-    <tr>
-      <th>cell_subset</th>
-      <td><p>(optional) an integer vector containing the cells to subset</p></td>
-    </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

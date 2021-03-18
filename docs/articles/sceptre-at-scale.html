@@ -50,6 +50,9 @@
 <li>
       <a href="../articles/sceptre-at-scale.html">sceptre at scale</a>
     </li>
+    <li>
+      <a href="../articles/sceptre-small-example.html">sceptre on small data</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -81,15 +84,16 @@
 <div id="important-note" class="section level1">
 <h1 class="hasAnchor">
 <a href="#important-note" class="anchor"></a>Important note</h1>
-<p><code>sceptre</code> is powered under the hood by <code>ondisc</code>, an R package that enables fast, universal, and intuitive computing on large-scale single-cell data. If you would like to apply at-scale <code>sceptre</code> to your own data, you must (i) convert your gene expression and gRNA perturbation data into <code>ondisc_matrix</code> objects, (ii) produce a list of gene-gRNA pairs to analyze, and (iii) compute the cell-specific matrix of technical factors. Please see the tutorial “<a href="https://timothy-barry.github.io/ondisc/articles/setting_up_a_crispr_screen.html">Setting up a single-cell pooled CRISPR screen</a>,” located on the <code>ondisc</code> website, for instructions on how to do this.</p>
+<p><code>sceptre</code> is powered under the hood by <code>ondisc</code>, an R package that enables fast, universal, and intuitive computing on large-scale single-cell data. If you would like to apply at-scale <code>sceptre</code> to your own data, you must (i) convert your gene expression and gRNA perturbation data into <code>ondisc_matrix</code> objects, (ii) produce a list of gene-gRNA pairs to analyze, and (iii) compute the cell-specific matrix of technical factors. Please see the tutorial “<a href="https://timothy-barry.github.io/ondisc/articles/setting_up_a_crispr_screen.html">Setting up a single-cell pooled CRISPR screen</a>,” located on the <code>ondisc</code> <a href="https://timothy-barry.github.io/ondisc/">website</a>, for instructions on how to do this.</p>
 <p>If you have completed the above tutorial, you can work through the entirety of this vignette. If not, you can work through sections 1-3 of this vignette, which demonstrate how to run <code>sceptre</code> at scale on a small, example dataset that ships with the package.</p>
 </div>
 <div id="obtaining-the-scripts" class="section level1">
 <h1 class="hasAnchor">
 <a href="#obtaining-the-scripts" class="anchor"></a>1. Obtaining the scripts</h1>
 <p>First, ensure that you have downloaded and installed <code>sceptre</code>.</p>
-<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")
-devtools::install_github("timothy-barry/sceptre")</a></code></pre>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"timothy-barry/sceptre"</span><span class="op">)</span></code></pre></div>
 <p>Next, open the terminal and navigate to a directory in which you would like to run the analysis. For example:</p>
 <pre><code># in terminal
 mkdir ~/my_sceptre_dir
@@ -109,7 +113,7 @@ ls # view sceptre_at_scale.bash and param_file.R</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">#param_file.R</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/ondisc/">ondisc</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span>
 <span class="va">param_funct</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">param</span><span class="op">)</span> <span class="op">{</span>
         <span class="kw"><a href="https://rdrr.io/r/base/switch.html">switch</a></span><span class="op">(</span><span class="va">param</span>,
                <span class="co"># modify the parameters below</span>
@@ -147,25 +151,22 @@ ls # view sceptre_at_scale.bash and param_file.R</code></pre>
 </ul>
 <p>By default, <code>param_file.R</code> contains example data that ship with <code>sceptre</code>. <code>expression_matrix</code> and <code>perturbation_matrix</code> are small gene expression and gRNA perturbation matrices, respectively, sampled from Gasperini et al. 2019.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/ondisc/">ondisc</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
-<span class="va">expression_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
+<code class="sourceCode R"><span class="va">expression_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://timothy-barry.github.io/ondisc//reference/ondisc_matrix.html">ondisc_matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
                                  <span class="st">"expressions.h5"</span>,
-                                 package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://timothy-barry.github.io/ondisc//reference/ondisc_matrix.html">ondisc_matrix</a></span><span class="op">(</span><span class="op">)</span>
+                                 package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">expression_matrix</span></code></pre></div>
 <pre><code>## An ondisc_matrix with 5 features and 205797 cells.</code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
+<code class="sourceCode R"><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://timothy-barry.github.io/ondisc//reference/ondisc_matrix.html">ondisc_matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
                                    <span class="st">"perturbations.h5"</span>,
-                                   package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://timothy-barry.github.io/ondisc//reference/ondisc_matrix.html">ondisc_matrix</a></span><span class="op">(</span><span class="op">)</span>
+                                   package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">perturbation_matrix</span></code></pre></div>
 <pre><code>## An ondisc_matrix with 4 features and 205797 cells.</code></pre>
 <p><code>covariate_matrix</code> stores the cell-specific technical factors for <code>expression_matrix</code> and <code>perturbation_matrix</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">covariate_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
+<code class="sourceCode R"><span class="va">covariate_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
                                 <span class="st">"covariate_matrix.rds"</span>,
-                                package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="op">)</span>
+                                package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span></code></pre></div>
 <pre><code>##        p_mito   prep_batch lg_total_umis lg_guide_count lg_n_genes
 ## 1 0.058786706 prep_batch_1      9.774062       4.204693   8.174421
@@ -176,9 +177,9 @@ ls # view sceptre_at_scale.bash and param_file.R</code></pre>
 ## 6 0.022356681 prep_batch_1      9.185125       4.043051   7.690286</code></pre>
 <p>Finally, <code>gene_gRNA_pairs</code> contains a list of gene-gRNA pairs for which we seek <em>p</em>-values.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gene_gRNA_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
+<code class="sourceCode R"><span class="va">gene_gRNA_pairs</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>,
                                <span class="st">"gene_gRNA_pairs.rds"</span>,
-                               package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="op">)</span>
+                               package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gene_gRNA_pairs</span><span class="op">)</span></code></pre></div>
 <pre><code>##           gene_id            gRNA_id
 ## 1 ENSG00000237683 chr11.2465_top_two
@@ -222,14 +223,13 @@ cat gene_precomp_round_1_pod_1.Rout</code></pre>
 <pre><code># in terminal
 cd ~/my_sceptre_dir/at_scale_scripts
 cp param_file.R param_file_big.R</code></pre>
-<p>Next, we open the file <code>param_file_big.R</code> and update the fields withinin the <code>switch</code> statement. Be sure to change the file path of <code>example_dir</code> so that it matches <code>example_dir</code> in “Setting up a single-cell pooled CRISPR screen.” (See the first code block in Section 1 of that tutorial.)</p>
+<p>Next, we open the file <code>param_file_big.R</code> and update the fields withinin the <code>switch</code> statement. Be sure to change the file path of <code>example_dir</code> so that it matches the <code>example_dir</code> you defined in “Setting up a single-cell pooled CRISPR screen.” (See the first code block in Section 1 of that tutorial.)</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># param_file_big.R</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/ondisc/">ondisc</a></span><span class="op">)</span>
 <span class="va">example_dir</span> <span class="op">&lt;-</span> <span class="st">"/Volumes/tims_new_drive/research/sceptre_example"</span> <span class="co"># change me!</span>
 
 <span class="va">processed_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">example_dir</span>, <span class="st">"/processed_data"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/ondisc/">ondisc</a></span><span class="op">)</span>
 <span class="va">param_funct</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">param</span><span class="op">)</span> <span class="op">{</span>
         <span class="kw"><a href="https://rdrr.io/r/base/switch.html">switch</a></span><span class="op">(</span><span class="va">param</span>,
                <span class="co"># modify the parameters below</span>
@@ -248,7 +248,7 @@ cp param_file.R param_file_big.R</code></pre>
 <p>We run <code>sceptre</code> on the parameters defined in this file by calling <code>bash</code> on <code>sceptre_at_scale.bash</code>, passing <code>param_file_big.R</code> as a command line argument.</p>
 <pre><code># in terminal
 bash sceptre_at_scale.bash param_file_big.R</code></pre>
-<p>This program takes about 15 minutes to run on a Macbook Pro. There might be several warnings produced by “vglm.fitter” about convergence. These warnings are related to the gene expression regressions and are safe to ignore, as the validity of <code>sceptre</code> does not depend on an accurate model for gene expression. There additionally might be several warnings produced by “st.infoUv” about “score not quite 0.” These warnings are related to the skew-t fit of the resampled test statistics and likewise are safe to ignore, as the score (i.e., gradient of the log-likelihood) need not be exactly 0 to get an accurate <em>p</em>-value.</p>
+<p>This program takes about 15 minutes to run on a Macbook Pro. There might be several warnings produced by “vglm.fitter” about convergence. These warnings are related to the gene expression regressions and are safe to ignore, as the validity of <code>sceptre</code> does not depend on an accurate model for gene expression. There additionally might be several warnings produced by “st.infoUv” about “score not quite 0.” These warnings are related to the skew-t fit of the resampled test statistics and likewise are safe to ignore, as the score (i.e., gradient of the log-likelihood) does not need to be exactly 0 for the <em>p</em>-value to be accurate.</p>
 <p>The results of the analysis are stored in example_dir/storage_dir/results.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">example_dir</span>, <span class="st">"/storage_dir/results/all_results.rds"</span><span class="op">)</span>

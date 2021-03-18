@@ -30,6 +30,10 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{log_dir}{(optional) directory in which to sink the log file}
 
+\item{expression_matrix}{the expression matrix, stored as an ondisc_matrix}
+
+\item{perturbation_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
+
 \item{covariate_matrix}{the cell-covariate matrix}
 
 \item{regularization_amount}{amount of regularuzation to apply to thetas}
@@ -39,15 +43,11 @@ run_gRNA_gene_pair_analysis_at_scale(
 \item{seed}{(optional) seed to pass to the randomization algorithm}
 
 \item{B}{number of bootstrap resamples (default 500)}
-
-\item{cell_gene_expression_matrix}{an FBM containing the cell-by-gene expressions}
-
-\item{ordered_gene_ids}{the gene ids of the cell-gene expression matrix}
-
-\item{gRNA_indicator_matrix_fp}{a file-path to the gRNA indicator matrix (assumed to be stored as a .fst file)}
-
-\item{cell_subset}{(optional) an integer vector containing the cells to subset}
 }
 \description{
+NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+}
+\details{
 Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
 }

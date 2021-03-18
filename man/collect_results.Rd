@@ -8,12 +8,14 @@ collect_results(results_dir)
 }
 \arguments{
 \item{results_dir}{the directory containing the results}
-
-\item{save_to_disk}{(boolean) save the collated results to the results directory? (default true)}
 }
 \value{
 the collated results data frame.
 }
 \description{
-Collates the individual results files into a single result file. An additional column, adjusted p-value (obtained through BH), is added to the data frame.
+NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
+WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
+}
+\details{
+Collates the individual results files into a single result file.
 }
