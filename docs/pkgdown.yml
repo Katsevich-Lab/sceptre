@@ -2,9 +2,8 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  sceptre-at-scale: sceptre-at-scale.html
   sceptre-small-example: sceptre-small-example.html
-last_built: 2021-03-18T02:27Z
+last_built: 2021-03-20T18:14Z
 urls:
   reference: timothy-barry.github.io/sceptre//reference
   article: timothy-barry.github.io/sceptre//articles

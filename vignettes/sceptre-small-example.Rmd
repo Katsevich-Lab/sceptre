@@ -37,7 +37,7 @@ data("gRNA_indicators")
 data("covariate_matrix")
 ```
 
-The *expressions* vector contains the gene expressions (in number of UMIs); the *gRNA_indicator* vector records whether the gRNA was detected or not detected in a given cell; and the *covariate_matrix* records cell-specific technical factors (in this case, (i) fraction of UMIs that map to mitochondrial genes, (ii) sequencing batch, (iii) log-transformed total UMI count across genes, (iv) log-transformed total number of detected gRNAs, and (v) log-transformed total genes expressed). There are 205,797 cells in the data. Let's take a peek at the data by calling *head*.
+The `expressions` vector contains the gene expressions (in number of UMIs); the `gRNA_indicator` vector records whether the gRNA was detected or not detected in a given cell; and the `covariate_matrix` records cell-specific technical factors (in this case, (i) fraction of UMIs that map to mitochondrial genes, (ii) sequencing batch, (iii) log-transformed total UMI count across genes, (iv) log-transformed total number of detected gRNAs, and (v) log-transformed total genes expressed). There are 205,797 cells in the data. Let's take a peek at the data by calling `head`.
 
 ```{r}
 head(expressions)

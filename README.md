@@ -24,7 +24,9 @@ misspecified.
 
 Tutorials available on the [package
 website](https://timothy-barry.github.io/sceptre/) demonstrate how to
-apply `sceptre` to small and
+apply `sceptre` to
+[small](https://timothy-barry.github.io/sceptre/articles/sceptre-small-example.html)
+and
 [large](https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html)
 datasets.
 
