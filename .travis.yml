@@ -1,2 +1,2 @@
-language: R
-cache: packages
+language: r
+r: bioc-devel
