@@ -33,7 +33,7 @@ Imports:
     purrr,
     ondisc
 Depends: 
-    R (>= 4.1)
+    R (>= 3.5)
 Suggests: 
     knitr,
     rmarkdown,
