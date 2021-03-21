@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 # `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" alt="" width="180" />
 
 <!-- badges: start -->
-[![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
+<!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
 
 Single-cell CRISPR screens provide unprecedented insight into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. `sceptre` (pronounced "scepter") is a methodology and associated R package for rigorously identifying regulatory relationships in high multiplicity-of-infection single-cell CRISPR screens. For a given gRNA and gene, `sceptre` produces a well-calibrated *p*-value for the null hypothesis that the gRNA has no impact on the expression of the gene. `sceptre` is robust and reliable: it seamlessly accounts for technical factors (e.g., sequencing batch and sequencing depth) and works well even when the expression model is misspecified.
