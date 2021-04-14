@@ -201,12 +201,13 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' verbose = FALSE)
 #' result
 run_sceptre_gRNA_gene_pair <- function(expressions, gRNA_indicators, covariate_matrix, side = "left", gene_precomp_size = NULL, B = 500, seed = NULL, reduced_output = TRUE, verbose = TRUE) {
-  if (verbose) cat(paste0("Running gRNA precomputation.\n"))
+  if (verbose) cat("Running gRNA precomputation.\n")
   gRNA_precomp <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix)
 
-  if (verbose) cat(paste0("Running gene precomputation.\n"))
+  if (verbose) cat("Running gene precomputation.\n")
   gene_precomp <- run_gene_precomputation(expressions, covariate_matrix, gene_precomp_size)
 
+  if (verbose) cat("Running CRT")
   out <- run_sceptre_using_precomp(expressions,
                                    gRNA_indicators,
                                    gRNA_precomp,
