@@ -1,4 +1,4 @@
-utils::globalVariables(c("log_theta", "mean_gene_exp", "regularized", "pod_id", "id", "gRNA_id", "gene_id", "offset_file", "size_unreg_file", "precomp_file", "result_file", "geom_mean_file", "curve", "fitted", "gaussian", "lower", "upper", "..density..", "y"))
+utils::globalVariables(c("log_theta", "mean_gene_exp", "regularized", "pod_id", "id", "gRNA_id", "gene_id", "offset_file", "size_unreg_file", "precomp_file", "result_file", "geom_mean_file", "curve", "fitted", "gaussian", "lower", "upper", "..density..", "y", "%dopar%", "foreach", "registerDoParallel"))
 
 #' sceptre
 #'
@@ -6,5 +6,6 @@ utils::globalVariables(c("log_theta", "mean_gene_exp", "regularized", "pod_id", 
 #'
 #' @docType package
 #' @importFrom magrittr %>%
+#' @import methods
 #' @name sceptre
 NULL

@@ -4,10 +4,12 @@
 \alias{collect_results}
 \title{Collect results}
 \usage{
-collect_results(results_dir)
+collect_results(results_dir, return_df = FALSE)
 }
 \arguments{
 \item{results_dir}{the directory containing the results}
+
+\item{return_df}{return the results data frame (in addition to writing it)?}
 }
 \value{
 the collated results data frame.
