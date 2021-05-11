@@ -31,12 +31,15 @@ Imports:
     dplyr,
     magrittr,
     purrr,
-    ondisc
+    ondisc,
+    methods
 Depends: 
     R (>= 3.5)
 Suggests: 
     knitr,
     rmarkdown,
     tidyr,
-    ggplot2
+    ggplot2,
+    foreach,
+    doParallel
 VignetteBuilder: knitr

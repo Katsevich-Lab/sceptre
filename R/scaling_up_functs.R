@@ -139,15 +139,17 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbation_matrix, covariate_matrix, log_dir) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
-  # subset covariate matrix according to cell subset
-
   # determine the gRNAs on which to run the precomputation
   gRNA_dictionary <- fst::read_fst(paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
   gRNA_ids <- gRNA_dictionary %>% dplyr::pull(id) %>% as.character()
   # run the precomputation for each of these gRNAs
   out <- sapply(gRNA_ids, function(gRNA_id) {
     cat(paste0("Running precomputation for gRNA ", gRNA_id, ".\n"))
-    gRNA_indicators <- perturbation_matrix[[gRNA_id,]] %>% as.numeric()
+    gRNA_indicators <- if (is(perturbation_matrix, "matrix")) {
+      perturbation_matrix[gRNA_id,]
+    } else {
+      perturbation_matrix[[gRNA_id,]] %>% as.numeric()
+    }
     run_gRNA_precomputation(gRNA_indicators, covariate_matrix)
   }) %>% as.data.frame()
   # save the result
@@ -180,7 +182,11 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, e
   gene_ids <- gene_dictionary %>% dplyr::pull(id) %>% as.character()
   precomps <- purrr::map(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 1 for gene ", gene_id, ".\n"))
-    expressions <- expression_matrix[[gene_id,]] %>% as.numeric()
+    expressions <- if (is(expression_matrix, "matrix")) {
+      expression_matrix[gene_id,]
+    } else {
+      expression_matrix[[gene_id,]] %>% as.numeric()
+    }
     unreg_size <- run_gene_precomputation(expressions = expressions, covariate_matrix = covariate_matrix, gene_precomp_size = NULL)[["gene_precomp_size"]]
     out <- list()
     out$unreg_size <- unreg_size
@@ -268,7 +274,11 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 
   offsets <- sapply(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 2 for gene ", gene_id, ".\n"))
-    expressions <- expression_matrix[[gene_id,]] %>% as.numeric()
+    expressions <- if (is(expression_matrix, "matrix")) {
+      expression_matrix[gene_id,]
+    } else {
+      expression_matrix[[gene_id,]] %>% as.numeric()
+    }
     dist_offsets <- run_gene_precomputation(expressions = expressions, covariate_matrix = covariate_matrix, gene_precomp_size = gene_sizes[[gene_id]])[["gene_precomp_offsets"]]
     return(dist_offsets)
   }) %>% as.data.frame()
@@ -328,9 +338,16 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
       gene_precomp_size <- readRDS(file = gene_size_loc)[[curr_gene]]
     }
     gRNA_precomp <- fst::read_fst(path = gRNA_prcomp_loc, columns = curr_gRNA) %>% dplyr::pull()
-    expressions <- expression_matrix[[curr_gene,]] %>% as.numeric()
-    gRNA_indicators <- perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
-
+    expressions <- if (is(expression_matrix, "matrix")) {
+      expression_matrix[curr_gene,]
+    } else {
+      expression_matrix[[curr_gene,]] %>% as.numeric()
+    }
+    gRNA_indicators <- if (is(perturbation_matrix, "matrix")) {
+      perturbation_matrix[curr_gRNA,]
+    } else {
+      perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
+    }
     # Run the dCRT
     run_sceptre_using_precomp(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B, seed, TRUE, TRUE)
   })
@@ -351,12 +368,14 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 #' Collates the individual results files into a single result file.
 #'
 #' @param results_dir the directory containing the results
+#' @param return_df return the results data frame (in addition to writing it)?
 #'
 #' @return the collated results data frame.
 #' @export
-collect_results <- function(results_dir) {
+collect_results <- function(results_dir, return_df = FALSE) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)
   all_results <- results_dir %>% paste0("/", to_load) %>% purrr::map(fst::read_fst) %>% purrr::reduce(rbind)
   saveRDS(object = all_results, file = paste0(results_dir, "/all_results.rds"))
+  return(all_results)
 }
