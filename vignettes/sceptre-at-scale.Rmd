@@ -7,11 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette shows how to run `sceptre` at scale in a Linux or Unix environment.
+This vignette shows how to run `sceptre` at scale in a Linux or Unix environment. You should consider this approach if you have a large dataset that does not easily fit into memory. A tutorial explaining how to run `sceptre` across several nodes on a computer cluster is forthcoming.
 
 # Important note
 
-`sceptre` is powered under the hood by `ondisc`, an R package that enables fast, universal, and intuitive computing on large-scale single-cell data. If you would like to apply at-scale `sceptre` to your own data, you must (i) convert your gene expression and gRNA perturbation data into `ondisc_matrix` objects, (ii) produce a list of gene-gRNA pairs to analyze, and (iii) compute the cell-specific matrix of technical factors. Please see the tutorial "[Setting up a single-cell pooled CRISPR screen](https://timothy-barry.github.io/ondisc/articles/setting_up_a_crispr_screen.html)," located on the `ondisc` [website](https://github.com/timothy-barry/ondisc), for instructions on how to do this.
+At-scale `sceptre` is powered under the hood by `ondisc`, an R package that enables fast, universal, and intuitive computing on large-scale single-cell data. If you would like to apply at-scale `sceptre` to your own data, you must (i) convert your gene expression and gRNA perturbation data into `ondisc_matrix` objects, (ii) produce a list of gene-gRNA pairs to analyze, and (iii) compute the cell-specific matrix of technical factors. Please see the tutorial "[Setting up a single-cell pooled CRISPR screen](https://timothy-barry.github.io/ondisc/articles/setting_up_a_crispr_screen.html)," located on the `ondisc` [website](https://github.com/timothy-barry/ondisc), for instructions on how to do this.
 
 If you have completed the above tutorial, you can work through the entirety of this vignette. If not, you can work through sections 1-3 of this vignette, which demonstrate how to run `sceptre` at scale on a small, example dataset that ships with the package.
 
