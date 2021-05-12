@@ -62,9 +62,9 @@ You can browse the source code on Github
 single-cell CRISPR screen analysis.” Preprint available on
 [bioRxiv](https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6).
 
-**Initial application paper**: J Morris, Z Daniloski, J Domingo, T
-Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E
-Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and
-pathways of blood trait loci using pooled CRISPR screens and single cell
-RNA sequencing.” Preprint available on
+**Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M
+Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T
+Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood
+trait loci using pooled CRISPR screens and single cell RNA sequencing.”
+Preprint available on
 [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).
