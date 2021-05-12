@@ -23,16 +23,20 @@ conditional randomization test.
 You can interact with the package in several ways.
 
 **Demo**: A small demo illustrating the core features of `sceptre` is
-available [here](). We recommend working through the demo to get a quick
-(5 minutes) feel for how the method works.
+available
+[here](https://timothy-barry.github.io/sceptre/articles/sceptre-small-example.html).
+We recommend working through the demo to get a quick (5 minutes) feel
+for how the method works.
 
 **Moderately-sized analysis**: If you are running an analysis of
 moderate size (i.e., the data fit into memory and you are using a single
-computer), see the tutorial [running a moderately-sized analysis]().
+computer), see the tutorial [running a moderately-sized
+analysis](https://timothy-barry.github.io/sceptre/articles/sceptre-on-moderately-sized-data.html).
 
 **Large-scale analysis**: If you are running a large-scale analysis
 (i.e., the data do *not* fit into memory or you are using multiple nodes
-on a computer cluster), see the tutorial [running sceptre at scale]().
+on a computer cluster), see the tutorial [running sceptre at
+scale](https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html).
 
 **Note**: `sceptre` currently applies to high multiplicity-of-infection
 (MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not
