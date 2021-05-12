@@ -19,9 +19,19 @@ knitr::opts_chunk$set(
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
 
-Single-cell CRISPR screens provide unprecedented insight into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. `sceptre` (pronounced "scepter") is a methodology and associated R package for rigorously identifying regulatory relationships in high multiplicity-of-infection single-cell CRISPR screens. For a given gRNA and gene, `sceptre` produces a well-calibrated *p*-value for the null hypothesis that the gRNA has no impact on the expression of the gene. `sceptre` is robust and reliable: it seamlessly accounts for technical factors (e.g., sequencing batch and sequencing depth) and works well even when the expression model is misspecified.
+Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. `sceptre` (pronounced "scepter") is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. `sceptre` tests whether a given perturbation is associated with the change in expression of a given gene using the intuitive and powerful conditional randomization test.
 
-Tutorials available on the [package website](https://timothy-barry.github.io/sceptre/) demonstrate how to apply `sceptre` to [small](https://timothy-barry.github.io/sceptre/articles/sceptre-small-example.html) and [large](https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html) datasets.
+# Using the package
+
+You can interact with the package in several ways.
+
+**Demo**: A small demo illustrating the core features of `sceptre` is available [here](). We recommend working through the demo to get a quick (5 minutes) feel for how the method works.
+
+**Moderately-sized analysis**: If you are running an analysis of moderate size (i.e., the data fit into memory and you are using a single computer), see the tutorial [running a moderately-sized analysis]().
+
+**Large-scale analysis**: If you are running a large-scale analysis (i.e., the data do *not* fit into memory or you are using multiple nodes on a computer cluster), see the tutorial [running sceptre at scale]().
+
+**Note**: `sceptre` currently applies to high multiplicity-of-infection (MOI; >5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not yet been carefully vetted in low-MOI settings. We are working on implementing such an extension, but for the time being, please be cautious in attempting to apply `sceptre` to low-MOI data.
 
 # Installation
 
@@ -31,4 +41,10 @@ You can install the development version of the package from Github with the foll
 install.packages("devtools")
 devtools::install_github("timothy-barry/sceptre")
 ```
-Browse the source code on Github [here](https://github.com/timothy-barry/sceptre).
+You can browse the source code on Github [here](https://github.com/timothy-barry/sceptre).
+
+# References
+
+**Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich. “Conditional resampling improves calibration and sensitivity in single-cell CRISPR screen analysis.” Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6).
+
+**Initial application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood trait loci using pooled CRISPR screens and single cell RNA sequencing.” Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).

@@ -18,15 +18,21 @@ navbar:
     href: reference/index.html
   - text: Tutorials
     menu:
-    - text: "sceptre at scale"
+    - text: "At-scale"
       href: articles/sceptre-at-scale.html
-    - text: "sceptre on small data"
+    - text: "Moderately-sized data"
+      href: articles/sceptre-on-moderately-sized-data.html
+    - text: "Demo"
       href: articles/sceptre-small-example.html
 
 reference:
-- title: Running a small analysis
+- title: Demo
   contents:
   - run_sceptre_gRNA_gene_pair
+
+- title: In-memory sceptre
+  contents:
+  - run_sceptre_in_memory
 
 - title: Plotting
   contents:
