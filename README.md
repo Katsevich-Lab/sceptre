@@ -60,7 +60,7 @@ You can browse the source code on Github
 **Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich.
 “Conditional resampling improves calibration and sensitivity in
 single-cell CRISPR screen analysis.” Preprint available on
-[bioRxiv](https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6).
+[bioRxiv](https://doi.org/10.1101/2020.08.13.250092).
 
 **Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M
 Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T
