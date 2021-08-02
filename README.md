@@ -68,3 +68,9 @@ Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood
 trait loci using pooled CRISPR screens and single cell RNA sequencing.”
 Preprint available on
 [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).
+
+# Funding
+
+We are grateful to [Analytics at Wharton](https://analytics.wharton.upenn.edu/) for supporting the development of this software.
+
+<img src="man/figures/wharton_analytics.png" align="center" alt="" width="350" />
