@@ -2,7 +2,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" alt="" width="180" />
-[![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)]
+![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)
 
 <!-- badges: start -->
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
