@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
+[![R-CMD-check](https://github.com/timothy-barry/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/timothy-barry/sceptre/actions)
 <!-- badges: end -->
 
 Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. `sceptre` (pronounced "scepter") is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. `sceptre` tests whether a given perturbation is associated with the change in expression of a given gene using the intuitive and powerful conditional randomization test.
@@ -48,3 +49,9 @@ You can browse the source code on Github [here](https://github.com/katsevich-lab
 **Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich. “Conditional resampling improves calibration and sensitivity in single-cell CRISPR screen analysis.” Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6).
 
 **Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood trait loci using pooled CRISPR screens and single cell RNA sequencing.” Preprint available on [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).
+
+# Funding
+
+We are grateful to [Analytics at Wharton](https://analytics.wharton.upenn.edu/) for supporting the development of this software.
+
+<img src="man/figures/wharton_analytics.png" align="center" alt="" width="350" />
