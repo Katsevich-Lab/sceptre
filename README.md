@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
-[![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml)
+<!-- [![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 
