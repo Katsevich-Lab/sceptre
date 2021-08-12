@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 [![R-CMD-check](https://github.com/timothy-barry/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/timothy-barry/sceptre/actions)
+[![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions)
 <!-- badges: end -->
 
 Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. `sceptre` (pronounced "scepter") is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. `sceptre` tests whether a given perturbation is associated with the change in expression of a given gene using the intuitive and powerful conditional randomization test.
