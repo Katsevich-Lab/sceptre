@@ -4,7 +4,7 @@
 # `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" alt="" width="180" />
 
 <!-- badges: start -->
-
+[![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions)
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
 
@@ -54,6 +54,8 @@ the following command:
 
 You can browse the source code on Github
 [here](https://github.com/katsevich-lab/sceptre).
+
+Note that sceptre has been tested in R versions >=3.5 in both macOS systems and Linux systems.
 
 # References
 
