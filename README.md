@@ -2,11 +2,16 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" alt="" width="180" />
+![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)
 
 <!-- badges: start -->
+<<<<<<< HEAD
 [![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions)
+=======
+>>>>>>> d60da2c8f0bd49e89ff231867da570e1120aa74b
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
+
 
 Single-cell CRISPR screens provide unprecedented insights into gene
 regulation and other facets of human genome biology. However, the
