@@ -77,8 +77,7 @@
 <a href="#sceptre-robust-single-cell-crispr-screen-analysis-" class="anchor"></a><code>sceptre</code>: robust single-cell CRISPR screen analysis <img src="reference/figures/hex.jpg" align="right" alt="" width="180">
 </h1></div>
 <!-- badges: start -->
-<!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
-<!-- badges: end -->
+
 <p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. <code>sceptre</code> tests whether a given perturbation is associated with the change in expression of a given gene using the intuitive and powerful conditional randomization test.</p>
 </div>
 <div id="using-the-package" class="section level1">
@@ -94,15 +93,22 @@
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
 <p>You can install the development version of the package from Github with the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
 <p>You can browse the source code on Github <a href="https://github.com/katsevich-lab/sceptre">here</a>.</p>
+<p>Note that sceptre has been tested only in R versions &gt;=3.5 in both macOS systems and Linux systems.</p>
 </div>
 <div id="references" class="section level1">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
 <p><strong>Methods paper</strong>: T Barry, X Wang, J Morris, K Roeder, E Katsevich. “Conditional resampling improves calibration and sensitivity in single-cell CRISPR screen analysis.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6">bioRxiv</a>.</p>
 <p><strong>Application paper</strong>: J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood trait loci using pooled CRISPR screens and single cell RNA sequencing.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1">bioRxiv</a>.</p>
+</div>
+<div id="funding" class="section level1">
+<h1 class="hasAnchor">
+<a href="#funding" class="anchor"></a>Funding</h1>
+<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/">Analytics at Wharton</a> for supporting the development of this software.</p>
+<p><img src="reference/figures/wharton_analytics.png" align="center" alt="" width="350"></p>
 </div>
 
   </div>
@@ -125,7 +131,13 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/scarlettcanny0629/sceptre/actions"><img src="https://github.com/scarlettcanny0629/sceptre/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
