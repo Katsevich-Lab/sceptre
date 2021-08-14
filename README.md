@@ -55,7 +55,7 @@ the following command:
 You can browse the source code on Github
 [here](https://github.com/katsevich-lab/sceptre).
 
-Note that sceptre has been tested in R versions >=3.5 in both macOS systems and Linux systems.
+Note that sceptre has been tested only in R versions >=3.5 in both macOS systems and Linux systems.
 
 # References
 
