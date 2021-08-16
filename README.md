@@ -5,10 +5,6 @@
 ![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)
 
 <!-- badges: start -->
-<<<<<<< HEAD
-[![R-CMD-check](https://github.com/scarlettcanny0629/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/scarlettcanny0629/sceptre/actions)
-=======
->>>>>>> d60da2c8f0bd49e89ff231867da570e1120aa74b
 <!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
 <!-- badges: end -->
 
