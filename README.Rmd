@@ -33,7 +33,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("scarlettcanny0629/sceptre")
+devtools::install_github("katsevich-lab/sceptre")
 ```
 Note that sceptre has been tested only in R versions >=3.5 in both macOS systems and Linux systems.
 
