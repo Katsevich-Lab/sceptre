@@ -115,7 +115,7 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
                                        perturbation_matrix = perturbation_matrix,
                                        covariate_matrix = covariate_matrix,
                                        regularization_amount = regularization_amount,
-                                       side = "left",
+                                       side = side,
                                        seed = seed,
                                        B = B)
   }
