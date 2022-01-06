@@ -54,7 +54,7 @@
 #'                      seed,
 #'                      B)
 #' }
-run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_matrix, covariate_matrix, gene_gRNA_pairs, side, pod_sizes, regularization_amount = 0.1, seed = 4, B = 500) {
+run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_matrix, covariate_matrix, gene_gRNA_pairs, side, pod_sizes = c(gene = 10, gRNA = 10, pair = 10), regularization_amount = 0.1, seed = 4, B = 500) {
   print(paste0("Note: check the `log` subdirectory of the storage directory ", as.character(storage_dir), " for updates!"))
   # set up parallel
   library(doParallel)
@@ -62,6 +62,11 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
   registerDoParallel()
   # create the offsite directory structure
   dirs <- initialize_directories(storage_location = storage_dir)
+
+  # threshold perturbation_matrix (using threshold = 3, for now) if necessary
+  if (max(perturbation_matrix) >= 2) {
+    perturbation_matrix <- perturbation_matrix >= 3
+  }
 
   # create file dictionaries
   dicts <- create_and_store_dictionaries(gene_gRNA_pairs,

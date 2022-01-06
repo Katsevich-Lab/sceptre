@@ -86,7 +86,7 @@ run_sceptre_using_precomp <- function(expressions, gRNA_indicators, gRNA_precomp
 
   # determine if the fit was successful
   if (!skew_t_fit$skew_t_fit_success || length(t_nulls) <= floor(0.95 * B)) { # If the skew-t fit failed, then try again.
-    t_nulls_second_set <- resample_B_times(9 * B)
+    t_nulls_second_set <- resample_B_times(2 * B)
     t_nulls <- c(t_nulls, t_nulls_second_set)
     skew_t_fit <- fit_skew_t(t_nulls, t_star, side)
   }
