@@ -62,7 +62,7 @@ macOS systems and Linux systems.
 
 **Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich.
 “Conditional resampling improves calibration and sensitivity in
-single-cell CRISPR screen analysis.” Genome Biology (2022). URL: genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2
+single-cell CRISPR screen analysis.” Genome Biology (2022). [Link](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
 **Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M
 Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T
