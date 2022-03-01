@@ -182,7 +182,7 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, e
   gene_ids <- gene_dictionary %>% dplyr::pull(id) %>% as.character()
   precomps <- purrr::map(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 1 for gene ", gene_id, ".\n"))
-    expressions <- if (is(expression_matrix, "matrix")) {
+    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
       expression_matrix[gene_id,]
     } else {
       expression_matrix[[gene_id,]] %>% as.numeric()
@@ -274,7 +274,7 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 
   offsets <- sapply(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 2 for gene ", gene_id, ".\n"))
-    expressions <- if (is(expression_matrix, "matrix")) {
+    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
       expression_matrix[gene_id,]
     } else {
       expression_matrix[[gene_id,]] %>% as.numeric()
@@ -338,7 +338,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
       gene_precomp_size <- readRDS(file = gene_size_loc)[[curr_gene]]
     }
     gRNA_precomp <- fst::read_fst(path = gRNA_prcomp_loc, columns = curr_gRNA) %>% dplyr::pull()
-    expressions <- if (is(expression_matrix, "matrix")) {
+    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
       expression_matrix[curr_gene,]
     } else {
       expression_matrix[[curr_gene,]] %>% as.numeric()
