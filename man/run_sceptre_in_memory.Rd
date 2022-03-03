@@ -11,7 +11,7 @@ run_sceptre_in_memory(
   covariate_matrix,
   gene_gRNA_pairs,
   side,
-  pod_sizes,
+  pod_sizes = c(gene = 10, gRNA = 10, pair = 10),
   regularization_amount = 0.1,
   seed = 4,
   B = 500

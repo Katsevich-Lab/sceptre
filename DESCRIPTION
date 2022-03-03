@@ -35,7 +35,8 @@ Imports:
     magrittr,
     purrr,
     ondisc,
-    methods
+    methods,
+    Matrix
 Depends: 
     R (>= 3.5)
 Suggests: 

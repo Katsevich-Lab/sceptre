@@ -57,15 +57,32 @@
 run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_matrix, covariate_matrix, gene_gRNA_pairs, side, pod_sizes = c(gene = 10, gRNA = 10, pair = 10), regularization_amount = 0.1, seed = 4, B = 500) {
   print(paste0("Note: check the `log` subdirectory of the storage directory ", as.character(storage_dir), " for updates!"))
   # set up parallel
-  library(doParallel)
-  library(foreach)
-  registerDoParallel()
+  doParallel::registerDoParallel()
   # create the offsite directory structure
   dirs <- initialize_directories(storage_location = storage_dir)
 
-  # threshold perturbation_matrix (using threshold = 3, for now) if necessary
+  # BASIC PROCESSING AND CHECKS
+  # 1. threshold perturbation_matrix (using threshold = 3, for now) if necessary
   if (max(perturbation_matrix) >= 2) {
     perturbation_matrix <- perturbation_matrix >= 3
+  }
+  # 2. Remove all genes and gRNAs that have 0 counts
+  gene_lib_sizes <- Matrix::rowSums(expression_matrix)
+  gRNA_lib_sizes <- Matrix::rowSums(perturbation_matrix)
+  bad_genes <- names(gene_lib_sizes[gene_lib_sizes == 0])
+  bad_gRNAs <- names(gRNA_lib_sizes[gRNA_lib_sizes == 0])
+  gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::filter(!(gene_id %in% bad_genes),
+                                                       !(gRNA_id %in% bad_gRNAs))
+  # 3. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices
+  abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(expression_matrix))]
+  abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(perturbation_matrix))]
+  if (length(abs_genes) >= 1) {
+    msg <- paste0("The genes `", paste0(abs_genes, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `expression_matrix` matrix. Either remove these genes from `gene_gRNA_pairs,` or add these genes to `expression_matrix`.")
+    stop(msg)
+  }
+  if (length(abs_gRNAs) >= 1) {
+    msg <- paste0("The perturbations `", paste0(abs_gRNAs, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `perturbation_matrix` matrix. Either remove these perturbations from `gene_gRNA_pairs,` or add these perturbations to `perturbation_matrix`.")
+    stop(msg)
   }
 
   # create file dictionaries
@@ -76,14 +93,13 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
                                          pod_sizes)
 
   # run first round of gene precomputations
-  foreach(pod_id = seq(1, dicts[["gene"]])) %dopar% {
-    run_gene_precomputation_at_scale_round_1(pod_id = pod_id,
-                                             gene_precomp_dir = dirs[["gene_precomp_dir"]],
-                                             expression_matrix = expression_matrix,
-                                             covariate_matrix = covariate_matrix,
-                                             regularization_amount = regularization_amount,
-                                             log_dir = dirs[["log_dir"]])
-  }
+  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
+                     run_gene_precomputation_at_scale_round_1(pod_id = pod_id,
+                                                              gene_precomp_dir = dirs[["gene_precomp_dir"]],
+                                                              expression_matrix = expression_matrix,
+                                                              covariate_matrix = covariate_matrix,
+                                                              regularization_amount = regularization_amount,
+                                                              log_dir = dirs[["log_dir"]]))
 
   # regularize thetas
   regularize_gene_sizes_at_scale(gene_precomp_dir = dirs[["gene_precomp_dir"]],
@@ -91,39 +107,36 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
                                  log_dir = dirs[["log_dir"]])
 
   # run second round of gene precomputations
-  foreach(pod_id = seq(1, dicts[["gene"]])) %dopar% {
-    run_gene_precomputation_at_scale_round_2(pod_id = pod_id,
-                                           gene_precomp_dir = dirs[["gene_precomp_dir"]],
-                                           expression_matrix = expression_matrix,
-                                           covariate_matrix = covariate_matrix,
-                                           regularization_amount = regularization_amount,
-                                           log_dir = dirs[["log_dir"]])
-  }
+  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
+                     run_gene_precomputation_at_scale_round_2(pod_id = pod_id,
+                                                              gene_precomp_dir = dirs[["gene_precomp_dir"]],
+                                                              expression_matrix = expression_matrix,
+                                                              covariate_matrix = covariate_matrix,
+                                                              regularization_amount = regularization_amount,
+                                                              log_dir = dirs[["log_dir"]]))
 
   # run gRNA precomputations
-  foreach(pod_id = seq(1, dicts[["gRNA"]])) %dopar% {
-    run_gRNA_precomputation_at_scale(pod_id = pod_id,
-                                     gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
-                                     perturbation_matrix = perturbation_matrix,
-                                     covariate_matrix = covariate_matrix,
-                                     log_dir = dirs[["log_dir"]])
-    }
+  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
+                     run_gRNA_precomputation_at_scale(pod_id = pod_id,
+                                                      gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
+                                                      perturbation_matrix = perturbation_matrix,
+                                                      covariate_matrix = covariate_matrix,
+                                                      log_dir = dirs[["log_dir"]]))
 
   # run at-scale analysis
-  foreach(pod_id = seq(1, dicts[["pairs"]])) %dopar% {
-    run_gRNA_gene_pair_analysis_at_scale(pod_id = pod_id,
-                                       gene_precomp_dir = dirs[["gene_precomp_dir"]],
-                                       gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
-                                       results_dir = dirs[["results_dir"]],
-                                       log_dir = dirs[["log_dir"]],
-                                       expression_matrix = expression_matrix,
-                                       perturbation_matrix = perturbation_matrix,
-                                       covariate_matrix = covariate_matrix,
-                                       regularization_amount = regularization_amount,
-                                       side = side,
-                                       seed = seed,
-                                       B = B)
-  }
+  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["pairs"]])),
+                     run_gRNA_gene_pair_analysis_at_scale(pod_id = pod_id,
+                                                          gene_precomp_dir = dirs[["gene_precomp_dir"]],
+                                                          gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
+                                                          results_dir = dirs[["results_dir"]],
+                                                          log_dir = dirs[["log_dir"]],
+                                                          expression_matrix = expression_matrix,
+                                                          perturbation_matrix = perturbation_matrix,
+                                                          covariate_matrix = covariate_matrix,
+                                                          regularization_amount = regularization_amount,
+                                                          side = side,
+                                                          seed = seed,
+                                                          B = B))
 
   # collect results
   results <- collect_results(results_dir = dirs[["results_dir"]])
