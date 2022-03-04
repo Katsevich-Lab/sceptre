@@ -104,7 +104,7 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
   # 2. gRNA
   gRNAs <- unique(gene_gRNA_pairs$gRNA_id)
   gRNA_dictionary <- create_dictionary(ids = gRNAs, pod_size = pod_sizes[["gRNA"]]) %>%
-    dplyr::mutate(precomp_file = factor(paste0(gRNA_precomp_dir, "/gRNA_precomp_", pod_id, ".fst")))
+    dplyr::mutate(precomp_file = factor(paste0(gRNA_precomp_dir, "/gRNA_precomp_", id, ".rds")))
   gRNA_dictionary_fp <- paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst")
   fst::write_fst(gRNA_dictionary, gRNA_dictionary_fp)
 
@@ -136,25 +136,24 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 #'
 #' @return NULL
 #' @export
-run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbation_matrix, covariate_matrix, log_dir) {
+run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbation_matrix, covariate_matrix, log_dir, B) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
   # determine the gRNAs on which to run the precomputation
   gRNA_dictionary <- fst::read_fst(paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
   gRNA_ids <- gRNA_dictionary %>% dplyr::pull(id) %>% as.character()
   # run the precomputation for each of these gRNAs
-  out <- sapply(gRNA_ids, function(gRNA_id) {
+  for (gRNA_id in gRNA_ids) {
     cat(paste0("Running precomputation for gRNA ", gRNA_id, ".\n"))
-    gRNA_indicators <- if (is(perturbation_matrix, "matrix")) {
+    gRNA_indicators <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
       perturbation_matrix[gRNA_id,]
     } else {
       perturbation_matrix[[gRNA_id,]] %>% as.numeric()
     }
-    run_gRNA_precomputation(gRNA_indicators, covariate_matrix)
-  }) %>% as.data.frame()
-  # save the result
-  precomp_matrix_fp <- (gRNA_dictionary %>% dplyr::pull(precomp_file))[1] %>% as.character
-  fst::write_fst(out, precomp_matrix_fp)
+    synth_data <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix, B)
+    precomp_matrix_fp <- (gRNA_dictionary %>% dplyr::pull(precomp_file))[1] %>% as.character
+    saveRDS(object = synth_data, precomp_matrix_fp)
+  }
   if (!is.null(log_dir)) deactivate_sink()
 }
 
@@ -318,39 +317,46 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
   gene_dict <- fst::read_fst(paste0(gene_precomp_dir, "/gene_dictionary.fst"))
   gRNA_dict <- fst::read_fst(paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst"))
   if (regularization_amount > 0) regularized_gene_sizes <- readRDS(gene_dict$size_reg_file[1] %>% as.character())[as.character(results_dict$gene_id)]
+  out_l <- vector(mode = "list", length = nrow(results_dict))
 
-  p_vals <- purrr::map_dfr(1:nrow(results_dict), function(i) {
+  for (i in seq(1, nrow(results_dict))) {
     curr_gene <- results_dict[[i, "gene_id"]] %>% as.character()
     curr_gRNA <- results_dict[[i, "gRNA_id"]] %>% as.character()
     cat(paste0("Running distilled CRT on gene ", curr_gene, " and gRNA ", curr_gRNA, ".\n"))
 
-    # Determine the file locations
-    gene_precomp_locs <- dplyr::filter(gene_dict, id == curr_gene)
-    gene_offset_loc <- gene_precomp_locs %>% dplyr::pull(offset_file) %>% as.character
-    if (regularization_amount == 0) gene_size_loc <- gene_precomp_locs %>% dplyr::pull(size_unreg_file) %>% as.character()
-    gRNA_prcomp_loc <- dplyr::filter(gRNA_dict, id == curr_gRNA) %>% dplyr::pull(precomp_file) %>% as.character()
-
     # Load the appropriate data from disk into memory
-    gene_precomp_offsets <- fst::read_fst(path = gene_offset_loc, columns = curr_gene) %>% dplyr::pull()
-    if (regularization_amount > 0) {
-      gene_precomp_size <- regularized_gene_sizes[[curr_gene]]
-    } else {
-      gene_precomp_size <- readRDS(file = gene_size_loc)[[curr_gene]]
+    # 1. gene
+    if (i == 1 || results_dict[[i, "gene_id"]] != results_dict[[i - 1, "gene_id"]]) {
+      gene_precomp_locs <- dplyr::filter(gene_dict, id == curr_gene)
+      gene_offset_loc <- gene_precomp_locs %>% dplyr::pull(offset_file) %>% as.character
+      gene_precomp_offsets <- fst::read_fst(path = gene_offset_loc, columns = curr_gene) %>% dplyr::pull()
+      if (regularization_amount > 0) {
+        gene_precomp_size <- regularized_gene_sizes[[curr_gene]]
+      } else {
+        gene_precomp_size <- readRDS(file = gene_size_loc)[[curr_gene]]
+      }
+      expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
+        expression_matrix[curr_gene,]
+      } else {
+        expression_matrix[[curr_gene,]] %>% as.numeric()
+      }
     }
-    gRNA_precomp <- fst::read_fst(path = gRNA_prcomp_loc, columns = curr_gRNA) %>% dplyr::pull()
-    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
-      expression_matrix[curr_gene,]
-    } else {
-      expression_matrix[[curr_gene,]] %>% as.numeric()
+
+    # 2. gRNA
+    if (i == 1 || results_dict[[i, "gRNA_id"]] != results_dict[[i - 1, "gRNA_id"]]) {
+      gRNA_prcomp_loc <- dplyr::filter(gRNA_dict, id == curr_gRNA) %>% dplyr::pull(precomp_file) %>% as.character()
+      gRNA_precomp <- readRDS(file = gRNA_prcomp_loc)
+      gRNA_indicators <- if (is(perturbation_matrix, "matrix")) {
+        perturbation_matrix[curr_gRNA,]
+      } else {
+        perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
+      }
     }
-    gRNA_indicators <- if (is(perturbation_matrix, "matrix")) {
-      perturbation_matrix[curr_gRNA,]
-    } else {
-      perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
-    }
+
     # Run the dCRT
-    run_sceptre_using_precomp(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B, seed, TRUE, TRUE)
-  })
+    run_sceptre_using_precomp_fast(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B, seed)
+  }
+
 
   # Create and save the result dataframe
   out <- results_dict %>% dplyr::select(gene_id = gene_id, gRNA_id = gRNA_id) %>% dplyr::mutate(p_vals)

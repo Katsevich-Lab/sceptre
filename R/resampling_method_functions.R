@@ -39,6 +39,34 @@ fit_skew_t <- function(t_nulls, t_star, side) {
 }
 
 
+run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B) {
+  n_cells <- length(expressions)
+  cell_idxs <- seq(1L, n_cells)
+
+  if (!is.null(seed)) set.seed(seed)
+  # compute test statistic on real data
+  exp_gene_offsets <- exp(gene_precomp_offsets)
+  z_star <- compute_nb_test_stat_fast(expressions[gRNA_indicators == 1], exp_gene_offsets[gRNA_indicators == 1], gene_precomp_size)
+
+  z_nulls <- replicate(n = B, expr = {
+    gRNA_indicators_null <- stats::rbinom(n = length(gRNA_precomp), size = 1, prob = gRNA_precomp)
+    compute_nb_test_stat_fast(expressions[gRNA_indicators_null == 1],
+                                   exp_gene_offsets[gRNA_indicators_null == 1], gene_precomp_size)
+  })
+
+}
+
+compute_nb_test_stat_fast <- function(y, exp_o, gene_precomp_size) {
+  est <- log(mean(y)) - log(mean(exp_o))
+  info <- sum((gene_precomp_size * exp(est) * exp_o)/(gene_precomp_size + exp(est) * exp_o))
+  z <- est/(sqrt(1/info))
+  return(z)
+}
+
+# fit_fast_mean_plus_offset_nb <- function() {
+#
+# }
+
 #' Run sceptre using precomputations for gRNAs and genes.
 #'
 #' This function is the workhorse function of the sceptre package. It runs a distilled CRT using a negative binomial test statistic based on an expression vector, a gRNA indicator vector, an offset vector (from the distillation step), gRNA conditional probabilities, an estimate of the negative binomial size parameter, and the number of resampling replicates.
@@ -117,10 +145,20 @@ run_sceptre_using_precomp <- function(expressions, gRNA_indicators, gRNA_precomp
 #'
 #' @noRd
 #' @return the fitted probabilities
-run_gRNA_precomputation <- function(gRNA_indicators, covariate_matrix) {
+run_gRNA_precomputation <- function(gRNA_indicators, covariate_matrix, B) {
+  # first, fit a logistic regression model to estimate perturbation probabilities
   fit_model_grna <- stats::glm(gRNA_indicators ~ ., family = stats::binomial(), data = covariate_matrix)
   out <- as.numeric(stats::fitted(fit_model_grna))
-  return(out)
+  # generate synthetic data
+  draws_idxs <- lapply(X = out, FUN = function(prob) {
+    draws <- stats::rbinom(n = B, size = 1, prob = prob)
+    which(draws == 1)
+  })
+  n_cells <- length(gRNA_indicators)
+  row_idxs <- rep(x = seq(1L, n_cells), times = sapply(draws_idxs, length))
+  col_idxs <- unlist(draws_idxs)
+  synth_data <- Matrix::sparseMatrix(i = row_idxs, j = col_idxs, dims = c(n_cells, B))
+  return(synth_data)
 }
 
 
