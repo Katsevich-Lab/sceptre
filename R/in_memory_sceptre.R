@@ -61,18 +61,21 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
   # create the offsite directory structure
   dirs <- initialize_directories(storage_location = storage_dir)
 
+  #############################
   # BASIC PROCESSING AND CHECKS
+  #############################
   # 1. threshold perturbation_matrix (using threshold = 3, for now) if necessary
   if (max(perturbation_matrix) >= 2) {
     perturbation_matrix <- perturbation_matrix >= 3
   }
-  # 2. Remove all genes and gRNAs that have 0 counts
+  # 2. Remove all genes and gRNAs that have 0 counts; arrange pairs by gRNA then gene; remove duplicates
   gene_lib_sizes <- Matrix::rowSums(expression_matrix)
   gRNA_lib_sizes <- Matrix::rowSums(perturbation_matrix)
   bad_genes <- names(gene_lib_sizes[gene_lib_sizes == 0])
   bad_gRNAs <- names(gRNA_lib_sizes[gRNA_lib_sizes == 0])
   gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::filter(!(gene_id %in% bad_genes),
                                                        !(gRNA_id %in% bad_gRNAs))
+  gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::arrange(gRNA_id, gene_id) %>% dplyr::distinct()
   # 3. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices
   abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(expression_matrix))]
   abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(perturbation_matrix))]
@@ -84,6 +87,8 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
     msg <- paste0("The perturbations `", paste0(abs_gRNAs, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `perturbation_matrix` matrix. Either remove these perturbations from `gene_gRNA_pairs,` or add these perturbations to `perturbation_matrix`.")
     stop(msg)
   }
+  # 4. Ensure that cell barcodes coincide across gene and perturbation matrices
+  if  (!identical(colnames(perturbation_matrix), colnames(expression_matrix))) stop("The cell barcodes in the perturbation and expression matrices do not coincide. Ensure that these matrices have identical cell barcodes in the same order.")
 
   # create file dictionaries
   dicts <- create_and_store_dictionaries(gene_gRNA_pairs,
@@ -121,7 +126,8 @@ run_sceptre_in_memory <- function(storage_dir, expression_matrix, perturbation_m
                                                       gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
                                                       perturbation_matrix = perturbation_matrix,
                                                       covariate_matrix = covariate_matrix,
-                                                      log_dir = dirs[["log_dir"]]))
+                                                      log_dir = dirs[["log_dir"]],
+                                                      B = B))
 
   # run at-scale analysis
   foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["pairs"]])),
