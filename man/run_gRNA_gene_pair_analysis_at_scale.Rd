@@ -15,7 +15,6 @@ run_gRNA_gene_pair_analysis_at_scale(
   covariate_matrix,
   regularization_amount,
   side,
-  seed,
   B
 )
 }
@@ -40,9 +39,9 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{side}{(optional, default left) sidedness of test}
 
-\item{seed}{(optional) seed to pass to the randomization algorithm}
-
 \item{B}{number of bootstrap resamples (default 500)}
+
+\item{seed}{(optional) seed to pass to the randomization algorithm}
 }
 \description{
 NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,

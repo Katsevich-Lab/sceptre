@@ -5,21 +5,18 @@
 \title{Run sceptre in memory}
 \usage{
 run_sceptre_in_memory(
-  storage_dir,
   expression_matrix,
   perturbation_matrix,
   covariate_matrix,
   gene_gRNA_pairs,
-  side,
-  pod_sizes = c(gene = 10, gRNA = 10, pair = 10),
+  side = "both",
+  storage_dir = tempdir(),
   regularization_amount = 0.1,
-  seed = 4,
-  B = 500
+  B = 1500,
+  seed = 4
 )
 }
 \arguments{
-\item{storage_dir}{name of a directory in which to store logs, intermediate computations, and final results}
-
 \item{expression_matrix}{a matrix of gene expressions (in UMI counts); rows correspond to genes and columns to cells; the rows should be named.}
 
 \item{perturbation_matrix}{a binary matrix of gRNA perturbations; rows correspond to gRNAs and columns to cells; the rows likewise should be names.}
@@ -30,13 +27,15 @@ run_sceptre_in_memory(
 
 \item{side}{sidedness of the test; one of "left", "right," and "both".  "left" is most appropriate for experiments in which cis-regulatory relationships are tested by perturbing putative enhancers with CRISPRi.}
 
-\item{pod_sizes}{an integer vector giving the size of the "gene", "gRNA", and "pair" pods. \code{sceptre} groups the genes, gRNAs, and gene-gRNA pairs into distinct "pods" and runs computations on these pods in parallel. Smaller pod sizes give rise to greater parallelization. \code{pod_sizes} should be vector of length three with names "gene", "gRNA", and "pair" and integer values giving the pod sizes.}
+\item{storage_dir}{name of a directory in which to store logs, intermediate computations, and final results}
 
 \item{regularization_amount}{(optional; default 0.1) the amount of regularization to apply to the estimated negative binomial size parameters, where 0 corresponds to no regularization at all.}
 
+\item{B}{(optional; default 500) number of random samples to draw in the conditional randomization test.}
+
 \item{seed}{(optional; default 4) seed to pass to the random number generator.}
 
-\item{B}{(optional; default 500) number of random samples to draw in the conditional randomization test.}
+\item{pod_sizes}{an integer vector giving the size of the "gene", "gRNA", and "pair" pods. \code{sceptre} groups the genes, gRNAs, and gene-gRNA pairs into distinct "pods" and runs computations on these pods in parallel. Smaller pod sizes give rise to greater parallelization. \code{pod_sizes} should be vector of length three with names "gene", "gRNA", and "pair" and integer values giving the pod sizes.}
 }
 \value{
 a data frame containing the results. Includes columns gene_id, gRNA_id, p_value, skew_t_fit_success (indicating whether the skew-t fit succeeded), xi, omega, alpha, nu (parameters of the skew-t distribution), z_value (the ground truth negative binomial test statistic), and n_successful_resamples (indicates how many of the B resamples were successful).

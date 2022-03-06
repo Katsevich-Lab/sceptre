@@ -5,49 +5,22 @@
 \title{Run SCEPTRE on a gRNA-gene pair}
 \usage{
 run_sceptre_gRNA_gene_pair(
-  expressions,
-  gRNA_indicators,
+  gene_expressions,
+  gRNA_expressions,
   covariate_matrix,
-  side = "left",
-  gene_precomp_size = NULL,
-  B = 500,
-  seed = NULL,
-  reduced_output = TRUE,
-  verbose = TRUE
+  side = "both",
+  B = 1500,
+  seed = 4
 )
 }
-\arguments{
-\item{expressions}{a vector a gene expressions}
-
-\item{gRNA_indicators}{a vector of gRNA indicators}
-
-\item{covariate_matrix}{the data frame of cell-specific covariates}
-
-\item{side}{(optional; default "left") side of the test; one of "left," "right," and "both."}
-
-\item{gene_precomp_size}{(optional) the pre-computed size of the gene NB distribution; if not supplied, will be estimated}
-
-\item{B}{(optional; default 500) number of conditional randomization test resamples}
-
-\item{seed}{(optional; default 4) seed of the random number generator}
-
-\item{reduced_output}{(optional; default TRUE) return the reduced output?}
-
-\item{verbose}{(optional; default TRUE) print status updates?}
-}
-\value{
-If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, a list containing all of the above, plus the vector of resampled test statistics.
-}
 \description{
-Runs SCEPTRE on a given gRNA-gene pair. The function requires as arguments the gene expression vector, the gRNA indicator vector, and the covariate matrix.
+Runs SCEPTRE on a given gRNA-gene pair.
 }
 \examples{
-data(expressions)
-data(gRNA_indicators)
-data(covariate_matrix)
-result <- run_sceptre_gRNA_gene_pair(expressions,
-gRNA_indicators,
-covariate_matrix,
-verbose = FALSE)
-result
+# load the example data
+data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
+gene_expressions <- gene_matrix[1,]
+gRNA_expressions <- gRNA_matrix[1,]
+# run method
+run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
 }

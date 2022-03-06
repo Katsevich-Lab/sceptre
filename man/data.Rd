@@ -3,9 +3,10 @@
 \docType{data}
 \name{data}
 \alias{data}
-\alias{expressions}
-\alias{gRNA_indicators}
+\alias{gene_matrix}
+\alias{gRNA_matrix}
 \alias{covariate_matrix}
+\alias{gene_gRNA_pairs}
 \title{Single-cell CRISPR screen example data}
 \format{
 \itemize{
@@ -21,21 +22,25 @@
 }
 }
 
-An object of class \code{integer} of length 205797.
+An object of class \code{matrix} (inherits from \code{array}) with 5 rows and 101508 columns.
 
-An object of class \code{integer} of length 205797.
+An object of class \code{dgTMatrix} with 25 rows and 101508 columns.
 
-An object of class \code{data.frame} with 205797 rows and 5 columns.
+An object of class \code{data.frame} with 101508 rows and 4 columns.
+
+An object of class \code{data.frame} with 100 rows and 2 columns.
 }
 \source{
 A genome-wide framework for Mapping Gene Regulation via Cellular Genetic Screens, Gasperini et al. 2019. Link: \url{https://www.sciencedirect.com/science/article/pii/S009286741831554X?via\%3Dihub}
 }
 \usage{
-expressions
+gene_matrix
 
-gRNA_indicators
+gRNA_matrix
 
 covariate_matrix
+
+gene_gRNA_pairs
 }
 \description{
 Example single-cell CRISPR screen data from the study A Genome-wide Framework for Mapping Gene Regulation via Cellular Genetic Screens by Gasperini et al. The authors used CRISPRi to perturb 6,000 candidate enhancers and assessed the impact of these perturbations via scRNA-seq. The example data come from a single gRNA (ID: chr7.3255_top_two), a single gene (ID: ENSG00000164713), and the set of cell-specific technical factors. There are 205,797 cells in total.
