@@ -19,10 +19,13 @@
 NULL
 
 #' @rdname data
-"expressions"
+"gene_matrix"
 
 #' @rdname data
-"gRNA_indicators"
+"gRNA_matrix"
 
 #' @rdname data
 "covariate_matrix"
+
+#' @rdname data
+"gene_gRNA_pairs"

@@ -9,7 +9,9 @@ run_gRNA_precomputation_at_scale(
   gRNA_precomp_dir,
   perturbation_matrix,
   covariate_matrix,
-  log_dir
+  log_dir,
+  B,
+  seed
 )
 }
 \arguments{

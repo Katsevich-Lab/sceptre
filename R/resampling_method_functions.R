@@ -169,41 +169,34 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 
 #' Run SCEPTRE on a gRNA-gene pair
 #'
-#' Runs SCEPTRE on a given gRNA-gene pair. The function requires as arguments the gene expression vector, the gRNA indicator vector, and the covariate matrix.
+#' Runs SCEPTRE on a given gRNA-gene pair.
 #'
-#' @param expressions a vector a gene expressions
-#' @param gRNA_indicators a vector of gRNA indicators
-#' @param covariate_matrix the data frame of cell-specific covariates
-#' @param side (optional; default "left") side of the test; one of "left," "right," and "both."
-#' @param gene_precomp_size (optional) the pre-computed size of the gene NB distribution; if not supplied, will be estimated
-#' @param B (optional; default 500) number of conditional randomization test resamples
-#' @param reduced_output (optional; default TRUE) return the reduced output?
-#' @param verbose (optional; default TRUE) print status updates?
-#' @param seed (optional; default 4) seed of the random number generator
-#' @return If reduced_output is TRUE, a data frame containing the following columns: p-value, skew-t fit success, skew-t fit MLEs (xi, omega, alpha, nu), the original signed test statistic, and the number of successful resamples; if reduced_output is FALSE, a list containing all of the above, plus the vector of resampled test statistics.
 #' @export
 #' @examples
-#' data(expressions)
-#' data(gRNA_indicators)
-#' data(covariate_matrix)
-#' result <- run_sceptre_gRNA_gene_pair(expressions,
-#' gRNA_indicators,
-#' covariate_matrix,
-#' verbose = FALSE)
-#' result
-run_sceptre_gRNA_gene_pair <- function(expressions, gRNA_indicators, covariate_matrix, side = "left", gene_precomp_size = NULL, B = 500, seed = NULL, reduced_output = TRUE) {
-  if (verbose) cat("Running gRNA precomputation.\n")
-  gRNA_precomp <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix, B, seed)
+#' # load the example data
+#' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
+#' gene_expressions <- gene_matrix[1,]
+#' gRNA_expressions <- gRNA_matrix[1,]
+#' # run method
+#' run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
+run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covariate_matrix, side = "both", B = 1500, seed = 4) {
+  THRESHOLD <- 3
 
-  if (verbose) cat("Running gene precomputation.\n")
-  gene_precomp <- run_gene_precomputation(expressions, covariate_matrix, gene_precomp_size)
+  cat("Running perturbation precomputation.")
+  gene_precomp <- run_gene_precomputation(gene_expressions, covariate_matrix, NULL)
+  cat(crayon::green(' \u2713\n'))
 
-  if (verbose) cat("Running CRT\n")
-  out <- run_sceptre_using_precomp_fast(expressions,
-                                        gRNA_indicators,
+  cat("Running gRNA precomputation.")
+  gRNA_precomp <- run_gRNA_precomputation(gRNA_expressions, covariate_matrix, B, seed)
+  cat(crayon::green(' \u2713\n'))
+
+  cat("Running perturbation-to-gene association analysis.")
+  out <- run_sceptre_using_precomp_fast(gene_expressions,
+                                        gRNA_expressions,
                                         gRNA_precomp,
                                         side,
                                         gene_precomp$gene_precomp_size,
                                         gene_precomp$gene_precomp_offsets)
+  cat(crayon::green(' \u2713\n'))
   return(out)
 }
