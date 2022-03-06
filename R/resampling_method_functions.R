@@ -38,23 +38,36 @@ fit_skew_t <- function(t_nulls, t_star, side) {
   return(list(skew_t_fit_success = skew_t_fit_success, out_p = out_p, skew_t_mle = skew_t_mle))
 }
 
-
-run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B) {
-  n_cells <- length(expressions)
-  cell_idxs <- seq(1L, n_cells)
-
-  if (!is.null(seed)) set.seed(seed)
-  # compute test statistic on real data
+#' Run sceptre using precomputations for gRNAs and genes.
+#'
+#' This function is the workhorse function of the sceptre package. It runs a distilled CRT using a negative binomial test statistic based on an expression vector, a gRNA indicator vector, an offset vector (from the distillation step), gRNA conditional probabilities, an estimate of the negative binomial size parameter, and the number of resampling replicates.
+#'
+#' @param expressions a vector of gene expressions (in UMI counts)
+#' @param gRNA_indicators a vector of gRNA indicators
+#' @param gRNA_precomp a n_cells x B matrix of synthetic indicators
+#' @param gene_precomp_size the pre-computed size
+#' @param gene_precomp_offsets the pre-computed distillation offsets
+#' @param side an argument to set test for left-sided, right-sided or two-tailed. Default as 'left' and can take 'left', 'right' or 'both'.#'
+#' @noRd
+#' @return if reduced_output, a dataframe with the p-value, test statistic, and other helpful values; if !reduced_output, a list containing all of the above, plus the resampled statistics.
+run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets) {
   exp_gene_offsets <- exp(gene_precomp_offsets)
-  z_star <- compute_nb_test_stat_fast(expressions[gRNA_indicators == 1], exp_gene_offsets[gRNA_indicators == 1], gene_precomp_size)
-
-  z_nulls <- replicate(n = B, expr = {
-    gRNA_indicators_null <- stats::rbinom(n = length(gRNA_precomp), size = 1, prob = gRNA_precomp)
-    compute_nb_test_stat_fast(expressions[gRNA_indicators_null == 1],
-                                   exp_gene_offsets[gRNA_indicators_null == 1], gene_precomp_size)
+  # compute test statistic on real data
+  z_star <- compute_nb_test_stat_fast_score(expressions[gRNA_indicators == 1], exp_gene_offsets[gRNA_indicators == 1], gene_precomp_size)
+  # compute test statistics on the resampled statistics
+  z_null <- apply(X = gRNA_precomp, MARGIN = 2, FUN = function(col) {
+    compute_nb_test_stat_fast_score(expressions[col], exp_gene_offsets[col], gene_precomp_size)
   })
-
+  # fit skew-t
+  skew_t_fit <- fit_skew_t(z_null, z_star, side)
+  # create output
+  out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
+                    xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
+                    alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
+                    z_value = z_star)
+  return(out)
 }
+
 
 compute_nb_test_stat_fast <- function(y, exp_o, gene_precomp_size) {
   est <- log(mean(y)) - log(mean(exp_o))
@@ -63,76 +76,15 @@ compute_nb_test_stat_fast <- function(y, exp_o, gene_precomp_size) {
   return(z)
 }
 
-# fit_fast_mean_plus_offset_nb <- function() {
-#
-# }
-
-#' Run sceptre using precomputations for gRNAs and genes.
-#'
-#' This function is the workhorse function of the sceptre package. It runs a distilled CRT using a negative binomial test statistic based on an expression vector, a gRNA indicator vector, an offset vector (from the distillation step), gRNA conditional probabilities, an estimate of the negative binomial size parameter, and the number of resampling replicates.
-#'
-#' @param expressions a vector of gene expressions (in UMI counts)
-#' @param gRNA_indicators a vector of gRNA indicators
-#' @param gRNA_precomp a vector of conditional probabilities for gRNA assignments
-#' @param gene_precomp_size the pre-computed size
-#' @param gene_precomp_offsets the pre-computed distillation offsets
-#' @param B the number of resamples to make (default 500)
-#' @param seed an arguement to set.seed; if null, no seed is set
-#' @param side an argument to set test for left-sided, right-sided or two-tailed. Default as 'left' and can take 'left', 'right' or 'both'.
-#' @param reduced_output logical indicating whether the function should the function return the full output or the reduced output.
-#' @param verbose print status updates to the console?
-#'
-#' @noRd
-#' @return if reduced_output, a dataframe with the p-value, test statistic, and other helpful values; if !reduced_output, a list containing all of the above, plus the resampled statistics.
-run_sceptre_using_precomp <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, B, seed, reduced_output, verbose) {
-  if (!is.null(seed)) set.seed(seed)
-
-  # compute the test statistic on the real data
-  fit_star <- VGAM::vglm(formula = expressions[gRNA_indicators == 1] ~ 1, family = VGAM::negbinomial.size(gene_precomp_size), offset = gene_precomp_offsets[gRNA_indicators == 1])
-  t_star <- VGAM::summaryvglm(fit_star)@coef3["(Intercept)", "z value"]
-
-  # Define a closure to resample B times (omitting the NAs)
-  resample_B_times <- function(my_B) {
-    t_nulls <- sapply(1:my_B, function(i) {
-      if (verbose && (i %% 100 == 0)) cat(paste0("Running resample ", i ,"/", my_B, ".\n"))
-      gRNA_indicators_null <- stats::rbinom(n = length(gRNA_precomp), size = 1, prob = gRNA_precomp)
-      tryCatch({
-        fit_null <- VGAM::vglm(formula = expressions[gRNA_indicators_null == 1] ~ 1, family = VGAM::negbinomial.size(gene_precomp_size), offset = gene_precomp_offsets[gRNA_indicators_null == 1])
-        VGAM::summaryvglm(fit_null)@coef3["(Intercept)", "z value"]},
-        error = function(e) return(NA),
-        warning = function(w) return(NA)
-      )
-    })
-    t_nulls[!is.na(t_nulls)]
-  }
-
-  # resample B times
-  t_nulls <- resample_B_times(B)
-
-  # obtain a p-value
-  skew_t_fit <- fit_skew_t(t_nulls, t_star, side)
-
-  # determine if the fit was successful
-  if (!skew_t_fit$skew_t_fit_success || length(t_nulls) <= floor(0.95 * B)) { # If the skew-t fit failed, then try again.
-    t_nulls_second_set <- resample_B_times(2 * B)
-    t_nulls <- c(t_nulls, t_nulls_second_set)
-    skew_t_fit <- fit_skew_t(t_nulls, t_star, side)
-  }
-
-  # Prepare the output
-  if (reduced_output) {
-    out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
-                      xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
-                      alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
-                      z_value = t_star, n_successful_resamples = length(t_nulls))
-  } else {
-    out <- list(p_value = skew_t_fit$out_p,
-                skew_t_fit_success = skew_t_fit$skew_t_fit_success,
-                skew_t_mle = skew_t_fit$skew_t_mle,
-                z_value = t_star,
-                resampled_z_values = t_nulls)
-  }
-  return(out)
+compute_nb_test_stat_fast_score <- function(y, exp_o, gene_precomp_size) {
+  r_exp_o <- gene_precomp_size * exp_o
+  y_exp_o <- y * exp_o
+  r_plus_exp_o <- gene_precomp_size + exp_o
+  sum_y <- sum(y)
+  top <- (y_exp_o + r_exp_o)/r_plus_exp_o
+  bottom <- r_exp_o/r_plus_exp_o
+  z <- (sum_y - sum(top))/sqrt(sum(bottom))
+  return(z)
 }
 
 
@@ -145,7 +97,8 @@ run_sceptre_using_precomp <- function(expressions, gRNA_indicators, gRNA_precomp
 #'
 #' @noRd
 #' @return the fitted probabilities
-run_gRNA_precomputation <- function(gRNA_indicators, covariate_matrix, B) {
+run_gRNA_precomputation <- function(gRNA_indicators, covariate_matrix, B, seed) {
+  set.seed(seed)
   # first, fit a logistic regression model to estimate perturbation probabilities
   fit_model_grna <- stats::glm(gRNA_indicators ~ ., family = stats::binomial(), data = covariate_matrix)
   out <- as.numeric(stats::fitted(fit_model_grna))
@@ -238,23 +191,19 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' covariate_matrix,
 #' verbose = FALSE)
 #' result
-run_sceptre_gRNA_gene_pair <- function(expressions, gRNA_indicators, covariate_matrix, side = "left", gene_precomp_size = NULL, B = 500, seed = NULL, reduced_output = TRUE, verbose = TRUE) {
+run_sceptre_gRNA_gene_pair <- function(expressions, gRNA_indicators, covariate_matrix, side = "left", gene_precomp_size = NULL, B = 500, seed = NULL, reduced_output = TRUE) {
   if (verbose) cat("Running gRNA precomputation.\n")
-  gRNA_precomp <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix)
+  gRNA_precomp <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix, B, seed)
 
   if (verbose) cat("Running gene precomputation.\n")
   gene_precomp <- run_gene_precomputation(expressions, covariate_matrix, gene_precomp_size)
 
   if (verbose) cat("Running CRT\n")
-  out <- run_sceptre_using_precomp(expressions,
-                                   gRNA_indicators,
-                                   gRNA_precomp,
-                                   side,
-                                   gene_precomp$gene_precomp_size,
-                                   gene_precomp$gene_precomp_offsets,
-                                   B,
-                                   if (is.null(seed)) 4 else seed,
-                                   reduced_output,
-                                   verbose)
+  out <- run_sceptre_using_precomp_fast(expressions,
+                                        gRNA_indicators,
+                                        gRNA_precomp,
+                                        side,
+                                        gene_precomp$gene_precomp_size,
+                                        gene_precomp$gene_precomp_offsets)
   return(out)
 }
