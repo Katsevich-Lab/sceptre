@@ -78,7 +78,6 @@ create_dictionary <- function(ids, pod_size) {
 #' @param pod_sizes an integer vector with three named elements: gRNA, gene, and pair. These elements give the sizes of the respective "pods."
 #'
 #' @return an integer vector containing the number of pods in the gene, gRNA, and pairs dictionaries.
-#' @export
 create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRNA_precomp_dir, results_dir, pod_sizes) {
   # 0. Clear out contents of gRNA precomp, gene precomp, and results directories
   for (direct in c(gRNA_precomp_dir, gene_precomp_dir)) {
@@ -135,7 +134,6 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 #' @param log_dir file path to the log directory
 #'
 #' @return NULL
-#' @export
 run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbation_matrix, covariate_matrix, log_dir, B, seed) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
@@ -173,8 +171,6 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbat
 #' @param covariate_matrix the cell-specific covariate matrix
 #' @param regularization_amount amount of regularization to apply to the thetas
 #' @param log_dir directory in which to sink the log file
-#'
-#' @export
 run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, expression_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_1_pod_", pod_id, ".Rout"))
 
@@ -222,7 +218,6 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, e
 #' @param gene_precomp_dir location of the gene precomputation directory
 #' @param log_dir location of the directory in which to sink the log file
 #' @param regularization_amount amount of regularization to apply to thetas (>= 0)
-#' @export
 regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amount, log_dir) {
   if (regularization_amount > 0) {
     if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_regularize_sizes", ".Rout"))
@@ -259,8 +254,6 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 #' @param covariate_matrix covariate matrix
 #' @param regularization_amount the amount of regularization to apply to the estimated negative binomial size parameters
 #' @param log_dir directory in which to sink the logs
-#'
-#' @export
 run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, expression_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_2_pod_", pod_id, ".Rout"))
 
@@ -310,7 +303,6 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 #' @param side (optional, default left) sidedness of test
 #'
 #' @return NULL
-#' @export
 run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, expression_matrix, perturbation_matrix, covariate_matrix, regularization_amount, side, B) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/result_", pod_id, ".Rout"))
 
@@ -378,7 +370,6 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 #' @param return_df return the results data frame (in addition to writing it)?
 #'
 #' @return the collated results data frame.
-#' @export
 collect_results <- function(results_dir, return_df = FALSE) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)

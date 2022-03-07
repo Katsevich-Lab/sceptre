@@ -22,13 +22,13 @@
 }
 }
 
-An object of class \code{matrix} (inherits from \code{array}) with 5 rows and 101508 columns.
+An object of class \code{matrix} (inherits from \code{array}) with 5 rows and 106660 columns.
 
-An object of class \code{dgTMatrix} with 25 rows and 101508 columns.
+An object of class \code{dgRMatrix} with 50 rows and 106660 columns.
 
-An object of class \code{data.frame} with 101508 rows and 4 columns.
+An object of class \code{data.frame} with 106660 rows and 4 columns.
 
-An object of class \code{data.frame} with 100 rows and 2 columns.
+An object of class \code{data.frame} with 23 rows and 2 columns.
 }
 \source{
 A genome-wide framework for Mapping Gene Regulation via Cellular Genetic Screens, Gasperini et al. 2019. Link: \url{https://www.sciencedirect.com/science/article/pii/S009286741831554X?via\%3Dihub}

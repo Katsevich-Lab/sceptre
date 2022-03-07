@@ -29,7 +29,7 @@ gRNAs_to_analyze <- unlist(gRNA_grps) %>% set_names(NULL)
 
 # determine genes and gRNAs to analyze
 genes_to_analyze <- get_feature_covariates(gene_odm) %>% dplyr::filter(mean_expression > 1) %>%
-  dplyr::sample_n(10) %>% row.names()
+  dplyr::sample_n(5) %>% row.names()
 
 # load matrices corresponding to sampled genes and gRNAs
 gene_matrix <- as.matrix(gene_odm[[genes_to_analyze,]])
@@ -40,7 +40,7 @@ row.names(gRNA_matrix) <- gRNAs_to_analyze; colnames(gRNA_matrix) <- get_cell_ba
 
 # create the data frame of gene-gRNA pairs to analyze
 gene_gRNA_pairs <- expand.grid(gene_id = genes_to_analyze, gRNA_id = my_enh_regions) %>%
-  dplyr::sample_n(45)
+  dplyr::sample_n(23)
 
 # save the expression matrix, perturbation matrix, covariate matrix, and gene-gRNA pairs matrix
 usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, gRNA_grps, overwrite = TRUE)
