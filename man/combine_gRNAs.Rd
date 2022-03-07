@@ -7,25 +7,31 @@
 combine_gRNAs(gRNA_matrix, gRNA_grps)
 }
 \arguments{
-\item{gRNA_matrix}{XX}
+\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the matrix should have row names giving the gRNA IDs}
 
-\item{gRNA_grps}{XX}
+\item{gRNA_grps}{a named list; each entry of the list should be a character vector giving the IDs of gRNAs that target the same site, with the name of that entry being the name of the targeted site}
 }
 \value{
-
+a "combined" gRNA-by-cell expression matrix, where gRNAs that target the same site have been collapsed into a single row (via addition of the constituent gRNAs)
 }
 \description{
-Combine gRNAs
+Combines gRNAs that target the same site into a single "combined" gRNA via addition of the constituent expression levels.
+}
+\details{
+It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
 }
 \examples{
 library(magrittr)
 data(gRNA_matrix)
-indiv_gRNAs <- sort(row.names(gRNA_matrix))
-grp_size <- 5L
-idxs <- seq(from = 1, to = length(indiv_gRNAs) + grp_size, by = grp_size)
-group_idxs <- seq(1, length(idxs) - 1)
-gRNA_grps <- lapply(X = group_idxs, FUN = function(i) {
- gRNA_grp <- indiv_gRNAs[seq(idxs[i], idxs[i + 1] - 1)]
-}) \%>\% set_names(., paste0("gRNA_grp_",  group_idxs))
+data(gRNA_grps)
 combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+
+# Example explanation:
+# `gRNA_grps` indicates that the gRNAs "AGAAGAGTCAGCCTTGCAC,"
+# "GAAGAGTCAGCCTTGCACT," "GTTTAGGGAACCCAGTGCA," "GTAACTTCATTTGCAGCAA,"
+# "TTACTTTTTATCAAGCCAA," "TCTAATTTAAGACCTGGGT," "AAGGTATCATTTTCTTGTC,"
+# "TTAGCCATAGAACCACTAC," "TTTTCCAGTAGTGGTTCTA," and "TACATGGCATAGATCTTTA"
+# all target the site "chr8:128428069-128428469". The function  collapses
+# the above gRNAs into a single "combined" gRNA called
+# "chr8:128428069-128428469" (and similarly for the other sites).
 }
