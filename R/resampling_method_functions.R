@@ -50,7 +50,7 @@ fit_skew_t <- function(t_nulls, t_star, side) {
 #' @param side an argument to set test for left-sided, right-sided or two-tailed. Default as 'left' and can take 'left', 'right' or 'both'.#'
 #' @noRd
 #' @return if reduced_output, a dataframe with the p-value, test statistic, and other helpful values; if !reduced_output, a list containing all of the above, plus the resampled statistics.
-run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets) {
+run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, full_output = FALSE) {
   exp_gene_offsets <- exp(gene_precomp_offsets)
   # compute test statistic on real data
   z_star <- compute_nb_test_stat_fast_score(expressions[gRNA_indicators == 1], exp_gene_offsets[gRNA_indicators == 1], gene_precomp_size)
@@ -61,10 +61,14 @@ run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_pr
   # fit skew-t
   skew_t_fit <- fit_skew_t(z_null, z_star, side)
   # create output
-  out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
-                    xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
-                    alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
-                    z_value = z_star)
+  if (full_output) {
+    out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
+                      xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
+                      alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
+                      z_value = z_star)
+  } else {
+    out <- data.frame(p_value = skew_t_fit$out_p, z_value = z_star)
+  }
   return(out)
 }
 
@@ -179,10 +183,12 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' gRNA_expressions <- gRNA_matrix[1,]
 #' # run method
 #' run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
-run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covariate_matrix, side = "both", B = 1500, seed = 4) {
+run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covariate_matrix, side = "both", B = 1500, full_output = FALSE, seed = 4) {
   THRESHOLD <- 3
 
   cat("Running perturbation precomputation.")
+  # threshold gRNA_expressions, if necessary
+  if (max(gRNA_expressions) >= 2) gRNA_expressions <- as.integer(gRNA_expressions >= THRESHOLD)
   gene_precomp <- run_gene_precomputation(gene_expressions, covariate_matrix, NULL)
   cat(crayon::green(' \u2713\n'))
 
@@ -196,7 +202,8 @@ run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covar
                                         gRNA_precomp,
                                         side,
                                         gene_precomp$gene_precomp_size,
-                                        gene_precomp$gene_precomp_offsets)
+                                        gene_precomp$gene_precomp_offsets,
+                                        full_output)
   cat(crayon::green(' \u2713\n'))
   return(out)
 }

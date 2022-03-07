@@ -10,6 +10,7 @@ run_sceptre_gRNA_gene_pair(
   covariate_matrix,
   side = "both",
   B = 1500,
+  full_output = FALSE,
   seed = 4
 )
 }
