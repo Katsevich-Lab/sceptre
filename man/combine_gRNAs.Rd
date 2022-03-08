@@ -15,7 +15,7 @@ combine_gRNAs(gRNA_matrix, gRNA_grps)
 a "combined" gRNA-by-cell expression matrix, where gRNAs that target the same site have been collapsed into a single row (via addition of the constituent gRNAs)
 }
 \description{
-Combines gRNAs that target the same site into a single "combined" gRNA via addition of the constituent expression levels.
+Combines gRNAs that target the same site into a single "combined" gRNA via addition of the expression levels of the constituent gRNAs.
 }
 \details{
 It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.

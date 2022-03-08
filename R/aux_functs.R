@@ -1,6 +1,6 @@
 #' Combine gRNAs
 #'
-#' Combines gRNAs that target the same site into a single "combined" gRNA via addition of the constituent expression levels.
+#' Combines gRNAs that target the same site into a single "combined" gRNA via addition of the expression levels of the constituent gRNAs.
 #'
 #' It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
 #'
