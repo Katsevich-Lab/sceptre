@@ -1,26 +1,26 @@
-#' Plot resampled test statistics over fitted skew-t distribution
+#' Plot fitted skew-t distribution
 #'
-#' Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic.
+#' Plots the skew-t distribution fitted to the resampled test statistics, alongside the "ground truth" test statistic derived from the raw data.
 #'
-#' @param resampled_zvalues the set of resampled z-values
-#' @param original_zvalue the z value of the original negative binomial fit
-#' @param dp the skew-t fit MLE
-#' @param interval (optional; default c(-4,4)) interval over which to plot the skew-t distribution
+#' One also can call this function on a given row of the data frame outputted by `run_sceptre_in_memory` when `full_output` is set to TRUE.
 #'
-#' @return a ggplot object containing the plot
+#' @param sceptre_result output of `run_sceptre_gRNA_gene_pair` when `full_output` is set to TRUE
+#' @param interval (optional) interval over which the distribution is plotted
+#'
+#' @return a ggplot object
 #' @export
 #' @examples
-#' data(expressions)
-#' data(gRNA_indicators)
-#' data(covariate_matrix)
-#' result <- run_sceptre_gRNA_gene_pair(expressions = expressions,
-#' gRNA_indicators = gRNA_indicators,
-#' covariate_matrix = covariate_matrix,
-#' reduced_output = FALSE,
-#' seed = 4,
-#' verbose = FALSE)
-#' plot_skew_t(result$resampled_z_values, result$z_value, result$skew_t_mle)
-plot_skew_t <- function(resampled_zvalues, original_zvalue, dp, interval = c(-4,4)) {
+#' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
+#' gene_expressions <- gene_matrix[1,]
+#' gRNA_expressions <- gRNA_matrix[1,]
+#' # run method
+#' result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left", full_output = TRUE)
+#' # plot result
+#' plot_skew_t(result)
+plot_skew_t <- function(sceptre_result, interval = c(-4, 4)) {
+  resampled_zvalues <- sceptre_result %>% dplyr::select(dplyr::starts_with("z_null_")) %>% as.numeric()
+  original_zvalue <- sceptre_result$z_value
+  dp <- sceptre_result %>% dplyr::select(xi, omega, alpha, nu) %>% as.numeric()
   z <- seq(interval[1], interval[2], length.out = 1000)
   df_curves <- data.frame(z = z, fitted = sn::dst(x = z, dp = dp), gaussian = stats::dnorm(z)) %>%
     tidyr::gather("curve", "y", fitted, gaussian) %>%

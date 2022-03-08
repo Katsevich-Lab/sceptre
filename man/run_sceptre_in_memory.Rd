@@ -39,7 +39,7 @@ run_sceptre_in_memory(
 \item{seed}{seed to the random number generator}
 }
 \value{
-a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}
+a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See
 }
 \description{
 The core function of the \code{sceptre} package. This function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
@@ -53,6 +53,6 @@ data(gRNA_grps) # iv. gRNAs grouped by target site
 data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
 # 2. (Optional) group together gRNAs that target the same site
 gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
-# 3. run method (~40s on 8-core Macbook Pro)
+# 3. run method (takes ~40s on an 8-core Macbook Pro)
 result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
 }

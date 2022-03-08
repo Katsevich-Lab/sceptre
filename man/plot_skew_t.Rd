@@ -2,34 +2,30 @@
 % Please edit documentation in R/plotting.R
 \name{plot_skew_t}
 \alias{plot_skew_t}
-\title{Plot resampled test statistics over fitted skew-t distribution}
+\title{Plot fitted skew-t distribution}
 \usage{
-plot_skew_t(resampled_zvalues, original_zvalue, dp, interval = c(-4, 4))
+plot_skew_t(sceptre_result, interval = c(-4, 4))
 }
 \arguments{
-\item{resampled_zvalues}{the set of resampled z-values}
+\item{sceptre_result}{output of \code{run_sceptre_gRNA_gene_pair} when \code{full_output} is set to TRUE}
 
-\item{original_zvalue}{the z value of the original negative binomial fit}
-
-\item{dp}{the skew-t fit MLE}
-
-\item{interval}{(optional; default c(-4,4)) interval over which to plot the skew-t distribution}
+\item{interval}{(optional) interval over which the distribution is plotted}
 }
 \value{
-a ggplot object containing the plot
+a ggplot object
 }
 \description{
-Plots the fitted skew-t distribution, along with the resampled (null) test statistics and real test statistic.
+Plots the skew-t distribution fitted to the resampled test statistics, alongside the "ground truth" test statistic derived from the raw data.
+}
+\details{
+One also can call this function on a given row of the data frame outputted by \code{run_sceptre_in_memory} when \code{full_output} is set to TRUE.
 }
 \examples{
-data(expressions)
-data(gRNA_indicators)
-data(covariate_matrix)
-result <- run_sceptre_gRNA_gene_pair(expressions = expressions,
-gRNA_indicators = gRNA_indicators,
-covariate_matrix = covariate_matrix,
-reduced_output = FALSE,
-seed = 4,
-verbose = FALSE)
-plot_skew_t(result$resampled_z_values, result$z_value, result$skew_t_mle)
+data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
+gene_expressions <- gene_matrix[1,]
+gRNA_expressions <- gRNA_matrix[1,]
+# run method
+result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left", full_output = TRUE)
+# plot result
+plot_skew_t(result)
 }
