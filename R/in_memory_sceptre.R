@@ -1,60 +1,33 @@
-#' Run sceptre in memory
+#' Run `sceptre` in memory
 #'
-#' Runs sceptre in memory. This function is appropriate for data of intermediate size (i.e., the data are small enough to fit into memory, and the analysis does not need to be run across nodes on a computer cluster).
+#' The core function of the `sceptre` package. This function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 #'
-#' @param storage_dir name of a directory in which to store logs, intermediate computations, and final results
-#' @param expression_matrix a matrix of gene expressions (in UMI counts); rows correspond to genes and columns to cells; the rows should be named.
-#' @param perturbation_matrix a binary matrix of gRNA perturbations; rows correspond to gRNAs and columns to cells; the rows likewise should be names.
-#' @param covariate_matrix a data frame of covariates; rows correspond to cells.
-#' @param gene_gRNA_pairs a data frame with named columns "gene_id" and "gRNA_id" giving the names of the gRNAs and genes to analyze.
-#' @param side sidedness of the test; one of "left", "right," and "both".  "left" is most appropriate for experiments in which cis-regulatory relationships are tested by perturbing putative enhancers with CRISPRi.
-#' @param pod_sizes an integer vector giving the size of the "gene", "gRNA", and "pair" pods. `sceptre` groups the genes, gRNAs, and gene-gRNA pairs into distinct "pods" and runs computations on these pods in parallel. Smaller pod sizes give rise to greater parallelization. `pod_sizes` should be vector of length three with names "gene", "gRNA", and "pair" and integer values giving the pod sizes.
-#' @param regularization_amount (optional; default 0.1) the amount of regularization to apply to the estimated negative binomial size parameters, where 0 corresponds to no regularization at all.
-#' @param seed (optional; default 4) seed to pass to the random number generator.
-#' @param B (optional; default 500) number of random samples to draw in the conditional randomization test.
+#' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named
+#' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named
+#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch
+#' @param gene_gRNA_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
+#' @param side sidedness of the test; one of "both," "left," and "right"
+#' @param B number of resamples to draw for the conditional randomization test
+#' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE)?
+#' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates
+#' @param storage_dir directory in which to store the intermediate computations
+#' @param seed seed to the random number generator
 #'
-#' @return a data frame containing the results. Includes columns gene_id, gRNA_id, p_value, skew_t_fit_success (indicating whether the skew-t fit succeeded), xi, omega, alpha, nu (parameters of the skew-t distribution), z_value (the ground truth negative binomial test statistic), and n_successful_resamples (indicates how many of the B resamples were successful).
+#' @return a data frame containing columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # generate random perturbation and expression data in memory
-#' library(dplyr)
-#' set.seed(4)
-#' n_gRNAs <- 50
-#' n_genes <- 40
-#' n_cells <- 5000
-#' # create perturbation, expression, and covariate matrices
-#' perturbation_matrix <- replicate(n = n_gRNAs, rbinom(n_cells, 1, 0.05)) %>% t()
-#' expression_matrix <- replicate(n = n_genes, rpois(n_cells, 1)) %>% t()
-#' covariate_matrix <- data.frame(p_mito = runif(n = n_cells, min = 0, max = 10),
-#'                                lg_umi_count = log(rpois(n = n_cells, lambda =  500)))
-#' # assign column names to the perturbation and expression matrices
-#' row.names(perturbation_matrix) <- paste0("gRNA", seq(1, n_gRNAs))
-#' row.names(expression_matrix) <- paste0("gene", seq(1, n_genes))
-#' # select 5000 random gene-gRNA pairs to analyze; create the gene_gRNA_pairs data frame
-#' gene_gRNA_pairs <- expand.grid(gene_id = row.names(expression_matrix),
-#'                                gRNA_id = row.names(perturbation_matrix)) %>% slice_sample(n = 90)
-#' # let the temporary directory be the storage dir
-#' storage_dir <- tempdir()
-#' # set the remaining parameters: test sidedness, pod_sizes, regularization_amount, seed, and B.
-#' side <- "left"
-#' pod_sizes = c(gene = 10, gRNA = 10, pair = 15)
-#' regularization_amount <- 0.1
-#' seed <- 4
-#' B <- 500
-#' result <- run_sceptre_in_memory(storage_dir,
-#'                      expression_matrix,
-#'                      perturbation_matrix,
-#'                      covariate_matrix,
-#'                      gene_gRNA_pairs,
-#'                      side,
-#'                      pod_sizes,
-#'                      regularization_amount,
-#'                      seed,
-#'                      B)
-#' }
-run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1500, seed = 4) {
+#' # 1. load the data
+#' data(gene_matrix) # i. gene expression matrix
+#' data(gRNA_matrix) # ii. gRNA expression matrix
+#' data(covariate_matrix) # iii. covariate matrix
+#' data(gRNA_grps) # iv. gRNAs grouped by target site
+#' data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
+#' # 2. (Optional) group together gRNAs that target the same site
+#' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+#' # 3. run method (~40s on 8-core Macbook Pro)
+#' result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
   ##################
@@ -73,13 +46,13 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
   # print(paste0("Note: check the `log` subdirectory of the storage directory ", as.character(storage_dir), " for updates!"))
   dirs <- initialize_directories(storage_location = storage_dir)
 
-  # 1. threshold perturbation_matrix (using threshold = 3, for now) if necessary
-  if (max(perturbation_matrix) >= 2) {
-    perturbation_matrix <- perturbation_matrix >= THRESHOLD
+  # 1. threshold gRNA_matrix (using threshold = 3, for now) if necessary
+  if (max(gRNA_matrix) >= 2) {
+    gRNA_matrix <- gRNA_matrix >= THRESHOLD
   }
   # 2. Remove all genes and gRNAs that have 0 counts; arrange pairs by gRNA then gene; remove duplicates
-  gene_lib_sizes <- Matrix::rowSums(expression_matrix)
-  gRNA_lib_sizes <- Matrix::rowSums(perturbation_matrix)
+  gene_lib_sizes <- Matrix::rowSums(gene_matrix)
+  gRNA_lib_sizes <- Matrix::rowSums(gRNA_matrix)
   bad_genes <- names(gene_lib_sizes[gene_lib_sizes < MIN_GENE_EXP])
   bad_gRNAs <- names(gRNA_lib_sizes[gRNA_lib_sizes < MIN_GRNA_EXP])
   if (length(bad_genes) >= 1) {
@@ -91,20 +64,21 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
     gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::filter(!(gRNA_id %in% bad_gRNAs))
   }
   # 3. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices; ensure all rows distinct
-  abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(expression_matrix))]
-  abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(perturbation_matrix))]
+  if (!all(c("gene_id", "gRNA_id") %in% colnames(gene_gRNA_pairs))) stop("The columns `gene_id` and `gRNA_id` must be present in the `gene_gRNA_pairs` data frame.")
+  abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(gene_matrix))]
+  abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(gRNA_matrix))]
   if (length(abs_genes) >= 1) {
-    msg <- paste0("The genes `", paste0(abs_genes, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `expression_matrix` matrix. Either remove these genes from `gene_gRNA_pairs,` or add these genes to `expression_matrix`.")
+    msg <- paste0("The genes `", paste0(abs_genes, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `gene_matrix` matrix. Either remove these genes from `gene_gRNA_pairs,` or add these genes to `gene_matrix`.")
     stop(msg)
   }
   if (length(abs_gRNAs) >= 1) {
-    msg <- paste0("The perturbations `", paste0(abs_gRNAs, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `perturbation_matrix` matrix. Either remove these perturbations from `gene_gRNA_pairs,` or add these perturbations to `perturbation_matrix`.")
+    msg <- paste0("The perturbations `", paste0(abs_gRNAs, collapse = ", "), "' are present in the `gene_gRNA_pairs` data frame but not in the `gRNA_matrix` matrix. Either remove these perturbations from `gene_gRNA_pairs,` or add these perturbations to `gRNA_matrix`.")
     stop(msg)
   }
   gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::distinct()
 
   # 4. Ensure that cell barcodes coincide across gene and perturbation matrices
-  if  (!identical(colnames(perturbation_matrix), colnames(expression_matrix))) stop("The cell barcodes in the perturbation and expression matrices do not coincide. Ensure that these matrices have identical cell barcodes in the same order.")
+  if  (!identical(colnames(gRNA_matrix), colnames(gene_matrix))) stop("The cell barcodes in the perturbation and expression matrices do not coincide. Ensure that these matrices have identical cell barcodes in the same order.")
   # 5. Set the pods
   n_genes <- length(unique(gene_gRNA_pairs$gene_id))
   n_gRNAs <- length(unique(gene_gRNA_pairs$gRNA_id))
@@ -128,7 +102,7 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
   foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
                      run_gene_precomputation_at_scale_round_1(pod_id = pod_id,
                                                               gene_precomp_dir = dirs[["gene_precomp_dir"]],
-                                                              expression_matrix = expression_matrix,
+                                                              gene_matrix = gene_matrix,
                                                               covariate_matrix = covariate_matrix,
                                                               regularization_amount = regularization_amount,
                                                               log_dir = dirs[["log_dir"]]))
@@ -143,7 +117,7 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
   foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
                      run_gene_precomputation_at_scale_round_2(pod_id = pod_id,
                                                               gene_precomp_dir = dirs[["gene_precomp_dir"]],
-                                                              expression_matrix = expression_matrix,
+                                                              gene_matrix = gene_matrix,
                                                               covariate_matrix = covariate_matrix,
                                                               regularization_amount = regularization_amount,
                                                               log_dir = dirs[["log_dir"]]))
@@ -153,7 +127,7 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
   foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
                      run_gRNA_precomputation_at_scale(pod_id = pod_id,
                                                       gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
-                                                      perturbation_matrix = perturbation_matrix,
+                                                      gRNA_matrix = gRNA_matrix,
                                                       covariate_matrix = covariate_matrix,
                                                       log_dir = dirs[["log_dir"]],
                                                       B = B,
@@ -168,12 +142,13 @@ run_sceptre_in_memory <- function(expression_matrix, perturbation_matrix, covari
                                                           gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
                                                           results_dir = dirs[["results_dir"]],
                                                           log_dir = dirs[["log_dir"]],
-                                                          expression_matrix = expression_matrix,
-                                                          perturbation_matrix = perturbation_matrix,
+                                                          gene_matrix = gene_matrix,
+                                                          gRNA_matrix = gRNA_matrix,
                                                           covariate_matrix = covariate_matrix,
                                                           regularization_amount = regularization_amount,
                                                           side = side,
-                                                          B = B))
+                                                          B = B,
+                                                          full_output))
   cat(crayon::green(' \u2713\n'))
   # collect results
   cat("Collecting and returning results. ")

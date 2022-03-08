@@ -15,7 +15,7 @@ The gene-gRNA pairs that we seek to test for association. Columns include \code{
 }
 \section{Overview}{
 
-This object is part of the example data in the \code{sceptre} package. The data are taken from the paper "Global Analysis of Enhancer Targets Reveals Convergent Enhancer-Driven Regulatory Modules" by Xie et al., 2019. The authors used CRISPRi-based perturb-seq to target >500 putative enhancers in a population of K562 cells. The example data consist of a subset of the sequenced gRNAs and genes measured on 106,660 cells.
+This object is part of the example data in the \code{sceptre} package. The data are taken from the paper "Global Analysis of Enhancer Targets Reveals Convergent Enhancer-Driven Regulatory Modules" by Xie et al., 2019. The authors used a CRISPRi-based perturb-seq assay to target >500 putative enhancers in a population of K562 cells. The example data consist of a subset of the sequenced gRNAs and genes measured on 106,660 cells.
 }
 
 \keyword{datasets}

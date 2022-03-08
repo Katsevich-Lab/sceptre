@@ -2,7 +2,7 @@
 % Please edit documentation in R/resampling_method_functions.R
 \name{run_sceptre_gRNA_gene_pair}
 \alias{run_sceptre_gRNA_gene_pair}
-\title{Run SCEPTRE on a gRNA-gene pair}
+\title{Run \code{sceptre} on a gRNA-gene pair}
 \usage{
 run_sceptre_gRNA_gene_pair(
   gene_expressions,
@@ -14,8 +14,26 @@ run_sceptre_gRNA_gene_pair(
   seed = 4
 )
 }
+\arguments{
+\item{gene_expressions}{(numeric vector) a vector of gene expressions}
+
+\item{gRNA_expressions}{(numeric vector) a vector of gRNA expressions (or, optionally, a user-thresholded vector of binary gRNA indicators)}
+
+\item{covariate_matrix}{(data frame) the cell-specific matrix of covariates}
+
+\item{side}{sidedness of the test, one of "left," "right," and "both"}
+
+\item{B}{number of resamples for the conditional randomization test}
+
+\item{full_output}{return the full output (TRUE) or a streamlined, reduced output (FALSE)?}
+
+\item{seed}{seed to the random number generator}
+}
 \description{
-Runs SCEPTRE on a given gRNA-gene pair.
+Runs \code{sceptre} on a given gRNA-gene pair.
+}
+\details{
+This function is for demonstration purposes only. The function \code{run_sceptre_in_memory} should be used when testing for association between multiple genes and gRNAs.
 }
 \examples{
 # load the example data
@@ -23,5 +41,5 @@ data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 gene_expressions <- gene_matrix[1,]
 gRNA_expressions <- gRNA_matrix[1,]
 # run method
-run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
+result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
 }

@@ -10,12 +10,13 @@ run_gRNA_gene_pair_analysis_at_scale(
   gRNA_precomp_dir,
   results_dir,
   log_dir,
-  expression_matrix,
-  perturbation_matrix,
+  gene_matrix,
+  gRNA_matrix,
   covariate_matrix,
   regularization_amount,
   side,
-  B
+  B,
+  full_output
 )
 }
 \arguments{
@@ -29,9 +30,9 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{log_dir}{(optional) directory in which to sink the log file}
 
-\item{expression_matrix}{the expression matrix, stored as an ondisc_matrix}
+\item{gene_matrix}{the expression matrix, stored as an ondisc_matrix}
 
-\item{perturbation_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
+\item{gRNA_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
 
 \item{covariate_matrix}{the cell-covariate matrix}
 

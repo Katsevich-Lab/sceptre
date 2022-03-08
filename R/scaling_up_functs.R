@@ -129,12 +129,12 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 #'
 #' @param pod_id ID of the pod for which to do the precomputation
 #' @param gRNA_precomp_dir file path to the gRNA precomputation directory
-#' @param perturbation_matrix the matrix of perturbations, stored as an ondisc_matrix
+#' @param gRNA_matrix the matrix of perturbations, stored as an ondisc_matrix
 #' @param covariate_matrix the cell-specific covariate matrix
 #' @param log_dir file path to the log directory
 #'
 #' @return NULL
-run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbation_matrix, covariate_matrix, log_dir, B, seed) {
+run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, gRNA_matrix, covariate_matrix, log_dir, B, seed) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
   # determine the gRNAs on which to run the precomputation
@@ -144,10 +144,10 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbat
   for (i in seq(1, length(gRNA_ids))) {
     gRNA_id <- gRNA_ids[i]
     cat(paste0("Running precomputation for gRNA ", gRNA_id, ".\n"))
-    gRNA_indicators <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
-      perturbation_matrix[gRNA_id,]
+    gRNA_indicators <- if (any(is(gene_matrix) %in% c("matrix", "Matrix"))) {
+      gRNA_matrix[gRNA_id,]
     } else {
-      perturbation_matrix[[gRNA_id,]] %>% as.numeric()
+      gRNA_matrix[[gRNA_id,]] %>% as.numeric()
     }
     synth_data <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix, B, seed)
     precomp_matrix_fp <- (gRNA_dictionary %>% dplyr::pull(precomp_file))[i] %>% as.character
@@ -167,21 +167,21 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, perturbat
 #'
 #' @param pod_id pod id
 #' @param gene_precomp_dir location of the gene precomputation directory
-#' @param expression_matrix an ondisc_matrix representing the expression data
+#' @param gene_matrix an ondisc_matrix representing the expression data
 #' @param covariate_matrix the cell-specific covariate matrix
 #' @param regularization_amount amount of regularization to apply to the thetas
 #' @param log_dir directory in which to sink the log file
-run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, expression_matrix, covariate_matrix, regularization_amount, log_dir) {
+run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_1_pod_", pod_id, ".Rout"))
 
   gene_dictionary <- fst::read_fst(paste0(gene_precomp_dir, "/gene_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
   gene_ids <- gene_dictionary %>% dplyr::pull(id) %>% as.character()
   precomps <- purrr::map(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 1 for gene ", gene_id, ".\n"))
-    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
-      expression_matrix[gene_id,]
+    expressions <- if (any(is(gene_matrix) %in% c("matrix", "Matrix"))) {
+      gene_matrix[gene_id,]
     } else {
-      expression_matrix[[gene_id,]] %>% as.numeric()
+      gene_matrix[[gene_id,]] %>% as.numeric()
     }
     unreg_size <- run_gene_precomputation(expressions = expressions, covariate_matrix = covariate_matrix, gene_precomp_size = NULL)[["gene_precomp_size"]]
     out <- list()
@@ -250,11 +250,11 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 #'
 #' @param pod_id pod id
 #' @param gene_precomp_dir gene precomp dir
-#' @param expression_matrix the gene expression matrix, stored as an ondisc_matrix
+#' @param gene_matrix the gene expression matrix, stored as an ondisc_matrix
 #' @param covariate_matrix covariate matrix
 #' @param regularization_amount the amount of regularization to apply to the estimated negative binomial size parameters
 #' @param log_dir directory in which to sink the logs
-run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, expression_matrix, covariate_matrix, regularization_amount, log_dir) {
+run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_2_pod_", pod_id, ".Rout"))
 
   gene_dictionary <- fst::read_fst(paste0(gene_precomp_dir, "/gene_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
@@ -267,10 +267,10 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 
   offsets <- sapply(gene_ids, function(gene_id) {
     cat(paste0("Running precomputation round 2 for gene ", gene_id, ".\n"))
-    expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
-      expression_matrix[gene_id,]
+    expressions <- if (any(is(gene_matrix) %in% c("matrix", "Matrix"))) {
+      gene_matrix[gene_id,]
     } else {
-      expression_matrix[[gene_id,]] %>% as.numeric()
+      gene_matrix[[gene_id,]] %>% as.numeric()
     }
     dist_offsets <- run_gene_precomputation(expressions = expressions, covariate_matrix = covariate_matrix, gene_precomp_size = gene_sizes[[gene_id]])[["gene_precomp_offsets"]]
     return(dist_offsets)
@@ -293,8 +293,8 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 #' @param gene_precomp_dir the directory containing the results of the gene precomputation
 #' @param gRNA_precomp_dir the directory containing the results of the gRNA precomputation
 #' @param results_dir directory in which to store the results
-#' @param expression_matrix the expression matrix, stored as an ondisc_matrix
-#' @param perturbation_matrix the matrix of perturbations, stored as an ondisc_matrix
+#' @param gene_matrix the expression matrix, stored as an ondisc_matrix
+#' @param gRNA_matrix the matrix of perturbations, stored as an ondisc_matrix
 #' @param covariate_matrix the cell-covariate matrix
 #' @param regularization_amount amount of regularuzation to apply to thetas
 #' @param B number of bootstrap resamples (default 500)
@@ -303,7 +303,7 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, e
 #' @param side (optional, default left) sidedness of test
 #'
 #' @return NULL
-run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, expression_matrix, perturbation_matrix, covariate_matrix, regularization_amount, side, B) {
+run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, gene_matrix, gRNA_matrix, covariate_matrix, regularization_amount, side, B, full_output) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/result_", pod_id, ".Rout"))
 
   results_dict <- fst::read_fst(paste0(results_dir, "/results_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
@@ -328,10 +328,10 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
       } else {
         gene_precomp_size <- readRDS(file = gene_size_loc)[[curr_gene]]
       }
-      expressions <- if (any(is(expression_matrix) %in% c("matrix", "Matrix"))) {
-        expression_matrix[curr_gene,]
+      expressions <- if (any(is(gene_matrix) %in% c("matrix", "Matrix"))) {
+        gene_matrix[curr_gene,]
       } else {
-        expression_matrix[[curr_gene,]] %>% as.numeric()
+        gene_matrix[[curr_gene,]] %>% as.numeric()
       }
     }
 
@@ -339,16 +339,16 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
     if (i == 1 || results_dict[[i, "gRNA_id"]] != results_dict[[i - 1, "gRNA_id"]]) {
       gRNA_prcomp_loc <- dplyr::filter(gRNA_dict, id == curr_gRNA) %>% dplyr::pull(precomp_file) %>% as.character()
       gRNA_precomp <- readRDS(file = gRNA_prcomp_loc)
-      gRNA_indicators <- if (any(is(perturbation_matrix) %in% c("matrix", "Matrix"))) {
-        perturbation_matrix[curr_gRNA,]
+      gRNA_indicators <- if (any(is(gRNA_matrix) %in% c("matrix", "Matrix"))) {
+        gRNA_matrix[curr_gRNA,]
       } else {
-        perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
+        gRNA_matrix[[curr_gRNA,]] %>% as.numeric()
       }
     }
 
     # Run the dCRT
     out_l[[i]] <- run_sceptre_using_precomp_fast(expressions, gRNA_indicators, gRNA_precomp, side,
-                                                 gene_precomp_size, gene_precomp_offsets)
+                                                 gene_precomp_size, gene_precomp_offsets, full_output)
   }
   # Create and save the result dataframe
   out_df <- do.call(what = "rbind", args = out_l) %>%
