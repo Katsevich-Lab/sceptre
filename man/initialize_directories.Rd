@@ -13,9 +13,5 @@ initialize_directories(storage_location)
 named vector containing the file paths of gene_precomp_dir, gRNA_precomp_dir, results_dir, and log_dir.
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 Initializes the offsite directory structure.
 }

@@ -20,16 +20,12 @@ run_gene_precomputation_at_scale_round_2(
 
 \item{gene_matrix}{the gene expression matrix, stored as an ondisc_matrix}
 
-\item{covariate_matrix}{covariate matrix}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
 
-\item{regularization_amount}{the amount of regularization to apply to the estimated negative binomial size parameters}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
 \item{log_dir}{directory in which to sink the logs}
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 Runs the second round of gene precomputations.
 }

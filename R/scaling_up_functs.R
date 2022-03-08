@@ -21,9 +21,6 @@ deactivate_sink <- function() {
 
 #' Initialize directories
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' Initializes the offsite directory structure.
 #'
 #' @param storage_location file path to a directory in which to store the intermediate and final results
@@ -65,13 +62,10 @@ create_dictionary <- function(ids, pod_size) {
 
 #' Create and store dictionaries
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps.
 #' This file creates those dictionaries and stores them in the appropriate locations on disk.
 #'
-#' @param gene_gRNA_pairs a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should include "gene_id" and "gRNA_id."
+#' @inheritParams run_sceptre_in_memory
 #' @param gene_precomp_dir the directory in which to store the gene precomputations
 #' @param gRNA_precomp_dir the directory in which to store the gRNA precomputations
 #' @param results_dir the directory in which to store the results
@@ -121,16 +115,12 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 
 #' Run gRNA precomputation at scale
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id).
 #' It stores the result in the gRNA precomputation directory.
 #'
+#' @inheritParams run_sceptre_in_memory
 #' @param pod_id ID of the pod for which to do the precomputation
 #' @param gRNA_precomp_dir file path to the gRNA precomputation directory
-#' @param gRNA_matrix the matrix of perturbations, stored as an ondisc_matrix
-#' @param covariate_matrix the cell-specific covariate matrix
 #' @param log_dir file path to the log directory
 #'
 #' @return NULL
@@ -159,17 +149,12 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, gRNA_matr
 
 #' Run_gene_precomputation_at_scale_round_1
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate
 #' and log geometric mean of each gene. It saves the results in the gene_precomp directory.
 #'
+#' @inheritParams run_sceptre_in_memory
 #' @param pod_id pod id
 #' @param gene_precomp_dir location of the gene precomputation directory
-#' @param gene_matrix an ondisc_matrix representing the expression data
-#' @param covariate_matrix the cell-specific covariate matrix
-#' @param regularization_amount amount of regularization to apply to the thetas
 #' @param log_dir directory in which to sink the log file
 run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_1_pod_", pod_id, ".Rout"))
@@ -210,9 +195,6 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, g
 
 #' Regularize genes at scale
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' Regularizes the estimated gene sizes.
 #'
 #' @param gene_precomp_dir location of the gene precomputation directory
@@ -243,16 +225,12 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 
 #' Run gene precomputation at scale round 2
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' Runs the second round of gene precomputations.
 #'
+#' @inheritParams run_sceptre_in_memory
 #' @param pod_id pod id
 #' @param gene_precomp_dir gene precomp dir
 #' @param gene_matrix the gene expression matrix, stored as an ondisc_matrix
-#' @param covariate_matrix covariate matrix
-#' @param regularization_amount the amount of regularization to apply to the estimated negative binomial size parameters
 #' @param log_dir directory in which to sink the logs
 run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_2_pod_", pod_id, ".Rout"))
@@ -284,24 +262,14 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, g
 
 #' Run gRNA-gene pair analysis at scale
 #'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-#'
 #' Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
 #'
+#' @inheritParams run_sceptre_in_memory
 #' @param pod_id id of the pod to compute
 #' @param gene_precomp_dir the directory containing the results of the gene precomputation
 #' @param gRNA_precomp_dir the directory containing the results of the gRNA precomputation
 #' @param results_dir directory in which to store the results
-#' @param gene_matrix the expression matrix, stored as an ondisc_matrix
-#' @param gRNA_matrix the matrix of perturbations, stored as an ondisc_matrix
-#' @param covariate_matrix the cell-covariate matrix
-#' @param regularization_amount amount of regularuzation to apply to thetas
-#' @param B number of bootstrap resamples (default 500)
 #' @param log_dir (optional) directory in which to sink the log file
-#' @param seed (optional) seed to pass to the randomization algorithm
-#' @param side (optional, default left) sidedness of test
-#'
 #' @return NULL
 run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, gene_matrix, gRNA_matrix, covariate_matrix, regularization_amount, side, B, full_output) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/result_", pod_id, ".Rout"))
@@ -360,9 +328,6 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 
 
 #' Collect results
-#'
-#' NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-#' WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
 #'
 #' Collates the individual results files into a single result file.
 #'

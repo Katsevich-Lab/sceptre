@@ -17,6 +17,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # 1. load the data
 #' data(gene_matrix) # i. gene expression matrix
 #' data(gRNA_matrix) # ii. gRNA expression matrix
@@ -27,6 +28,7 @@
 #' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
 #' result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+#' }
 run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
