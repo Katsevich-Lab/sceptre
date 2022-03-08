@@ -30,24 +30,20 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{log_dir}{(optional) directory in which to sink the log file}
 
-\item{gene_matrix}{the expression matrix, stored as an ondisc_matrix}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
 
-\item{gRNA_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
+\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named}
 
-\item{covariate_matrix}{the cell-covariate matrix}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
 
-\item{regularization_amount}{amount of regularuzation to apply to thetas}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
-\item{side}{(optional, default left) sidedness of test}
+\item{side}{sidedness of the test; one of "both," "left," and "right"}
 
-\item{B}{number of bootstrap resamples (default 500)}
+\item{B}{number of resamples to draw for the conditional randomization test}
 
-\item{seed}{(optional) seed to pass to the randomization algorithm}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
 }

@@ -36,7 +36,8 @@ Imports:
     purrr,
     ondisc,
     methods,
-    Matrix
+    Matrix,
+    crayon
 Depends: 
     R (>= 3.5)
 Suggests: 

@@ -45,6 +45,7 @@ a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, 
 The core function of the \code{sceptre} package. This function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 }
 \examples{
+\dontrun{
 # 1. load the data
 data(gene_matrix) # i. gene expression matrix
 data(gRNA_matrix) # ii. gRNA expression matrix
@@ -55,4 +56,5 @@ data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
 gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 # 3. run method (takes ~40s on an 8-core Macbook Pro)
 result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+}
 }

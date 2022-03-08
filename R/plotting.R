@@ -14,7 +14,8 @@
 #' gene_expressions <- gene_matrix[1,]
 #' gRNA_expressions <- gRNA_matrix[1,]
 #' # run method
-#' result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left", full_output = TRUE)
+#' result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions,
+#' covariate_matrix, "left", full_output = TRUE)
 #' # plot result
 #' plot_skew_t(result)
 plot_skew_t <- function(sceptre_result, interval = c(-4, 4)) {

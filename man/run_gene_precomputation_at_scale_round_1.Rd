@@ -18,19 +18,15 @@ run_gene_precomputation_at_scale_round_1(
 
 \item{gene_precomp_dir}{location of the gene precomputation directory}
 
-\item{gene_matrix}{an ondisc_matrix representing the expression data}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
 
-\item{covariate_matrix}{the cell-specific covariate matrix}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
 
-\item{regularization_amount}{amount of regularization to apply to the thetas}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
 \item{log_dir}{directory in which to sink the log file}
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate
 and log geometric mean of each gene. It saves the results in the gene_precomp directory.
 }

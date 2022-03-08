@@ -18,9 +18,5 @@ regularize_gene_sizes_at_scale(
 \item{log_dir}{location of the directory in which to sink the log file}
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 Regularizes the estimated gene sizes.
 }

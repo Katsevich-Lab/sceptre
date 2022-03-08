@@ -15,9 +15,5 @@ collect_results(results_dir, return_df = FALSE)
 the collated results data frame.
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 Collates the individual results files into a single result file.
 }

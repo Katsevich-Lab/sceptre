@@ -13,7 +13,7 @@ create_and_store_dictionaries(
 )
 }
 \arguments{
-\item{gene_gRNA_pairs}{a data frame containing a the gene-gRNA pairs to analyze using sceptre. The column names should include "gene_id" and "gRNA_id."}
+\item{gene_gRNA_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
 
 \item{gene_precomp_dir}{the directory in which to store the gene precomputations}
 
@@ -27,10 +27,6 @@ create_and_store_dictionaries(
 an integer vector containing the number of pods in the gene, gRNA, and pairs dictionaries.
 }
 \description{
-NOTE: DO NOT USE THIS FUNCTION DIRECTLY. INSTEAD, USE THE "AT-SCALE" BASH SCRIPT,
-WHICH IS DESCRIBED HERE: https://timothy-barry.github.io/sceptre/articles/sceptre-at-scale.html
-}
-\details{
 We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps.
 This file creates those dictionaries and stores them in the appropriate locations on disk.
 }
