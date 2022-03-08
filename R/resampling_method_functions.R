@@ -171,9 +171,19 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 }
 
 
-#' Run SCEPTRE on a gRNA-gene pair
+#' Run `sceptre` on a gRNA-gene pair
 #'
-#' Runs SCEPTRE on a given gRNA-gene pair.
+#' Runs `sceptre` on a given gRNA-gene pair.
+#'
+#' This function is for demonstration purposes only. The function `run_sceptre_in_memory` should be used when testing for association between multiple genes and gRNAs.
+#'
+#' @param gene_expressions (numeric vector) a vector of gene expressions
+#' @param gRNA_expressions (numeric vector) a vector of gRNA expressions (or, optionally, a user-thresholded vector of binary gRNA indicators)
+#' @param covariate_matrix (data frame) the cell-specific matrix of covariates
+#' @param side sidedness of the test, one of "left," "right," and "both"
+#' @param B number of resamples for the conditional randomization test
+#' @param full_output return the full output (TRUE) or a streamlined, reduced output (FALSE)?
+#' @param seed seed to the random number generator
 #'
 #' @export
 #' @examples
@@ -182,7 +192,7 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' gene_expressions <- gene_matrix[1,]
 #' gRNA_expressions <- gRNA_matrix[1,]
 #' # run method
-#' run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
+#' result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
 run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covariate_matrix, side = "both", B = 1500, full_output = FALSE, seed = 4) {
   THRESHOLD <- 3
 

@@ -7,7 +7,7 @@
 run_gene_precomputation_at_scale_round_1(
   pod_id,
   gene_precomp_dir,
-  expression_matrix,
+  gene_matrix,
   covariate_matrix,
   regularization_amount,
   log_dir
@@ -18,7 +18,7 @@ run_gene_precomputation_at_scale_round_1(
 
 \item{gene_precomp_dir}{location of the gene precomputation directory}
 
-\item{expression_matrix}{an ondisc_matrix representing the expression data}
+\item{gene_matrix}{an ondisc_matrix representing the expression data}
 
 \item{covariate_matrix}{the cell-specific covariate matrix}
 

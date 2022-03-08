@@ -2,83 +2,57 @@
 % Please edit documentation in R/in_memory_sceptre.R
 \name{run_sceptre_in_memory}
 \alias{run_sceptre_in_memory}
-\title{Run sceptre in memory}
+\title{Run \code{sceptre} in memory}
 \usage{
 run_sceptre_in_memory(
-  expression_matrix,
-  perturbation_matrix,
+  gene_matrix,
+  gRNA_matrix,
   covariate_matrix,
   gene_gRNA_pairs,
   side = "both",
   storage_dir = tempdir(),
   regularization_amount = 0.1,
-  B = 1500,
+  B = 1000,
+  full_output = FALSE,
   seed = 4
 )
 }
 \arguments{
-\item{expression_matrix}{a matrix of gene expressions (in UMI counts); rows correspond to genes and columns to cells; the rows should be named.}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
 
-\item{perturbation_matrix}{a binary matrix of gRNA perturbations; rows correspond to gRNAs and columns to cells; the rows likewise should be names.}
+\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named}
 
-\item{covariate_matrix}{a data frame of covariates; rows correspond to cells.}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
 
-\item{gene_gRNA_pairs}{a data frame with named columns "gene_id" and "gRNA_id" giving the names of the gRNAs and genes to analyze.}
+\item{gene_gRNA_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
 
-\item{side}{sidedness of the test; one of "left", "right," and "both".  "left" is most appropriate for experiments in which cis-regulatory relationships are tested by perturbing putative enhancers with CRISPRi.}
+\item{side}{sidedness of the test; one of "both," "left," and "right"}
 
-\item{storage_dir}{name of a directory in which to store logs, intermediate computations, and final results}
+\item{storage_dir}{directory in which to store the intermediate computations}
 
-\item{regularization_amount}{(optional; default 0.1) the amount of regularization to apply to the estimated negative binomial size parameters, where 0 corresponds to no regularization at all.}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
-\item{B}{(optional; default 500) number of random samples to draw in the conditional randomization test.}
+\item{B}{number of resamples to draw for the conditional randomization test}
 
-\item{seed}{(optional; default 4) seed to pass to the random number generator.}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
 
-\item{pod_sizes}{an integer vector giving the size of the "gene", "gRNA", and "pair" pods. \code{sceptre} groups the genes, gRNAs, and gene-gRNA pairs into distinct "pods" and runs computations on these pods in parallel. Smaller pod sizes give rise to greater parallelization. \code{pod_sizes} should be vector of length three with names "gene", "gRNA", and "pair" and integer values giving the pod sizes.}
+\item{seed}{seed to the random number generator}
 }
 \value{
-a data frame containing the results. Includes columns gene_id, gRNA_id, p_value, skew_t_fit_success (indicating whether the skew-t fit succeeded), xi, omega, alpha, nu (parameters of the skew-t distribution), z_value (the ground truth negative binomial test statistic), and n_successful_resamples (indicates how many of the B resamples were successful).
+a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}
 }
 \description{
-Runs sceptre in memory. This function is appropriate for data of intermediate size (i.e., the data are small enough to fit into memory, and the analysis does not need to be run across nodes on a computer cluster).
+The core function of the \code{sceptre} package. This function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 }
 \examples{
-\dontrun{
-# generate random perturbation and expression data in memory
-library(dplyr)
-set.seed(4)
-n_gRNAs <- 50
-n_genes <- 40
-n_cells <- 5000
-# create perturbation, expression, and covariate matrices
-perturbation_matrix <- replicate(n = n_gRNAs, rbinom(n_cells, 1, 0.05)) \%>\% t()
-expression_matrix <- replicate(n = n_genes, rpois(n_cells, 1)) \%>\% t()
-covariate_matrix <- data.frame(p_mito = runif(n = n_cells, min = 0, max = 10),
-                               lg_umi_count = log(rpois(n = n_cells, lambda =  500)))
-# assign column names to the perturbation and expression matrices
-row.names(perturbation_matrix) <- paste0("gRNA", seq(1, n_gRNAs))
-row.names(expression_matrix) <- paste0("gene", seq(1, n_genes))
-# select 5000 random gene-gRNA pairs to analyze; create the gene_gRNA_pairs data frame
-gene_gRNA_pairs <- expand.grid(gene_id = row.names(expression_matrix),
-                               gRNA_id = row.names(perturbation_matrix)) \%>\% slice_sample(n = 90)
-# let the temporary directory be the storage dir
-storage_dir <- tempdir()
-# set the remaining parameters: test sidedness, pod_sizes, regularization_amount, seed, and B.
-side <- "left"
-pod_sizes = c(gene = 10, gRNA = 10, pair = 15)
-regularization_amount <- 0.1
-seed <- 4
-B <- 500
-result <- run_sceptre_in_memory(storage_dir,
-                     expression_matrix,
-                     perturbation_matrix,
-                     covariate_matrix,
-                     gene_gRNA_pairs,
-                     side,
-                     pod_sizes,
-                     regularization_amount,
-                     seed,
-                     B)
-}
+# 1. load the data
+data(gene_matrix) # i. gene expression matrix
+data(gRNA_matrix) # ii. gRNA expression matrix
+data(covariate_matrix) # iii. covariate matrix
+data(gRNA_grps) # iv. gRNAs grouped by target site
+data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
+# 2. (Optional) group together gRNAs that target the same site
+gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+# 3. run method (~40s on 8-core Macbook Pro)
+result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
 }

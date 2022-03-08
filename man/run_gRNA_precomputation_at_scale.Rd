@@ -7,7 +7,7 @@
 run_gRNA_precomputation_at_scale(
   pod_id,
   gRNA_precomp_dir,
-  perturbation_matrix,
+  gRNA_matrix,
   covariate_matrix,
   log_dir,
   B,
@@ -19,7 +19,7 @@ run_gRNA_precomputation_at_scale(
 
 \item{gRNA_precomp_dir}{file path to the gRNA precomputation directory}
 
-\item{perturbation_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
+\item{gRNA_matrix}{the matrix of perturbations, stored as an ondisc_matrix}
 
 \item{covariate_matrix}{the cell-specific covariate matrix}
 
