@@ -62,10 +62,13 @@ run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_pr
   skew_t_fit <- fit_skew_t(z_null, z_star, side)
   # create output
   if (full_output) {
+    B <- length(z_null)
+    z_df <- as.data.frame(matrix(z_null, nrow = 1, ncol = B))
+    colnames(z_df) <- paste0("z_null_", seq(1, B))
     out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
                       xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
                       alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
-                      z_value = z_star)
+                      z_value = z_star) %>% dplyr::mutate(z_df)
   } else {
     out <- data.frame(p_value = skew_t_fit$out_p, z_value = z_star)
   }
