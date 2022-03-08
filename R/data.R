@@ -1,31 +1,49 @@
-#' Single-cell CRISPR screen example data
-#'
-#' Example single-cell CRISPR screen data from the study A Genome-wide Framework for Mapping Gene Regulation via Cellular Genetic Screens by Gasperini et al. The authors used CRISPRi to perturb 6,000 candidate enhancers and assessed the impact of these perturbations via scRNA-seq. The example data come from a single gRNA (ID: chr7.3255_top_two), a single gene (ID: ENSG00000164713), and the set of cell-specific technical factors. There are 205,797 cells in total.
+#' `sceptre` package example data
 #' @name data
-#' @format
-#' - expressions: an integer vector containing the gene expression data across all cells, measured in UMIs.
-
-#' - gRNA_indicators: a binary (i.e., 0/1) vector indicating whether the perturbation was detected in a given cell.
-#'
-#' - covariate_matrix: the set of cell-specific technical factors. The following columns are in the data frame:
-#' \describe{
-#'   \item{p_mito}{fraction of UMIs that mapped to mitochondrial genes}
-#'   \item{prep_batch}{sequencing batch (either prep_batch_1 or prep_batch_2)}
-#'   \item{lg_total_umis}{log-transformed total UMI count}
-#'   \item{lg_guide_count}{log-transformed number of perturbations detected}
-#'   \item{lg_n_genes}{log-transformed number of genes expressed}
-#' }
-#' @source A genome-wide framework for Mapping Gene Regulation via Cellular Genetic Screens, Gasperini et al. 2019. Link: \url{https://www.sciencedirect.com/science/article/pii/S009286741831554X?via%3Dihub}
+#' @section Overview:
+#' This object is part of the example data in the `sceptre` package. The data are taken from the paper "Global Analysis of Enhancer Targets Reveals Convergent Enhancer-Driven Regulatory Modules" by Xie et al., 2019. The authors used CRISPRi-based perturb-seq to target >500 putative enhancers in a population of K562 cells. The example data consist of a subset of the sequenced gRNAs and genes measured on 106,660 cells.
 NULL
 
-#' @rdname data
+
+#' Gene expression matrix
+#'
+#' A gene-by-cell expression matrix.
+#'
+#' @inheritSection data Overview
+#' @usage data(gene_matrix)
 "gene_matrix"
 
-#' @rdname data
+#' gRNA expression matrix
+#'
+#' A gRNA-by-cell expression matrix.
+#'
+#' @inheritSection data Overview
+#' @usage data(gRNA_matrix)
 "gRNA_matrix"
 
-#' @rdname data
+#' Covariate matrix
+#'
+#' A matrix of cell-specific technical factors:
+#' \describe{
+#'   \item{`lg_gene_lib_size`}{(numeric) log-transformed gene library size}
+#'   \item{`lg_gRNA_lib_size`}{(numeric) log-transformed gRNA library size}
+#'   \item{`batch`}{(factor) sequencing batch (batch_1, ..., batch_5)}
+#'   \item{`p_mito`}{(numeric) fraction of sequenced gene transcripts that map to mitochondrial genes}
+#' }
+#' @inheritSection data Overview
+#' @usage data(covariate_matrix)
 "covariate_matrix"
 
-#' @rdname data
+#' Gene-gRNA pairs
+#'
+#' The gene-gRNA pairs that we seek to test for association. Columns include `gene_id` and `gRNA_id`.
+#' @inheritSection data Overview
+#' @usage data(gene_gRNA_pairs)
 "gene_gRNA_pairs"
+
+#' gRNA groups
+#'
+#' A named list grouping gRNAs by the chromosomal site that they target.
+#' @inheritSection data Overview
+#' @usage data(gRNA_grps)
+"gRNA_grps"
