@@ -2,9 +2,13 @@
 #'
 #' This function is the primary interface to the high-MOI `sceptre` method. The function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 #'
-#' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named
-#' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named
-#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch
+#' - When `full_output` is set to TRUE, the output is a data frame with the following columns:
+#'
+#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters. When the number of genes is < 50, however, the default value of `regularization_amount` becomes 0.1, as regularization across genes is less effective when there are few genes.
+#'
+#' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
+#' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named
+#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named
 #' @param gene_gRNA_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
 #' @param side sidedness of the test; one of "both," "left," and "right"
 #' @param B number of resamples to draw for the conditional randomization test
@@ -14,7 +18,7 @@
 #' @param parallel parallelize execution of the method?
 #' @param seed seed to the random number generator
 #'
-#' @return a data frame containing columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See
+#' @return a data frame containing columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See "details" for a description of the output when `full_output` is set to TRUE.
 #' @export
 #'
 #' @examples
@@ -58,7 +62,15 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
   if (max(gRNA_matrix) >= 2) {
     gRNA_matrix <- gRNA_matrix >= THRESHOLD
   }
-  # 2. Remove all genes and gRNAs that have low counts; arrange pairs by gRNA then gene; remove duplicates
+  # 2. Ensure that cell barcodes coincide across gene and perturbation matrices
+  if  (!identical(colnames(gRNA_matrix), colnames(gene_matrix)) || !identical(row.names(covariate_matrix), colnames(gene_matrix))) {
+    stop("The column names of `gene_matrix` and `gRNA_matrix` and the row names of `covariate matrix` should be the cell barcodes. Ensure that the cell barcodes are present and identical across these matrices/data frames.")
+  }
+  if (is.null(row.names(gRNA_matrix)) || is.null(row.names(gene_matrix))) {
+    stop("The row names of `gene_matrix` and `gRNA_matrix` should contain the gene IDs and gRNA IDs, respectively.")
+  }
+
+  # 3. Remove all genes and gRNAs that have low counts; arrange pairs by gRNA then gene; remove duplicates
   gene_lib_sizes <- Matrix::rowSums(gene_matrix)
   gRNA_lib_sizes <- Matrix::rowSums(gRNA_matrix)
   bad_genes <- names(gene_lib_sizes[gene_lib_sizes < MIN_GENE_EXP])
@@ -71,7 +83,7 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
     warning(paste0("Removing perturbations low counts (counts <", MIN_GRNA_EXP, "). Consider grouping together perturbations that target the same gene."))
     gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::filter(!(gRNA_id %in% bad_gRNAs))
   }
-  # 3. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices; ensure all rows distinct
+  # 4. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices; ensure all rows distinct
   if (!all(c("gene_id", "gRNA_id") %in% colnames(gene_gRNA_pairs))) stop("The columns `gene_id` and `gRNA_id` must be present in the `gene_gRNA_pairs` data frame.")
   abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(gene_matrix))]
   abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(gRNA_matrix))]
@@ -84,8 +96,6 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
     stop(msg)
   }
   gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::distinct()
-  # 4. Ensure that cell barcodes coincide across gene and perturbation matrices
-  if  (!identical(colnames(gRNA_matrix), colnames(gene_matrix))) stop("The cell barcodes in the perturbation and expression matrices do not coincide. Ensure that these matrices have identical cell barcodes in the same order.")
   # 5. Set the pods
   n_genes <- length(unique(gene_gRNA_pairs$gene_id))
   n_gRNAs <- length(unique(gene_gRNA_pairs$gRNA_id))

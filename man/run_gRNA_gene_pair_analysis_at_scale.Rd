@@ -30,11 +30,11 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{log_dir}{(optional) directory in which to sink the log file}
 
-\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named}
+\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named}
 
 \item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
