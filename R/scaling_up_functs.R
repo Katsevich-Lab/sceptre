@@ -320,7 +320,8 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
   }
   # Create and save the result dataframe
   out_df <- do.call(what = "rbind", args = out_l) %>%
-    dplyr::mutate(gRNA_id = results_dict$gRNA_id, gene_id = results_dict$gene_id)
+    dplyr::mutate(gRNA_id = results_dict$gRNA_id, gene_id = results_dict$gene_id) %>%
+    dplyr::relocate(gene_id, gRNA_id)
   out_fp <- (results_dict %>% dplyr::pull(result_file))[1] %>% as.character()
   fst::write_fst(out_df, out_fp)
   if (!is.null(log_dir)) deactivate_sink()
