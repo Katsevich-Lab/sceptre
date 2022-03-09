@@ -42,7 +42,8 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
   # BASIC PROCESSING AND CHECKS
   #############################
   cat("Running checks and setting up directory structure.")
-  # 0. Set up parallel, offsite directory structure, pod sizes
+
+  # 0. Set up parallel, fst, offsite directory structure, pod sizes
   n_cores <- parallel::detectCores()
   doParallel::registerDoParallel(cores = n_cores)
   # print(paste0("Note: check the `log` subdirectory of the storage directory ", as.character(storage_dir), " for updates!"))
@@ -94,11 +95,11 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
   # METHOD START
   ##############
   # create file dictionaries
-  dicts <- create_and_store_dictionaries(gene_gRNA_pairs,
+  dicts <- suppressMessages(create_and_store_dictionaries(gene_gRNA_pairs,
                                          dirs[["gene_precomp_dir"]],
                                          dirs[["gRNA_precomp_dir"]],
                                          dirs[["results_dir"]],
-                                         pod_sizes)
+                                         pod_sizes))
   cat("Running gene precomputations. ")
   # run first round of gene precomputations
   foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),

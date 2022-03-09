@@ -1,0 +1,35 @@
+---
+title: "sceptre_on_data_of_moderate_size"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sceptre_on_data_of_moderate_size}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sceptre)
+```
+
+We do the following steps.
+
+1. Load the gene expression matrix, gRNA expression matrix, and cell-wise covariate matrix.
+
+The cell-wise covariate should have the following four columns:
+- Log gene library size (obtainable via log(Matrix::colSums(X)))
+- Log gRNA library size (obtainable via log(Matrix::colSums(X)))
+- P mito
+- Sequencing batch
+
+2. (Optional) Combine gRNAs that target the same site.
+
+3. Decide the sidedness of the test ("left", "right", or "both")
+
+4. Run sceptre
