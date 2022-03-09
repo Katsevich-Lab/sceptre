@@ -2,7 +2,7 @@
 % Please edit documentation in R/in_memory_sceptre.R
 \name{run_sceptre_high_moi}
 \alias{run_sceptre_high_moi}
-\title{Run \code{sceptre}}
+\title{Run \code{sceptre} (high MOI)}
 \usage{
 run_sceptre_high_moi(
   gene_matrix,
@@ -14,15 +14,16 @@ run_sceptre_high_moi(
   regularization_amount = 0.1,
   B = 1000,
   full_output = FALSE,
+  parallel = TRUE,
   seed = 4
 )
 }
 \arguments{
-\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
 
-\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named}
+\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named.}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
 
 \item{gene_gRNA_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
 
@@ -36,13 +37,15 @@ run_sceptre_high_moi(
 
 \item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
 
+\item{parallel}{parallelize execution of the method?}
+
 \item{seed}{seed to the random number generator}
 }
 \value{
 a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See
 }
 \description{
-This function is the core function of the \code{sceptre} package. The function tests for association between a set of gRNAs and genes in a high multiplicity of infection (MOI) single-cell CRISPR screen. It returns a p-value for each pairwise test of association.
+This function is the primary interface to the high-MOI \code{sceptre} method. The function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 }
 \examples{
 \dontrun{
