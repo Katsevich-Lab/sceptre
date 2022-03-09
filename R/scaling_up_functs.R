@@ -65,7 +65,7 @@ create_dictionary <- function(ids, pod_size) {
 #' We require a few bookkeeping files (that we call "dictionaries") for the gRNA and gene precomputation steps.
 #' This file creates those dictionaries and stores them in the appropriate locations on disk.
 #'
-#' @inheritParams run_sceptre_in_memory
+#' @inheritParams run_sceptre_high_moi
 #' @param gene_precomp_dir the directory in which to store the gene precomputations
 #' @param gRNA_precomp_dir the directory in which to store the gRNA precomputations
 #' @param results_dir the directory in which to store the results
@@ -118,7 +118,7 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
 #' This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id).
 #' It stores the result in the gRNA precomputation directory.
 #'
-#' @inheritParams run_sceptre_in_memory
+#' @inheritParams run_sceptre_high_moi
 #' @param pod_id ID of the pod for which to do the precomputation
 #' @param gRNA_precomp_dir file path to the gRNA precomputation directory
 #' @param log_dir file path to the log directory
@@ -152,7 +152,7 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, gRNA_matr
 #' This function runs the first round of gene precomputations. In particular, it computes the raw dispersion estimate
 #' and log geometric mean of each gene. It saves the results in the gene_precomp directory.
 #'
-#' @inheritParams run_sceptre_in_memory
+#' @inheritParams run_sceptre_high_moi
 #' @param pod_id pod id
 #' @param gene_precomp_dir location of the gene precomputation directory
 #' @param log_dir directory in which to sink the log file
@@ -227,7 +227,7 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 #'
 #' Runs the second round of gene precomputations.
 #'
-#' @inheritParams run_sceptre_in_memory
+#' @inheritParams run_sceptre_high_moi
 #' @param pod_id pod id
 #' @param gene_precomp_dir gene precomp dir
 #' @param gene_matrix the gene expression matrix, stored as an ondisc_matrix
@@ -264,7 +264,7 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, g
 #'
 #' Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
 #'
-#' @inheritParams run_sceptre_in_memory
+#' @inheritParams run_sceptre_high_moi
 #' @param pod_id id of the pod to compute
 #' @param gene_precomp_dir the directory containing the results of the gene precomputation
 #' @param gRNA_precomp_dir the directory containing the results of the gRNA precomputation

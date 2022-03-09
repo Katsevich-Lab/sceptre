@@ -1,6 +1,6 @@
-#' Run `sceptre` in memory
+#' Run `sceptre` (high MOI)
 #'
-#' The core function of the `sceptre` package. This function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
+#' This function is the primary interface to the high-MOI `sceptre` method. The function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
 #'
 #' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named
 #' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) should be named
@@ -11,6 +11,7 @@
 #' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE)?
 #' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates
 #' @param storage_dir directory in which to store the intermediate computations
+#' @param parallel parallelize execution of the method?
 #' @param seed seed to the random number generator
 #'
 #' @return a data frame containing columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See
@@ -27,9 +28,9 @@
 #' # 2. (Optional) group together gRNAs that target the same site
 #' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
-#' result <- run_sceptre_in_memory(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+#' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
 #' }
-run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, seed = 4) {
+run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
   ##################
@@ -37,6 +38,7 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
   THRESHOLD <- 3
   MIN_GENE_EXP <- 250
   MIN_GRNA_EXP <- 30
+  N_GENES_REGULARIZATION_THRESH <- 50
 
   #############################
   # BASIC PROCESSING AND CHECKS
@@ -44,16 +46,19 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
   cat("Running checks and setting up directory structure.")
 
   # 0. Set up parallel, fst, offsite directory structure, pod sizes
-  n_cores <- parallel::detectCores()
-  doParallel::registerDoParallel(cores = n_cores)
-  # print(paste0("Note: check the `log` subdirectory of the storage directory ", as.character(storage_dir), " for updates!"))
   dirs <- initialize_directories(storage_location = storage_dir)
-
+  if (parallel) {
+    n_cores <- parallel::detectCores()
+    doParallel::registerDoParallel(cores = n_cores)
+    foreach_funct <- foreach::`%dopar%`
+  } else {
+    foreach_funct <- foreach::`%do%`
+  }
   # 1. threshold gRNA_matrix (using threshold = 3, for now) if necessary
   if (max(gRNA_matrix) >= 2) {
     gRNA_matrix <- gRNA_matrix >= THRESHOLD
   }
-  # 2. Remove all genes and gRNAs that have 0 counts; arrange pairs by gRNA then gene; remove duplicates
+  # 2. Remove all genes and gRNAs that have low counts; arrange pairs by gRNA then gene; remove duplicates
   gene_lib_sizes <- Matrix::rowSums(gene_matrix)
   gRNA_lib_sizes <- Matrix::rowSums(gRNA_matrix)
   bad_genes <- names(gene_lib_sizes[gene_lib_sizes < MIN_GENE_EXP])
@@ -79,7 +84,6 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
     stop(msg)
   }
   gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::distinct()
-
   # 4. Ensure that cell barcodes coincide across gene and perturbation matrices
   if  (!identical(colnames(gRNA_matrix), colnames(gene_matrix))) stop("The cell barcodes in the perturbation and expression matrices do not coincide. Ensure that these matrices have identical cell barcodes in the same order.")
   # 5. Set the pods
@@ -88,8 +92,10 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
   n_pairs <- nrow(gene_gRNA_pairs)
   pod_sizes <- c(gene = ceiling(n_genes/(2 * n_cores)),
                  gRNA = ceiling(n_gRNAs/(2 * n_cores)),
-                 pair = ceiling(n_pairs/(3 * n_cores)))
+                 pair = ceiling(n_pairs/(2 * n_cores)))
   cat(crayon::green(' \u2713\n'))
+  # 6. If number of genes is small, set regularization_amount to 0
+  if (n_genes < N_GENES_REGULARIZATION_THRESH) regularization_amount <- 0
 
   ##############
   # METHOD START
@@ -102,7 +108,7 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
                                          pod_sizes))
   cat("Running gene precomputations. ")
   # run first round of gene precomputations
-  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
+  foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
                      run_gene_precomputation_at_scale_round_1(pod_id = pod_id,
                                                               gene_precomp_dir = dirs[["gene_precomp_dir"]],
                                                               gene_matrix = gene_matrix,
@@ -117,7 +123,7 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
                                  log_dir = dirs[["log_dir"]])
 
   # run second round of gene precomputations
-  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
+  foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["gene"]])),
                      run_gene_precomputation_at_scale_round_2(pod_id = pod_id,
                                                               gene_precomp_dir = dirs[["gene_precomp_dir"]],
                                                               gene_matrix = gene_matrix,
@@ -127,7 +133,7 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
 
   # run gRNA precomputations
   cat("Running perturbation precomputations. ")
-  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
+  foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
                      run_gRNA_precomputation_at_scale(pod_id = pod_id,
                                                       gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
                                                       gRNA_matrix = gRNA_matrix,
@@ -139,7 +145,7 @@ run_sceptre_in_memory <- function(gene_matrix, gRNA_matrix, covariate_matrix, ge
 
   # run at-scale analysis
   cat("Running perturbation-to-gene association tests.")
-  foreach::`%dopar%`(foreach::foreach(pod_id = seq(1, dicts[["pairs"]])),
+  foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["pairs"]])),
                      run_gRNA_gene_pair_analysis_at_scale(pod_id = pod_id,
                                                           gene_precomp_dir = dirs[["gene_precomp_dir"]],
                                                           gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
