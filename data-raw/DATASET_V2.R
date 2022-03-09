@@ -17,6 +17,7 @@ covariate_matrix <- gene_odm %>% get_cell_covariates() %>% dplyr::select(n_umis,
   dplyr::mutate(n_gRNA_umis = (gRNA_odm_ungrouped %>% get_cell_covariates() %>% dplyr::pull(n_umis))) %>%
   dplyr::summarize(lg_gene_lib_size = log(n_umis), p_mito, batch, lg_gRNA_lib_size = log(n_gRNA_umis)) %>%
   dplyr::select(lg_gene_lib_size, lg_gRNA_lib_size, batch, p_mito)
+row.names(covariate_matrix) <- get_cell_barcodes(gene_odm)
 
 # Determine gRNAs to analyze, as well as groupings
 set.seed(4)

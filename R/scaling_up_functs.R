@@ -277,7 +277,9 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
   results_dict <- fst::read_fst(paste0(results_dir, "/results_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
   gene_dict <- fst::read_fst(paste0(gene_precomp_dir, "/gene_dictionary.fst"))
   gRNA_dict <- fst::read_fst(paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst"))
-  if (regularization_amount > 0) regularized_gene_sizes <- readRDS(gene_dict$size_reg_file[1] %>% as.character())[as.character(results_dict$gene_id)]
+  if (regularization_amount > 0) {
+    regularized_gene_sizes <- readRDS(gene_dict$size_reg_file[1] %>% as.character())[as.character(results_dict$gene_id)]
+  }
   out_l <- vector(mode = "list", length = nrow(results_dict))
 
   for (i in seq(1, nrow(results_dict))) {
@@ -290,6 +292,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
     if (i == 1 || results_dict[[i, "gene_id"]] != results_dict[[i - 1, "gene_id"]]) {
       gene_precomp_locs <- dplyr::filter(gene_dict, id == curr_gene)
       gene_offset_loc <- gene_precomp_locs %>% dplyr::pull(offset_file) %>% as.character
+      gene_size_loc <- gene_precomp_locs %>% dplyr::pull(size_unreg_file) %>% as.character
       gene_precomp_offsets <- fst::read_fst(path = gene_offset_loc, columns = curr_gene) %>% dplyr::pull()
       if (regularization_amount > 0) {
         gene_precomp_size <- regularized_gene_sizes[[curr_gene]]

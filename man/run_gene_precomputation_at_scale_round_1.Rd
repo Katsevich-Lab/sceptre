@@ -18,9 +18,9 @@ run_gene_precomputation_at_scale_round_1(
 
 \item{gene_precomp_dir}{location of the gene precomputation directory}
 
-\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) should be named}
+\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named}
 
 \item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
