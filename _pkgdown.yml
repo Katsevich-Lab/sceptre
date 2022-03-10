@@ -16,24 +16,21 @@ navbar:
   left:
   - text: Function reference
     href: reference/index.html
-  - text: Tutorials
-    menu:
-    - text: "At-scale"
-      href: articles/sceptre-at-scale.html
-    - text: "Moderately-sized data"
-      href: articles/sceptre-on-moderately-sized-data.html
-    - text: "Demo"
-      href: articles/sceptre-small-example.html
+  - text: Basic tutorial
+    href: reference/index.html
+  - text: "News"
+    href: news/index.html
+
+news:
+ releases:
+ - text: "sceptre 0.1.0"
+   href: reference/index.html/news-0.1.html
 
 reference:
-- title: Demo
+- title: Core function
   contents:
-  - run_sceptre_gRNA_gene_pair
+  - run_sceptre_high_moi
 
-- title: In-memory sceptre
+- title: Auxiliary functions
   contents:
-  - run_sceptre_in_memory
-
-- title: Plotting
-  contents:
-  - plot_skew_t
+  - combine_gRNAs

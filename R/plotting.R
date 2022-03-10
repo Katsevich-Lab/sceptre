@@ -8,7 +8,6 @@
 #' @param interval (optional) interval over which the distribution is plotted
 #'
 #' @return a ggplot object
-#' @export
 #' @examples
 #' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 #' gene_expressions <- gene_matrix[1,]

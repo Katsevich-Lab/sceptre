@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">sceptre</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -40,23 +42,11 @@
 <li>
   <a href="reference/index.html">Function reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Tutorials
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/sceptre-at-scale.html">At-scale</a>
-    </li>
-    <li>
-      <a href="articles/sceptre-on-moderately-sized-data.html">Moderately-sized data</a>
-    </li>
-    <li>
-      <a href="articles/sceptre-small-example.html">Demo</a>
-    </li>
-  </ul>
+  <a href="reference/index.html">Basic tutorial</a>
+</li>
+<li>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -72,44 +62,73 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="sceptre-robust-single-cell-crispr-screen-analysis-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#sceptre-robust-single-cell-crispr-screen-analysis-" class="anchor"></a><code>sceptre</code>: robust single-cell CRISPR screen analysis <img src="reference/figures/hex.jpg" align="right" alt="" width="180">
+<div class="section level1">
+<div class="page-header"><h1 id="sceptre-robust-single-cell-crispr-screen-analysis-">
+<code>sceptre</code>: robust single-cell CRISPR screen analysis
+<img src="reference/figures/hex.jpg" align="right" alt="" width="180"><a class="anchor" aria-label="anchor" href="#sceptre-robust-single-cell-crispr-screen-analysis-"></a>
 </h1></div>
-<p><img src="https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></p>
 <!-- badges: start -->
-<!-- [![R build status](https://travis-ci.com/timothy-barry/sceptre.svg?branch=main)](https://travis-ci.com/timothy-barry/sceptre)
-<!-- badges: end -->
-<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. <code>sceptre</code> tests whether a given perturbation is associated with the change in expression of a given gene using the intuitive and powerful conditional randomization test.</p>
+<p><img src="https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"><!-- badges: end --></p>
+<p>Single-cell CRISPR screens provide unprecedented insights into gene
+regulation and other facets of human genome biology. However, the
+analysis of these screens poses significant statistical and
+computational challenges. <code>sceptre</code> (pronounced “scepter”) is
+a methodology and associated R package for rigorously identifying
+regulatory relationships in single-cell CRISPR screen experiments.
+<code>sceptre</code> tests whether a given perturbation is associated
+with the change in expression of a given gene using the robust,
+powerful, and intuitive conditional randomization test.</p>
+<p><strong>Update March 2022</strong>: We are excited to release
+<code>sceptre</code> version 0.1.0, a major update that significantly
+improves the speed and ease-of-use of the software. Please download the
+latest version of <code>sceptre</code> (see below) and check the News
+page for further details.</p>
 </div>
-<div id="using-the-package" class="section level1">
-<h1 class="hasAnchor">
-<a href="#using-the-package" class="anchor"></a>Using the package</h1>
-<p>You can interact with the package in several ways.</p>
-<p><strong>Demo</strong>: A small demo illustrating the core features of <code>sceptre</code> is available <a href="https://katsevich-lab.github.io/sceptre/articles/sceptre-small-example.html">here</a>. We recommend working through the demo to get a quick (5 minutes) feel for how the method works.</p>
-<p><strong>Moderately-sized analysis</strong>: If you are running an analysis of moderate size (i.e., the data fit into memory and you are using a single computer), see the tutorial <a href="https://katsevich-lab.github.io/sceptre/articles/sceptre-on-moderately-sized-data.html">running a moderately-sized analysis</a>.</p>
-<p><strong>Large-scale analysis</strong>: If you are running a large-scale analysis (i.e., the data do <em>not</em> fit into memory or you are using multiple nodes on a computer cluster), see the tutorial <a href="https://katsevich-lab.github.io/sceptre/articles/sceptre-at-scale.html">running sceptre at scale</a>.</p>
-<p><strong>Note</strong>: <code>sceptre</code> currently applies to high multiplicity-of-infection (MOI; &gt;5 gRNAs/cell) single-cell CRISPR screen data. <code>sceptre</code> has not yet been carefully vetted in low-MOI settings. We are working on implementing such an extension, but for the time being, please be cautious in attempting to apply <code>sceptre</code> to low-MOI data.</p>
+<div class="section level1">
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h1>
+<p>You can install the development version of the package from Github
+with the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
+<p>You can browse the source code on Github <a href="https://github.com/katsevich-lab/sceptre" class="external-link">here</a>.
+<code>sceptre</code> has been tested in R versions &gt;=3.5 on macOS and
+Linux systems.</p>
 </div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
-<p>You can install the development version of the package from Github with the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
-<p>You can browse the source code on Github <a href="https://github.com/katsevich-lab/sceptre">here</a>.</p>
-<p>Note that sceptre has been tested only in R versions &gt;=3.5 in both macOS systems and Linux systems.</p>
+<div class="section level1">
+<h1 id="using-the-software">Using the software<a class="anchor" aria-label="anchor" href="#using-the-software"></a>
+</h1>
+<p><code>sceptre</code> has several interfaces, which you can choose
+between based on the size of your analysis.</p>
+<p><strong>Small or moderately-sized analysis</strong>: If you are
+running an analysis of small or moderate size (i.e., the data fit into
+memory and you are using a single computer), see the basic
+<code>sceptre</code> tutorial here.</p>
+<p><strong>Large-scale analysis</strong>: If you are running a
+large-scale analysis (i.e., the data do not fit into memory or you are
+using a high-performance cluster or cloud), see the at-scale tutorial
+here. <span style="color:blue">(Currently under revision; will be
+available soon.)</span></p>
+<p><strong>Note</strong>: <code>sceptre</code> currently applies to high
+multiplicity-of-infection (MOI; &gt;5 gRNAs/cell) single-cell CRISPR
+screen data. <code>sceptre</code> has not yet been carefully vetted in
+low-MOI settings. We are working on developing such an extension, which
+we expect to be available in 2022.</p>
 </div>
-<div id="references" class="section level1">
-<h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
-<p><strong>Methods paper</strong>: T Barry, X Wang, J Morris, K Roeder, E Katsevich. “Conditional resampling improves calibration and sensitivity in single-cell CRISPR screen analysis.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2020.08.13.250092v6">bioRxiv</a>.</p>
-<p><strong>Application paper</strong>: J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood trait loci using pooled CRISPR screens and single cell RNA sequencing.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1">bioRxiv</a>.</p>
-</div>
-<div id="funding" class="section level1">
-<h1 class="hasAnchor">
-<a href="#funding" class="anchor"></a>Funding</h1>
-<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/">Analytics at Wharton</a> for supporting the development of this software.</p>
+<div class="section level1">
+<h1 id="references-and-funding">References and funding<a class="anchor" aria-label="anchor" href="#references-and-funding"></a>
+</h1>
+<p><strong>Methods paper</strong>: T Barry, X Wang, J Morris, K Roeder,
+E Katsevich. “SCEPTRE improves calibration and sensitivity in
+single-cell CRISPR screen analysis.” <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Genome
+Biology</a>.</p>
+<p><strong>Application paper</strong>: J Morris, Z Daniloski, J Domingo,
+T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E
+Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and
+pathways of blood trait loci using pooled CRISPR screens and single cell
+RNA sequencing.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1" class="external-link">bioRxiv</a>.</p>
+<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/" class="external-link">Analytics at Wharton</a> for
+supporting the development of this software.</p>
 <p><img src="reference/figures/wharton_analytics.png" align="center" alt="" width="350"></p>
 </div>
 
@@ -117,32 +136,48 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://timothy-barry.github.io/">Timothy Barry</a> <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Eugene Katsevich <br><small class="roles"> Author, thesis advisor </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing sceptre</a></li>
+</ul>
+</div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>
+<a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a> <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Eugene Katsevich <br><small class="roles"> Author, thesis advisor </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://timothy-barry.github.io/">Timothy Barry</a>, Eugene Katsevich.</p>
+  <p></p>
+<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy
+Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -150,6 +185,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -45,7 +45,7 @@ run_sceptre_high_moi(
 A data frame containing the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
-This function is the core function of the \code{sceptre} package. The function conducts a robust and powerful test of association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+This function is the core function of the \code{sceptre} package. The function applies the SCEPTRE method to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 }
 \details{
 \itemize{
