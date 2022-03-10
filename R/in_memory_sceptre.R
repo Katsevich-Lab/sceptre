@@ -1,26 +1,27 @@
-#' Run `sceptre` (high MOI)
+#' Run `sceptre` on high multiplicity-of-infection data
 #'
-#' This function is the primary interface to the high-MOI `sceptre` method. The function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
-#'
-#' - When `full_output` is set to TRUE, the output is a data frame with the following columns:
-#'
-#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters. When the number of genes is < 50, however, the default value of `regularization_amount` becomes 0.1, as regularization across genes is less effective when there are few genes.
+#' This function is the core function of the `sceptre` package. The function conducts a robust and powerful test of association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 #'
 #' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
 #' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named
-#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named
+#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
 #' @param gene_gRNA_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
 #' @param side sidedness of the test; one of "both," "left," and "right"
 #' @param B number of resamples to draw for the conditional randomization test
 #' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE)?
 #' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates
 #' @param storage_dir directory in which to store the intermediate computations
-#' @param parallel parallelize execution of the method?
+#' @param parallel parallelize execution?
 #' @param seed seed to the random number generator
 #'
-#' @return a data frame containing columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See "details" for a description of the output when `full_output` is set to TRUE.
-#' @export
+#' @return A data frame containing the following columns: `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See "details" for a description of the output when `full_output` is set to TRUE.
 #'
+#' @details
+#' - The required arguments are `gene_matrix`, `gRNA_matrix`, `covariate_matrix`, and `gene_gRNA_pairs`; all other arguments are optional and set to reasonable defaults.
+#' - When `full_output` is set to TRUE, the output is a data frame with the following columns:
+#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of `regularization_amount` is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+#'
+#' @export
 #' @examples
 #' \dontrun{
 #' # 1. load the data
@@ -47,7 +48,7 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
   #############################
   # BASIC PROCESSING AND CHECKS
   #############################
-  cat("Running checks and setting up directory structure.")
+  cat("Running checks and setting up directory structure. ")
 
   # 0. Set up parallel, fst, offsite directory structure, pod sizes
   dirs <- initialize_directories(storage_location = storage_dir)

@@ -10,12 +10,8 @@
 #' @export
 #'
 #' @examples
-#' library(magrittr)
-#' data(gRNA_matrix)
-#' data(gRNA_grps)
-#' combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 #'
-#' # Example explanation:
+#' # 1. First example
 #' # `gRNA_grps` indicates that the gRNAs "AGAAGAGTCAGCCTTGCAC,"
 #' # "GAAGAGTCAGCCTTGCACT," "GTTTAGGGAACCCAGTGCA," "GTAACTTCATTTGCAGCAA,"
 #' # "TTACTTTTTATCAAGCCAA," "TCTAATTTAAGACCTGGGT," "AAGGTATCATTTTCTTGTC,"
@@ -23,11 +19,25 @@
 #' # all target the site "chr8:128428069-128428469". The function  collapses
 #' # the above gRNAs into a single "combined" gRNA called
 #' # "chr8:128428069-128428469" (and similarly for the other sites).
+#' library(magrittr)
+#' data(gRNA_matrix)
+#' data(gRNA_grps)
+#' combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+#'
+#' # 2. Second example
+#' # Here we group only the gRNAs in the first two gRNA groups;
+#' # all other gRNAs remain ungrouped.
+#' gRNA_grps <- gRNA_grps[1:2]
+#' combined_gRNA_matrix_2 <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 combine_gRNAs <- function(gRNA_matrix, gRNA_grps) {
-  out <- sapply(X = names(gRNA_grps), FUN = function(grp_name) {
-    # cat(paste0("Operating on ", grp_name, ".\n"))
+  # Determine which gRNAs are not contained within gRNA_grps
+  leftover_gRNAs <- setdiff(row.names(gRNA_matrix), unlist(gRNA_grps))
+  out_leftover <- gRNA_matrix[leftover_gRNAs,]
+  out_grped <- sapply(X = names(gRNA_grps), FUN = function(grp_name) {
     mat_sub <- gRNA_matrix[gRNA_grps[[grp_name]],]
     Matrix::colSums(mat_sub)
   }) %>% Matrix::t()
+  out <- rbind(out_leftover, out_grped)
   return(out)
 }
+

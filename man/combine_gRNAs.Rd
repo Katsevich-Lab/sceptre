@@ -21,12 +21,8 @@ Combines gRNAs that target the same site into a single "combined" gRNA via addit
 It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
 }
 \examples{
-library(magrittr)
-data(gRNA_matrix)
-data(gRNA_grps)
-combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 
-# Example explanation:
+# 1. First example
 # `gRNA_grps` indicates that the gRNAs "AGAAGAGTCAGCCTTGCAC,"
 # "GAAGAGTCAGCCTTGCACT," "GTTTAGGGAACCCAGTGCA," "GTAACTTCATTTGCAGCAA,"
 # "TTACTTTTTATCAAGCCAA," "TCTAATTTAAGACCTGGGT," "AAGGTATCATTTTCTTGTC,"
@@ -34,4 +30,14 @@ combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 # all target the site "chr8:128428069-128428469". The function  collapses
 # the above gRNAs into a single "combined" gRNA called
 # "chr8:128428069-128428469" (and similarly for the other sites).
+library(magrittr)
+data(gRNA_matrix)
+data(gRNA_grps)
+combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+
+# 2. Second example
+# Here we group only the gRNAs in the first two gRNA groups;
+# all other gRNAs remain ungrouped.
+gRNA_grps <- gRNA_grps[1:2]
+combined_gRNA_matrix_2 <- combine_gRNAs(gRNA_matrix, gRNA_grps)
 }
