@@ -36,10 +36,12 @@ Runs \code{sceptre} on a given gRNA-gene pair.
 This function is for demonstration purposes only. The function \code{run_sceptre_in_memory} should be used when testing for association between multiple genes and gRNAs.
 }
 \examples{
+\dontrun{
 # load the example data
 data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 gene_expressions <- gene_matrix[1,]
 gRNA_expressions <- gRNA_matrix[1,]
 # run method
 result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
+}
 }

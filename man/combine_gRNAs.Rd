@@ -7,7 +7,7 @@
 combine_gRNAs(gRNA_matrix, gRNA_grps)
 }
 \arguments{
-\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the matrix should have row names giving the gRNA IDs}
+\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the row names should be gRNA IDs}
 
 \item{gRNA_grps}{a named list; each entry of the list should be a character vector giving the IDs of gRNAs that target the same site, with the name of that entry being the name of the targeted site}
 }
@@ -18,7 +18,7 @@ a "combined" gRNA-by-cell expression matrix, where gRNAs that target the same si
 Combines gRNAs that target the same site into a single "combined" gRNA via addition of the expression levels.
 }
 \details{
-It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
+It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially true when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
 }
 \examples{
 
@@ -31,6 +31,8 @@ It typically is a good idea to combine gRNAs that target the same site into a si
 # the above gRNAs into a single "combined" gRNA called
 # "chr8:128428069-128428469" (and similarly for the other sites).
 library(magrittr)
+library(Matrix)
+
 data(gRNA_matrix)
 data(gRNA_grps)
 combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, gRNA_grps)

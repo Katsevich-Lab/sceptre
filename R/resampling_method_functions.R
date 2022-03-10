@@ -189,12 +189,14 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' @param seed seed to the random number generator
 #'
 #' @examples
+#' \dontrun{
 #' # load the example data
 #' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 #' gene_expressions <- gene_matrix[1,]
 #' gRNA_expressions <- gRNA_matrix[1,]
 #' # run method
 #' result <- run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions, covariate_matrix, "left")
+#' }
 run_sceptre_gRNA_gene_pair <- function(gene_expressions, gRNA_expressions, covariate_matrix, side = "both", B = 1500, full_output = FALSE, seed = 4) {
   THRESHOLD <- 3
 
