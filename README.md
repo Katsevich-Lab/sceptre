@@ -15,34 +15,13 @@ computational challenges. `sceptre` (pronounced “scepter”) is a
 methodology and associated R package for rigorously identifying
 regulatory relationships in single-cell CRISPR screen experiments.
 `sceptre` tests whether a given perturbation is associated with the
-change in expression of a given gene using the intuitive and powerful
-conditional randomization test.
+change in expression of a given gene using the robust, powerful, and
+intuitive conditional randomization test.
 
-# Using the package
-
-You can interact with the package in several ways.
-
-**Demo**: A small demo illustrating the core features of `sceptre` is
-available
-[here](https://katsevich-lab.github.io/sceptre/articles/sceptre-small-example.html).
-We recommend working through the demo to get a quick (5 minutes) feel
-for how the method works.
-
-**Moderately-sized analysis**: If you are running an analysis of
-moderate size (i.e., the data fit into memory and you are using a single
-computer), see the tutorial [running a moderately-sized
-analysis](https://katsevich-lab.github.io/sceptre/articles/sceptre-on-moderately-sized-data.html).
-
-**Large-scale analysis**: If you are running a large-scale analysis
-(i.e., the data do *not* fit into memory or you are using multiple nodes
-on a computer cluster), see the tutorial [running sceptre at
-scale](https://katsevich-lab.github.io/sceptre/articles/sceptre-at-scale.html).
-
-**Note**: `sceptre` currently applies to high multiplicity-of-infection
-(MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not
-yet been carefully vetted in low-MOI settings. We are working on
-implementing such an extension, but for the time being, please be
-cautious in attempting to apply `sceptre` to low-MOI data.
+**Update March 2022**: We are excited to release `sceptre` version
+0.1.0, a major update that significantly improves the speed and
+ease-of-use of the software. Please download the latest version of
+`sceptre` (see below) and check the News page for further details.
 
 # Installation
 
@@ -53,16 +32,35 @@ the following command:
     devtools::install_github("katsevich-lab/sceptre")
 
 You can browse the source code on Github
-[here](https://github.com/katsevich-lab/sceptre).
+[here](https://github.com/katsevich-lab/sceptre). `sceptre` has been
+tested in R versions \>=3.5 on macOS and Linux systems.
 
-Note that sceptre has been tested only in R versions \>=3.5 in both
-macOS systems and Linux systems.
+# Using the software
 
-# References
+`sceptre` has several interfaces, which you can choose between based on
+the size of your analysis.
+
+**Small or moderately-sized analysis**: If you are running an analysis
+of small or moderate size (i.e., the data fit into memory and you are
+using a single computer), see the basic `sceptre` tutorial here.
+
+**Large-scale analysis**: If you are running a large-scale analysis
+(i.e., the data do not fit into memory or you are using a
+high-performance cluster or cloud), see the at-scale tutorial here.
+<span style="color:blue">(Currently under revision; will be available
+soon.)</span>
+
+**Note**: `sceptre` currently applies to high multiplicity-of-infection
+(MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not
+yet been carefully vetted in low-MOI settings. We are working on
+developing such an extension, which we expect to be available in 2022.
+
+# References and funding
 
 **Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich.
-“Conditional resampling improves calibration and sensitivity in
-single-cell CRISPR screen analysis.” Genome Biology (2022). [Link](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+“SCEPTRE improves calibration and sensitivity in single-cell CRISPR
+screen analysis.” [Genome
+Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
 **Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M
 Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T
@@ -70,8 +68,6 @@ Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood
 trait loci using pooled CRISPR screens and single cell RNA sequencing.”
 Preprint available on
 [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).
-
-# Funding
 
 We are grateful to [Analytics at
 Wharton](https://analytics.wharton.upenn.edu/) for supporting the

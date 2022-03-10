@@ -26,7 +26,6 @@ deactivate_sink <- function() {
 #' @param storage_location file path to a directory in which to store the intermediate and final results
 #'
 #' @return named vector containing the file paths of gene_precomp_dir, gRNA_precomp_dir, results_dir, and log_dir.
-#' @export
 initialize_directories <- function(storage_location) {
   if (!dir.exists(storage_location)) dir.create(storage_location, recursive = TRUE)
   sub_dirs <- c("gene_precomp", "gRNA_precomp", "results", "logs")

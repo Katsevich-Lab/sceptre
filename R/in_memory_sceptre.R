@@ -1,6 +1,6 @@
 #' Run `sceptre` on high multiplicity-of-infection data
 #'
-#' This function is the core function of the `sceptre` package. The function conducts a robust and powerful test of association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+#' This function is the core function of the `sceptre` package. The function applies the SCEPTRE method to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 #'
 #' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
 #' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named

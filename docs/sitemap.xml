@@ -1,51 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>timothy-barry.github.io/sceptre//index.html</loc>
+    <loc>timothy-barry.github.io/sceptre/404.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/collect_results.html</loc>
+    <loc>timothy-barry.github.io/sceptre/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/create_and_store_dictionaries.html</loc>
+    <loc>timothy-barry.github.io/sceptre/LICENSE.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/data.html</loc>
+    <loc>timothy-barry.github.io/sceptre/articles/index.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/initialize_directories.html</loc>
+    <loc>timothy-barry.github.io/sceptre/articles/using_sceptre.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/plot_skew_t.html</loc>
+    <loc>timothy-barry.github.io/sceptre/authors.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/regularize_gene_sizes_at_scale.html</loc>
+    <loc>timothy-barry.github.io/sceptre/index.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_gRNA_gene_pair_analysis_at_scale.html</loc>
+    <loc>timothy-barry.github.io/sceptre/news/index.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_gRNA_precomputation_at_scale.html</loc>
+    <loc>timothy-barry.github.io/sceptre/news/news-0.1.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_gene_precomputation_at_scale_round_1.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/collect_results.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_gene_precomputation_at_scale_round_2.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/combine_gRNAs.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_sceptre_gRNA_gene_pair.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/covariate_matrix.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/run_sceptre_in_memory.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/create_and_store_dictionaries.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//reference/sceptre.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/data.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//articles/sceptre-on-moderately-sized-data.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/gRNA_grps.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre//articles/sceptre-small-example.html</loc>
+    <loc>timothy-barry.github.io/sceptre/reference/gRNA_matrix.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_pairs.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gene_matrix.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/initialize_directories.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/plot_skew_t.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/regularize_gene_sizes_at_scale.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_gRNA_gene_pair_analysis_at_scale.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_gRNA_precomputation_at_scale.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_gene_precomputation_at_scale_round_1.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_gene_precomputation_at_scale_round_2.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_sceptre_gRNA_gene_pair.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_sceptre_high_moi.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_sceptre_in_memory.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/sceptre.html</loc>
   </url>
 </urlset>
