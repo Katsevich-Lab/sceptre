@@ -56,7 +56,7 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>gRNA_matrix</dt>
-<dd><p>a gRNA-by-cell expression matrix; the matrix should have row names giving the gRNA IDs</p></dd>
+<dd><p>a gRNA-by-cell expression matrix; the row names should be gRNA IDs</p></dd>
 <dt>gRNA_grps</dt>
 <dd><p>a named list; each entry of the list should be a character vector giving the IDs of gRNAs that target the same site, with the name of that entry being the name of the targeted site</p></dd>
 </dl></div>
@@ -66,7 +66,7 @@
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially the case when gRNA expression levels are low or there are not a lot of (e.g., &lt; 100,000) cells.</p>
+    <p>It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially true when gRNA expression levels are low or there are not a lot of (e.g., &lt; 100,000) cells.</p>
     </div>
 
     <div id="ref-examples">
@@ -81,10 +81,11 @@
 <span class="r-in"><span class="co"># the above gRNAs into a single "combined" gRNA called</span></span>
 <span class="r-in"><span class="co"># "chr8:128428069-128428469" (and similarly for the other sites).</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span class="r-in"></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_grps</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">combined_gRNA_matrix</span> <span class="op">&lt;-</span> <span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">gRNA_grps</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: Matrix</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># 2. Second example</span></span>
 <span class="r-in"><span class="co"># Here we group only the gRNAs in the first two gRNA groups;</span></span>

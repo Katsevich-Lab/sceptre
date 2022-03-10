@@ -50,21 +50,18 @@
 and speed are improved considerably.</p>
 <div class="section level3">
 <h3 id="usability-0-1-0">Usability<a class="anchor" aria-label="anchor" href="#usability-0-1-0"></a></h3>
-<ul><li><p>There is now a single interface to the <code>sceptre</code>
-algorithm: the function <code>run_sceptre_high_moi</code> (previously
-called <code>run_sceptre_in_memory</code>). The function
-<code>run_sceptre_gRNA_gene_pair</code>, which was redundant, is now
-deprecated.</p></li>
-<li><p><code>run_sceptre_high_moi</code> is much simpler to use.
-<code>run_sceptre_high_moi</code> now has only four required arguments:
-<code>gene_matrix</code> (previously called
-<code>expression_matrix</code>), <code>gRNA_matrix</code> (previously
-called <code>expression_matrix</code>), <code>covariate_matrix</code>,
-and <code>gene_gRNA_pairs</code>. The formerly required arguments
-<code>storage_dir</code> and <code>side</code> are now set to
-<code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> and “both” by default. Additionally, the argument
-<code>pod_sizes</code> is removed entirely (and handled
-internally).</p></li>
+<ul><li><p>The function <code>run_sceptre_gRNA_gene_pair</code>, which was
+redundant, is now deprecated.</p></li>
+<li><p><code>run_sceptre_high_moi</code>(previously called
+<code>run_sceptre_in_memory</code>) is simpler to use: the function now
+has only four required arguments: <code>gene_matrix</code> (previously
+called <code>expression_matrix</code>), <code>gRNA_matrix</code>
+(previously called <code>expression_matrix</code>),
+<code>covariate_matrix</code>, and <code>gene_gRNA_pairs</code>. The
+formerly required arguments <code>storage_dir</code> and
+<code>side</code> are now set to <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> and “both” by
+default. Additionally, the argument <code>pod_sizes</code> is removed
+entirely (and handled internally).</p></li>
 <li><p><code>run_sceptre_high_moi</code> has the additional optional
 arguments <code>full_output</code> and <code>parallel</code>.
 <code>full_output</code> controls the complexity of the data frame
@@ -76,20 +73,33 @@ with four columns only, all of which are easy to interpret:
 function is parallelized (TRUE; default) or not (FALSE).</p></li>
 <li><p><code>run_sceptre_high_moi</code> now accepts a raw (i.e.,
 unthresholded) gRNA matrix or a user-thresholded gRNA matrix.</p></li>
-<li><p>The new auxiliary function <code>combine_gRNAs</code> combines
-gRNAs that target the same chromosomal site, facilitating this common
-analysis step.</p></li>
+<li><p>A new auxiliary function <code>combine_gRNAs</code> combines
+gRNAs that target the same chromosomal site.</p></li>
 <li><p>Numerous checks have been added to
 <code>run_sceptre_high_moi</code> ensure that the input is valid. For
 example, <code>run_sceptre_high_moi</code> checks that gene IDs and gRNA
-IDs in <code>gene_gRNA_pairs</code> are in fact present in
-<code>gene_matrix</code> and <code>gRNA_matrix</code>,
+IDs in <code>gene_gRNA_pairs</code> are in fact subsets of the row names
+of <code>gene_matrix</code> and <code>gRNA_matrix</code>,
 respectively.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="speed-0-1-0">Speed<a class="anchor" aria-label="anchor" href="#speed-0-1-0"></a></h3>
-<p>Two accelerations have been added to improve execution speed.</p>
-</div>
+<p>Two accelerations have been implemented to improve speed. These
+accelerations do not affect the API of the package.</p>
+<ul><li><p>First, the test statistic used in the conditional randomization
+test has changed. Previously, the test statistic was a z-score derived
+from a <em>Wald</em> test of a fitted negative binomial GLM. Now, the
+test statistic is a z-score derived from a <em>score</em> test of the
+same negative binomial GLM, which is asymptotically equivalent to the
+former but more robust in finite samples. Additionally, this score
+test-based <em>z</em>-score is computed via an explicit formula,
+sidestepping the need to fit a GLM, as was done previously. Overall, the
+new test statistic is faster to compute and more robust than the
+previous test statistic.</p></li>
+<li><p>The synthetic perturbation indicators are now generated as part
+of the gRNA precomputation, factoring out this somewhat time-intensive
+step from the pairwise tests of association.</p></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0.1" id="sceptre-001-initial-release">sceptre 0.0.1 (Initial release)<a class="anchor" aria-label="anchor" href="#sceptre-001-initial-release"></a></h2>

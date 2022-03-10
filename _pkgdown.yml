@@ -34,3 +34,4 @@ reference:
 - title: Auxiliary functions
   contents:
   - combine_gRNAs
+  - plot_result

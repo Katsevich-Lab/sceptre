@@ -1,10 +1,10 @@
-#' Run `sceptre` on high multiplicity-of-infection data
+#' Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data
 #'
-#' This function is the core function of the `sceptre` package. The function applies the SCEPTRE method to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+#' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 #'
-#' @param gene_matrix a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
-#' @param gRNA_matrix a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named
-#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
+#' @param gene_matrix a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
+#' @param gRNA_matrix a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators
+#' @param covariate_matrix the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
 #' @param gene_gRNA_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
 #' @param side sidedness of the test; one of "both," "left," and "right"
 #' @param B number of resamples to draw for the conditional randomization test
@@ -17,10 +17,14 @@
 #' @return A data frame containing the following columns: `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See "details" for a description of the output when `full_output` is set to TRUE.
 #'
 #' @details
-#' - The required arguments are `gene_matrix`, `gRNA_matrix`, `covariate_matrix`, and `gene_gRNA_pairs`; all other arguments are optional and set to reasonable defaults.
-#' - When `full_output` is set to TRUE, the output is a data frame with the following columns:
-#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of `regularization_amount` is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+#' Details are arranged from most to least important.
 #'
+#' - `gene_matrix` should be a **raw** (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts. Likewise, `gRNA_matrix` should be a raw matrix of UMI counts. Alternately, `gRNA_matrix` can be a binary matrix of perturbation presence/absence indicators, where the user has assigned perturbation indicators to cells by, for example, thresholding the raw gRNA count matrix.
+#' - The gene IDs (respectively, gRNA IDs) within `gene_gRNA_pairs` must be a subset of the row names of `gene_matrix` (respectively, `gRNA_matrix`).
+#' - If `combine_gRNAs` has been called on `gRNA_matrix` to collapse the gRNAs into distinct target sites, then the `gRNA_ID` column of `gene_gRNA_pairs` should contain the names of the target sites.
+#' - The `side` parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase *or* decrease in gene expression.
+#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of `regularization_amount` is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+#' - When `full_output` is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: `gene_id`, `gRNA_id`, `p_value`, `skew_t_fit_success` (if TRUE, *p*-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical *p*-value returned), `xi`, `omega`, `alpha`, `nu` (fitted parameters of the skew-t distribution; NA if fit failed), `z_value` (z-value obtained on "ground truth" data), and `z_null_1`, ..., `z_null_B` (z-values obtained from resampled datasets).
 #' @export
 #' @examples
 #' \dontrun{
@@ -57,6 +61,7 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
     doParallel::registerDoParallel(cores = n_cores)
     foreach_funct <- foreach::`%dopar%`
   } else {
+    n_cores <- 1L
     foreach_funct <- foreach::`%do%`
   }
   # 1. threshold gRNA_matrix (using threshold = 3, for now) if necessary

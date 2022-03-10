@@ -14,9 +14,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette 
+This vignette illustrates application of `sceptre` to a small example dataset. First, install the up-to-date version of `sceptre` from Github, if you have not yet done so.
 
-```{r setup}
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("katsevich-lab/sceptre")
+```
+
+
+
+```{r}
 library(sceptre)
 ```
 

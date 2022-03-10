@@ -19,9 +19,9 @@ run_gRNA_precomputation_at_scale(
 
 \item{gRNA_precomp_dir}{file path to the gRNA precomputation directory}
 
-\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named}
+\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
 \item{log_dir}{file path to the log directory}
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/in_memory_sceptre.R
 \name{run_sceptre_high_moi}
 \alias{run_sceptre_high_moi}
-\title{Run \code{sceptre} on high multiplicity-of-infection data}
+\title{Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data}
 \usage{
 run_sceptre_high_moi(
   gene_matrix,
@@ -19,11 +19,11 @@ run_sceptre_high_moi(
 )
 }
 \arguments{
-\item{gene_matrix}{a gene-by cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
+\item{gene_matrix}{a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named}
+\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
 \item{gene_gRNA_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
 
@@ -45,13 +45,17 @@ run_sceptre_high_moi(
 A data frame containing the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
-This function is the core function of the \code{sceptre} package. The function applies the SCEPTRE method to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+This function is the core function of the \code{sceptre} package. The function applies SCEPTRE to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 }
 \details{
+Details are arranged from most to least important.
 \itemize{
-\item The required arguments are \code{gene_matrix}, \code{gRNA_matrix}, \code{covariate_matrix}, and \code{gene_gRNA_pairs}; all other arguments are optional and set to reasonable defaults.
-\item When \code{full_output} is set to TRUE, the output is a data frame with the following columns:
+\item \code{gene_matrix} should be a \strong{raw} (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts. Likewise, \code{gRNA_matrix} should be a raw matrix of UMI counts. Alternately, \code{gRNA_matrix} can be a binary matrix of perturbation presence/absence indicators, where the user has assigned perturbation indicators to cells by, for example, thresholding the raw gRNA count matrix.
+\item The gene IDs (respectively, gRNA IDs) within \code{gene_gRNA_pairs} must be a subset of the row names of \code{gene_matrix} (respectively, \code{gRNA_matrix}).
+\item If \code{combine_gRNAs} has been called on \code{gRNA_matrix} to collapse the gRNAs into distinct target sites, then the \code{gRNA_ID} column of \code{gene_gRNA_pairs} should contain the names of the target sites.
+\item The \code{side} parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase \emph{or} decrease in gene expression.
 \item The default value of \code{regularization_amount} is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of \code{regularization_amount} is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+\item When \code{full_output} is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, \code{skew_t_fit_success} (if TRUE, \emph{p}-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical \emph{p}-value returned), \code{xi}, \code{omega}, \code{alpha}, \code{nu} (fitted parameters of the skew-t distribution; NA if fit failed), \code{z_value} (z-value obtained on "ground truth" data), and \code{z_null_1}, ..., \code{z_null_B} (z-values obtained from resampled datasets).
 }
 }
 \examples{
