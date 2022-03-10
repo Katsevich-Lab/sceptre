@@ -2,7 +2,7 @@
 % Please edit documentation in R/in_memory_sceptre.R
 \name{run_sceptre_high_moi}
 \alias{run_sceptre_high_moi}
-\title{Run \code{sceptre} (high MOI)}
+\title{Run \code{sceptre} on high multiplicity-of-infection data}
 \usage{
 run_sceptre_high_moi(
   gene_matrix,
@@ -23,7 +23,7 @@ run_sceptre_high_moi(
 
 \item{gRNA_matrix}{a gRNA-by cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size, log-transformed gRNA library size, percent mitochondrial reads, and batch. The rows (i.e., cell barcodes) should be named}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
 \item{gene_gRNA_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
 
@@ -37,18 +37,22 @@ run_sceptre_high_moi(
 
 \item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
 
-\item{parallel}{parallelize execution of the method?}
+\item{parallel}{parallelize execution?}
 
 \item{seed}{seed to the random number generator}
 }
 \value{
-a data frame containing columns \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See "details" for a description of the output when \code{full_output} is set to TRUE.
+A data frame containing the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
-This function is the primary interface to the high-MOI \code{sceptre} method. The function tests for association between a set of gRNAs and a set of genes, returning a p-value for each pairwise test of association.
+This function is the core function of the \code{sceptre} package. The function conducts a robust and powerful test of association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 }
 \details{
-When \code{full_output} is set to TRUE, the output is a data frame with the following columns:
+\itemize{
+\item The required arguments are \code{gene_matrix}, \code{gRNA_matrix}, \code{covariate_matrix}, and \code{gene_gRNA_pairs}; all other arguments are optional and set to reasonable defaults.
+\item When \code{full_output} is set to TRUE, the output is a data frame with the following columns:
+\item The default value of \code{regularization_amount} is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of \code{regularization_amount} is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+}
 }
 \examples{
 \dontrun{
