@@ -41,9 +41,9 @@ NULL
 #' @usage data(gene_gRNA_pairs)
 "gene_gRNA_pairs"
 
-#' gRNA groups
+#' site table
 #'
-#' A named list grouping gRNAs by the chromosomal site that they target.
+#' A data frame containing the target site (as a chromosomal position) of each gRNA. The column names are `site` and `gRNA_id`.
 #' @inheritSection data Overview
-#' @usage data(gRNA_grps)
-"gRNA_grps"
+#' @usage data(site_table)
+"site_table"
