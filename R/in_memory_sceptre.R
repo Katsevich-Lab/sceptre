@@ -32,10 +32,10 @@
 #' data(gene_matrix) # i. gene expression matrix
 #' data(gRNA_matrix) # ii. gRNA expression matrix
 #' data(covariate_matrix) # iii. covariate matrix
-#' data(gRNA_grps) # iv. gRNAs grouped by target site
+#' data(site_table) # iv. gRNAs grouped by target site
 #' data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
 #' # 2. (Optional) group together gRNAs that target the same site
-#' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, gRNA_grps)
+#' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
 #' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
 #' }

@@ -85,13 +85,14 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># load the example data</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"><span class="co"># load the example data</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span>; <span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span>; <span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">gene_expressions</span> <span class="op">&lt;-</span> <span class="va">gene_matrix</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span></span>
 <span class="r-in"><span class="va">gRNA_expressions</span> <span class="op">&lt;-</span> <span class="va">gRNA_matrix</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span></span>
 <span class="r-in"><span class="co"># run method</span></span>
 <span class="r-in"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_sceptre_gRNA_gene_pair</span><span class="op">(</span><span class="va">gene_expressions</span>, <span class="va">gRNA_expressions</span>, <span class="va">covariate_matrix</span>, <span class="st">"left"</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in run_sceptre_gRNA_gene_pair(gene_expressions, gRNA_expressions,     covariate_matrix, "left"):</span> could not find function "run_sceptre_gRNA_gene_pair"</span>
+<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </div>

@@ -23,10 +23,9 @@ row.names(covariate_matrix) <- get_cell_barcodes(gene_odm)
 set.seed(4)
 gRNA_groups_df <- readRDS(paste0(xie_fp, "../intermediate/guide_seqs.rds"))
 my_enh_regions <- sample(x = unique(gRNA_groups_df$hg38_enh_region), size = 5, replace = FALSE)
-gRNA_grps <- gRNA_groups_df %>% dplyr::filter(hg38_enh_region %in% my_enh_regions) %>%
-  dplyr::group_by(hg38_enh_region) %>% dplyr::group_map(.f = function(tbl, key) tbl$spacer_seq) %>%
-  set_names(my_enh_regions)
-gRNAs_to_analyze <- unlist(gRNA_grps) %>% set_names(NULL)
+site_table <- gRNA_groups_df %>% dplyr::filter(hg38_enh_region %in% my_enh_regions) %>%
+  dplyr::rename("site" = "hg38_enh_region", "gRNA_id" = "spacer_seq")
+gRNAs_to_analyze <- gRNA_grps$gRNA_id %>% unique()
 
 # determine genes and gRNAs to analyze
 genes_to_analyze <- get_feature_covariates(gene_odm) %>% dplyr::filter(mean_expression > 1) %>%
@@ -44,4 +43,4 @@ gene_gRNA_pairs <- expand.grid(gene_id = genes_to_analyze, gRNA_id = my_enh_regi
   dplyr::sample_n(23)
 
 # save the expression matrix, perturbation matrix, covariate matrix, and gene-gRNA pairs matrix
-usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, gRNA_grps, overwrite = TRUE)
+usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, site_table, overwrite = TRUE)

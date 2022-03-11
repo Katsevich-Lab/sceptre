@@ -45,5 +45,7 @@ Suggests:
     tidyr,
     ggplot2,
     foreach,
-    doParallel
+    doParallel,
+    tidyverse,
+    cowplot
 VignetteBuilder: knitr
