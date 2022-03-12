@@ -21,7 +21,10 @@ intuitive conditional randomization test.
 **Update March 2022**: We are excited to release `sceptre` version
 0.1.0, a major update that significantly improves the speed and
 ease-of-use of the software. Please download the latest version of
-`sceptre` (see below) and check the News page for further details.
+`sceptre` (see below) and check the [updated
+tutorial](https://katsevich-lab.github.io/sceptre/articles/using_sceptre.html)
+and [news page](https://katsevich-lab.github.io/sceptre/news/index.html)
+for further details.
 
 # Installation
 
@@ -42,13 +45,14 @@ the size of your analysis.
 
 **Small or moderately-sized analysis**: If you are running an analysis
 of small or moderate size (i.e., the data fit into memory and you are
-using a single computer), see the basic `sceptre` tutorial here.
+using a single computer), see the basic `sceptre` tutorial
+[here](https://katsevich-lab.github.io/sceptre/articles/using_sceptre.html).
 
 **Large-scale analysis**: If you are running a large-scale analysis
 (i.e., the data do not fit into memory or you are using a
 high-performance cluster or cloud), see the at-scale tutorial here.
-<span style="color:blue">(Currently under revision; will be available
-soon.)</span>
+<span style="color:blue">(Currently under construction; will be
+available soon.)</span>
 
 **Note**: `sceptre` currently applies to high multiplicity-of-infection
 (MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not
