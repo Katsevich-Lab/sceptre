@@ -149,7 +149,7 @@ It also is possible to test for an increase *or* decrease in gene expression, in
 
 The final step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `gRNA_matrix`, `covariate_matrix`, `gene_gRNA_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
 
-```{r, cache=TRUE}
+```{r,eval=FALSE}
 result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                gRNA_matrix = gRNA_matrix,
                                covariate_matrix = covariate_matrix,
@@ -157,15 +157,9 @@ result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                side = "left")
 ```
 
-The output is a data frame called `result` with columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. The first three columns have clear meanings; the final column, `z_value`, is the z-value of a negative binomial GLM fitted to the data. Positive z-values indicate increased expression, whereas negative z-values indicate decreased expression.
+The output is a data frame called `result` with columns `gene_id`, `gRNA_id`, `p_value`, and `z_value`. The first three columns have clear meanings; the final column, `z_value`, is the z-value of a negative binomial GLM fitted to the data. Positive z-values indicate increased expression, whereas negative z-values indicate decreased expression. Finally, we apply the Benjamini-Hochberg procedure to the *p*-values to correct for multiple testing.
 
-```{r}
-head(result)
-```
-
-Finally, we apply the Benjamini-Hochberg procedure to the *p*-values to correct for multiple testing.
-
-```{r}
+```{r,eval=FALSE}
 result_bh <- result %>% mutate(p_adj = p_value)
 ```
 
