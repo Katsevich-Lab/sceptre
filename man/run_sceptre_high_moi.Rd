@@ -59,6 +59,7 @@ Details are arranged from most to least important.
 }
 }
 \examples{
+\dontrun{
 # 1. load the data
 data(gene_matrix) # i. gene expression matrix
 data(gRNA_matrix) # ii. gRNA expression matrix
@@ -69,4 +70,5 @@ data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
 gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
 # 3. run method (takes ~40s on an 8-core Macbook Pro)
 result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+}
 }
