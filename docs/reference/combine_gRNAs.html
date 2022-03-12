@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../reference/index.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre.html">Basic tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -50,48 +50,50 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">gRNA_grps</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">site_table</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>gRNA_matrix</dt>
 <dd><p>a gRNA-by-cell expression matrix; the row names should be gRNA IDs</p></dd>
-<dt>gRNA_grps</dt>
-<dd><p>a named list; each entry of the list should be a character vector giving the IDs of gRNAs that target the same site, with the name of that entry being the name of the targeted site</p></dd>
+<dt>site_table</dt>
+<dd><p>a data frame with column names "site" and "gRNA_id". The "site" column should give the target site of each gRNA ID</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a "combined" gRNA-by-cell expression matrix, where gRNAs that target the same site have been collapsed into a single row (via addition of the constituent gRNAs)</p>
+    <p>a "collapsed" gRNA-by-cell expression matrix, where gRNAs that target the same site have been collapsed into a single row (via addition of the constituent gRNAs)</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>It typically is a good idea to combine gRNAs that target the same site into a single site-specific "combined" gRNA to increase statistical power. This is especially true when gRNA expression levels are low or there are not a lot of (e.g., &lt; 100,000) cells.</p>
+    <p>Combining gRNAs that target the same site helps to increase statistical power. This operation is especially appealing when gRNA expression levels are low or there are not a lot of (e.g., &lt; 100,000) cells.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co"># 1. First example</span></span>
-<span class="r-in"><span class="co"># `gRNA_grps` indicates that the gRNAs "AGAAGAGTCAGCCTTGCAC,"</span></span>
-<span class="r-in"><span class="co"># "GAAGAGTCAGCCTTGCACT," "GTTTAGGGAACCCAGTGCA," "GTAACTTCATTTGCAGCAA,"</span></span>
-<span class="r-in"><span class="co"># "TTACTTTTTATCAAGCCAA," "TCTAATTTAAGACCTGGGT," "AAGGTATCATTTTCTTGTC,"</span></span>
-<span class="r-in"><span class="co"># "TTAGCCATAGAACCACTAC," "TTTTCCAGTAGTGGTTCTA," and "TACATGGCATAGATCTTTA"</span></span>
-<span class="r-in"><span class="co"># all target the site "chr8:128428069-128428469". The function  collapses</span></span>
-<span class="r-in"><span class="co"># the above gRNAs into a single "combined" gRNA called</span></span>
-<span class="r-in"><span class="co"># "chr8:128428069-128428469" (and similarly for the other sites).</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:stats’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     filter, lag</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
 <span class="r-in"></span>
+<span class="r-in"><span class="co"># 1. First example</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_grps</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">combined_gRNA_matrix</span> <span class="op">&lt;-</span> <span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">gRNA_grps</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">site_table</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">combined_gRNA_matrix</span> <span class="op">&lt;-</span> <span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">site_table</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># 2. Second example</span></span>
-<span class="r-in"><span class="co"># Here we group only the gRNAs in the first two gRNA groups;</span></span>
-<span class="r-in"><span class="co"># all other gRNAs remain ungrouped.</span></span>
-<span class="r-in"><span class="va">gRNA_grps</span> <span class="op">&lt;-</span> <span class="va">gRNA_grps</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
-<span class="r-in"><span class="va">combined_gRNA_matrix_2</span> <span class="op">&lt;-</span> <span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">gRNA_grps</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># Here we group only the gRNAs that target sites "chr10:17457016-17457416"</span></span>
+<span class="r-in"><span class="co"># and "chr18:48566684-48567084;" all others remain ungrouped</span></span>
+<span class="r-in"><span class="va">site_table_2</span> <span class="op">&lt;-</span> <span class="va">site_table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span class="r-in"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">site</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"chr10:17457016-17457416"</span>, <span class="st">"chr18:48566684-48567084"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">combined_gRNA_matrix_2</span> <span class="op">&lt;-</span> <span class="fu">combine_gRNAs</span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">site_table_2</span><span class="op">)</span></span>
 </code></pre></div>
     </div>
   </div>

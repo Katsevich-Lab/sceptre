@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../reference/index.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre.html">Basic tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -106,18 +106,23 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># 1. load the data</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># 1. load the data</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span> <span class="co"># i. gene expression matrix</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="co"># ii. gRNA expression matrix</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span> <span class="co"># iii. covariate matrix</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_grps</span><span class="op">)</span> <span class="co"># iv. gRNAs grouped by target site</span></span>
+<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">site_table</span><span class="op">)</span> <span class="co"># iv. gRNAs grouped by target site</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_pairs</span><span class="op">)</span> <span class="co"># v. gene-gRNA pairs to analyze</span></span>
 <span class="r-in"><span class="co"># 2. (Optional) group together gRNAs that target the same site</span></span>
-<span class="r-in"><span class="va">gRNA_matrix_grouped</span> <span class="op">&lt;-</span> <span class="fu"><a href="combine_gRNAs.html">combine_gRNAs</a></span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">gRNA_grps</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">gRNA_matrix_grouped</span> <span class="op">&lt;-</span> <span class="fu"><a href="combine_gRNAs.html">combine_gRNAs</a></span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">site_table</span><span class="op">)</span></span>
 <span class="r-in"><span class="co"># 3. run method (takes ~40s on an 8-core Macbook Pro)</span></span>
 <span class="r-in"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_sceptre_high_moi</span><span class="op">(</span><span class="va">gene_matrix</span>, <span class="va">gRNA_matrix_grouped</span>, <span class="va">covariate_matrix</span>, <span class="va">gene_gRNA_pairs</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Check /var/folders/h6/pt59hmwd7rqb3jqfzwh0hlth0000gn/T//RtmpqXd0Tt/logs for more detailed status updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running checks and setting up directory structure. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running gene precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running perturbation precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running perturbation-to-gene association tests.<span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Collecting and returning results. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </div>

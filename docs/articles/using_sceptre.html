@@ -43,7 +43,7 @@
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../reference/index.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre.html">Basic tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -72,24 +72,322 @@
 
     
     
-<p>This vignette illustrates application of <code>sceptre</code> to a
-small example dataset. Our aim is to show that getting up-and-running
-with the software is quick and easy. First, we install the up-to-date
-version of <code>sceptre</code> from Github.</p>
+<p>This vignette illustrates application of <code>sceptre</code> to an
+example high-multiplicity-of-infection (MOI) single-cell CRISPR screen
+dataset. We begin by installing and loading all required packages,
+including the up-to-date version of <code>sceptre</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span></code></pre></div>
-<p>We load required packages and example data.</p>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tidyverse"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cowplot"</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="step-1-prepare-the-data">Step 1: Prepare the data<a class="anchor" aria-label="anchor" href="#step-1-prepare-the-data"></a>
+</h2>
+<p>The first step is to prepare the data for <code>sceptre</code>. We
+must prepare three separate data objects: the gene-by-cell expression
+matrix, the gRNA-by-cell expression matrix, and the cell-specific matrix
+of covariates.</p>
+<div class="section level3">
+<h3 id="gene-and-grna-expression-matrices">Gene and gRNA expression matrices<a class="anchor" aria-label="anchor" href="#gene-and-grna-expression-matrices"></a>
+</h3>
+<p>We load the example gene-by-cell and gRNA-by-cell expression matrices
+that are included in the <code>sceptre</code> package.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span>
+<span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></code></pre></div>
+<p>Briefly, <code>gene_matrix</code> (respectively,
+<code>gRNA_matrix</code>) is a 5 x 106,660 (respectively, 50 x 106,660)
+matrix of gene (respectively, gRNA) unique molecular identifier (UMI)
+counts. The data are taken from the paper “Global analysis of enhancer
+targets reveals convergent enhancer-driven regulatory modules” by Xie et
+al., 2019. The authors of this study used a CRISPRi-based assay to
+target putative enhancers in a population of K562 cells. Both genes and
+gRNAs are downsampled to reduce the size of the data. One can use the
+commands <code><a href="../reference/gene_matrix.html">?gene_matrix</a></code> and <code><a href="../reference/gRNA_matrix.html">?gRNA_matrix</a></code> to read
+more about these data.</p>
+<p>The row names of <code>gene_matrix</code> and
+<code>gRNA_matrix</code> are the gene IDs and gRNA IDs, respectively.
+The column names, meanwhile, are the cell barcodes.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># row names</span>
+<span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span>
+<span class="co">#&gt; [1] "ENSG00000105819.13" "ENSG00000123405.13" "ENSG00000279070.2" </span>
+<span class="co">#&gt; [4] "ENSG00000166582.9"  "ENSG00000106404.13"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AGAAGAGTCAGCCTTGCAC" "GAAGAGTCAGCCTTGCACT" "GTTTAGGGAACCCAGTGCA"</span>
+<span class="co">#&gt; [4] "GTAACTTCATTTGCAGCAA" "TTACTTTTTATCAAGCCAA" "TCTAATTTAAGACCTGGGT"</span>
 
-<span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="co"># column names</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AAACCTGAGAGGTACC_4_1" "AAACCTGAGGAATTAC_4_1" "AAACCTGCAATGTAAG_4_1"</span>
+<span class="co">#&gt; [4] "AAACCTGCACAGACTT_4_1" "AAACCTGCACGAAGCA_4_1" "AAACCTGCAGGCTGAA_4_1"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AAACCTGAGAGGTACC_4_1" "AAACCTGAGGAATTAC_4_1" "AAACCTGCAATGTAAG_4_1"</span>
+<span class="co">#&gt; [4] "AAACCTGCACAGACTT_4_1" "AAACCTGCACGAAGCA_4_1" "AAACCTGCAGGCTGAA_4_1"</span></code></pre></div>
+<p>To get a better feel for the data, we plot a histogram of the
+expressions of an arbitrarily selected gene (“ENSG00000105819.13”) and
+gRNA (“AGAAGAGTCAGCCTTGCAC”).</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">example_gene</span> <span class="op">&lt;-</span> <span class="va">gene_matrix</span><span class="op">[</span><span class="st">"ENSG00000105819.13"</span>,<span class="op">]</span>
+<span class="va">example_gRNA</span> <span class="op">&lt;-</span> <span class="va">gRNA_matrix</span><span class="op">[</span><span class="st">"AGAAGAGTCAGCCTTGCAC"</span>,<span class="op">]</span>
+
+<span class="va">hist_gene</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gene</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">15</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"dodgerblue3"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Gene expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+
+<span class="va">hist_gRNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gRNA</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">40</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"orchid4"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"gRNA expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+
+<span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span><span class="va">hist_gene</span>, <span class="va">hist_gRNA</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="using_sceptre_files/figure-html/plot_hist-1.png" width="672"></p>
+<p>As expected, the data are highly discrete counts. Note that we do
+<em>not</em> normalize either the gene or gRNA expression matrices,
+opting instead to work directly with the raw counts.</p>
+</div>
+<div class="section level3">
+<h3 id="cell-wise-covariate-matrix">Cell-wise covariate matrix<a class="anchor" aria-label="anchor" href="#cell-wise-covariate-matrix"></a>
+</h3>
+<p>Next, we load the cell-wise covariate matrix,
+<code>covariate_matrix</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span>
+<span class="co">#&gt;                      lg_gene_lib_size lg_gRNA_lib_size   batch     p_mito</span>
+<span class="co">#&gt; AAACCTGAGAGGTACC_4_1         7.928406         5.609472 batch_4 0.04828829</span>
+<span class="co">#&gt; AAACCTGAGGAATTAC_4_1         9.235131         5.433722 batch_4 0.02087601</span>
+<span class="co">#&gt; AAACCTGCAATGTAAG_4_1         9.658482         5.831882 batch_4 0.03334611</span>
+<span class="co">#&gt; AAACCTGCACAGACTT_4_1         8.593599         5.075174 batch_4 0.06058922</span>
+<span class="co">#&gt; AAACCTGCACGAAGCA_4_1         9.255983         6.049733 batch_4 0.02550874</span>
+<span class="co">#&gt; AAACCTGCAGGCTGAA_4_1         8.907477         5.733341 batch_4 0.03858129</span></code></pre></div>
+<p><code>covariate_matrix</code> is a 106,660 x 4 data frame of
+“technical factors,” or covariates. The row names of this data frame are
+the cell barcodes. The covariates are as follows:</p>
+<ul>
+<li><p>Log-transformed gene library size
+(<code>lg_gene_lib_size</code>), which can be computed via
+<code>log(colSums(gene_matrix))</code></p></li>
+<li><p>Log-transformed gRNA library size
+(<code>lg_gRNA_lib_size</code>), which can be computed via
+<code>log(colSums(gRNA_matrix))</code></p></li>
+<li><p>Sequencing batch (<code>batch</code>)</p></li>
+<li><p>Percentage of gene transcripts that map to mitochondrial genes
+(<code>p_mito</code>)</p></li>
+</ul>
+<p>We strongly recommend that users include the same four covariates
+(i.e., <code>lg_gene_lib_size</code>, <code>lg_gRNA_lib_size</code>,
+<code>batch</code>, and <code>p_mito</code>) in their own cell-wise
+covariate matrix.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="step-2-optional-combine-grnas-that-target-the-same-site">Step 2: (Optional) Combine gRNAs that target the same site<a class="anchor" aria-label="anchor" href="#step-2-optional-combine-grnas-that-target-the-same-site"></a>
+</h2>
+<p>The second step — which is optional — is to group together gRNAs that
+target the same chromosomal site. To this end we load
+<code>site_table</code>, a data frame that maps each gRNA to its target
+site. The columns of <code>site_table</code> are <code>site</code> and
+<code>gRNA_id</code>. An examination of <code>site_table</code> reveals
+that the 50 gRNAs in the example data target five distinct chromosomal
+sites, each a putative enhancer.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">site_table</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">site_table</span><span class="op">)</span>
+<span class="co">#&gt;                      site             gRNA_id</span>
+<span class="co">#&gt; 1 chr10:17457016-17457416 AGAAGAGTCAGCCTTGCAC</span>
+<span class="co">#&gt; 2 chr10:17457016-17457416 GAAGAGTCAGCCTTGCACT</span>
+<span class="co">#&gt; 3 chr10:17457016-17457416 GTTTAGGGAACCCAGTGCA</span>
+<span class="co">#&gt; 4 chr10:17457016-17457416 GTAACTTCATTTGCAGCAA</span>
+<span class="co">#&gt; 5 chr10:17457016-17457416 TTACTTTTTATCAAGCCAA</span>
+<span class="co">#&gt; 6 chr10:17457016-17457416 TCTAATTTAAGACCTGGGT</span>
+<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">site_table</span><span class="op">$</span><span class="va">site</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; [1] 5</span></code></pre></div>
+<p>The helper function <code>combine_gRNAs</code> takes as arguments a
+<code>gRNA_matrix</code> and a <code>site_table</code> and collapses
+gRNAs that target the same site into a single “combined” gRNA via
+addition of the constituent expression levels, returning a transformed
+<code>gRNA_matrix</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gRNA_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_gRNAs.html">combine_gRNAs</a></span><span class="op">(</span><span class="va">gRNA_matrix</span>, <span class="va">site_table</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span>  
+<span class="co">#&gt; [1] "chr10:17457016-17457416"  "chr18:48566684-48567084" </span>
+<span class="co">#&gt; [3] "chr18:48676744-48677144"  "chr18:57820043-57820443" </span>
+<span class="co">#&gt; [5] "chr8:128428069-128428469"</span></code></pre></div>
+<p>The updated matrix has five rows; the names of these rows are the
+names of the target sites. The column names (i.e., the cell barcodes)
+remain unchanged.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span>
+<span class="co">#&gt; [1] "chr10:17457016-17457416"  "chr18:48566684-48567084" </span>
+<span class="co">#&gt; [3] "chr18:48676744-48677144"  "chr18:57820043-57820443" </span>
+<span class="co">#&gt; [5] "chr8:128428069-128428469"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; [1] "AAACCTGAGAGGTACC_4_1" "AAACCTGAGGAATTAC_4_1" "AAACCTGCAATGTAAG_4_1"</span>
+<span class="co">#&gt; [4] "AAACCTGCACAGACTT_4_1" "AAACCTGCACGAAGCA_4_1" "AAACCTGCAGGCTGAA_4_1"</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="step-3-determine-which-grna-gene-pairs-to-analyze">Step 3: Determine which gRNA-gene pairs to analyze<a class="anchor" aria-label="anchor" href="#step-3-determine-which-grna-gene-pairs-to-analyze"></a>
+</h2>
+<p>The third step is to determine which gene-gRNA pairs to analyze. It
+is common to analyze pairs of genes and gRNAs that are in close physical
+proximity to uncover <em>cis</em>-regulatory relationships. For
+simplicity, in this tutorial, we analyze a set of 23 randomly-selected
+gene-gRNA pairs, stored in the data frame
+<code>gene_gRNA_pairs</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_pairs</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gene_gRNA_pairs</span><span class="op">)</span>
+<span class="co">#&gt;              gene_id                  gRNA_id</span>
+<span class="co">#&gt; 1  ENSG00000279070.2  chr18:57820043-57820443</span>
+<span class="co">#&gt; 2 ENSG00000105819.13  chr18:48566684-48567084</span>
+<span class="co">#&gt; 3  ENSG00000166582.9  chr18:48676744-48677144</span>
+<span class="co">#&gt; 4 ENSG00000106404.13 chr8:128428069-128428469</span>
+<span class="co">#&gt; 5 ENSG00000123405.13 chr8:128428069-128428469</span>
+<span class="co">#&gt; 6 ENSG00000106404.13  chr18:57820043-57820443</span></code></pre></div>
+<p>The <code>gene_gRNA_pairs</code> data frame contains two columns:
+<code>gene_id</code> and <code>gRNA_id</code>. The gene IDs
+(respectively, gRNA IDs) in <code>gene_gRNA_pairs</code> must be a
+subset of the gene IDs (respectively, gRNA IDs) of
+<code>gene_matrix</code> (respectively, <code>gRNA_matrix</code>). Note
+that the gRNAs in <code>gRNA_gene_pairs</code> can either be “combined”
+or “uncombined,” depending on whether the rows of
+<code>gRNA_matrix</code> have been collapsed. In this tutorial
+<code>gRNA_gene_pairs</code> consists of “combined” gRNAs.</p>
+</div>
+<div class="section level2">
+<h2 id="step-4-determine-the-sidedness-of-the-test">Step 4: Determine the sidedness of the test<a class="anchor" aria-label="anchor" href="#step-4-determine-the-sidedness-of-the-test"></a>
+</h2>
+<p>The fourth step is to determine the sideness of the statistical test.
+If we are testing for an <em>increase</em> (respectively,
+<em>decrease</em>) in gene expression, then we should use a
+<em>right</em>-sided (respectively, <em>left</em>-sided) test. Whether
+we seek to test for an increase or decrease in gene expression depends
+<em>both</em> on the genomic element being targeted <em>and</em> on the
+CRISPR modality being used. For example, if we use CRISPRi to target an
+up-regulatory element (e.g., an enhancer or a transcription start site),
+then should test for a <em>decrease</em> in expression and therefore use
+a <em>left</em>-sided test. The following table summarizes whether a
+left- or right-tailed test is appropriate given the target element and
+CRISPR modality. We can see from the first row of the table that a
+left-tailed test is best for the example data.</p>
+<table class="table">
+<colgroup>
+<col width="23%">
+<col width="28%">
+<col width="32%">
+<col width="15%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Target element</th>
+<th align="center">CRISPR modality</th>
+<th align="center">Testing for…</th>
+<th align="center">Sidedness</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">Enhancer or TSS</td>
+<td align="center">CRISPRi or CRISPRko</td>
+<td align="center">Decrease in expression</td>
+<td align="center">Left</td>
+</tr>
+<tr class="even">
+<td align="center">Silencer</td>
+<td align="center">CRISPRi or CRISPRko</td>
+<td align="center">Increase in expression</td>
+<td align="center">Right</td>
+</tr>
+<tr class="odd">
+<td align="center">Enhancer or TSS</td>
+<td align="center">CRISPRa</td>
+<td align="center">Increase in expression</td>
+<td align="center">Right</td>
+</tr>
+<tr class="even">
+<td align="center">Silencer</td>
+<td align="center">CRISPRa</td>
+<td align="center">Decrease in expression</td>
+<td align="center">Left</td>
+</tr>
+</tbody>
+</table>
+<p>It also is possible to test for an increase <em>or</em> decrease in
+gene expression, in which case one should use a two-tailed test; see
+<code><a href="../reference/run_sceptre_high_moi.html">?run_sceptre_high_moi</a></code> (discussed below) for details.</p>
+</div>
+<div class="section level2">
+<h2 id="step-5-run-the-method">Step 5: Run the method<a class="anchor" aria-label="anchor" href="#step-5-run-the-method"></a>
+</h2>
+<p>The final step is to call the function
+<code>run_sceptre_high_moi</code> on the data. The most important
+arguments to this function are <code>gene_matrix</code>,
+<code>gRNA_matrix</code>, <code>covariate_matrix</code>,
+<code>gene_gRNA_pairs</code>, and <code>side</code>, all of which we
+prepared above. <code>run_sceptre_high_moi</code> has several
+additional, optional arguments, which are set to reasonable defaults.
+One can read more about <code>run_sceptre_high_moi</code> by checking
+the documentation (<code><a href="../reference/run_sceptre_high_moi.html">?run_sceptre_high_moi</a></code>). The function
+takes about 40 second to run on the example data on an 8-core Macbook
+Pro.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sceptre_high_moi.html">run_sceptre_high_moi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,
+                               gRNA_matrix <span class="op">=</span> <span class="va">gRNA_matrix</span>,
+                               covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,
+                               gene_gRNA_pairs <span class="op">=</span> <span class="va">gene_gRNA_pairs</span>,
+                               side <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span>
+<span class="co">#&gt; Check /var/folders/h6/pt59hmwd7rqb3jqfzwh0hlth0000gn/T//RtmpbSEKsA/logs for more detailed status updates.</span>
+<span class="co">#&gt; Running checks and setting up directory structure. <span style="color: #00BB00;"> ✓</span></span>
+<span class="co"><span style="color: #00BB00;">#&gt; </span>Running gene precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="co"><span style="color: #00BB00;">#&gt; </span>Running perturbation precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="co"><span style="color: #00BB00;">#&gt; </span>Running perturbation-to-gene association tests.<span style="color: #00BB00;"> ✓</span></span>
+<span class="co"><span style="color: #00BB00;">#&gt; </span>Collecting and returning results. <span style="color: #00BB00;"> ✓</span></span>
+<span class="co"><span style="color: #00BB00;">#&gt; </span></span></code></pre></div>
+<p>The output is a data frame called <code>result</code> with columns
+<code>gene_id</code>, <code>gRNA_id</code>, <code>p_value</code>, and
+<code>z_value</code>. The first three columns have clear meanings; the
+final column, <code>z_value</code>, is the z-value of a negative
+binomial GLM fitted to the data. Positive z-values indicate increased
+expression, whereas negative z-values indicate decreased expression.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>
+<span class="co">#&gt;              gene_id                  gRNA_id    p_value     z_value</span>
+<span class="co">#&gt; 1  ENSG00000279070.2  chr18:57820043-57820443 0.09409877 -1.54600057</span>
+<span class="co">#&gt; 2 ENSG00000105819.13  chr18:48566684-48567084 0.75447579  0.58228004</span>
+<span class="co">#&gt; 3  ENSG00000166582.9  chr10:17457016-17457416 0.32493022 -0.69581655</span>
+<span class="co">#&gt; 4  ENSG00000166582.9  chr18:48566684-48567084 0.68596936  0.24225727</span>
+<span class="co">#&gt; 5  ENSG00000279070.2 chr8:128428069-128428469 0.61729021  0.05130445</span>
+<span class="co">#&gt; 6 ENSG00000123405.13  chr10:17457016-17457416 0.02831457 -1.99882285</span></code></pre></div>
+<p>Finally, we apply the Benjamini-Hochberg procedure to the
+<em>p</em>-values to correct for multiple testing.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">result_bh</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p_adj <span class="op">=</span> <span class="va">p_value</span><span class="op">)</span></code></pre></div>
+<p>And with that we have completed our analysis!</p>
+</div>
+<div class="section level2">
+<h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h2>
+<ul>
+<li><p>Optionally, <code>gRNA_matrix</code> can be a binary matrix of
+perturbation presence/absence indicators, where the user has assigned
+perturbation indicators to cells by, for example, thresholding the raw
+gRNA count matrix.</p></li>
+<li><p>The function <code>plot_result</code> (documented in
+<code><a href="../reference/plot_result.html">?plot_result</a></code>) creates an informative plot of the
+output.</p></li>
+</ul>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
