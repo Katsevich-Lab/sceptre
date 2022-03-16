@@ -89,3 +89,21 @@ create_perturbation_matrix <- function(gRNA_matrix, gRNA_groups_table, threshold
   out <- rbind(out_leftover, out_grped)
 }
 
+
+#' Threshold a gRNA count matrix
+#'
+#' Thresholds a given gRNA count matrix
+#'
+#' @param gRNA_matrix a gRNA-by-cell expression matrix; the matrix can be represented as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R)
+#' @param threshold the threshold used to assign perturbations to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")
+#'
+#' @return a binary matrix of imputed perturbation assignments
+#' @export
+#'
+#' @examples
+#' data(gRNA_matrix)
+#' gRNA_matrix_binary <- threshold_gRNA_matrix(gRNA_matrix)
+threshold_gRNA_matrix <- function(gRNA_matrix, threshold = 3) {
+  return(gRNA_matrix >= threshold)
+}
+

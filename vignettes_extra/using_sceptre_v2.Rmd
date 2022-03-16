@@ -45,7 +45,7 @@ data(gene_matrix)
 data(gRNA_matrix)
 ```
 
-Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 106,660) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target putative enhancers in a population of K562 cells. Genes, gRNAs, and cells are downsampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
+Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 106,660) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
 
 The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, respectively. The column names, meanwhile, are the cell barcodes. In general the gRNA IDs must be strings that uniquely identify each gRNA (for example, the gRNA sequence itself); in this case the gRNA IDs are gRNA-specific oligonucleotide barcodes.
 
@@ -54,17 +54,17 @@ The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, 
 ```{r}
 options(width = 300)
 # gene_matrix; rows are genes, columns are cells
-gene_matrix[1:10, 17:19]
+gene_matrix[1:10, 10:12]
 
 # gRNA matrix; rows are gRNAs, columns are cells
-gRNA_matrix[1:10, 17:19]
+gRNA_matrix[1:10, 10:12]
 ```
 
 We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG00000125968") and gRNA ("GTTGCAGATGAGGCAACCGA") to visualize the data.
 
 ```{r, plot_hist, fig.width=7, fig.height=3, fig.retina=2}
-example_gene <- gene_matrix["ENSG00000171530",]
-example_gRNA <- gRNA_matrix["GAATCGGGTGGGATTCCCAG",]
+example_gene <- gene_matrix["ENSG00000125968",]
+example_gRNA <- gRNA_matrix["GTTGCAGATGAGGCAACCGA",]
 
 hist_gene <- ggplot(data = example_gene %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "dodgerblue3", alpha = 0.7) +
@@ -100,15 +100,52 @@ head(covariate_matrix)
 
 We strongly recommend that users include the same four covariates (i.e., `lg_gene_lib_size`, `lg_gRNA_lib_size`, `batch`, and `p_mito`) in their own cell-wise covariate matrix.
 
-## Step 2: create the "perturbation matrix"
+## Step 2: (Optional) Assign perturbation identities to cells
 
-The second step is to convert the gRNA count matrix into a "perturbation matrix." This step consists of (i) imputing perturbation assignments onto the cells by thresholding the gRNA counts and (ii) combining gRNAs that target the same chromosomal site into a single "combined" gRNA.
+The second step is to impute perturbation assignments onto the cells. We implement this step by thresholding the gRNA count matrix. For a given gRNA and cell, we label the cell as having been *perturbed* by the gRNA if the count of the gRNA in the cell exceeds a user-specified, integer-valued threshold; otherwise, we label the cell has having been *unperturbed* by the gRNA. The default threshold that we use for this purpose is 3, which we have found to work well in practice. This routine is implemented in the function `threshold_gRNA_matrix`.
 
-We begin by loading the `gRNA_groups_table` data frame, which contains additional information about each individual gRNA.
+```{r}
+gRNA_matrix_binary <- threshold_gRNA_matrix(gRNA_matrix)
+
+# `gRNA_matrix_binary` is a thresholded version of `gRNA_matrix`
+gRNA_matrix_binary[1:10, 1:3]
+
+```
+
+Users can select a different threshold or apply their own procedure for assigning perturbation indicators to cells.
+
+Note that this step is optional; users instead can pass a raw gRNA count matrix to the `sceptre` function, in which case this matrix is thresholded internally.
+
+## Step 3: (Optional) Combine gRNAs
+
+The second step is to simplify the gRNA count matrix by (i) imputing perturbation assignments onto the cells by thresholding the gRNA counts and (ii) combining gRNAs that target the same chromosomal site.
+
+We focus our attention on the second of these two tasks. The data frame `gRNA_groups_table` maps each gRNA to its "gRNA group." Each "gRNA group" in the example data consists of exactly two gRNAs. `gRNA_groups_table` contains three columns:
+
+-   `gRNA_id`: the ID of an individual gRNA
+
+-   `gRNA_group`: the "group" to which a given gRNA belongs. For enhancer-targeting and TSS-targeting gRNAs, this is the location in the genome that the gRNA targets. For negative control gRNAs, this
+
+`gRNA_id` (i.e., the ID of an individual gRNA), `gRNA_group` (i.e., ;
+
+An examination of `gRNA_groups_table` reveals that the 50 gRNAs in the example data target 25 distinct locations.
 
 ```{r}
 data("gRNA_groups_table")
 head(gRNA_groups_table, 10)
+length(unique(gRNA_groups_table$gRNA_group))
+```
+
+For example, rows 1 and 2 of `gRNA_groups_table` indicate that the gRNAs "GCTCTTGGCTGGAGAATGCA" and "GTTGCAGATGAGGCAACCGA" target the putative enhancer located at `chr1.10702`.
+
+```{r}
+gRNA_groups_table[1:2,]
+```
+
+Next,
+
+```{r}
+gRNA_groups_table[41:42,]
 ```
 
 ```{r}
