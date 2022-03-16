@@ -11,7 +11,7 @@ n_cells <- 40000
 #########################################
 # 1. Construct gene-gRNA pairs data frame
 #########################################
-set.seed(10)
+set.seed(20)
 gene_gRNA_pairs_raw <- pairs_ungrouped %>%
   select(gene_id, gRNA_group, site_type) %>%
   distinct()
@@ -68,6 +68,12 @@ multimodal_odm <- multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(g
 cell_ids <- sample(seq(1, ncol(multimodal_odm)), n_cells)
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
+############################
+# Simplify the cell barcodes
+############################
+cell_barcodes <- get_cell_barcodes(multimodal_odm_downsample)
+my_cell_barcodes <- substr(x = cell_barcodes, start = 0, stop = 23)
+
 ##############################
 # Load gRNA and gene data data
 ##############################
@@ -76,11 +82,11 @@ gene_sub <- get_modality(multimodal_odm_downsample, "gene")
 
 gene_matrix <- gene_sub[[my_gene_ids,]]
 row.names(gene_matrix) <- my_gene_ids
-colnames(gene_matrix) <- get_cell_barcodes(gene_sub)
+colnames(gene_matrix) <- my_cell_barcodes
 
 gRNA_matrix <- gRNA_sub[[my_gRNA_ids,]]
 row.names(gRNA_matrix) <- my_gRNA_ids
-colnames(gRNA_matrix) <- get_cell_barcodes(gRNA_sub)
+colnames(gRNA_matrix) <- my_cell_barcodes
 
 ##############################
 # Compute the covariate matrix
@@ -90,7 +96,7 @@ covariate_matrix <- multimodal_odm_downsample %>% get_cell_covariates() %>%
          lg_gene_lib_size = log(gene_n_umis),
          p_mito = gene_p_mito,
          batch = gene_batch)
-row.names(covariate_matrix) <- get_cell_barcodes(gRNA_sub)
+row.names(covariate_matrix) <- my_cell_barcodes
 
 ###############################
 # Simplify the gRNA group names
