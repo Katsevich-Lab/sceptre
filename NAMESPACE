@@ -3,5 +3,6 @@
 export(create_perturbation_matrix)
 export(plot_result)
 export(run_sceptre_high_moi)
+export(threshold_gRNA_matrix)
 import(methods)
 importFrom(magrittr,"%>%")
