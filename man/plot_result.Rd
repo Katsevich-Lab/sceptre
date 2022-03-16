@@ -16,6 +16,7 @@ a ggplot2 object containing the plot
 For a given gRNA-gene pair analyzed by \code{sceptre}, plots the resampled test statistics, alongside the "ground truth" test statistic derived from the raw data.
 }
 \examples{
+\dontrun{
 data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 gene_expressions <- gene_matrix[1,,drop=FALSE]
 gRNA_expressions <- gRNA_matrix[1,,drop=FALSE]
@@ -26,4 +27,5 @@ result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix, covariate_matrix,
 row <- result[1,]
 result_plot <- plot_result(row)
 plot(result_plot)
+}
 }

@@ -5,7 +5,7 @@
 \alias{covariate_matrix}
 \title{Covariate matrix}
 \format{
-An object of class \code{data.frame} with 106660 rows and 4 columns.
+An object of class \code{data.frame} with 40000 rows and 4 columns.
 }
 \usage{
 data(covariate_matrix)

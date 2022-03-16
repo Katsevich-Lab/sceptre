@@ -2,7 +2,7 @@
 % Please edit documentation in R/aux_functs.R
 \name{combine_gRNAs}
 \alias{combine_gRNAs}
-\title{Combine gRNAs}
+\title{Combine gRNAs (deprecated)}
 \usage{
 combine_gRNAs(gRNA_matrix, site_table)
 }
@@ -21,6 +21,7 @@ Combines gRNAs that target the same site into a single "combined" gRNA via addit
 Combining gRNAs that target the same site helps to increase statistical power. This operation is especially appealing when gRNA expression levels are low or there are not a lot of (e.g., < 100,000) cells.
 }
 \examples{
+\dontrun{
 library(magrittr)
 library(Matrix)
 library(dplyr)
@@ -36,4 +37,5 @@ combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix, site_table)
 site_table_2 <- site_table \%>\%
 filter(site \%in\% c("chr10:17457016-17457416", "chr18:48566684-48567084"))
 combined_gRNA_matrix_2 <- combine_gRNAs(gRNA_matrix, site_table_2)
+}
 }

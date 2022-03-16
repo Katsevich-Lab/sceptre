@@ -167,6 +167,8 @@ result_bh <- result %>% mutate(p_adj = p_value)
 
 And with that we have completed our analysis!
 
+## Step 6. Process the results
+
 ## Notes
 
 -   Optionally, `gRNA_matrix` can be a binary matrix of perturbation presence/absence indicators, where the user has assigned perturbation indicators to cells by, for example, thresholding the raw gRNA count matrix.

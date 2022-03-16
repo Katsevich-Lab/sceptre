@@ -7,6 +7,7 @@
 #' @return a ggplot2 object containing the plot
 #' @export
 #' @examples
+#' \dontrun{
 #' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
 #' gene_expressions <- gene_matrix[1,,drop=FALSE]
 #' gRNA_expressions <- gRNA_matrix[1,,drop=FALSE]
@@ -17,6 +18,7 @@
 #' row <- result[1,]
 #' result_plot <- plot_result(row)
 #' plot(result_plot)
+#' }
 plot_result <- function(row) {
   resampled_zvalues <- row %>% dplyr::select(dplyr::starts_with("z_null_")) %>% as.numeric()
   original_zvalue <- row$z_value

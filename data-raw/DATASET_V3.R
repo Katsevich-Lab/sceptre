@@ -42,10 +42,14 @@ my_gRNA_groups <- unique(as.character(gene_gRNA_pairs$gRNA_group))
 #####################################
 # 2. Construct gRNA groups data frame
 #####################################
-gRNA_groups <- pairs_ungrouped %>% select(gRNA_group, barcode) %>%
-   distinct() %>% filter(gRNA_group %in% my_gRNA_groups) %>%
-  select(gRNA_id = barcode, gRNA_group)
-my_gRNA_ids <- as.character(gRNA_groups$gRNA_id)
+gRNA_groups_table <- pairs_ungrouped %>% select(gRNA_group, barcode, site_type) %>%
+  distinct() %>% filter(gRNA_group %in% my_gRNA_groups) %>% filter(site_type != "TSS") %>%
+  rename(gRNA_id = barcode, gRNA_type = site_type) %>%
+  mutate(gRNA_type = factor(gRNA_type, c("DHS", "selfTSS", "NTC"), c("enh_target", "tss_target", "non_target"))) %>%
+  mutate_all(.tbl = ., .funs = as.character) %>%
+  arrange(gRNA_type) %>%
+  select(gRNA_id, gRNA_group, gRNA_type)
+my_gRNA_ids <- as.character(gRNA_groups_table$gRNA_id)
 
 ###########
 # Load ODMs
@@ -82,7 +86,27 @@ colnames(gRNA_matrix) <- get_cell_barcodes(gRNA_sub)
 # Compute the covariate matrix
 ##############################
 covariate_matrix <- multimodal_odm_downsample %>% get_cell_covariates() %>%
-  mutate(lg_gRNA_lib_size = log(gRNA_n_umis),
+  summarize(lg_gRNA_lib_size = log(gRNA_n_umis),
          lg_gene_lib_size = log(gene_n_umis),
          p_mito = gene_p_mito,
          batch = gene_batch)
+row.names(covariate_matrix) <- get_cell_barcodes(gRNA_sub)
+
+###############################
+# Simplify the gRNA group names
+###############################
+simplify_grna_names <- function(vect) {
+  vect <- gsub(x = vect, pattern = "_top_two", replacement = "")
+  ntc_orig_names <- sort(unique(grep(pattern = "random*|scrambled*", x = vect, value = TRUE)))
+  ntc_new_names <- paste0("NTC_", seq(1, length(ntc_orig_names)))
+  for (i in seq(1, length(ntc_orig_names))) {
+    orig_name <- ntc_orig_names[i]
+    vect[orig_name ==  vect] <- ntc_new_names[i]
+  }
+  return(vect)
+}
+
+gene_gRNA_pairs$gRNA_group <- simplify_grna_names(gene_gRNA_pairs$gRNA_group )
+gRNA_groups_table$gRNA_group <- simplify_grna_names(gRNA_groups_table$gRNA_group)
+
+usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, gRNA_groups_table, overwrite = TRUE)
