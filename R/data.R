@@ -45,5 +45,5 @@ NULL
 #'
 #' A data frame containing the target site (as a chromosomal position) of each gRNA. The column names are `site` and `gRNA_id`.
 #' @inheritSection data Overview
-#' @usage data(site_table)
-"site_table"
+#' @usage data(gRNA_groups_table)
+"gRNA_groups_table"

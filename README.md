@@ -59,19 +59,31 @@ available soon.)</span>
 yet been carefully vetted in low-MOI settings. We are working on
 developing such an extension, which we expect to be available in 2022.
 
-# References and funding
+# References
 
-**Methods paper**: T Barry, X Wang, J Morris, K Roeder, E Katsevich.
-“SCEPTRE improves calibration and sensitivity in single-cell CRISPR
-screen analysis.” [Genome
+Please consider citing the following if you find `sceptre` helpful in
+your research.
+
+**Methods papers**
+
+T Barry, X Wang, J Morris, K Roeder, E Katsevich. “SCEPTRE improves
+calibration and sensitivity in single-cell CRISPR screen analysis.”
+[Genome
 Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
-**Application paper**: J Morris, Z Daniloski, J Domingo, T Barry, M
-Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T
-Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood
-trait loci using pooled CRISPR screens and single cell RNA sequencing.”
-Preprint available on
+T Barry, E Katsevich, K Roeder. “Exponential family measurement error
+models for single-cell CRISPR screens.” [Arxiv
+preprint](https://doi.org/10.48550/arXiv.2201.01879).
+
+**Application paper**
+
+J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E
+Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana.
+“Discovery of target genes and pathways of blood trait loci using pooled
+CRISPR screens and single cell RNA sequencing.” Preprint available on
 [bioRxiv](https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1).
+
+# Funding
 
 We are grateful to [Analytics at
 Wharton](https://analytics.wharton.upenn.edu/) for supporting the

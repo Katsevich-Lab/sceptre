@@ -1,0 +1,118 @@
+---
+title: "Basic `sceptre` tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic `sceptre` tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+**Updated March 2022**
+
+This vignette illustrates application of `sceptre` to an example high-multiplicity-of-infection (MOI) single-cell CRISPR screen dataset. We begin by installing and loading all required packages, including the up-to-date version of `sceptre`.
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("katsevich-lab/sceptre")
+install.packages("tidyverse")
+install.packages("cowplot")
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+library(Matrix)
+library(sceptre)
+```
+
+## Step 1: Prepare the data
+
+The first step is to prepare the data to pass to `sceptre`. We must prepare three separate data objects: the gene-by-cell expression matrix, the gRNA-by-cell expression matrix, and the cell-specific matrix of covariates.
+
+### Gene and gRNA expression matrices
+
+We load the example gene-by-cell and gRNA-by-cell expression matrices that are included in the `sceptre` package.
+
+```{r}
+data(gene_matrix)
+data(gRNA_matrix)
+```
+
+Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 106,660) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target putative enhancers in a population of K562 cells. Genes, gRNAs, and cells are downsampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
+
+The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, respectively. The column names, meanwhile, are the cell barcodes. In general the gRNA IDs must be strings that uniquely identify each gRNA (for example, the gRNA sequence itself); in this case the gRNA IDs are gRNA-specific oligonucleotide barcodes.
+
+`gene_matrix` and `gRNA_matrix` are sparse matrices (as implemented by the `Matrix` package); in general these matrices can be either sparse matrices or standard (dense) R matrices. We print a few rows and columns of `gene_matrix` and `gRNA_matrix` to get a sense of what the data look like.
+
+```{r}
+options(width = 300)
+# gene_matrix; rows are genes, columns are cells
+gene_matrix[1:10, 17:19]
+
+# gRNA matrix; rows are gRNAs, columns are cells
+gRNA_matrix[1:10, 17:19]
+```
+
+We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG00000125968") and gRNA ("GTTGCAGATGAGGCAACCGA") to visualize the data.
+
+```{r, plot_hist, fig.width=7, fig.height=3, fig.retina=2}
+example_gene <- gene_matrix["ENSG00000171530",]
+example_gRNA <- gRNA_matrix["GAATCGGGTGGGATTCCCAG",]
+
+hist_gene <- ggplot(data = example_gene %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+  geom_histogram(binwidth = 3, col = "black", fill = "dodgerblue3", alpha = 0.7) +
+  scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("Gene expressions") + ylab("") + theme_bw(base_size = 10)
+
+hist_gRNA <- ggplot(data = example_gRNA %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+  geom_histogram(binwidth = 3, col = "black", fill = "orchid4", alpha = 0.7) +
+  scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("gRNA expressions") + ylab("") + theme_bw(base_size = 10)
+
+plot_grid(hist_gene, hist_gRNA, labels = c("a", "b"))
+```
+
+As expected, the data are highly discrete counts. Note that we do *not* normalize either the gene or gRNA expression matrices, opting instead to work directly with the raw counts.
+
+### Cell-wise covariate matrix
+
+Next, we load the cell-wise covariate matrix, `covariate_matrix`.
+
+```{r}
+data(covariate_matrix)
+head(covariate_matrix)
+```
+
+`covariate_matrix` is a 106,660 x 4 data frame of "technical factors," or covariates. The row names of this data frame are the cell barcodes. The covariates are as follows:
+
+-   Log-transformed gene library size (`lg_gene_lib_size`); this can be computed via `log(colSums(gene_matrix))`
+
+-   Log-transformed gRNA library size (`lg_gRNA_lib_size`); this can be computed via `log(colSums(gRNA_matrix))`
+
+-   Sequencing batch (`batch`)
+
+-   Percentage of gene transcripts that map to mitochondrial genes (`p_mito`)
+
+We strongly recommend that users include the same four covariates (i.e., `lg_gene_lib_size`, `lg_gRNA_lib_size`, `batch`, and `p_mito`) in their own cell-wise covariate matrix.
+
+## Step 2: create the "perturbation matrix"
+
+The second step is to convert the gRNA count matrix into a "perturbation matrix." This step consists of (i) imputing perturbation assignments onto the cells by thresholding the gRNA counts and (ii) combining gRNAs that target the same chromosomal site into a single "combined" gRNA.
+
+We begin by loading the `gRNA_groups_table` data frame, which contains additional information about each individual gRNA.
+
+```{r}
+data("gRNA_groups_table")
+head(gRNA_groups_table, 10)
+```
+
+```{r}
+perturabtion_matrix <- create_perturbation_matrix(gRNA_matrix = gRNA_matrix,
+                                                  gRNA_groups_table = gRNA_groups_table)
+perturabtion_matrix[1:5,1:3]
+```

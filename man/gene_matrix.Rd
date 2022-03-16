@@ -5,7 +5,7 @@
 \alias{gene_matrix}
 \title{Gene expression matrix}
 \format{
-An object of class \code{matrix} (inherits from \code{array}) with 5 rows and 106660 columns.
+An object of class \code{dgTMatrix} with 20 rows and 40000 columns.
 }
 \usage{
 data(gene_matrix)
