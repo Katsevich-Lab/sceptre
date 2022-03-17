@@ -15,7 +15,10 @@ threshold_gRNA_matrix(gRNA_matrix, threshold = 3)
 a binary matrix of imputed perturbation assignments
 }
 \description{
-Thresholds a given gRNA count matrix
+Thresholds a given gRNA count matrix. A threshold of 3 is a reasonable default choice.
+}
+\details{
+See "Exponential family measurement error models for single-cell CRISPR screens" by Barry et al. 2022 for an in-depth analysis of thresholding in single-cell CRISPR screens.
 }
 \examples{
 data(gRNA_matrix)
