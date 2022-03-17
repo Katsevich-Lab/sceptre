@@ -11,7 +11,7 @@ n_cells <- 40000
 #########################################
 # 1. Construct gene-gRNA pairs data frame
 #########################################
-set.seed(20)
+set.seed(62)
 gene_gRNA_pairs_raw <- pairs_ungrouped %>%
   select(gene_id, gRNA_group, site_type) %>%
   distinct()
@@ -65,6 +65,7 @@ gene_odm <- read_odm(odm_fp = paste0(gasp_fp, "processed/gene/gasp_scale_gene_ex
 ###################################
 multimodal_odm <- multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(gRNA = gRNA_odm,
                                                                                 gene = gene_odm))
+multimodal_odm <- multimodal_odm[,(multimodal_odm %>% get_cell_covariates() %>% pull(gRNA_n_umis)) != 0]
 cell_ids <- sample(seq(1, ncol(multimodal_odm)), n_cells)
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Tim Barry, **Updated March 2022**
+Tim Barry & Eugene Katsevich, **Updated March 2022**
 
 This vignette illustrates application of `sceptre` to an example high-multiplicity-of-infection (MOI) single-cell CRISPR screen dataset. We begin by installing and loading all required packages, including the up-to-date version of `sceptre`.
 
@@ -47,7 +47,7 @@ data(gRNA_matrix)
 
 Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 106,660) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
 
-The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, respectively. The column names, meanwhile, are the cell barcodes. In general the gRNA IDs must be strings that uniquely identify each gRNA. In the example data the gRNA IDs are gRNA-specific oligonucleotide barcodes. Next, `gene_matrix` and `gRNA_matrix` are sparse matrices (as implemented by the `Matrix` package); in general these matrices can be either sparse matrices or standard (dense) R matrices. We print a few rows and columns of `gene_matrix` and `gRNA_matrix` to get a sense of what the data look like.
+The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, respectively. The gRNA IDs are gRNA-specific oligonucleotide barcodes. In general the gRNA IDs must be strings that uniquely identify each gRNA. The column names, meanwhile, are the cell barcodes. Next, `gene_matrix` and `gRNA_matrix` are sparse matrices (as implemented by the `Matrix` package). In general these matrices can be either sparse matrices or standard (dense) R matrices. We print a few rows and columns of `gene_matrix` and `gRNA_matrix` to get a sense of what the data look like.
 
 ```{r}
 options(width = 300)
@@ -58,11 +58,11 @@ gene_matrix[1:10, 1:3]
 gRNA_matrix[1:10, 1:3]
 ```
 
-We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG00000136997") and gRNA ("TGAGATAACATCCCCTCCCG") to visualize the data.
+We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG00000111057") and gRNA ("TGTCAGTCCTCCCTCCCCCA") to visualize the data.
 
 ```{r, plot_hist, fig.width=7, fig.height=3, fig.retina=2}
-example_gene <- gene_matrix["ENSG00000136997",]
-example_gRNA <- gRNA_matrix["TGAGATAACATCCCCTCCCG",]
+example_gene <- gene_matrix["ENSG00000111057",]
+example_gRNA <- gRNA_matrix["TGTCAGTCCTCCCTCCCCCA",]
 
 hist_gene <- ggplot(data = example_gene %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "dodgerblue3", alpha = 0.7) +
@@ -88,9 +88,9 @@ head(covariate_matrix)
 
 `covariate_matrix` is a 106,660 x 4 data frame of "technical factors," or covariates. The row names of this data frame are the cell barcodes. The covariates are as follows:
 
--   Log-transformed gene library size (`lg_gene_lib_size`); this can be computed via `log(colSums(gene_matrix))`
+-   Log-transformed gene library size (`lg_gene_lib_size`); this vector can be computed via `log(colSums(gene_matrix))`
 
--   Log-transformed gRNA library size (`lg_gRNA_lib_size`); this can be computed via `log(colSums(gRNA_matrix))`
+-   Log-transformed gRNA library size (`lg_gRNA_lib_size`); this vector can be computed via `log(colSums(gRNA_matrix))`
 
 -   Sequencing batch (`batch`)
 
@@ -100,14 +100,13 @@ We strongly recommend that users include the same four covariates (i.e., `lg_gen
 
 ## Step 2: (Optional) Assign perturbation identities to cells
 
-The second step is to impute perturbation assignments onto the cells. For a given gRNA and cell, we label the cell as having been *perturbed* by the gRNA if the count of the gRNA within the cell exceeds a user-specified, integer-valued threshold; otherwise, we label the cell has having been *unperturbed* by the gRNA. The default threshold that we use for this purpose is 3, which we have found to work well in practice. This simple thresholding routine is implemented by the function `threshold_gRNA_matrix`.
+The second step is to impute perturbation assignments onto the cells. For a given gRNA and cell, we label the cell as having been *perturbed* by the gRNA if the UMI count of the gRNA within the cell exceeds a user-specified, integer-valued threshold; otherwise, we label the cell has having been *unperturbed* by the gRNA. The default threshold that we use for this purpose is 3, which we have found to work well in practice. This simple thresholding routine is implemented by the function `threshold_gRNA_matrix`.
 
 ```{r}
-gRNA_matrix_binary <- threshold_gRNA_matrix(gRNA_matrix)
+perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 
-# `gRNA_matrix_binary` is a thresholded version of `gRNA_matrix`
-gRNA_matrix_binary[1:10, 1:3]
-
+# `perturbation_matrix` is a thresholded version of `gRNA_matrix`
+perturbation_matrix[1:10, 1:3]
 ```
 
 Users can select a different threshold or apply their own procedure for assigning perturbation indicators to cells.
@@ -127,7 +126,7 @@ The `gRNA_groups_table` data frame has three columns:
 
 -   `gRNA_id`: the ID of an individual gRNA
 
--   `gRNA_group`: the "group" to which a given gRNA belongs. Gasperini et al. designed exactly two gRNAs to target each putative enhancer or TSS. Therefore, gRNAs that target the same putative enhancer or TSS are paired to form groups of size two. Nontargeting gRNAs, meanwhile, are paired randomly, also forming groups of size two.
+-   `gRNA_group`: the "group" to which a given gRNA belongs. Gasperini et al. designed exactly two gRNAs to target each putative enhancer or TSS; gRNAs that target the same putative enhancer or TSS are paired to form groups of size two. Nontargeting gRNAs, meanwhile, are paired randomly, also forming groups of size two.
 
     Note that in general, a gRNA group can contain any nonzero number of gRNAs.
 
@@ -151,50 +150,51 @@ Finally, the non-targeting gRNAs "AATATTCTCCCTCATTCTGG" and "TTAAAATTGATTCTGCCAC
 gRNA_groups_table[31:32,]
 ```
 
-The function `combine_gRNAs` takes as arguments a `gRNA_matrix` and a `gRNA_groups_table` and collapses gRNAs in the same group into a single "combined" gRNA. The data frame `gRNA_groups_table` must have columns `gRNA_id` and `gRNA_group`, as above; the `gRNA_type` column is optional.
+The function `combine_gRNAs` takes as arguments a thresholded `gRNA_matrix` (i.e., the `perturbation_matrix`) and a `gRNA_groups_table` and collapses gRNAs in the same group into a single "combined" gRNA. The data frame `gRNA_groups_table` must have columns `gRNA_id` and `gRNA_group`, as above; the `gRNA_type` column is optional.
 
 ```{r}
-combined_gRNA_matrix <- combine_gRNAs(gRNA_matrix = gRNA_matrix,
-                                      gRNA_groups_table = gRNA_groups_table)
+combined_perturbation_matrix <- combine_gRNAs(perturbation_matrix = perturbation_matrix,
+                                              gRNA_groups_table = gRNA_groups_table)
 ```
 
-The ouput matrix `combined_gRNA_matrix` has 25 rows corresponding to the 25 "gRNA groups" within `gRNA_groups_table`. The column names (i.e., the cell barcodes) remain unchanged.
+The ouput matrix, `combined_perturbation_matrix`, is a 25 x 40,000 binary matrix, with rows corresponding to the 25 "gRNA groups" within `gRNA_groups_table`. The column names (i.e., the cell barcodes) remain unchanged.
 
 ```{r}
-dim(combined_gRNA_matrix)
-combined_gRNA_matrix[1:10,1:3]
+dim(combined_perturbation_matrix)
+combined_perturbation_matrix[1:10,1:3]
 ```
 
 We note that this step is optional; `sceptre` works on either combined or uncombined gRNAs.
 
 ## Step 4: Determine which pairs to analyze
 
-Step 4 is to determine the pairs of genes and gRNA groups to analyze. It is common to analyze pairs of genes and gRNA groups that are in close physical proximity to uncover *cis*-regulatory relationships. The data frame `gene_gRNA_pairs` contains the pairs of genes and gRNA groups that we will analyze in our analysis.
+Step 4 is to determine the pairs of genes and gRNA groups to analyze. It is common to analyze pairs of genes and gRNA groups that are in close physical proximity to uncover *cis*-regulatory relationships. The data frame `gene_gRNA_pairs` contains the 120 pairs of genes and gRNA groups that we will analyze in our analysis.
 
 ```{r}
 data(gene_gRNA_pairs)
+nrow(gene_gRNA_pairs)
 gene_gRNA_pairs[c(1:2, 6:7, 21:22),]
 ```
 
-The `gene_gRNA_pairs` data frame contains three columns: `gene_id`, `gRNA_group`, and `type`. The gene IDs (respectively, gRNA groups) in `gene_gRNA_pairs` must be a subset of the gene IDs (respectively, gRNA groups) in `gene_matrix` (respectively, `combined_gRNA_matrix`). The `type` column gives the "type" of each pair: one of `positive_control` (for TSS-targeting gRNA groups paired to the target gene), `candidate` (for putative enhancer-targeting gRNA groups paired to a nearby gene), and `negative_control` (for pairs of genes and gRNA groups that consist of a non-targeting gRNA group). The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. We note that the `type` column, while helpful for bookkeeping purposes, is optional.
+The `gene_gRNA_pairs` data frame contains three columns: `gene_id`, `gRNA_group`, and `type`. The gene IDs (respectively, gRNA groups) in `gene_gRNA_pairs` must be a subset of the gene IDs (respectively, gRNA groups) in `gene_matrix` (respectively, `combined_perturbation_matrix`). The `type` column gives the "type" of each pair: one of `positive_control` (for TSS-targeting gRNA groups paired to the target gene), `candidate` (for putative enhancer-targeting gRNA groups paired to a nearby gene), and `negative_control` (for pairs of genes and gRNA groups that consist of a non-targeting gRNA group). The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. We note that the `type` column, while helpful for bookkeeping purposes, is optional.
 
 ## Step 5: Determine the sidedness of the test
 
 The fourth step is to determine the sideness of the statistical test. If we are testing for an *increase* (respectively, *decrease*) in gene expression in response to the perturbation, then we should use a *right*-sided (respectively, *left*-sided) test. On the other hand, if we are testing for an increase *or* decrease in gene expression, then we should use a *two*-sided test.
 
-Whether we seek to test for an increase or decrease in gene expression depends on (i) the genomic element being targeted, (ii) the CRISPR modality being used, and (iii) whether we are testing an association in *cis* or in *trans*. For example, if we use CRISPRi to perturb an enhancer, and if we seek to test for an association between that enhancer and a gene in *cis*, then we should should test for a *decrease* in expression and therefore use a *left*-sided test. The following table summarizes whether a left-, right-, or two-tailed tailed test is appropriate as a function of the aforementioned variables.
+Whether we seek to test for an increase or decrease in gene expression (or either and increase *or* decrease) depends on (i) the genomic element being targeted, (ii) the CRISPR modality being used, and (iii) whether we are testing an association in *cis* or in *trans*. For example, if we perturb a putative enhancer via CRISPRi and test for an association between that enhancer and a gene in *cis*, then we should should test for a *decrease* in expression and therefore use a *left*-sided test. The following table summarizes whether a left-, right-, or two-tailed tailed test is appropriate as a function of the aforementioned variables.
 
 | Target element  |   CRISPR modality   | *Cis* or *trans* |     Testing for...     | Sidedness |
-|:------------:|:-----------:|:---------:|:----------------:|:-------------:|
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
 | Enhancer or TSS | CRISPRi or CRISPRko |      *Cis*       | Decrease in expression |   Left    |
 |    Silencer     | CRISPRi or CRISPRko |      *Cis*       | Increase in expression |   Right   |
 | Enhancer or TSS |       CRISPRa       |      *Cis*       | Increase in expression |   Right   |
 |    Silencer     |       CRISPRa       |      *Cis*       | Decrease in expression |   Left    |
 |       Any       |         Any         |     *Trans*      | Increase *or* Decrease |   Both    |
 
-*Trans* relationships are more complex than *cis* relationships, as *trans* relationships act through the intermediary of one or more transcription factors. We recommend using a two-sided test for all tests of *trans* relationships.
+*Trans* relationships are more complex than *cis* relationships, as *trans* relationships are mediated by one or more transcription factors. Given the resultant uncertainty about the direction of *trans* relationships, a two-sided test is appropriate for all *trans* tests.
 
-The first row of the table indicates we should use a left-tailed test for the example data.
+We use a left-tailed test for the example data, as suggested by the first row of the table.
 
 ```{r}
 side <- "left"
@@ -202,14 +202,29 @@ side <- "left"
 
 ## Step 6: Run the method
 
-The final step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `gRNA_matrix`, `covariate_matrix`, `gene_gRNA_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
+The final step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
 
 ```{r,eval=FALSE}
 result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
-                               gRNA_matrix = gRNA_matrix,
+                               combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
                                gene_gRNA_pairs = gene_gRNA_pairs,
                                side = "left")
 ```
 
+```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE,cache=TRUE}
+result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+                               combined_perturbation_matrix = combined_perturbation_matrix,
+                               covariate_matrix = covariate_matrix,
+                               gene_gRNA_pairs = gene_gRNA_pairs,
+                               side = "left",
+                               parallel = TRUE)
+```
+
 ## Step 7. Analyze the results
+
+-   Make a QQ-plot of the negative control pairs (should lie along the diagonal line)
+-   Examine the p-values of the positive control pairs.
+-   Finally, apply BH to the candidate pairs; report as discoveries those with adjusted p-values \< 0.1.
+
+Note: it is important to apply BH *only* to the candidate pairs (i.e., the pairs in the discovery set); adding positive control and negative control pairs makes BH anticonservative and convservative, respectively.

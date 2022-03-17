@@ -4,20 +4,23 @@
 \alias{combine_gRNAs}
 \title{Combine gRNAs}
 \usage{
-combine_gRNAs(gRNA_matrix, gRNA_groups_table)
+combine_gRNAs(perturbation_matrix, gRNA_groups_table)
 }
 \arguments{
-\item{gRNA_matrix}{a gRNA-by-cell expression matrix stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs}
+\item{perturbation_matrix}{a gRNA-by-cell expression matrix stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs}
 
 \item{gRNA_groups_table}{a data frame with columns \code{gRNA_id} and \code{gRNA_group}.}
 }
 \value{
-
+a "combined"
 }
 \description{
-A threshold of 3 is a reasonable default for high-MOI single-cell CRISPR screens;
+Combine gRNAs
 }
 \examples{
+library(Matrix)
 data("gRNA_matrix")
-data("gRNA_groups")
+data("gRNA_groups_table")
+perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
+combined_perturbation_matrix <- combine_gRNAs(perturbation_matrix, gRNA_groups_table)
 }
