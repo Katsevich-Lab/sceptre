@@ -3,7 +3,7 @@
 #' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
 #'
 #' @param gene_matrix a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
-#' @param gRNA_matrix a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators
+#' @param combined_perturbation_matrix a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators
 #' @param covariate_matrix the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
 #' @param gene_gRNA_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
 #' @param side sidedness of the test; one of "both," "left," and "right"
@@ -34,12 +34,13 @@
 #' data(covariate_matrix) # iii. covariate matrix
 #' data(site_table) # iv. gRNAs grouped by target site
 #' data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
-#' # 2. (Optional) group together gRNAs that target the same site
+#' # 2. (Optional) threshold and combine gRNA matrix
 #' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
+#
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
-#' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+#' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs, parallel = FALSE)
 #' }
-run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
+run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
   ##################
@@ -65,6 +66,7 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
     foreach_funct <- foreach::`%do%`
   }
   # 1. threshold gRNA_matrix (using threshold = 3, for now) if necessary
+  gRNA_matrix <- combined_perturbation_matrix
   if (max(gRNA_matrix) >= 2) {
     gRNA_matrix <- gRNA_matrix >= THRESHOLD
   }
@@ -90,6 +92,9 @@ run_sceptre_high_moi <- function(gene_matrix, gRNA_matrix, covariate_matrix, gen
     gene_gRNA_pairs <- gene_gRNA_pairs %>% dplyr::filter(!(gRNA_id %in% bad_gRNAs))
   }
   # 4. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices; ensure all rows distinct
+  if ("gRNA_group" %in% colnames(gene_gRNA_pairs)) {
+    gene_gRNA_pairs <- dplyr::rename(gene_gRNA_pairs, gRNA_id = gRNA_group)
+  }
   if (!all(c("gene_id", "gRNA_id") %in% colnames(gene_gRNA_pairs))) stop("The columns `gene_id` and `gRNA_id` must be present in the `gene_gRNA_pairs` data frame.")
   abs_genes <- gene_gRNA_pairs$gene_id[!(gene_gRNA_pairs$gene_id %in% row.names(gene_matrix))]
   abs_gRNAs <- gene_gRNA_pairs$gRNA_id[!(gene_gRNA_pairs$gRNA_id %in% row.names(gRNA_matrix))]
