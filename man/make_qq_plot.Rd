@@ -26,3 +26,7 @@ make_qq_plot(
 \description{
 Make qq-plot
 }
+\examples{
+p_vals <- runif(1000)
+make_qq_plot(p_vals)
+}

@@ -36,10 +36,10 @@ NULL
 
 #' Gene-gRNA pairs
 #'
-#' The gene-gRNA pairs that we seek to test for association. Columns include `gene_id` and `gRNA_id`.
+#' The gene-gRNA group pairs that we seek to test for association. Columns include `gene_id` and `gRNA_group`.
 #' @inheritSection data Overview
-#' @usage data(gene_gRNA_pairs)
-"gene_gRNA_pairs"
+#' @usage data(gene_gRNA_group_pairs)
+"gene_gRNA_group_pairs"
 
 #' site table
 #'

@@ -115,11 +115,11 @@ perturbation_matrix[1:10, 1:3]
 
 **Note**: Step 2 is optional; users instead can pass the raw gRNA count matrix to the `sceptre` function, in which case the matrix is thresholded internally to produce a perturbation matrix. (This option, though convenient, precludes the possibility of *combining* gRNAs and thus is not recommended; see below.)
 
-**Note**: Users optionally can implement their own strategy for producing the perturbation matrix.
+**Note**: Users optionally can implement their own strategy for converting the gRNA count matrix into a perturbation matrix.
 
 ## Step 3: Combine gRNAs
 
-The third step is to combine the perturbations of gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
+The third step is to combine gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
 
 ```{r}
 data("gRNA_groups_table")
@@ -184,11 +184,11 @@ gene_gRNA_group_pairs[c(1:2, 6:7, 21:22),]
 
 The `gene_gRNA_group_pairs` data frame contains three columns: `gene_id`, `gRNA_group`, and `pair_type`. The gene IDs (respectively, gRNA groups) in `gene_gRNA_group_pairs` must be a subset of the gene IDs (respectively, gRNA groups) in `gene_matrix` (respectively, `combined_perturbation_matrix`). The `pair_type` column gives the "type" of each pair, one of `positive_control` (for TSS-targeting gRNA groups paired to their target gene), `candidate` (for putative enhancer-targeting gRNA groups paired to a nearby gene), and `negative_control` (for pairs of genes and gRNA groups that consist of a non-targeting gRNA group).
 
-The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. When a large number of genes and non-targeting gRNA groups is available, it is reasonable to analyze a random subset of the non-targeting gRNA group-gene pairs to reduce computational cost. We recommend analyzing at least as many negative control pairs as candidate pairs.
+The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. When a large number of genes and non-targeting gRNA groups is available, it is common to analyze a random subset of the non-targeting gRNA group-gene pairs to reduce computational cost. We recommend analyzing at least as many negative control pairs as there are candidate pairs.
 
-**Note**: the `pair_type` column, while helpful for bookkeeping purposes, is optional.
+**Note**: The `pair_type` column, while helpful for bookkeeping purposes, is optional.
 
-**Note**: Negative control and positive control pairs are *not* required to run `sceptre`; however, negative and positive control pairs are extremely useful for checking method calibration and power (see Step 7, below) and therefore are strongly recommended.
+**Note**: Negative control and positive control pairs are *not* required to run `sceptre`; however, negative and positive control pairs are extremely useful for checking the calibration and power of `sceptre` (see Step 7, below) and therefore are strongly recommended.
 
 ## Step 5: Determine the sidedness of the test
 
@@ -204,7 +204,7 @@ Whether we seek to test for an increase or decrease in gene expression (or eithe
 |    Silencer     |       CRISPRa       |      *Cis*       | Decrease in expression |   Left    |
 |       Any       |         Any         |     *Trans*      | Increase *or* Decrease |   Both    |
 
-*Trans* relationships are more complex (and their direction less certain) than *cis* relationships, as *trans* relationships typically involve one or more transcription factors. We recommend two-sided tests for all tests of *trans* relationships.
+The direction of *trans* relationships is less certain than that of *cis* relationships, as *trans* relationships typically are mediated by one or more transcription factors. We therefore recommend using a two-sided test for all tests of *trans* relationships.
 
 We use a left-tailed test for the example data, as suggested by the first row of the table.
 
@@ -233,11 +233,11 @@ result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                parallel = FALSE)
 ```
 
-**Note**: Users can supply the raw gRNA expression matrix they obtained from Step 1 or the perturbation matrix they obtained from Step 2 to the `combined_perturbation_matrix` argument, in which case `sceptre` treats each gRNA as its own group of one. In this case the `gRNA_group` column still should be a subset of the row names of `combined_perturbation_matrix`. We recommend against this usage unless the data consist of only a single gRNA per target.
+**Note**: Users can supply the raw gRNA expression matrix they obtained from Step 1 or the perturbation matrix they obtained from Step 2 to the `combined_perturbation_matrix` argument, in which case `sceptre` treats each gRNA as its own group of one. We recommend against this usage unless the data consist of only a single gRNA per target.
 
 ## Step 7. Analyze the results
 
-The output is a data frame called `result`; `result` is simply `gene_gRNA_pairs` with two additional columns: `p_value`, and `z_value`. `p_value` is the *p*-value of the association test for a given pair, and `z_value` is the z-value of a negative binomial GLM fitted to the data for a given pair. Positive z-values indicate increased expression and negative z-values indicate decreased expression. We examine several rows of `result` below.
+The output of `run_sceptre_high_moi` is a data frame called `result`, which is simply `gene_gRNA_pairs` with two additional columns: `p_value`, and `z_value`. `p_value` is the SCEPTRE *p*-value for a given pair, and `z_value` is the z-value of a negative binomial GLM fitted to the data for a given pair. Positive z-values indicate increased expression, and negative z-values indicate decreased expression. We examine several rows of `result` below.
 
 ```{r}
 head(result, 10)
@@ -245,7 +245,7 @@ head(result, 10)
 
 ### Negative control pairs
 
-It is a good idea to verify that the test is correctly calibrated. To this end we create a QQ-plot of the *p*-values corresponding to the negative control pairs. We extract the negative control *p*-values from the `result` data frame and pass them to the function `make_qq_plot`.
+We must verify that the test is correctly calibrated. To this end we create a QQ-plot of the *p*-values corresponding to the negative control pairs. We extract the negative control *p*-values from the `result` data frame and pass them to the function `make_qq_plot`.
 
 ```{r, fig.width=5, fig.height=3, fig.retina=2}
 neg_control_p_vals <- result %>% filter(pair_type == "negative_control") %>% pull(p_value)
@@ -255,7 +255,7 @@ plot(qq_plot)
 
 The QQ-plot is a visual diagnostic that displays the extent to which the negative control *p*-values deviate from the expected uniform distribution. The points, each of which represents a *p*-value, should lie roughly along the diagonal line. If the points do not lie along the diagonal, then the test is poorly calibrated and the results are unreliable. The gray region is a 95% pointwise confidence band.
 
-A reasonable rule of thumb for interpreting the QQ-plot is as follows: if all (or nearly all) of the points with an expected null *p-*value of 0.1 or less fall within the confidence band, then we can be confident that the test is correctly calibrated. In other words, if nearly all the points to the *right* of 0.1 on the *x*-axis fall within the gray region, then we have good reason to trust the results. This rule of thumb is satisfied on the example data, as seen above.
+A reasonable rule of thumb for interpreting the QQ-plot is as follows: if all (or nearly all) of the points with an expected null *p-*value of 0.1 or less fall within the confidence band, then we can be confident that the test is correctly calibrated. In other words, if nearly all the points to the *right* of 0.1 (dashed red line) on the *x*-axis fall within the gray region, then we have good reason to trust the results. This rule of thumb is satisfied on the example data, as seen above.
 
 A forthcoming article will give recommendations for what to do if the QQ-plot reveals that the test is miscalibrated. We do not expect this to happen commonly.
 
@@ -268,7 +268,7 @@ pos_control_p_vals <- result %>% filter(pair_type == "positive_control") %>% pul
 pos_control_p_vals
 ```
 
-The positive control *p*-values are all small ($< 10^{-10}$), indicating that the test is powerful.
+The positive control *p*-values are all small, indicating that the test is powerful.
 
 ### Candidate pairs
 
