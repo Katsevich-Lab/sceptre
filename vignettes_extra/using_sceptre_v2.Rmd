@@ -1,5 +1,5 @@
 ---
-title: "Basic `sceptre` tutorial"
+title: "`sceptre` tutorial"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Basic `sceptre` tutorial}
@@ -32,6 +32,8 @@ library(Matrix)
 library(sceptre)
 ```
 
+We proceed in seven steps.
+
 ## Step 1: Prepare the data
 
 The first step is to prepare the data to pass to `sceptre`. We must prepare three separate data objects: the gene-by-cell expression matrix, the gRNA-by-cell expression matrix, and the cell-specific matrix of covariates.
@@ -45,7 +47,7 @@ data(gene_matrix)
 data(gRNA_matrix)
 ```
 
-Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 106,660) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
+Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 40,000) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
 
 The row names of `gene_matrix` and `gRNA_matrix` are the gene IDs and gRNA IDs, respectively. The gRNA IDs are gRNA-specific oligonucleotide barcodes. In general the gRNA IDs must be strings that uniquely identify each gRNA. The column names, meanwhile, are the cell barcodes. Next, `gene_matrix` and `gRNA_matrix` are sparse matrices (as implemented by the `Matrix` package). In general these matrices can be either sparse matrices or standard (dense) R matrices. We print a few rows and columns of `gene_matrix` and `gRNA_matrix` to get a sense of what the data look like.
 
@@ -86,7 +88,7 @@ data(covariate_matrix)
 head(covariate_matrix)
 ```
 
-`covariate_matrix` is a 106,660 x 4 data frame of "technical factors," or covariates. The row names of this data frame are the cell barcodes. The covariates are as follows:
+`covariate_matrix` is a 40,000 x 4 data frame of "technical factors," or covariates. The row names of this data frame are the cell barcodes. The covariates are as follows:
 
 -   Log-transformed gene library size (`lg_gene_lib_size`); this vector can be computed via `log(colSums(gene_matrix))`
 
@@ -98,7 +100,7 @@ head(covariate_matrix)
 
 We strongly recommend that users include the same four covariates (i.e., `lg_gene_lib_size`, `lg_gRNA_lib_size`, `batch`, and `p_mito`) in their own cell-wise covariate matrix.
 
-## Step 2: (Optional) Assign perturbation identities to cells
+## Step 2: Assign perturbation identities to cells
 
 The second step is to impute perturbation assignments onto the cells. For a given gRNA and cell, we label the cell as having been *perturbed* by the gRNA if the UMI count of the gRNA within the cell exceeds a user-specified, integer-valued threshold; otherwise, we label the cell has having been *unperturbed* by the gRNA. The default threshold that we use for this purpose is 3, which we have found to work well in practice. This simple thresholding routine is implemented by the function `threshold_gRNA_matrix`.
 
@@ -109,13 +111,15 @@ perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 perturbation_matrix[1:10, 1:3]
 ```
 
-Users can select a different threshold or apply their own procedure for assigning perturbation indicators to cells.
+**Note**: We draw a terminological distinction between a "gRNA count" and a "perturbation." A "gRNA count" is the number of transcripts (in UMIs) that we observe for a given gRNA in a given cell; a "perturbation" is an assignment of a gRNA to a cell, obtained by thresholding a gRNA count. A "perturbation matrix" is a binary matrix of gRNA-to-cell assignments.
 
-Note that this step is optional; users instead can pass the raw gRNA count matrix to the `sceptre` function, in which case the matrix is thresholded internally. (This option, though convenient, precludes the possibility of *combining* gRNAs; see below.)
+**Note**: Step 2 is optional; users instead can pass the raw gRNA count matrix to the `sceptre` function, in which case the matrix is thresholded internally to produce a perturbation matrix. (This option, though convenient, precludes the possibility of *combining* gRNAs and thus is not recommended; see below.)
 
-## Step 3: (Optional) Combine gRNAs
+**Note**: Users optionally can implement their own strategy for producing the perturbation matrix.
 
-The third step is to combine gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
+## Step 3: Combine gRNAs
+
+The third step is to combine the perturbations of gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
 
 ```{r}
 data("gRNA_groups_table")
@@ -144,17 +148,17 @@ Similarly, the gRNAs "CCCGCGCGCCGCACGGACGG" and "GCGGATCGGGGCAAGGCTCG" target th
 gRNA_groups_table[41:42,]
 ```
 
-Finally, the non-targeting gRNAs "AATATTCTCCCTCATTCTGG" and "TTAAAATTGATTCTGCCACT" are paired randomly to form a group called "NTC_1."
+Finally, the non-targeting gRNAs "AATATTCTCCCTCATTCTGG" and "TTAAAATTGATTCTGCCACT" are paired randomly to form a group called "NTC_2."
 
 ```{r}
 gRNA_groups_table[31:32,]
 ```
 
-The function `combine_gRNAs` takes as arguments a thresholded `gRNA_matrix` (i.e., the `perturbation_matrix`) and a `gRNA_groups_table` and collapses gRNAs in the same group into a single "combined" gRNA. The data frame `gRNA_groups_table` must have columns `gRNA_id` and `gRNA_group`, as above; the `gRNA_type` column is optional.
+The function `combine_perturbations` takes as arguments a `perturbation_matrix` (i.e., the thresholded `gRNA_matrix`) and a `gRNA_groups_table` and collapses gRNAs in the same group into a single "combined" gRNA. The data frame `gRNA_groups_table` must have columns `gRNA_id` and `gRNA_group`, as above.
 
 ```{r}
-combined_perturbation_matrix <- combine_gRNAs(perturbation_matrix = perturbation_matrix,
-                                              gRNA_groups_table = gRNA_groups_table)
+combined_perturbation_matrix <- combine_perturbations(perturbation_matrix = perturbation_matrix,
+                                                      gRNA_groups_table = gRNA_groups_table)
 ```
 
 The ouput matrix, `combined_perturbation_matrix`, is a 25 x 40,000 binary matrix, with rows corresponding to the 25 "gRNA groups" within `gRNA_groups_table`. The column names (i.e., the cell barcodes) remain unchanged.
@@ -164,19 +168,27 @@ dim(combined_perturbation_matrix)
 combined_perturbation_matrix[1:10,1:3]
 ```
 
-We note that this step is optional; `sceptre` works on either combined or uncombined gRNAs.
+**Note**: Step 3 is optional but recommended; `sceptre` works on either combined or uncombined perturbation matrices.
+
+**Note**: The `gRNA_type` column in `gRNA_groups_table` is optional but useful for bookkeeping purposes.
 
 ## Step 4: Determine which pairs to analyze
 
-Step 4 is to determine the pairs of genes and gRNA groups to analyze. It is common to analyze pairs of genes and gRNA groups that are in close physical proximity to uncover *cis*-regulatory relationships. The data frame `gene_gRNA_pairs` contains the 120 pairs of genes and gRNA groups that we will analyze in our analysis.
+Step 4 is to determine the pairs of genes and gRNA groups to analyze. It is common to analyze pairs of genes and gRNA groups that are in close physical proximity to uncover *cis*-regulatory relationships. The data frame `gene_gRNA_group_pairs` contains the 120 pairs of genes and gRNA groups that we will analyze in our analysis.
 
 ```{r}
-data(gene_gRNA_pairs)
-nrow(gene_gRNA_pairs)
-gene_gRNA_pairs[c(1:2, 6:7, 21:22),]
+data(gene_gRNA_group_pairs)
+nrow(gene_gRNA_group_pairs)
+gene_gRNA_group_pairs[c(1:2, 6:7, 21:22),]
 ```
 
-The `gene_gRNA_pairs` data frame contains three columns: `gene_id`, `gRNA_group`, and `type`. The gene IDs (respectively, gRNA groups) in `gene_gRNA_pairs` must be a subset of the gene IDs (respectively, gRNA groups) in `gene_matrix` (respectively, `combined_perturbation_matrix`). The `type` column gives the "type" of each pair: one of `positive_control` (for TSS-targeting gRNA groups paired to the target gene), `candidate` (for putative enhancer-targeting gRNA groups paired to a nearby gene), and `negative_control` (for pairs of genes and gRNA groups that consist of a non-targeting gRNA group). The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. We note that the `type` column, while helpful for bookkeeping purposes, is optional.
+The `gene_gRNA_group_pairs` data frame contains three columns: `gene_id`, `gRNA_group`, and `pair_type`. The gene IDs (respectively, gRNA groups) in `gene_gRNA_group_pairs` must be a subset of the gene IDs (respectively, gRNA groups) in `gene_matrix` (respectively, `combined_perturbation_matrix`). The `pair_type` column gives the "type" of each pair, one of `positive_control` (for TSS-targeting gRNA groups paired to their target gene), `candidate` (for putative enhancer-targeting gRNA groups paired to a nearby gene), and `negative_control` (for pairs of genes and gRNA groups that consist of a non-targeting gRNA group).
+
+The negative control pairs were constructed by pairing each non-targeting gRNA group to the entire set of genes, as is standard. When a large number of genes and non-targeting gRNA groups is available, it is reasonable to analyze a random subset of the non-targeting gRNA group-gene pairs to reduce computational cost. We recommend analyzing at least as many negative control pairs as candidate pairs.
+
+**Note**: the `pair_type` column, while helpful for bookkeeping purposes, is optional.
+
+**Note**: Negative control and positive control pairs are *not* required to run `sceptre`; however, negative and positive control pairs are extremely useful for checking method calibration and power (see Step 7, below) and therefore are strongly recommended.
 
 ## Step 5: Determine the sidedness of the test
 
@@ -192,7 +204,7 @@ Whether we seek to test for an increase or decrease in gene expression (or eithe
 |    Silencer     |       CRISPRa       |      *Cis*       | Decrease in expression |   Left    |
 |       Any       |         Any         |     *Trans*      | Increase *or* Decrease |   Both    |
 
-*Trans* relationships are more complex than *cis* relationships, as *trans* relationships are mediated by one or more transcription factors. Given the resultant uncertainty about the direction of *trans* relationships, a two-sided test is appropriate for all *trans* tests.
+*Trans* relationships are more complex (and their direction less certain) than *cis* relationships, as *trans* relationships typically involve one or more transcription factors. We recommend two-sided tests for all tests of *trans* relationships.
 
 We use a left-tailed test for the example data, as suggested by the first row of the table.
 
@@ -202,29 +214,79 @@ side <- "left"
 
 ## Step 6: Run the method
 
-The final step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
+The sixth step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_group_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
 
 ```{r,eval=FALSE}
 result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
-                               gene_gRNA_pairs = gene_gRNA_pairs,
-                               side = "left")
+                               gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+                               side = side)
 ```
 
-```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE,cache=TRUE}
+```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
 result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
-                               gene_gRNA_pairs = gene_gRNA_pairs,
-                               side = "left",
-                               parallel = TRUE)
+                               gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+                               side = side,
+                               parallel = FALSE)
 ```
+
+**Note**: Users can supply the raw gRNA expression matrix they obtained from Step 1 or the perturbation matrix they obtained from Step 2 to the `combined_perturbation_matrix` argument, in which case `sceptre` treats each gRNA as its own group of one. In this case the `gRNA_group` column still should be a subset of the row names of `combined_perturbation_matrix`. We recommend against this usage unless the data consist of only a single gRNA per target.
 
 ## Step 7. Analyze the results
 
--   Make a QQ-plot of the negative control pairs (should lie along the diagonal line)
--   Examine the p-values of the positive control pairs.
--   Finally, apply BH to the candidate pairs; report as discoveries those with adjusted p-values \< 0.1.
+The output is a data frame called `result`; `result` is simply `gene_gRNA_pairs` with two additional columns: `p_value`, and `z_value`. `p_value` is the *p*-value of the association test for a given pair, and `z_value` is the z-value of a negative binomial GLM fitted to the data for a given pair. Positive z-values indicate increased expression and negative z-values indicate decreased expression. We examine several rows of `result` below.
 
-Note: it is important to apply BH *only* to the candidate pairs (i.e., the pairs in the discovery set); adding positive control and negative control pairs makes BH anticonservative and convservative, respectively.
+```{r}
+head(result, 10)
+```
+
+### Negative control pairs
+
+It is a good idea to verify that the test is correctly calibrated. To this end we create a QQ-plot of the *p*-values corresponding to the negative control pairs. We extract the negative control *p*-values from the `result` data frame and pass them to the function `make_qq_plot`.
+
+```{r, fig.width=5, fig.height=3, fig.retina=2}
+neg_control_p_vals <- result %>% filter(pair_type == "negative_control") %>% pull(p_value)
+qq_plot <- make_qq_plot(neg_control_p_vals)
+plot(qq_plot)
+```
+
+The QQ-plot is a visual diagnostic that displays the extent to which the negative control *p*-values deviate from the expected uniform distribution. The points, each of which represents a *p*-value, should lie roughly along the diagonal line. If the points do not lie along the diagonal, then the test is poorly calibrated and the results are unreliable. The gray region is a 95% pointwise confidence band.
+
+A reasonable rule of thumb for interpreting the QQ-plot is as follows: if all (or nearly all) of the points with an expected null *p-*value of 0.1 or less fall within the confidence band, then we can be confident that the test is correctly calibrated. In other words, if nearly all the points to the *right* of 0.1 on the *x*-axis fall within the gray region, then we have good reason to trust the results. This rule of thumb is satisfied on the example data, as seen above.
+
+A forthcoming article will give recommendations for what to do if the QQ-plot reveals that the test is miscalibrated. We do not expect this to happen commonly.
+
+### Positive control pairs
+
+Next, to verify that the test is powerful (i.e., that the test is capable of detecting true relationships), we assess the power of the test on the positive control pairs. We extract the positive control *p*-values and examine their values.
+
+```{r}
+pos_control_p_vals <- result %>% filter(pair_type == "positive_control") %>% pull(p_value)
+pos_control_p_vals
+```
+
+The positive control *p*-values are all small ($< 10^{-10}$), indicating that the test is powerful.
+
+### Candidate pairs
+
+Finally, we produce the discovery set. We extract the *p*-values corresponding to the candidate pairs and apply a Benjamini-Hochberg (BH) correction to adjust for multiple testing.
+
+```{r}
+candidate_pair_results <- result %>% filter(pair_type == "candidate")
+candidate_pair_results_p_adj <- candidate_pair_results %>%
+  mutate(p_val_adj = p.adjust(p_value, method = "BH"))
+head(candidate_pair_results_p_adj)
+```
+
+We call pairs with an adjusted *p*-value of less or equal than 0.1 significant; the discovery set (i.e., the set of significant pairs) has a false discovery rate (FDR) of 10%.
+
+```{r}
+discovery_set <- candidate_pair_results_p_adj %>% filter(p_val_adj <= 0.1)
+```
+
+The discovery set in this case is empty, as we tested only fifteen candidate pairs.
+
+**Note**: It is crucial to apply BH *only* to the pairs in the discovery set (i.e., the candidate pairs). Including positive control or negative control pairs in the discovery set causes BH to become excessively liberal or conservative, respectively.

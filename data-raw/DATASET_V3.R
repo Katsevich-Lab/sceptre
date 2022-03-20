@@ -34,7 +34,7 @@ gene_gRNA_pairs_NTC <- expand.grid(gene_id = my_gene_ids, gRNA_group = neg_contr
 gene_gRNA_pairs <- rbind(gene_gRNA_pairs_pc_candidate,
                          gene_gRNA_pairs_NTC) %>%
   mutate_all(as.character) %>%
-  mutate(type = factor(site_type, c("selfTSS", "DHS", "NTC"),
+  mutate(pair_type = factor(site_type, c("selfTSS", "DHS", "NTC"),
                        c("positive_control", "candidate", "negative_control")),
          site_type = NULL)
 my_gRNA_groups <- unique(as.character(gene_gRNA_pairs$gRNA_group))
@@ -115,5 +115,6 @@ simplify_grna_names <- function(vect) {
 
 gene_gRNA_pairs$gRNA_group <- simplify_grna_names(gene_gRNA_pairs$gRNA_group )
 gRNA_groups_table$gRNA_group <- simplify_grna_names(gRNA_groups_table$gRNA_group)
+gene_gRNA_group_pairs <- gene_gRNA_pairs
 
-usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_pairs, gRNA_groups_table, overwrite = TRUE)
+usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_group_pairs, gRNA_groups_table, overwrite = TRUE)

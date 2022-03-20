@@ -54,3 +54,56 @@ plot_result <- function(row) {
           axis.text.y = ggplot2::element_blank())
   return(p)
 }
+
+
+#' Make qq-plot
+#'
+#' @param p_values Fill in
+#' @param ci_level Fill in
+#' @param subsampling_factor Fill in
+#' @param point_col Fill in
+#'
+#' @return
+#' @export
+make_qq_plot <- function(p_values, ci_level = 0.95, subsampling_factor = 1, point_col = "royalblue4") {
+  p_thresh <- 1e-8
+  to_plot <- data.frame(pvalue = p_values) %>%
+    dplyr::mutate(r = rank(pvalue), expected = stats::ppoints(dplyr::n())[r],
+                  clower = stats::qbeta(p = (1 - ci_level)/2, shape1 = r, shape2 = dplyr::n() + 1 - r),
+                  cupper = stats::qbeta(p = (1 + ci_level)/2, shape1 = r, shape2 = dplyr::n()+ 1 - r)) %>%
+    filter(-log10(expected) > 2 | row_number() %% subsampling_factor == 0) %>%
+    mutate(pvalue = ifelse(pvalue < p_thresh, p_thresh, pvalue))
+  p <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = expected, y = pvalue, ymin = clower, ymax = cupper)) +
+    ggplot2::geom_point(size = 1, alpha = 0.9, col = point_col) +
+    ggplot2::geom_ribbon(alpha = 0.25) +
+    geom_abline(intercept = 0, slope = 1) +
+    ggplot2::scale_x_continuous(trans = revlog_trans(base = 10)) + scale_y_continuous(trans = revlog_trans(base = 10)) +
+    ggplot2::xlab(expression(paste("Expected null p-value"))) +
+    ggplot2::ylab(expression(paste("Observed p-value"))) +
+    ggplot2::ggtitle("QQ-plot of p-values") +
+    ggplot2::theme_bw() + ggplot2::theme(legend.position = c(0.25, 0.85),
+                       legend.background = ggplot2::element_rect(fill = "transparent", color = NA),
+                       legend.title = ggplot2::element_blank(),
+                       panel.grid = ggplot2::element_blank(),
+                       strip.background = ggplot2::element_blank(),
+                       panel.border = ggplot2::element_blank(),
+                       axis.line = ggplot2::element_line(),
+                       plot.title = ggplot2::element_text(hjust = 0.5))
+  return(p)
+}
+
+
+revlog_trans <- function(base = exp(1)) {
+  trans <- function(x) {
+    -log(x, base)
+  }
+  inv <- function(x){
+    base^(-x)
+  }
+  scales::trans_new(paste("revlog-", base, sep = ""),
+                    trans,
+                    inv,
+                    scales::log_breaks(base = base),
+                    domain = c(1e-100, Inf)
+  )
+}

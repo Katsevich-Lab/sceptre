@@ -71,7 +71,7 @@ create_dictionary <- function(ids, pod_size) {
 #' @param pod_sizes an integer vector with three named elements: gRNA, gene, and pair. These elements give the sizes of the respective "pods."
 #'
 #' @return an integer vector containing the number of pods in the gene, gRNA, and pairs dictionaries.
-create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRNA_precomp_dir, results_dir, pod_sizes) {
+create_and_store_dictionaries <- function(gene_gRNA_group_pairs, gene_precomp_dir, gRNA_precomp_dir, results_dir, pod_sizes) {
   # 0. Clear out contents of gRNA precomp, gene precomp, and results directories
   for (direct in c(gRNA_precomp_dir, gene_precomp_dir)) {
     x <- file.remove(list.files(direct, full.names = TRUE))
@@ -84,7 +84,7 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
   }
 
   # 1. genes
-  genes <- unique(gene_gRNA_pairs$gene_id)
+  genes <- unique(gene_gRNA_group_pairs$gene_id)
   gene_dictionary <- create_dictionary(ids = genes, pod_size = pod_sizes[["gene"]]) %>%
     dplyr::mutate(size_unreg_file = paste0(gene_precomp_dir, "/gene_size_unreg_", pod_id, ".rds") %>% factor(),
            geom_mean_file = paste0(gene_precomp_dir, "/gene_geom_mean_", pod_id, ".rds") %>% factor(),
@@ -94,15 +94,15 @@ create_and_store_dictionaries <- function(gene_gRNA_pairs, gene_precomp_dir, gRN
   fst::write_fst(gene_dictionary, gene_dictionary_fp)
 
   # 2. gRNA
-  gRNAs <- unique(gene_gRNA_pairs$gRNA_id)
+  gRNAs <- unique(gene_gRNA_group_pairs$gRNA_id)
   gRNA_dictionary <- create_dictionary(ids = gRNAs, pod_size = pod_sizes[["gRNA"]]) %>%
     dplyr::mutate(precomp_file = factor(paste0(gRNA_precomp_dir, "/gRNA_precomp_", id, ".rds")))
   gRNA_dictionary_fp <- paste0(gRNA_precomp_dir, "/gRNA_dictionary.fst")
   fst::write_fst(gRNA_dictionary, gRNA_dictionary_fp)
 
   # 3. gRNA-gene pairs
-  pairs_dictionary <- create_dictionary(ids = gene_gRNA_pairs$gRNA_id, pod_size = pod_sizes[["pair"]]) %>%
-    dplyr::rename(gRNA_id = id) %>% dplyr::mutate(gene_id = gene_gRNA_pairs$gene_id) %>% dplyr::select(gRNA_id, gene_id, pod_id) %>%
+  pairs_dictionary <- create_dictionary(ids = gene_gRNA_group_pairs$gRNA_id, pod_size = pod_sizes[["pair"]]) %>%
+    dplyr::rename(gRNA_id = id) %>% dplyr::mutate(gene_id = gene_gRNA_group_pairs$gene_id) %>% dplyr::select(gRNA_id, gene_id, pod_id) %>%
     dplyr::mutate(result_file = paste0(results_dir, "/result_", pod_id, ".fst") %>% factor())
   pairs_dictionary_fp <- paste0(results_dir, "/results_dictionary.fst")
   fst::write_fst(pairs_dictionary, pairs_dictionary_fp)
@@ -321,6 +321,8 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
                                                  gene_precomp_size, gene_precomp_offsets, full_output)
   }
   # Create and save the result dataframe
+  out_df <-
+
   out_df <- do.call(what = "rbind", args = out_l) %>%
     dplyr::mutate(gRNA_id = results_dict$gRNA_id, gene_id = results_dict$gene_id) %>%
     dplyr::relocate(gene_id, gRNA_id)
@@ -338,10 +340,13 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 #' @param return_df return the results data frame (in addition to writing it)?
 #'
 #' @return the collated results data frame.
-collect_results <- function(results_dir, return_df = FALSE) {
+collect_results <- function(results_dir, gene_gRNA_group_pairs) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)
   all_results <- results_dir %>% paste0("/", to_load) %>% purrr::map(fst::read_fst) %>% purrr::reduce(rbind)
+  if (ncol(gene_gRNA_group_pairs) >= 3) {
+    all_results <- dplyr::left_join(gene_gRNA_group_pairs, all_results)
+  }
   saveRDS(object = all_results, file = paste0(results_dir, "/all_results.rds"))
   return(all_results)
 }
