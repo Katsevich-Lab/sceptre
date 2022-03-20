@@ -4,7 +4,7 @@
 \alias{collect_results}
 \title{Collect results}
 \usage{
-collect_results(results_dir, return_df = FALSE)
+collect_results(results_dir, gene_gRNA_pairs)
 }
 \arguments{
 \item{results_dir}{the directory containing the results}

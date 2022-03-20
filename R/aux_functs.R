@@ -1,9 +1,11 @@
-#' Combine gRNAs
+#' Combine perturbations
 #'
-#' @param perturbation_matrix a gRNA-by-cell expression matrix stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs
-#' @param gRNA_groups_table a data frame with columns `gRNA_id` and `gRNA_group`.
 #'
-#' @return a "combined"
+#'
+#' @param perturbation_matrix a perturbation matrix (i.e., a binary matrix of gRNA-to-cell assignments) stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs
+#' @param gRNA_groups_table a data frame with columns `gRNA_id` and `gRNA_group`, mapping each gRNA to its gRNA group
+#'
+#' @return a "combined" perturbation matrix, where gRNAs within the same gRNA group have been collapsed into a single row
 #' @export
 #'
 #' @examples
@@ -11,8 +13,8 @@
 #' data("gRNA_matrix")
 #' data("gRNA_groups_table")
 #' perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
-#' combined_perturbation_matrix <- combine_gRNAs(perturbation_matrix, gRNA_groups_table)
-combine_gRNAs <- function(perturbation_matrix, gRNA_groups_table) {
+#' combined_perturbation_matrix <- combine_perturbations(perturbation_matrix, gRNA_groups_table)
+combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
   # check that gRNA_id and gRNA_group are present in `gRNA_groups` df
   if (!all(c("gRNA_id", "gRNA_group") %in% colnames(gRNA_groups_table))) {
     stop("`gRNA_id` and `gRNA_group` should be columns of `gRNA_groups`.")

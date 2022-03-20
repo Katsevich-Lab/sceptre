@@ -6,7 +6,7 @@
 \usage{
 run_sceptre_high_moi(
   gene_matrix,
-  gRNA_matrix,
+  combined_perturbation_matrix,
   covariate_matrix,
   gene_gRNA_pairs,
   side = "both",
@@ -21,7 +21,7 @@ run_sceptre_high_moi(
 \arguments{
 \item{gene_matrix}{a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{gRNA_matrix}{a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators}
+\item{combined_perturbation_matrix}{a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators}
 
 \item{covariate_matrix}{the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
@@ -66,9 +66,9 @@ data(gRNA_matrix) # ii. gRNA expression matrix
 data(covariate_matrix) # iii. covariate matrix
 data(site_table) # iv. gRNAs grouped by target site
 data(gene_gRNA_pairs) # v. gene-gRNA pairs to analyze
-# 2. (Optional) group together gRNAs that target the same site
+# 2. (Optional) threshold and combine gRNA matrix
 gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
 # 3. run method (takes ~40s on an 8-core Macbook Pro)
-result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs)
+result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_pairs, parallel = FALSE)
 }
 }
