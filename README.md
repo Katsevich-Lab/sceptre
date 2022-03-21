@@ -21,8 +21,7 @@ intuitive conditional randomization test.
 **Update March 2022**: We are excited to release `sceptre` version
 0.1.0, a major update that significantly improves the speed and
 ease-of-use of the software. Please download the latest version of
-`sceptre` (see below) and check the updated tutorial and [news
-page](https://katsevich-lab.github.io/sceptre/news/index.html) for
+`sceptre` (see below) and check the updated tutorial and news page for
 further details.
 
 # Installation
