@@ -19,9 +19,10 @@ make_qq_plot(p_values, ci_level = 0.95, point_col = "royalblue4", alpha = 0.9)
 a ggplot object containing the QQ-plot
 }
 \description{
-Makes a QQ-plot from a set of values hypothesized to follow a uniform distribution (e.g., \emph{p}-values).
+Makes a QQ-plot for a set of values hypothesized to follow a uniform distribution (e.g., \emph{p}-values).
 }
 \examples{
+set.seed(4)
 p_vals <- runif(5000)
 make_qq_plot(p_vals)
 }

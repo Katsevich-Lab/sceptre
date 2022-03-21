@@ -8,7 +8,8 @@
 #' @export
 #' @examples
 #' # RUN THE METHOD
-#' set.seed(1)
+#' library(magrittr)
+#' set.seed(4)
 #' data(gene_matrix)
 #' data(gRNA_matrix)
 #' data(covariate_matrix)
@@ -64,7 +65,7 @@ plot_result <- function(row) {
 
 #' Make QQ-plot
 #'
-#' Makes a QQ-plot from a set of values hypothesized to follow a uniform distribution (e.g., *p*-values).
+#' Makes a QQ-plot for a set of values hypothesized to follow a uniform distribution (e.g., *p*-values).
 #'
 #' @param p_values a vector values -- hypothesized to follow a uniform distribution -- from which to construct the QQ-plot. This vector typically will be a set of *p*-values.
 #' @param ci_level level of the pointwise confidence band (default 0.95)
@@ -74,6 +75,7 @@ plot_result <- function(row) {
 #' @return a ggplot object containing the QQ-plot
 #' @export
 #' @examples
+#' set.seed(4)
 #' p_vals <- runif(5000)
 #' make_qq_plot(p_vals)
 make_qq_plot <- function(p_values, ci_level = 0.95, point_col = "royalblue4", alpha = 0.9) {

@@ -66,29 +66,33 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># RUN THE METHOD</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span class="r-in"><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span class="r-in"><span class="fu"><a href="combine_perturbations.html">combine_perturbations</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in threshold_gRNA_matrix(gRNA_matrix) %&gt;% combine_perturbations(gRNA_groups_table):</span> could not find function "%&gt;%"</span>
-<span class="r-in"><span class="va">gene_gRNA_group_pairs</span> <span class="op">&lt;-</span> <span class="va">gene_gRNA_group_pairs</span> <span class="op">%&gt;%</span> <span class="fu">sample_n</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in gene_gRNA_group_pairs %&gt;% sample_n(1):</span> could not find function "%&gt;%"</span>
+<span class="r-in"><span class="va">gene_gRNA_group_pairs</span> <span class="op">&lt;-</span> <span class="va">gene_gRNA_group_pairs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_sceptre_high_moi.html">run_sceptre_high_moi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span>
 <span class="r-in">combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,</span>
 <span class="r-in">covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,</span>
 <span class="r-in">gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,</span>
 <span class="r-in">side <span class="op">=</span> <span class="st">"left"</span>, parallel <span class="op">=</span> <span class="cn">FALSE</span>, full_output <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Check /var/folders/h6/pt59hmwd7rqb3jqfzwh0hlth0000gn/T//Rtmpjdo5Sf/logs for more detailed status updates.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running checks and setting up directory structure. </span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in run_sceptre_high_moi(gene_matrix = gene_matrix, combined_perturbation_matrix = combined_perturbation_matrix,     covariate_matrix = covariate_matrix, gene_gRNA_group_pairs = gene_gRNA_group_pairs,     side = "left", parallel = FALSE, full_output = TRUE):</span> object 'combined_perturbation_matrix' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Check /var/folders/h6/pt59hmwd7rqb3jqfzwh0hlth0000gn/T//RtmpnpGMoi/logs for more detailed status updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running checks and setting up directory structure. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running gene precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running perturbation precomputations. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running perturbation-to-gene association tests.<span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Collecting and returning results. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = c("gene_id", "gRNA_id")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># CREATE THE PLOT</span></span>
 <span class="r-in"><span class="fu">plot_result</span><span class="op">(</span><span class="va">result</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::select(., dplyr::starts_with("z_null_")):</span> object 'result' not found</span>
+<span class="r-plt img"><img src="plot_result-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>
