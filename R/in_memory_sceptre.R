@@ -1,6 +1,6 @@
 #' Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data
 #'
-#' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNA groups and a set of genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
+#' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNA groups and genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
 #'
 #' @param gene_matrix a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
 #' @param combined_perturbation_matrix a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.
