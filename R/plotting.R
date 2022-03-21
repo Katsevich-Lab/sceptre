@@ -8,8 +8,8 @@
 #' @export
 #' @examples
 #' # RUN THE METHOD
-#' library(magrittr)
 #' set.seed(4)
+#' library(magrittr)
 #' data(gene_matrix)
 #' data(gRNA_matrix)
 #' data(covariate_matrix)
