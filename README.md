@@ -44,7 +44,7 @@ the size of your analysis.
 **Small or moderately-sized analysis**: If you are running an analysis
 of small or moderate size (i.e., the data fit into memory and you are
 using a single computer), see the standard `sceptre` tutorial
-[here](https://katsevich-lab.github.io/sceptre/articles/using_sceptre.html).
+[here](https://katsevich-lab.github.io/sceptre/articles/using_sceptre_v2.html).
 
 **Large-scale analysis**: If you are running a large-scale analysis
 (i.e., the data do not fit into memory or you are using a
