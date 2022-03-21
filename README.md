@@ -59,8 +59,8 @@ developing such an extension, which we expect to be available in 2022.
 
 # References
 
-Please consider citing the following if you find `sceptre` helpful in
-your research.
+Please consider starring this repository and citing the following if you
+find `sceptre` helpful in your research.
 
 **Methods papers**
 
