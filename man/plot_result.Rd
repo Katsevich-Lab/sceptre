@@ -19,6 +19,7 @@ For a given gRNA-gene pair analyzed by \code{sceptre}, plots the resampled test 
 # RUN THE METHOD
 set.seed(4)
 library(magrittr)
+library(dplyr)
 data(gene_matrix)
 data(gRNA_matrix)
 data(covariate_matrix)
