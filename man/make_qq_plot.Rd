@@ -2,31 +2,26 @@
 % Please edit documentation in R/plotting.R
 \name{make_qq_plot}
 \alias{make_qq_plot}
-\title{Make qq-plot}
+\title{Make QQ-plot}
 \usage{
-make_qq_plot(
-  p_values,
-  ci_level = 0.95,
-  subsampling_factor = 1,
-  point_col = "royalblue4"
-)
+make_qq_plot(p_values, ci_level = 0.95, point_col = "royalblue4", alpha = 0.9)
 }
 \arguments{
-\item{p_values}{Fill in}
+\item{p_values}{a vector values -- hypothesized to follow a uniform distribution -- from which to construct the QQ-plot. This vector typically will be a set of \emph{p}-values.}
 
-\item{ci_level}{Fill in}
+\item{ci_level}{level of the pointwise confidence band (default 0.95)}
 
-\item{subsampling_factor}{Fill in}
+\item{point_col}{color of the plotted points}
 
-\item{point_col}{Fill in}
+\item{alpha}{transparency of the plotted points}
 }
 \value{
-
+a ggplot object containing the QQ-plot
 }
 \description{
-Make qq-plot
+Makes a QQ-plot from a set of values hypothesized to follow a uniform distribution (e.g., \emph{p}-values).
 }
 \examples{
-p_vals <- runif(1000)
+p_vals <- runif(5000)
 make_qq_plot(p_vals)
 }

@@ -16,8 +16,8 @@ navbar:
   left:
   - text: Function reference
     href: reference/index.html
-  - text: Basic tutorial
-    href: articles/using_sceptre.html
+  - text: Tutorial
+    href: articles/using_sceptre_v2.html
   - text: "News"
     href: news/index.html
 
@@ -33,5 +33,15 @@ reference:
 
 - title: Auxiliary functions
   contents:
-  - combine_gRNAs
+  - threshold_gRNA_matrix
+  - combine_perturbations
+  - make_qq_plot
   - plot_result
+
+- title: Data
+  contents:
+  - gene_matrix
+  - gRNA_matrix
+  - covariate_matrix
+  - gRNA_groups_table
+  - gene_gRNA_group_pairs

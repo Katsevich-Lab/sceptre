@@ -21,10 +21,9 @@ intuitive conditional randomization test.
 **Update March 2022**: We are excited to release `sceptre` version
 0.1.0, a major update that significantly improves the speed and
 ease-of-use of the software. Please download the latest version of
-`sceptre` (see below) and check the [updated
-tutorial](https://katsevich-lab.github.io/sceptre/articles/using_sceptre.html)
-and [news page](https://katsevich-lab.github.io/sceptre/news/index.html)
-for further details.
+`sceptre` (see below) and check the updated tutorial and [news
+page](https://katsevich-lab.github.io/sceptre/news/index.html) for
+further details.
 
 # Installation
 
@@ -45,7 +44,7 @@ the size of your analysis.
 
 **Small or moderately-sized analysis**: If you are running an analysis
 of small or moderate size (i.e., the data fit into memory and you are
-using a single computer), see the basic `sceptre` tutorial
+using a single computer), see the standard `sceptre` tutorial
 [here](https://katsevich-lab.github.io/sceptre/articles/using_sceptre.html).
 
 **Large-scale analysis**: If you are running a large-scale analysis
@@ -72,7 +71,7 @@ calibration and sensitivity in single-cell CRISPR screen analysis.”
 Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
 T Barry, E Katsevich, K Roeder. “Exponential family measurement error
-models for single-cell CRISPR screens.” [Arxiv
+models for single-cell CRISPR screens.” [arXiv
 preprint](https://doi.org/10.48550/arXiv.2201.01879).
 
 **Application paper**

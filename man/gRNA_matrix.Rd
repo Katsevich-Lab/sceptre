@@ -15,7 +15,7 @@ A gRNA-by-cell expression matrix.
 }
 \section{Overview}{
 
-This object is part of the example data in the \code{sceptre} package. The data are taken from the paper "Global Analysis of Enhancer Targets Reveals Convergent Enhancer-Driven Regulatory Modules" by Xie et al., 2019. The authors used a CRISPRi-based perturb-seq assay to target >500 putative enhancers in a population of K562 cells. The example data consist of a subset of the sequenced gRNAs and genes measured on 106,660 cells.
+This object is part of the example data. The data are taken from the paper "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data.
 }
 
 \keyword{datasets}

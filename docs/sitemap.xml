@@ -16,6 +16,9 @@
     <loc>timothy-barry.github.io/sceptre/articles/using_sceptre.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/articles/using_sceptre_v2.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/authors.html</loc>
   </url>
   <url>
@@ -34,6 +37,9 @@
     <loc>timothy-barry.github.io/sceptre/reference/combine_gRNAs.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/combine_perturbations.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/covariate_matrix.html</loc>
   </url>
   <url>
@@ -43,10 +49,16 @@
     <loc>timothy-barry.github.io/sceptre/reference/data.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gRNA_groups_table.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/gRNA_grps.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/gRNA_matrix.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_group_pairs.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_pairs.html</loc>
@@ -59,6 +71,9 @@
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/initialize_directories.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/make_qq_plot.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/plot_resampling_distribution.html</loc>
@@ -98,5 +113,8 @@
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/site_table.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/threshold_gRNA_matrix.html</loc>
   </url>
 </urlset>

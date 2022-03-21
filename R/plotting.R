@@ -1,24 +1,30 @@
 #' Plot result
 #'
-#' For a given gRNA-gene pair analyzed by `sceptre`, plots the resampled test statistics, alongside the "ground truth" test statistic derived from the raw data.
+#' For a given gRNA-gene pair analyzed by `sceptre`, plots the resampled test statistics alongside the "ground truth" test statistic derived from the raw data.
 #'
-#' @param row single row of the data frame outputted by `run_sceptre_gRNA_gene_pair`, when `full_output` is set to TRUE
+#' @param row single row of the data frame outputted by `run_sceptre_high_moi`, when `full_output` is set to TRUE
 #'
 #' @return a ggplot2 object containing the plot
 #' @export
 #' @examples
-#' \dontrun{
-#' data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
-#' gene_expressions <- gene_matrix[1,,drop=FALSE]
-#' gRNA_expressions <- gRNA_matrix[1,,drop=FALSE]
-#' gene_gRNA_pairs <- data.frame(gene_id = row.names(gene_expressions),
-#'                               gRNA_id = row.names(gRNA_expressions))
-#' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix, covariate_matrix,
-#'                                gene_gRNA_pairs, parallel = FALSE, full_output = TRUE)
-#' row <- result[1,]
-#' result_plot <- plot_result(row)
-#' plot(result_plot)
-#' }
+#' # RUN THE METHOD
+#' set.seed(1)
+#' data(gene_matrix)
+#' data(gRNA_matrix)
+#' data(covariate_matrix)
+#' data(gRNA_groups_table)
+#' data(gene_gRNA_group_pairs)
+#' combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix) %>%
+#' combine_perturbations(gRNA_groups_table)
+#' gene_gRNA_group_pairs <- gene_gRNA_group_pairs %>% sample_n(1)
+#' result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+#' combined_perturbation_matrix = combined_perturbation_matrix,
+#' covariate_matrix = covariate_matrix,
+#' gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+#' side = "left", parallel = FALSE, full_output = TRUE)
+#'
+#' # CREATE THE PLOT
+#' plot_result(result[1,])
 plot_result <- function(row) {
   resampled_zvalues <- row %>% dplyr::select(dplyr::starts_with("z_null_")) %>% as.numeric()
   original_zvalue <- row$z_value
@@ -56,25 +62,27 @@ plot_result <- function(row) {
 }
 
 
-#' Make qq-plot
+#' Make QQ-plot
 #'
-#' @param p_values Fill in
-#' @param ci_level Fill in
-#' @param subsampling_factor Fill in
-#' @param point_col Fill in
+#' Makes a QQ-plot from a set of values hypothesized to follow a uniform distribution (e.g., *p*-values).
 #'
-#' @return
+#' @param p_values a vector values -- hypothesized to follow a uniform distribution -- from which to construct the QQ-plot. This vector typically will be a set of *p*-values.
+#' @param ci_level level of the pointwise confidence band (default 0.95)
+#' @param point_col color of the plotted points
+#' @param alpha transparency of the plotted points
+#'
+#' @return a ggplot object containing the QQ-plot
 #' @export
 #' @examples
-#' p_vals <- runif(1000)
+#' p_vals <- runif(5000)
 #' make_qq_plot(p_vals)
-make_qq_plot <- function(p_values, ci_level = 0.95, subsampling_factor = 1, point_col = "royalblue4", alpha = 0.9) {
+make_qq_plot <- function(p_values, ci_level = 0.95, point_col = "royalblue4", alpha = 0.9) {
   p_thresh <- 1e-8
   to_plot <- data.frame(pvalue = p_values) %>%
     dplyr::mutate(r = rank(pvalue), expected = stats::ppoints(dplyr::n())[r],
                   clower = stats::qbeta(p = (1 - ci_level)/2, shape1 = r, shape2 = dplyr::n() + 1 - r),
                   cupper = stats::qbeta(p = (1 + ci_level)/2, shape1 = r, shape2 = dplyr::n()+ 1 - r)) %>%
-    dplyr::filter(-log10(expected) > 2 | dplyr::row_number() %% subsampling_factor == 0) %>%
+    # dplyr::filter(-log10(expected) > 2) %>%
     dplyr::mutate(pvalue = ifelse(pvalue < p_thresh, p_thresh, pvalue))
   p <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = expected, y = pvalue, ymin = clower, ymax = cupper)) +
     ggplot2::geom_point(size = 1, alpha = alpha, col = point_col) +

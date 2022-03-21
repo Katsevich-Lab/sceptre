@@ -47,5 +47,6 @@ Suggests:
     foreach,
     doParallel,
     tidyverse,
-    cowplot
+    cowplot,
+    scales
 VignetteBuilder: knitr

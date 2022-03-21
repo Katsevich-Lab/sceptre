@@ -9,7 +9,7 @@ collect_results(results_dir, gene_gRNA_group_pairs)
 \arguments{
 \item{results_dir}{the directory containing the results}
 
-\item{return_df}{return the results data frame (in addition to writing it)?}
+\item{gene_gRNA_group_pairs}{the gene-gRNA groups data frame}
 }
 \value{
 the collated results data frame.

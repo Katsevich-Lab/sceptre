@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../articles/using_sceptre.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre_v2.html">Tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -57,7 +57,7 @@
   <span class="va">results_dir</span>,
   <span class="va">log_dir</span>,
   <span class="va">gene_matrix</span>,
-  <span class="va">gRNA_matrix</span>,
+  <span class="va">combined_perturbation_matrix</span>,
   <span class="va">covariate_matrix</span>,
   <span class="va">regularization_amount</span>,
   <span class="va">side</span>,
@@ -80,10 +80,10 @@
 <dd><p>(optional) directory in which to sink the log file</p></dd>
 <dt>gene_matrix</dt>
 <dd><p>a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named</p></dd>
-<dt>gRNA_matrix</dt>
-<dd><p>a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators</p></dd>
+<dt>combined_perturbation_matrix</dt>
+<dd><p>a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.</p></dd>
 <dt>covariate_matrix</dt>
-<dd><p>the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named</p></dd>
+<dd><p>the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named</p></dd>
 <dt>regularization_amount</dt>
 <dd><p>non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates</p></dd>
 <dt>side</dt>
@@ -91,7 +91,7 @@
 <dt>B</dt>
 <dd><p>number of resamples to draw for the conditional randomization test</p></dd>
 <dt>full_output</dt>
-<dd><p>return the full output (TRUE) or a simplified, reduced output (FALSE)?</p></dd>
+<dd><p>return the full output (TRUE) or a simplified, reduced output (FALSE; default)?</p></dd>
 </dl></div>
 
   </div>

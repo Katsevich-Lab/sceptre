@@ -7,7 +7,7 @@
 combine_perturbations(perturbation_matrix, gRNA_groups_table)
 }
 \arguments{
-\item{perturbation_matrix}{a perturbation matrix (i.e., a binary matrix of gRNA-to-cell assignments) stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs}
+\item{perturbation_matrix}{a perturbation matrix (i.e., a binary matrix of gRNA-to-cell assignments) stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs.}
 
 \item{gRNA_groups_table}{a data frame with columns \code{gRNA_id} and \code{gRNA_group}, mapping each gRNA to its gRNA group}
 }
@@ -15,7 +15,10 @@ combine_perturbations(perturbation_matrix, gRNA_groups_table)
 a "combined" perturbation matrix, where gRNAs within the same gRNA group have been collapsed into a single row
 }
 \description{
-Combine perturbations
+Combines perturbations by collapsing gRNAs within the same group into a single "combined" gRNA.
+}
+\details{
+The function combines binary (i.e., 0/1) perturbation vectors via a "max" operation. In other words, if \code{x1}, \code{x2}, ..., \code{xp} are binary perturbation vectors, then the "combined" perturbation vector \code{v} is \code{v = pmax(x1, x2, ..., xp)}, where \code{pmax} is the element-wise maximum function.
 }
 \examples{
 library(Matrix)

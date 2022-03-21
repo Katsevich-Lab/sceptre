@@ -2,23 +2,20 @@
 % Please edit documentation in R/aux_functs.R
 \name{threshold_gRNA_matrix}
 \alias{threshold_gRNA_matrix}
-\title{Threshold a gRNA count matrix}
+\title{Threshold gRNA count matrix}
 \usage{
 threshold_gRNA_matrix(gRNA_matrix, threshold = 3)
 }
 \arguments{
 \item{gRNA_matrix}{a gRNA-by-cell expression matrix; the matrix can be represented as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R)}
 
-\item{threshold}{the threshold used to assign perturbations to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")}
+\item{threshold}{the threshold used to assign perturbation indicators to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")}
 }
 \value{
-a binary matrix of imputed perturbation assignments
+a binary matrix of perturbation assignments
 }
 \description{
-Thresholds a given gRNA count matrix.
-}
-\details{
-See "Exponential family measurement error models for single-cell CRISPR screens" by Barry et al. 2022 for an in-depth analysis of thresholding in single-cell CRISPR screens.
+Thresholds a gRNA count matrix, producing a perturbation matrix.
 }
 \examples{
 data(gRNA_matrix)

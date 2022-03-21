@@ -27,7 +27,7 @@ This file creates those dictionaries and stores them in the appropriate location
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../articles/using_sceptre.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre_v2.html">Tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -53,7 +53,7 @@ This file creates those dictionaries and stores them in the appropriate location
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">create_and_store_dictionaries</span><span class="op">(</span>
-  <span class="va">gene_gRNA_pairs</span>,
+  <span class="va">gene_gRNA_group_pairs</span>,
   <span class="va">gene_precomp_dir</span>,
   <span class="va">gRNA_precomp_dir</span>,
   <span class="va">results_dir</span>,
@@ -63,8 +63,8 @@ This file creates those dictionaries and stores them in the appropriate location
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>gene_gRNA_pairs</dt>
-<dd><p>a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named <code>gene_id</code> and <code>gRNA_id</code></p></dd>
+    <dl><dt>gene_gRNA_group_pairs</dt>
+<dd><p>a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named <code>gene_id</code> and <code>gRNA_group</code>.</p></dd>
 <dt>gene_precomp_dir</dt>
 <dd><p>the directory in which to store the gene precomputations</p></dd>
 <dt>gRNA_precomp_dir</dt>

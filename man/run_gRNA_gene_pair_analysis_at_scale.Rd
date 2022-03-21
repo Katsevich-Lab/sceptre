@@ -11,7 +11,7 @@ run_gRNA_gene_pair_analysis_at_scale(
   results_dir,
   log_dir,
   gene_matrix,
-  gRNA_matrix,
+  combined_perturbation_matrix,
   covariate_matrix,
   regularization_amount,
   side,
@@ -32,7 +32,9 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{gene_matrix}{a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
+\item{combined_perturbation_matrix}{a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.}
+
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
 \item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
 
@@ -40,7 +42,7 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{B}{number of resamples to draw for the conditional randomization test}
 
-\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE; default)?}
 }
 \description{
 Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.
