@@ -13,7 +13,7 @@ create_and_store_dictionaries(
 )
 }
 \arguments{
-\item{gene_gRNA_group_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
+\item{gene_gRNA_group_pairs}{a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_group}.}
 
 \item{gene_precomp_dir}{the directory in which to store the gene precomputations}
 

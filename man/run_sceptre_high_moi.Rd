@@ -21,11 +21,11 @@ run_sceptre_high_moi(
 \arguments{
 \item{gene_matrix}{a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named}
 
-\item{combined_perturbation_matrix}{a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators}
+\item{combined_perturbation_matrix}{a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.}
 
-\item{covariate_matrix}{the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
+\item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
-\item{gene_gRNA_group_pairs}{a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_id}}
+\item{gene_gRNA_group_pairs}{a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_group}.}
 
 \item{side}{sidedness of the test; one of "both," "left," and "right"}
 
@@ -35,24 +35,24 @@ run_sceptre_high_moi(
 
 \item{B}{number of resamples to draw for the conditional randomization test}
 
-\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)?}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE; default)?}
 
 \item{parallel}{parallelize execution?}
 
 \item{seed}{seed to the random number generator}
 }
 \value{
-A data frame containing the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, and \code{z_value}. See "details" for a description of the output when \code{full_output} is set to TRUE.
+the \code{gene_gRNA_group_pairs} data frame with new columns \code{p_value} and \code{z_value} appended. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
-This function is the core function of the \code{sceptre} package. The function applies SCEPTRE to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+This function is the core function of the \code{sceptre} package. The function applies SCEPTRE to test for association between a set of gRNA groups and a set of genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
 }
 \details{
 Details are arranged from most to least important.
 \itemize{
-\item \code{gene_matrix} should be a \strong{raw} (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts. Likewise, \code{gRNA_matrix} should be a raw matrix of UMI counts. Alternately, \code{gRNA_matrix} can be a binary matrix of perturbation presence/absence indicators, where the user has assigned perturbation indicators to cells by, for example, thresholding the raw gRNA count matrix.
-\item The gene IDs (respectively, gRNA IDs) within \code{gene_gRNA_group_pairs} must be a subset of the row names of \code{gene_matrix} (respectively, \code{gRNA_matrix}).
-\item If \code{combine_gRNAs} has been called on \code{gRNA_matrix} to collapse the gRNAs into distinct target sites, then the \code{gRNA_ID} column of \code{gene_gRNA_group_pairs} should contain the names of the target sites.
+\item \code{gene_matrix} should be a \strong{raw} (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts.
+\item \code{combined_perturbation_matrix} should be a "combined perturbation matrix", which can be obtained by applying the functions \code{threshold_gRNA_matrix} and \code{combine_perturbations} (in that order) to a raw gRNA count matrix. \code{combined_perturbation_matrix} optionally can be a raw gRNA expression matrix or an uncombined perturbation matrix, in which case each gRNA is treated as its own group of one. See the tutorial for more details.
+\item The gene IDs (respectively, gRNA groups) within \code{gene_gRNA_group_pairs} must be a subset of the row names of \code{gene_matrix} (respectively, \code{combined_perturbation_matrix}).
 \item The \code{side} parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase \emph{or} decrease in gene expression.
 \item The default value of \code{regularization_amount} is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of \code{regularization_amount} is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
 \item When \code{full_output} is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, \code{skew_t_fit_success} (if TRUE, \emph{p}-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical \emph{p}-value returned), \code{xi}, \code{omega}, \code{alpha}, \code{nu} (fitted parameters of the skew-t distribution; NA if fit failed), \code{z_value} (z-value obtained on "ground truth" data), and \code{z_null_1}, ..., \code{z_null_B} (z-values obtained from resampled datasets).
@@ -60,15 +60,27 @@ Details are arranged from most to least important.
 }
 \examples{
 \dontrun{
+library(dplyr)
+library(magrittr)
 # 1. load the data
 data(gene_matrix) # i. gene expression matrix
 data(gRNA_matrix) # ii. gRNA expression matrix
 data(covariate_matrix) # iii. covariate matrix
-data(site_table) # iv. gRNAs grouped by target site
-data(gene_gRNA_group_pairs) # v. gene-gRNA pairs to analyze
-# 2. (Optional) threshold and combine gRNA matrix
-gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
+data(gRNA_groups_table) # iv. gRNAs grouped by target site
+data(gene_gRNA_group_pairs) # v. gene-gRNA group pairs to analyze
+
+# 2. threshold and combine gRNA matrix
+combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix) \%>\%
+combine_perturbations(gRNA_groups_table)
+
+# 3. select the gene-gRNA group pairs to analyze
+set.seed(4)
+gene_gRNA_group_pairs <- gene_gRNA_group_pairs \%>\% sample_n(25)
 # 3. run method (takes ~40s on an 8-core Macbook Pro)
-result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_group_pairs, parallel = FALSE)
+result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+combined_perturbation_matrix = combined_perturbation_matrix,
+covariate_matrix = covariate_matrix,
+gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+side = "left")
 }
 }

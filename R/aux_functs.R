@@ -1,8 +1,10 @@
 #' Combine perturbations
 #'
+#' Combines perturbations by collapsing gRNAs within the same group into a single "combined" gRNA.
 #'
+#' The function combines binary (i.e., 0/1) perturbation vectors via a "max" operation. In other words, if `x1`, `x2`, ..., `xp` are binary perturbation vectors, then the "combined" perturbation vector `v` is `v = pmax(x1, x2, ..., xp)`, where `pmax` is the element-wise maximum function.
 #'
-#' @param perturbation_matrix a perturbation matrix (i.e., a binary matrix of gRNA-to-cell assignments) stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs
+#' @param perturbation_matrix a perturbation matrix (i.e., a binary matrix of gRNA-to-cell assignments) stored as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R); the row names should be the gRNA IDs.
 #' @param gRNA_groups_table a data frame with columns `gRNA_id` and `gRNA_group`, mapping each gRNA to its gRNA group
 #'
 #' @return a "combined" perturbation matrix, where gRNAs within the same gRNA group have been collapsed into a single row
@@ -38,16 +40,14 @@ combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
 }
 
 
-#' Threshold a gRNA count matrix
+#' Threshold gRNA count matrix
 #'
-#' Thresholds a given gRNA count matrix.
-#'
-#' See "Exponential family measurement error models for single-cell CRISPR screens" by Barry et al. 2022 for an in-depth analysis of thresholding in single-cell CRISPR screens.
+#' Thresholds a gRNA count matrix, producing a perturbation matrix.
 #'
 #' @param gRNA_matrix a gRNA-by-cell expression matrix; the matrix can be represented as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R)
-#' @param threshold the threshold used to assign perturbations to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")
+#' @param threshold the threshold used to assign perturbation indicators to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")
 #'
-#' @return a binary matrix of imputed perturbation assignments
+#' @return a binary matrix of perturbation assignments
 #' @export
 #'
 #' @examples

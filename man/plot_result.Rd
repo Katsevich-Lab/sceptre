@@ -7,25 +7,31 @@
 plot_result(row)
 }
 \arguments{
-\item{row}{single row of the data frame outputted by \code{run_sceptre_gRNA_gene_pair}, when \code{full_output} is set to TRUE}
+\item{row}{single row of the data frame outputted by \code{run_sceptre_high_moi}, when \code{full_output} is set to TRUE}
 }
 \value{
 a ggplot2 object containing the plot
 }
 \description{
-For a given gRNA-gene pair analyzed by \code{sceptre}, plots the resampled test statistics, alongside the "ground truth" test statistic derived from the raw data.
+For a given gRNA-gene pair analyzed by \code{sceptre}, plots the resampled test statistics alongside the "ground truth" test statistic derived from the raw data.
 }
 \examples{
-\dontrun{
-data(gene_matrix); data(gRNA_matrix); data(covariate_matrix)
-gene_expressions <- gene_matrix[1,,drop=FALSE]
-gRNA_expressions <- gRNA_matrix[1,,drop=FALSE]
-gene_gRNA_pairs <- data.frame(gene_id = row.names(gene_expressions),
-                              gRNA_id = row.names(gRNA_expressions))
-result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix, covariate_matrix,
-                               gene_gRNA_pairs, parallel = FALSE, full_output = TRUE)
-row <- result[1,]
-result_plot <- plot_result(row)
-plot(result_plot)
-}
+# RUN THE METHOD
+set.seed(1)
+data(gene_matrix)
+data(gRNA_matrix)
+data(covariate_matrix)
+data(gRNA_groups_table)
+data(gene_gRNA_group_pairs)
+combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix) \%>\%
+combine_perturbations(gRNA_groups_table)
+gene_gRNA_group_pairs <- gene_gRNA_group_pairs \%>\% sample_n(1)
+result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+combined_perturbation_matrix = combined_perturbation_matrix,
+covariate_matrix = covariate_matrix,
+gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+side = "left", parallel = FALSE, full_output = TRUE)
+
+# CREATE THE PLOT
+plot_result(result[1,])
 }

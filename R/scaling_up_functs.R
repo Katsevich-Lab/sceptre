@@ -123,7 +123,7 @@ create_and_store_dictionaries <- function(gene_gRNA_group_pairs, gene_precomp_di
 #' @param log_dir file path to the log directory
 #'
 #' @return NULL
-run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, gRNA_matrix, covariate_matrix, log_dir, B, seed) {
+run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, combined_perturbation_matrix, covariate_matrix, log_dir, B, seed) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
   # determine the gRNAs on which to run the precomputation
@@ -134,9 +134,9 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, gRNA_matr
     gRNA_id <- gRNA_ids[i]
     cat(paste0("Running precomputation for gRNA ", gRNA_id, ".\n"))
     gRNA_indicators <- if (any(is(gene_matrix) %in% c("matrix", "Matrix"))) {
-      gRNA_matrix[gRNA_id,]
+      combined_perturbation_matrix[gRNA_id,]
     } else {
-      gRNA_matrix[[gRNA_id,]] %>% as.numeric()
+      combined_perturbation_matrix[[gRNA_id,]] %>% as.numeric()
     }
     synth_data <- run_gRNA_precomputation(gRNA_indicators, covariate_matrix, B, seed)
     precomp_matrix_fp <- (gRNA_dictionary %>% dplyr::pull(precomp_file))[i] %>% as.character
@@ -270,7 +270,7 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, g
 #' @param results_dir directory in which to store the results
 #' @param log_dir (optional) directory in which to sink the log file
 #' @return NULL
-run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, gene_matrix, gRNA_matrix, covariate_matrix, regularization_amount, side, B, full_output) {
+run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, gene_matrix, combined_perturbation_matrix, covariate_matrix, regularization_amount, side, B, full_output) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/result_", pod_id, ".Rout"))
 
   results_dict <- fst::read_fst(paste0(results_dir, "/results_dictionary.fst")) %>% dplyr::filter(pod_id == !!pod_id)
@@ -309,10 +309,10 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
     if (i == 1 || results_dict[[i, "gRNA_id"]] != results_dict[[i - 1, "gRNA_id"]]) {
       gRNA_prcomp_loc <- dplyr::filter(gRNA_dict, id == curr_gRNA) %>% dplyr::pull(precomp_file) %>% as.character()
       gRNA_precomp <- readRDS(file = gRNA_prcomp_loc)
-      gRNA_indicators <- if (any(is(gRNA_matrix) %in% c("matrix", "Matrix"))) {
-        gRNA_matrix[curr_gRNA,]
+      gRNA_indicators <- if (any(is(combined_perturbation_matrix) %in% c("matrix", "Matrix"))) {
+        combined_perturbation_matrix[curr_gRNA,]
       } else {
-        gRNA_matrix[[curr_gRNA,]] %>% as.numeric()
+        combined_perturbation_matrix[[curr_gRNA,]] %>% as.numeric()
       }
     }
 
@@ -337,7 +337,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 #' Collates the individual results files into a single result file.
 #'
 #' @param results_dir the directory containing the results
-#' @param return_df return the results data frame (in addition to writing it)?
+#' @param gene_gRNA_group_pairs the gene-gRNA groups data frame
 #'
 #' @return the collated results data frame.
 collect_results <- function(results_dir, gene_gRNA_group_pairs) {

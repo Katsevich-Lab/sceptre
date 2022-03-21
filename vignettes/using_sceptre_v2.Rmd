@@ -2,7 +2,7 @@
 title: "`sceptre` tutorial"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Basic `sceptre` tutorial}
+  %\VignetteIndexEntry{`sceptre` tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -117,7 +117,7 @@ perturbation_matrix[1:10, 1:3]
 
 **Note**: Users optionally can implement their own strategy for converting the gRNA count matrix into a perturbation matrix.
 
-## Step 3: Combine gRNAs
+## Step 3: Combine perturbations
 
 The third step is to combine gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
 
@@ -197,7 +197,7 @@ The fourth step is to determine the sideness of the statistical test. If we are 
 Whether we seek to test for an increase or decrease in gene expression (or either and increase *or* decrease) depends on (i) the genomic element being targeted, (ii) the CRISPR modality being used, and (iii) whether we are testing an association in *cis* or in *trans*. For example, if we perturb a putative enhancer via CRISPRi and test for an association between that enhancer and a gene in *cis*, then we should should test for a *decrease* in expression and therefore use a *left*-sided test. The following table summarizes whether a left-, right-, or two-tailed tailed test is appropriate as a function of the aforementioned variables.
 
 | Target element  |   CRISPR modality   | *Cis* or *trans* |     Testing for...     | Sidedness |
-|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+|:---------------:|:-------------------:|:----------------:|:----------------------:|:---------:|
 | Enhancer or TSS | CRISPRi or CRISPRko |      *Cis*       | Decrease in expression |   Left    |
 |    Silencer     | CRISPRi or CRISPRko |      *Cis*       | Increase in expression |   Right   |
 | Enhancer or TSS |       CRISPRa       |      *Cis*       | Increase in expression |   Right   |

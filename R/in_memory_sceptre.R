@@ -1,44 +1,56 @@
 #' Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data
 #'
-#' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNAs and a set of genes while controlling for a set of technical confounders. The function returns a p-value for each pairwise test of association conducted.
+#' This function is the core function of the `sceptre` package. The function applies SCEPTRE to test for association between a set of gRNA groups and a set of genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
 #'
 #' @param gene_matrix a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named
-#' @param combined_perturbation_matrix a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators
-#' @param covariate_matrix the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
-#' @param gene_gRNA_group_pairs a data frame specifying the gene-gRNA pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_id`
+#' @param combined_perturbation_matrix a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.
+#' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
+#' @param gene_gRNA_group_pairs a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_group`.
 #' @param side sidedness of the test; one of "both," "left," and "right"
 #' @param B number of resamples to draw for the conditional randomization test
-#' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE)?
+#' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE; default)?
 #' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates
 #' @param storage_dir directory in which to store the intermediate computations
 #' @param parallel parallelize execution?
 #' @param seed seed to the random number generator
 #'
-#' @return A data frame containing the following columns: `gene_id`, `gRNA_id`, `p_value`, and `z_value`. See "details" for a description of the output when `full_output` is set to TRUE.
+#' @return the `gene_gRNA_group_pairs` data frame with new columns `p_value` and `z_value` appended. See "details" for a description of the output when `full_output` is set to TRUE.
 #'
 #' @details
 #' Details are arranged from most to least important.
 #'
-#' - `gene_matrix` should be a **raw** (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts. Likewise, `gRNA_matrix` should be a raw matrix of UMI counts. Alternately, `gRNA_matrix` can be a binary matrix of perturbation presence/absence indicators, where the user has assigned perturbation indicators to cells by, for example, thresholding the raw gRNA count matrix.
-#' - The gene IDs (respectively, gRNA IDs) within `gene_gRNA_group_pairs` must be a subset of the row names of `gene_matrix` (respectively, `gRNA_matrix`).
-#' - If `combine_gRNAs` has been called on `gRNA_matrix` to collapse the gRNAs into distinct target sites, then the `gRNA_ID` column of `gene_gRNA_group_pairs` should contain the names of the target sites.
+#' - `gene_matrix` should be a **raw** (i.e., un-normalized) matrix of UMI (unique molecular identifier) counts.
+#' - `combined_perturbation_matrix` should be a "combined perturbation matrix", which can be obtained by applying the functions `threshold_gRNA_matrix` and `combine_perturbations` (in that order) to a raw gRNA count matrix. `combined_perturbation_matrix` optionally can be a raw gRNA expression matrix or an uncombined perturbation matrix, in which case each gRNA is treated as its own group of one. See the tutorial for more details.
+#' - The gene IDs (respectively, gRNA groups) within `gene_gRNA_group_pairs` must be a subset of the row names of `gene_matrix` (respectively, `combined_perturbation_matrix`).
 #' - The `side` parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase *or* decrease in gene expression.
 #' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of `regularization_amount` is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
 #' - When `full_output` is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: `gene_id`, `gRNA_id`, `p_value`, `skew_t_fit_success` (if TRUE, *p*-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical *p*-value returned), `xi`, `omega`, `alpha`, `nu` (fitted parameters of the skew-t distribution; NA if fit failed), `z_value` (z-value obtained on "ground truth" data), and `z_null_1`, ..., `z_null_B` (z-values obtained from resampled datasets).
 #' @export
 #' @examples
 #' \dontrun{
+#' library(dplyr)
+#' library(magrittr)
 #' # 1. load the data
 #' data(gene_matrix) # i. gene expression matrix
 #' data(gRNA_matrix) # ii. gRNA expression matrix
 #' data(covariate_matrix) # iii. covariate matrix
-#' data(site_table) # iv. gRNAs grouped by target site
-#' data(gene_gRNA_group_pairs) # v. gene-gRNA pairs to analyze
-#' # 2. (Optional) threshold and combine gRNA matrix
-#' gRNA_matrix_grouped <- combine_gRNAs(gRNA_matrix, site_table)
+#' data(gRNA_groups_table) # iv. gRNAs grouped by target site
+#' data(gene_gRNA_group_pairs) # v. gene-gRNA group pairs to analyze
+#'
+#' # 2. threshold and combine gRNA matrix
+#' combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix) %>%
+#' combine_perturbations(gRNA_groups_table)
+#'
+#' # 3. select the gene-gRNA group pairs to analyze
+#' set.seed(4)
+#' gene_gRNA_group_pairs <- gene_gRNA_group_pairs %>% sample_n(25)
 #
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
-#' result <- run_sceptre_high_moi(gene_matrix, gRNA_matrix_grouped, covariate_matrix, gene_gRNA_group_pairs, parallel = FALSE)
+#' result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+#' combined_perturbation_matrix = combined_perturbation_matrix,
+#' covariate_matrix = covariate_matrix,
+#' gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+#' side = "left")
 #' }
 run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.1, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
   ##################
@@ -157,7 +169,7 @@ run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, cova
   foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
                      run_gRNA_precomputation_at_scale(pod_id = pod_id,
                                                       gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
-                                                      gRNA_matrix = gRNA_matrix,
+                                                      combined_perturbation_matrix = combined_perturbation_matrix,
                                                       covariate_matrix = covariate_matrix,
                                                       log_dir = dirs[["log_dir"]],
                                                       B = B,
@@ -173,7 +185,7 @@ run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, cova
                                                           results_dir = dirs[["results_dir"]],
                                                           log_dir = dirs[["log_dir"]],
                                                           gene_matrix = gene_matrix,
-                                                          gRNA_matrix = gRNA_matrix,
+                                                          combined_perturbation_matrix = combined_perturbation_matrix,
                                                           covariate_matrix = covariate_matrix,
                                                           regularization_amount = regularization_amount,
                                                           side = side,

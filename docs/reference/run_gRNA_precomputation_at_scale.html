@@ -27,7 +27,7 @@ It stores the result in the gRNA precomputation directory.'><!-- mathjax --><scr
   <a href="../reference/index.html">Function reference</a>
 </li>
 <li>
-  <a href="../articles/using_sceptre.html">Basic tutorial</a>
+  <a href="../articles/using_sceptre_v2.html">Tutorial</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -55,7 +55,7 @@ It stores the result in the gRNA precomputation directory.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">run_gRNA_precomputation_at_scale</span><span class="op">(</span>
   <span class="va">pod_id</span>,
   <span class="va">gRNA_precomp_dir</span>,
-  <span class="va">gRNA_matrix</span>,
+  <span class="va">combined_perturbation_matrix</span>,
   <span class="va">covariate_matrix</span>,
   <span class="va">log_dir</span>,
   <span class="va">B</span>,
@@ -69,10 +69,10 @@ It stores the result in the gRNA precomputation directory.</p>
 <dd><p>ID of the pod for which to do the precomputation</p></dd>
 <dt>gRNA_precomp_dir</dt>
 <dd><p>file path to the gRNA precomputation directory</p></dd>
-<dt>gRNA_matrix</dt>
-<dd><p>a gRNA-by-cell expression matrix; the rows (i.e., gRNA IDs) and columns (i.e., cell barcodes) should be named. This matrix can be a matrix of raw counts (recommended), or alternately, a user-thresholded binary matrix of perturbation presence/absences indicators</p></dd>
+<dt>combined_perturbation_matrix</dt>
+<dd><p>a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.</p></dd>
 <dt>covariate_matrix</dt>
-<dd><p>the cell-specific matrix of technical factors, which ideally contains the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named</p></dd>
+<dd><p>the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named</p></dd>
 <dt>log_dir</dt>
 <dd><p>file path to the log directory</p></dd>
 <dt>B</dt>
