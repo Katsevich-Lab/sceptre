@@ -321,9 +321,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
                                                  gene_precomp_size, gene_precomp_offsets, full_output)
   }
   # Create and save the result dataframe
-  out_df <-
-
-  out_df <- do.call(what = "rbind", args = out_l) %>%
+  out_df <- data.table::rbindlist(out_l) %>%
     dplyr::mutate(gRNA_id = results_dict$gRNA_id, gene_id = results_dict$gene_id) %>%
     dplyr::relocate(gene_id, gRNA_id)
   out_fp <- (results_dict %>% dplyr::pull(result_file))[1] %>% as.character()
@@ -343,7 +341,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 collect_results <- function(results_dir, gene_gRNA_group_pairs) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)
-  all_results <- results_dir %>% paste0("/", to_load) %>% purrr::map(fst::read_fst) %>% purrr::reduce(rbind)
+  all_results <- results_dir %>% paste0("/", to_load) %>% purrr::map(fst::read_fst) %>%  data.table::rbindlist()
   if (ncol(gene_gRNA_group_pairs) >= 3) {
     all_results <- dplyr::left_join(gene_gRNA_group_pairs, all_results)
   }
