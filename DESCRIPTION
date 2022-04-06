@@ -36,7 +36,8 @@ Imports:
     purrr,
     methods,
     Matrix,
-    crayon
+    crayon,
+    data.table
 Depends: 
     R (>= 3.5)
 Suggests: 
