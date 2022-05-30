@@ -108,6 +108,126 @@ make_qq_plot <- function(p_values, ci_level = 0.95, point_col = "royalblue4", al
 }
 
 
+StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
+  required_aes = c("y"),
+
+  setup_data = function(data, params){
+    if ("group" %in% names(data)) {
+      max_unique_pts_per_group <- data |>
+        dplyr::group_by(PANEL, group) |>
+        dplyr::summarise(pts_per_group = dplyr::n()) |>
+        dplyr::summarise(unique_pts_per_group = length(unique(pts_per_group))) |>
+        dplyr::summarise(max(unique_pts_per_group)) |>
+        dplyr::pull()
+      if (max_unique_pts_per_group > 1) {
+        stop("Within each panel, you must have the same number of points per QQ plot!")
+      } else {
+        data |>
+          dplyr::select(y, PANEL, group) |>   # remove attributes like color, shape, etc.
+          dplyr::filter(group == min(group))  # keep only one of the groups to plot
+      }
+    } else {
+      data
+    }
+  },
+
+  compute_group = function(data, scales, distribution = "unif", ci_level = 0.95) {
+    quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
+    if(is.null(scales$x$trans)){
+      scales$x$trans <- scales::identity_trans()
+    }
+    if(is.null(scales$y$trans)){
+      scales$y$trans <- scales::identity_trans()
+    }
+    data |>
+      dplyr::mutate(y = scales$y$trans$inverse(y)) |>
+      dplyr::mutate(r = rank(y),
+                    x = quantile_fun(stats::ppoints(dplyr::n())[r]),
+                    ymin = quantile_fun(stats::qbeta(p = (1 - ci_level)/2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
+                    ymax = quantile_fun(stats::qbeta(p = (1 + ci_level)/2, shape1 = r, shape2 = dplyr::n()+ 1 - r))) |>
+      dplyr::mutate(x = scales$x$trans$transform(x),
+                    y = scales$y$trans$transform(y),
+                    ymin = scales$y$trans$transform(ymin),
+                    ymax = scales$y$trans$transform(ymax))
+  }
+)
+
+stat_qq_band <- function(mapping = NULL, data = NULL, geom = "ribbon",
+                           position = "identity", na.rm = FALSE, show.legend = FALSE,
+                           inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatQQBand, data = data, mapping = mapping, geom = geom,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, alpha = 0.25, ...)
+  )
+}
+
+StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
+  required_aes = c("y"),
+
+  compute_group = function(data, scales, distribution = "unif") {
+    if(is.null(scales$x$trans)){
+      scales$x$trans <- scales::identity_trans()
+    }
+    if(is.null(scales$y$trans)){
+      scales$y$trans <- scales::identity_trans()
+    }
+    quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
+    data |>
+      dplyr::mutate(y = scales$y$trans$inverse(y)) |>
+      dplyr::mutate(x = quantile_fun(stats::ppoints(dplyr::n())[rank(y)])) |>
+      dplyr::mutate(x = scales$x$trans$transform(x),
+                    y = scales$y$trans$transform(y))
+  }
+)
+
+stat_qq_points <- function(mapping = NULL, data = NULL, geom = "point",
+                           position = "identity", na.rm = FALSE, show.legend = NA,
+                           inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = StatQQPoints, data = data, mapping = mapping, geom = geom,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+data <- tidyr::expand_grid(tibble::tibble(dataset_A = c(rep("A1", 100),
+                                                rep("A1", 200),
+                                                rep("A2", 300),
+                                                rep("A2", 400)),
+                                  dataset_B = c(rep("B1", 100),
+                                                rep("B2", 200),
+                                                rep("B1", 300),
+                                                rep("B2", 400))),
+                   tibble::tibble(method = c("X", "Y"))) |>
+  dplyr::mutate(p_value = rnorm(dplyr::n()))
+
+# data <- tibble::tibble(p_vals = runif(200), method = factor(rep(c(1,2), 100)), type = factor(c(rep(1, 100), rep(2, 100))))
+data |>
+  ggplot2::ggplot(ggplot2::aes(y = p_value, colour = method)) +
+  stat_qq_points(distribution = "norm") +
+  stat_qq_band(distribution = "norm") +
+  ggplot2::geom_abline() +
+  # ggplot2::scale_x_continuous(trans = revlog_trans(base = 10)) +
+  # ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
+  ggplot2::facet_grid(dataset_A ~ dataset_B) +
+  ggplot2::theme_bw()
+
+ci_level = 0.95
+plot_2 <- tibble::tibble(y = p_vals) |>
+  dplyr::mutate(r = rank(y),
+                x = stats::ppoints(dplyr::n())[r],
+                ymin = stats::qbeta(p = (1 - ci_level)/2, shape1 = r, shape2 = dplyr::n() + 1 - r),
+                ymax = stats::qbeta(p = (1 + ci_level)/2, shape1 = r, shape2 = dplyr::n()+ 1 - r)) |>
+  ggplot2::ggplot(ggplot2::aes(x = x, y = y, ymin = ymin, ymax = ymax)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_ribbon(alpha = 0.25) +
+  ggplot2::geom_abline() +
+  ggplot2::scale_x_continuous(trans = revlog_trans(base = 10)) +
+  ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
+  ggplot2::theme_bw()
+plot(plot_2)
+
 revlog_trans <- function(base = exp(1)) {
   trans <- function(x) {
     -log(x, base)
