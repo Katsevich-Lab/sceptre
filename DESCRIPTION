@@ -39,7 +39,7 @@ Imports:
     crayon,
     data.table
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1)
 Suggests: 
     knitr,
     rmarkdown,
