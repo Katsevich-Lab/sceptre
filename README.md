@@ -19,8 +19,8 @@ change in expression of a given gene using the robust, powerful, and
 intuitive conditional randomization test.
 
 **Update June 2022**: We have released a beta version of the `sceptre`
-Nextflow pipeline. This pipeline greatly facilitates the analysis of
-large-scale single-cell CRISPR screen data.
+Nextflow pipeline. This pipeline greatly facilitates the application of
+`sceptre` to large-scale data.
 
 **Update March 2022**: We are excited to release `sceptre` version
 0.1.0, a major update that significantly improves the speed and
