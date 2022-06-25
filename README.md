@@ -18,11 +18,13 @@ regulatory relationships in single-cell CRISPR screen experiments.
 change in expression of a given gene using the robust, powerful, and
 intuitive conditional randomization test.
 
+**Update June 2022**: We have released a beta version of the `sceptre`
+Nextflow pipeline. This pipeline greatly facilitates the application of
+`sceptre` to large-scale data.
+
 **Update March 2022**: We are excited to release `sceptre` version
 0.1.0, a major update that significantly improves the speed and
-ease-of-use of the software. Please download the latest version of
-`sceptre` (see below) and check the updated tutorial and news page for
-further details.
+ease-of-use of the software.
 
 # Installation
 
@@ -34,7 +36,7 @@ the following command:
 
 You can browse the source code on Github
 [here](https://github.com/katsevich-lab/sceptre). `sceptre` has been
-tested in R versions \>=3.5 on macOS and Linux systems.
+tested in R versions \>=4.1 on macOS and Linux systems.
 
 # Using the software
 
@@ -47,10 +49,12 @@ using a single computer), see the standard `sceptre` tutorial
 [here](https://katsevich-lab.github.io/sceptre/articles/using_sceptre_v2.html).
 
 **Large-scale analysis**: If you are running a large-scale analysis
-(i.e., the data do not fit into memory or you are using a
-high-performance cluster or cloud), see the at-scale tutorial here.
-<span style="color:blue">(Currently under construction; will be
-available soon.)</span>
+(i.e., the data do not easily fit into memory or you are using a
+high-performance cluster or cloud), see the `sceptre` Nextflow pipeline
+[here](https://github.com/timothy-barry/sceptre-pipeline). The
+documentation for the `sceptre` Nextflow pipeline currently is sparse;
+please open a Github issue if you are interested in using this pipeline,
+and we will provide support.
 
 **Note**: `sceptre` currently applies to high multiplicity-of-infection
 (MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not

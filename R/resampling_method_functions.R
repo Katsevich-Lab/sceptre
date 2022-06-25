@@ -53,7 +53,10 @@ fit_skew_t <- function(t_nulls, t_star, side) {
 run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_precomp, side, gene_precomp_size, gene_precomp_offsets, full_output = FALSE) {
   exp_gene_offsets <- exp(gene_precomp_offsets)
   # compute test statistic on real data
-  z_star <- compute_nb_test_stat_fast_score(expressions[gRNA_indicators == 1], exp_gene_offsets[gRNA_indicators == 1], gene_precomp_size)
+  y <- expressions[gRNA_indicators == 1]
+  exp_o <- exp_gene_offsets[gRNA_indicators == 1]
+  log_fold_change <- log(mean(y)) - log(mean(exp_o))
+  z_star <- compute_nb_test_stat_fast_score(y, exp_o, gene_precomp_size)
   # compute test statistics on the resampled statistics
   z_null <- apply(X = gRNA_precomp, MARGIN = 2, FUN = function(col) {
     compute_nb_test_stat_fast_score(expressions[col], exp_gene_offsets[col], gene_precomp_size)
@@ -68,20 +71,13 @@ run_sceptre_using_precomp_fast <- function(expressions, gRNA_indicators, gRNA_pr
     out <- data.frame(p_value = skew_t_fit$out_p, skew_t_fit_success = skew_t_fit$skew_t_fit_success,
                       xi = skew_t_fit$skew_t_mle[["xi"]], omega = skew_t_fit$skew_t_mle[["omega"]],
                       alpha = skew_t_fit$skew_t_mle[["alpha"]], nu = skew_t_fit$skew_t_mle[["nu"]],
-                      z_value = z_star) %>% dplyr::mutate(z_df)
+                      z_value = z_star, log_fold_change = log_fold_change) %>% dplyr::mutate(z_df)
   } else {
-    out <- data.frame(p_value = skew_t_fit$out_p, z_value = z_star)
+    out <- data.frame(p_value = skew_t_fit$out_p, z_value = z_star, log_fold_change = log_fold_change)
   }
   return(out)
 }
 
-
-compute_nb_test_stat_fast <- function(y, exp_o, gene_precomp_size) {
-  est <- log(mean(y)) - log(mean(exp_o))
-  info <- sum((gene_precomp_size * exp(est) * exp_o)/(gene_precomp_size + exp(est) * exp_o))
-  z <- est/(sqrt(1/info))
-  return(z)
-}
 
 compute_nb_test_stat_fast_score <- function(y, exp_o, gene_precomp_size) {
   r_exp_o <- gene_precomp_size * exp_o
