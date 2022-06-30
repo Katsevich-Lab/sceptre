@@ -64,79 +64,44 @@
 
 <div class="section level1">
 <div class="page-header"><h1 id="sceptre-robust-single-cell-crispr-screen-analysis-">
-<code>sceptre</code>: robust single-cell CRISPR screen analysis
-<img src="reference/figures/hex.jpg" align="right" alt="" width="180"><a class="anchor" aria-label="anchor" href="#sceptre-robust-single-cell-crispr-screen-analysis-"></a>
+<code>sceptre</code>: robust single-cell CRISPR screen analysis <img src="reference/figures/hex.jpg" align="right" alt="" width="180"><a class="anchor" aria-label="anchor" href="#sceptre-robust-single-cell-crispr-screen-analysis-"></a>
 </h1></div>
 <!-- badges: start -->
 <p><img src="https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"><!-- badges: end --></p>
-<p>Single-cell CRISPR screens provide unprecedented insights into gene
-regulation and other facets of human genome biology. However, the
-analysis of these screens poses significant statistical and
-computational challenges. <code>sceptre</code> (pronounced “scepter”) is
-a methodology and associated R package for rigorously identifying
-regulatory relationships in single-cell CRISPR screen experiments.
-<code>sceptre</code> tests whether a given perturbation is associated
-with the change in expression of a given gene using the robust,
-powerful, and intuitive conditional randomization test.</p>
-<p><strong>Update March 2022</strong>: We are excited to release
-<code>sceptre</code> version 0.1.0, a major update that significantly
-improves the speed and ease-of-use of the software. Please download the
-latest version of <code>sceptre</code> (see below) and check the updated
-tutorial and news page for further details.</p>
+<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a methodology and associated R package for rigorously identifying regulatory relationships in single-cell CRISPR screen experiments. <code>sceptre</code> tests whether a given perturbation is associated with the change in expression of a given gene using the robust, powerful, and intuitive conditional randomization test.</p>
+<p><strong>Update June 2022</strong>: We have released a beta version of the <code>sceptre</code> Nextflow pipeline. This pipeline greatly facilitates the application of <code>sceptre</code> to large-scale data.</p>
+<p><strong>Update March 2022</strong>: We are excited to release <code>sceptre</code> version 0.1.0, a major update that significantly improves the speed and ease-of-use of the software.</p>
 </div>
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<p>You can install the development version of the package from Github
-with the following command:</p>
+<p>You can install the development version of the package from Github with the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
-<p>You can browse the source code on Github <a href="https://github.com/katsevich-lab/sceptre" class="external-link">here</a>.
-<code>sceptre</code> has been tested in R versions &gt;=3.5 on macOS and
-Linux systems.</p>
+<p>You can browse the source code on Github <a href="https://github.com/katsevich-lab/sceptre" class="external-link">here</a>. <code>sceptre</code> has been tested in R versions &gt;=4.1 on macOS and Linux systems.</p>
 </div>
 <div class="section level1">
 <h1 id="using-the-software">Using the software<a class="anchor" aria-label="anchor" href="#using-the-software"></a>
 </h1>
-<p><code>sceptre</code> has several interfaces, which you can choose
-between based on the size of your analysis.</p>
-<p><strong>Small or moderately-sized analysis</strong>: If you are
-running an analysis of small or moderate size (i.e., the data fit into
-memory and you are using a single computer), see the standard
-<code>sceptre</code> tutorial <a href="https://katsevich-lab.github.io/sceptre/articles/using_sceptre_v2.html" class="external-link">here</a>.</p>
-<p><strong>Large-scale analysis</strong>: If you are running a
-large-scale analysis (i.e., the data do not fit into memory or you are
-using a high-performance cluster or cloud), see the at-scale tutorial
-here. <span style="color:blue">(Currently under construction; will be
-available soon.)</span></p>
-<p><strong>Note</strong>: <code>sceptre</code> currently applies to high
-multiplicity-of-infection (MOI; &gt;5 gRNAs/cell) single-cell CRISPR
-screen data. <code>sceptre</code> has not yet been carefully vetted in
-low-MOI settings. We are working on developing such an extension, which
-we expect to be available in 2022.</p>
+<p><code>sceptre</code> has several interfaces, which you can choose between based on the size of your analysis.</p>
+<p><strong>Small or moderately-sized analysis</strong>: If you are running an analysis of small or moderate size (i.e., the data fit into memory and you are using a single computer), see the standard <code>sceptre</code> tutorial <a href="https://katsevich-lab.github.io/sceptre/articles/using_sceptre_v2.html" class="external-link">here</a>.</p>
+<p><strong>Large-scale analysis</strong>: If you are running a large-scale analysis (i.e., the data do not easily fit into memory or you are using a high-performance cluster or cloud), see the <code>sceptre</code> Nextflow pipeline <a href="https://github.com/timothy-barry/sceptre-pipeline" class="external-link">here</a>. The documentation for the <code>sceptre</code> Nextflow pipeline currently is sparse; please open a Github issue if you are interested in using this pipeline, and we will provide support.</p>
+<p><strong>Note</strong>: <code>sceptre</code> currently applies to high multiplicity-of-infection (MOI; &gt;5 gRNAs/cell) single-cell CRISPR screen data. <code>sceptre</code> has not yet been carefully vetted in low-MOI settings. We are working on developing such an extension, which we expect to be available in 2022.</p>
 </div>
 <div class="section level1">
 <h1 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h1>
-<p>Please consider starring this repository and citing the following if
-you find <code>sceptre</code> helpful in your research.</p>
+<p>Please consider starring this repository and citing the following if you find <code>sceptre</code> helpful in your research.</p>
 <p><strong>Methods papers</strong></p>
-<p>T Barry, X Wang, J Morris, K Roeder, E Katsevich. “SCEPTRE improves
-calibration and sensitivity in single-cell CRISPR screen analysis.” <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Genome
-Biology</a>.</p>
-<p>T Barry, E Katsevich, K Roeder. “Exponential family measurement error
-models for single-cell CRISPR screens.” <a href="https://doi.org/10.48550/arXiv.2201.01879" class="external-link">arXiv preprint</a>.</p>
+<p>T Barry, X Wang, J Morris, K Roeder, E Katsevich. “SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis.” <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Genome Biology</a>.</p>
+<p>T Barry, E Katsevich, K Roeder. “Exponential family measurement error models for single-cell CRISPR screens.” <a href="https://doi.org/10.48550/arXiv.2201.01879" class="external-link">arXiv preprint</a>.</p>
 <p><strong>Application paper</strong></p>
-<p>J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao,
-E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana.
-“Discovery of target genes and pathways of blood trait loci using pooled
-CRISPR screens and single cell RNA sequencing.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1" class="external-link">bioRxiv</a>.</p>
+<p>J Morris, Z Daniloski, J Domingo, T Barry, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways of blood trait loci using pooled CRISPR screens and single cell RNA sequencing.” Preprint available on <a href="https://www.biorxiv.org/content/10.1101/2021.04.07.438882v1" class="external-link">bioRxiv</a>.</p>
 </div>
 <div class="section level1">
 <h1 id="funding">Funding<a class="anchor" aria-label="anchor" href="#funding"></a>
 </h1>
-<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/" class="external-link">Analytics at Wharton</a> for
-supporting the development of this software.</p>
+<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/" class="external-link">Analytics at Wharton</a> for supporting the development of this software.</p>
 <p><img src="reference/figures/wharton_analytics.png" align="center" alt="" width="350"></p>
 </div>
 
@@ -178,14 +143,12 @@ supporting the development of this software.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy
-Barry</a>, Eugene Katsevich.</p>
+<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
