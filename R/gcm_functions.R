@@ -1,20 +1,3 @@
-#' Run GCM precomputation
-#'
-#' Runs the precomputation for the "GCM" mode of inference
-#'
-#' @param expressions a numeric (or integer) vector of gene expressions or gRNA indicators
-#' @param covariate_matrix a matrix of technical factors on which to regress the expressions or indicators
-#' @param a string giving the family to use in the regression (one of "poisson" and "binomial")
-#'
-#' @return a list with element "resids", the vector of residuals
-run_precomputation_gcm <- function(expressions, covariate_matrix, family) {
-  pois_fit <- stats::glm(expressions ~ ., data = covariate_matrix, family = family)
-  fitted_vals <- stats::fitted.values(pois_fit)
-  resids <- expressions - fitted_vals
-  return(list(resids = resids))
-}
-
-
 #' Run GCM inference
 #'
 #' Run GCM inference using the gene and gRNA precomputations
