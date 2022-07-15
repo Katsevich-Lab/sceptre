@@ -191,43 +191,6 @@ stat_qq_points <- function(mapping = NULL, data = NULL, geom = "point",
   )
 }
 
-data <- tidyr::expand_grid(tibble::tibble(dataset_A = c(rep("A1", 100),
-                                                rep("A1", 200),
-                                                rep("A2", 300),
-                                                rep("A2", 400)),
-                                  dataset_B = c(rep("B1", 100),
-                                                rep("B2", 200),
-                                                rep("B1", 300),
-                                                rep("B2", 400))),
-                   tibble::tibble(method = c("X", "Y"))) |>
-  dplyr::mutate(p_value = rnorm(dplyr::n()))
-
-# data <- tibble::tibble(p_vals = runif(200), method = factor(rep(c(1,2), 100)), type = factor(c(rep(1, 100), rep(2, 100))))
-data |>
-  ggplot2::ggplot(ggplot2::aes(y = p_value, colour = method)) +
-  stat_qq_points(distribution = "norm") +
-  stat_qq_band(distribution = "norm") +
-  ggplot2::geom_abline() +
-  # ggplot2::scale_x_continuous(trans = revlog_trans(base = 10)) +
-  # ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
-  ggplot2::facet_grid(dataset_A ~ dataset_B) +
-  ggplot2::theme_bw()
-
-ci_level = 0.95
-plot_2 <- tibble::tibble(y = p_vals) |>
-  dplyr::mutate(r = rank(y),
-                x = stats::ppoints(dplyr::n())[r],
-                ymin = stats::qbeta(p = (1 - ci_level)/2, shape1 = r, shape2 = dplyr::n() + 1 - r),
-                ymax = stats::qbeta(p = (1 + ci_level)/2, shape1 = r, shape2 = dplyr::n()+ 1 - r)) |>
-  ggplot2::ggplot(ggplot2::aes(x = x, y = y, ymin = ymin, ymax = ymax)) +
-  ggplot2::geom_point() +
-  ggplot2::geom_ribbon(alpha = 0.25) +
-  ggplot2::geom_abline() +
-  ggplot2::scale_x_continuous(trans = revlog_trans(base = 10)) +
-  ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
-  ggplot2::theme_bw()
-plot(plot_2)
-
 revlog_trans <- function(base = exp(1)) {
   trans <- function(x) {
     -log(x, base)
