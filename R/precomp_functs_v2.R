@@ -4,9 +4,10 @@
 #'
 #' @param expressions the numeric vector of gene expressions
 #' @param covariate_matrix the covariate matrix on which to regress (NOTE: should contain an interecept term)
+#' @param fam a string indicating the family to use in the regression (either "nb" or "poisson")
 #'
-#' @return a named vector of fitted coefficients, alongside the fitted size parameter (named "gene_theta")
-run_gene_precomputation_v2 <- function(expressions, covariate_matrix) {
+#' @return a named vector of fitted coefficients, alongside the fitted size parameter (named "gene_theta") if fam == "nb"
+run_gene_precomputation_v2 <- function(expressions, covariate_matrix, fam) {
   # second backup: method of moments
   backup_2 <- function(pois_fit) {
     MASS::theta.mm(y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual)
@@ -25,14 +26,19 @@ run_gene_precomputation_v2 <- function(expressions, covariate_matrix) {
   }
 
   # try to fit a negative binomial GLM with unknown dispersion
-  result <- tryCatch({
-    fit_nb_init <- MASS::glm.nb(formula = expressions ~ . + 0, data = covariate_matrix)
-    gene_theta <- max(fit_nb_init$theta, 0.1)
-    fit_nb <- VGAM::vglm(formula = expressions ~ . + 0, family = VGAM::negbinomial.size(gene_theta), data = covariate_matrix)
-    fitted_coefs <- stats::coef(fit_nb)
-    return(c(fitted_coefs, gene_theta = gene_theta))
-  }, error = function(e) backup(), warning = function(w) backup())
-
+  if (fam == "nb") {
+    result <- tryCatch({
+      fit_nb_init <- MASS::glm.nb(formula = expressions ~ . + 0, data = covariate_matrix)
+      gene_theta <- max(fit_nb_init$theta, 0.1)
+      fit_nb <- VGAM::vglm(formula = expressions ~ . + 0, family = VGAM::negbinomial.size(gene_theta), data = covariate_matrix)
+      fitted_coefs <- stats::coef(fit_nb)
+      return(c(fitted_coefs, gene_theta = gene_theta))
+    }, error = function(e) backup(), warning = function(w) backup())
+  }
+  if (fam == "poisson") {
+    pois_fit <- stats::glm(expressions ~ . + 0, data = covariate_matrix, family = stats::poisson())
+    result <- stats::coef(pois_fit)
+  }
   return(result)
 }
 
