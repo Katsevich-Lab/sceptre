@@ -37,7 +37,8 @@ Imports:
     methods,
     Matrix,
     crayon,
-    data.table
+    data.table,
+    R.utils
 Depends: 
     R (>= 4.1)
 Suggests: 
