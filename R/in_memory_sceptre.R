@@ -6,15 +6,15 @@
 #' @param combined_perturbation_matrix a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.
 #' @param covariate_matrix the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named
 #' @param gene_gRNA_group_pairs a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named `gene_id` and `gRNA_group`.
-#' @param side sidedness of the test; one of "both," "left," and "right"
-#' @param B number of resamples to draw for the conditional randomization test
-#' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE; default)?
-#' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates
-#' @param storage_dir directory in which to store the intermediate computations
-#' @param parallel parallelize execution?
-#' @param seed seed to the random number generator
+#' @param side sidedness of the test; one of "both," "left," and "right". (default "both")
+#' @param B number of resamples to draw for the conditional randomization test. (default 1000)
+#' @param full_output return the full output (TRUE) or a simplified, reduced output (FALSE)? (default FALSE)
+#' @param regularization_amount non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates (default 0)
+#' @param storage_dir directory in which to store the intermediate computations (default tempdir)
+#' @param parallel parallelize execution? (default TRUE)
+#' @param seed seed to the random number generator (default 4)
 #'
-#' @return the `gene_gRNA_group_pairs` data frame with new columns `p_value` and `z_value` appended. See "details" for a description of the output when `full_output` is set to TRUE.
+#' @return the `gene_gRNA_group_pairs` data frame with new columns `p_value`, `z_value`, and `log_fold_change` appended. See "details" for a description of the output when `full_output` is set to TRUE.
 #'
 #' @details
 #' Details are arranged from most to least important.
@@ -23,7 +23,7 @@
 #' - `combined_perturbation_matrix` should be a "combined perturbation matrix", which can be obtained by applying the functions `threshold_gRNA_matrix` and `combine_perturbations` (in that order) to a raw gRNA count matrix. `combined_perturbation_matrix` optionally can be a raw gRNA expression matrix or an uncombined perturbation matrix, in which case each gRNA is treated as its own group of one. See the tutorial for more details.
 #' - The gene IDs (respectively, gRNA groups) within `gene_gRNA_group_pairs` must be a subset of the row names of `gene_matrix` (respectively, `combined_perturbation_matrix`).
 #' - The `side` parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase *or* decrease in gene expression.
-#' - The default value of `regularization_amount` is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of `regularization_amount` is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+#' - The default value of `regularization_amount` is 0.0, meaning that zero regularization is applied to the estimated negative binomial size parameters. One can increase the value of this parameter to protect against overfitting, which can be useful when there are many genes.
 #' - When `full_output` is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: `gene_id`, `gRNA_id`, `p_value`, `skew_t_fit_success` (if TRUE, *p*-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical *p*-value returned), `xi`, `omega`, `alpha`, `nu` (fitted parameters of the skew-t distribution; NA if fit failed), `z_value` (z-value obtained on "ground truth" data), and `z_null_1`, ..., `z_null_B` (z-values obtained from resampled datasets).
 #' @export
 #' @examples
@@ -96,18 +96,17 @@ run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, cova
   bad_genes <- names(gene_lib_sizes[gene_lib_sizes < MIN_GENE_EXP])
   bad_gRNAs <- names(gRNA_lib_sizes[gRNA_lib_sizes < MIN_GRNA_EXP])
   if (length(bad_genes) >= 1) {
-    warning(paste0("Removing genes with low expressions (UMI count <", MIN_GENE_EXP, ")."))
+    warning(paste0("Removing the following genes with low expressions (UMI count <", MIN_GENE_EXP, "): ", paste0(bad_gRNAs, collapse = " ")))
     gene_gRNA_group_pairs <- gene_gRNA_group_pairs %>% dplyr::filter(!(gene_id %in% bad_genes))
   }
   if (length(bad_gRNAs) >= 1) {
-    warning(paste0("Removing perturbations low counts (counts <", MIN_GRNA_EXP, "). Consider grouping together perturbations that target the same gene."))
-    gene_gRNA_group_pairs <- gene_gRNA_group_pairs %>% dplyr::filter(!(gRNA_id %in% bad_gRNAs))
+    warning(paste0("Removing the following perturbations with low counts (counts <", MIN_GRNA_EXP, "): ", paste0(bad_gRNAs, collapse = " "), ". Consider grouping together perturbations that target the same site to circumvent this problem."))
+    gene_gRNA_group_pairs <- gene_gRNA_group_pairs %>% dplyr::filter(!(gRNA_group %in% bad_gRNAs))
   }
   # 4. Make sure genes/gRNAs in the data frame are actually a part of the expression matrices; ensure all rows distinct
-  if ("gRNA_group" %in% colnames(gene_gRNA_group_pairs)) {
-    gene_gRNA_group_pairs <- dplyr::rename(gene_gRNA_group_pairs, gRNA_id = gRNA_group)
-  }
-  if (!all(c("gene_id", "gRNA_id") %in% colnames(gene_gRNA_group_pairs))) stop("The columns `gene_id` and `gRNA_id` must be present in the `gene_gRNA_group_pairs` data frame.")
+  if (!all(c("gene_id", "gRNA_group") %in% colnames(gene_gRNA_group_pairs))) stop("The columns `gene_id` and `gRNA_group` must be present in the `gene_gRNA_group_pairs` data frame.")
+  # swap "gRNA_group" to "gRNA_id"
+  gene_gRNA_group_pairs <- dplyr::rename(gene_gRNA_group_pairs, gRNA_id = gRNA_group)
   abs_genes <- gene_gRNA_group_pairs$gene_id[!(gene_gRNA_group_pairs$gene_id %in% row.names(gene_matrix))]
   abs_gRNAs <- gene_gRNA_group_pairs$gRNA_id[!(gene_gRNA_group_pairs$gRNA_id %in% row.names(gRNA_matrix))]
   if (length(abs_genes) >= 1) {

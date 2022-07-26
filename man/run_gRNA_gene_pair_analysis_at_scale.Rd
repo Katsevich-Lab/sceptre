@@ -36,13 +36,13 @@ run_gRNA_gene_pair_analysis_at_scale(
 
 \item{covariate_matrix}{the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named}
 
-\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates (default 0)}
 
-\item{side}{sidedness of the test; one of "both," "left," and "right"}
+\item{side}{sidedness of the test; one of "both," "left," and "right". (default "both")}
 
-\item{B}{number of resamples to draw for the conditional randomization test}
+\item{B}{number of resamples to draw for the conditional randomization test. (default 1000)}
 
-\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE; default)?}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)? (default FALSE)}
 }
 \description{
 Runs the gene-gRRNA pair ananysis across an entire pod of gene-gRNA pairs.

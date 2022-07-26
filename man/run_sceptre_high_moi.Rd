@@ -11,7 +11,7 @@ run_sceptre_high_moi(
   gene_gRNA_group_pairs,
   side = "both",
   storage_dir = tempdir(),
-  regularization_amount = 0.1,
+  regularization_amount = 0,
   B = 1000,
   full_output = FALSE,
   parallel = TRUE,
@@ -27,22 +27,22 @@ run_sceptre_high_moi(
 
 \item{gene_gRNA_group_pairs}{a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named \code{gene_id} and \code{gRNA_group}.}
 
-\item{side}{sidedness of the test; one of "both," "left," and "right"}
+\item{side}{sidedness of the test; one of "both," "left," and "right". (default "both")}
 
-\item{storage_dir}{directory in which to store the intermediate computations}
+\item{storage_dir}{directory in which to store the intermediate computations (default tempdir)}
 
-\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates}
+\item{regularization_amount}{non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates (default 0)}
 
-\item{B}{number of resamples to draw for the conditional randomization test}
+\item{B}{number of resamples to draw for the conditional randomization test. (default 1000)}
 
-\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE; default)?}
+\item{full_output}{return the full output (TRUE) or a simplified, reduced output (FALSE)? (default FALSE)}
 
-\item{parallel}{parallelize execution?}
+\item{parallel}{parallelize execution? (default TRUE)}
 
-\item{seed}{seed to the random number generator}
+\item{seed}{seed to the random number generator (default 4)}
 }
 \value{
-the \code{gene_gRNA_group_pairs} data frame with new columns \code{p_value} and \code{z_value} appended. See "details" for a description of the output when \code{full_output} is set to TRUE.
+the \code{gene_gRNA_group_pairs} data frame with new columns \code{p_value}, \code{z_value}, and \code{log_fold_change} appended. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
 This function is the core function of the \code{sceptre} package. The function applies SCEPTRE to test for association between a set of gRNA groups and genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
@@ -54,7 +54,7 @@ Details are arranged from most to least important.
 \item \code{combined_perturbation_matrix} should be a "combined perturbation matrix", which can be obtained by applying the functions \code{threshold_gRNA_matrix} and \code{combine_perturbations} (in that order) to a raw gRNA count matrix. \code{combined_perturbation_matrix} optionally can be a raw gRNA expression matrix or an uncombined perturbation matrix, in which case each gRNA is treated as its own group of one. See the tutorial for more details.
 \item The gene IDs (respectively, gRNA groups) within \code{gene_gRNA_group_pairs} must be a subset of the row names of \code{gene_matrix} (respectively, \code{combined_perturbation_matrix}).
 \item The \code{side} parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase \emph{or} decrease in gene expression.
-\item The default value of \code{regularization_amount} is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is < 50, however, the default value of \code{regularization_amount} is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.
+\item The default value of \code{regularization_amount} is 0.0, meaning that zero regularization is applied to the estimated negative binomial size parameters. One can increase the value of this parameter to protect against overfitting, which can be useful when there are many genes.
 \item When \code{full_output} is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: \code{gene_id}, \code{gRNA_id}, \code{p_value}, \code{skew_t_fit_success} (if TRUE, \emph{p}-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical \emph{p}-value returned), \code{xi}, \code{omega}, \code{alpha}, \code{nu} (fitted parameters of the skew-t distribution; NA if fit failed), \code{z_value} (z-value obtained on "ground truth" data), and \code{z_null_1}, ..., \code{z_null_B} (z-values obtained from resampled datasets).
 }
 }

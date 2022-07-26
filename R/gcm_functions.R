@@ -19,9 +19,9 @@ run_sceptre_using_gcm <- function(gene_resids, gRNA_resids, side) {
   z <- top/bottom
   # compute the p-value
   p_val <- switch(side,
-                  "left" = pnorm(q = z, lower.tail = TRUE),
-                  "right" = pnorm(q = z, lower.tail = FALSE),
-                  "both" = 2 * pnorm(q = abs(z), lower.tail = FALSE))
+                  "left" = stats::pnorm(q = z, lower.tail = TRUE),
+                  "right" = stats::pnorm(q = z, lower.tail = FALSE),
+                  "both" = 2 * stats::pnorm(q = abs(z), lower.tail = FALSE))
   return(data.frame(p_value = p_val, z_value = z))
 }
 
