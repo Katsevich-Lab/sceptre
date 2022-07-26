@@ -25,9 +25,9 @@ run_gRNA_precomputation_at_scale(
 
 \item{log_dir}{file path to the log directory}
 
-\item{B}{number of resamples to draw for the conditional randomization test}
+\item{B}{number of resamples to draw for the conditional randomization test. (default 1000)}
 
-\item{seed}{seed to the random number generator}
+\item{seed}{seed to the random number generator (default 4)}
 }
 \description{
 This function runs the gRNA precomputation on a selected "pod" of gRNAs (as identified by the pod_id).

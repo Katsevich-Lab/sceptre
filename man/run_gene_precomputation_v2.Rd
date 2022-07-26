@@ -4,15 +4,17 @@
 \alias{run_gene_precomputation_v2}
 \title{Run gene precomputation (v2)}
 \usage{
-run_gene_precomputation_v2(expressions, covariate_matrix)
+run_gene_precomputation_v2(expressions, covariate_matrix, fam)
 }
 \arguments{
 \item{expressions}{the numeric vector of gene expressions}
 
 \item{covariate_matrix}{the covariate matrix on which to regress (NOTE: should contain an interecept term)}
+
+\item{fam}{a string indicating the family to use in the regression (either "nb" or "poisson")}
 }
 \value{
-a named vector of fitted coefficients, alongside the fitted size parameter (named "gene_theta")
+a named vector of fitted coefficients, alongside the fitted size parameter (named "gene_theta") if fam == "nb"
 }
 \description{
 Runs precomputation on a gene

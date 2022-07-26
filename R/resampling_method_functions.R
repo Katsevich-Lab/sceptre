@@ -15,7 +15,7 @@ fit_skew_t <- function(t_nulls, t_star, side) {
     R.utils::withTimeout(expr = sn::selm(t_nulls ~ 1, family = "ST"), timeout = 3),
     error = function(e) return(NA),
     warning = function(w) return(NA))
-  if (class(skew_t_fit) == "selm") { # If the fit worked,
+  if (is(skew_t_fit, "selm")) { # If the fit worked,
     dp <- skew_t_fit@param$dp # then extract the parameters.
     if (!any(is.na(dp))) { # If all the fitted parameters are numbers,
       p_value_skew_t <- switch(side,

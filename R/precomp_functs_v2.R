@@ -47,7 +47,7 @@ run_gene_precomputation_v2 <- function(expressions, covariate_matrix, fam) {
 #'
 #' Runs precomputation on a vector of grna indicators
 #'
-#' @param expressions the numeric vector of gene expressions
+#' @param indicators the binary vector of grna indicators
 #' @param covariate_matrix the covariate matrix on which to regress (NOTE: should contain an interecept term)
 #'
 #' @return a named vector of fitted coefficients
