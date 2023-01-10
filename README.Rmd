@@ -57,7 +57,7 @@ computer), see the standard `sceptre` tutorial [here](https://katsevich-lab.gith
 **Note**: `sceptre` currently applies to high multiplicity-of-infection
 (MOI; \>5 gRNAs/cell) single-cell CRISPR screen data. `sceptre` has not
 yet been carefully vetted in low-MOI settings. We are working on
-developing such an extension, which we expect to be available in 2022.
+developing such an extension, which we expect to be available in 2023.
 
 # References
 
