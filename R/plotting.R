@@ -5,7 +5,6 @@
 #' @param row single row of the data frame outputted by `run_sceptre_high_moi`, when `full_output` is set to TRUE
 #'
 #' @return a ggplot2 object containing the plot
-#' @export
 #' @examples
 #' # RUN THE METHOD
 #' set.seed(4)
@@ -27,6 +26,7 @@
 #'
 #' # CREATE THE PLOT
 #' plot_result(result[1,])
+#' @noRd
 plot_result <- function(row) {
   resampled_zvalues <- row %>% dplyr::select(dplyr::starts_with("z_null_")) %>% as.numeric()
   original_zvalue <- row$z_value

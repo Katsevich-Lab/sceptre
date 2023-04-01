@@ -187,6 +187,8 @@ run_gene_precomputation <- function(expressions, covariate_matrix, gene_precomp_
 #' @param full_output return the full output (TRUE) or a streamlined, reduced output (FALSE)?
 #' @param seed seed to the random number generator
 #'
+#' @noRd
+#'
 #' @examples
 #' \dontrun{
 #' # load the example data

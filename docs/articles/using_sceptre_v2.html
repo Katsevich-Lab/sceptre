@@ -80,15 +80,15 @@ example high-multiplicity-of-infection (MOI) single-cell CRISPR screen
 dataset. We begin by installing and loading all required packages,
 including the up-to-date version of <code>sceptre</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tidyverse"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cowplot"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tidyverse"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cowplot"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://Matrix.R-forge.R-project.org/" class="external-link">Matrix</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span></span></code></pre></div>
 <p>We proceed in seven steps.</p>
 <div class="section level2">
 <h2 id="step-1-prepare-the-data">Step 1: Prepare the data<a class="anchor" aria-label="anchor" href="#step-1-prepare-the-data"></a>
@@ -103,8 +103,8 @@ the cell-specific matrix of covariates.</p>
 <p>We load the example gene-by-cell and gRNA-by-cell expression matrices
 that are included in the <code>sceptre</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span>
-<span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span></code></pre></div>
 <p>Briefly, <code>gene_matrix</code> (respectively,
 <code>gRNA_matrix</code>) is a 20 x 40,000 (respectively, 50 x 40,000)
 matrix of gene (respectively, gRNA) unique molecular identifier (UMI)
@@ -129,52 +129,52 @@ sparse matrices or standard (dense) R matrices. We print a few rows and
 columns of <code>gene_matrix</code> and <code>gRNA_matrix</code> to get
 a sense of what the data look like.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">300</span><span class="op">)</span>
-<span class="co"># gene_matrix; rows are genes, columns are cells</span>
-<span class="va">gene_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>
-<span class="co">#&gt; 10 x 3 sparse Matrix of class "dgTMatrix"</span>
-<span class="co">#&gt;                 CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span>
-<span class="co">#&gt; ENSG00000111057                       1                       5                       1</span>
-<span class="co">#&gt; ENSG00000121211                       .                       1                       .</span>
-<span class="co">#&gt; ENSG00000134809                       3                      10                       1</span>
-<span class="co">#&gt; ENSG00000166902                       1                       3                       .</span>
-<span class="co">#&gt; ENSG00000172809                      12                      19                      33</span>
-<span class="co">#&gt; ENSG00000105298                       .                       .                       .</span>
-<span class="co">#&gt; ENSG00000108389                       .                       1                       .</span>
-<span class="co">#&gt; ENSG00000157985                       .                       .                       .</span>
-<span class="co">#&gt; ENSG00000107731                       .                       .                       .</span>
-<span class="co">#&gt; ENSG00000184357                       .                       1                       .</span>
-
-<span class="co"># gRNA matrix; rows are gRNAs, columns are cells</span>
-<span class="va">gRNA_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>
-<span class="co">#&gt; 10 x 3 sparse Matrix of class "dgTMatrix"</span>
-<span class="co">#&gt;                      CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span>
-<span class="co">#&gt; TGTCAGTCCTCCCTCCCCCA                       .                       .                       .</span>
-<span class="co">#&gt; CTAAACAGTGAAAGTCACAG                       .                       .                       .</span>
-<span class="co">#&gt; GCTCCAATCATATTCTAGAG                       .                       .                       .</span>
-<span class="co">#&gt; GATGAAACCTAAGGGCACAC                       .                       .                       .</span>
-<span class="co">#&gt; TGCAGACGAGTGTCTCAGAG                       .                       .                       .</span>
-<span class="co">#&gt; TCATCTTGAAGTCAGCTCCA                       .                       .                       3</span>
-<span class="co">#&gt; GAGAATGGCATGGAGCTCAA                       .                       .                       .</span>
-<span class="co">#&gt; AGAGCAAGAGAGCAACTCCG                       .                       .                       .</span>
-<span class="co">#&gt; CAGCAATTCTACCTTCAGGT                       .                       .                       .</span>
-<span class="co">#&gt; TTTGGTTGTTGCAAATGAGG                       .                       .                       .</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="co"># gene_matrix; rows are genes, columns are cells</span></span>
+<span><span class="va">gene_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="co">#&gt; 10 x 3 sparse Matrix of class "dgTMatrix"</span></span>
+<span><span class="co">#&gt;                 CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span></span>
+<span><span class="co">#&gt; ENSG00000111057                       1                       5                       1</span></span>
+<span><span class="co">#&gt; ENSG00000121211                       .                       1                       .</span></span>
+<span><span class="co">#&gt; ENSG00000134809                       3                      10                       1</span></span>
+<span><span class="co">#&gt; ENSG00000166902                       1                       3                       .</span></span>
+<span><span class="co">#&gt; ENSG00000172809                      12                      19                      33</span></span>
+<span><span class="co">#&gt; ENSG00000105298                       .                       .                       .</span></span>
+<span><span class="co">#&gt; ENSG00000108389                       .                       1                       .</span></span>
+<span><span class="co">#&gt; ENSG00000157985                       .                       .                       .</span></span>
+<span><span class="co">#&gt; ENSG00000107731                       .                       .                       .</span></span>
+<span><span class="co">#&gt; ENSG00000184357                       .                       1                       .</span></span>
+<span></span>
+<span><span class="co"># gRNA matrix; rows are gRNAs, columns are cells</span></span>
+<span><span class="va">gRNA_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="co">#&gt; 10 x 3 sparse Matrix of class "dgTMatrix"</span></span>
+<span><span class="co">#&gt;                      CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span></span>
+<span><span class="co">#&gt; TGTCAGTCCTCCCTCCCCCA                       .                       .                       .</span></span>
+<span><span class="co">#&gt; CTAAACAGTGAAAGTCACAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; GCTCCAATCATATTCTAGAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; GATGAAACCTAAGGGCACAC                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TGCAGACGAGTGTCTCAGAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TCATCTTGAAGTCAGCTCCA                       .                       .                       3</span></span>
+<span><span class="co">#&gt; GAGAATGGCATGGAGCTCAA                       .                       .                       .</span></span>
+<span><span class="co">#&gt; AGAGCAAGAGAGCAACTCCG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; CAGCAATTCTACCTTCAGGT                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TTTGGTTGTTGCAAATGAGG                       .                       .                       .</span></span></code></pre></div>
 <p>We also plot a histogram of the counts of an arbitrarily selected
 gene (“ENSG00000111057”) and gRNA (“TGTCAGTCCTCCCTCCCCCA”) to visualize
 the data.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">example_gene</span> <span class="op">&lt;-</span> <span class="va">gene_matrix</span><span class="op">[</span><span class="st">"ENSG00000111057"</span>,<span class="op">]</span>
-<span class="va">example_gRNA</span> <span class="op">&lt;-</span> <span class="va">gRNA_matrix</span><span class="op">[</span><span class="st">"TGTCAGTCCTCCCTCCCCCA"</span>,<span class="op">]</span>
-
-<span class="va">hist_gene</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gene</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">40</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"dodgerblue3"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Gene expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
-
-<span class="va">hist_gRNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gRNA</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">40</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"orchid4"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"gRNA expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
-
-<span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span><span class="va">hist_gene</span>, <span class="va">hist_gRNA</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">example_gene</span> <span class="op">&lt;-</span> <span class="va">gene_matrix</span><span class="op">[</span><span class="st">"ENSG00000111057"</span>,<span class="op">]</span></span>
+<span><span class="va">example_gRNA</span> <span class="op">&lt;-</span> <span class="va">gRNA_matrix</span><span class="op">[</span><span class="st">"TGTCAGTCCTCCCTCCCCCA"</span>,<span class="op">]</span></span>
+<span></span>
+<span><span class="va">hist_gene</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gene</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">40</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"dodgerblue3"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Gene expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">hist_gRNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">example_gRNA</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>count <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">count</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">count</span> <span class="op">&lt;=</span> <span class="fl">40</span><span class="op">)</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"black"</span>, fill <span class="op">=</span> <span class="st">"orchid4"</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>trans<span class="op">=</span><span class="st">'log10'</span>, expand <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"gRNA expressions"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span><span class="va">hist_gene</span>, <span class="va">hist_gRNA</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="using_sceptre_v2_files/figure-html/plot_hist-1.png" width="672"></p>
 <p>As expected, the data are highly discrete counts. Note that we do
 <em>not</em> normalize either the gene or gRNA expression matrices,
@@ -186,15 +186,15 @@ opting instead to work directly with the raw counts.</p>
 <p>Next, we load the cell-wise covariate matrix,
 <code>covariate_matrix</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span>
-<span class="co">#&gt;                         lg_gRNA_lib_size lg_gene_lib_size     p_mito        batch</span>
-<span class="co">#&gt; CTCGAAAGTCCATGAT-1_2B_7         6.023448         9.276783 0.03861979 prep_batch_2</span>
-<span class="co">#&gt; GACACGCTCAAAGACA-1_2B_4         6.561031        10.274982 0.04499379 prep_batch_2</span>
-<span class="co">#&gt; GGCTCGATCTGTGCAA-1_1B_1         8.196988         9.744375 0.02460745 prep_batch_1</span>
-<span class="co">#&gt; CTGGTCTGTGGGTATG-1_2B_7         5.929589         9.260368 0.03326996 prep_batch_2</span>
-<span class="co">#&gt; TCTGGAAGTACATGTC-1_2A_5         7.134094        10.002880 0.07319942 prep_batch_2</span>
-<span class="co">#&gt; AACTGGTGTAGAGCTG-1_1A_4         5.655992         8.875567 0.01327186 prep_batch_1</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                         lg_gRNA_lib_size lg_gene_lib_size     p_mito        batch</span></span>
+<span><span class="co">#&gt; CTCGAAAGTCCATGAT-1_2B_7         6.023448         9.276783 0.03861979 prep_batch_2</span></span>
+<span><span class="co">#&gt; GACACGCTCAAAGACA-1_2B_4         6.561031        10.274982 0.04499379 prep_batch_2</span></span>
+<span><span class="co">#&gt; GGCTCGATCTGTGCAA-1_1B_1         8.196988         9.744375 0.02460745 prep_batch_1</span></span>
+<span><span class="co">#&gt; CTGGTCTGTGGGTATG-1_2B_7         5.929589         9.260368 0.03326996 prep_batch_2</span></span>
+<span><span class="co">#&gt; TCTGGAAGTACATGTC-1_2A_5         7.134094        10.002880 0.07319942 prep_batch_2</span></span>
+<span><span class="co">#&gt; AACTGGTGTAGAGCTG-1_1A_4         5.655992         8.875567 0.01327186 prep_batch_1</span></span></code></pre></div>
 <p><code>covariate_matrix</code> is a 40,000 x 4 data frame of
 “technical factors,” or covariates. The row names of this data frame are
 the cell barcodes. The covariates are as follows:</p>
@@ -227,22 +227,22 @@ default threshold that we use for this purpose is 3, which we have found
 to work well in practice. This simple thresholding routine is
 implemented by the function <code>threshold_gRNA_matrix</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span>
-
-<span class="co"># `perturbation_matrix` is a thresholded version of `gRNA_matrix`</span>
-<span class="va">perturbation_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>
-<span class="co">#&gt; 10 x 3 sparse Matrix of class "lgTMatrix"</span>
-<span class="co">#&gt;                      CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span>
-<span class="co">#&gt; TGTCAGTCCTCCCTCCCCCA                       .                       .                       .</span>
-<span class="co">#&gt; CTAAACAGTGAAAGTCACAG                       .                       .                       .</span>
-<span class="co">#&gt; GCTCCAATCATATTCTAGAG                       .                       .                       .</span>
-<span class="co">#&gt; GATGAAACCTAAGGGCACAC                       .                       .                       .</span>
-<span class="co">#&gt; TGCAGACGAGTGTCTCAGAG                       .                       .                       .</span>
-<span class="co">#&gt; TCATCTTGAAGTCAGCTCCA                       .                       .                       |</span>
-<span class="co">#&gt; GAGAATGGCATGGAGCTCAA                       .                       .                       .</span>
-<span class="co">#&gt; AGAGCAAGAGAGCAACTCCG                       .                       .                       .</span>
-<span class="co">#&gt; CAGCAATTCTACCTTCAGGT                       .                       .                       .</span>
-<span class="co">#&gt; TTTGGTTGTTGCAAATGAGG                       .                       .                       .</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># `perturbation_matrix` is a thresholded version of `gRNA_matrix`</span></span>
+<span><span class="va">perturbation_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="co">#&gt; 10 x 3 sparse Matrix of class "lgTMatrix"</span></span>
+<span><span class="co">#&gt;                      CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span></span>
+<span><span class="co">#&gt; TGTCAGTCCTCCCTCCCCCA                       .                       .                       .</span></span>
+<span><span class="co">#&gt; CTAAACAGTGAAAGTCACAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; GCTCCAATCATATTCTAGAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; GATGAAACCTAAGGGCACAC                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TGCAGACGAGTGTCTCAGAG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TCATCTTGAAGTCAGCTCCA                       .                       .                       |</span></span>
+<span><span class="co">#&gt; GAGAATGGCATGGAGCTCAA                       .                       .                       .</span></span>
+<span><span class="co">#&gt; AGAGCAAGAGAGCAACTCCG                       .                       .                       .</span></span>
+<span><span class="co">#&gt; CAGCAATTCTACCTTCAGGT                       .                       .                       .</span></span>
+<span><span class="co">#&gt; TTTGGTTGTTGCAAATGAGG                       .                       .                       .</span></span></code></pre></div>
 <p><strong>Note</strong>: We draw a terminological distinction between a
 “gRNA count” and a “perturbation.” A “gRNA count” is the number of
 transcripts (in UMIs) that we observe for a given gRNA in a given cell;
@@ -266,17 +266,17 @@ location. Information about the genomic position that each gRNA targets
 is available in the <code>gRNA_groups_table</code>, which we explore
 below.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="st">"gRNA_groups_table"</span><span class="op">)</span>
-<span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">31</span>, <span class="fl">32</span>, <span class="fl">41</span>, <span class="fl">42</span><span class="op">)</span>,<span class="op">]</span> 
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> TGTCAGTCCTCCCTCCCCCA chr10.2250 enh_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CTAAACAGTGAAAGTCACAG chr10.2250 enh_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AGAGGTAACCAAAATAGCAA NTC_2      non_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ATATGTAACCTCCAGAATGA NTC_2      non_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CAGGCTTTGCGGACGACGGG KRT18_TSS  tss_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> GCTTTGCGGACGACGGTGGG KRT18_TSS  tss_target</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="st">"gRNA_groups_table"</span><span class="op">)</span></span>
+<span><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">31</span>, <span class="fl">32</span>, <span class="fl">41</span>, <span class="fl">42</span><span class="op">)</span>,<span class="op">]</span> </span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
+<span><span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> TGTCAGTCCTCCCTCCCCCA chr10.2250 enh_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CTAAACAGTGAAAGTCACAG chr10.2250 enh_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AGAGGTAACCAAAATAGCAA NTC_2      non_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ATATGTAACCTCCAGAATGA NTC_2      non_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> CAGGCTTTGCGGACGACGGG KRT18_TSS  tss_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> GCTTTGCGGACGACGGTGGG KRT18_TSS  tss_target</span></span></code></pre></div>
 <p>The <code>gRNA_groups_table</code> data frame has three columns:</p>
 <ul>
 <li><p><code>gRNA_id</code>: the ID of an individual gRNA</p></li>
@@ -298,32 +298,32 @@ non-targeting.</p></li>
 “GTTGCAGATGAGGCAACCGA” target the putative enhancer located at
 <em>chr10.1318</em> and are grouped.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> TGTCAGTCCTCCCTCCCCCA chr10.2250 enh_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CTAAACAGTGAAAGTCACAG chr10.2250 enh_target</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> TGTCAGTCCTCCCTCCCCCA chr10.2250 enh_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> CTAAACAGTGAAAGTCACAG chr10.2250 enh_target</span></span></code></pre></div>
 <p>Similarly, the gRNAs “CCCGCGCGCCGCACGGACGG” and
 “GCGGATCGGGGCAAGGCTCG” target the TSS of gene <em>HDGF</em> and are
 grouped.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">41</span><span class="op">:</span><span class="fl">42</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CAGGCTTTGCGGACGACGGG KRT18_TSS  tss_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> GCTTTGCGGACGACGGTGGG KRT18_TSS  tss_target</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">41</span><span class="op">:</span><span class="fl">42</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> CAGGCTTTGCGGACGACGGG KRT18_TSS  tss_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> GCTTTGCGGACGACGGTGGG KRT18_TSS  tss_target</span></span></code></pre></div>
 <p>Finally, the non-targeting gRNAs “AATATTCTCCCTCATTCTGG” and
 “TTAAAATTGATTCTGCCACT” are paired randomly to form a group called
 “NTC_2.”</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">31</span><span class="op">:</span><span class="fl">32</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span>
-<span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AGAGGTAACCAAAATAGCAA NTC_2      non_target</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ATATGTAACCTCCAGAATGA NTC_2      non_target</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">gRNA_groups_table</span><span class="op">[</span><span class="fl">31</span><span class="op">:</span><span class="fl">32</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   gRNA_id              gRNA_group gRNA_type </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AGAGGTAACCAAAATAGCAA NTC_2      non_target</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ATATGTAACCTCCAGAATGA NTC_2      non_target</span></span></code></pre></div>
 <p>The function <code>combine_perturbations</code> takes as arguments a
 <code>perturbation_matrix</code> (i.e., the thresholded
 <code>gRNA_matrix</code>) and a <code>gRNA_groups_table</code> and
@@ -331,28 +331,28 @@ collapses gRNAs in the same group into a single “combined” gRNA. The
 data frame <code>gRNA_groups_table</code> must have columns
 <code>gRNA_id</code> and <code>gRNA_group</code>, as above.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_perturbations.html">combine_perturbations</a></span><span class="op">(</span>perturbation_matrix <span class="op">=</span> <span class="va">perturbation_matrix</span>,
-                                                      gRNA_groups_table <span class="op">=</span> <span class="va">gRNA_groups_table</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_perturbations.html">combine_perturbations</a></span><span class="op">(</span>perturbation_matrix <span class="op">=</span> <span class="va">perturbation_matrix</span>,</span>
+<span>                                                      gRNA_groups_table <span class="op">=</span> <span class="va">gRNA_groups_table</span><span class="op">)</span></span></code></pre></div>
 <p>The ouput matrix, <code>combined_perturbation_matrix</code>, is a 25
 x 40,000 binary matrix, with rows corresponding to the 25 “gRNA groups”
 within <code>gRNA_groups_table</code>. The column names (i.e., the cell
 barcodes) remain unchanged.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">combined_perturbation_matrix</span><span class="op">)</span>
-<span class="co">#&gt; [1]    25 40000</span>
-<span class="va">combined_perturbation_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>
-<span class="co">#&gt; 10 x 3 sparse Matrix of class "lgCMatrix"</span>
-<span class="co">#&gt;            CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span>
-<span class="co">#&gt; chr10.2250                       .                       .                       .</span>
-<span class="co">#&gt; chr14.2077                       .                       .                       .</span>
-<span class="co">#&gt; chr1.6211                        .                       .                       |</span>
-<span class="co">#&gt; chr17.1748                       .                       .                       .</span>
-<span class="co">#&gt; chr17.3995                       .                       .                       .</span>
-<span class="co">#&gt; chr17.5367                       .                       .                       .</span>
-<span class="co">#&gt; chr17.875                        .                       .                       .</span>
-<span class="co">#&gt; chr18.248                        .                       .                       .</span>
-<span class="co">#&gt; chr19.2680                       .                       .                       .</span>
-<span class="co">#&gt; chr19.633                        .                       .                       .</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">combined_perturbation_matrix</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]    25 40000</span></span>
+<span><span class="va">combined_perturbation_matrix</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="co">#&gt; 10 x 3 sparse Matrix of class "lgCMatrix"</span></span>
+<span><span class="co">#&gt;            CTCGAAAGTCCATGAT-1_2B_7 GACACGCTCAAAGACA-1_2B_4 GGCTCGATCTGTGCAA-1_1B_1</span></span>
+<span><span class="co">#&gt; chr10.2250                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr14.2077                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr1.6211                        .                       .                       |</span></span>
+<span><span class="co">#&gt; chr17.1748                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr17.3995                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr17.5367                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr17.875                        .                       .                       .</span></span>
+<span><span class="co">#&gt; chr18.248                        .                       .                       .</span></span>
+<span><span class="co">#&gt; chr19.2680                       .                       .                       .</span></span>
+<span><span class="co">#&gt; chr19.633                        .                       .                       .</span></span></code></pre></div>
 <p><strong>Note</strong>: Step 3 is optional but recommended;
 <code>sceptre</code> works on either combined or uncombined perturbation
 matrices.</p>
@@ -369,19 +369,19 @@ physical proximity to uncover <em>cis</em>-regulatory relationships. The
 data frame <code>gene_gRNA_group_pairs</code> contains the 120 pairs of
 genes and gRNA groups that we will analyze in our analysis.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span>
-<span class="co">#&gt; [1] 120</span>
-<span class="va">gene_gRNA_group_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,<span class="op">]</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="co">#&gt;   gene_id         gRNA_group pair_type       </span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ENSG00000111057 KRT18_TSS  positive_control</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ENSG00000121211 MND1_TSS   positive_control</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ENSG00000105298 chr19.633  candidate       </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ENSG00000108389 chr17.3995 candidate       </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ENSG00000111057 NTC_2      negative_control</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ENSG00000121211 NTC_2      negative_control</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 120</span></span>
+<span><span class="va">gene_gRNA_group_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">:</span><span class="fl">7</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">22</span><span class="op">)</span>,<span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
+<span><span class="co">#&gt;   gene_id         gRNA_group pair_type       </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ENSG00000111057 KRT18_TSS  positive_control</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ENSG00000121211 MND1_TSS   positive_control</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ENSG00000105298 chr19.633  candidate       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ENSG00000108389 chr17.3995 candidate       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ENSG00000111057 NTC_2      negative_control</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ENSG00000121211 NTC_2      negative_control</span></span></code></pre></div>
 <p>The <code>gene_gRNA_group_pairs</code> data frame contains three
 columns: <code>gene_id</code>, <code>gRNA_group</code>, and
 <code>pair_type</code>. The gene IDs (respectively, gRNA groups) in
@@ -491,7 +491,7 @@ therefore recommend using a two-sided test for all tests of
 <p>We use a left-tailed test for the example data, as suggested by the
 first row of the table.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">side</span> <span class="op">&lt;-</span> <span class="st">"left"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">side</span> <span class="op">&lt;-</span> <span class="st">"left"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="step-6-run-the-method">Step 6: Run the method<a class="anchor" aria-label="anchor" href="#step-6-run-the-method"></a>
@@ -508,11 +508,11 @@ arguments, which are set to reasonable defaults. One can read more about
 (<code><a href="../reference/run_sceptre_high_moi.html">?run_sceptre_high_moi</a></code>). The function takes about 40 second
 to run on the example data on an 8-core Macbook Pro.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sceptre_high_moi.html">run_sceptre_high_moi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,
-                               combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,
-                               covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,
-                               gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,
-                               side <span class="op">=</span> <span class="va">side</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sceptre_high_moi.html">run_sceptre_high_moi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span>
+<span>                               combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,</span>
+<span>                               covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,</span>
+<span>                               gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,</span>
+<span>                               side <span class="op">=</span> <span class="va">side</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Note</strong>: Users can supply the raw gRNA expression
 matrix they obtained from Step 1 or the perturbation matrix they
 obtained from Step 2 to the <code>combined_perturbation_matrix</code>
@@ -533,20 +533,20 @@ Positive z-values indicate increased expression, and negative z-values
 indicate decreased expression. We examine several rows of
 <code>result</code> below.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">10</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 5</span></span>
-<span class="co">#&gt;    gene_id         gRNA_id    pair_type         p_value z_value</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> ENSG00000111057 KRT18_TSS  positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> -<span style="color: #BB0000;">12.5</span>  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ENSG00000121211 MND1_TSS   positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  -<span style="color: #BB0000;">9.74</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ENSG00000134809 TIMM10_TSS positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> -<span style="color: #BB0000;">14.0</span>  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ENSG00000166902 MRPL16_TSS positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  -<span style="color: #BB0000;">9.80</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ENSG00000172809 RPL38_TSS  positive_control 2.23<span style="color: #949494;">e</span><span style="color: #BB0000;">-13</span> -<span style="color: #BB0000;">14.3</span>  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ENSG00000105298 chr19.633  candidate        4.29<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>  -<span style="color: #BB0000;">0.217</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ENSG00000108389 chr17.3995 candidate        8.36<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>   0.936</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ENSG00000157985 chr2.7132  candidate        1.62<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>  -<span style="color: #BB0000;">0.984</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ENSG00000107731 chr10.2250 candidate        4.39<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>  -<span style="color: #BB0000;">1.27</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ENSG00000184357 chr6.1291  candidate        8.49<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>   0.797</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 6</span></span></span>
+<span><span class="co">#&gt;    gene_id         gRNA_id    pair_type         p_value z_value log_fold_change</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> ENSG00000111057 KRT18_TSS  positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> -<span style="color: #BB0000;">12.5</span>           -<span style="color: #BB0000;">1.21</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> ENSG00000121211 MND1_TSS   positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  -<span style="color: #BB0000;">9.74</span>          -<span style="color: #BB0000;">1.26</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> ENSG00000134809 TIMM10_TSS positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> -<span style="color: #BB0000;">14.0</span>           -<span style="color: #BB0000;">0.980</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> ENSG00000166902 MRPL16_TSS positive_control 2.22<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  -<span style="color: #BB0000;">9.80</span>          -<span style="color: #BB0000;">1.15</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> ENSG00000172809 RPL38_TSS  positive_control 2.23<span style="color: #949494;">e</span><span style="color: #BB0000;">-13</span> -<span style="color: #BB0000;">14.3</span>           -<span style="color: #BB0000;">0.641</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> ENSG00000105298 chr19.633  candidate        4.29<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>  -<span style="color: #BB0000;">0.217</span>         -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> ENSG00000108389 chr17.3995 candidate        8.36<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>   0.936          0.131 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> ENSG00000157985 chr2.7132  candidate        1.62<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>  -<span style="color: #BB0000;">0.984</span>         -<span style="color: #BB0000;">0.218</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> ENSG00000107731 chr10.2250 candidate        4.39<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>  -<span style="color: #BB0000;">1.27</span>        -<span style="color: #BB0000;">Inf</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> ENSG00000184357 chr6.1291  candidate        8.49<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span>   0.797          0.036<span style="text-decoration: underline;">4</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="negative-control-pairs">Negative control pairs<a class="anchor" aria-label="anchor" href="#negative-control-pairs"></a>
 </h3>
@@ -556,9 +556,9 @@ control pairs. We extract the negative control <em>p</em>-values from
 the <code>result</code> data frame and pass them to the function
 <code>make_qq_plot</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">neg_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"negative_control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span>
-<span class="va">qq_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_qq_plot.html">make_qq_plot</a></span><span class="op">(</span><span class="va">neg_control_p_vals</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">qq_plot</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">neg_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"negative_control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span></span>
+<span><span class="va">qq_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_qq_plot.html">make_qq_plot</a></span><span class="op">(</span><span class="va">neg_control_p_vals</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">qq_plot</span><span class="op">)</span></span></code></pre></div>
 <p><img src="using_sceptre_v2_files/figure-html/unnamed-chunk-19-1.png" width="480"></p>
 <p>The QQ-plot is a visual diagnostic that displays the extent to which
 the negative control <em>p</em>-values deviate from the expected uniform
@@ -586,9 +586,9 @@ capable of detecting true relationships), we assess the power of the
 test on the positive control pairs. We extract the positive control
 <em>p</em>-values and examine their values.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pos_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"positive_control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span>
-<span class="va">pos_control_p_vals</span>
-<span class="co">#&gt; [1] 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 2.232103e-13</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pos_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"positive_control"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span></span>
+<span><span class="va">pos_control_p_vals</span></span>
+<span><span class="co">#&gt; [1] 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 2.232103e-13</span></span></code></pre></div>
 <p>The positive control <em>p</em>-values are all small, indicating that
 the test is powerful.</p>
 </div>
@@ -599,24 +599,24 @@ the test is powerful.</p>
 <em>p</em>-values corresponding to the candidate pairs and apply a
 Benjamini-Hochberg (BH) correction to adjust for multiple testing.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">candidate_pair_results</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"candidate"</span><span class="op">)</span>
-<span class="va">candidate_pair_results_p_adj</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p_val_adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></span><span class="op">(</span><span class="va">p_value</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">candidate_pair_results_p_adj</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span>
-<span class="co">#&gt;   gene_id         gRNA_id    pair_type p_value z_value p_val_adj</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ENSG00000105298 chr19.633  candidate  0.429   -<span style="color: #BB0000;">0.217</span>     0.737</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ENSG00000108389 chr17.3995 candidate  0.836    0.936     0.906</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ENSG00000157985 chr2.7132  candidate  0.162   -<span style="color: #BB0000;">0.984</span>     0.537</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ENSG00000107731 chr10.2250 candidate  0.043<span style="text-decoration: underline;">9</span>  -<span style="color: #BB0000;">1.27</span>      0.431</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ENSG00000184357 chr6.1291  candidate  0.849    0.797     0.906</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ENSG00000090060 chr14.2077 candidate  0.179   -<span style="color: #BB0000;">1.02</span>      0.537</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">candidate_pair_results</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"candidate"</span><span class="op">)</span></span>
+<span><span class="va">candidate_pair_results_p_adj</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p_val_adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></span><span class="op">(</span><span class="va">p_value</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">candidate_pair_results_p_adj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;   gene_id         gRNA_id    pair_type p_value z_value log_fold_change p_val_adj</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ENSG00000105298 chr19.633  candidate  0.429   -<span style="color: #BB0000;">0.217</span>         -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">2</span>     0.737</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ENSG00000108389 chr17.3995 candidate  0.836    0.936          0.131      0.906</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ENSG00000157985 chr2.7132  candidate  0.162   -<span style="color: #BB0000;">0.984</span>         -<span style="color: #BB0000;">0.218</span>      0.537</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ENSG00000107731 chr10.2250 candidate  0.043<span style="text-decoration: underline;">9</span>  -<span style="color: #BB0000;">1.27</span>        -<span style="color: #BB0000;">Inf</span>          0.431</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ENSG00000184357 chr6.1291  candidate  0.849    0.797          0.036<span style="text-decoration: underline;">4</span>     0.906</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ENSG00000090060 chr14.2077 candidate  0.179   -<span style="color: #BB0000;">1.02</span>          -<span style="color: #BB0000;">0.048</span><span style="color: #BB0000; text-decoration: underline;">7</span>     0.537</span></span></code></pre></div>
 <p>We call pairs with an adjusted <em>p</em>-value of less or equal than
 0.1 significant; the discovery set (i.e., the set of significant pairs)
 has a false discovery rate (FDR) of 10%.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results_p_adj</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">p_val_adj</span> <span class="op">&lt;=</span> <span class="fl">0.1</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results_p_adj</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">p_val_adj</span> <span class="op">&lt;=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
 <p>The discovery set in this case is empty, as we tested only fifteen
 candidate pairs.</p>
 <p><strong>Note</strong>: It is crucial to apply BH <em>only</em> to the
@@ -639,14 +639,12 @@ BH to become excessively liberal or conservative, respectively.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy
-Barry</a>, Eugene Katsevich.</p>
+<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>

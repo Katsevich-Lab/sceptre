@@ -50,49 +50,72 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">run_sceptre_high_moi</span><span class="op">(</span>
-  <span class="va">gene_matrix</span>,
-  <span class="va">combined_perturbation_matrix</span>,
-  <span class="va">covariate_matrix</span>,
-  <span class="va">gene_gRNA_group_pairs</span>,
-  side <span class="op">=</span> <span class="st">"both"</span>,
-  storage_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,
-  regularization_amount <span class="op">=</span> <span class="fl">0.1</span>,
-  B <span class="op">=</span> <span class="fl">1000</span>,
-  full_output <span class="op">=</span> <span class="cn">FALSE</span>,
-  parallel <span class="op">=</span> <span class="cn">TRUE</span>,
-  seed <span class="op">=</span> <span class="fl">4</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">run_sceptre_high_moi</span><span class="op">(</span></span>
+<span>  <span class="va">gene_matrix</span>,</span>
+<span>  <span class="va">combined_perturbation_matrix</span>,</span>
+<span>  <span class="va">covariate_matrix</span>,</span>
+<span>  <span class="va">gene_gRNA_group_pairs</span>,</span>
+<span>  side <span class="op">=</span> <span class="st">"both"</span>,</span>
+<span>  storage_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  regularization_amount <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  full_output <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">4</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>gene_matrix</dt>
 <dd><p>a gene-by-cell expression matrix; the rows (i.e., gene IDs) and columns (i.e., cell barcodes) should be named</p></dd>
+
+
 <dt>combined_perturbation_matrix</dt>
 <dd><p>a binary matrix of perturbations (i.e., gRNA group-to-cell assignments); the rows (i.e., gRNA groups) and columns (i.e., cell barcodes) should be named.</p></dd>
+
+
 <dt>covariate_matrix</dt>
 <dd><p>the cell-specific matrix of technical factors, ideally containing the following covariates: log-transformed gene library size (numeric), log-transformed gRNA library size (numeric), percent mitochondrial reads (numeric), and batch (factor). The rows (i.e., cell barcodes) should be named</p></dd>
+
+
 <dt>gene_gRNA_group_pairs</dt>
 <dd><p>a data frame specifying the gene-gRNA group pairs to test for association; the data frame should contain columns named <code>gene_id</code> and <code>gRNA_group</code>.</p></dd>
+
+
 <dt>side</dt>
-<dd><p>sidedness of the test; one of "both," "left," and "right"</p></dd>
+<dd><p>sidedness of the test; one of "both," "left," and "right". (default "both")</p></dd>
+
+
 <dt>storage_dir</dt>
-<dd><p>directory in which to store the intermediate computations</p></dd>
+<dd><p>directory in which to store the intermediate computations (default tempdir)</p></dd>
+
+
 <dt>regularization_amount</dt>
-<dd><p>non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates</p></dd>
+<dd><p>non-negative number specifying the amount of regularization to apply to the negative binomial dispersion parameter estimates (default 0)</p></dd>
+
+
 <dt>B</dt>
-<dd><p>number of resamples to draw for the conditional randomization test</p></dd>
+<dd><p>number of resamples to draw for the conditional randomization test. (default 1000)</p></dd>
+
+
 <dt>full_output</dt>
-<dd><p>return the full output (TRUE) or a simplified, reduced output (FALSE; default)?</p></dd>
+<dd><p>return the full output (TRUE) or a simplified, reduced output (FALSE)? (default FALSE)</p></dd>
+
+
 <dt>parallel</dt>
-<dd><p>parallelize execution?</p></dd>
+<dd><p>parallelize execution? (default TRUE)</p></dd>
+
+
 <dt>seed</dt>
-<dd><p>seed to the random number generator</p></dd>
+<dd><p>seed to the random number generator (default 4)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>the <code>gene_gRNA_group_pairs</code> data frame with new columns <code>p_value</code> and <code>z_value</code> appended. See "details" for a description of the output when <code>full_output</code> is set to TRUE.</p>
+    
+
+<p>the <code>gene_gRNA_group_pairs</code> data frame with new columns <code>p_value</code>, <code>z_value</code>, and <code>log_fold_change</code> appended. See "details" for a description of the output when <code>full_output</code> is set to TRUE.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -100,36 +123,36 @@
 <li><p><code>combined_perturbation_matrix</code> should be a "combined perturbation matrix", which can be obtained by applying the functions <code>threshold_gRNA_matrix</code> and <code>combine_perturbations</code> (in that order) to a raw gRNA count matrix. <code>combined_perturbation_matrix</code> optionally can be a raw gRNA expression matrix or an uncombined perturbation matrix, in which case each gRNA is treated as its own group of one. See the tutorial for more details.</p></li>
 <li><p>The gene IDs (respectively, gRNA groups) within <code>gene_gRNA_group_pairs</code> must be a subset of the row names of <code>gene_matrix</code> (respectively, <code>combined_perturbation_matrix</code>).</p></li>
 <li><p>The <code>side</code> parameter controls the sidedness of the test. The arguments "left" and "right" are appropriate when testing for a decrease and increase in gene expression, respectively. The default argument -- "both" -- is appropriate when testing for an increase <em>or</em> decrease in gene expression.</p></li>
-<li><p>The default value of <code>regularization_amount</code> is 0.1, meaning that a small amount of regularization is applied to the estimated negative binomial size parameters, which helps protect against overfitting. When the number of genes is &lt; 50, however, the default value of <code>regularization_amount</code> is set to 0 (i.e., no regularization), as regularization is known to be ineffective when there are few genes.</p></li>
+<li><p>The default value of <code>regularization_amount</code> is 0.0, meaning that zero regularization is applied to the estimated negative binomial size parameters. One can increase the value of this parameter to protect against overfitting, which can be useful when there are many genes.</p></li>
 <li><p>When <code>full_output</code> is set to TRUE (as opposed to FALSE, the default), the output is a data frame with the following columns: <code>gene_id</code>, <code>gRNA_id</code>, <code>p_value</code>, <code>skew_t_fit_success</code> (if TRUE, <em>p</em>-value based on tail probability of fitted skew-t distribution returned; if FALSE, empirical <em>p</em>-value returned), <code>xi</code>, <code>omega</code>, <code>alpha</code>, <code>nu</code> (fitted parameters of the skew-t distribution; NA if fit failed), <code>z_value</code> (z-value obtained on "ground truth" data), and <code>z_null_1</code>, ..., <code>z_null_B</code> (z-values obtained from resampled datasets).</p></li>
 </ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># 1. load the data</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span> <span class="co"># i. gene expression matrix</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="co"># ii. gRNA expression matrix</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span> <span class="co"># iii. covariate matrix</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span> <span class="co"># iv. gRNAs grouped by target site</span></span>
-<span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span> <span class="co"># v. gene-gRNA group pairs to analyze</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 2. threshold and combine gRNA matrix</span></span>
-<span class="r-in"><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span class="r-in"><span class="fu"><a href="combine_perturbations.html">combine_perturbations</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 3. select the gene-gRNA group pairs to analyze</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">gene_gRNA_group_pairs</span> <span class="op">&lt;-</span> <span class="va">gene_gRNA_group_pairs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># 3. run method (takes ~40s on an 8-core Macbook Pro)</span></span>
-<span class="r-in"><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_sceptre_high_moi</span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span>
-<span class="r-in">combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,</span>
-<span class="r-in">covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,</span>
-<span class="r-in">gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,</span>
-<span class="r-in">side <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># 1. load the data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_matrix</span><span class="op">)</span> <span class="co"># i. gene expression matrix</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="co"># ii. gRNA expression matrix</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">covariate_matrix</span><span class="op">)</span> <span class="co"># iii. covariate matrix</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span> <span class="co"># iv. gRNAs grouped by target site</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gene_gRNA_group_pairs</span><span class="op">)</span> <span class="co"># v. gene-gRNA group pairs to analyze</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. threshold and combine gRNA matrix</span></span></span>
+<span class="r-in"><span><span class="va">combined_perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="fu"><a href="combine_perturbations.html">combine_perturbations</a></span><span class="op">(</span><span class="va">gRNA_groups_table</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3. select the gene-gRNA group pairs to analyze</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gene_gRNA_group_pairs</span> <span class="op">&lt;-</span> <span class="va">gene_gRNA_group_pairs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># 3. run method (takes ~40s on an 8-core Macbook Pro)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">run_sceptre_high_moi</span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span></span>
+<span class="r-in"><span>combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,</span></span>
+<span class="r-in"><span>covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,</span></span>
+<span class="r-in"><span>gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,</span></span>
+<span class="r-in"><span>side <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -140,13 +163,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy
-Barry</a>, Eugene Katsevich.</p>
+  <p></p><p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

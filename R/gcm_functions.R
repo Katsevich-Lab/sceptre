@@ -7,6 +7,7 @@
 #' @param side sidedness of the test; one of "left", "right", or "both"
 #'
 #' @return a data frame containing columns "p_value" and "z_value"
+#' @noRd
 run_sceptre_using_gcm <- function(gene_resids, gRNA_resids, side) {
   # obtain basic quantities
   r <- gene_resids * gRNA_resids

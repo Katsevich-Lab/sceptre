@@ -26,6 +26,7 @@ deactivate_sink <- function() {
 #' @param storage_location file path to a directory in which to store the intermediate and final results
 #'
 #' @return named vector containing the file paths of gene_precomp_dir, gRNA_precomp_dir, results_dir, and log_dir.
+#' @noRd
 initialize_directories <- function(storage_location) {
   if (!dir.exists(storage_location)) dir.create(storage_location, recursive = TRUE)
   sub_dirs <- c("gene_precomp", "gRNA_precomp", "results", "logs")
@@ -71,6 +72,7 @@ create_dictionary <- function(ids, pod_size) {
 #' @param pod_sizes an integer vector with three named elements: gRNA, gene, and pair. These elements give the sizes of the respective "pods."
 #'
 #' @return an integer vector containing the number of pods in the gene, gRNA, and pairs dictionaries.
+#' @noRd
 create_and_store_dictionaries <- function(gene_gRNA_group_pairs, gene_precomp_dir, gRNA_precomp_dir, results_dir, pod_sizes) {
   # 0. Clear out contents of gRNA precomp, gene precomp, and results directories
   for (direct in c(gRNA_precomp_dir, gene_precomp_dir)) {
@@ -123,6 +125,7 @@ create_and_store_dictionaries <- function(gene_gRNA_group_pairs, gene_precomp_di
 #' @param log_dir file path to the log directory
 #'
 #' @return NULL
+#' @noRd
 run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, combined_perturbation_matrix, covariate_matrix, log_dir, B, seed) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
@@ -155,6 +158,7 @@ run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, combined_
 #' @param pod_id pod id
 #' @param gene_precomp_dir location of the gene precomputation directory
 #' @param log_dir directory in which to sink the log file
+#' @noRd
 run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_1_pod_", pod_id, ".Rout"))
 
@@ -199,6 +203,7 @@ run_gene_precomputation_at_scale_round_1 <- function(pod_id, gene_precomp_dir, g
 #' @param gene_precomp_dir location of the gene precomputation directory
 #' @param log_dir location of the directory in which to sink the log file
 #' @param regularization_amount amount of regularization to apply to thetas (>= 0)
+#' @noRd
 regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amount, log_dir) {
   if (regularization_amount > 0) {
     if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_regularize_sizes", ".Rout"))
@@ -231,6 +236,7 @@ regularize_gene_sizes_at_scale <- function(gene_precomp_dir, regularization_amou
 #' @param gene_precomp_dir gene precomp dir
 #' @param gene_matrix the gene expression matrix, stored as an ondisc_matrix
 #' @param log_dir directory in which to sink the logs
+#' @noRd
 run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, gene_matrix, covariate_matrix, regularization_amount, log_dir) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/gene_precomp_round_2_pod_", pod_id, ".Rout"))
 
@@ -270,6 +276,7 @@ run_gene_precomputation_at_scale_round_2 <- function(pod_id, gene_precomp_dir, g
 #' @param results_dir directory in which to store the results
 #' @param log_dir (optional) directory in which to sink the log file
 #' @return NULL
+#' @noRd
 run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_precomp_dir, results_dir, log_dir, gene_matrix, combined_perturbation_matrix, covariate_matrix, regularization_amount, side, B, full_output) {
   if (!is.null(log_dir)) activate_sink(paste0(log_dir, "/result_", pod_id, ".Rout"))
 
@@ -338,6 +345,7 @@ run_gRNA_gene_pair_analysis_at_scale <- function(pod_id, gene_precomp_dir, gRNA_
 #' @param gene_gRNA_group_pairs the gene-gRNA groups data frame
 #'
 #' @return the collated results data frame.
+#' @noRd
 collect_results <- function(results_dir, gene_gRNA_group_pairs) {
   file_names <- list.files(results_dir)
   to_load <- grep(pattern = 'result_[0-9]+.fst', x = file_names, value = TRUE)
