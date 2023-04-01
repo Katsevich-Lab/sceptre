@@ -50,25 +50,30 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">threshold_gRNA_matrix</span><span class="op">(</span><span class="va">gRNA_matrix</span>, threshold <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">threshold_gRNA_matrix</span><span class="op">(</span><span class="va">gRNA_matrix</span>, threshold <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>gRNA_matrix</dt>
 <dd><p>a gRNA-by-cell expression matrix; the matrix can be represented as a sparse matrix (as implemented by the Matrix package) or a dense matrix (as implemented by base R)</p></dd>
+
+
 <dt>threshold</dt>
 <dd><p>the threshold used to assign perturbation indicators to cells; counts above the threshold are set to 1 (indicating "perturbed"), and counts below the threshold are set to 0 (indicating "unperturbed")</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a binary matrix of perturbation assignments</p>
+    
+
+<p>a binary matrix of perturbation assignments</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu">threshold_gRNA_matrix</span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="data.html">data</a></span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">perturbation_matrix</span> <span class="op">&lt;-</span> <span class="fu">threshold_gRNA_matrix</span><span class="op">(</span><span class="va">gRNA_matrix</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -79,13 +84,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy
-Barry</a>, Eugene Katsevich.</p>
+  <p></p><p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

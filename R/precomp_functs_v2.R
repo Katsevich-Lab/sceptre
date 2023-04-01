@@ -7,6 +7,7 @@
 #' @param fam a string indicating the family to use in the regression (either "nb" or "poisson")
 #'
 #' @return a named vector of fitted coefficients, alongside the fitted size parameter (named "gene_theta") if fam == "nb"
+#' @noRd
 run_gene_precomputation_v2 <- function(expressions, covariate_matrix, fam) {
   # second backup: method of moments
   backup_2 <- function(pois_fit) {
@@ -51,6 +52,7 @@ run_gene_precomputation_v2 <- function(expressions, covariate_matrix, fam) {
 #' @param covariate_matrix the covariate matrix on which to regress (NOTE: should contain an interecept term)
 #'
 #' @return a named vector of fitted coefficients
+#' @noRd
 run_grna_precomputation_v2 <- function(indicators, covariate_matrix) {
   fit <- stats::glm(formula = indicators ~ . + 0, family = "binomial", data = covariate_matrix)
   ret <- stats::coef(fit)
@@ -66,6 +68,7 @@ run_grna_precomputation_v2 <- function(indicators, covariate_matrix) {
 #' @param B the number of resampled vectors to create
 #'
 #' @return a sparse matrix (of dimension n x B) containing the resampled indicators
+#' @noRd
 generate_synthetic_grna_data <- function(fitted_probs, B) {
   draws_idxs <- lapply(X = fitted_probs, FUN = function(prob) {
     draws <- stats::rbinom(n = B, size = 1, prob = prob)

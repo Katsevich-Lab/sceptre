@@ -30,16 +30,17 @@ reference:
 - title: Core function
   contents:
   - run_sceptre_high_moi
+  - sceptre
 
 - title: Auxiliary functions
   contents:
   - threshold_gRNA_matrix
   - combine_perturbations
   - make_qq_plot
-  - plot_result
 
 - title: Data
   contents:
+  - data
   - gene_matrix
   - gRNA_matrix
   - covariate_matrix
