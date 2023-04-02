@@ -1,6 +1,6 @@
 Package: sceptre
-Title: Robustly Infer Regulatory Relationships in Single-Cell CRISPR Screen Experiments
-Version: 0.1.0
+Title: Robust Differential Expression Analysis for Single-Cell CRISPR Screens
+Version: 0.5.0
 Authors@R: 
     c(person(given = "Timothy",
            family = "Barry",
@@ -13,42 +13,38 @@ Authors@R:
            person(given = "John",
            family = "Morris",
            role = c("ctb")),
-           person(given = "Xuran",
-           family = "Wang",
-           role = "ctb"),
            person(given = "Kathryn",
            family = "Roeder",
            role = "ths"))
-Description: SCEPTRE (analysis of single cell perturbation screens via conditional resampling) is a method for single-cell CRISPR screen analysis. SCEPTRE infers gene-perturbation associations by modeling the random assortment of CRISPR guide RNAs among cells instead of gene expression, thereby remaining valid despite confounder presence and arbitrary misspecification of the gene expression model.
+Description: `sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by methodological and algorithmic advances in robust association analysis via resampling score statistics and fast permutation testing. `sceptre` has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
-Imports: 
-    sn,
-    VGAM,
-    stats,
-    MASS,
-    fst,
-    dplyr,
-    magrittr,
-    purrr,
-    methods,
-    Matrix,
+Imports:
+    BH,
+    cowplot,
     crayon,
     data.table,
-    R.utils
+    dplyr,
+    ggplot2,
+    MASS,
+    Matrix,
+    methods,
+    Rcpp (>= 1.0.9),
+    stats
 Depends: 
     R (>= 4.1)
-Suggests: 
+Suggests:
     knitr,
-    rmarkdown,
-    tidyr,
-    ggplot2,
-    foreach,
     doParallel,
-    tidyverse,
-    cowplot,
-    scales
+    foreach,
+    fst,
+    purrr,
+    R.utils,
+    scales,
+    sn,
+    tidyr,
+    VGAM
 VignetteBuilder: knitr
