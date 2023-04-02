@@ -10,16 +10,16 @@ NULL
 #' A gene-by-cell expression matrix.
 #'
 #' @inheritSection data Overview
-#' @usage data(gene_matrix)
-"gene_matrix"
+#' @usage data(gene_matrix_highmoi)
+"gene_matrix_highmoi"
 
 #' gRNA expression matrix
 #'
 #' A gRNA-by-cell expression matrix.
 #'
 #' @inheritSection data Overview
-#' @usage data(gRNA_matrix)
-"gRNA_matrix"
+#' @usage data(gRNA_matrix_highmoi)
+"gRNA_matrix_highmoi"
 
 #' Covariate matrix
 #'
@@ -31,19 +31,19 @@ NULL
 #'   \item{`batch`}{(factor) sequencing batch (`batch_1`, `batch_2`)}
 #' }
 #' @inheritSection data Overview
-#' @usage data(covariate_matrix)
-"covariate_matrix"
+#' @usage data(covariate_matrix_highmoi)
+"covariate_matrix_highmoi"
 
 #' Gene-gRNA group pairs
 #'
 #' The pairs of genes and gRNA groups that we seek to test for association. Columns `gene_id` (required), `gRNA_group` (required), and `pair_type` (optional).
 #' @inheritSection data Overview
-#' @usage data(gene_gRNA_group_pairs)
-"gene_gRNA_group_pairs"
+#' @usage data(gene_gRNA_group_pairs_highmoi)
+"gene_gRNA_group_pairs_highmoi"
 
 #' gRNA groups table
 #'
 #' A data frame that maps each gRNA ID to its gRNA group and gRNA type. The columns are `gRNA_id` (required), `gRNA_group` (required), and `gRNA_type` (optional).
 #' @inheritSection data Overview
-#' @usage data(gRNA_groups_table)
-"gRNA_groups_table"
+#' @usage data(gRNA_groups_table_highmoi)
+"gRNA_groups_table_highmoi"
