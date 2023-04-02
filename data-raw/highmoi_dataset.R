@@ -4,8 +4,8 @@ library(ondisc)
 library(magrittr)
 
 # set the Gasperini directory
-gasp_fp <- paste0(.get_config_path("LOCAL_GASPERINI_2019_DATA_DIR"), "at-scale/")
-pairs_ungrouped <- readRDS(paste0(gasp_fp, "processed/gRNA_ungrouped/pairs_ungrouped.rds"))
+gasp_fp <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/")
+pairs_ungrouped <- readRDS(paste0(gasp_fp, "processed/pairs_ungrouped.rds"))
 n_cells <- 40000
 
 #########################################
@@ -17,18 +17,18 @@ gene_gRNA_pairs_raw <- pairs_ungrouped |>
   distinct()
 gene_gRNA_pairs_pc_candidate <- rbind(
   gene_gRNA_pairs_raw |>
-    filter(site_type == "selfTSS") |>
+    dplyr::filter(site_type == "selfTSS") |>
     sample_n(5),
   gene_gRNA_pairs_raw |>
-    filter(site_type == "DHS") |>
+    dplyr::filter(site_type == "DHS") |>
     sample_n(15)
 )
 my_gene_ids <- gene_gRNA_pairs_pc_candidate$gene_id |>
   as.character() |> unique()
 neg_control_gRNAs <- gene_gRNA_pairs_raw |>
-  filter(site_type == "NTC") |>
+  dplyr::filter(site_type == "NTC") |>
   pull(gRNA_group) |> unique() |>
-  sample(., size = 5) |> as.character()
+  sample(size = 5) |> as.character()
 gene_gRNA_pairs_NTC <- expand.grid(gene_id = my_gene_ids, gRNA_group = neg_control_gRNAs) |>
   mutate(site_type = "NTC")
 gene_gRNA_pairs <- rbind(gene_gRNA_pairs_pc_candidate,
@@ -43,10 +43,10 @@ my_gRNA_groups <- unique(as.character(gene_gRNA_pairs$gRNA_group))
 # 2. Construct gRNA groups data frame
 #####################################
 gRNA_groups_table <- pairs_ungrouped |> select(gRNA_group, barcode, site_type) |>
-  distinct() |> filter(gRNA_group %in% my_gRNA_groups) |> filter(site_type != "TSS") |>
+  distinct() |> dplyr::filter(gRNA_group %in% my_gRNA_groups) |> dplyr::filter(site_type != "TSS") |>
   rename(gRNA_id = barcode, gRNA_type = site_type) |>
   mutate(gRNA_type = factor(gRNA_type, c("DHS", "selfTSS", "NTC"), c("enh_target", "tss_target", "non_target"))) |>
-  mutate_all(.tbl = ., .funs = as.character) |>
+  mutate_all(.funs = as.character) |>
   arrange(gRNA_type) |>
   select(gRNA_id, gRNA_group, gRNA_type)
 my_gRNA_ids <- as.character(gRNA_groups_table$gRNA_id)
@@ -117,4 +117,21 @@ gene_gRNA_pairs$gRNA_group <- simplify_grna_names(gene_gRNA_pairs$gRNA_group )
 gRNA_groups_table$gRNA_group <- simplify_grna_names(gRNA_groups_table$gRNA_group)
 gene_gRNA_group_pairs <- gene_gRNA_pairs
 
-usethis::use_data(gene_matrix, gRNA_matrix, covariate_matrix, gene_gRNA_group_pairs, gRNA_groups_table, overwrite = TRUE)
+data("gene_matrix_highmoi")
+data("covariate_matrix_highmoi")
+data("gRNA_matrix_highmoi")
+data("gRNA_groups_table_highmoi")
+data("gene_gRNA_group_pairs_highmoi")
+
+covariate_matrix_highmoi <- covariate_matrix
+gene_gRNA_group_pairs_highmoi <- gene_gRNA_group_pairs
+gene_matrix_highmoi <- gene_matrix
+gRNA_groups_table_highmoi <- gRNA_groups_table
+gRNA_matrix_highmoi <- gRNA_matrix
+
+usethis::use_data(gene_matrix_highmoi,
+                  gRNA_matrix_highmoi,
+                  covariate_matrix_highmoi,
+                  gene_gRNA_group_pairs_highmoi,
+                  gRNA_groups_table_highmoi,
+                  overwrite = TRUE)

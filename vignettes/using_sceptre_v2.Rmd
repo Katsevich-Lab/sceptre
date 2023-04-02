@@ -21,9 +21,13 @@ This vignette illustrates application of `sceptre` to an example high-multiplici
 ```{r, eval=FALSE}
 install.packages("devtools")
 devtools::install_github("katsevich-lab/sceptre")
-install.packages("tidyverse")
-install.packages("cowplot")
+
+packages <- c("doParallel", "foreach", "fst", "purrr",
+              "R.utils", "scales", "sn", "tidyr", "VGAM")
+for (pack in packages) install.packages(pack)
 ```
+
+We `library` the packages whose functions we will be calling in the tutorial.
 
 ```{r, message=FALSE, warning=FALSE}
 library(dplyr)
@@ -44,8 +48,10 @@ The first step is to prepare the data to pass to `sceptre`. We must prepare thre
 We load the example gene-by-cell and gRNA-by-cell expression matrices that are included in the `sceptre` package.
 
 ```{r}
-data(gene_matrix)
-data(gRNA_matrix)
+data(gene_matrix_highmoi)
+gene_matrix <- gene_matrix_highmoi
+data(gRNA_matrix_highmoi)
+gRNA_matrix <- gRNA_matrix_highmoi
 ```
 
 Briefly, `gene_matrix` (respectively, `gRNA_matrix`) is a 20 x 40,000 (respectively, 50 x 40,000) matrix of gene (respectively, gRNA) unique molecular identifier (UMI) counts. The data are taken from the [paper](https://www.sciencedirect.com/science/article/pii/S009286741831554X) "A genome-wide framework for mapping gene regulation via cellular genetic screens" by Gasperini et al., 2019. The authors used a CRISPRi-based assay to target 5,000+ putative enhancers in a population of K562 cells. The authors additionally targeted 200+ gene transcription start sites (TSSs) and designed a library of 50 non-targeting gRNAs to serve as negative controls. Genes, gRNAs, and cells are all down-sampled to reduce the size of the data. One can use the commands `?gene_matrix` and `?gRNA_matrix` to read more about these data.
@@ -85,7 +91,8 @@ As expected, the data are highly discrete counts. Note that we do *not* normaliz
 Next, we load the cell-wise covariate matrix, `covariate_matrix`.
 
 ```{r}
-data(covariate_matrix)
+data(covariate_matrix_highmoi)
+covariate_matrix <- covariate_matrix_highmoi
 head(covariate_matrix)
 ```
 
@@ -123,7 +130,8 @@ perturbation_matrix[1:10, 1:3]
 The third step is to combine gRNAs that target the same chromosomal location. Information about the genomic position that each gRNA targets is available in the `gRNA_groups_table`, which we explore below.
 
 ```{r}
-data("gRNA_groups_table")
+data(gRNA_groups_table_highmoi)
+gRNA_groups_table <- gRNA_groups_table_highmoi
 gRNA_groups_table[c(1, 2, 31, 32, 41, 42),] 
 ```
 
@@ -178,7 +186,8 @@ combined_perturbation_matrix[1:10,1:3]
 Step 4 is to determine the pairs of genes and gRNA groups to analyze. It is common to analyze pairs of genes and gRNA groups that are in close physical proximity to uncover *cis*-regulatory relationships. The data frame `gene_gRNA_group_pairs` contains the 120 pairs of genes and gRNA groups that we will analyze in our analysis.
 
 ```{r}
-data(gene_gRNA_group_pairs)
+data(gene_gRNA_group_pairs_highmoi)
+gene_gRNA_group_pairs <- gene_gRNA_group_pairs_highmoi
 nrow(gene_gRNA_group_pairs)
 gene_gRNA_group_pairs[c(1:2, 6:7, 21:22),]
 ```
