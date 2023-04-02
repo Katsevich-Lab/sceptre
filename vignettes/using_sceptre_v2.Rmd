@@ -26,7 +26,8 @@ install.packages("cowplot")
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(cowplot)
 library(Matrix)
 library(sceptre)
@@ -66,11 +67,11 @@ We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG000
 example_gene <- gene_matrix["ENSG00000111057",]
 example_gRNA <- gRNA_matrix["TGTCAGTCCTCCCTCCCCCA",]
 
-hist_gene <- ggplot(data = example_gene %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+hist_gene <- ggplot(data = example_gene |> tibble(count = _) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "dodgerblue3", alpha = 0.7) +
   scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("Gene expressions") + ylab("") + theme_bw(base_size = 10)
 
-hist_gRNA <- ggplot(data = example_gRNA %>% tibble(count = .) %>% filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+hist_gRNA <- ggplot(data = example_gRNA |> tibble(count = _) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "orchid4", alpha = 0.7) +
   scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("gRNA expressions") + ylab("") + theme_bw(base_size = 10)
 
@@ -197,7 +198,7 @@ The fourth step is to determine the sideness of the statistical test. If we are 
 Whether we seek to test for an increase or decrease in gene expression (or either and increase *or* decrease) depends on (i) the genomic element being targeted, (ii) the CRISPR modality being used, and (iii) whether we are testing an association in *cis* or in *trans*. For example, if we perturb a putative enhancer via CRISPRi and test for an association between that enhancer and a gene in *cis*, then we should should test for a *decrease* in expression and therefore use a *left*-sided test. The following table summarizes whether a left-, right-, or two-tailed tailed test is appropriate as a function of the aforementioned variables.
 
 | Target element  |   CRISPR modality   | *Cis* or *trans* |     Testing for...     | Sidedness |
-|:---------------:|:-------------------:|:----------------:|:----------------------:|:---------:|
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
 | Enhancer or TSS | CRISPRi or CRISPRko |      *Cis*       | Decrease in expression |   Left    |
 |    Silencer     | CRISPRi or CRISPRko |      *Cis*       | Increase in expression |   Right   |
 | Enhancer or TSS |       CRISPRa       |      *Cis*       | Increase in expression |   Right   |
@@ -217,7 +218,7 @@ side <- "left"
 The sixth step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_group_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
 
 ```{r,eval=FALSE}
-result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+ result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
                                gene_gRNA_group_pairs = gene_gRNA_group_pairs,
@@ -225,12 +226,17 @@ result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
 ```
 
 ```{r,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+if (file.exists("highmoi_sceptre_result.rds")) {
+  result <- readRDS("highmoi_sceptre_result.rds")
+} else {
 result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
                                gene_gRNA_group_pairs = gene_gRNA_group_pairs,
                                side = side,
                                parallel = FALSE)
+ saveRDS(result, "highmoi_sceptre_result.rds")
+}
 ```
 
 **Note**: Users can supply the raw gRNA expression matrix they obtained from Step 1 or the perturbation matrix they obtained from Step 2 to the `combined_perturbation_matrix` argument, in which case `sceptre` treats each gRNA as its own group of one. We recommend against this usage unless the data consist of only a single gRNA per target.
@@ -248,7 +254,7 @@ head(result, 10)
 We must verify that the test is correctly calibrated. To this end we create a QQ-plot of the *p*-values corresponding to the negative control pairs. We extract the negative control *p*-values from the `result` data frame and pass them to the function `make_qq_plot`.
 
 ```{r, fig.width=5, fig.height=3, fig.retina=2}
-neg_control_p_vals <- result %>% filter(pair_type == "negative_control") %>% pull(p_value)
+neg_control_p_vals <- result |> dplyr::filter(pair_type == "negative_control") |> pull(p_value)
 qq_plot <- make_qq_plot(neg_control_p_vals)
 plot(qq_plot)
 ```
@@ -264,7 +270,7 @@ A forthcoming article will give recommendations for what to do if the QQ-plot re
 Next, to verify that the test is powerful (i.e., that the test is capable of detecting true relationships), we assess the power of the test on the positive control pairs. We extract the positive control *p*-values and examine their values.
 
 ```{r}
-pos_control_p_vals <- result %>% filter(pair_type == "positive_control") %>% pull(p_value)
+pos_control_p_vals <- result |> filter(pair_type == "positive_control") |> pull(p_value)
 pos_control_p_vals
 ```
 
@@ -275,8 +281,8 @@ The positive control *p*-values are all small, indicating that the test is power
 Finally, we produce the discovery set. We extract the *p*-values corresponding to the candidate pairs and apply a Benjamini-Hochberg (BH) correction to adjust for multiple testing.
 
 ```{r}
-candidate_pair_results <- result %>% filter(pair_type == "candidate")
-candidate_pair_results_p_adj <- candidate_pair_results %>%
+candidate_pair_results <- result |> filter(pair_type == "candidate")
+candidate_pair_results_p_adj <- candidate_pair_results |>
   mutate(p_val_adj = p.adjust(p_value, method = "BH"))
 head(candidate_pair_results_p_adj)
 ```
@@ -284,7 +290,7 @@ head(candidate_pair_results_p_adj)
 We call pairs with an adjusted *p*-value of less or equal than 0.1 significant; the discovery set (i.e., the set of significant pairs) has a false discovery rate (FDR) of 10%.
 
 ```{r}
-discovery_set <- candidate_pair_results_p_adj %>% filter(p_val_adj <= 0.1)
+discovery_set <- candidate_pair_results_p_adj |> filter(p_val_adj <= 0.1)
 ```
 
 The discovery set in this case is empty, as we tested only fifteen candidate pairs.

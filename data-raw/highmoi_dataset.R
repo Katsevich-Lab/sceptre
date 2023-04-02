@@ -1,4 +1,4 @@
-# example data from Xie dataset
+# example data from Gasperini dataset
 library(dplyr)
 library(ondisc)
 library(magrittr)
@@ -12,42 +12,42 @@ n_cells <- 40000
 # 1. Construct gene-gRNA pairs data frame
 #########################################
 set.seed(62)
-gene_gRNA_pairs_raw <- pairs_ungrouped %>%
-  select(gene_id, gRNA_group, site_type) %>%
+gene_gRNA_pairs_raw <- pairs_ungrouped |>
+  select(gene_id, gRNA_group, site_type) |>
   distinct()
 gene_gRNA_pairs_pc_candidate <- rbind(
-  gene_gRNA_pairs_raw %>%
-    filter(site_type == "selfTSS") %>%
+  gene_gRNA_pairs_raw |>
+    filter(site_type == "selfTSS") |>
     sample_n(5),
-  gene_gRNA_pairs_raw %>%
-    filter(site_type == "DHS") %>%
+  gene_gRNA_pairs_raw |>
+    filter(site_type == "DHS") |>
     sample_n(15)
 )
-my_gene_ids <- gene_gRNA_pairs_pc_candidate$gene_id %>%
-  as.character() %>% unique()
-neg_control_gRNAs <- gene_gRNA_pairs_raw %>%
-  filter(site_type == "NTC") %>%
-  pull(gRNA_group) %>% unique() %>%
-  sample(., size = 5) %>% as.character()
-gene_gRNA_pairs_NTC <- expand.grid(gene_id = my_gene_ids, gRNA_group = neg_control_gRNAs) %>%
+my_gene_ids <- gene_gRNA_pairs_pc_candidate$gene_id |>
+  as.character() |> unique()
+neg_control_gRNAs <- gene_gRNA_pairs_raw |>
+  filter(site_type == "NTC") |>
+  pull(gRNA_group) |> unique() |>
+  sample(., size = 5) |> as.character()
+gene_gRNA_pairs_NTC <- expand.grid(gene_id = my_gene_ids, gRNA_group = neg_control_gRNAs) |>
   mutate(site_type = "NTC")
 gene_gRNA_pairs <- rbind(gene_gRNA_pairs_pc_candidate,
-                         gene_gRNA_pairs_NTC) %>%
-  mutate_all(as.character) %>%
+                         gene_gRNA_pairs_NTC) |>
+  mutate_all(as.character) |>
   mutate(pair_type = factor(site_type, c("selfTSS", "DHS", "NTC"),
-                       c("positive_control", "candidate", "negative_control")),
+                            c("positive_control", "candidate", "negative_control")),
          site_type = NULL)
 my_gRNA_groups <- unique(as.character(gene_gRNA_pairs$gRNA_group))
 
 #####################################
 # 2. Construct gRNA groups data frame
 #####################################
-gRNA_groups_table <- pairs_ungrouped %>% select(gRNA_group, barcode, site_type) %>%
-  distinct() %>% filter(gRNA_group %in% my_gRNA_groups) %>% filter(site_type != "TSS") %>%
-  rename(gRNA_id = barcode, gRNA_type = site_type) %>%
-  mutate(gRNA_type = factor(gRNA_type, c("DHS", "selfTSS", "NTC"), c("enh_target", "tss_target", "non_target"))) %>%
-  mutate_all(.tbl = ., .funs = as.character) %>%
-  arrange(gRNA_type) %>%
+gRNA_groups_table <- pairs_ungrouped |> select(gRNA_group, barcode, site_type) |>
+  distinct() |> filter(gRNA_group %in% my_gRNA_groups) |> filter(site_type != "TSS") |>
+  rename(gRNA_id = barcode, gRNA_type = site_type) |>
+  mutate(gRNA_type = factor(gRNA_type, c("DHS", "selfTSS", "NTC"), c("enh_target", "tss_target", "non_target"))) |>
+  mutate_all(.tbl = ., .funs = as.character) |>
+  arrange(gRNA_type) |>
   select(gRNA_id, gRNA_group, gRNA_type)
 my_gRNA_ids <- as.character(gRNA_groups_table$gRNA_id)
 
@@ -64,8 +64,8 @@ gene_odm <- read_odm(odm_fp = paste0(gasp_fp, "processed/gene/gasp_scale_gene_ex
 # multimodal data; downsample cells
 ###################################
 multimodal_odm <- multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(gRNA = gRNA_odm,
-                                                                                gene = gene_odm))
-multimodal_odm <- multimodal_odm[,(multimodal_odm %>% get_cell_covariates() %>% pull(gRNA_n_umis)) != 0]
+                                                                               gene = gene_odm))
+multimodal_odm <- multimodal_odm[,(multimodal_odm |> get_cell_covariates() |> pull(gRNA_n_umis)) != 0]
 cell_ids <- sample(seq(1, ncol(multimodal_odm)), n_cells)
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
@@ -92,11 +92,11 @@ colnames(gRNA_matrix) <- my_cell_barcodes
 ##############################
 # Compute the covariate matrix
 ##############################
-covariate_matrix <- multimodal_odm_downsample %>% get_cell_covariates() %>%
+covariate_matrix <- multimodal_odm_downsample |> get_cell_covariates() |>
   summarize(lg_gRNA_lib_size = log(gRNA_n_umis),
-         lg_gene_lib_size = log(gene_n_umis),
-         p_mito = gene_p_mito,
-         batch = gene_batch)
+            lg_gene_lib_size = log(gene_n_umis),
+            p_mito = gene_p_mito,
+            batch = gene_batch)
 row.names(covariate_matrix) <- my_cell_barcodes
 
 ###############################

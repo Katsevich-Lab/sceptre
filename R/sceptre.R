@@ -2,10 +2,8 @@ utils::globalVariables(c("log_theta", "mean_gene_exp", "regularized", "pod_id", 
 
 #' sceptre
 #'
-#' SCEPTRE (analysis of single cell perturbation screens via conditional resampling) is a method for single-cell CRISPR screen analysis. SCEPTRE infers gene-perturbation associations by modeling the random assortment of CRISPR guide RNAs among cells instead of modeling gene expression, thereby remaining valid despite confounder presence and arbitrary misspecification of the gene expression model.
+#' `sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by several methodological and algorithmic advances in robust differential expression analysis and fast permutation testing. `sceptre` has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis.
 #'
 #' @docType package
-#' @importFrom magrittr %>%
-#' @import methods
 #' @name sceptre
 NULL
