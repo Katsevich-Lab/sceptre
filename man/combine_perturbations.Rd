@@ -22,8 +22,10 @@ The function combines binary (i.e., 0/1) perturbation vectors via a "max" operat
 }
 \examples{
 library(Matrix)
-data("gRNA_matrix")
-data("gRNA_groups_table")
+data("gRNA_matrix_highmoi")
+data("gRNA_groups_table_highmoi")
+gRNA_matrix <- gRNA_matrix_highmoi
+gRNA_groups_table <- gRNA_groups_table_highmoi
 perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 combined_perturbation_matrix <- combine_perturbations(perturbation_matrix, gRNA_groups_table)
 }

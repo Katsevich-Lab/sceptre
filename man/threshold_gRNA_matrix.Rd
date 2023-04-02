@@ -18,6 +18,7 @@ a binary matrix of perturbation assignments
 Thresholds a gRNA count matrix, producing a perturbation matrix.
 }
 \examples{
-data(gRNA_matrix)
+data(gRNA_matrix_highmoi)
+gRNA_matrix <- gRNA_matrix_highmoi
 perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 }

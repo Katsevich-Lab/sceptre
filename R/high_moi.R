@@ -1152,8 +1152,10 @@ make_qq_plot <- function(p_values, ci_level = 0.95, point_col = "royalblue4", al
 #'
 #' @examples
 #' library(Matrix)
-#' data("gRNA_matrix")
-#' data("gRNA_groups_table")
+#' data("gRNA_matrix_highmoi")
+#' data("gRNA_groups_table_highmoi")
+#' gRNA_matrix <- gRNA_matrix_highmoi
+#' gRNA_groups_table <- gRNA_groups_table_highmoi
 #' perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 #' combined_perturbation_matrix <- combine_perturbations(perturbation_matrix, gRNA_groups_table)
 combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
@@ -1191,7 +1193,8 @@ combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
 #' @export
 #'
 #' @examples
-#' data(gRNA_matrix)
+#' data(gRNA_matrix_highmoi)
+#' gRNA_matrix <- gRNA_matrix_highmoi
 #' perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix)
 threshold_gRNA_matrix <- function(gRNA_matrix, threshold = 3) {
   return(gRNA_matrix >= threshold)
