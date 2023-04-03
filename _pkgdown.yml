@@ -13,36 +13,46 @@ template:
 
 navbar:
   type: default
-  left:
-  - text: Function reference
-    href: reference/index.html
-  - text: Tutorial
-    href: articles/using_sceptre_v2.html
-  - text: "News"
-    href: news/index.html
-
-news:
- releases:
- - text: "sceptre 0.1.0"
-   href: reference/index.html/news-0.1.html
 
 reference:
-- title: Core function
+
+
+- title: Low MOI functions
+  contents:
+  - run_sceptre_lowmoi
+  - compute_cell_covariates
+  - generate_all_pairs
+  - plot_calibration_result
+  - compare_calibration_and_discovery_results
+  - make_volcano_plot
+  - obtain_discovery_set
+
+- title: Low MOI example data
+  contents:
+  - covariate_data_frame_lowmoi
+  - response_matrix_lowmoi
+  - grna_group_data_frame_lowmoi
+  - grna_matrix_lowmoi
+  - lowmoi_data
+
+- title: High MOI functions
   contents:
   - run_sceptre_high_moi
-  - sceptre
-
-- title: Auxiliary functions
-  contents:
   - threshold_gRNA_matrix
   - combine_perturbations
   - make_qq_plot
 
-- title: Data
+- title: High MOI example data
   contents:
-  - data
-  - gene_matrix
-  - gRNA_matrix
-  - covariate_matrix
-  - gRNA_groups_table
-  - gene_gRNA_group_pairs
+  - gene_matrix_highmoi
+  - gRNA_matrix_highmoi
+  - covariate_matrix_highmoi
+  - gRNA_groups_table_highmoi
+  - gene_gRNA_group_pairs_highmoi
+  - highmoi_data
+
+- title: Package information
+  contents:
+  - sceptre
+
+news:

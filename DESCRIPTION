@@ -47,5 +47,6 @@ Suggests:
     scales,
     sn,
     tidyr,
-    VGAM
+    VGAM,
+    rmarkdown
 VignetteBuilder: knitr
