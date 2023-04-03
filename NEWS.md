@@ -1,8 +1,12 @@
+# sceptre 0.5.0 (2023-04-03)
+
+Version 0.5.0 is a substantial update. We added functionality for low MOI analysis! The low MOI module is based new statistical methods and computational algorithms.
+
 # sceptre 0.1.0 (2022-03-10)
 
 Version 0.1.0 is a major update to `sceptre`. Usability and speed are improved considerably.
 
-## Usability
+### Usability
 
 -   The function `run_sceptre_gRNA_gene_pair`, which was redundant, is now deprecated.
 
@@ -16,7 +20,7 @@ Version 0.1.0 is a major update to `sceptre`. Usability and speed are improved c
 
 -   Numerous checks have been added to `run_sceptre_high_moi` ensure that the input is valid. For example, `run_sceptre_high_moi` checks that gene IDs and gRNA IDs in `gene_gRNA_pairs` are in fact subsets of the row names of `gene_matrix` and `gRNA_matrix`, respectively.
 
-## Speed
+### Speed
 
 Two accelerations have been implemented to improve speed. These accelerations do not affect the API of the package.
 

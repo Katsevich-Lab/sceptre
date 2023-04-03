@@ -3,6 +3,8 @@ url: timothy-barry.github.io/sceptre/
 authors:
   "Timothy Barry":
     href: https://timothy-barry.github.io/
+  "Eugene Katsevich":
+    href: https://ekatsevi.github.io/
 
 development:
   mode: auto

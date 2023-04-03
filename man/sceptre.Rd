@@ -5,5 +5,5 @@
 \alias{sceptre}
 \title{sceptre}
 \description{
-\code{sceptre} is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. \code{sceptre} is powered by several methodological and algorithmic advances in robust differential expression analysis and fast permutation testing. \code{sceptre} has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis.
+\code{sceptre} is a statistically principled, fast, memory-light, and user-friendly software for single-cell CRISPR screen analysis. sceptre achieves state-of-the-art calibration and power on single-cell CRISPR screen data by leveraging several methodological and algorithmic advances in assumption-lean and computationally efficient differential expression analysis. \code{sceptre} includes modules for analysis of low MOI and high MOI data.
 }

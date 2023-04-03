@@ -1,9 +1,9 @@
 ---
-title: "High MOI `sceptre` tutorial"
+title: "High MOI sceptre tutorial"
 output: rmarkdown::html_vignette
 author: Tim Barry & Gene Katsevich
 vignette: >
-  %\VignetteIndexEntry{High MOI `sceptre` tutorial}
+  %\VignetteIndexEntry{High MOI sceptre tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
