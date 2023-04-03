@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Low MOI `sceptre` tutorial • sceptre</title>
+<title>Low MOI sceptre tutorial • sceptre</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/lumen/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Low MOI `sceptre` tutorial">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Low MOI sceptre tutorial">
 <meta property="og:description" content="sceptre">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -50,10 +50,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/highmoi_tutorial.html">High MOI `sceptre` tutorial</a>
+      <a href="../articles/highmoi_tutorial.html">High MOI sceptre tutorial</a>
     </li>
     <li>
-      <a href="../articles/lowmoi_tutorial.html">Low MOI `sceptre` tutorial</a>
+      <a href="../articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
     </li>
   </ul>
 </li>
@@ -74,7 +74,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Low MOI <code>sceptre</code> tutorial</h1>
+      <h1 data-toc-skip>Low MOI sceptre tutorial</h1>
                         <h4 data-toc-skip class="author">Tim Barry</h4>
             
       
@@ -103,7 +103,7 @@ works. The entire script takes less than two minutes to run on a
 standard laptop.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre3</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># load the data associated with the experiment</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">response_matrix_lowmoi</span><span class="op">)</span> <span class="co"># gene-by-cell expression matrix</span></span>
@@ -354,8 +354,11 @@ gRNAs</em>). <code>sceptre</code> tests a given response-gRNA group pair
 for association by comparing the expression level of the response across
 cells that have been infected by (any gRNA within) the given gRNA group
 against cells that have been infected by a non-targeting gRNA.</p>
-<p><strong>Step 2: Determine the set of response-gRNA group pairs to
-analyze.</strong></p>
+</div>
+<div class="section level3">
+<h3 id="step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-">Step 2: Determine the set of response-gRNA group pairs to
+analyze.<a class="anchor" aria-label="anchor" href="#step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-"></a>
+</h3>
 <p>After preparing the data objects, we must determine the set of
 response-gRNA group pairs to test for association. This determination
 typically is made on the basis of the biological question under
@@ -386,8 +389,7 @@ should specify the set of response-gRNA group pairs to test for
 association.</p>
 </div>
 <div class="section level3">
-<h3 id="step-3-set-the-formula-object-">
-<strong>Step 3: Set the formula object</strong>.<a class="anchor" aria-label="anchor" href="#step-3-set-the-formula-object-"></a>
+<h3 id="step-3-set-the-formula-object-">Step 3: Set the formula object.<a class="anchor" aria-label="anchor" href="#step-3-set-the-formula-object-"></a>
 </h3>
 <p>The third step is to construct a formula object that specifies how to
 adjust for the cell-specific covariates. We recommend including the
@@ -403,9 +405,7 @@ necessary.</p>
 <span>                            <span class="va">bio_rep</span> <span class="op">+</span> <span class="va">p_mito</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="step-4-select-the-pairwise-quality-control-qc-threshold-">
-<strong>Step 4: Select the pairwise quality control (QC)
-threshold.</strong><a class="anchor" aria-label="anchor" href="#step-4-select-the-pairwise-quality-control-qc-threshold-"></a>
+<h3 id="step-4-select-the-pairwise-quality-control-qc-threshold-">Step 4: Select the pairwise quality control (QC) threshold.<a class="anchor" aria-label="anchor" href="#step-4-select-the-pairwise-quality-control-qc-threshold-"></a>
 </h3>
 <p>The fourth and final step of the setup is to select a pairwise QC
 threshold. We digress briefly to discuss QC in the context of
@@ -454,8 +454,7 @@ nonzero control cells.
 <p>Now that we have completed setup, we are ready to begin the data
 analysis.</p>
 <div class="section level3">
-<h3 id="step-5--run-the-calibration-check-">
-<strong>Step 5. Run the calibration check.</strong><a class="anchor" aria-label="anchor" href="#step-5--run-the-calibration-check-"></a>
+<h3 id="step-5--run-the-calibration-check-">Step 5. Run the calibration check.<a class="anchor" aria-label="anchor" href="#step-5--run-the-calibration-check-"></a>
 </h3>
 <p>We begin by running the “calibration check.” The calibration check
 verifies that <code>sceptre</code> controls the rate of false
@@ -559,8 +558,7 @@ calibration check is carried out on “matched” pairs devoid of biological
 signal.</p>
 </div>
 <div class="section level3">
-<h3 id="step-6-assess-calibration-">
-<strong>Step 6: Assess calibration.</strong><a class="anchor" aria-label="anchor" href="#step-6-assess-calibration-"></a>
+<h3 id="step-6-assess-calibration-">Step 6: Assess calibration.<a class="anchor" aria-label="anchor" href="#step-6-assess-calibration-"></a>
 </h3>
 <p>We next assess whether the negative control results are
 well-calibrated. To do so, we call the function
@@ -607,7 +605,9 @@ forthcoming.</p>
 <div class="section level2">
 <h2 id="part-iii-discovery-analysis">Part III: Discovery analysis<a class="anchor" aria-label="anchor" href="#part-iii-discovery-analysis"></a>
 </h2>
-<p><strong>Step 7. Run the discovery analysis.</strong></p>
+<div class="section level3">
+<h3 id="step-7--run-the-discovery-analysis-">Step 7. Run the discovery analysis.<a class="anchor" aria-label="anchor" href="#step-7--run-the-discovery-analysis-"></a>
+</h3>
 <p>Once we have verified that <code>sceptre</code> is adequately
 calibrated, we are ready to carry out the discovery analysis. We run the
 discovery analysis by calling <code>run_sceptre_lowmoi</code>, passing
@@ -684,10 +684,9 @@ the number of negative control pairs.</p>
 <span><span class="co">#&gt; [1] 6327</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">calibration_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6327</span></span></code></pre></div>
+</div>
 <div class="section level3">
-<h3 id="step-8--visualize-the-discovery-analysis-results-">
-<strong>Step 8. Visualize the discovery analysis
-results.</strong><a class="anchor" aria-label="anchor" href="#step-8--visualize-the-discovery-analysis-results-"></a>
+<h3 id="step-8--visualize-the-discovery-analysis-results-">Step 8. Visualize the discovery analysis results.<a class="anchor" aria-label="anchor" href="#step-8--visualize-the-discovery-analysis-results-"></a>
 </h3>
 <p>Next, we create a couple plots to help us visualize the discovery
 results. We plot the negative control p-values and the discovery
@@ -719,9 +718,7 @@ are called as insignificant.</p>
 <p><img src="volcano_plot.png" width="400px" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
-<h3 id="step-9-obtain-the-discovery-set-for-downstream-analysis-">
-<strong>Step 9: Obtain the discovery set for downstream
-analysis.</strong><a class="anchor" aria-label="anchor" href="#step-9-obtain-the-discovery-set-for-downstream-analysis-"></a>
+<h3 id="step-9-obtain-the-discovery-set-for-downstream-analysis-">Step 9: Obtain the discovery set for downstream analysis.<a class="anchor" aria-label="anchor" href="#step-9-obtain-the-discovery-set-for-downstream-analysis-"></a>
 </h3>
 <p>Finally, we obtain the discovery set. We pass
 <code>discovery_result</code> to <code>obtain_discovery_set</code>,
@@ -755,7 +752,7 @@ See the documentation of these functions for more information.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, Eugene Katsevich.</p>
+<p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, <a href="https://ekatsevi.github.io/" class="external-link">Eugene Katsevich</a>.</p>
 </div>
 
 <div class="pkgdown">

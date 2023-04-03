@@ -2,10 +2,10 @@ citHeader("To cite sceptre in publications, please use the following:")
 
 citEntry(entry = "article",
 author = "Timothy Barry, and Kaishu Mason, and Kathryn Roeder, and Eugene Katsevich",
-title = "Robust differential expression testing for single-cell CRISPR screens",
+title = "Robust differential expression analysis for single-cell CRISPR screens",
 journal = "Preprint",
 year = "2023",
-textVersion = "Barry, T., Mason, K., Roeder, K., Katsevich, E. (2023) Robust differential expression testing for single-cell CRISPR screens.")
+textVersion = "Barry, T., Mason, K., Roeder, K., Katsevich, E. (2023) Robust differential expression analysis for single-cell CRISPR screens.")
 
 citEntry(entry = "article",
   author = "Timothy Barry, and Xuran Wang, and John A Morris, Kathryn Roeder, and Eugene Katsevich",

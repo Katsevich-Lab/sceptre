@@ -2,7 +2,7 @@
 % Please edit documentation in R/high_moi.R
 \name{run_sceptre_high_moi}
 \alias{run_sceptre_high_moi}
-\title{Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data}
+\title{Run \code{sceptre} on high MOI data}
 \usage{
 run_sceptre_high_moi(
   gene_matrix,
@@ -45,7 +45,7 @@ run_sceptre_high_moi(
 the \code{gene_gRNA_group_pairs} data frame with new columns \code{p_value}, \code{z_value}, and \code{log_fold_change} appended. See "details" for a description of the output when \code{full_output} is set to TRUE.
 }
 \description{
-This function is the core function of the \code{sceptre} package. The function applies SCEPTRE to test for association between a set of gRNA groups and genes while controlling for technical confounders. The function returns a p-value for each pairwise test of association.
+The function applies SCEPTRE to test for association between a set of gRNA groups and genes in a high MOI experiment. The function returns a p-value and log fold change estimate for each pairwise test of association.
 }
 \details{
 Details are arranged from most to least important.
