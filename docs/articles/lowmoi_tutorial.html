@@ -162,9 +162,8 @@ that <code>sceptre</code> returns is high-quality. We then conduct the
 “discovery analysis,” which entails applying <code>sceptre</code> to the
 set of perturbation-gene pairs whose regulatory relationships we seek to
 learn. Finally, we create a couple plots to visualize the results and
-obtain the set of perturbation-gene relationships that
-<code>sceptre</code> has discovered. Below, we describe each step of the
-analysis procedure in greater detail.</p>
+obtain the discovery set. Below, we describe each step of the analysis
+procedure in greater detail.</p>
 </div>
 <div class="section level2">
 <h2 id="part-i-setup">Part I: Setup<a class="anchor" aria-label="anchor" href="#part-i-setup"></a>
@@ -283,11 +282,13 @@ and <code>p_mito</code> in their cell covariate matrix. When applicable,
 sequencing batch and/or biological replicate also should be included.
 Categorical variables (e.g., <code>bio_rep</code>) should be stored as
 factors or strings rather than integers.</p>
-<p><strong>Note</strong>: Users can compute the variables
-<code>response_n_umis</code>, <code>response_n_nonzero</code>, and
-<code>p_mito</code> for an input matrix using the <code>sceptre</code>
-function <code>compute_cell_covariates</code>. An demonstration of this
-function is below:</p>
+<details><summary><strong>How to compute the cell covariate matrix within
+<code>sceptre</code></strong>
+</summary><p>Users can compute the variables <code>response_n_umis</code>,
+<code>response_n_nonzero</code>, and <code>p_mito</code> for an input
+matrix using the <code>sceptre</code> function
+<code>compute_cell_covariates</code>. An demonstration of this function
+is below:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">covariate_data_frame_reduced</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compute_cell_covariates.html">compute_cell_covariates</a></span><span class="op">(</span><span class="va">response_matrix_lowmoi</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">covariate_data_frame_reduced</span><span class="op">)</span></span>
@@ -304,12 +305,12 @@ information via the dollar sign (<code>$</code>) operator.</p>
 <code class="sourceCode R"><span><span class="va">covariate_data_frame_reduced</span><span class="op">$</span><span class="va">bio_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rep_1"</span>, <span class="fl">9428</span><span class="op">)</span>,</span>
 <span>                                          <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rep_2"</span>, <span class="fl">6001</span><span class="op">)</span>,</span>
 <span>                                          <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"rep_3"</span>, <span class="fl">5300</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>We will use <code>covariate_data_frame_lowmoi</code> instead of the
+We will use <code>covariate_data_frame_lowmoi</code> instead of the
 above-computed <code>covariate_data_frame_reduced</code> throughout the
 rest of this tutorial, as the former was computed using the entire set
 of genes, while the latter was computed using the reduced set of 290
-genes.</p>
-<p>iv. The <strong>gRNA group table</strong> records the “gRNA group” to
+genes.
+</details><p>iv. The <strong>gRNA group table</strong> records the “gRNA group” to
 which each individual gRNA belongs. Typically, gRNAs that target the
 same genomic location are assigned to the same gRNA group. The example
 gRNA group table included in the <code>sceptre</code> package is stored
@@ -359,7 +360,7 @@ against cells that have been infected by a non-targeting gRNA.</p>
 <h3 id="step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-">Step 2: Determine the set of response-gRNA group pairs to
 analyze.<a class="anchor" aria-label="anchor" href="#step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-"></a>
 </h3>
-<p>After preparing the data objects, we must determine the set of
+<p>After preparing the data objects, we determine the set of
 response-gRNA group pairs to test for association. This determination
 typically is made on the basis of the biological question under
 investigation. For example, in an experiment that seeks to map enhancers
@@ -423,19 +424,19 @@ these forms of QC on their own if they choose before passing their data
 to <code>sceptre</code>.)</p>
 <p>For a given response-gRNA group pair, we define the “number of
 nonzero treatment cells” as the number of “treatment cells” (i.e., cells
-that have received a gRNA in the gRNA group) in which the response
-exhibits nonzero expression. Similarly, we define the “number of nonzero
-control cells” as the number of “control cells” (i.e., cells that have
-received a non-targeting gRNA) in which the response exhibits nonzero
-expression. The number of nonzero treatment cells and the number of
-nonzero control cells are good metrics of pair quality.
-<code>sceptre</code> filters out pairs for which the number of nonzero
-treatment cells or the number of nonzero control cells falls below some
-threshold. By default, this threshold is set to 7 for both metrics. (See
-the section “Pairwise QC” in Barry 2023 for a justification of this
-threshold.) While a threshold of 7 is a good starting point, users can
-experiment with different choices for this threshold by setting the
-parameters <code>n_nonzero_trt_thresh</code> and
+perturbed by the given gRNA group) in which the response exhibits
+nonzero expression. Similarly, we define the “number of nonzero control
+cells” as the number of “control cells” (i.e., cells that have received
+a non-targeting gRNA) in which the response exhibits nonzero expression.
+The number of nonzero treatment cells and the number of nonzero control
+cells are good metrics of pair quality. <code>sceptre</code> filters out
+pairs for which the number of nonzero treatment cells or the number of
+nonzero control cells falls below some threshold. By default, this
+threshold is set to 7 for both metrics. (See the section “Pairwise QC”
+in Barry 2023 for a justification of this threshold.) While a threshold
+of 7 is a good starting point, users can experiment with different
+choices for this threshold by setting the parameters
+<code>n_nonzero_trt_thresh</code> and
 <code>n_nonzero_cntrl_thresh</code> to different values in the
 <code>run_sceptre_lowmoi</code> function. The choice of pairwise QC
 threshold can impact the results, sometimes considerably. A simple
@@ -456,15 +457,15 @@ analysis.</p>
 <div class="section level3">
 <h3 id="step-5--run-the-calibration-check-">Step 5. Run the calibration check.<a class="anchor" aria-label="anchor" href="#step-5--run-the-calibration-check-"></a>
 </h3>
-<p>We begin by running the “calibration check.” The calibration check
-verifies that <code>sceptre</code> controls the rate of false
-discoveries on the dataset being analyzed. The calibration check
-consists of randomly grouping together NT gRNAs to form “negative
-control” gRNA groups. These negative control gRNA groups are then paired
-to a large set of randomly-selected responses, forming “negative
-control” response-gRNA group pairs. <code>sceptre</code> is applied to
-analyze these negative control response-gRNA group pairs. As the
-negative control pairs are devoid of biological signal, the p-values
+<p>We begin by running the “calibration check.” The calibration check is
+an analysis that verifies that <code>sceptre</code> is able to control
+the rate of false discoveries on the dataset under analysis. The
+calibration check consists of randomly grouping together NT gRNAs to
+form “negative control” gRNA groups. These negative control gRNA groups
+are then paired to a large set of randomly-selected responses, forming
+“negative control” response-gRNA group pairs. <code>sceptre</code> is
+applied to analyze these negative control response-gRNA group pairs. As
+the negative control pairs are devoid of biological signal, the p-values
 that <code>sceptre</code> produces on the negative control pairs should
 be uniformly distributed. Moreover, after an appropriate multiple
 testing correction, <code>sceptre</code> should make zero (or very few)
@@ -487,7 +488,9 @@ example invocation takes about 30 seconds to run.</p>
 <span>formula_object <span class="op">=</span> <span class="va">formula_object</span>,</span>
 <span>response_grna_group_pairs <span class="op">=</span> <span class="va">response_grna_group_pairs</span>,</span>
 <span>calibration_check <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># calibration_check TRUE</span></span></code></pre></div>
-<p>The output, <code>calibration_result</code>, is a data frame
+<details><summary><strong>Details about the <code>calibration_result</code>
+output</strong>
+</summary><p>The output, <code>calibration_result</code>, is a data frame
 containing 6,327 rows and six columns. Each row corresponds to a
 negative control response-gRNA group pair. The columns are as
 follows:</p>
@@ -502,7 +505,7 @@ constitute the gRNA group are listed, concatenated into a string via an
 ampersand (“&amp;”) separator.</li>
 <li>
 <code>n_nonzero_trt</code>: the number of “treatment cells” (i.e.,
-cells that received the negative control gRNA group) with nonzero
+cells perturbed by the negative control gRNA group) with nonzero
 response expression.</li>
 <li>
 <code>n_nonzero_cntrl</code>: the number of “control cells” (i.e.,
@@ -531,10 +534,12 @@ log-2 fold change in expression of the response.</li>
 <span><span class="co">#&gt; 4: 0.0005822327         0.1751009</span></span>
 <span><span class="co">#&gt; 5: 0.0006522506         0.2180436</span></span>
 <span><span class="co">#&gt; 6: 0.0013039292        -0.2703491</span></span></code></pre></div>
-<p>We pause briefly to discuss how the negative control pairs are
-constructed. Recall that our ultimate aim is to conduct a “discovery
-analysis” (step 7), which entails applying <code>sceptre</code> to the
-discovery response-gRNA group pairs specified in
+</details><details><summary><strong>Details about how negative control pairs are
+constructed</strong>
+</summary><p>We describe how the negative control pairs are constructed. Recall
+that our ultimate aim is to conduct a “discovery analysis” (step 7),
+which entails applying <code>sceptre</code> to the discovery
+response-gRNA group pairs specified in
 <code>response_grna_group_pairs</code>. The calibration check is
 “matched” to the discovery analysis in three important ways. First, the
 number of gRNAs assigned to each negative control gRNA group is equal to
@@ -556,6 +561,7 @@ that passes pairwise QC. In summary, the calibration check closely
 mirrors the discovery analysis, the difference being that the
 calibration check is carried out on “matched” pairs devoid of biological
 signal.</p>
+</details>
 </div>
 <div class="section level3">
 <h3 id="step-6-assess-calibration-">Step 6: Assess calibration.<a class="anchor" aria-label="anchor" href="#step-6-assess-calibration-"></a>
@@ -626,10 +632,13 @@ set to <code>FALSE</code>) computes a p-value and estimates the log-fold
 change for each response-gRNA group pair specified in
 <code>response_grna_group_pairs</code> (that passes QC). The columns of
 the output data frame, <code>discovery_result</code>, are the same as
-those of <code>calibration_result</code>. The <code>grna_group</code>
-column of <code>discovery_result</code>, however, contains targeting
-gRNA groups instead of negative control gRNA groups. Rows are sorted by
-<code>p_value</code>.</p>
+those of <code>calibration_result</code>. <code>response_id</code> and
+<code>grna_group</code> indicate the response and gRNA group that
+constitute the given pair; <code>n_nonzero_trt</code> and
+<code>n_nonzero_cntrl</code> are the number of nonzero treatment cells
+and nonzero control cells, respectively; and <code>p_value</code> and
+<code>log_2_fold_change</code> are the p-value and log-2 fold change for
+the pair. Rows are sorted by <code>p_value</code>.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">discovery_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    response_id grna_group n_nonzero_trt n_nonzero_cntrl       p_value</span></span>
@@ -665,7 +674,8 @@ bottom rows of the <code>discovery_result</code> data frame.</p>
 <span><span class="co">#&gt; 4:                NA</span></span>
 <span><span class="co">#&gt; 5:                NA</span></span>
 <span><span class="co">#&gt; 6:                NA</span></span></code></pre></div>
-<p>We briefly examine the discovery pairs that pass pairwise QC by
+<details><summary><strong>Details about the discovery pairs</strong>
+</summary><p>We briefly examine the discovery pairs that pass pairwise QC by
 filtering <code>discovery_result</code> for rows that do not contain
 <code>NA</code>.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -684,6 +694,7 @@ the number of negative control pairs.</p>
 <span><span class="co">#&gt; [1] 6327</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">calibration_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6327</span></span></code></pre></div>
+</details>
 </div>
 <div class="section level3">
 <h3 id="step-8--visualize-the-discovery-analysis-results-">Step 8. Visualize the discovery analysis results.<a class="anchor" aria-label="anchor" href="#step-8--visualize-the-discovery-analysis-results-"></a>
@@ -728,14 +739,18 @@ discoveries.</p>
 <code class="sourceCode R"><span><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/obtain_discovery_set.html">obtain_discovery_set</a></span><span class="op">(</span><span class="va">discovery_result</span><span class="op">)</span></span></code></pre></div>
 <p>We can use <code>discovery_set</code> for various downstream
 analyses.</p>
-<p><strong>Note</strong>: We have used the BH correction at level 0.1
-throughout this analysis. One can change the multiple testing correction
-procedure and level by setting the arguments
-<code>multiple_testing_correction</code> and <code>alpha</code> to
-different values in the functions <code>plot_calibration_result</code>,
+<details><summary><strong>Applying different multiple testing correction
+procedures</strong>
+</summary>
+We have used the BH correction at level 0.1 throughout this analysis.
+One can change the multiple testing correction procedure and level by
+setting the arguments <code>multiple_testing_correction</code> and
+<code>alpha</code> to different values in the functions
+<code>plot_calibration_result</code>,
 <code>compare_calibration_and_discovery_results</code>,
 <code>make_volcano_plot</code>, and <code>obtain_discovery_set</code>.
-See the documentation of these functions for more information.</p>
+See the documentation of these functions for more information.
+</details>
 </div>
 </div>
   </div>

@@ -39,7 +39,7 @@ reference:
 
 - title: High MOI functions
   contents:
-  - run_sceptre_high_moi
+  - run_sceptre_highmoi
   - threshold_gRNA_matrix
   - combine_perturbations
   - make_qq_plot

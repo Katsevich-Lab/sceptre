@@ -413,13 +413,13 @@
 #' gene_gRNA_group_pairs <- gene_gRNA_group_pairs |> sample_n(25)
 #
 #' # 3. run method (takes ~40s on an 8-core Macbook Pro)
-#' result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+#' result <- run_sceptre_highmoi(gene_matrix = gene_matrix,
 #' combined_perturbation_matrix = combined_perturbation_matrix,
 #' covariate_matrix = covariate_matrix,
 #' gene_gRNA_group_pairs = gene_gRNA_group_pairs,
 #' side = "left")
 #' }
-run_sceptre_high_moi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.0, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
+run_sceptre_highmoi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.0, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
   ##################
