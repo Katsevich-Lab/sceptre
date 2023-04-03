@@ -223,10 +223,10 @@ side <- "left"
 
 ## Step 6: Run the method
 
-The sixth step is to call the function `run_sceptre_high_moi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_group_pairs`, and `side`, all of which we prepared above. `run_sceptre_high_moi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_high_moi` by checking the documentation (`?run_sceptre_high_moi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
+The sixth step is to call the function `run_sceptre_highmoi` on the data. The most important arguments to this function are `gene_matrix`, `combined_perturbation_matrix`, `covariate_matrix`, `gene_gRNA_group_pairs`, and `side`, all of which we prepared above. `run_sceptre_highmoi` has several additional, optional arguments, which are set to reasonable defaults. One can read more about `run_sceptre_highmoi` by checking the documentation (`?run_sceptre_highmoi`). The function takes about 40 second to run on the example data on an 8-core Macbook Pro.
 
 ```{r,eval=FALSE}
- result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+ result <- run_sceptre_highmoi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
                                gene_gRNA_group_pairs = gene_gRNA_group_pairs,
@@ -237,7 +237,7 @@ The sixth step is to call the function `run_sceptre_high_moi` on the data. The m
 if (file.exists("highmoi_sceptre_result.rds")) {
   result <- readRDS("highmoi_sceptre_result.rds")
 } else {
-result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
+result <- run_sceptre_highmoi(gene_matrix = gene_matrix,
                                combined_perturbation_matrix = combined_perturbation_matrix,
                                covariate_matrix = covariate_matrix,
                                gene_gRNA_group_pairs = gene_gRNA_group_pairs,
@@ -251,7 +251,7 @@ result <- run_sceptre_high_moi(gene_matrix = gene_matrix,
 
 ## Step 7. Analyze the results
 
-The output of `run_sceptre_high_moi` is a data frame called `result`, which is simply `gene_gRNA_pairs` with two additional columns: `p_value`, and `z_value`. `p_value` is the SCEPTRE *p*-value for a given pair, and `z_value` is the z-value of a negative binomial GLM fitted to the data for a given pair. Positive z-values indicate increased expression, and negative z-values indicate decreased expression. We examine several rows of `result` below.
+The output of `run_sceptre_highmoi` is a data frame called `result`, which is simply `gene_gRNA_pairs` with two additional columns: `p_value`, and `z_value`. `p_value` is the SCEPTRE *p*-value for a given pair, and `z_value` is the z-value of a negative binomial GLM fitted to the data for a given pair. Positive z-values indicate increased expression, and negative z-values indicate decreased expression. We examine several rows of `result` below.
 
 ```{r}
 head(result, 10)

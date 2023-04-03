@@ -143,7 +143,9 @@ head(covariate_data_frame_lowmoi)
 
 There are four covariates: `response_n_umis` (i.e., the total number of gene UMIs sequenced in the cell), `response_n_nonzero` (i.e., the total number of genes expressed in the cell), `bio_rep` (i.e., the biological replicate in which the cell was sequenced, one of `rep_1`, `rep_2`, and `rep_3`) and `p_mito` (i.e., the proportion of sequenced gene transcripts that map to mitochondrial genes). We strongly recommend that users include the variables `response_n_umis`, `response_n_nonzero`, and `p_mito` in their cell covariate matrix. When applicable, sequencing batch and/or biological replicate also should be included. Categorical variables (e.g., `bio_rep`) should be stored as factors or strings rather than integers.
 
-**Note**: Users can compute the variables `response_n_umis`, `response_n_nonzero`, and `p_mito` for an input matrix using the `sceptre` function `compute_cell_covariates`. An demonstration of this function is below:
+<details>
+<summary>**How to compute the cell covariate matrix within `sceptre`**</summary>
+Users can compute the variables `response_n_umis`, `response_n_nonzero`, and `p_mito` for an input matrix using the `sceptre` function `compute_cell_covariates`. An demonstration of this function is below:
 
 ```{r}
 covariate_data_frame_reduced <- compute_cell_covariates(response_matrix_lowmoi)
@@ -159,6 +161,7 @@ covariate_data_frame_reduced$bio_rep <- c(rep("rep_1", 9428),
 ```
 
 We will use `covariate_data_frame_lowmoi` instead of the above-computed `covariate_data_frame_reduced` throughout the rest of this tutorial, as the former was computed using the entire set of genes, while the latter was computed using the reduced set of 290 genes.
+</details>
 
 iv\. The **gRNA group table** records the "gRNA group" to which each individual gRNA belongs. Typically, gRNAs that target the same genomic location are assigned to the same gRNA group. The example gRNA group table included in the `sceptre` package is stored in the variable `grna_group_data_frame_lowmoi`.
 
@@ -210,7 +213,7 @@ formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) +
 
 The fourth and final step of the setup is to select a pairwise QC threshold. We digress briefly to discuss QC in the context of single-cell CRISPR screens. Three types of QC that are common in single-cell CRISPR screen analysis are response-wise QC, gRNA-wise QC, and cell-wise QC, which aim to filter out low-quality responses, low-quality gRNAs, and low-quality cells, respectively. A fourth type of QC, *pairwise QC*, aims to filter out low-quality response-gRNA group pairs. Pairwise QC, though not currently widespread in the single-cell CRISPR screen space, arguably is the most important type of QC in single-cell CRISPR screen analysis. `sceptre` provides support for pairwise QC. (`sceptre` does not currently implement response-wise, gRNA-wise, or cell-wise QC; users can implement these forms of QC on their own if they choose before passing their data to `sceptre`.)
 
-For a given response-gRNA group pair, we define the "number of nonzero treatment cells" as the number of "treatment cells" (i.e., cells that have received the gRNA group) in which the response exhibits nonzero expression. Similarly, we define the "number of nonzero control cells" as the number of "control cells" (i.e., cells that have received a non-targeting gRNA) in which the response exhibits nonzero expression. The number of nonzero treatment cells and the number of nonzero control cells are good metrics of pair quality. `sceptre` filters out pairs for which the number of nonzero treatment cells or the number of nonzero control cells falls below some threshold. By default, this threshold is set to 7 for both metrics. (See the section "Pairwise QC" in Barry 2023 for a justification of this threshold.) While a threshold of 7 is a good starting point, users can experiment with different choices for this threshold by setting the parameters `n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` to different values in the `run_sceptre_lowmoi` function. The choice of pairwise QC threshold can impact the results, sometimes considerably. A simple illustration of pairwise QC is below.
+For a given response-gRNA group pair, we define the "number of nonzero treatment cells" as the number of "treatment cells" (i.e., cells perturbed by the given gRNA group) in which the response exhibits nonzero expression. Similarly, we define the "number of nonzero control cells" as the number of "control cells" (i.e., cells that have received a non-targeting gRNA) in which the response exhibits nonzero expression. The number of nonzero treatment cells and the number of nonzero control cells are good metrics of pair quality. `sceptre` filters out pairs for which the number of nonzero treatment cells or the number of nonzero control cells falls below some threshold. By default, this threshold is set to 7 for both metrics. (See the section "Pairwise QC" in Barry 2023 for a justification of this threshold.) While a threshold of 7 is a good starting point, users can experiment with different choices for this threshold by setting the parameters `n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` to different values in the `run_sceptre_lowmoi` function. The choice of pairwise QC threshold can impact the results, sometimes considerably. A simple illustration of pairwise QC is below.
 
 ```{r, out.width = "550px", fig.align="center", echo = FALSE, fig.cap=c("Pairwise QC using a default threshold of 7 nonzero treatment cells and 7 nonzero control cells.")}
 knitr::include_graphics("qc_crop.png")
@@ -236,11 +239,14 @@ response_grna_group_pairs = response_grna_group_pairs,
 calibration_check = TRUE) # calibration_check TRUE
 ```
 
+<details>
+<summary>**Details about the `calibration_result` output**</summary>
+
 The output, `calibration_result`, is a data frame containing 6,327 rows and six columns. Each row corresponds to a negative control response-gRNA group pair. The columns are as follows:
 
 -   `response_id`: the response in the given negative control response-gRNA group pair.
 -   `grna_group`: the gRNA group in the given negative control response-gRNA group pair. The individual NT gRNAs that constitute the gRNA group are listed, concatenated into a string via an ampersand ("&") separator.
--   `n_nonzero_trt`: the number of "treatment cells" (i.e., cells that received the negative control gRNA group) with nonzero response expression.
+-   `n_nonzero_trt`: the number of "treatment cells" (i.e., cells perturbed by the negative control gRNA group) with nonzero response expression.
 -   `n_nonzero_cntrl`: the number of "control cells" (i.e., NT-receiving cells that did *not* receive the negative control gRNA group) with nonzero response expression.
 -   `p_value`: the `sceptre` p-value for the test of association between the gRNA group and the response.
 -   `log_2_fold_change`: the `sceptre`-estimated log-2 fold change in expression of the response.
@@ -265,7 +271,12 @@ print_progress = FALSE)
 head(calibration_result)
 ```
 
-We pause briefly to discuss how the negative control pairs are constructed. Recall that our ultimate aim is to conduct a "discovery analysis" (step 7), which entails applying `sceptre` to the discovery response-gRNA group pairs specified in `response_grna_group_pairs`. The calibration check is "matched" to the discovery analysis in three important ways. First, the number of gRNAs assigned to each negative control gRNA group is equal to the median number of gRNAs per targeting gRNA group (four, in the case of the example data). Second, the negative control pairs are subjected to the same pairwise QC to which the discovery pairs are subjected. In particular, the minimum number of treatment cells with nonzero expression (`n_nonzero_trt`) and the minimum number of control cells with nonzero expression (`n_nonzero_cntrl`) are both greater than or equal to seven, the default QC threshold.
+</details>
+
+<details>
+<summary>**Details about how negative control pairs are constructed**</summary>
+
+We describe how the negative control pairs are constructed. Recall that our ultimate aim is to conduct a "discovery analysis" (step 7), which entails applying `sceptre` to the discovery response-gRNA group pairs specified in `response_grna_group_pairs`. The calibration check is "matched" to the discovery analysis in three important ways. First, the number of gRNAs assigned to each negative control gRNA group is equal to the median number of gRNAs per targeting gRNA group (four, in the case of the example data). Second, the negative control pairs are subjected to the same pairwise QC to which the discovery pairs are subjected. In particular, the minimum number of treatment cells with nonzero expression (`n_nonzero_trt`) and the minimum number of control cells with nonzero expression (`n_nonzero_cntrl`) are both greater than or equal to seven, the default QC threshold.
 
 ```{r}
 min(calibration_result$n_nonzero_trt)
@@ -273,6 +284,8 @@ min(calibration_result$n_nonzero_cntrl)
 ```
 
 Finally, as we will confirm shortly, the number of negative control pairs analyzed (i.e., 6,327) is equal to the number of discovery pairs that passes pairwise QC. In summary, the calibration check closely mirrors the discovery analysis, the difference being that the calibration check is carried out on "matched" pairs devoid of biological signal.
+
+</details>
 
 ### Step 6: Assess calibration.
 
@@ -332,7 +345,7 @@ print_progress = FALSE)
 }
 ```
 
-`run_sceptre_lowmoi` (with `calibration_check` set to `FALSE`) computes a p-value and estimates the log-fold change for each response-gRNA group pair specified in `response_grna_group_pairs` (that passes QC). The columns of the output data frame, `discovery_result`, are the same as those of `calibration_result`. The `grna_group` column of `discovery_result`, however, contains targeting gRNA groups instead of negative control gRNA groups. Rows are sorted by `p_value`.
+`run_sceptre_lowmoi` (with `calibration_check` set to `FALSE`) computes a p-value and estimates the log-fold change for each response-gRNA group pair specified in `response_grna_group_pairs` (that passes QC). The columns of the output data frame, `discovery_result`, are the same as those of `calibration_result`. `response_id` and `grna_group` indicate the response and gRNA group that constitute the given pair; `n_nonzero_trt` and `n_nonzero_cntrl` are the number of nonzero treatment cells and nonzero control cells, respectively; and `p_value` and `log_2_fold_change` are the p-value and log-2 fold change for the pair. Rows are sorted by `p_value`.
 
 ```{r}
 head(discovery_result)
@@ -343,6 +356,9 @@ Pairs that fail to pass QC are assigned a `p_value` and `log_2_fold_change` of `
 ```{r}
 tail(discovery_result)
 ```
+
+<details>
+<summary>**Details about the discovery pairs**</summary>
 
 We briefly examine the discovery pairs that pass pairwise QC by filtering `discovery_result` for rows that do not contain `NA`.
 
@@ -363,6 +379,8 @@ Moreover, the number of discovery pairs that passes QC is equal to the number of
 nrow(discovery_result_pass_qc)
 nrow(calibration_result)
 ```
+
+</details>
 
 ### Step  8. Visualize the discovery analysis results.
 
@@ -408,4 +426,7 @@ discovery_set <- obtain_discovery_set(discovery_result)
 
 We can use `discovery_set` for various downstream analyses.
 
-**Note**: We have used the BH correction at level 0.1 throughout this analysis. One can change the multiple testing correction procedure and level by setting the arguments `multiple_testing_correction` and `alpha` to different values in the functions `plot_calibration_result`, `compare_calibration_and_discovery_results`, `make_volcano_plot`, and `obtain_discovery_set`. See the documentation of these functions for more information.
+<details>
+<summary>**Applying different multiple testing correction procedures**</summary>
+We have used the BH correction at level 0.1 throughout this analysis. One can change the multiple testing correction procedure and level by setting the arguments `multiple_testing_correction` and `alpha` to different values in the functions `plot_calibration_result`, `compare_calibration_and_discovery_results`, `make_volcano_plot`, and `obtain_discovery_set`. See the documentation of these functions for more information.
+</details>
