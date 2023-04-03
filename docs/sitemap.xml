@@ -10,13 +10,13 @@
     <loc>timothy-barry.github.io/sceptre/LICENSE.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/articles/highmoi_tutorial.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/articles/index.html</loc>
   </url>
   <url>
-    <loc>timothy-barry.github.io/sceptre/articles/using_sceptre.html</loc>
-  </url>
-  <url>
-    <loc>timothy-barry.github.io/sceptre/articles/using_sceptre_v2.html</loc>
+    <loc>timothy-barry.github.io/sceptre/articles/lowmoi_tutorial.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/authors.html</loc>
@@ -40,7 +40,19 @@
     <loc>timothy-barry.github.io/sceptre/reference/combine_perturbations.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/compare_calibration_and_discovery_results.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/compute_cell_covariates.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/covariate_data_frame_lowmoi.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/covariate_matrix.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/covariate_matrix_highmoi.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/create_and_store_dictionaries.html</loc>
@@ -52,13 +64,22 @@
     <loc>timothy-barry.github.io/sceptre/reference/gRNA_groups_table.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gRNA_groups_table_highmoi.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/gRNA_grps.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/gRNA_matrix.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gRNA_matrix_highmoi.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_group_pairs.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_group_pairs_highmoi.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/gene_gRNA_pairs.html</loc>
@@ -67,13 +88,40 @@
     <loc>timothy-barry.github.io/sceptre/reference/gene_matrix.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/gene_matrix_highmoi.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/generate_all_pairs.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/grna_group_data_frame_lowmoi.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/grna_matrix_lowmoi.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/highmoi_data.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/index.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/initialize_directories.html</loc>
   </url>
   <url>
+    <loc>timothy-barry.github.io/sceptre/reference/lowmoi_data.html</loc>
+  </url>
+  <url>
     <loc>timothy-barry.github.io/sceptre/reference/make_qq_plot.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/make_volcano_plot.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/obtain_discovery_set.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/plot_calibration_result.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/plot_resampling_distribution.html</loc>
@@ -86,6 +134,9 @@
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/regularize_gene_sizes_at_scale.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/response_matrix_lowmoi.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/run_gRNA_gene_pair_analysis_at_scale.html</loc>
@@ -107,6 +158,9 @@
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/run_sceptre_in_memory.html</loc>
+  </url>
+  <url>
+    <loc>timothy-barry.github.io/sceptre/reference/run_sceptre_lowmoi.html</loc>
   </url>
   <url>
     <loc>timothy-barry.github.io/sceptre/reference/sceptre.html</loc>

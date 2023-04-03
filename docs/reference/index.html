@@ -23,13 +23,23 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
-  <a href="../reference/index.html">Function reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/highmoi_tutorial.html">High MOI `sceptre` tutorial</a>
+    </li>
+    <li>
+      <a href="../articles/lowmoi_tutorial.html">Low MOI `sceptre` tutorial</a>
+    </li>
+  </ul></li>
 <li>
-  <a href="../articles/using_sceptre_v2.html">Tutorial</a>
-</li>
-<li>
-  <a href="../news/index.html">News</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"></ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -44,7 +54,63 @@
     </div>
 
     <table class="ref-index"><colgroup><col class="alias"><col class="title"></colgroup><tbody><tr><th colspan="2">
-          <h2 id="core-function">Core function <a href="#core-function" class="anchor" aria-hidden="true"></a></h2>
+          <h2 id="low-moi-functions">Low MOI functions <a href="#low-moi-functions" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="run_sceptre_lowmoi.html">run_sceptre_lowmoi()</a></code> </p>
+        </td>
+        <td><p>Run <code>sceptre</code> on low MOI data</p></td>
+      </tr><tr><td>
+          <p><code><a href="compute_cell_covariates.html">compute_cell_covariates()</a></code> </p>
+        </td>
+        <td><p>Compute cell covariates</p></td>
+      </tr><tr><td>
+          <p><code><a href="generate_all_pairs.html">generate_all_pairs()</a></code> </p>
+        </td>
+        <td><p>Generate all pairs</p></td>
+      </tr><tr><td>
+          <p><code><a href="plot_calibration_result.html">plot_calibration_result()</a></code> </p>
+        </td>
+        <td><p>Plot calibration result</p></td>
+      </tr><tr><td>
+          <p><code><a href="compare_calibration_and_discovery_results.html">compare_calibration_and_discovery_results()</a></code> </p>
+        </td>
+        <td><p>Compare calibration and discovery results</p></td>
+      </tr><tr><td>
+          <p><code><a href="make_volcano_plot.html">make_volcano_plot()</a></code> </p>
+        </td>
+        <td><p>Make volcano plot</p></td>
+      </tr><tr><td>
+          <p><code><a href="obtain_discovery_set.html">obtain_discovery_set()</a></code> </p>
+        </td>
+        <td><p>Obtain discovery set</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="low-moi-example-data">Low MOI example data <a href="#low-moi-example-data" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="covariate_data_frame_lowmoi.html">covariate_data_frame_lowmoi</a></code> </p>
+        </td>
+        <td><p>Covariate data frame</p></td>
+      </tr><tr><td>
+          <p><code><a href="response_matrix_lowmoi.html">response_matrix_lowmoi</a></code> </p>
+        </td>
+        <td><p>Response expression matrix</p></td>
+      </tr><tr><td>
+          <p><code><a href="grna_group_data_frame_lowmoi.html">grna_group_data_frame_lowmoi</a></code> </p>
+        </td>
+        <td><p>gRNA group data frame</p></td>
+      </tr><tr><td>
+          <p><code><a href="grna_matrix_lowmoi.html">grna_matrix_lowmoi</a></code> </p>
+        </td>
+        <td><p>gRNA expression matrix</p></td>
+      </tr><tr><td>
+          <p><code><a href="lowmoi_data.html">lowmoi_data</a></code> </p>
+        </td>
+        <td><p><code>sceptre</code> package example low MOI data</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="high-moi-functions">High MOI functions <a href="#high-moi-functions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
@@ -52,14 +118,6 @@
         </td>
         <td><p>Run SCEPTRE on high multiplicity-of-infection single-cell CRISPR screen data</p></td>
       </tr><tr><td>
-          <p><code><a href="sceptre.html">sceptre</a></code> </p>
-        </td>
-        <td><p>sceptre</p></td>
-      </tr></tbody><tbody><tr><th colspan="2">
-          <h2 id="auxiliary-functions">Auxiliary functions <a href="#auxiliary-functions" class="anchor" aria-hidden="true"></a></h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr></tbody><tbody><tr><td>
           <p><code><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix()</a></code> </p>
         </td>
         <td><p>Threshold gRNA count matrix</p></td>
@@ -72,33 +130,41 @@
         </td>
         <td><p>Make QQ-plot</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h2 id="data">Data <a href="#data" class="anchor" aria-hidden="true"></a></h2>
+          <h2 id="high-moi-example-data">High MOI example data <a href="#high-moi-example-data" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="data.html">data</a></code> </p>
-        </td>
-        <td><p><code>sceptre</code> package example data</p></td>
-      </tr><tr><td>
-          <p><code><a href="gene_matrix.html">gene_matrix</a></code> </p>
+          <p><code><a href="gene_matrix_highmoi.html">gene_matrix_highmoi</a></code> </p>
         </td>
         <td><p>Gene expression matrix</p></td>
       </tr><tr><td>
-          <p><code><a href="gRNA_matrix.html">gRNA_matrix</a></code> </p>
+          <p><code><a href="gRNA_matrix_highmoi.html">gRNA_matrix_highmoi</a></code> </p>
         </td>
         <td><p>gRNA expression matrix</p></td>
       </tr><tr><td>
-          <p><code><a href="covariate_matrix.html">covariate_matrix</a></code> </p>
+          <p><code><a href="covariate_matrix_highmoi.html">covariate_matrix_highmoi</a></code> </p>
         </td>
         <td><p>Covariate matrix</p></td>
       </tr><tr><td>
-          <p><code><a href="gRNA_groups_table.html">gRNA_groups_table</a></code> </p>
+          <p><code><a href="gRNA_groups_table_highmoi.html">gRNA_groups_table_highmoi</a></code> </p>
         </td>
         <td><p>gRNA groups table</p></td>
       </tr><tr><td>
-          <p><code><a href="gene_gRNA_group_pairs.html">gene_gRNA_group_pairs</a></code> </p>
+          <p><code><a href="gene_gRNA_group_pairs_highmoi.html">gene_gRNA_group_pairs_highmoi</a></code> </p>
         </td>
         <td><p>Gene-gRNA group pairs</p></td>
+      </tr><tr><td>
+          <p><code><a href="highmoi_data.html">highmoi_data</a></code> </p>
+        </td>
+        <td><p><code>sceptre</code> package example high MOI data</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="package-information">Package information <a href="#package-information" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="sceptre.html">sceptre</a></code> </p>
+        </td>
+        <td><p>sceptre</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

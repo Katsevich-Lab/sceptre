@@ -1,8 +1,9 @@
 ---
-title: "`sceptre` tutorial"
+title: "High MOI `sceptre` tutorial"
 output: rmarkdown::html_vignette
+author: Tim Barry & Gene Katsevich
 vignette: >
-  %\VignetteIndexEntry{`sceptre` tutorial}
+  %\VignetteIndexEntry{High MOI `sceptre` tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,8 +14,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
-Tim Barry & Eugene Katsevich, **Updated March 2022**
 
 This vignette illustrates application of `sceptre` to an example high-multiplicity-of-infection (MOI) single-cell CRISPR screen dataset. We begin by installing and loading all required packages, including the up-to-date version of `sceptre`.
 
