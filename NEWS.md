@@ -1,6 +1,6 @@
 # sceptre 0.5.0 (2023-04-03)
 
-Version 0.5.0 is a substantial update. We added functionality for low MOI analysis! The low MOI module is based new statistical methods and computational algorithms.
+Version 0.5.0 is a substantial update. We have added functionality for low MOI analysis! The low MOI module is based new statistical methods and computational algorithms.
 
 # sceptre 0.1.0 (2022-03-10)
 

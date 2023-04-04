@@ -55,6 +55,9 @@
     <li>
       <a href="../articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
     </li>
+    <li>
+      <a href="../articles/quality_control_in_low_moi.html">Low MOI Quality Control</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -78,6 +81,7 @@
                         <h4 data-toc-skip class="author">Tim Barry &amp;
 Gene Katsevich</h4>
             
+            <h4 data-toc-skip class="date">April 2023</h4>
       
       
       <div class="hidden name"><code>highmoi_tutorial.Rmd</code></div>
@@ -518,18 +522,18 @@ first row of the table.</p>
 <h2 id="step-6-run-the-method">Step 6: Run the method<a class="anchor" aria-label="anchor" href="#step-6-run-the-method"></a>
 </h2>
 <p>The sixth step is to call the function
-<code>run_sceptre_high_moi</code> on the data. The most important
+<code>run_sceptre_highmoi</code> on the data. The most important
 arguments to this function are <code>gene_matrix</code>,
 <code>combined_perturbation_matrix</code>,
 <code>covariate_matrix</code>, <code>gene_gRNA_group_pairs</code>, and
 <code>side</code>, all of which we prepared above.
-<code>run_sceptre_high_moi</code> has several additional, optional
+<code>run_sceptre_highmoi</code> has several additional, optional
 arguments, which are set to reasonable defaults. One can read more about
-<code>run_sceptre_high_moi</code> by checking the documentation
-(<code><a href="../reference/run_sceptre_high_moi.html">?run_sceptre_high_moi</a></code>). The function takes about 40 second
+<code>run_sceptre_highmoi</code> by checking the documentation
+(<code><a href="../reference/run_sceptre_highmoi.html">?run_sceptre_highmoi</a></code>). The function takes about 40 second
 to run on the example data on an 8-core Macbook Pro.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span> <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sceptre_high_moi.html">run_sceptre_high_moi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span>
+<code class="sourceCode R"><span> <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_sceptre_highmoi.html">run_sceptre_highmoi</a></span><span class="op">(</span>gene_matrix <span class="op">=</span> <span class="va">gene_matrix</span>,</span>
 <span>                               combined_perturbation_matrix <span class="op">=</span> <span class="va">combined_perturbation_matrix</span>,</span>
 <span>                               covariate_matrix <span class="op">=</span> <span class="va">covariate_matrix</span>,</span>
 <span>                               gene_gRNA_group_pairs <span class="op">=</span> <span class="va">gene_gRNA_group_pairs</span>,</span>
@@ -544,15 +548,14 @@ only a single gRNA per target.</p>
 <div class="section level2">
 <h2 id="step-7--analyze-the-results">Step 7. Analyze the results<a class="anchor" aria-label="anchor" href="#step-7--analyze-the-results"></a>
 </h2>
-<p>The output of <code>run_sceptre_high_moi</code> is a data frame
-called <code>result</code>, which is simply <code>gene_gRNA_pairs</code>
-with two additional columns: <code>p_value</code>, and
-<code>z_value</code>. <code>p_value</code> is the SCEPTRE
-<em>p</em>-value for a given pair, and <code>z_value</code> is the
-z-value of a negative binomial GLM fitted to the data for a given pair.
-Positive z-values indicate increased expression, and negative z-values
-indicate decreased expression. We examine several rows of
-<code>result</code> below.</p>
+<p>The output of <code>run_sceptre_highmoi</code> is a data frame called
+<code>result</code>, which is simply <code>gene_gRNA_pairs</code> with
+two additional columns: <code>p_value</code>, and <code>z_value</code>.
+<code>p_value</code> is the SCEPTRE <em>p</em>-value for a given pair,
+and <code>z_value</code> is the z-value of a negative binomial GLM
+fitted to the data for a given pair. Positive z-values indicate
+increased expression, and negative z-values indicate decreased
+expression. We examine several rows of <code>result</code> below.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 6</span></span></span>

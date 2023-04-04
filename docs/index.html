@@ -55,6 +55,9 @@
     <li>
       <a href="articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
     </li>
+    <li>
+      <a href="articles/quality_control_in_low_moi.html">Low MOI Quality Control</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -80,7 +83,7 @@
 <!-- badges: start -->
 <p><img src="https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg"></p>
 <!-- badges: end -->
-<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a statistically principled, fast, memory-light, and user-friendly software for single-cell CRISPR screen analysis. <code>sceptre</code> achieves state-of-the-art calibration and power on single-cell CRISPR screen data by leveraging several methodological and algorithmic advances in assumption-lean and computationally efficient differential expression analysis.</p>
+<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a statistically principled, fast, memory-light, and user-friendly software for single-cell CRISPR screen analysis. <code>sceptre</code> achieves state-of-the-art calibration and power on single-cell CRISPR screen data by leveraging several methodological and algorithmic advances in assumption-lean, computationally efficient differential expression analysis.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -94,7 +97,7 @@
 </h2>
 <p><code>sceptre</code> includes modules for low multiplicity-of-infection (MOI) and high MOI single-cell CRISPR screen analysis. These modules are based on distinct statistical methods.</p>
 <ul>
-<li><p><strong>Low MOI</strong>: If you are working with low MOI data (&lt; 2 gRNAs per cell), see the <a href="docs/articles/lowmoi_tutorial.html">low MOI tutorial</a>.</p></li>
+<li><p><strong>Low MOI</strong>: If you are working with low MOI data (&lt; 2 gRNAs per cell), see the <a href="lowmoi_tutorial.html">low MOI tutorial</a>.</p></li>
 <li><p><strong>High MOI</strong>: If you are working with high MOI data (&gt; 5 gRNAs per cell), see the <a href="docs/articles/highmoi_tutorial.html">high MOI tutorial</a>.</p></li>
 <li><p><strong>Large-scale analysis at low or high MOI</strong>: if you are running a large-scale analysis (i.e., the data do not easily fit into memory or you are using a high-performance cluster or cloud), see the <code>sceptre</code> <a href="">Nextflow pipeline</a>. This pipeline currently is under active development and is not yet stable. Open a Github issue or send an email if you are interested in using this pipeline, and we will do our best to provide support.</p></li>
 </ul>
