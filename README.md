@@ -17,7 +17,7 @@ statistically principled, fast, memory-light, and user-friendly software
 for single-cell CRISPR screen analysis. `sceptre` achieves
 state-of-the-art calibration and power on single-cell CRISPR screen data
 by leveraging several methodological and algorithmic advances in
-assumption-lean and computationally efficient differential expression
+assumption-lean, computationally efficient differential expression
 analysis.
 
 ## Installation
@@ -37,7 +37,7 @@ high MOI single-cell CRISPR screen analysis. These modules are based on
 distinct statistical methods.
 
 - **Low MOI**: If you are working with low MOI data (\< 2 gRNAs per
-  cell), see the [low MOI tutorial](docs/articles/lowmoi_tutorial.html).
+  cell), see the [low MOI tutorial](lowmoi_tutorial.html).
 
 - **High MOI**: If you are working with high MOI data (\> 5 gRNAs per
   cell), see the [high MOI
