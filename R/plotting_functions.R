@@ -38,7 +38,7 @@ plot_calibration_result <- function(calibration_result, alpha = 0.1, multiple_te
   p_a <- ggplot2::ggplot(data = calibration_result,
                          mapping = ggplot2::aes(y = p_value)) +
     stat_qq_points(ymin = 1e-8, size = 0.55,
-                                col = "darkblue",
+                                col = "firebrick2",
                                 alpha = 0.9) +
     stat_qq_band() +
     ggplot2::scale_x_reverse() +
@@ -50,7 +50,7 @@ plot_calibration_result <- function(calibration_result, alpha = 0.1, multiple_te
 
   p_b <- ggplot2::ggplot(data = calibration_result, mapping = ggplot2::aes(y = p_value)) +
     stat_qq_points(ymin = 1e-8, size = 0.55,
-                   col = "darkblue", alpha = 0.9) +
+                   col = "firebrick2", alpha = 0.9) +
     stat_qq_band() +
     ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
     ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
@@ -65,7 +65,7 @@ plot_calibration_result <- function(calibration_result, alpha = 0.1, multiple_te
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
     ggplot2::xlab("Estimated log fold change") + ggplot2::ylab("Density") +
-    ggplot2::geom_vline(xintercept = 0, col = "darkred", linewidth = 1) +
+    ggplot2::geom_vline(xintercept = 0, col = "firebrick2", linewidth = 1) +
     my_theme
 
   p_d <- ggplot2::ggplot() +
@@ -103,7 +103,8 @@ plot_calibration_result <- function(calibration_result, alpha = 0.1, multiple_te
 compare_calibration_and_discovery_results <- function(calibration_result, discovery_result, alpha = 0.1, multiple_testing_correction = "BH") {
   discovery_result <- discovery_result |> stats::na.omit()
   lab <- c(rep(factor("Negative control"), nrow(calibration_result)),
-           rep(factor("Discovery"), nrow(discovery_result)))
+           rep(factor("Discovery"), nrow(discovery_result))) |>
+    factor(levels = c("Discovery", "Negative control"))
 
   discovery_set <- obtain_discovery_set(discovery_result, alpha, multiple_testing_correction)
   thresh <- if (nrow(discovery_set) >= 1) max(discovery_set$p_value) else NULL
@@ -123,7 +124,7 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
     ggplot2::theme(legend.title = ggplot2::element_blank(),
                    legend.position = "bottom") +
     ggplot2::geom_hline(yintercept = thresh, linetype = "dashed") +
-    ggplot2::scale_color_manual(values = c("firebrick2", "dodgerblue3"))
+    ggplot2::scale_color_manual(values = c("dodgerblue3", "firebrick2"))
 }
 
 
@@ -151,17 +152,17 @@ get_my_theme <- function(element_text_size = 11) {
 #' @examples
 #' # See the example in the run_sceptre_lowmoi help file.
 #' ?run_sceptre_lowmoi
-make_volcano_plot <- function(discovery_result, alpha = 0.1, multiple_testing_correction = "BH") {
+make_volcano_plot <- function(discovery_result, alpha = 0.1, x_limits = c(-1.5, 1.5), transparency = 0.5, point_size = 0.9, multiple_testing_correction = "BH") {
   discovery_result <- discovery_result |> stats::na.omit()
   disc_set <- obtain_discovery_set(discovery_result, alpha, multiple_testing_correction)
   p_thresh <- max(disc_set$p_value)
   p_lower_lim <- 1e-12
   out <- ggplot2::ggplot(data = discovery_result |> dplyr::mutate(reject = p_value < p_thresh,
                                                                   p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
-                                                                  log_2_fold_change = ifelse(log_2_fold_change > 1.5, 1.5, log_2_fold_change),
-                                                                  log_2_fold_change = ifelse(log_2_fold_change < -1.5, -1.5, log_2_fold_change)),
+                                                                  log_2_fold_change = ifelse(log_2_fold_change > x_limits[2], x_limits[2], log_2_fold_change),
+                                                                  log_2_fold_change = ifelse(log_2_fold_change < x_limits[1], x_limits[1], log_2_fold_change)),
                   mapping = ggplot2::aes(x = log_2_fold_change, y = p_value, col = reject)) +
-    ggplot2::geom_point(alpha = 0.5, size = 0.9) +
+    ggplot2::geom_point(alpha = transparency, size = point_size) +
     ggplot2::scale_y_continuous(trans = revlog_trans(10), limits = c(1, 1e-12), expand = c(0.02, 0)) +
     get_my_theme() + ggplot2::xlab("Log fold change") + ggplot2::ylab("P-value") +
     ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") +
