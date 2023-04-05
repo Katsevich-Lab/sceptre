@@ -98,9 +98,9 @@ checkpoints with multimodal single-cell screens” by Papalexi et al.,
 2021. The authors of this study perturbed 26 genes hypothesized to play
 a role in the expression of immune checkpoint molecules and measured the
 effects of these perturbations via single-cell RNA sequencing.</p>
-<div class="section level2">
-<h2 id="initial-code-demonstration">Initial code demonstration<a class="anchor" aria-label="anchor" href="#initial-code-demonstration"></a>
-</h2>
+<div class="section level3">
+<h3 id="initial-code-demonstration">Initial code demonstration<a class="anchor" aria-label="anchor" href="#initial-code-demonstration"></a>
+</h3>
 <p>The code below is a self-contained and complete application of
 <code>sceptre</code> to the example data. Users can copy, paste, and
 execute this code in Rstudio to get a sense for how <code>sceptre</code>
@@ -151,24 +151,34 @@ standard laptop.</p>
 <span></span>
 <span><span class="co"># obtain the discovery set for downstream analysis</span></span>
 <span><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/obtain_discovery_set.html">obtain_discovery_set</a></span><span class="op">(</span><span class="va">discovery_result</span><span class="op">)</span></span></code></pre></div>
-<p>All <code>sceptre</code> analyses follow this general template.
-First, we load the data. Next, we construct the set of CRISPR
-perturbation-gene pairs that we seek to test for association. We then
-define a formula object, which specifies how <code>sceptre</code> is to
+<p>All <code>sceptre</code> analyses follow this general template.</p>
+<ul>
+<li><p><strong>Setup</strong>: We begin by setting up the analysis. This
+entails (1) loading the data; (2) constructing the set of CRISPR
+perturbation-gene pairs that we seek to test for association; and (3)
+defining a formula object that specifies how <code>sceptre</code> is to
 adjust for the cell-specific covariates (e.g., sequencing depth, batch,
-etc.). Subsequently, we carry out the “calibration check,” which
-involves applying <code>sceptre</code> to a set of
-automatically-generated negative control CRISPR perturbation-gene pairs
-(i.e., perturbation-gene pairs for which we know there is no regulatory
-relationship). The calibration check enables us to verify that
-<code>sceptre</code> controls the number of false discoveries on the
-dataset under analysis, which ultimately ensures that the discovery set
-that <code>sceptre</code> returns is high-quality. We then conduct the
-“discovery analysis,” which entails applying <code>sceptre</code> to the
-set of perturbation-gene pairs whose regulatory relationships we seek to
-learn. Finally, we create a couple plots to visualize the results and
-obtain the discovery set. Below, we describe each step of the analysis
-procedure in greater detail.</p>
+etc.).</p></li>
+<li><p><strong>Calibration check</strong>: We then carry out the
+“calibration check,” which involves applying <code>sceptre</code> to a
+set of automatically-generated negative control CRISPR perturbation-gene
+pairs (i.e., perturbation-gene pairs for which we know there is no
+regulatory relationship). The calibration check enables us to verify
+that <code>sceptre</code> controls the number of false discoveries on
+the dataset under analysis, which ultimately ensures that the discovery
+set that <code>sceptre</code> returns is high-quality. The calibration
+check entails (4) carrying out the calibration check itself and (5)
+visualizing the calibration check results.</p></li>
+<li><p><strong>Discovery analysis</strong>: We finally conduct the
+“discovery analysis,” which consists of applying <code>sceptre</code> to
+analyze the set of perturbation-gene pairs whose regulatory
+relationships we seek to learn. The discovery analysis entails (6)
+carrying out the discovery analysis itself, (7) visualizing the
+discovery analysis results, and (8) obtaining the final discovery
+set.</p></li>
+</ul>
+<p>Below, we describe each step of the analysis procedure in greater
+detail.</p>
 </div>
 <div class="section level2">
 <h2 id="part-i-setup">Part I: Setup<a class="anchor" aria-label="anchor" href="#part-i-setup"></a>
@@ -177,9 +187,9 @@ procedure in greater detail.</p>
 preparing the data to pass to <code>sceptre</code>, determining the set
 of CRISPR perturbation-gene pairs to test for association, and defining
 a formula object that specifies how to adjust for the covariates.</p>
-<div class="section level3">
-<h3 id="step-1-prepare-the-data-objects">Step 1: Prepare the data objects<a class="anchor" aria-label="anchor" href="#step-1-prepare-the-data-objects"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-1-prepare-the-data-objects">Step 1: Prepare the data objects<a class="anchor" aria-label="anchor" href="#step-1-prepare-the-data-objects"></a>
+</h4>
 <p>A single-cell CRISPR screen analysis involves four fundamental data
 objects: (i) the response-by-cell expression matrix, (ii) the
 gRNA-by-cell expression matrix, (iii) the cell covariate matrix, and
@@ -360,10 +370,10 @@ for association by comparing the expression level of the response across
 cells that have been infected by (any gRNA within) the given gRNA group
 against cells that have been infected by a non-targeting gRNA.</p>
 </div>
-<div class="section level3">
-<h3 id="step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-">Step 2: Determine the set of response-gRNA group pairs to
+<div class="section level4">
+<h4 id="step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-">Step 2: Determine the set of response-gRNA group pairs to
 analyze.<a class="anchor" aria-label="anchor" href="#step-2-determine-the-set-of-response-grna-group-pairs-to-analyze-"></a>
-</h3>
+</h4>
 <p>After preparing the data objects, we determine the set of
 response-gRNA group pairs to test for association. This determination
 typically is made on the basis of the biological question under
@@ -393,9 +403,9 @@ two columns: <code>response_id</code> and <code>grna_group</code>.</p>
 should specify the set of response-gRNA group pairs to test for
 association.</p>
 </div>
-<div class="section level3">
-<h3 id="step-3-set-the-formula-object-">Step 3: Set the formula object.<a class="anchor" aria-label="anchor" href="#step-3-set-the-formula-object-"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-3-set-the-formula-object-">Step 3: Set the formula object.<a class="anchor" aria-label="anchor" href="#step-3-set-the-formula-object-"></a>
+</h4>
 <p>The third step is to construct a formula object that specifies how to
 adjust for the cell-specific covariates. We recommend including the
 following covariates in the formula object:
@@ -403,21 +413,19 @@ following covariates in the formula object:
 <code>p_mito</code>, and (if applicable) sequencing batch and/or
 biological replicate. It is best practice to log-transform integer count
 variables (e.g., <code>response_n_umis</code>,
-<code>response_n_nonzero</code>), although this is not strictly speaking
-necessary.</p>
+<code>response_n_nonzero</code>).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">formula_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">response_n_umis</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">response_n_nonzero</span><span class="op">)</span> <span class="op">+</span></span>
 <span>                            <span class="va">bio_rep</span> <span class="op">+</span> <span class="va">p_mito</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-<div class="section level2">
-<h2 id="part-ii-calibration-check">Part II: Calibration check<a class="anchor" aria-label="anchor" href="#part-ii-calibration-check"></a>
-</h2>
+<div class="section level3">
+<h3 id="part-ii-calibration-check">Part II: Calibration check<a class="anchor" aria-label="anchor" href="#part-ii-calibration-check"></a>
+</h3>
 <p>Now that we have completed setup, we are ready to begin the data
 analysis.</p>
-<div class="section level3">
-<h3 id="step-4--run-the-calibration-check-">Step 4. Run the calibration check.<a class="anchor" aria-label="anchor" href="#step-4--run-the-calibration-check-"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-4--run-the-calibration-check-">Step 4. Run the calibration check.<a class="anchor" aria-label="anchor" href="#step-4--run-the-calibration-check-"></a>
+</h4>
 <p>We begin by running the “calibration check.” The calibration check is
 an analysis that verifies that <code>sceptre</code> is able to control
 the rate of false discoveries on the dataset under analysis. The
@@ -453,10 +461,9 @@ example invocation takes about 30 seconds to run.</p>
 containing p-values for negative control response-gRNA group pairs.</p>
 <details><summary><strong>Click here for a more detailed explanation of the calibration
 check analysis, which may be skipped on a first pass.</strong>
-</summary><p>The output, <code>calibration_result</code>, is a data frame
-containing 6,327 rows and six columns. Each row corresponds to a
-negative control response-gRNA group pair. The columns are as
-follows:</p>
+</summary><p><code>calibration_result</code> is a data frame containing 6,327 rows
+and six columns. Each row corresponds to a negative control
+response-gRNA group pair. The columns are as follows:</p>
 <ul>
 <li>
 <code>response_id</code>: the response in the given negative control
@@ -524,9 +531,9 @@ the difference being that the calibration check is carried out on
 “matched” pairs devoid of biological signal.</p>
 </details>
 </div>
-<div class="section level3">
-<h3 id="step-5-assess-calibration-">Step 5: Assess calibration.<a class="anchor" aria-label="anchor" href="#step-5-assess-calibration-"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-5-assess-calibration-">Step 5: Assess calibration.<a class="anchor" aria-label="anchor" href="#step-5-assess-calibration-"></a>
+</h4>
 <p>We next assess whether the negative control results are
 well-calibrated. To do so, we call the function
 <code><a href="../reference/plot_calibration_result.html">plot_calibration_result()</a></code>, which creates a visualization
@@ -559,22 +566,22 @@ close to zero; a number in the range [-0.1, 0.1] is adequate.</p></li>
 <p><code>sceptre</code> may not exhibit good calibration initially. This
 is OK. There are several strategies that a user can employ to improve
 the calibration of <code>sceptre</code>. First, one can increase the QC
-thresholds (see <a href="pairwise-qc.html">pairwise quality
-control</a>), which if not specified are set to sensible default values.
-Second, one can deactivate the asymptotic inference module of
-<code>sceptre</code> by setting <code>fit_skew_normal</code> to
-<code>FALSE</code>. Third, one can add additional, potentially relevant
-covariates to the <code>formula_object</code>. A complete article
-discussing strategies for improving the calibration of
-<code>sceptre</code> is forthcoming.</p>
+thresholds (see <a href="pairwise-qc.html">quality control</a>), which
+if not specified are set to sensible default values. Second, one can
+deactivate the asymptotic inference module of <code>sceptre</code> by
+setting <code>fit_skew_normal</code> to <code>FALSE</code>. Third, one
+can add additional, potentially relevant covariates to the
+<code>formula_object</code>. A complete article discussing strategies
+for improving the calibration of <code>sceptre</code> is
+forthcoming.</p>
 </div>
 </div>
-<div class="section level2">
-<h2 id="part-iii-discovery-analysis">Part III: Discovery analysis<a class="anchor" aria-label="anchor" href="#part-iii-discovery-analysis"></a>
-</h2>
 <div class="section level3">
-<h3 id="step-6--run-the-discovery-analysis-">Step 6. Run the discovery analysis.<a class="anchor" aria-label="anchor" href="#step-6--run-the-discovery-analysis-"></a>
+<h3 id="part-iii-discovery-analysis">Part III: Discovery analysis<a class="anchor" aria-label="anchor" href="#part-iii-discovery-analysis"></a>
 </h3>
+<div class="section level4">
+<h4 id="step-6--run-the-discovery-analysis-">Step 6. Run the discovery analysis.<a class="anchor" aria-label="anchor" href="#step-6--run-the-discovery-analysis-"></a>
+</h4>
 <p>Once we have verified that <code>sceptre</code> is adequately
 calibrated, we are ready to carry out the discovery analysis. We run the
 discovery analysis by calling <code>run_sceptre_lowmoi</code>, passing
@@ -636,9 +643,9 @@ bottom rows of the <code>discovery_result</code> data frame.</p>
 <span><span class="co">#&gt; 5:                NA</span></span>
 <span><span class="co">#&gt; 6:                NA</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="step-7--visualize-the-discovery-analysis-results-">Step 7. Visualize the discovery analysis results.<a class="anchor" aria-label="anchor" href="#step-7--visualize-the-discovery-analysis-results-"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-7--visualize-the-discovery-analysis-results-">Step 7. Visualize the discovery analysis results.<a class="anchor" aria-label="anchor" href="#step-7--visualize-the-discovery-analysis-results-"></a>
+</h4>
 <p>Next, we create a couple plots to help us visualize the discovery
 results. We plot the negative control p-values and the discovery
 p-values on the same Q-Q plot via a call to
@@ -668,9 +675,9 @@ are called as insignificant.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/make_volcano_plot.html">make_volcano_plot</a></span><span class="op">(</span>discovery_result <span class="op">=</span> <span class="va">discovery_result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="volcano_plot.png" width="400px" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level3">
-<h3 id="step-9-obtain-the-discovery-set-for-downstream-analysis-">Step 9: Obtain the discovery set for downstream analysis.<a class="anchor" aria-label="anchor" href="#step-9-obtain-the-discovery-set-for-downstream-analysis-"></a>
-</h3>
+<div class="section level4">
+<h4 id="step-9-obtain-the-discovery-set-for-downstream-analysis-">Step 9: Obtain the discovery set for downstream analysis.<a class="anchor" aria-label="anchor" href="#step-9-obtain-the-discovery-set-for-downstream-analysis-"></a>
+</h4>
 <p>Finally, we obtain the discovery set. We pass
 <code>discovery_result</code> to <code>obtain_discovery_set</code>,
 which returns the subset of response-gRNA group pairs that are called as
@@ -690,6 +697,7 @@ setting the arguments <code>multiple_testing_correction</code> and
 <code>make_volcano_plot</code>, and <code>obtain_discovery_set</code>.
 See the documentation of these functions for more information.</p>
 </details>
+</div>
 </div>
 </div>
   </div>
