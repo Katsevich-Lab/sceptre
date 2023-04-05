@@ -76,9 +76,17 @@ make_volcano_plot(discovery_result)
 discovery_set <- obtain_discovery_set(discovery_result)
 ```
 
-All `sceptre` analyses follow this general template. First, we load the data. Next, we construct the set of CRISPR perturbation-gene pairs that we seek to test for association. We then define a formula object, which specifies how `sceptre` is to adjust for the cell-specific covariates (e.g., sequencing depth, batch, etc.). Subsequently, we carry out the "calibration check," which involves applying `sceptre` to a set of automatically-generated negative control CRISPR perturbation-gene pairs (i.e., perturbation-gene pairs for which we know there is no regulatory relationship). The calibration check enables us to verify that `sceptre` controls the number of false discoveries on the dataset under analysis, which ultimately ensures that the discovery set that `sceptre` returns is high-quality. We then conduct the "discovery analysis," which entails applying `sceptre` to the set of perturbation-gene pairs whose regulatory relationships we seek to learn. Finally, we create a couple plots to visualize the results and obtain the discovery set. Below, we describe each step of the analysis procedure in greater detail.
+All `sceptre` analyses follow this general template.
 
-## Part I: Setup
+-   **Setup**: We begin by setting up the analysis. This entails (1) loading the data; (2) constructing the set of CRISPR perturbation-gene pairs that we seek to test for association; and (3) defining a formula object that specifies how `sceptre` is to adjust for the cell-specific covariates (e.g., sequencing depth, batch, etc.).
+
+-   **Calibration check**: We then carry out the "calibration check," which involves applying `sceptre` to a set of automatically-generated negative control CRISPR perturbation-gene pairs (i.e., perturbation-gene pairs for which we know there is no regulatory relationship). The calibration check enables us to verify that `sceptre` controls the number of false discoveries on the dataset under analysis, which ultimately ensures that the discovery set that `sceptre` returns is high-quality. The calibration check entails (4) carrying out the calibration check itself and (5) visualizing the calibration check results.
+
+-   **Discovery analysis**: We finally conduct the "discovery analysis," which consists of applying `sceptre` to analyze the set of perturbation-gene pairs whose regulatory relationships we seek to learn. The discovery analysis entails (6) carrying out the discovery analysis itself, (7) visualizing the discovery analysis results, and (8) obtaining the final discovery set.
+
+Below, we describe each step of the analysis procedure in greater detail.
+
+# Part I: Setup
 
 We begin by setting up the analysis. Setup consists of three steps: preparing the data to pass to `sceptre`, determining the set of CRISPR perturbation-gene pairs to test for association, and defining a formula object that specifies how to adjust for the covariates.
 
@@ -206,7 +214,7 @@ In general the `response_grna_group_pairs` data frame should specify the set of 
 
 ### Step 3: Set the formula object.
 
-The third step is to construct a formula object that specifies how to adjust for the cell-specific covariates. We recommend including the following covariates in the formula object: `response_n_umis`, `response_n_nonzero`, `p_mito`, and (if applicable) sequencing batch and/or biological replicate. It is best practice to log-transform integer count variables (e.g., `response_n_umis`, `response_n_nonzero`), although this is not strictly speaking necessary.
+The third step is to construct a formula object that specifies how to adjust for the cell-specific covariates. We recommend including the following covariates in the formula object: `response_n_umis`, `response_n_nonzero`, `p_mito`, and (if applicable) sequencing batch and/or biological replicate. It is best practice to log-transform integer count variables (e.g., `response_n_umis`, `response_n_nonzero`).
 
 ```{r}
 formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) +
@@ -239,7 +247,7 @@ The output, `calibration_result`, is a data frame containing p-values for negati
 
 <summary>**Click here for a more detailed explanation of the calibration check analysis, which may be skipped on a first pass.**</summary>
 
-The output, `calibration_result`, is a data frame containing 6,327 rows and six columns. Each row corresponds to a negative control response-gRNA group pair. The columns are as follows:
+`calibration_result` is a data frame containing 6,327 rows and six columns. Each row corresponds to a negative control response-gRNA group pair. The columns are as follows:
 
 -   `response_id`: the response in the given negative control response-gRNA group pair.
 -   `grna_group`: the gRNA group in the given negative control response-gRNA group pair. The individual NT gRNAs that constitute the gRNA group are listed, concatenated into a string via an ampersand ("&") separator.
@@ -303,7 +311,7 @@ knitr::include_graphics("calibration_result.png")
 
 -   Finally, the bottom right panel is a text box displaying (i) the number of false discoveries that `sceptre` makes on the negative control data (after a BH correction at level 0.1) and (ii) the mean estimated log-fold change. The number of false discoveries should be a small integer like zero, one, two, or three. (Zero is ideal.) The mean estimated log-fold change, meanwhile, should be a numeric value close to zero; a number in the range [-0.1, 0.1] is adequate.
 
-`sceptre` may not exhibit good calibration initially. This is OK. There are several strategies that a user can employ to improve the calibration of `sceptre`. First, one can increase the QC thresholds (see [pairwise quality control](pairwise-qc.html)), which if not specified are set to sensible default values. Second, one can deactivate the asymptotic inference module of `sceptre` by setting `fit_skew_normal` to `FALSE`. Third, one can add additional, potentially relevant covariates to the `formula_object`. A complete article discussing strategies for improving the calibration of `sceptre` is forthcoming.
+`sceptre` may not exhibit good calibration initially. This is OK. There are several strategies that a user can employ to improve the calibration of `sceptre`. First, one can increase the QC thresholds (see [quality control](pairwise-qc.html)), which if not specified are set to sensible default values. Second, one can deactivate the asymptotic inference module of `sceptre` by setting `fit_skew_normal` to `FALSE`. Third, one can add additional, potentially relevant covariates to the `formula_object`. A complete article discussing strategies for improving the calibration of `sceptre` is forthcoming.
 
 ## Part III: Discovery analysis
 
@@ -400,4 +408,3 @@ We can use `discovery_set` for various downstream analyses.
 We have used the BH correction at level 0.1 throughout this analysis. One can change the multiple testing correction procedure and level by setting the arguments `multiple_testing_correction` and `alpha` to different values in the functions `plot_calibration_result`, `compare_calibration_and_discovery_results`, `make_volcano_plot`, and `obtain_discovery_set`. See the documentation of these functions for more information.
 
 </details>
-

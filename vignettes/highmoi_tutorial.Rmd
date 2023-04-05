@@ -73,11 +73,11 @@ We also plot a histogram of the counts of an arbitrarily selected gene ("ENSG000
 example_gene <- gene_matrix["ENSG00000111057",]
 example_gRNA <- gRNA_matrix["TGTCAGTCCTCCCTCCCCCA",]
 
-hist_gene <- ggplot(data = example_gene |> tibble(count = _) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+hist_gene <- ggplot(data = tibble(count = example_gene) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "dodgerblue3", alpha = 0.7) +
   scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("Gene expressions") + ylab("") + theme_bw(base_size = 10)
 
-hist_gRNA <- ggplot(data = example_gRNA |> tibble(count = _) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
+hist_gRNA <- ggplot(data = tibble(count = example_gRNA) |> dplyr::filter(count >= 1, count <= 40), mapping = aes(x = count)) +
   geom_histogram(binwidth = 3, col = "black", fill = "orchid4", alpha = 0.7) +
   scale_y_continuous(trans='log10', expand = c(0, NA)) + xlab("gRNA expressions") + ylab("") + theme_bw(base_size = 10)
 
