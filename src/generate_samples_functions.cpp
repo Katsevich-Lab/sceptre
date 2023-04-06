@@ -128,4 +128,3 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
   Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
   return ptr;
 }
-
