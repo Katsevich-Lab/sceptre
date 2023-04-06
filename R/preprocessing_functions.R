@@ -4,19 +4,19 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if (!colnames_present) {
     stop("The data frame `grna_group_data_frame` must have columns `grna_id` and `grna_group`. The `grna_group` column should specify the group to which each `grna_id` belongs.")
   }
-  
+
   # 2. check for the presence of "non-targeting" in the grna_group column
   nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
   if (!nt_present) {
     stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
   }
-  
+
   # 3. verify that the row names are unique for both response and grna modalities
   response_ids <- rownames(response_matrix)
   grna_ids <- rownames(grna_matrix)
   if (length(response_ids) != length(unique(response_ids))) stop("The rownames of the `response_matrix` must be unique.")
   if (length(grna_ids) != length(unique(grna_ids))) stop("The rownames of the `grna_matrix` must be unique.")
- 
+
   # 4. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
   problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
   if (length(problematic_grna_ids) >= 1) {
@@ -25,7 +25,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if (any(grna_ids == "non-targeting")) {
     stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
   }
-  
+
   # 5. if the pairs to analyze have been specified...
     # i. verify that `grna_group` and `response_id` are columns
     all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
@@ -41,10 +41,10 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
     if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
       stop("The column `grna_group` of the `response_grna_group_pairs` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`.")
     }
-  
+
   # 6. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
-  
+
   # 7. check the covariate data frame has at least one column and that the variables in the formula object are a subset of the column names of the covariate data frame
   if (ncol(covariate_data_frame) == 0) {
     stop("The global cell covariate matrix must contain at least one column.")
@@ -54,7 +54,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if (!all(check_var)) {
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
-  
+
   # 8. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
     ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
@@ -64,22 +64,22 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   }
   check_matrix_class(response_matrix, "response_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix"))
   check_matrix_class(grna_matrix, "grna_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "lgTMatrix", "lgCMatrix", "lgRMatrix"))
-  
+
   # 9. check for agreement in number of cells
   check_ncells <- (ncol(response_matrix) == ncol(grna_matrix)) && (ncol(response_matrix) == nrow(covariate_data_frame))
   if (!check_ncells) {
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
   }
-  
+
   # 10. check the test statistic
   if(!(test_stat %in% c("full", "distilled"))) {
     stop("`test_stat` must be either `full` or `distilled`.")
   }
-  
+
   # 11. convert the `response_grna_group_pairs` data frame to a data table
   data.table::setDT(response_grna_group_pairs)
   data.table::setorderv(response_grna_group_pairs, cols = "response_id")
-  
+
   return(NULL)
 }
 
@@ -111,7 +111,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
       stop("Class not recognized.")
     }
     x <- matrix_in@x
-    
+
     # perform the sorting operation
     sort_in_place <- methods::is(matrix_in, "matrix") || methods::is(matrix_in, "dgTMatrix")
     if (sort_in_place) {
@@ -120,7 +120,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
     } else {
       dt <- data.table::data.table(i = i, j = j, x = x) # deep copy
     }
-    
+
     # finally, initialize the output
     if (make_row_accessible) {
       data.table::setorderv(x = dt, cols = c("i", "j"))
@@ -171,7 +171,7 @@ assign_grnas_to_cells_lowmoi_v2 <- function(grna_matrix, grna_group_data_frame, 
   grna_group_assignments <- grna_group_data_frame$grna_group[match(x = indiv_grna_id_assignments,
                                                                    table = grna_group_data_frame$grna_id)]
   grna_groups <- grna_group_data_frame$grna_group
-  
+
   # obtain all_nt_idxs
   out <- list()
 
@@ -184,12 +184,12 @@ assign_grnas_to_cells_lowmoi_v2 <- function(grna_matrix, grna_group_data_frame, 
     }) |> stats::setNames(unique_grna_groups)
     out$grna_group_idxs <- grna_group_idxs
   }
-  
+
   # if running a discovery analysis, add the indices of all NT gRNAs
   if (!calibration_check) {
     out$all_nt_idxs <- which(grna_group_assignments == "non-targeting")
   }
-  
+
   # if running a calibration check, add the indices of the individual NT gRNAs relative to all_nt_idxs
   if (calibration_check) {
     nt_grnas <- grna_group_data_frame |>
@@ -207,7 +207,7 @@ assign_grnas_to_cells_lowmoi_v2 <- function(grna_matrix, grna_group_data_frame, 
     out$all_nt_idxs <- all_nt_idxs
     out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
   }
-  
+
   return(out)
 }
 
@@ -220,6 +220,7 @@ get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, un
     out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
   } else { # discovery
     grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
+    grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
     range_grna_group_sizes <- range(grna_group_sizes)
     n_control_cells <- length(grna_assignments$all_nt_idxs)
     out <- hybrid_fisher_iwor_sampler(N = n_control_cells,
@@ -240,17 +241,17 @@ harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, test_st
   if (!fit_skew_normal) {
     assign(x = "B2", value = 0L, inherits = TRUE)
   }
-  
+
   assign(x = "full_test_stat", value = test_stat == "full",  inherits = TRUE)
   return (NULL)
 }
 
 
 #' Compute cell covariates
-#' 
+#'
 #' The \code{compute_cell_covariates()} function takes as input a feature-by-cell matrix and computes the cell covariates for that matrix.
 #'
-#' @param matrix_in a matrix with features (e.g., genes, gRNAs, or proteins) in the rows and cells in the columns. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. Row names are optional. 
+#' @param matrix_in a matrix with features (e.g., genes, gRNAs, or proteins) in the rows and cells in the columns. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. Row names are optional.
 #'
 #' @return a data frame containing the following cell covariates.
 #' \itemize{
