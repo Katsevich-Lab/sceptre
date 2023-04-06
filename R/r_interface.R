@@ -101,7 +101,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
                                formula_object, response_grna_group_pairs,
                                calibration_check, n_nonzero_trt_thresh = 7L,
                                n_nonzero_cntrl_thresh = 7L, return_debugging_metrics = FALSE,
-                               return_resampling_dist = FALSE,  fit_skew_normal = TRUE,
+                               return_resampling_dist = FALSE, fit_skew_normal = TRUE,
                                calibration_group_size = NULL, n_calibration_pairs = NULL,
                                test_stat = "full", B1 = 499L, B2 = 4999L, B3 = 24999L,
                                print_progress = TRUE) {

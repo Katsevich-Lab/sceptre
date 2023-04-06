@@ -2,15 +2,15 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 print_synthetic_idxs <- function(synthetic_idx_ptr, n_rows_to_print) {
-    invisible(.Call('_sceptre_print_synthetic_idxs', PACKAGE = 'sceptre', synthetic_idx_ptr, n_rows_to_print))
+    invisible(.Call(`_sceptre_print_synthetic_idxs`, synthetic_idx_ptr, n_rows_to_print))
 }
 
 print_n_synthetic_idxs <- function(synthetic_idx_ptr) {
-    invisible(.Call('_sceptre_print_n_synthetic_idxs', PACKAGE = 'sceptre', synthetic_idx_ptr))
+    invisible(.Call(`_sceptre_print_n_synthetic_idxs`, synthetic_idx_ptr))
 }
 
 synth_idx_list_to_matrix <- function(synthetic_idx_ptr) {
-    .Call('_sceptre_synth_idx_list_to_matrix', PACKAGE = 'sceptre', synthetic_idx_ptr)
+    .Call(`_sceptre_synth_idx_list_to_matrix`, synthetic_idx_ptr)
 }
 
 #' Estimate theta
@@ -25,7 +25,7 @@ synth_idx_list_to_matrix <- function(synthetic_idx_ptr) {
 #' @return the estimated theta
 #' @noRd
 estimate_theta <- function(y, mu, dfr, limit, eps) {
-    .Call('_sceptre_estimate_theta', PACKAGE = 'sceptre', y, mu, dfr, limit, eps)
+    .Call(`_sceptre_estimate_theta`, y, mu, dfr, limit, eps)
 }
 
 #' @title Fisher-Yates sampler
@@ -35,7 +35,7 @@ estimate_theta <- function(y, mu, dfr, limit, eps) {
 #' @param B the number of WOR samples to generate
 #' @noRd
 fisher_yates_samlper <- function(n_tot, M, B) {
-    .Call('_sceptre_fisher_yates_samlper', PACKAGE = 'sceptre', n_tot, M, B)
+    .Call(`_sceptre_fisher_yates_samlper`, n_tot, M, B)
 }
 
 #' @title Hybrid Fisher-Yates/IWOR sampler
@@ -46,82 +46,82 @@ fisher_yates_samlper <- function(n_tot, M, B) {
 #' @param B the number of WOR samples to generate
 #' @noRd
 hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
-    .Call('_sceptre_hybrid_fisher_iwor_sampler', PACKAGE = 'sceptre', N, m, M, B)
+    .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
 compute_observed_distilled_statistic <- function(a, b, n_cntrl) {
-    .Call('_sceptre_compute_observed_distilled_statistic', PACKAGE = 'sceptre', a, b, n_cntrl)
+    .Call(`_sceptre_compute_observed_distilled_statistic`, a, b, n_cntrl)
 }
 
 compute_null_distilled_statistics <- function(a, b, start_pos, B, n_trt, synthetic_idxs) {
-    .Call('_sceptre_compute_null_distilled_statistics', PACKAGE = 'sceptre', a, b, start_pos, B, n_trt, synthetic_idxs)
+    .Call(`_sceptre_compute_null_distilled_statistics`, a, b, start_pos, B, n_trt, synthetic_idxs)
 }
 
 run_low_level_test_distilled <- function(y, mu, a, b, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
-    .Call('_sceptre_run_low_level_test_distilled', PACKAGE = 'sceptre', y, mu, a, b, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
+    .Call(`_sceptre_run_low_level_test_distilled`, y, mu, a, b, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
 }
 
 run_low_level_test_full_v2 <- function(y, mu, a, w, D, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
-    .Call('_sceptre_run_low_level_test_full_v2', PACKAGE = 'sceptre', y, mu, a, w, D, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
+    .Call(`_sceptre_run_low_level_test_full_v2`, y, mu, a, w, D, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
 }
 
 sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot) {
-    .Call('_sceptre_sample_combinations', PACKAGE = 'sceptre', undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot)
+    .Call(`_sceptre_sample_combinations`, undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
-    .Call('_sceptre_iterate_over_combinations', PACKAGE = 'sceptre', n_nt_grnas, undercover_group_size, n_possible_groups)
+    .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
 sample_undercover_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL) {
-    .Call('_sceptre_sample_undercover_pairs', PACKAGE = 'sceptre', n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL)
+    .Call(`_sceptre_sample_undercover_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL)
 }
 
 increment_matrix <- function(m) {
-    invisible(.Call('_sceptre_increment_matrix', PACKAGE = 'sceptre', m))
+    invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
 load_nonzero_posits <- function(j, p, column_idx, y) {
-    invisible(.Call('_sceptre_load_nonzero_posits', PACKAGE = 'sceptre', j, p, column_idx, y))
+    invisible(.Call(`_sceptre_load_nonzero_posits`, j, p, column_idx, y))
 }
 
 compute_nt_nonzero_matrix_and_n_ok_pairs <- function(j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs) {
-    .Call('_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs', PACKAGE = 'sceptre', j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs)
+    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs`, j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs)
 }
 
 compute_n_nonzero_trt_vector <- function(expression_vector, grna_group_idxs, grna_group_posits) {
-    .Call('_sceptre_compute_n_nonzero_trt_vector', PACKAGE = 'sceptre', expression_vector, grna_group_idxs, grna_group_posits)
+    .Call(`_sceptre_compute_n_nonzero_trt_vector`, expression_vector, grna_group_idxs, grna_group_posits)
 }
 
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {
-    .Call('_sceptre_compute_empirical_p_value', PACKAGE = 'sceptre', null_statistics, z_orig, side)
+    .Call(`_sceptre_compute_empirical_p_value`, null_statistics, z_orig, side)
 }
 
 fit_skew_normal_funct <- function(y) {
-    .Call('_sceptre_fit_skew_normal_funct', PACKAGE = 'sceptre', y)
+    .Call(`_sceptre_fit_skew_normal_funct`, y)
 }
 
 check_sn_tail <- function(y, xi_hat, omega_hat, alpha_hat) {
-    .Call('_sceptre_check_sn_tail', PACKAGE = 'sceptre', y, xi_hat, omega_hat, alpha_hat)
+    .Call(`_sceptre_check_sn_tail`, y, xi_hat, omega_hat, alpha_hat)
 }
 
 fit_and_evaluate_skew_normal <- function(z_orig, null_statistics) {
-    .Call('_sceptre_fit_and_evaluate_skew_normal', PACKAGE = 'sceptre', z_orig, null_statistics)
+    .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
-    .Call('_sceptre_load_csr_row', PACKAGE = 'sceptre', j, p, x, row_idx, n_cells)
+    .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }
 
 obtain_pointer_vector <- function(i, dim) {
-    .Call('_sceptre_obtain_pointer_vector', PACKAGE = 'sceptre', i, dim)
+    .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
 convert_pointer_to_index_vector <- function(p) {
-    .Call('_sceptre_convert_pointer_to_index_vector', PACKAGE = 'sceptre', p)
+    .Call(`_sceptre_convert_pointer_to_index_vector`, p)
 }
 
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito) {
-    .Call('_sceptre_compute_cell_covariates_cpp', PACKAGE = 'sceptre', i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito)
+    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito)
 }
 
