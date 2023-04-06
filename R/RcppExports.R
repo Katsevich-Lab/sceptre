@@ -49,6 +49,10 @@ hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
+hybrid_fisher_iwor_sampler_test <- function(N, m, M, B) {
+    .Call(`_sceptre_hybrid_fisher_iwor_sampler_test`, N, m, M, B)
+}
+
 compute_observed_distilled_statistic <- function(a, b, n_cntrl) {
     .Call(`_sceptre_compute_observed_distilled_statistic`, a, b, n_cntrl)
 }
