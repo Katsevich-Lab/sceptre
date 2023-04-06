@@ -84,20 +84,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// hybrid_fisher_iwor_sampler_test
-SEXP hybrid_fisher_iwor_sampler_test(int N, int m, int M, int B);
-RcppExport SEXP _sceptre_hybrid_fisher_iwor_sampler_test(SEXP NSEXP, SEXP mSEXP, SEXP MSEXP, SEXP BSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type N(NSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type M(MSEXP);
-    Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(hybrid_fisher_iwor_sampler_test(N, m, M, B));
-    return rcpp_result_gen;
-END_RCPP
-}
 // compute_observed_distilled_statistic
 double compute_observed_distilled_statistic(NumericVector a, NumericVector b, int n_cntrl);
 RcppExport SEXP _sceptre_compute_observed_distilled_statistic(SEXP aSEXP, SEXP bSEXP, SEXP n_cntrlSEXP) {
@@ -388,7 +374,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
     {"_sceptre_fisher_yates_samlper", (DL_FUNC) &_sceptre_fisher_yates_samlper, 3},
     {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
-    {"_sceptre_hybrid_fisher_iwor_sampler_test", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler_test, 4},
     {"_sceptre_compute_observed_distilled_statistic", (DL_FUNC) &_sceptre_compute_observed_distilled_statistic, 3},
     {"_sceptre_compute_null_distilled_statistics", (DL_FUNC) &_sceptre_compute_null_distilled_statistics, 6},
     {"_sceptre_run_low_level_test_distilled", (DL_FUNC) &_sceptre_run_low_level_test_distilled, 12},

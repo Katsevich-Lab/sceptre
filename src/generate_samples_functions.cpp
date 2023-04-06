@@ -68,8 +68,10 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
 
   // initialize x vector shared across samples; also initialize i_doub vector
   std::vector<int> x(N + m);
-  std::vector<double> i_doub_array(M);
-  for (int i = 0; i < M; i ++) i_doub_array[i] = (double) i;
+  //std::vector<double> i_doub_array(M);
+  //for (int i = 0; i < M; i ++) i_doub_array[i] = (double) i;
+  std::vector<double> i_doub_array(M + 1);
+  for (int i = 0; i < M + 1; i ++) i_doub_array[i] = (double) i;
 
   // initialize the random number generator
   std::mt19937 generator(4);
