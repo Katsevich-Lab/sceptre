@@ -133,7 +133,6 @@ SEXP hybrid_fisher_iwor_sampler_test(int N, int m, int M, int B) {
   // initialize output vector
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
 
-  /*
   // initialize x vector shared across samples; also initialize i_doub vector
   std::vector<int> x(N + m);
   std::vector<double> i_doub_array(M);
@@ -147,6 +146,7 @@ SEXP hybrid_fisher_iwor_sampler_test(int N, int m, int M, int B) {
   double N_doub = (double) N, m_doub = (double) m, i_doub, p, u;
   int pos, temp;
 
+  /*
   // loop over B
   for (int j = 0; j < B; j ++) {
     // fill x with 0...N+m-1
