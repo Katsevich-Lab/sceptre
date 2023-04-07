@@ -32,7 +32,7 @@ double nb_theta_pilot_est(NumericVector y, NumericVector mu) {
 }
 
 
-double nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
+std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   int it = 0;
   double del = 1;
   while (++it < limit && fabs(del) > eps) {
@@ -41,11 +41,14 @@ double nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int
     t0 -= del;
   }
 
-  return(t0);
+  double warning = 0.0;
+  if (t0 < 0 || it == limit || !std::isfinite(t0)) warning = 1.0;
+  std::vector<double> out { t0, warning };
+  return(out);
 }
 
 
-double nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, double eps, int* warning) {
+std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, double eps) {
   int it = 0;
   double del = 1;
 
@@ -55,59 +58,34 @@ double nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, dou
     t0 += del;
   }
 
-  if (t0 < 0 || it == limit) *warning = 1;
-  return(t0);
+  double warning = 0.0;
+  if (t0 < 0 || it == limit || !std::isfinite(t0)) warning = 1.0;
+  std::vector<double> out { t0, warning };
+  return(out);
 }
 
 
-//' Estimate theta
-//'
-//' This function estimates the negative binomial size parameter theta using the fitted means of a Poisson GLM.
-//'
-//' @param y a vector of expressions
-//' @param mu a vector of fitted means from the Poisson regression
-//' @param dfr the residual degrees of freedom of the Poisson regression
-//' @param limit iteration limit
-//' @param eps convergence threshold
-//' @return the estimated theta
-//' @noRd
 // [[Rcpp::export]]
 List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   // first, attempt to estimate theta via MLE
   double t0 = nb_theta_pilot_est(y, mu);
   double estimate = t0;
-  int warning = 0;
   int method = 3;
   try {
-    estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
+    std::vector<double> out = nb_theta_mle(t0, y, mu, limit, eps);
+    estimate = out[0];
     method = 1;
     // if there is a warning, swtich to MM
-    if (warning) {
+    if (out[1] > 0.5) {
+      out = nb_theta_mm(t0, y, mu, dfr, limit, eps);
+      estimate = out[0];
       method = 2;
-      estimate = nb_theta_mm(t0, y, mu, dfr, limit, eps);
+      if (out[1] > 0.5) {
+        estimate = t0;
+        method = 3;
+      }
     }
     // return both the estimate and method indicator
   } catch (...) {}
   return(List::create(estimate, method));
-}
-
-
-// [[Rcpp::export]]
-List estimate_theta_test(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
-  // first, attempt to estimate theta via MLE
-  double t0 = nb_theta_pilot_est(y, mu);
-  double estimate = t0;
-  int warning = 0;
-  int method = 3;
-  try {
-    //estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
-    //method = 1;
-    // if there is a warning, swtich to MM
-    //if (warning) {
-      method = 2;
-      estimate = nb_theta_mm(t0, y, mu, dfr, limit, eps);
-    //  }
-    // return both the estimate and method indicator
-  } catch (...) {}
-  return(List::create(estimate, method, warning));
 }
