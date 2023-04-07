@@ -100,13 +100,13 @@ List estimate_theta_test(NumericVector y, NumericVector mu, double dfr, int limi
   int warning = 0;
   int method = 3;
   try {
-    estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
-    method = 1;
+    //estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
+    //method = 1;
     // if there is a warning, swtich to MM
-    if (warning) {
+    //if (warning) {
       method = 2;
       estimate = nb_theta_mm(t0, y, mu, dfr, limit, eps);
-      }
+    //  }
     // return both the estimate and method indicator
   } catch (...) {}
   return(List::create(estimate, method, warning));
