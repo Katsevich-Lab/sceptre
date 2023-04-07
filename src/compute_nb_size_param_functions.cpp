@@ -90,3 +90,23 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
   } catch (...) {}
   return(List::create(estimate, method));
 }
+
+
+List estimate_theta_test(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
+  // first, attempt to estimate theta via MLE
+  double t0 = nb_theta_pilot_est(y, mu);
+  double estimate = t0;
+  // int warning = 0;
+  int method = 3;
+  //try {
+  //  estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
+  //  method = 1;
+    // if there is a warning, swtich to MM
+  //  if (warning) {
+  //    method = 2;
+  //    estimate = nb_theta_mm(t0, y, mu, dfr, limit, eps);
+  //  }
+    // return both the estimate and method indicator
+  // } catch (...) {}
+  return(List::create(estimate, method));
+}
