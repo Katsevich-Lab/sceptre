@@ -10,27 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// print_synthetic_idxs
-void print_synthetic_idxs(SEXP synthetic_idx_ptr, int n_rows_to_print);
-RcppExport SEXP _sceptre_print_synthetic_idxs(SEXP synthetic_idx_ptrSEXP, SEXP n_rows_to_printSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type synthetic_idx_ptr(synthetic_idx_ptrSEXP);
-    Rcpp::traits::input_parameter< int >::type n_rows_to_print(n_rows_to_printSEXP);
-    print_synthetic_idxs(synthetic_idx_ptr, n_rows_to_print);
-    return R_NilValue;
-END_RCPP
-}
-// print_n_synthetic_idxs
-void print_n_synthetic_idxs(SEXP synthetic_idx_ptr);
-RcppExport SEXP _sceptre_print_n_synthetic_idxs(SEXP synthetic_idx_ptrSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type synthetic_idx_ptr(synthetic_idx_ptrSEXP);
-    print_n_synthetic_idxs(synthetic_idx_ptr);
-    return R_NilValue;
-END_RCPP
-}
 // synth_idx_list_to_matrix
 IntegerVector synth_idx_list_to_matrix(SEXP synthetic_idx_ptr);
 RcppExport SEXP _sceptre_synth_idx_list_to_matrix(SEXP synthetic_idx_ptrSEXP) {
@@ -368,8 +347,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_sceptre_print_synthetic_idxs", (DL_FUNC) &_sceptre_print_synthetic_idxs, 2},
-    {"_sceptre_print_n_synthetic_idxs", (DL_FUNC) &_sceptre_print_n_synthetic_idxs, 1},
     {"_sceptre_synth_idx_list_to_matrix", (DL_FUNC) &_sceptre_synth_idx_list_to_matrix, 1},
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
     {"_sceptre_fisher_yates_samlper", (DL_FUNC) &_sceptre_fisher_yates_samlper, 3},
