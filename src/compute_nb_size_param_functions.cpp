@@ -92,6 +92,7 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
 }
 
 
+// [[Rcpp::export]]
 List estimate_theta_test(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   // first, attempt to estimate theta via MLE
   double t0 = nb_theta_pilot_est(y, mu);
