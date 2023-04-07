@@ -24,7 +24,7 @@ SEXP fisher_yates_samlper(int n_tot, int M, int B) {
   for (int i = 0; i < M; i ++) i_doub_array[i] = (double) i;
 
   // initialize remaining pieces
-  double n_tot_doub = (double) n_tot, mult_fact, u, temp;
+  double n_tot_doub = (double) n_tot, u, temp;
   int pos;
 
   // loop from 0 to B, generating WOR samples
