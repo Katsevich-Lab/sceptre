@@ -48,25 +48,24 @@ double nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int
 double nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, double eps, int* warning) {
   int it = 0;
   double del = 1;
-  
+
   while (++it < limit && fabs(del) > eps) {
     t0 = fabs(t0);
     del = nb_score(t0, mu, y)/nb_info(t0, mu, y);
     t0 += del;
   }
-  
-  *warning = 0;
+
   if (t0 < 0 || it == limit) *warning = 1;
   return(t0);
 }
 
 
 //' Estimate theta
-//' 
+//'
 //' This function estimates the negative binomial size parameter theta using the fitted means of a Poisson GLM.
-//' 
+//'
 //' @param y a vector of expressions
-//' @param mu a vector of fitted means from the Poisson regression 
+//' @param mu a vector of fitted means from the Poisson regression
 //' @param dfr the residual degrees of freedom of the Poisson regression
 //' @param limit iteration limit
 //' @param eps convergence threshold
@@ -77,7 +76,7 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
   // first, attempt to estimate theta via MLE
   double t0 = nb_theta_pilot_est(y, mu);
   double estimate = t0;
-  int warning;
+  int warning = 0;
   int method = 3;
   try {
     estimate = nb_theta_mle(t0, y, mu, limit, eps, &warning);
@@ -87,7 +86,7 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
       method = 2;
       estimate = nb_theta_mm(t0, y, mu, dfr, limit, eps);
     }
-    // return both the estimate and method indicator 
+    // return both the estimate and method indicator
   } catch (...) {}
   return(List::create(estimate, method));
 }
