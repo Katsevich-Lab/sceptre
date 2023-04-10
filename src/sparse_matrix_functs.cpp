@@ -52,11 +52,11 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
   IntegerVector n_nonzero(n_cells);
   NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes);
   List out;
-  
+
   int n_nonzero_count;
   double n_umi_count, n_umi_count_mito;
   for (int k = 0; k < mt_gene_idxs.size(); k ++) mt_gene_idxs[k] --;
-  
+
   for (int k = 0; k < n_cells; k ++) {
     n_umi_count = 0;
     n_nonzero_count = 0;
@@ -65,22 +65,45 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
       n_umi_count += y[r];
       if (y[r] > 0.5) n_nonzero_count ++;
     }
-    
+
     if (compute_p_mito) {
       n_umi_count_mito = 0;
       for (int r = 0; r < mt_gene_idxs.size(); r ++) n_umi_count_mito += y[mt_gene_idxs[r]];
       p_mito[k] = n_umi_count_mito/n_umi_count;
     }
-    
+
     n_nonzero[k] = n_nonzero_count;
     n_umi[k] = n_umi_count;
   }
-  
+
   if (compute_p_mito) {
     out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito);
   } else {
     out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi);
   }
-  
+
   return out;
+}
+
+
+// [[Rcpp::export]]
+IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells) {
+  IntegerVector out(n_cells);
+  int p_start, p_end, curr_maximizer;
+  double curr_max;
+
+  for (int k = 0; k < n_cells; k ++) {
+    p_start = p[k];
+    p_end = p[k+1];
+    curr_max = -1.0;
+    curr_maximizer = -1;
+    for (int l = p_start; l < p_end; l ++) {
+      if (x[l] > curr_max) {
+        curr_max = x[l];
+        curr_maximizer = i[l];
+      }
+    }
+    out[k] = curr_maximizer + 1;
+  }
+  return(out);
 }

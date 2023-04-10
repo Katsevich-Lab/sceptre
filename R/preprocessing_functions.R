@@ -165,7 +165,10 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 
 
 assign_grnas_to_cells_lowmoi_v2 <- function(grna_matrix, grna_group_data_frame, calibration_check, n_calibration_pairs) {
-  grna_idx <- apply(X = grna_matrix, MARGIN = 2, which.max)
+  # get the idx of the maximum of each column
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
+  grna_idx <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p, x = grna_matrix@x, n_cells = ncol(grna_matrix))
+  # grna_idx <- apply(X = grna_matrix, MARGIN = 2, which.max)
   grna_rownames <- factor(rownames(grna_matrix))
   indiv_grna_id_assignments <- grna_rownames[grna_idx]
   grna_group_assignments <- grna_group_data_frame$grna_group[match(x = indiv_grna_id_assignments,
