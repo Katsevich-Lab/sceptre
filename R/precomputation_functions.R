@@ -28,7 +28,7 @@ perform_response_precomputation <- function(expressions, covariate_matrix) {
                                         limit = 50, eps = (.Machine$double.eps)^(1/4))
   theta_fit_str <- c("mle", "mm", "pilot")[response_theta_list[[2]]]
   theta <- max(min(response_theta_list[[1]], 1000), 0.01)
-  
+
   # obtain the fitted coefficients
   fitted_coefs_list <- tryCatch({
     fit_nb <- stats::glm.fit(y = expressions,
@@ -39,12 +39,12 @@ perform_response_precomputation <- function(expressions, covariate_matrix) {
          fitted_coefs = fit_nb$coefficients)
   }, error = function(e) backup_2(pois_fit, pois_warn), warning = function(w) backup_2(pois_fit, pois_warn))
   precomp_str <- paste0(fitted_coefs_list$fitted_coef_str, ":", theta_fit_str)
-  
+
   # output the result
   result <- list(precomp_str = precomp_str,
                  fitted_coefs = fitted_coefs_list$fitted_coefs,
                  theta = theta)
-  
+
   return(result)
 }
 
