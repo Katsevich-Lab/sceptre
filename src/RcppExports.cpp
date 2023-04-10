@@ -345,6 +345,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_colwise_max
+IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells);
+RcppExport SEXP _sceptre_compute_colwise_max(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_cellsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_colwise_max(i, p, x, n_cells));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_synth_idx_list_to_matrix", (DL_FUNC) &_sceptre_synth_idx_list_to_matrix, 1},
@@ -370,6 +384,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_convert_pointer_to_index_vector", (DL_FUNC) &_sceptre_convert_pointer_to_index_vector, 1},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
+    {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 4},
     {NULL, NULL, 0}
 };
 

@@ -7,6 +7,9 @@
 make_volcano_plot(
   discovery_result,
   alpha = 0.1,
+  x_limits = c(-1.5, 1.5),
+  transparency = 0.5,
+  point_size = 0.9,
   multiple_testing_correction = "BH"
 )
 }
