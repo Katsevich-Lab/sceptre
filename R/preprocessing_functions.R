@@ -80,6 +80,10 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   data.table::setDT(response_grna_group_pairs)
   data.table::setorderv(response_grna_group_pairs, cols = "response_id")
 
+  # 12. ensure that "non-targeting" is not a group in the pairs to analyze data frame
+  if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
+    stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
+  }
   return(NULL)
 }
 
