@@ -85,6 +85,20 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
 
 
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
+  # if a logical matrix, convert to the corresponding numeric matrix; consider more efficient implementation later
+  if (methods::is(matrix_in, "lgRMatrix")) {
+    attr(matrix_in, "class") <- "dgRMatrix"
+    matrix_in@x <- rep(1.0, length(matrix_in@j))
+  }
+  if (methods::is(matrix_in, "lgCMatrix")) {
+    attr(matrix_in, "class") <- "dgCMatrix"
+    matrix_in@x <- rep(1.0, length(matrix_in@i))
+  }
+  if (methods::is(matrix_in, "lgTMatrix")) {
+    attr(matrix_in, "class") <- "dgTMatrix"
+    matrix_in@x <- rep(1.0,  length(matrix_in@j))
+  }
+
   if (methods::is(matrix_in, "dgRMatrix") && make_row_accessible) {
     out <- matrix_in
   } else if (methods::is(matrix_in, "dgCMatrix") && !make_row_accessible) {
