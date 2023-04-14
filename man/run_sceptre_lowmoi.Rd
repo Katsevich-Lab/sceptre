@@ -19,10 +19,11 @@ run_sceptre_lowmoi(
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
-  test_stat = "full",
+  test_stat = "exact",
   B1 = 499L,
   B2 = 4999L,
   B3 = 24999L,
+  regression_method = "poisson_glm",
   print_progress = TRUE
 )
 }

@@ -1,4 +1,4 @@
-check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame, formula_object, calibration_check, response_grna_group_pairs, test_stat) {
+check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame, formula_object, calibration_check, response_grna_group_pairs, test_stat, regression_method) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -72,8 +72,8 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   }
 
   # 10. check the test statistic
-  if(!(test_stat %in% c("full", "distilled"))) {
-    stop("`test_stat` must be either `full` or `distilled`.")
+  if(!(test_stat %in% c("exact", "approximate"))) {
+    stop("`test_stat` must be either `exact` or `approximate`.")
   }
 
   # 11. convert the `response_grna_group_pairs` data frame to a data table
@@ -84,6 +84,12 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
     stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
   }
+
+  # 13. ensure that regression_method is nb_glm or poisson_glm
+  if (!(regression_method %in% c("nb_glm", "poisson_glm"))) {
+    stop("`regression_method` should be either `nb_glm` or `poisson_glm`.")
+  }
+
   return(NULL)
 }
 
@@ -263,7 +269,6 @@ harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, test_st
     assign(x = "B2", value = 0L, inherits = TRUE)
   }
 
-  assign(x = "full_test_stat", value = test_stat == "full",  inherits = TRUE)
   return (NULL)
 }
 
