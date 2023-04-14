@@ -1,9 +1,10 @@
 run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                                  covariate_matrix, response_grna_group_pairs,
-                                 synthetic_idxs, full_test_stat, return_resampling_dist,
-                                 fit_skew_normal, B1, B2, B3, calibration_check,
+                                 synthetic_idxs, test_stat,
+                                 return_resampling_dist, fit_skew_normal,
+                                 B1, B2, B3, calibration_check,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                 return_debugging_metrics, print_progress) {
+                                 return_debugging_metrics, regression_method, print_progress) {
   # 0. preliminary setup; initialize the args_to_pass, set the low_level_association_funct
   result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
   out_counter <- 1L
@@ -18,6 +19,7 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
     args_to_pass$covariate_matrix <- covariate_matrix
   }
 
+  full_test_stat <- TRUE
   low_level_association_funct <- if (!calibration_check & full_test_stat) {
     "lowmoi_full_stat_discovery"
   } else if (!calibration_check & !full_test_stat) {
@@ -82,7 +84,8 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
 
     # 6. perform the expression on technical factor regression
     response_precomp <- perform_response_precomputation(expressions = expression_vector_nt,
-                                                        covariate_matrix = covariate_matrix_nt)
+                                                        covariate_matrix = covariate_matrix_nt,
+                                                        regression_method = regression_method)
 
     # 7. obtain precomputation peices for NT cells
     pieces_precomp <- compute_precomputation_pieces(expression_vector_nt,
