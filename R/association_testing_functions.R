@@ -17,7 +17,7 @@ get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
 }
 
 
-lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
+lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     grna_group <- grna_groups[i]
@@ -59,7 +59,7 @@ lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_sk
 }
 
 
-lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt) {
+lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   # compute the D matrix
   D <- compute_D_matrix(Zt_wZ = pieces_precomp$Zt_wZ, wZ = pieces_precomp$wZ)
@@ -83,7 +83,7 @@ lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, 
 }
 
 
-lowmoi_exact_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, grna_groups, expression_vector, regression_method) {
+lowmoi_exact_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     grna_group <- grna_groups[i]

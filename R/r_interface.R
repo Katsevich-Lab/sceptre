@@ -104,18 +104,18 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
                                n_nonzero_cntrl_thresh = 7L, return_debugging_metrics = FALSE,
                                return_resampling_dist = FALSE, fit_skew_normal = TRUE,
                                calibration_group_size = NULL, n_calibration_pairs = NULL,
-                               test_stat = "approximate", B1 = 499L, B2 = 4999L, B3 = 24999L,
-                               regression_method = "poisson_glm", print_progress = TRUE) {
+                               B1 = 499L, B2 = 4999L, B3 = 24999L, regression_method = "poisson_glm",
+                               print_progress = TRUE) {
   ###############
   # PART 1: SETUP
   ###############
   cat("Running setup. ")
   # 1. check function input arguments
   check_inputs(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
-               formula_object, calibration_check, response_grna_group_pairs, test_stat, regression_method) |> invisible()
+               formula_object, calibration_check, response_grna_group_pairs, regression_method) |> invisible()
 
   # 2. harmonize arguments (called for side-effect)
-  harmonize_arguments(return_resampling_dist, fit_skew_normal, test_stat) |> invisible()
+  harmonize_arguments(return_resampling_dist, fit_skew_normal) |> invisible()
 
   # 3. cast and transpose response matrix; cast grna matrix
   response_matrix <- set_matrix_accessibility(response_matrix, TRUE)
@@ -149,8 +149,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
   cat("Running differential expression analyses.\n")
   ret <- run_lowmoi_in_memory(response_matrix, grna_assignments,
                               covariate_matrix, response_grna_group_pairs,
-                              synthetic_idxs, test_stat,
-                              return_resampling_dist, fit_skew_normal,
+                              synthetic_idxs, return_resampling_dist, fit_skew_normal,
                               B1, B2, B3, calibration_check,
                               n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                               return_debugging_metrics, regression_method, print_progress)

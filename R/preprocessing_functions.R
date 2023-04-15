@@ -1,4 +1,4 @@
-check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame, formula_object, calibration_check, response_grna_group_pairs, test_stat, regression_method) {
+check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame, formula_object, calibration_check, response_grna_group_pairs, regression_method) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -71,12 +71,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
   }
 
-  # 10. check the test statistic
-  if(!(test_stat %in% c("exact", "approximate"))) {
-    stop("`test_stat` must be either `exact` or `approximate`.")
-  }
-
-  # 11. convert the `response_grna_group_pairs` data frame to a data table
+  # 10. convert the `response_grna_group_pairs` data frame to a data table
   data.table::setDT(response_grna_group_pairs)
   data.table::setorderv(response_grna_group_pairs, cols = "response_id")
 
@@ -259,7 +254,7 @@ get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, un
 }
 
 
-harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, test_stat) {
+harmonize_arguments <- function(return_resampling_dist, fit_skew_normal) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
     assign(x = "B3", value = 0L, inherits = TRUE)
@@ -309,4 +304,11 @@ compute_cell_covariates <- function(matrix_in) {
                     n_umis = out$n_umi)
   if (compute_p_mito) ret$p_mito <- out$p_mito
   return(ret)
+}
+
+
+compute_regression_ses <- function(covariate_matrix_nt, w) {
+ info_mat <- t(covariate_matrix_nt * w) %*% covariate_matrix_nt
+ ses <- sqrt(diag(solve(info_mat)))
+ return(ses)
 }
