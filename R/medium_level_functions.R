@@ -1,21 +1,24 @@
 run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                                  covariate_matrix, response_grna_group_pairs,
-                                 synthetic_idxs, test_stat,
-                                 return_resampling_dist, fit_skew_normal,
+                                 synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                  B1, B2, B3, calibration_check,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                  return_debugging_metrics, regression_method, print_progress) {
   # 0. preliminary setup; initialize the args_to_pass, set the low_level_association_funct
   result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
-  low_level_association_funct <- set_low_level_association_funct_lowmoi(calibration_check, test_stat)
-  perform_outer_regression <- (test_stat == "approximate") || calibration_check
   out_counter <- 1L
-  args_to_pass <- init_args_to_pass(calibration_check, test_stat, synthetic_idxs,
-                                    B1, B2, B3, fit_skew_normal, return_resampling_dist,
-                                    grna_assignments, covariate_matrix, regression_method)
+  args_to_pass <- list(synthetic_idxs = synthetic_idxs, B1 = B1, B2 = B2, B3 = B3,
+                       fit_skew_normal = fit_skew_normal,
+                       return_resampling_dist = return_resampling_dist,
+                       grna_group_idxs = grna_assignments$grna_group_idxs,
+                       covariate_matrix = covariate_matrix,
+                       all_nt_idxs = grna_assignments$all_nt_idxs,
+                       regression_method = regression_method,
+                       indiv_nt_grna_idxs = if (calibration_check) grna_assignments$indiv_nt_grna_idxs else NA)
+  SE_THRESH <- 15.0
 
   # 1. obtain the subset of the covariate matrix corresponding to the NT cells and n_cells
-  if (perform_outer_regression) covariate_matrix_nt <- covariate_matrix[grna_assignments$all_nt_idxs,]
+  covariate_matrix_nt <- covariate_matrix[grna_assignments$all_nt_idxs,]
   n_cells <- ncol(response_matrix)
 
   # 2. loop over the response IDs
@@ -65,29 +68,33 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
       curr_df <- curr_df[pass_qc,]
     }
 
-    if (perform_outer_regression) {
-      # 6. perform the expression on technical factor regression
-      response_precomp <- perform_response_precomputation(expressions = expression_vector_nt,
-                                                          covariate_matrix = covariate_matrix_nt,
-                                                          regression_method = regression_method)
 
-      # 7. obtain precomputation peices for NT cells
-      pieces_precomp <- compute_precomputation_pieces(expression_vector_nt,
-                                                      covariate_matrix_nt,
-                                                      response_precomp$fitted_coefs,
-                                                      response_precomp$theta,
-                                                      full_test_stat = TRUE)
+    # 6. perform the expression on technical factor regression
+    response_precomp <- perform_response_precomputation(expressions = expression_vector_nt,
+                                                        covariate_matrix = covariate_matrix_nt,
+                                                        regression_method = regression_method)
 
-      args_to_pass$pieces_precomp <- pieces_precomp
-      args_to_pass$expression_vector_nt <- expression_vector_nt
-      if (!calibration_check) args_to_pass$response_precomp <- response_precomp
-    }
+    # 7. obtain precomputation peices for NT cells
+    pieces_precomp <- compute_precomputation_pieces(expression_vector_nt,
+                                                    covariate_matrix_nt,
+                                                    response_precomp$fitted_coefs,
+                                                    response_precomp$theta,
+                                                    full_test_stat = TRUE)
 
-    # 8. update the args to pass with grna_groups, expression_vector, response_precomp, pieces_precomp
-    args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     if (!calibration_check) {
-      args_to_pass$expression_vector <- expression_vector
+      # 8. verify that the regression coefficients are high precision
+      low_level_association_funct <- "lowmoi_approximate_stat_discovery"
+      regression_ses <- compute_regression_ses(covariate_matrix_nt = covariate_matrix_nt,
+                                               w = pieces_precomp$w)
+      if (any(regression_ses >= SE_THRESH)) low_level_association_funct <- "lowmoi_exact_stat_discovery"
+    } else {
+      low_level_association_funct <- "lowmoi_undercover_stat"
     }
+    args_to_pass$grna_groups <- as.character(curr_df$grna_group)
+    args_to_pass$pieces_precomp <- pieces_precomp
+    args_to_pass$expression_vector_nt <- expression_vector_nt
+    args_to_pass$expression_vector <- expression_vector
+    args_to_pass$response_precomp <- response_precomp
 
     # 9. pass the arguments to the appropriate low-level association testing function
     curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
@@ -95,7 +102,7 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
     # 10. combine the response-wise results into a data table; insert into list
     result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
                                                                 return_debugging_metrics, return_resampling_dist,
-                                                                response_precomp$precomp_str)
+                                                                response_precomp$precomp_str, low_level_association_funct)
     out_counter <- out_counter + 1L
   }
 
@@ -115,22 +122,3 @@ set_low_level_association_funct_lowmoi <- function(calibration_check, test_stat)
   return(low_level_association_funct)
 }
 
-
-init_args_to_pass <- function(calibration_check, test_stat, synthetic_idxs,
-                              B1, B2, B3, fit_skew_normal, return_resampling_dist,
-                              grna_assignments, covariate_matrix, regression_method) {
-  args_to_pass <- list(synthetic_idxs = synthetic_idxs,
-                       B1 = B1, B2 = B2, B3 = B3, fit_skew_normal = fit_skew_normal,
-                       return_resampling_dist = return_resampling_dist)
-  if (calibration_check) {
-    args_to_pass$indiv_nt_grna_idxs <- grna_assignments$indiv_nt_grna_idxs
-  } else {
-    args_to_pass$grna_group_idxs <- grna_assignments$grna_group_idxs
-    args_to_pass$covariate_matrix <- covariate_matrix
-    if (test_stat == "exact") {
-      args_to_pass$all_nt_idxs <- grna_assignments$all_nt_idxs
-      args_to_pass$regression_method <- regression_method
-    }
-  }
-  return(args_to_pass)
-}
