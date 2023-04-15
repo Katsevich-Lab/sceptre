@@ -104,7 +104,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
                                n_nonzero_cntrl_thresh = 7L, return_debugging_metrics = FALSE,
                                return_resampling_dist = FALSE, fit_skew_normal = TRUE,
                                calibration_group_size = NULL, n_calibration_pairs = NULL,
-                               test_stat = "exact", B1 = 499L, B2 = 4999L, B3 = 24999L,
+                               test_stat = "approximate", B1 = 499L, B2 = 4999L, B3 = 24999L,
                                regression_method = "poisson_glm", print_progress = TRUE) {
   ###############
   # PART 1: SETUP
