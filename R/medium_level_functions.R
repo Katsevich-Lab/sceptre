@@ -1,7 +1,7 @@
 run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                                  covariate_matrix, response_grna_group_pairs,
                                  synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                                 B1, B2, B3, calibration_check,
+                                 B1, B2, B3, calibration_check, discovery_test_stat,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                  return_debugging_metrics, regression_method, print_progress) {
   # 0. preliminary setup; initialize the args_to_pass, set the low_level_association_funct
@@ -16,6 +16,12 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                        regression_method = regression_method,
                        indiv_nt_grna_idxs = if (calibration_check) grna_assignments$indiv_nt_grna_idxs else NA)
   SE_THRESH <- 15.0
+  if (calibration_check) {
+    low_level_association_funct <- "lowmoi_undercover_stat"
+  } else {
+    low_level_association_funct <- if (discovery_test_stat == "exact") "lowmoi_exact_stat_discovery" else "lowmoi_approximate_stat_discovery"
+  }
+  run_outer_regression <- calibration_check || (discovery_test_stat == "approximate")
 
   # 1. obtain the subset of the covariate matrix corresponding to the NT cells and n_cells
   covariate_matrix_nt <- covariate_matrix[grna_assignments$all_nt_idxs,]
@@ -70,26 +76,30 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
 
 
     # 6. perform the expression on technical factor regression
-    response_precomp <- perform_response_precomputation(expressions = expression_vector_nt,
-                                                        covariate_matrix = covariate_matrix_nt,
-                                                        regression_method = regression_method)
+    if (run_outer_regression) {
+      response_precomp <- perform_response_precomputation(expressions = expression_vector_nt,
+                                                          covariate_matrix = covariate_matrix_nt,
+                                                          regression_method = regression_method)
 
-    # 7. obtain precomputation peices for NT cells
-    pieces_precomp <- compute_precomputation_pieces(expression_vector_nt,
-                                                    covariate_matrix_nt,
-                                                    response_precomp$fitted_coefs,
-                                                    response_precomp$theta,
-                                                    full_test_stat = TRUE)
-
-    if (!calibration_check) {
-      # 8. verify that the regression coefficients are high precision
-      low_level_association_funct <- "lowmoi_approximate_stat_discovery"
-      regression_ses <- compute_regression_ses(covariate_matrix_nt = covariate_matrix_nt,
-                                               w = pieces_precomp$w)
-      if (any(regression_ses >= SE_THRESH)) low_level_association_funct <- "lowmoi_exact_stat_discovery"
+      # 7. obtain precomputation peices for NT cells
+      pieces_precomp <- compute_precomputation_pieces(expression_vector_nt,
+                                                      covariate_matrix_nt,
+                                                      response_precomp$fitted_coefs,
+                                                      response_precomp$theta,
+                                                      full_test_stat = TRUE)
     } else {
-      low_level_association_funct <- "lowmoi_undercover_stat"
+      response_precomp <- pieces_precomp <- NA
     }
+
+    #if (!calibration_check) {
+    #  # 8. verify that the regression coefficients are high precision
+    #  low_level_association_funct <- "lowmoi_approximate_stat_discovery"
+    #  regression_ses <- compute_regression_ses(covariate_matrix_nt = covariate_matrix_nt,
+    #                                           w = pieces_precomp$w)
+    #  if (any(regression_ses >= SE_THRESH)) low_level_association_funct <- "lowmoi_exact_stat_discovery"
+    #} else {
+    #  low_level_association_funct <- "lowmoi_undercover_stat"
+    #}
     args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     args_to_pass$pieces_precomp <- pieces_precomp
     args_to_pass$expression_vector_nt <- expression_vector_nt

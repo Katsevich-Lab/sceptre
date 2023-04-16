@@ -100,12 +100,12 @@
 run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
                                covariate_data_frame, grna_group_data_frame,
                                formula_object, response_grna_group_pairs,
-                               calibration_check, n_nonzero_trt_thresh = 7L,
-                               n_nonzero_cntrl_thresh = 7L, return_debugging_metrics = FALSE,
-                               return_resampling_dist = FALSE, fit_skew_normal = TRUE,
-                               calibration_group_size = NULL, n_calibration_pairs = NULL,
-                               B1 = 499L, B2 = 4999L, B3 = 24999L, regression_method = "poisson_glm",
-                               print_progress = TRUE) {
+                               calibration_check, discovery_test_stat = "approximate",
+                               n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
+                               return_debugging_metrics = FALSE, return_resampling_dist = FALSE,
+                               fit_skew_normal = TRUE, calibration_group_size = NULL,
+                               n_calibration_pairs = NULL, B1 = 499L, B2 = 4999L, B3 = 24999L,
+                               regression_method = "poisson_glm", print_progress = TRUE) {
   ###############
   # PART 1: SETUP
   ###############
@@ -150,7 +150,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
   ret <- run_lowmoi_in_memory(response_matrix, grna_assignments,
                               covariate_matrix, response_grna_group_pairs,
                               synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                              B1, B2, B3, calibration_check,
+                              B1, B2, B3, calibration_check, discovery_test_stat,
                               n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                               return_debugging_metrics, regression_method, print_progress)
 }
