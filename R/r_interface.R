@@ -100,7 +100,7 @@
 run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
                                covariate_data_frame, grna_group_data_frame,
                                formula_object, response_grna_group_pairs,
-                               calibration_check, discovery_test_stat = "approximate",
+                               calibration_check, discovery_test_stat = "exact",
                                n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
                                return_debugging_metrics = FALSE, return_resampling_dist = FALSE,
                                fit_skew_normal = TRUE, calibration_group_size = NULL,
