@@ -100,6 +100,7 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
     #} else {
     #  low_level_association_funct <- "lowmoi_undercover_stat"
     #}
+
     args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     args_to_pass$pieces_precomp <- pieces_precomp
     args_to_pass$expression_vector_nt <- expression_vector_nt
