@@ -34,20 +34,6 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 
 
 // [[Rcpp::export]]
-IntegerVector convert_pointer_to_index_vector(IntegerVector p) {
-  int out_size = p[p.size() - 1], counter = 0;
-  IntegerVector v(out_size);
-  for (int i = 0; i < p.size(); i++) {
-    for (int j = 0; j < p[i + 1] - p[i]; j ++) {
-      v[counter] = i;
-      counter ++;
-    }
-  }
-  return v;
-}
-
-
-// [[Rcpp::export]]
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito) {
   IntegerVector n_nonzero(n_cells);
   NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes);
