@@ -317,17 +317,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// convert_pointer_to_index_vector
-IntegerVector convert_pointer_to_index_vector(IntegerVector p);
-RcppExport SEXP _sceptre_convert_pointer_to_index_vector(SEXP pSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    rcpp_result_gen = Rcpp::wrap(convert_pointer_to_index_vector(p));
-    return rcpp_result_gen;
-END_RCPP
-}
 // compute_cell_covariates_cpp
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito);
 RcppExport SEXP _sceptre_compute_cell_covariates_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_genesSEXP, SEXP n_cellsSEXP, SEXP mt_gene_idxsSEXP, SEXP compute_p_mitoSEXP) {
@@ -382,7 +371,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
-    {"_sceptre_convert_pointer_to_index_vector", (DL_FUNC) &_sceptre_convert_pointer_to_index_vector, 1},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 4},
     {NULL, NULL, 0}
