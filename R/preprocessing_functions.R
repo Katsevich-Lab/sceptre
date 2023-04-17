@@ -122,9 +122,11 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
       j <- matrix_in@j
     } else if (methods::is(matrix_in, "dgCMatrix")) {
       i <- matrix_in@i
-      j <- convert_pointer_to_index_vector(matrix_in@p)
+      # j <- convert_pointer_to_index_vector(matrix_in@p)
+      j <- convert_pointer_to_index_vector_v2(matrix_in@p)
     } else if (methods::is(matrix_in, "dgRMatrix")) {
-      i <- convert_pointer_to_index_vector(matrix_in@p)
+      # i <- convert_pointer_to_index_vector(matrix_in@p)
+      i <- convert_pointer_to_index_vector_v2(matrix_in@p)
       j <- matrix_in@j
     } else {
       stop("Class not recognized.")
@@ -158,6 +160,12 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
     rownames(out) <- response_ids
   }
   return(out)
+}
+
+
+convert_pointer_to_index_vector_v2 <- function(p) {
+  l <- diff(p)
+  rep(x = seq(0, length(l) - 1L), times = l)
 }
 
 
