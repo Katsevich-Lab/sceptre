@@ -1,12 +1,12 @@
 test_that("set_matrix_accessibility", {
   library(Matrix)
-  n_row <- sample(seq(40, 80), 1L) 
+  n_row <- sample(seq(40, 80), 1L)
   n_col <- sample(seq(40, 80), 1L)
   m <- matrix(data = rpois(n = n_row * n_col, lambda = 0.5), nrow = n_row, ncol = n_col)
   m_r <- set_matrix_accessibility(matrix_in = m, make_row_accessible = TRUE)
   expect_true(is(m_r, "dgRMatrix"))
   expect_true(all(m_r == m))
-  
+
   m <- matrix(data = rpois(n = n_row * n_col, lambda = 0.5), nrow = n_row, ncol = n_col)
   m_c <- set_matrix_accessibility(matrix_in = m, make_row_accessible = FALSE)
   expect_true(is(m_c, "dgCMatrix"))
@@ -33,7 +33,7 @@ test_that("assign_grnas_to_cells_lowmoi", {
       dplyr::pull(grna_group) |> as.character()
     expect_equal(grna_group, test_grna_group)
   }
-  
+
   # test indiv nt
   indiv_nt_idxs <- grna_assignments$indiv_nt_grna_idxs
   indiv_nts <- names(indiv_nt_idxs)
@@ -54,7 +54,8 @@ test_that("response precomputation", {
   theta <- 9
   y <- sapply(X = mus, FUN = function(mu) MASS::rnegbin(n = 1, mu = mu, theta = theta))
   precomp <- perform_response_precomputation(expressions = y,
-                                             covariate_matrix = X)
+                                             covariate_matrix = X,
+                                             regression_method = "nb_glm")
   expect_true(all(abs(betas - precomp$fitted_coefs) < 0.5))
   abs(precomp$theta - theta) < 0.5
 })

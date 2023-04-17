@@ -98,10 +98,6 @@ obtain_pointer_vector <- function(i, dim) {
     .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
-convert_pointer_to_index_vector <- function(p) {
-    .Call(`_sceptre_convert_pointer_to_index_vector`, p)
-}
-
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito) {
     .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito)
 }
