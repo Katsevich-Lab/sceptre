@@ -132,7 +132,7 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
   if (tail_ok) {
     skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
     p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
-    if (p <= 0) p = 1.0e-50;
+    if (p <= 1.0e-250) p = 1.0e-250;
   }
 
   // 7. return p
