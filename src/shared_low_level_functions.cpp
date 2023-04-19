@@ -1,4 +1,4 @@
-// [[Rcpp::depends(BH)]]   
+// [[Rcpp::depends(BH)]]
 
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -45,7 +45,7 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   int n = y.size();
   double MAX_GAMMA_1 = 0.995;
   double n_doub = (double) n, s_1 = 0, s_2 = 0, s_3 = 0;
-  
+
   // compute mean and standard deviation
   for (int i = 0; i < n; i ++) {
     s_1 += y[i];
@@ -53,14 +53,14 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   }
   double m_y = s_1/n_doub;
   double sd_y = sqrt(s_2/n_doub - m_y * m_y);
-  
+
   // compute gamma1
   for (int i = 0; i < n; i ++) {
     s_3 += pow(y[i] - m_y, 3);
   }
   double gamma1 = s_3/(n_doub * pow(sd_y, 3));
   if (gamma1 > MAX_GAMMA_1) gamma1 = 0.9 * MAX_GAMMA_1;
-  
+
   // reparameterize solution
   double b = sqrt(2.0/M_PI);
   double r = std::copysign(1.0, gamma1) * pow(2 * std::abs(gamma1)/(4 - M_PI), 1.0/3.0);
@@ -70,7 +70,7 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   double sd_z = sqrt(1 - mu_z * mu_z);
   double omega = sd_y/sd_z;
   double xi = m_y - omega * mu_z;
-  
+
   return std::vector<double> {xi, omega, alpha};
 }
 
@@ -82,10 +82,10 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
   double RATIO_THRESH = 2.0;
   int idx;
   bool good_fit = true;
-  
+
   // initialize the fitted skew normal distribution
   skew_normal dist(xi_hat, omega_hat, alpha_hat);
-  
+
   // loop over the probabilities
   for (int i = 180; i < 199; i ++) {
     p = ((double) i)/200.0;
@@ -96,7 +96,7 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
     if (ratio > RATIO_THRESH) {
       good_fit = false;
       break;
-    } 
+    }
   }
   return good_fit;
 }
@@ -107,18 +107,18 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
   // 1. fit the skew normal
   std::vector<double> fitted_params = fit_skew_normal_funct(null_statistics);
   double p = -1.0;
-  
+
   // 2. sort the vector of null statistics
   sort(null_statistics.begin(), null_statistics.end(), std::less<double>());
-  
+
   // 3. compute the median of the null statistics
   int median_idx = (null_statistics.size() - 1)/2;
   double median = null_statistics[median_idx];
-  
+
   // 4. determine the tail to check; if z_orig >= median, right; else, left
   bool check_right_tail = (z_orig >= median);
   bool tail_ok;
-  
+
   // 5. check the appropriate tail and, if applicable, compute p-value
   if (check_right_tail) { // right tail check
     tail_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
@@ -127,14 +127,14 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
     for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
     tail_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
   }
-  
+
   // 6. if the tail is OK, compute the SN p-value (using the appropriate tail)
   if (tail_ok) {
     skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
     p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
-    if (p < 0) p = 1.0e-50;
+    if (p <= 0) p = 1.0e-50;
   }
-  
+
   // 7. return p
   return p;
 }
