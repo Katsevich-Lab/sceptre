@@ -114,6 +114,10 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
   check_inputs(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                formula_object, calibration_check, response_grna_group_pairs, regression_method) |> invisible()
 
+  # 1.5 order the respone grna group pairs
+  response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
+  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
+
   # 2. harmonize arguments (called for side-effect)
   harmonize_arguments(return_resampling_dist, fit_skew_normal) |> invisible()
 
