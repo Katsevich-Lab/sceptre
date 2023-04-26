@@ -17,7 +17,7 @@ statistically principled, fast, memory-light, and user-friendly software
 for single-cell CRISPR screen analysis. `sceptre` achieves
 state-of-the-art calibration and power on single-cell CRISPR screen data
 by leveraging several methodological and algorithmic advances in
-assumption-lean, computationally efficient differential expression
+assumption-lean and computationally efficient differential expression
 analysis.
 
 ## Installation
@@ -32,45 +32,47 @@ versions \>= 4.1 on macOS and Linux systems.
 
 ## Using the software
 
-`sceptre` includes modules for low multiplicity-of-infection (MOI) and
-high MOI single-cell CRISPR screen analysis. These modules are based on
-distinct statistical methods.
+`sceptre` includes separate modules for low multiplicity-of-infection
+(MOI) and high MOI single-cell CRISPR screen analysis.
 
-- **Low MOI**: If you are working with low MOI data (\< 2 gRNAs per
-  cell), see the [low MOI tutorial](lowmoi_tutorial.html).
+- Low MOI: If you are working with low MOI data (\< 2 gRNAs per cell),
+  see the [low MOI tutorial](lowmoi_tutorial.html).
 
-- **High MOI**: If you are working with high MOI data (\> 5 gRNAs per
-  cell), see the [high MOI
-  tutorial](docs/articles/highmoi_tutorial.html).
+- High MOI: If you are working with high MOI data (\> 5 gRNAs per cell),
+  see the [high MOI tutorial](docs/articles/highmoi_tutorial.html).
 
-- **Large-scale analysis at low or high MOI**: if you are running a
+- Large-scale analysis at low or high MOI: If you are running a
   large-scale analysis (i.e., the data do not easily fit into memory or
   you are using a high-performance cluster or cloud), see the `sceptre`
   [Nextflow pipeline](). This pipeline currently is under active
-  development and is not yet stable. Open a Github issue or send an
-  email if you are interested in using this pipeline, and we will do our
-  best to provide support.
-
-You can browse the [source code]() on Github.
+  development and is not yet stable; please open a Github issue or send
+  an email if you are interested.
 
 ## Associated papers
 
-The following series of papers introduces the `sceptre` methodology and
-— more broadly — explores statistical and computational challenges at
-play in single-cell CRISPR screen analysis.
+The following series of papers introduces the `sceptre` methodology,
+applies `sceptre` to carry out biological discovery, and — more broadly
+— interrogates and aims to resolve statistical and computational
+challenges at play in single-cell CRISPR screen analysis.
 
-- Low MOI p-values and calibration: T Barry, K Mason, K Roeder, E
-  Katsevich. “Robust differential expression analysis for single-cell
-  CRISPR screens.” BioRxiv preprint.
+1.  (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
+    differential expression analysis for single-cell CRISPR screens.”
+    BioRxiv preprint.
 
-- High MOI p-values and calibration: T Barry, X Wang, J Morris, K
-  Roeder, E Katsevich. “SCEPTRE improves calibration and sensitivity in
-  single-cell CRISPR screen analysis.” [Genome
-  Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+2.  (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E
+    Katsevich. “SCEPTRE improves calibration and sensitivity in
+    single-cell CRISPR screen analysis.” [Genome
+    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
-- Log fold change estimation: T Barry, E Katsevich, K Roeder.
-  “Exponential family measurement error models for single-cell CRISPR
-  screens.” [arXiv preprint](https://doi.org/10.48550/arXiv.2201.01879).
+3.  (Application of `sceptre` to GWAS loci) J Morris, …, K Roeder, E
+    Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and
+    pathways at GWAS loci by pooled single-cell CRISPR screens.”
+    [Science]().
+
+4.  (Effect size estimation) T Barry, K Roeder, E Katsevich.
+    “Exponential family measurement error models for single-cell CRISPR
+    screens.” [arXiv
+    preprint](https://doi.org/10.48550/arXiv.2201.01879).
 
 Please consider citing the most relevant among these papers if you find
 `sceptre` helpful in your research. Please also consider starring this
