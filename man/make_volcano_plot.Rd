@@ -18,6 +18,12 @@ make_volcano_plot(
 
 \item{alpha}{(optional; default 0.1) the nominal type-I error control level}
 
+\item{x_limits}{a vector of length two giving the lower and upper limits of the volcano plot}
+
+\item{transparency}{a number in the range (0, 1) indicating the transparency of the points}
+
+\item{point_size}{a positive number indicating the size of the points}
+
 \item{multiple_testing_correction}{(optional; default "BH") the multiple testing correction method (one of "BH", "bonferroni", "BY", or "holm")}
 }
 \value{

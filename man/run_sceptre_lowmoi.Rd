@@ -14,12 +14,12 @@ run_sceptre_lowmoi(
   calibration_check,
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
+  discovery_test_stat = "exact",
   return_debugging_metrics = FALSE,
   return_resampling_dist = FALSE,
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
-  test_stat = "exact",
   B1 = 499L,
   B2 = 4999L,
   B3 = 24999L,
@@ -46,6 +46,8 @@ run_sceptre_lowmoi(
 
 \item{n_nonzero_cntrl_thresh}{(optional; moderate importance; default 7) \code{n_nonzero_cntrl} is the number of "control cells" (i.e., cells that have received an NT gRNA) with nonzero expression. \code{sceptre} filters for pairs with a \code{n_nonzero_control} value equal to or greater than \code{n_nonzero_control_thresh}.}
 
+\item{discovery_test_stat}{(optional; lower importance; default "exact") the test statistic to use in the discovery analysis, either "exact" or "approximate".}
+
 \item{return_debugging_metrics}{(optional; lower importance; default \code{FALSE}) return metrics that facilitate debugging calibration issues? (See "Note" for details.)}
 
 \item{return_resampling_dist}{(optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?}
@@ -56,15 +58,15 @@ run_sceptre_lowmoi(
 
 \item{n_calibration_pairs}{(optional; lower importance; default \code{NULL}) the number of negative control pairs to analyze in the calibration check. By default, the number of negative control pairs that \code{sceptre} analyzes is equal to the number of discovery pairs (i.e., pairs specified in the data frame \code{response_grna_group_pairs}) that passes pairwise QC.}
 
-\item{test_stat}{(optional; lower importance; default "full") a string indicating the test statistic to use within the permutation test, either "full" or "distilled". The "full" statistic refers to the full negative binomial GLM score statistic, while the "distilled" statistic is an approximation to the former. The full statistic typically is more powerful (i.e., yields more discoveries) but is slower to compute.}
-
 \item{B1}{(optional; lower importance; default 499) the number of null test statistics to compute in the first round of the permutation test.}
 
 \item{B2}{(optional; lower importance; default 4999) the number of null test statistics to compute the second round of the permutation test.}
 
 \item{B3}{(optional; lower importance; default 24999) the number of null test statistics to compute the third round of the permutation test.}
 
-\item{print_progress}{print the progress of the function?}
+\item{regression_method}{(optional; lower importance; default "poisson_glm") The regression method to use to regress out the covariates, either "poisson_glm" for a Poisson GLM or "nb_glm" for a negative binomial GLM.}
+
+\item{print_progress}{(optional) print the progress of the function?}
 }
 \value{
 a data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.
@@ -96,9 +98,11 @@ The notes are arranged roughly in order of most important to least important.
 \item{\code{sceptre} uses three rounds of permutation testing to test a given pair. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to round 2; otherwise, \code{sceptre} returns \code{p1}. In round 2, \code{sceptre} computes \code{B2} null statistics and fits a skew normal distribution to these null statistics. If the skew-normal fit is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to round 3. In round 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}.}
 \item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_skew_normal} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
 \item{When \code{return_resampling_dist} is set to \code{TRUE}, \code{sceptre} uses only a single round of permutation testing, returning \code{B1} resampled statistics for each pair. \code{return_resampling_dist} should be set to \code{TRUE} for debugging purposes only.}
+\item{The \code{discovery_test_stat} parameter controls the test statistic used. The "exact" statistic is more robust, while the "approximate" statistic is faster. In most cases the two test statistics yield similar results.}
 }
 }
 \examples{
+\dontrun{
 library(Matrix)
 
 # 0. load the data associated with the experiment
@@ -122,8 +126,7 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = TRUE,
-print_progress = FALSE)
+calibration_check = TRUE)
 
 # 4. plot the calibration result to ensure adequate calibration
 plot_calibration_result(calibration_result)
@@ -135,8 +138,7 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = FALSE,
-print_progress = FALSE)
+calibration_check = FALSE)
 
 # 6. compare discovery p-values to the negative control p-values; make a volcano plot
 compare_calibration_and_discovery_results(calibration_result, discovery_result)
@@ -144,4 +146,5 @@ make_volcano_plot(discovery_result)
 
 # 7. obtain the discovery set for downstream analysis
 discovery_set <- obtain_discovery_set(discovery_result)
+}
 }

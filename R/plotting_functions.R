@@ -146,7 +146,9 @@ get_my_theme <- function(element_text_size = 11) {
 #'  The horizontal dashed line indicates the multiple testing threshold. Points above the dashed line (which are colored in purple) are called as discoveries; points below the dashed line (which are colored in blue), meanwhile, are called as insignificant.
 #'
 #' @inheritParams compare_calibration_and_discovery_results
-#'
+#' @param x_limits a vector of length two giving the lower and upper limits of the volcano plot
+#' @param transparency a number in the range (0, 1) indicating the transparency of the points
+#' @param point_size a positive number indicating the size of the points
 #' @return a ggplot2 object
 #' @export
 #' @examples
