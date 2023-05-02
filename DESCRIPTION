@@ -24,7 +24,7 @@ Authors@R:
            role = "ths")
            )
 Description: `sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by methodological and algorithmic advances in robust association analysis via resampling score statistics and fast permutation testing. `sceptre` has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis. 
-License: GPL (>= 3)
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -91,16 +91,6 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
       response_precomp <- pieces_precomp <- NA
     }
 
-    #if (!calibration_check) {
-    #  # 8. verify that the regression coefficients are high precision
-    #  low_level_association_funct <- "lowmoi_approximate_stat_discovery"
-    #  regression_ses <- compute_regression_ses(covariate_matrix_nt = covariate_matrix_nt,
-    #                                           w = pieces_precomp$w)
-    #  if (any(regression_ses >= SE_THRESH)) low_level_association_funct <- "lowmoi_exact_stat_discovery"
-    #} else {
-    #  low_level_association_funct <- "lowmoi_undercover_stat"
-    #}
-
     args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     args_to_pass$pieces_precomp <- pieces_precomp
     args_to_pass$expression_vector_nt <- expression_vector_nt

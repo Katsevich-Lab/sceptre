@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sceptre</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -104,8 +104,8 @@ effects of these perturbations via single-cell RNA sequencing.</p>
 <p>The code below is a self-contained and complete application of
 <code>sceptre</code> to the example data. Users can copy, paste, and
 execute this code in Rstudio to get a sense for how <code>sceptre</code>
-works. The entire script takes less than two minutes to run on a
-standard laptop.</p>
+works. The entire script takes three minutes to run on a standard
+laptop.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load package</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptre</span><span class="op">)</span></span>
@@ -167,12 +167,12 @@ regulatory relationship). The calibration check enables us to verify
 that <code>sceptre</code> controls the number of false discoveries on
 the dataset under analysis, which ultimately ensures that the discovery
 set that <code>sceptre</code> returns is high-quality. The calibration
-check entails (4) carrying out the calibration check itself and (5)
+check step entails (4) carrying out the calibration check itself and (5)
 visualizing the calibration check results.</p></li>
 <li><p><strong>Discovery analysis</strong>: We finally conduct the
 “discovery analysis,” which consists of applying <code>sceptre</code> to
 analyze the set of perturbation-gene pairs whose regulatory
-relationships we seek to learn. The discovery analysis entails (6)
+relationships we seek to learn. The discovery analysis step entails (6)
 carrying out the discovery analysis itself, (7) visualizing the
 discovery analysis results, and (8) obtaining the final discovery
 set.</p></li>

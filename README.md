@@ -3,12 +3,6 @@
 
 # `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" width="180"/>
 
-<!-- badges: start -->
-
-![](https://github.com/scarlettcanny0629/sceptre/actions/workflows/R-CMD-check.yaml/badge.svg)
-
-<!-- badges: end -->
-
 Single-cell CRISPR screens provide unprecedented insights into gene
 regulation and other facets of human genome biology. However, the
 analysis of these screens poses significant statistical and

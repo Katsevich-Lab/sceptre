@@ -22,7 +22,7 @@ This tutorial illustrates application of `sceptre` to an example low multiplicit
 
 ## Initial code demonstration
 
-The code below is a self-contained and complete application of `sceptre` to the example data. Users can copy, paste, and execute this code in Rstudio to get a sense for how `sceptre` works. The entire script takes less than two minutes to run on a standard laptop.
+The code below is a self-contained and complete application of `sceptre` to the example data. Users can copy, paste, and execute this code in Rstudio to get a sense for how `sceptre` works. The entire script takes three minutes to run on a standard laptop.
 
 ```{r, echo = FALSE}
 library(sceptre)
@@ -80,9 +80,9 @@ All `sceptre` analyses follow this general template.
 
 -   **Setup**: We begin by setting up the analysis. This entails (1) loading the data; (2) constructing the set of CRISPR perturbation-gene pairs that we seek to test for association; and (3) defining a formula object that specifies how `sceptre` is to adjust for the cell-specific covariates (e.g., sequencing depth, batch, etc.).
 
--   **Calibration check**: We then carry out the "calibration check," which involves applying `sceptre` to a set of automatically-generated negative control CRISPR perturbation-gene pairs (i.e., perturbation-gene pairs for which we know there is no regulatory relationship). The calibration check enables us to verify that `sceptre` controls the number of false discoveries on the dataset under analysis, which ultimately ensures that the discovery set that `sceptre` returns is high-quality. The calibration check entails (4) carrying out the calibration check itself and (5) visualizing the calibration check results.
+-   **Calibration check**: We then carry out the "calibration check," which involves applying `sceptre` to a set of automatically-generated negative control CRISPR perturbation-gene pairs (i.e., perturbation-gene pairs for which we know there is no regulatory relationship). The calibration check enables us to verify that `sceptre` controls the number of false discoveries on the dataset under analysis, which ultimately ensures that the discovery set that `sceptre` returns is high-quality. The calibration check step entails (4) carrying out the calibration check itself and (5) visualizing the calibration check results.
 
--   **Discovery analysis**: We finally conduct the "discovery analysis," which consists of applying `sceptre` to analyze the set of perturbation-gene pairs whose regulatory relationships we seek to learn. The discovery analysis entails (6) carrying out the discovery analysis itself, (7) visualizing the discovery analysis results, and (8) obtaining the final discovery set.
+-   **Discovery analysis**: We finally conduct the "discovery analysis," which consists of applying `sceptre` to analyze the set of perturbation-gene pairs whose regulatory relationships we seek to learn. The discovery analysis step entails (6) carrying out the discovery analysis itself, (7) visualizing the discovery analysis results, and (8) obtaining the final discovery set.
 
 Below, we describe each step of the analysis procedure in greater detail.
 
