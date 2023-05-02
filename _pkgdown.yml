@@ -12,6 +12,7 @@ development:
 template:
   params:
     bootswatch: lumen
+  bootstrap: 5
 
 navbar:
   type: default
