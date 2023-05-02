@@ -66,7 +66,7 @@ run_sceptre_lowmoi(
 
 \item{regression_method}{(optional; lower importance; default "poisson_glm") The regression method to use to regress out the covariates, either "poisson_glm" for a Poisson GLM or "nb_glm" for a negative binomial GLM.}
 
-\item{print_progress}{(optional) print the progress of the function?}
+\item{print_progress}{(optional; default TRUE) print the progress of the function?}
 }
 \value{
 a data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.
