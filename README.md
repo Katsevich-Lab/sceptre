@@ -3,6 +3,11 @@
 
 # `sceptre`: robust single-cell CRISPR screen analysis
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
+<!-- badges: end -->
+
 <img src="man/figures/hex.jpg" align="right" width="200"/>
 
 Single-cell CRISPR screens provide unprecedented insights into gene
