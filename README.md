@@ -6,6 +6,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
+
 <!-- badges: end -->
 
 <img src="man/figures/hex.jpg" align="right" width="200"/>
@@ -28,8 +29,9 @@ You can install `sceptre` from Github with the following command:
     install.packages("devtools")
     devtools::install_github("katsevich-lab/sceptre")
 
-A Bioconductor upload is forthcoming. `sceptre` has been tested in R
-versions \>= 4.1 on macOS and Linux systems.
+View the source code [here](https://github.com/Katsevich-Lab/sceptre).
+`sceptre` has been tested in R versions \>= 4.1 on macOS and Linux
+systems.
 
 ## Using the software
 
@@ -82,7 +84,9 @@ challenges at play in single-cell CRISPR screen analysis.
 
 Please consider citing the most relevant among these papers if you find
 `sceptre` helpful in your research. Please also consider starring this
-repository to increase its visibility.
+repository to increase its visibility. Finally, please contact the
+authors if you seek to copy and paste portions of the source code into
+your own package.
 
 ## Funding
 
