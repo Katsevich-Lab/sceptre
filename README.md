@@ -1,7 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `sceptre`: robust single-cell CRISPR screen analysis <img src="man/figures/hex.jpg" align="right" width="180"/>
+# `sceptre`: robust single-cell CRISPR screen analysis
+
+<img src="man/figures/hex.jpg" align="right" width="200"/>
 
 Single-cell CRISPR screens provide unprecedented insights into gene
 regulation and other facets of human genome biology. However, the
