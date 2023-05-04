@@ -10,8 +10,6 @@ development:
   mode: auto
 
 template:
-  params:
-    bootswatch: lumen
   bootstrap: 5
 
 navbar:
