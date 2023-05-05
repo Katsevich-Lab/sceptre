@@ -419,7 +419,7 @@
 #' gene_gRNA_group_pairs = gene_gRNA_group_pairs,
 #' side = "left")
 #' }
-run_sceptre_highmoi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.0, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
+run_sceptre_highmoi_old <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.0, B = 1000, full_output = FALSE, parallel = TRUE, seed = 4) {
   ##################
   # DEFINE CONSTANTS
   ##################
