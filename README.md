@@ -29,9 +29,9 @@ You can install `sceptre` from Github with the following command:
     install.packages("devtools")
     devtools::install_github("katsevich-lab/sceptre")
 
-View the source code [here](https://github.com/Katsevich-Lab/sceptre).
-`sceptre` has been tested in R versions \>= 4.1 on macOS and Linux
-systems.
+You can view the source code
+[here](https://github.com/Katsevich-Lab/sceptre). `sceptre` has been
+tested in R versions \>= 4.1 on macOS and Linux systems.
 
 ## Using the software
 
