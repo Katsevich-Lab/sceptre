@@ -256,6 +256,11 @@ get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, un
 }
 
 
+get_synthetic_idxs_highmoi <- function(B, max_cells_per_grna_group, n_cells) {
+ fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
+}
+
+
 harmonize_arguments <- function(return_resampling_dist, fit_skew_normal) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)

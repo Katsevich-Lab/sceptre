@@ -112,14 +112,3 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
   return(ret)
 }
-
-
-set_low_level_association_funct_lowmoi <- function(calibration_check, test_stat) {
-  if (calibration_check) {
-    low_level_association_funct <- "lowmoi_undercover_stat"
-  } else { # discovery analysis
-    low_level_association_funct <- if (test_stat == "exact") "lowmoi_exact_stat_discovery" else  "lowmoi_approximate_stat_discovery"
-  }
-  return(low_level_association_funct)
-}
-
