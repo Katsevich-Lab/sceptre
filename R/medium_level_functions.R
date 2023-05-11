@@ -15,7 +15,6 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                        all_nt_idxs = grna_assignments$all_nt_idxs,
                        regression_method = regression_method,
                        indiv_nt_grna_idxs = if (calibration_check) grna_assignments$indiv_nt_grna_idxs else NA)
-  SE_THRESH <- 15.0
   if (calibration_check) {
     low_level_association_funct <- "lowmoi_undercover_stat"
   } else {
@@ -111,4 +110,47 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
   ret <- data.table::rbindlist(result_list_outer, fill = TRUE)
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
   return(ret)
+}
+
+
+run_high_moi_in_memory <- function(response_matrix, grna_assignments,
+                                   covariate_matrix, response_grna_group_pairs,
+                                   synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                   B1, B2, B3, calibration_check, discovery_test_stat,
+                                   n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                   return_debugging_metrics, regression_method, print_progress) {
+  # 0. preliminary setup; initialize the args_to_pass, set the low_level_association_funct
+  result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
+  out_counter <- 1L
+  args_to_pass <- list(synthetic_idxs = synthetic_idxs, B1 = B1, B2 = B2, B3 = B3,
+                       fit_skew_normal = fit_skew_normal,
+                       return_resampling_dist = return_resampling_dist,
+                       grna_assignments = grna_assignments,
+                       covariate_matrix = covariate_matrix,
+                       regression_method = regression_method)
+  n_cells <- ncol(response_matrix)
+
+  # 2. loop over the response IDs
+  response_ids <- unique(response_grna_group_pairs$response_id)
+  for (response_idx in seq_along(response_ids)) {
+    if ((response_idx == 1 || response_idx %% 5 == 0) && print_progress) {
+      cat(paste0("Analyzing pairs containing response ", as.character(response_ids[response_idx]), " (", response_idx, " of ", length(response_ids), ")\n"))
+    }
+    if (response_idx %% 200 == 0) gc() |> invisible()
+    response_id <- as.character(response_ids[response_idx])
+
+    # 3. load the expressions of the current response; also get the nt expression vector
+    expression_vector <- load_csr_row(j = response_matrix@j,
+                                      p = response_matrix@p,
+                                      x = response_matrix@x,
+                                      row_idx = which(rownames(response_matrix) == response_id),
+                                      n_cells = n_cells)
+
+    # 4. obtain the gRNA groups to analyze
+    l <- response_grna_group_pairs$response_id == response_id
+    curr_df <- response_grna_group_pairs[l,]
+
+    # 5. perform the QC
+
+  }
 }

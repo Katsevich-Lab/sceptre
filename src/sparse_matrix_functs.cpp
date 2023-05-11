@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
-
+using namespace std;
 
 void load_sparse_vector(IntegerVector l, IntegerVector p, NumericVector x, int idx, int dim, NumericVector out) {
   int start = p[idx], end = p[idx + 1];
@@ -90,6 +90,33 @@ IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVecto
       }
     }
     out[k] = curr_maximizer + 1;
+  }
+  return(out);
+}
+
+
+// [[Rcpp::export]]
+IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, double threshold) {
+  int row_idx, col_idx, start, end, counter = 0;
+  double count;
+  threshold -= 0.5;
+  std::unordered_set<int> set;
+  for (int i = 0; i < row_idxs.size(); i++) {
+    row_idx = row_idxs[i] - 1;
+    int start = p[row_idx], end = p[row_idx + 1];
+    for (int k = start; k < end; k ++) {
+      count = x[k];
+      col_idx = j[k];
+      if (count > threshold) {
+        set.insert(col_idx + 1);
+      }
+    }
+  }
+  IntegerVector out(set.size());
+  std::unordered_set<int>::iterator itr;
+  for (itr = set.begin(); itr != set.end(); itr++) {
+    out[counter] = *itr;
+    counter ++;
   }
   return(out);
 }
