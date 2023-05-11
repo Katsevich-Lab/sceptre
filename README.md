@@ -63,7 +63,8 @@ challenges at play in single-cell CRISPR screen analysis.
 
 1.  (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
     differential expression analysis for single-cell CRISPR screens.”
-    BioRxiv preprint forthcoming.
+    [Working
+    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf).
 
 2.  (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E
     Katsevich. “SCEPTRE improves calibration and sensitivity in
