@@ -1,22 +1,3 @@
-compute_D_matrix <- function(Zt_wZ, wZ) {
-  P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
-  U <- P_decomp$vectors
-  Lambda_minus_half <- 1/sqrt(P_decomp$values)
-  D <- (Lambda_minus_half * t(U)) %*% t(wZ)
-  return(D)
-}
-
-
-get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
-  undercover_nts <- strsplit(x = undercover_group, split = "&", fixed = TRUE)[[1]]
-  control_cells <- indiv_nt_grna_idxs[setdiff(names(indiv_nt_grna_idxs), undercover_nts)] |>
-    unlist() |> stats::setNames(NULL)
-  undercover_cells <- indiv_nt_grna_idxs[undercover_nts] |> unlist() |> stats::setNames(NULL)
-  idxs <- c(control_cells, undercover_cells)
-  return(list(idxs = idxs, n_trt = length(undercover_cells), n_cntrl = length(control_cells)))
-}
-
-
 lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
@@ -153,4 +134,23 @@ backup_distilled <- function(curr_expression_vector, curr_covariate_matrix,
                                B1 = B1, B2 = B2, B3 = B3,
                                fit_skew_normal = fit_skew_normal,
                                return_resampling_dist = return_resampling_dist)
+}
+
+
+compute_D_matrix <- function(Zt_wZ, wZ) {
+  P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
+  U <- P_decomp$vectors
+  Lambda_minus_half <- 1/sqrt(P_decomp$values)
+  D <- (Lambda_minus_half * t(U)) %*% t(wZ)
+  return(D)
+}
+
+
+get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
+  undercover_nts <- strsplit(x = undercover_group, split = "&", fixed = TRUE)[[1]]
+  control_cells <- indiv_nt_grna_idxs[setdiff(names(indiv_nt_grna_idxs), undercover_nts)] |>
+    unlist() |> stats::setNames(NULL)
+  undercover_cells <- indiv_nt_grna_idxs[undercover_nts] |> unlist() |> stats::setNames(NULL)
+  idxs <- c(control_cells, undercover_cells)
+  return(list(idxs = idxs, n_trt = length(undercover_cells), n_cntrl = length(control_cells)))
 }

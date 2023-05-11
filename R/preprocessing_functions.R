@@ -256,11 +256,6 @@ get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, un
 }
 
 
-get_synthetic_idxs_highmoi <- function(B, max_cells_per_grna_group, n_cells) {
- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
-}
-
-
 harmonize_arguments <- function(return_resampling_dist, fit_skew_normal) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
@@ -314,8 +309,28 @@ compute_cell_covariates <- function(matrix_in) {
 }
 
 
-compute_regression_ses <- function(covariate_matrix_nt, w) {
- info_mat <- t(covariate_matrix_nt * w) %*% covariate_matrix_nt
- ses <- sqrt(diag(solve(info_mat)))
- return(ses)
+get_synthetic_idxs_highmoi <- function(B, grna_assignments, n_cells) {
+  max_cells_per_grna_group <- sapply(grna_assignments, length) |> max()
+  fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
+}
+
+
+assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_data_frame) {
+  grna_ids <- rownames(grna_matrix)
+  # make the grna matrix row-accessible
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+  # obtain the assignments for all grna groups, looping over each
+  grna_groups <- unique(grna_group_data_frame$grna_group)
+  grna_groups <- grna_groups[grna_groups != "non-targeting"]
+  # loop over the grna groups, obtaining the cell assignments
+  grna_assignments <- sapply(grna_groups, function(grna_group) {
+    l <- grna_group_data_frame$grna_group == grna_group
+    curr_grna_ids <- grna_group_data_frame$grna_id[l]
+    row_idxs <- match(x = curr_grna_ids, grna_ids)
+    cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                                     row_idxs = row_idxs, threshold = threshold)
+    # cell_idxs <- which(apply(grna_matrix[1:2,] >= threshold, 2, function(col) any(col)))
+    return(cell_idxs)
+  })
+  return(grna_assignments)
 }

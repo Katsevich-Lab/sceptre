@@ -211,7 +211,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
 run_sceptre_highmoi <- function(response_matrix, grna_matrix,
                                 covariate_data_frame, grna_group_data_frame,
                                 formula_object, response_grna_group_pairs,
-                                calibration_check, n_nonzero_trt_thresh = 7L,
+                                calibration_check, threshold = 5, n_nonzero_trt_thresh = 7L,
                                 n_nonzero_cntrl_thresh = 7L, discovery_test_stat = "exact",
                                 return_debugging_metrics = FALSE, return_resampling_dist = FALSE,
                                 fit_skew_normal = TRUE, calibration_group_size = NULL,
@@ -222,9 +222,10 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
   check_inputs(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                formula_object, calibration_check, response_grna_group_pairs, regression_method) |> invisible()
 
-  # 2. order the response grna group pairs
+  # 2. order the response grna group pairs; cast grna group table to data.table
   response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
   data.table::setorderv(response_grna_group_pairs, cols = "response_id")
+  data.table::setDT(grna_group_data_frame)
 
   # 3. harmonize arguments (called for side-effect)
   harmonize_arguments(return_resampling_dist, fit_skew_normal) |> invisible()
@@ -237,11 +238,12 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
   rm(covariate_data_frame)
 
   # 6. assign the gRNAs to cells
-  grna_matrix <- set_matrix_accessibility(grna_matrix, TRUE)
+  grna_assignments <- assign_grnas_to_cells_highmoi(grna_matrix, threshold, grna_group_data_frame)
+  # grna_matrix <- set_matrix_accessibility(grna_matrix, TRUE)
   cat(crayon::green(' \u2713\n'))
 
   # 7. construct the undercover response_grna_group_pairs
-  #if (calibration_check) {
+  # if (calibration_check) {
   #  cat("Constructing negative control pairs.")
   #  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
   #  response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, grna_group_data_frame, response_grna_group_pairs)
@@ -251,8 +253,18 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
   # 8. generate the set of synthetic indicator idxs
   cat("Generating permutation resamples.")
   # synthetic_idxs <- get_synthetic_idxs_lowmoi(grna_assignments, B1 + B2 + B3, calibration_check, calibration_group_size)
-  synthetic_idxs <- get_synthetic_idxs_highmoi(B = B1 + B2 + B3, max_cells_per_grna_group = 5000L, n_cells = ncol(response_matrix))
+  synthetic_idxs <- get_synthetic_idxs_highmoi(B = B1 + B2 + B3, grna_assignments = grna_assignments, n_cells = ncol(response_matrix))
   cat(crayon::green(' \u2713\n'))
   gc() |> invisible()
 
+  ####################
+  # PART 2: RUN METHOD
+  ####################
+  cat("Running differential expression analyses.\n")
+  ret <- run_high_moi_in_memory(response_matrix, grna_assignments,
+                                covariate_matrix, response_grna_group_pairs,
+                                synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                B1, B2, B3, calibration_check, discovery_test_stat,
+                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                return_debugging_metrics, regression_method, print_progress)
 }
