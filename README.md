@@ -64,24 +64,24 @@ challenges at play in single-cell CRISPR screen analysis.
 1.  (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
     differential expression analysis for single-cell CRISPR screens.”
     [Working
-    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf).
+    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf), 2023.
 
 2.  (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E
     Katsevich. “SCEPTRE improves calibration and sensitivity in
     single-cell CRISPR screen analysis.” [Genome
-    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2), 2021.
 
 3.  (Application of `sceptre` to GWAS loci) J Morris, C Caragine, Z
     Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S
     Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N
     Sanjana. “Discovery of target genes and pathways at GWAS loci by
     pooled single-cell CRISPR screens.”
-    [Science](https://www.science.org/doi/10.1126/science.adh7699).
+    [Science](https://www.science.org/doi/10.1126/science.adh7699), 2023.
 
 4.  (Effect size estimation) T Barry, K Roeder, E Katsevich.
     “Exponential family measurement error models for single-cell CRISPR
     screens.” [arXiv
-    preprint](https://doi.org/10.48550/arXiv.2201.01879).
+    preprint](https://doi.org/10.48550/arXiv.2201.01879), 2022.
 
 Please consider citing the most relevant among these papers if you find
 `sceptre` helpful in your research. Please also consider starring this
@@ -91,8 +91,8 @@ your own package.
 
 ## Funding
 
-We are grateful to [Analytics at
-Wharton](https://analytics.wharton.upenn.edu/) for supporting the
+We are grateful to [Analytics at Wharton](https://analytics.wharton.upenn.edu/) and the [National Science Foundation](https://www.nsf.gov/) (DMS-2113072) for supporting the
 development of this software.
 
-<img src="man/figures/wharton_analytics.png" align="center" width="200"/>
+<img src="man/figures/wharton_analytics.png" align="center" height="100"/> &nbsp; &nbsp; <img src="man/figures/nsf.jpeg" align="center" height="100"/>
+
