@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `sceptre`: robust single-cell CRISPR screen analysis
+# `sceptre`: robust analysis of <br>single-cell CRISPR screen data
 
 <!-- badges: start -->
 
@@ -29,17 +29,16 @@ You can install `sceptre` from Github with the following command:
     install.packages("devtools")
     devtools::install_github("katsevich-lab/sceptre")
 
-You can view the source code
-[here](https://github.com/Katsevich-Lab/sceptre). `sceptre` has been
-tested in R versions \>= 4.1 on macOS and Linux systems.
+`sceptre` has been tested in R versions \>= 4.1 on macOS and Linux
+systems.
 
 ## Using the software
 
 `sceptre` includes separate modules for low multiplicity-of-infection
 (MOI) and high MOI single-cell CRISPR screen analysis.
 
-- Low MOI: If you are working with low MOI data (1 gRNA per cell),
-  see the [low MOI
+- Low MOI: If you are working with low MOI data (1 gRNA per cell), see
+  the [low MOI
   tutorial](https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html).
 
 - High MOI: If you are working with high MOI data (\> 5 gRNAs per cell),
@@ -64,24 +63,24 @@ challenges at play in single-cell CRISPR screen analysis.
 1.  (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
     differential expression analysis for single-cell CRISPR screens.”
     [Working
-    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf), 2023.
+    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf), 2023.
 
 2.  (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E
     Katsevich. “SCEPTRE improves calibration and sensitivity in
     single-cell CRISPR screen analysis.” [Genome
-    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2), 2021.
+    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2), 2021.
 
 3.  (Application of `sceptre` to GWAS loci) J Morris, C Caragine, Z
     Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S
     Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N
     Sanjana. “Discovery of target genes and pathways at GWAS loci by
     pooled single-cell CRISPR screens.”
-    [Science](https://www.science.org/doi/10.1126/science.adh7699), 2023.
+    [Science](https://www.science.org/doi/10.1126/science.adh7699), 2023.
 
 4.  (Effect size estimation) T Barry, K Roeder, E Katsevich.
     “Exponential family measurement error models for single-cell CRISPR
     screens.” [arXiv
-    preprint](https://doi.org/10.48550/arXiv.2201.01879), 2022.
+    preprint](https://doi.org/10.48550/arXiv.2201.01879), 2022.
 
 Please consider citing the most relevant among these papers if you find
 `sceptre` helpful in your research. Please also consider starring this
@@ -91,8 +90,10 @@ your own package.
 
 ## Funding
 
-We are grateful to [Analytics at Wharton](https://analytics.wharton.upenn.edu/) and the [National Science Foundation](https://www.nsf.gov/) (DMS-2113072) for supporting the
+We are grateful to [Analytics at
+Wharton](https://analytics.wharton.upenn.edu/) and the [National Science
+Foundation](https://www.nsf.gov/) (DMS-2113072) for supporting the
 development of this software.
 
-<img src="man/figures/wharton_analytics.png" align="center" height="100"/> &nbsp; &nbsp; <img src="man/figures/nsf.jpeg" align="center" height="100"/>
-
+<img src="man/figures/wharton_analytics.png" align="center" width="500"/>
+    <img src="man/figures/nsf.jpeg" align="center" height="50"/>
