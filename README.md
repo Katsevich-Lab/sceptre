@@ -38,7 +38,7 @@ tested in R versions \>= 4.1 on macOS and Linux systems.
 `sceptre` includes separate modules for low multiplicity-of-infection
 (MOI) and high MOI single-cell CRISPR screen analysis.
 
-- Low MOI: If you are working with low MOI data (\< 2 gRNAs per cell),
+- Low MOI: If you are working with low MOI data (1 gRNA per cell),
   see the [low MOI
   tutorial](https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html).
 
