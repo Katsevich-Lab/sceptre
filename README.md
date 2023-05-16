@@ -61,27 +61,28 @@ applies `sceptre` to discover new biology, and — more broadly —
 interrogates and aims to resolve statistical and computational
 challenges at play in single-cell CRISPR screen analysis.
 
-1.  (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
-    differential expression analysis for single-cell CRISPR screens.”
-    [Working
-    manuscript](https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf).
+- (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust
+  differential expression analysis for single-cell CRISPR screens.”
+  [BioRxiv
+  preprint](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v1).
+  <span style="color:red">(new!)</span>
 
-2.  (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E
-    Katsevich. “SCEPTRE improves calibration and sensitivity in
-    single-cell CRISPR screen analysis.” [Genome
-    Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+- (Application of `sceptre` to GWAS loci) J Morris, C Caragine, Z
+  Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S
+  Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N
+  Sanjana. “Discovery of target genes and pathways at GWAS loci by
+  pooled single-cell CRISPR screens.”
+  [Science](https://www.science.org/doi/10.1126/science.adh7699). <span
+  style="color:red">(new!)</span>
 
-3.  (Application of `sceptre` to GWAS loci) J Morris, C Caragine, Z
-    Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S
-    Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N
-    Sanjana. “Discovery of target genes and pathways at GWAS loci by
-    pooled single-cell CRISPR screens.”
-    [Science](https://www.science.org/doi/10.1126/science.adh7699).
+- (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E Katsevich.
+  “SCEPTRE improves calibration and sensitivity in single-cell CRISPR
+  screen analysis.” [Genome
+  Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
 
-4.  (Effect size estimation) T Barry, K Roeder, E Katsevich.
-    “Exponential family measurement error models for single-cell CRISPR
-    screens.” [arXiv
-    preprint](https://doi.org/10.48550/arXiv.2201.01879).
+- (Effect size estimation) T Barry, K Roeder, E Katsevich. “Exponential
+  family measurement error models for single-cell CRISPR screens.”
+  [arXiv preprint](https://doi.org/10.48550/arXiv.2201.01879).
 
 Please consider citing the most relevant among these papers if you find
 `sceptre` helpful in your research. Please also consider starring this
