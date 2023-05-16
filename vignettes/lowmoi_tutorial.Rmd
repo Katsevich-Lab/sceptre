@@ -34,9 +34,9 @@ library(Matrix)
 library(sceptre)
 
 # load the data associated with the experiment
-data(response_matrix_lowmoi) # gene-by-cell expression matrix
-data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
-data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
+data(response_matrix_lowmoi)       # gene-by-cell expression matrix
+data(grna_matrix_lowmoi)           # gRNA-by-cell expression matrix
+data(covariate_data_frame_lowmoi)  # cell-by-covariate data frame
 data(grna_group_data_frame_lowmoi) # gRNA group information
 
 # obtain the set of pairs to analyze
@@ -44,29 +44,35 @@ response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
                                                 grna_group_data_frame_lowmoi)
 
 # set the formula object
-formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) +
-                            bio_rep + p_mito)
+formula_object <- formula(~log(response_n_umis) + 
+                           log(response_n_nonzero) +
+                           bio_rep + 
+                           p_mito)
 
 # run the calibration check analysis (NOTE: `calibration_check` set to `TRUE`)
-calibration_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
-grna_matrix = grna_matrix_lowmoi,
-covariate_data_frame = covariate_data_frame_lowmoi,
-grna_group_data_frame = grna_group_data_frame_lowmoi,
-formula_object = formula_object,
-response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = TRUE)
+calibration_result <- run_sceptre_lowmoi(
+  response_matrix = response_matrix_lowmoi,
+  grna_matrix = grna_matrix_lowmoi,
+  covariate_data_frame = covariate_data_frame_lowmoi,
+  grna_group_data_frame = grna_group_data_frame_lowmoi,
+  formula_object = formula_object,
+  response_grna_group_pairs = response_grna_group_pairs,
+  calibration_check = TRUE
+)
 
 # plot the calibration result to ensure adequate calibration of the p-values
 plot_calibration_result(calibration_result)
 
 # run the discovery analysis (NOTE: `calibration_check` set to `FALSE`)
-discovery_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
-grna_matrix = grna_matrix_lowmoi,
-covariate_data_frame = covariate_data_frame_lowmoi,
-grna_group_data_frame = grna_group_data_frame_lowmoi,
-formula_object = formula_object,
-response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = FALSE)
+discovery_result <- run_sceptre_lowmoi(
+  response_matrix = response_matrix_lowmoi,
+  grna_matrix = grna_matrix_lowmoi,
+  covariate_data_frame = covariate_data_frame_lowmoi,
+  grna_group_data_frame = grna_group_data_frame_lowmoi,
+  formula_object = formula_object,
+  response_grna_group_pairs = response_grna_group_pairs,
+  calibration_check = FALSE
+)
 
 # compare discovery p-values to the negative control p-values; make a volcano plot
 compare_calibration_and_discovery_results(calibration_result, discovery_result)
@@ -113,7 +119,7 @@ response_matrix_lowmoi[1:5, 1:5]
 The gene IDs, which uniquely identify each gene, are stored as row names.
 
 ```{r}
-rownames(response_matrix_lowmoi) |> head()
+response_matrix_lowmoi |> rownames() |> head()
 ```
 
 `response_matrix_lowmoi` is a sparse R matrix. In general the response-by-cell matrix should be a standard (i.e., dense) R matrix or a sparse R matrix (of type `dgCMatrix`, `dgTMatrix`, or `dgRMatrix`). Note that the response-by-cell matrix is an *un-normalized* (i.e., raw) matrix of counts.
@@ -133,7 +139,7 @@ grna_matrix_lowmoi[25:30, 1:5]
 The gRNA IDs, which uniquely identify each individual gRNA, are stored as row names.
 
 ```{r}
-rownames(grna_matrix_lowmoi) |> head()
+grna_matrix_lowmoi |> rownames() |> head()
 ```
 
 Like the gene expression matrix, the gRNA-by-cell matrix either should be a standard R matrix or a sparse R matrix. Users optionally can pass a logical (i.e., `TRUE`/`FALSE`) matrix of cell-to-gRNA assignments; see the documentation of `run_sceptre_lowmoi` via (`?run_sceptre_lowmoi`) for more details.
@@ -217,8 +223,10 @@ In general the `response_grna_group_pairs` data frame should specify the set of 
 The third step is to construct a formula object that specifies how to adjust for the cell-specific covariates. We recommend including the following covariates in the formula object: `response_n_umis`, `response_n_nonzero`, `p_mito`, and (if applicable) sequencing batch and/or biological replicate. It is best practice to log-transform integer count variables (e.g., `response_n_umis`, `response_n_nonzero`).
 
 ```{r}
-formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) +
-                            bio_rep + p_mito)
+formula_object <- formula(~log(response_n_umis) + 
+                            log(response_n_nonzero) +
+                            bio_rep + 
+                            p_mito)
 ```
 
 ## Part II: Calibration check
@@ -232,13 +240,15 @@ We begin by running the "calibration check." The calibration check is an analysi
 We run the calibration check by calling `run_sceptre_lowmoi`, passing as arguments (i) the response matrix, (ii) the gRNA matrix, (iii) the covariate data frame, (iv) the gRNA group data frame, (v) the formula object, and (vi) the (discovery) response-gRNA group pairs. We also set the `calibration_check` argument to `TRUE`. The example invocation takes about 30 seconds to run.
 
 ```{r, eval=FALSE}
-calibration_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
-grna_matrix = grna_matrix_lowmoi,
-covariate_data_frame = covariate_data_frame_lowmoi,
-grna_group_data_frame = grna_group_data_frame_lowmoi,
-formula_object = formula_object,
-response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = TRUE) # calibration_check TRUE
+calibration_result <- run_sceptre_lowmoi(
+  response_matrix = response_matrix_lowmoi,
+  grna_matrix = grna_matrix_lowmoi,
+  covariate_data_frame = covariate_data_frame_lowmoi,
+  grna_group_data_frame = grna_group_data_frame_lowmoi,
+  formula_object = formula_object,
+  response_grna_group_pairs = response_grna_group_pairs,
+  calibration_check = TRUE # calibration_check TRUE
+) 
 ```
 
 The output, `calibration_result`, is a data frame containing p-values for negative control response-gRNA group pairs.
@@ -320,13 +330,15 @@ knitr::include_graphics("calibration_result.png")
 Once we have verified that `sceptre` is adequately calibrated, we are ready to carry out the discovery analysis. We run the discovery analysis by calling `run_sceptre_lowmoi`, passing the same arguments that we passed for the calibration check but setting `calibration_check` to `FALSE`.
 
 ```{r, eval=FALSE}
-discovery_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
-grna_matrix = grna_matrix_lowmoi,
-covariate_data_frame = covariate_data_frame_lowmoi,
-grna_group_data_frame = grna_group_data_frame_lowmoi,
-formula_object = formula_object,
-response_grna_group_pairs = response_grna_group_pairs,
-calibration_check = FALSE) # calibration check FALSE
+discovery_result <- run_sceptre_lowmoi(
+  response_matrix = response_matrix_lowmoi,
+  grna_matrix = grna_matrix_lowmoi,
+  covariate_data_frame = covariate_data_frame_lowmoi,
+  grna_group_data_frame = grna_group_data_frame_lowmoi,
+  formula_object = formula_object,
+  response_grna_group_pairs = response_grna_group_pairs,
+  calibration_check = FALSE # calibration check FALSE
+) 
 ```
 
 ```{r, echo=FALSE}
@@ -364,7 +376,8 @@ Next, we create a couple plots to help us visualize the discovery results. We pl
 ```{r, eval = FALSE}
 compare_calibration_and_discovery_results(
   calibration_result = calibration_result,
-  discovery_result = discovery_result)
+  discovery_result = discovery_result
+)
 ```
 
 ```{r, out.width = "400px", fig.align="center", echo = FALSE}

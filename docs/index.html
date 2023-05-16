@@ -8,8 +8,8 @@
 <meta name="description" content="`sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by methodological and algorithmic advances in robust association analysis via resampling score statistics and fast permutation testing. `sceptre` has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis. ">
 <title>Robust Differential Expression Analysis for Single-Cell CRISPR Screens • sceptre</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Robust Differential Expression Analysis for Single-Cell CRISPR Screens">
 <meta property="og:description" content="`sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by methodological and algorithmic advances in robust association analysis via resampling score statistics and fast permutation testing. `sceptre` has modules for low multiplicity of infection (MOI) and high MOI single-cell CRISPR screen analysis. ">
@@ -22,7 +22,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-default navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">sceptre</a>
 
@@ -54,7 +54,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -62,52 +69,59 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="sceptre-robust-single-cell-crispr-screen-analysis">
-<code>sceptre</code>: robust single-cell CRISPR screen analysis<a class="anchor" aria-label="anchor" href="#sceptre-robust-single-cell-crispr-screen-analysis"></a>
+<div class="page-header"><h1 id="sceptre-robust-analysis-of--single-cell-crispr-screen-data">
+<code>sceptre</code>: robust analysis of <br>single-cell CRISPR screen data<a class="anchor" aria-label="anchor" href="#sceptre-robust-analysis-of--single-cell-crispr-screen-data"></a>
 </h1></div>
 <!-- badges: start -->
 
 <!-- badges: end -->
 <p><img src="reference/figures/hex.jpg" align="right" width="200"></p>
-<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a statistically principled, fast, memory-light, and user-friendly software for single-cell CRISPR screen analysis. <code>sceptre</code> achieves state-of-the-art calibration and power on single-cell CRISPR screen data by leveraging several methodological and algorithmic advances in assumption-lean and computationally efficient differential expression analysis.</p>
+<p>Single-cell CRISPR screens provide unprecedented insights into gene regulation and other facets of human genome biology. However, the analysis of these screens poses significant statistical and computational challenges. <code>sceptre</code> (pronounced “scepter”) is a statistically principled, fast, memory-light, and user-friendly software for single-cell CRISPR screen analysis. <code>sceptre</code> achieves state-of-the-art calibration and power on single-cell CRISPR screen data by leveraging several methodological and algorithmic advances in assumption-lean and computationally efficient differential expression testing.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install <code>sceptre</code> from Github with the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"katsevich-lab/sceptre"</span>)</span></code></pre></div>
-<p>You can view the source code <a href="https://github.com/Katsevich-Lab/sceptre" class="external-link">here</a>. <code>sceptre</code> has been tested in R versions &gt;= 4.1 on macOS and Linux systems.</p>
+<p><code>sceptre</code> has been tested in R versions &gt;= 4.1 on macOS and Linux systems.</p>
 </div>
 <div class="section level2">
 <h2 id="using-the-software">Using the software<a class="anchor" aria-label="anchor" href="#using-the-software"></a>
 </h2>
 <p><code>sceptre</code> includes separate modules for low multiplicity-of-infection (MOI) and high MOI single-cell CRISPR screen analysis.</p>
 <ul>
-<li><p>Low MOI: If you are working with low MOI data (&lt; 2 gRNAs per cell), see the <a href="https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html" class="external-link">low MOI tutorial</a>.</p></li>
-<li><p>High MOI: If you are working with high MOI data (&gt; 5 gRNAs per cell), see the <a href="https://katsevich-lab.github.io/sceptre/articles/highmoi_tutorial.html" class="external-link">high MOI tutorial</a>.</p></li>
+<li><p>Low MOI: If you are working with low MOI data (1 gRNA per cell), see the <a href="https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html">low MOI tutorial</a>.</p></li>
+<li><p>High MOI: If you are working with high MOI data (&gt; 5 gRNAs per cell), see the <a href="https://katsevich-lab.github.io/sceptre/articles/highmoi_tutorial.html">high MOI tutorial</a>.</p></li>
 <li><p>Large-scale analysis at low or high MOI: If you are running a large-scale analysis (i.e., the data do not easily fit into memory or you are using a high-performance cluster or cloud), see the <code>sceptre</code> <a href="https://github.com/timothy-barry/sceptre-pipeline" class="external-link">Nextflow pipeline</a>. This pipeline currently is under active development and is not yet stable; please open a Github issue or send an email if you are interested.</p></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="associated-papers">Associated papers<a class="anchor" aria-label="anchor" href="#associated-papers"></a>
 </h2>
-<p>The following series of papers introduces the <code>sceptre</code> methodology, applies <code>sceptre</code> to discover new biology, and — more broadly — interrogates and aims to resolve statistical and computational challenges at play in single-cell CRISPR screen analysis.</p>
-<ol style="list-style-type: decimal">
-<li><p>(Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust differential expression analysis for single-cell CRISPR screens.” <a href="https://github.com/Katsevich-Lab/sceptre2-manuscript/blob/main/working_manuscript/barry_2023_working.pdf" class="external-link">Working manuscript</a>.</p></li>
-<li><p>(High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E Katsevich. “SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis.” <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Genome Biology</a>.</p></li>
-<li><p>(Application of <code>sceptre</code> to GWAS loci) J Morris, C Caragine, Z Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways at GWAS loci by pooled single-cell CRISPR screens.” <a href="https://www.science.org/doi/10.1126/science.adh7699" class="external-link">Science</a>.</p></li>
-<li><p>(Effect size estimation) T Barry, K Roeder, E Katsevich. “Exponential family measurement error models for single-cell CRISPR screens.” <a href="https://doi.org/10.48550/arXiv.2201.01879" class="external-link">arXiv preprint</a>.</p></li>
-</ol>
+<p>The following series of papers introduces the <code>sceptre</code> methodology, applies <code>sceptre</code> to discover biology, and — more broadly — interrogates and aims to resolve statistical and computational challenges at play in single-cell CRISPR screen analysis.</p>
+<ul>
+<li><p>(Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. “Robust differential expression testing for single-cell CRISPR screens at low multiplicity of infection.” <a href="https://www.biorxiv.org/content/10.1101/2023.05.15.540875v1" class="external-link">BioRxiv preprint</a>, 2023. <span style="color:red">(new!)</span></p></li>
+<li><p>(Application of <code>sceptre</code> to GWAS loci) J Morris, C Caragine, Z Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. “Discovery of target genes and pathways at GWAS loci by pooled single-cell CRISPR screens.” <a href="https://www.science.org/doi/10.1126/science.adh7699" class="external-link">Science</a>, 2023. <span style="color:red">(new!)</span></p></li>
+<li><p>(High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E Katsevich. “SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis.” <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Genome Biology</a>, 2021.</p></li>
+<li><p>(Effect size estimation) T Barry, K Roeder, E Katsevich. “Exponential family measurement error models for single-cell CRISPR screens.” <a href="https://doi.org/10.48550/arXiv.2201.01879" class="external-link">arXiv preprint</a>, 2022.</p></li>
+</ul>
 <p>Please consider citing the most relevant among these papers if you find <code>sceptre</code> helpful in your research. Please also consider starring this repository to increase its visibility. Finally, please contact the authors if you seek to copy and paste portions of the source code into your own package.</p>
 </div>
 <div class="section level2">
 <h2 id="funding">Funding<a class="anchor" aria-label="anchor" href="#funding"></a>
 </h2>
-<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/" class="external-link">Analytics at Wharton</a> for supporting the development of this software.</p>
-<p><img src="reference/figures/wharton_analytics.png" align="center" width="200"></p>
+<p>We are grateful to <a href="https://analytics.wharton.upenn.edu/" class="external-link">Analytics at Wharton</a> and the <a href="https://www.nsf.gov/" class="external-link">National Science Foundation</a> (DMS-2113072) for supporting the development of this software.</p>
+<p><img src="reference/figures/wharton_analytics.png" align="center" width="400">     <img src="reference/figures/nsf.jpeg" align="center" width="109"></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/Katsevich-Lab/sceptre/" class="external-link">Browse source code</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
