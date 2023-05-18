@@ -163,51 +163,24 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
 }
 
 
-#' Title
+# data(covariate_matrix_highmoi)
+# data(gene_matrix_highmoi)
+# data(gRNA_matrix_highmoi)
+# data(gRNA_groups_table_highmoi)
 #'
-#' @param response_matrix
-#' @param grna_matrix
-#' @param covariate_data_frame
-#' @param grna_group_data_frame
-#' @param formula_object
-#' @param response_grna_group_pairs
-#' @param calibration_check
-#' @param n_nonzero_trt_thresh
-#' @param n_nonzero_cntrl_thresh
-#' @param discovery_test_stat
-#' @param return_debugging_metrics
-#' @param return_resampling_dist
-#' @param fit_skew_normal
-#' @param calibration_group_size
-#' @param n_calibration_pairs
-#' @param B1
-#' @param B2
-#' @param B3
-#' @param regression_method
-#' @param print_progress
+# # modify the grna group table to get it into the "standard" format
+# gRNA_groups_table_highmoi$gRNA_group[gRNA_groups_table_highmoi$gRNA_type == "non_target"] <- "non-targeting"
+# gRNA_groups_table_highmoi <- gRNA_groups_table_highmoi |>
+# dplyr::rename("grna_id" = "gRNA_id", "grna_group" = "gRNA_group") |>
+# dplyr::mutate(gRNA_type = NULL)
 #'
-#' @return
-#' @export
-#'
-#' @examples
-#' data(covariate_matrix_highmoi)
-#' data(gene_matrix_highmoi)
-#' data(gRNA_matrix_highmoi)
-#' data(gRNA_groups_table_highmoi)
-#'
-#' # modify the grna group table to get it into the "standard" format
-#' gRNA_groups_table_highmoi$gRNA_group[gRNA_groups_table_highmoi$gRNA_type == "non_target"] <- "non-targeting"
-#' gRNA_groups_table_highmoi <- gRNA_groups_table_highmoi |>
-#' dplyr::rename("grna_id" = "gRNA_id", "grna_group" = "gRNA_group") |>
-#' dplyr::mutate(gRNA_type = NULL)
-#'
-#' response_matrix <- gene_matrix_highmoi
-#' grna_matrix <- gRNA_matrix_highmoi
-#' covariate_data_frame <- covariate_matrix_highmoi
-#' grna_group_data_frame <- gRNA_groups_table_highmoi
-#' formula_object <- formula(~ lg_gRNA_lib_size + lg_gene_lib_size + p_mito + batch)
-#' response_grna_group_pairs <- generate_all_pairs(response_matrix, grna_group_data_frame)
-#' calibration_check <- FALSE
+# response_matrix <- gene_matrix_highmoi
+# grna_matrix <- gRNA_matrix_highmoi
+# covariate_data_frame <- covariate_matrix_highmoi
+# grna_group_data_frame <- gRNA_groups_table_highmoi
+# formula_object <- formula(~ lg_gRNA_lib_size + lg_gene_lib_size + p_mito + batch)
+# response_grna_group_pairs <- generate_all_pairs(response_matrix, grna_group_data_frame)
+# calibration_check <- FALSE
 run_sceptre_highmoi <- function(response_matrix, grna_matrix,
                                 covariate_data_frame, grna_group_data_frame,
                                 formula_object, response_grna_group_pairs,
@@ -227,7 +200,7 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
   data.table::setorderv(response_grna_group_pairs, cols = "response_id")
   data.table::setDT(grna_group_data_frame)
 
-  # 3. harmonize arguments (called for side-effect)
+  # 3. harmonize arguments (called for side-effects)
   harmonize_arguments(return_resampling_dist, fit_skew_normal) |> invisible()
 
   # 4. cast and transpose response matrix; cast grna matrix
