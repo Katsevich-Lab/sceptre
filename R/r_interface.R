@@ -242,7 +242,7 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
   # grna_matrix <- set_matrix_accessibility(grna_matrix, TRUE)
   cat(crayon::green(' \u2713\n'))
 
-  # 7. construct the undercover response_grna_group_pairs
+  # 7. construct the undercover response_grna_group_pairs (TO DO)
   # if (calibration_check) {
   #  cat("Constructing negative control pairs.")
   #  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
@@ -252,7 +252,6 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
 
   # 8. generate the set of synthetic indicator idxs
   cat("Generating permutation resamples.")
-  # synthetic_idxs <- get_synthetic_idxs_lowmoi(grna_assignments, B1 + B2 + B3, calibration_check, calibration_group_size)
   synthetic_idxs <- get_synthetic_idxs_highmoi(B = B1 + B2 + B3, grna_assignments = grna_assignments, n_cells = ncol(response_matrix))
   cat(crayon::green(' \u2713\n'))
   gc() |> invisible()
