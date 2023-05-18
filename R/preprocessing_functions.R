@@ -1,23 +1,19 @@
-check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame, formula_object, calibration_check, response_grna_group_pairs, regression_method) {
+check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
+                         grna_group_data_frame, formula_object, calibration_check,
+                         response_grna_group_pairs, regression_method, moi, control_group) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
     stop("The data frame `grna_group_data_frame` must have columns `grna_id` and `grna_group`. The `grna_group` column should specify the group to which each `grna_id` belongs.")
   }
 
-  # 2. check for the presence of "non-targeting" in the grna_group column
-  nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
-  if (!nt_present) {
-    stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
-  }
-
-  # 3. verify that the row names are unique for both response and grna modalities
+  # 2. verify that the row names are unique for both response and grna modalities
   response_ids <- rownames(response_matrix)
   grna_ids <- rownames(grna_matrix)
   if (length(response_ids) != length(unique(response_ids))) stop("The rownames of the `response_matrix` must be unique.")
   if (length(grna_ids) != length(unique(grna_ids))) stop("The rownames of the `grna_matrix` must be unique.")
 
-  # 4. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
+  # 3. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
   problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
   if (length(problematic_grna_ids) >= 1) {
     stop(paste0("The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: ", paste0(grna_ids[problematic_grna_ids], collapse = ", ")))
@@ -26,7 +22,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
     stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
   }
 
-  # 5. if the pairs to analyze have been specified...
+  # 4. if the pairs to analyze have been specified...
     # i. verify that `grna_group` and `response_id` are columns
     all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
     # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
@@ -42,10 +38,10 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
       stop("The column `grna_group` of the `response_grna_group_pairs` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`.")
     }
 
-  # 6. check that there are no offsets in the formula object
+  # 5. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
 
-  # 7. check the covariate data frame has at least one column and that the variables in the formula object are a subset of the column names of the covariate data frame
+  # 6. check the covariate data frame has at least one column and that the variables in the formula object are a subset of the column names of the covariate data frame
   if (ncol(covariate_data_frame) == 0) {
     stop("The global cell covariate matrix must contain at least one column.")
   }
@@ -55,7 +51,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
 
-  # 8. check type of input matrices
+  # 7. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
     ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
     if (!ok_class) {
@@ -65,22 +61,45 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   check_matrix_class(response_matrix, "response_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix"))
   check_matrix_class(grna_matrix, "grna_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "lgTMatrix", "lgCMatrix", "lgRMatrix"))
 
-  # 9. check for agreement in number of cells
+  # 8. check for agreement in number of cells
   check_ncells <- (ncol(response_matrix) == ncol(grna_matrix)) && (ncol(response_matrix) == nrow(covariate_data_frame))
   if (!check_ncells) {
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
   }
 
-  # 10. ensure that "non-targeting" is not a group in the pairs to analyze data frame
+  # 9. ensure that "non-targeting" is not a group in the pairs to analyze data frame
   if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
     stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
   }
 
-  # 11. ensure that regression_method is nb_glm or poisson_glm
+  # 10. ensure that regression_method is nb_glm or poisson_glm
   if (!(regression_method %in% c("nb_glm", "poisson_glm"))) {
     stop("`regression_method` should be either `nb_glm` or `poisson_glm`.")
   }
 
+  # 11. verify that moi and control group are specified
+  if (!(moi %in% c("low", "high"))) {
+    stop("`moi` should be either `low` or `high`.")
+  }
+
+  # 12. verify that control group is either nt_cells or complement
+  if (!control_group %in% c("nt_cells", "complement")) {
+    stop("`control_group` should be either `nt_cells` or `complement`.")
+  }
+
+  # 13. check for the presence of "non-targeting" in the grna_group column
+  nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
+  if (!nt_present) {
+    stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
+  }
+
+  # 14. if we are in low MOI and the control group is set to the complement set, NT cells must be present; verify.
+  if (moi == "low" && control_group == "complement") {
+    nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
+    if (!nt_present) {
+      stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
+    }
+  }
   return(NULL)
 }
 
@@ -185,57 +204,6 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-assign_grnas_to_cells_lowmoi_v2 <- function(grna_matrix, grna_group_data_frame, calibration_check, n_calibration_pairs) {
-  # get the idx of the maximum of each column
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
-  grna_idx <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p, x = grna_matrix@x, n_cells = ncol(grna_matrix))
-  # grna_idx <- apply(X = grna_matrix, MARGIN = 2, which.max)
-  grna_rownames <- factor(rownames(grna_matrix))
-  indiv_grna_id_assignments <- grna_rownames[grna_idx]
-  grna_group_assignments <- grna_group_data_frame$grna_group[match(x = indiv_grna_id_assignments,
-                                                                   table = grna_group_data_frame$grna_id)]
-  grna_groups <- grna_group_data_frame$grna_group
-
-  # obtain all_nt_idxs
-  out <- list()
-
-  # add the targeting grna groups if doing a discovery analysis or n_calibration_pairs not specified
-  if (!calibration_check || is.null(n_calibration_pairs)) {
-    unique_grna_groups <- unique(grna_groups)
-    unique_grna_groups <- unique_grna_groups[unique_grna_groups != "non-targeting"]
-    grna_group_idxs <- lapply(unique_grna_groups, function(unique_grna_group) {
-      which(grna_group_assignments == unique_grna_group)
-    }) |> stats::setNames(unique_grna_groups)
-    out$grna_group_idxs <- grna_group_idxs
-  }
-
-  # if running a discovery analysis, add the indices of all NT gRNAs
-  if (!calibration_check) {
-    out$all_nt_idxs <- which(grna_group_assignments == "non-targeting")
-  }
-
-  # if running a calibration check, add the indices of the individual NT gRNAs relative to all_nt_idxs
-  if (calibration_check) {
-    nt_grnas <- grna_group_data_frame |>
-      dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")
-    nt_grna_idxs <- lapply(nt_grnas, function(nt_grna) {
-      which(nt_grna == indiv_grna_id_assignments)
-    }) |> stats::setNames(nt_grnas)
-    all_nt_idxs <- stats::setNames(unlist(nt_grna_idxs), NULL)
-    n_cells_per_nt <- sapply(nt_grna_idxs, length)
-    stop <- cumsum(n_cells_per_nt)
-    start <- c(0L, stop[-length(stop)]) + 1L
-    indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-      seq(start[i], stop[i])
-    }) |> stats::setNames(nt_grnas)
-    out$all_nt_idxs <- all_nt_idxs
-    out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-  }
-
-  return(out)
-}
-
-
 get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, undercover_group_size = NULL) {
   if (calibration_check) {
     indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
@@ -256,16 +224,15 @@ get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, un
 }
 
 
-harmonize_arguments <- function(return_resampling_dist, fit_skew_normal) {
+harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
     assign(x = "B3", value = 0L, inherits = TRUE)
     assign(x = "fit_skew_normal", value = FALSE, inherits = TRUE)
   }
-  if (!fit_skew_normal) {
-    assign(x = "B2", value = 0L, inherits = TRUE)
-  }
-
+  if (!fit_skew_normal) assign(x = "B2", value = 0L, inherits = TRUE)
+  assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
+  assign(x = "control_group_complement", value = (control_group == "complement"), inherits = TRUE)
   return (NULL)
 }
 
@@ -315,22 +282,8 @@ get_synthetic_idxs_highmoi <- function(B, grna_assignments, n_cells) {
 }
 
 
-assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_data_frame) {
-  grna_ids <- rownames(grna_matrix)
-  # make the grna matrix row-accessible
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  # obtain the assignments for all grna groups, looping over each
-  grna_groups <- unique(grna_group_data_frame$grna_group)
-  grna_groups <- grna_groups[grna_groups != "non-targeting"]
-  # loop over the grna groups, obtaining the cell assignments
-  grna_assignments <- sapply(grna_groups, function(grna_group) {
-    l <- grna_group_data_frame$grna_group == grna_group
-    curr_grna_ids <- grna_group_data_frame$grna_id[l]
-    row_idxs <- match(x = curr_grna_ids, grna_ids)
-    cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                     row_idxs = row_idxs, threshold = threshold)
-    # cell_idxs <- which(apply(grna_matrix[1:2,] >= threshold, 2, function(col) any(col)))
-    return(cell_idxs)
-  })
-  return(grna_assignments)
+order_pairs_to_analyze <- function(response_grna_group_pairs) {
+  response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
+  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
+  return(response_grna_group_pairs)
 }
