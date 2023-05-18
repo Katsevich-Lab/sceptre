@@ -90,6 +90,7 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
       response_precomp <- pieces_precomp <- NA
     }
 
+    # 8. update args_to_pass
     args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     args_to_pass$pieces_precomp <- pieces_precomp
     args_to_pass$expression_vector_nt <- expression_vector_nt
@@ -125,10 +126,10 @@ run_high_moi_in_memory <- function(response_matrix, grna_assignments,
   args_to_pass <- list(synthetic_idxs = synthetic_idxs, B1 = B1, B2 = B2, B3 = B3,
                        fit_skew_normal = fit_skew_normal,
                        return_resampling_dist = return_resampling_dist,
-                       grna_assignments = grna_assignments,
-                       covariate_matrix = covariate_matrix,
-                       regression_method = regression_method)
+                       grna_group_idxs = grna_assignments,
+                       covariate_matrix = covariate_matrix)
   n_cells <- ncol(response_matrix)
+  low_level_association_funct <- "highmoi_discovery_stat"
 
   # 2. loop over the response IDs
   response_ids <- unique(response_grna_group_pairs$response_id)
@@ -150,7 +151,61 @@ run_high_moi_in_memory <- function(response_matrix, grna_assignments,
     l <- response_grna_group_pairs$response_id == response_id
     curr_df <- response_grna_group_pairs[l,]
 
-    # 5. perform the QC
+    # 5. if running a discovery analysis, do QC
+    if (!calibration_check) {
+      n_nonzero_tot <- sum(expression_vector >= 1)
+      grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_assignments))
+      n_nonzero_trt_curr <- compute_n_nonzero_trt_vector(expression_vector = expression_vector,
+                                                         grna_group_idxs = grna_assignments,
+                                                         grna_group_posits = grna_group_posits)
+      curr_df$n_nonzero_trt <- n_nonzero_trt_curr
+      curr_df$n_nonzero_cntrl <- n_nonzero_tot - n_nonzero_trt_curr
+      pass_qc <- (curr_df$n_nonzero_trt >= n_nonzero_trt_thresh) & (curr_df$n_nonzero_cntrl >= n_nonzero_cntrl_thresh)
 
+      # i. if no pair passes qc, jump to next iteration
+      if (!any(pass_qc)) {
+        result_list_outer[[out_counter]] <- curr_df
+        out_counter <- out_counter + 1L
+        next
+      }
+
+      # ii. remove any rows that have not passed qc; keep the rows that have passed qc
+      if (!all(pass_qc)) {
+        result_list_outer[[out_counter]] <- curr_df[!pass_qc,]
+        out_counter <- out_counter + 1L
+      }
+      curr_df <- curr_df[pass_qc,]
+    }
+
+    # 6. perform the gene expression on technical factor regression
+    response_precomp <- perform_response_precomputation(expressions = expression_vector,
+                                                        covariate_matrix = covariate_matrix,
+                                                        regression_method = regression_method)
+
+    # 7. obtain precomputation peices for NT cells
+    pieces_precomp <- compute_precomputation_pieces(expression_vector,
+                                                    covariate_matrix,
+                                                    response_precomp$fitted_coefs,
+                                                    response_precomp$theta,
+                                                    full_test_stat = TRUE)
+
+    # 8. update args to pass
+    args_to_pass$grna_groups <- as.character(curr_df$grna_group)
+    args_to_pass$pieces_precomp <- pieces_precomp
+    args_to_pass$expression_vector <- expression_vector
+
+    # pass the arguments the the low-level association testing function
+    curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
+
+    # 10. combine the response-wise results into a data table; insert into list
+    result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
+                                                                return_debugging_metrics, return_resampling_dist,
+                                                                response_precomp$precomp_str, low_level_association_funct)
+    out_counter <- out_counter + 1L
   }
+
+  # combine and sort result
+  ret <- data.table::rbindlist(result_list_outer, fill = TRUE)
+  data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
+  return(ret)
 }

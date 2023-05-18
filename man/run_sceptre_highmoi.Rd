@@ -12,6 +12,7 @@ run_sceptre_highmoi(
   formula_object,
   response_grna_group_pairs,
   calibration_check,
+  threshold = 5,
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
   discovery_test_stat = "exact",

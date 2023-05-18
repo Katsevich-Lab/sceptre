@@ -1,3 +1,28 @@
+highmoi_discovery_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, grna_groups, pieces_precomp, expression_vector) {
+  result_list_inner <- vector(mode = "list", length = length(grna_groups))
+  n_cells <- length(expression_vector)
+  # compute the D matrix
+  D <- compute_D_matrix(Zt_wZ = pieces_precomp$Zt_wZ, wZ = pieces_precomp$wZ)
+  for (i in seq_along(grna_groups)) {
+    curr_grna_group <- grna_groups[i]
+    idxs <- get_discovery_idx_vector(curr_grna_group, grna_group_idxs, n_cells)
+    result <- run_low_level_test_full_v2(y = expression_vector[idxs$idxs],
+                                         mu = pieces_precomp$mu[idxs$idxs],
+                                         a = pieces_precomp$a[idxs$idxs],
+                                         w = pieces_precomp$w[idxs$idxs],
+                                         D = D[,idxs$idxs],
+                                         n_cntrl = idxs$n_cntrl,
+                                         n_trt = idxs$n_trt,
+                                         synthetic_idxs = synthetic_idxs,
+                                         B1 = B1, B2 = B2, B3 = B3,
+                                         fit_skew_normal = fit_skew_normal,
+                                         return_resampling_dist = return_resampling_dist)
+    result_list_inner[[i]] <- result
+  }
+  return(result_list_inner)
+}
+
+
 lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
@@ -153,4 +178,12 @@ get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
   undercover_cells <- indiv_nt_grna_idxs[undercover_nts] |> unlist() |> stats::setNames(NULL)
   idxs <- c(control_cells, undercover_cells)
   return(list(idxs = idxs, n_trt = length(undercover_cells), n_cntrl = length(control_cells)))
+}
+
+
+get_discovery_idx_vector <- function(curr_grna_group, grna_group_idxs, n_cells) {
+  trt_idxs <- grna_group_idxs[[curr_grna_group]]
+  cntrl_idxs <- seq(1L, n_cells)[-trt_idxs]
+  idxs <- c(cntrl_idxs, trt_idxs)
+  return(list(idxs = idxs, n_trt = length(trt_idxs), n_cntrl = length(cntrl_idxs)))
 }
