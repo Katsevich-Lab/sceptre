@@ -2,35 +2,57 @@
 # If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
 # If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
 assign_grnas_to_cells <- function(grna_matrix, grna_group_data_frame, threshold, low_moi, control_group_complement, calibration_check) {
-  grna_assignments <- assign_grnas_to_cells_lowmoi(grna_matrix, grna_group_data_frame, calibration_check, control_group_complement)
-
+  if (low_moi) {
+    grna_assignments <- assign_grnas_to_cells_lowmoi(grna_matrix, grna_group_data_frame, calibration_check, control_group_complement)
+  } else {
+    grna_assignments <- assign_grnas_to_cells_highmoi(grna_matrix, threshold, grna_group_data_frame, calibration_check)
+  }
+ return(grna_assignments)
 }
 
 
-assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_data_frame) {
-  grna_ids <- rownames(grna_matrix)
-  # make the grna matrix row-accessible
+assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_data_frame, calibration_check) {
+  out <- list()
+
+  # 1. make the matrix row-accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  # obtain the assignments for all grna groups, looping over each
-  grna_groups <- unique(grna_group_data_frame$grna_group)
+
+  # 2. obtain the grna ids and groups
+  grna_ids <- rownames(grna_matrix)
+  grna_groups <- as.character(unique(grna_group_data_frame$grna_group))
   grna_groups <- grna_groups[grna_groups != "non-targeting"]
-  # loop over the grna groups, obtaining the cell assignments
-  grna_assignments <- sapply(grna_groups, function(grna_group) {
+
+  # 3. loop over the targeting grna groups, obtaining the cell assignments for each
+  grna_group_idxs <- sapply(grna_groups, function(grna_group) {
     l <- grna_group_data_frame$grna_group == grna_group
     curr_grna_ids <- grna_group_data_frame$grna_id[l]
     row_idxs <- match(x = curr_grna_ids, grna_ids)
     cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                                      row_idxs = row_idxs, threshold = threshold)
-    # cell_idxs <- which(apply(grna_matrix[1:2,] >= threshold, 2, function(col) any(col)))
     return(cell_idxs)
   })
-  return(grna_assignments)
+  out$grna_group_idxs <- grna_group_idxs
+
+  # 4. if running a calibration check, also the individual NT gRNAs
+  if (calibration_check) {
+    nt_grnas <- grna_group_data_frame |>
+      dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")
+    indiv_nt_grna_idxs <- sapply(nt_grnas, function(nt_grna) {
+      row_idx <- match(x = nt_grna, grna_ids)
+      cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                                       row_idxs = row_idx, threshold = threshold)
+      return(cell_idxs)
+    })
+    out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
+  }
+
+  return(out)
 }
 
 
 assign_grnas_to_cells_lowmoi <- function(grna_matrix, grna_group_data_frame, calibration_check, control_group_complement) {
   out <- list()
-  # 1. get the idx of the maximum of each column
+  # 1. make grna matrix column accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
 
   # 2. get the individual grna assignments
@@ -77,6 +99,5 @@ assign_grnas_to_cells_lowmoi <- function(grna_matrix, grna_group_data_frame, cal
     }
     out$all_nt_idxs <- all_nt_idxs
   }
-
   return(out)
 }
