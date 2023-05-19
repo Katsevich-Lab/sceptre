@@ -232,7 +232,7 @@ harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, co
   }
   if (!fit_skew_normal) assign(x = "B2", value = 0L, inherits = TRUE)
   assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
-  assign(x = "control_group_complement", value = (control_group == "complement"), inherits = TRUE)
+  assign(x = "control_group_complement", value = (control_group == "complement" || moi == "high"), inherits = TRUE)
   return (NULL)
 }
 
