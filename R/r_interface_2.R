@@ -108,6 +108,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
 
   # 7. construct the negative control pairs
   if (calibration_check) {
+    if (moi == "high") stop("Automatic calibration check not yet supported for high MOI.")
     cat("Constructing negative control pairs.")
     if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
     response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size,

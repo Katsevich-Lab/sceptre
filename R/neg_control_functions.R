@@ -24,7 +24,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
                                                      n_cells = response_matrix@Dim[2],
                                                      grna_group_idxs = grna_group_idxs,
                                                      indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-                                                     all_nt_idxs = grna_assignments$all_nt_idxs,
+                                                     all_nt_idxs = if (!control_group_complement) grna_assignments$all_nt_idxs else integer(),
                                                      to_analyze_response_idxs = to_analyze_response_idxs,
                                                      to_analyze_grna_idxs = to_analyze_grna_idxs,
                                                      n_nonzero_trt_thresh = n_nonzero_trt_thresh,
@@ -47,7 +47,8 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
   }
 
   # 5. sample WOR from the set of undercover pairs
-  samp <- sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+  samp <- sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m,
+                                  n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 
   # 6. construct the data frame of negative control pairs
   response_ids <- factor(rownames(response_matrix))
