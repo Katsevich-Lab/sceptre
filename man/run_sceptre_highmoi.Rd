@@ -14,7 +14,7 @@ run_sceptre_highmoi(
   regularization_amount = 0,
   B = 1000,
   full_output = FALSE,
-  parallel = TRUE,
+  parallel = FALSE,
   seed = 4
 )
 }
