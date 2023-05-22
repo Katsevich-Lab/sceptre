@@ -41,17 +41,20 @@ systems.
   the [low MOI
   tutorial](https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html).
 
-- High MOI: If you are working with high MOI data (\> 5 gRNAs per cell),
-  see the [high MOI
+- High MOI: If you are working with high MOI data ($\geq$ 2 gRNAs per
+  cell), see the [high MOI
   tutorial](https://katsevich-lab.github.io/sceptre/articles/highmoi_tutorial.html).
 
 - Large-scale analysis at low or high MOI: If you are running a
   large-scale analysis (i.e., the data do not easily fit into memory or
   you are using a high-performance cluster or cloud), see the `sceptre`
   [Nextflow
-  pipeline](https://github.com/timothy-barry/sceptre-pipeline). This
-  pipeline currently is under active development and is not yet stable;
-  please open a Github issue or send an email if you are interested.
+  pipeline](https://github.com/timothy-barry/sceptre-pipeline). Open a
+  Github issue if you are interested in using this pipeline.
+
+The high-MOI function currently is slower and more memory-intensive than
+the low-MOI function. Updates to improve the speed and memory efficiency
+of the high-MOI function are coming June 2023.
 
 ## Associated papers
 
