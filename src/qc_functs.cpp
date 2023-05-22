@@ -63,7 +63,7 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs(IntegerVector j, IntegerVector p, 
 List compute_nt_nonzero_matrix_and_n_ok_pairs_v2(IntegerVector j, IntegerVector p, int n_cells, List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, bool compute_n_ok_pairs, bool control_group_complement) {
   // 0. initialize variables and objects
   std::vector<bool> y(n_cells);
-  int n_nt_grnas = indiv_nt_grna_idxs.size(), n_genes = p.size() - 1, n_ok_pairs = 0, pair_pointer = 0, n_nonzero = 0, n_nonzero_cntrl = 0;
+  int n_nt_grnas = indiv_nt_grna_idxs.size(), n_genes = p.size() - 1, n_ok_pairs = 0, pair_pointer = 0, n_nonzero = 0, n_nonzero_cntrl = 0, n_nonzero_trt = 0;
   IntegerVector curr_idxs;
   IntegerVector n_nonzero_tot(n_genes);
   bool n_cntrl_cells_ok;
