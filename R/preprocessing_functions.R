@@ -10,6 +10,12 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if (!nt_present) {
     stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
   }
+  # verify also that >= 2 NT gRNAs are present when running a calibration check
+  n_nt_grnas <- grna_group_data_frame |>
+    dplyr::filter(grna_group == "non-targeting") |> nrow()
+  if (calibration_check && (n_nt_grnas <= 1)) {
+    stop("Two or more non-targeting gRNAs must be present when running a calibration check.")
+  }
 
   # 3. verify that the row names are unique for both response and grna modalities
   response_ids <- rownames(response_matrix)
@@ -80,6 +86,8 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame, grn
   if (!(regression_method %in% c("nb_glm", "poisson_glm"))) {
     stop("`regression_method` should be either `nb_glm` or `poisson_glm`.")
   }
+
+  # 12.
 
   return(NULL)
 }
