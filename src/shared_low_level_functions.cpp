@@ -107,32 +107,40 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
   // 1. fit the skew normal
   std::vector<double> fitted_params = fit_skew_normal_funct(null_statistics);
   double p = -1.0;
+  bool finite_params = true;
 
-  // 2. sort the vector of null statistics
-  sort(null_statistics.begin(), null_statistics.end(), std::less<double>());
-
-  // 3. compute the median of the null statistics
-  int median_idx = (null_statistics.size() - 1)/2;
-  double median = null_statistics[median_idx];
-
-  // 4. determine the tail to check; if z_orig >= median, right; else, left
-  bool check_right_tail = (z_orig >= median);
-  bool tail_ok;
-
-  // 5. check the appropriate tail and, if applicable, compute p-value
-  if (check_right_tail) { // right tail check
-    tail_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
-  } else { // left tail check
-    std::reverse(null_statistics.begin(), null_statistics.end());
-    for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
-    tail_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+  // 1.5 check that params are real numbers
+  for (int i = 0; i < fitted_params.size(); i ++) {
+    if (!std::isfinite(fitted_params[i])) finite_params = false;
   }
 
-  // 6. if the tail is OK, compute the SN p-value (using the appropriate tail)
-  if (tail_ok) {
-    skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
-    p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
-    if (p <= 1.0e-250) p = 1.0e-250;
+  if (finite_params) {
+    // 2. sort the vector of null statistics
+    sort(null_statistics.begin(), null_statistics.end(), std::less<double>());
+
+    // 3. compute the median of the null statistics
+    int median_idx = (null_statistics.size() - 1)/2;
+    double median = null_statistics[median_idx];
+
+    // 4. determine the tail to check; if z_orig >= median, right; else, left
+    bool check_right_tail = (z_orig >= median);
+    bool tail_ok;
+
+    // 5. check the appropriate tail and, if applicable, compute p-value
+    if (check_right_tail) { // right tail check
+      tail_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
+    } else { // left tail check
+      std::reverse(null_statistics.begin(), null_statistics.end());
+      for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
+      tail_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+    }
+
+    // 6. if the tail is OK, compute the SN p-value (using the appropriate tail)
+    if (tail_ok) {
+      skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
+      p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
+      if (p <= 1.0e-250) p = 1.0e-250;
+    }
   }
 
   // 7. return p
