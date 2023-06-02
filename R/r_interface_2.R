@@ -57,6 +57,7 @@
 #' calibration_check <- FALSE
 #' moi <- "low"
 #' control_group <- "complement"
+#' calibration_check <- FALSE
 #' grna_group_data_frame <- grna_group_data_frame_lowmoi
 #'
 #' # 1. obtain the set of pairs to analyze
@@ -106,12 +107,12 @@ run_sceptre <- function(response_matrix, grna_matrix,
 
   # 5. convert the cell covariate data frame into a design matrix
   covariate_matrix <- convert_covariate_df_to_design_matrix(covariate_data_frame, formula_object)
-  rm(covariate_data_frame)
+  # rm(covariate_data_frame)
 
   # 6. assign gRNAs to cells
   n_cells <- nrow(covariate_matrix)
-  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, n_cells, calibration_check)
-  rm(grna_matrix)
+  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, calibration_check)
+  # rm(grna_matrix)
   cat(crayon::green(' \u2713\n'))
 
   # 7. construct the negative control pairs
@@ -135,5 +136,9 @@ run_sceptre <- function(response_matrix, grna_matrix,
   ####################
   # PART 2: RUN METHOD
   ####################
-
+  ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
+                                 covariate_matrix, response_grna_group_pairs,
+                                 synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                 B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                                 n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
 }
