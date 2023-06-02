@@ -72,29 +72,18 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
   }
 
-  # 10. ensure that regression_method is nb_glm or poisson_glm
-  if (!(regression_method %in% c("nb_glm", "poisson_glm"))) {
-    stop("`regression_method` should be either `nb_glm` or `poisson_glm`.")
-  }
-
-  # 11. verify that moi and control group are specified
+  # 10. verify that moi and control group are specified
   if (!(moi %in% c("low", "high"))) {
     stop("`moi` should be either `low` or `high`.")
   }
 
-  # 12. verify that control group is either nt_cells or complement
+  # 11. verify that control group is either nt_cells or complement
   if (!control_group %in% c("nt_cells", "complement")) {
     stop("`control_group` should be either `nt_cells` or `complement`.")
   }
 
-  # 13. check for the presence of "non-targeting" in the grna_group column
-  nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
-  if (!nt_present) {
-    stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
-  }
-
-  # 14. if we are in low MOI and the control group is set to the complement set, NT cells must be present; verify.
-  if (moi == "low" && control_group == "complement") {
+  # 12. if we are in low MOI and the control group is set to the nt_cells set, NT cells must be present; verify.
+  if (moi == "low" && control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
     if (!nt_present) {
       stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
@@ -204,26 +193,6 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, undercover_group_size = NULL) {
-  if (calibration_check) {
-    indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
-    M <- sum(indiv_nt_sizes[seq(1, undercover_group_size)])
-    n_control_cells <- length(grna_assignments$all_nt_idxs)
-    out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
-  } else { # discovery
-    grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
-    grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
-    range_grna_group_sizes <- range(grna_group_sizes)
-    n_control_cells <- length(grna_assignments$all_nt_idxs)
-    out <- hybrid_fisher_iwor_sampler(N = n_control_cells,
-                                      m = range_grna_group_sizes[1],
-                                      M = range_grna_group_sizes[2],
-                                      B = B)
-  }
-  return(out)
-}
-
-
 harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
@@ -276,14 +245,56 @@ compute_cell_covariates <- function(matrix_in) {
 }
 
 
+order_pairs_to_analyze <- function(response_grna_group_pairs) {
+  response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
+  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
+  return(response_grna_group_pairs)
+}
+
+
 get_synthetic_idxs_highmoi <- function(B, grna_assignments, n_cells) {
   max_cells_per_grna_group <- sapply(grna_assignments, length) |> max()
   fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
 }
 
 
-order_pairs_to_analyze <- function(response_grna_group_pairs) {
-  response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
-  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
-  return(response_grna_group_pairs)
+get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, undercover_group_size = NULL) {
+
+  return(out)
+}
+
+
+get_synthetic_idxs <- function(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, n_cells, calibration_check) {
+  if (low_moi && !control_group_complement) {
+    if (calibration_check) {
+      # option 1: low MOI, NT cell control group, calibration check
+      indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+      M <- sum(indiv_nt_sizes[seq(1, undercover_group_size)])
+      n_control_cells <- length(grna_assignments$all_nt_idxs)
+      out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
+    } else {
+      # option 2: low MOI, NT cell control group, discovery
+      grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
+      grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
+      range_grna_group_sizes <- range(grna_group_sizes)
+      n_control_cells <- length(grna_assignments$all_nt_idxs)
+      out <- hybrid_fisher_iwor_sampler(N = n_control_cells,
+                                        m = range_grna_group_sizes[1],
+                                        M = range_grna_group_sizes[2],
+                                        B = B)
+    }
+  }
+  if (control_group_complement) {
+    # option 3: complement set control group, calibration check
+    if (calibration_check) {
+      indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+      M <- sum(indiv_nt_sizes[seq(1, undercover_group_size)])
+      out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
+    } else {
+      # option 4: complement set control group, discovery
+      max_cells_per_grna_group <- sapply(grna_assignments$grna_group_idxs, length) |> max()
+      out <- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
+    }
+  }
+  return(out)
 }
