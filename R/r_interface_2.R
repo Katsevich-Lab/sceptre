@@ -51,6 +51,14 @@
 #' data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
 #' data(grna_group_data_frame_lowmoi) # gRNA group information
 #'
+#' response_matrix <- response_matrix_lowmoi
+#' grna_matrix <- grna_matrix_lowmoi
+#' covariate_data_frame <- covariate_data_frame_lowmoi
+#' calibration_check <- FALSE
+#' moi <- "low"
+#' control_group <- "complement"
+#' grna_group_data_frame <- grna_group_data_frame_lowmoi
+#'
 #' # 1. obtain the set of pairs to analyze
 #' response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
 #' grna_group_data_frame_lowmoi)
@@ -77,8 +85,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
                         calibration_group_size = NULL, n_calibration_pairs = NULL,
-                        B1 = 499L, B2 = 4999L, B3 = 24999L,
-                        regression_method = "poisson_glm", print_progress = TRUE) {
+                        B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   ###############
   # PART 1: SETUP
   ###############
@@ -88,7 +95,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
                grna_group_data_frame, formula_object, calibration_check,
                response_grna_group_pairs, regression_method, moi, control_group) |> invisible()
 
-  # 2. order the pairs to analyze data frame
+  # 2. order the pairs to analyze data frame, gene first and then grna second
   response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs)
 
   # 3. harmonize arguments (called for side-effects)
@@ -102,7 +109,8 @@ run_sceptre <- function(response_matrix, grna_matrix,
   rm(covariate_data_frame)
 
   # 6. assign gRNAs to cells
-  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, threshold, low_moi, control_group_complement, calibration_check)
+  n_cells <- nrow(covariate_matrix)
+  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, n_cells, calibration_check)
   rm(grna_matrix)
   cat(crayon::green(' \u2713\n'))
 
@@ -119,6 +127,10 @@ run_sceptre <- function(response_matrix, grna_matrix,
   }
 
   # 8. generate the set of synthetic indicator idxs
+  cat("Generating permutation resamples.")
+  synthetic_idxs <- get_synthetic_idxs(grna_assignments, B1 + B2 + B3, calibration_check, low_moi, control_group_complement, calibration_group_size)
+  cat(crayon::green(' \u2713\n'))
+  gc() |> invisible()
 
   ####################
   # PART 2: RUN METHOD

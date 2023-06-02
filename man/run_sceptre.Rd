@@ -25,7 +25,6 @@ run_sceptre(
   B1 = 499L,
   B2 = 4999L,
   B3 = 24999L,
-  regression_method = "poisson_glm",
   print_progress = TRUE
 )
 }
@@ -68,9 +67,9 @@ run_sceptre(
 
 \item{B3}{(optional; lower importance; default 24999) the number of null test statistics to compute the third round of the permutation test.}
 
-\item{regression_method}{(optional; lower importance; default "poisson_glm") The regression method to use to regress out the covariates, either "poisson_glm" for a Poisson GLM or "nb_glm" for a negative binomial GLM.}
-
 \item{print_progress}{(optional; default TRUE) print the progress of the function?}
+
+\item{regression_method}{(optional; lower importance; default "poisson_glm") The regression method to use to regress out the covariates, either "poisson_glm" for a Poisson GLM or "nb_glm" for a negative binomial GLM.}
 }
 \value{
 a data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.
@@ -99,6 +98,14 @@ data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
 data(grna_group_data_frame_lowmoi) # gRNA group information
+
+response_matrix <- response_matrix_lowmoi
+grna_matrix <- grna_matrix_lowmoi
+covariate_data_frame <- covariate_data_frame_lowmoi
+calibration_check <- FALSE
+moi <- "low"
+control_group <- "complement"
+grna_group_data_frame <- grna_group_data_frame_lowmoi
 
 # 1. obtain the set of pairs to analyze
 response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
