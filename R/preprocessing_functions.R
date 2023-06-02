@@ -252,24 +252,12 @@ order_pairs_to_analyze <- function(response_grna_group_pairs) {
 }
 
 
-get_synthetic_idxs_highmoi <- function(B, grna_assignments, n_cells) {
-  max_cells_per_grna_group <- sapply(grna_assignments, length) |> max()
-  fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
-}
-
-
-get_synthetic_idxs_lowmoi <- function(grna_assignments, B, calibration_check, undercover_group_size = NULL) {
-
-  return(out)
-}
-
-
-get_synthetic_idxs <- function(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, n_cells, calibration_check) {
+get_synthetic_idxs <- function(grna_assignments, B, calibration_check, low_moi, control_group_complement, calibration_group_size) {
   if (low_moi && !control_group_complement) {
     if (calibration_check) {
       # option 1: low MOI, NT cell control group, calibration check
       indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
-      M <- sum(indiv_nt_sizes[seq(1, undercover_group_size)])
+      M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
       n_control_cells <- length(grna_assignments$all_nt_idxs)
       out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
     } else {
@@ -288,7 +276,7 @@ get_synthetic_idxs <- function(grna_matrix, grna_group_data_frame, grna_assign_t
     # option 3: complement set control group, calibration check
     if (calibration_check) {
       indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
-      M <- sum(indiv_nt_sizes[seq(1, undercover_group_size)])
+      M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
       out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
     } else {
       # option 4: complement set control group, discovery
