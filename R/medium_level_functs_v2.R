@@ -95,7 +95,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
     args_to_pass$response_precomp <- response_precomp
 
     # 8. pass the arguments to the appropriate low-level assocation testing function
-    # curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
+    curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
 
     # 9. combine the response-wise results into a data table; insert into list
     result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
