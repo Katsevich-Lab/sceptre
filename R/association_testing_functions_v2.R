@@ -1,12 +1,3 @@
-# helper function 0: compute D matrix
-compute_D_matrix <- function(Zt_wZ, wZ) {
-  P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
-  U <- P_decomp$vectors
-  Lambda_minus_half <- 1/sqrt(P_decomp$values)
-  D <- (Lambda_minus_half * t(U)) %*% t(wZ)
-  return(D)
-}
-
 # helper function 1: idx vector for discovery analysis complement set
 get_idx_vector_discovery_complement_set <- function(curr_grna_group, grna_group_idxs, n_cells) {
   trt_idxs <- grna_group_idxs[[curr_grna_group]]

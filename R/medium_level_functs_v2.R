@@ -27,7 +27,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
     low_level_association_funct <- "discovery_complement_perm_test"
   }
   run_outer_regression <- low_level_association_funct != "discovery_ntcells_perm_test"
-  n_cells <- ncol(covariate_matrix)
+  n_cells <- nrow(covariate_matrix)
   if (low_level_association_funct == "calibration_ntcells_perm_test") {
     covariate_matrix <- covariate_matrix[all_nt_idxs,]
   }
@@ -85,14 +85,13 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
                                                       response_precomp$theta,
                                                       full_test_stat = TRUE)
     } else {
-      response_precomp <- pieces_precomp <- NA
+      pieces_precomp <- NA
     }
 
     # 7. update the args_to_pass
     args_to_pass$grna_groups <- as.character(curr_df$grna_group)
     args_to_pass$expression_vector <- expression_vector
     args_to_pass$pieces_precomp <- pieces_precomp
-    args_to_pass$response_precomp <- response_precomp
 
     # 8. pass the arguments to the appropriate low-level assocation testing function
     curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
