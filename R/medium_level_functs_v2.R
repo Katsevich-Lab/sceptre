@@ -27,7 +27,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
     low_level_association_funct <- "discovery_complement_perm_test"
   }
   run_outer_regression <- low_level_association_funct != "discovery_ntcells_perm_test"
-  n_cells <- ncol(response_matrix)
+  n_cells <- ncol(covariate_matrix)
   if (low_level_association_funct == "calibration_ntcells_perm_test") {
     covariate_matrix <- covariate_matrix[all_nt_idxs,]
   }
