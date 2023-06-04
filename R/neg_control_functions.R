@@ -62,7 +62,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
 
   # 7. check the number of rows of df, and issue a warning if less than the required amount
   if (nrow(df) < n_calibration_pairs) {
-    warning(paste0("Unable to generate ", n_calibration_pairs, " negative control pairs. Consider increasing `calibration_group_size`."))
+    warning(paste0("Unable to generate ", n_calibration_pairs, " negative control pairs (i.e., the number of discovery pairs that passes pairwise QC). Consider increasing `calibration_group_size`. If possible, consider rerunning the experiment with more negative control gRNAs."))
   }
 
   return(df)

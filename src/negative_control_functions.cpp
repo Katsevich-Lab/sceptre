@@ -34,11 +34,11 @@ IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_s
   std::mt19937 generator(4);
   std::uniform_real_distribution<double> distribution(0, 1);
 
-  // initialze additional variables
+  // initialize additional variables
   int B = 10000, n_nt_grnas = n_nonzero_m.nrow(), n_pairs_passed_qc = 0, n_nonzero_trt, n_nonzero_cntrl, gene_idx;
   double MULT_FACTOR = 5.0, n_genes = (double) n_nonzero_m.ncol();
 
-  // 1. estimate the fraction of pairs that passes QC
+  // 1. estimate the fraction of negative control pairs that passes QC
   for (int i = 0; i < B; i ++) {
     sample = draw_wor_sample(n_nt_grnas, undercover_group_size, generator, distribution);
     gene_idx = floor(distribution(generator) * n_genes);

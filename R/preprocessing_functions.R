@@ -252,37 +252,32 @@ order_pairs_to_analyze <- function(response_grna_group_pairs) {
 }
 
 
-get_synthetic_idxs <- function(grna_assignments, B, calibration_check, low_moi, control_group_complement, calibration_group_size) {
-  if (low_moi && !control_group_complement) {
-    if (calibration_check) {
-      # option 1: low MOI, NT cell control group, calibration check
-      indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
-      M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
-      n_control_cells <- length(grna_assignments$all_nt_idxs)
-      out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
-    } else {
-      # option 2: low MOI, NT cell control group, discovery
-      grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
-      grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
-      range_grna_group_sizes <- range(grna_group_sizes)
-      n_control_cells <- length(grna_assignments$all_nt_idxs)
-      out <- hybrid_fisher_iwor_sampler(N = n_control_cells,
-                                        m = range_grna_group_sizes[1],
-                                        M = range_grna_group_sizes[2],
-                                        B = B)
-    }
+get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_check, control_group_complement, calibration_group_size, n_cells) {
+  if (calibration_check && !control_group_complement) { # 1. calibration check, nt cells (low MOI only)
+    indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+    M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+    n_control_cells <- length(grna_assignments$all_nt_idxs)
+    out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
+
+  } else if (calibration_check && control_group_complement) { # 2. calibration check, complement (low and high MOI)
+    indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+    M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+    out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
+
+  } else if (!calibration_check && !control_group_complement) { # 3. discovery, nt cells (low MOI only)
+    grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
+    grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
+    range_grna_group_sizes <- range(grna_group_sizes)
+    n_control_cells <- length(grna_assignments$all_nt_idxs)
+    out <- hybrid_fisher_iwor_sampler(N = n_control_cells,
+                                      m = range_grna_group_sizes[1],
+                                      M = range_grna_group_sizes[2],
+                                      B = B)
+
+  } else if (!calibration_check && control_group_complement) { # 4. discovery, complement (low and high MOI)
+    max_cells_per_grna_group <- sapply(grna_assignments$grna_group_idxs, length) |> max()
+    out <- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
   }
-  if (control_group_complement) {
-    # option 3: complement set control group, calibration check
-    if (calibration_check) {
-      indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
-      M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
-      out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
-    } else {
-      # option 4: complement set control group, discovery
-      max_cells_per_grna_group <- sapply(grna_assignments$grna_group_idxs, length) |> max()
-      out <- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
-    }
-  }
+
   return(out)
 }

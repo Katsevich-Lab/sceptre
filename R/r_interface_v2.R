@@ -110,7 +110,6 @@ run_sceptre <- function(response_matrix, grna_matrix,
   # rm(covariate_data_frame)
 
   # 6. assign gRNAs to cells
-  n_cells <- nrow(covariate_matrix)
   grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, calibration_check)
   # rm(grna_matrix)
   cat(crayon::green(' \u2713\n'))
@@ -129,7 +128,10 @@ run_sceptre <- function(response_matrix, grna_matrix,
 
   # 8. generate the set of synthetic indicator idxs
   cat("Generating permutation resamples.")
-  synthetic_idxs <- get_synthetic_idxs(grna_assignments, B1 + B2 + B3, calibration_check, low_moi, control_group_complement, calibration_group_size)
+  n_cells <- nrow(covariate_matrix)
+  synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
+                                                   control_group_complement, calibration_group_size, n_cells)
+
   cat(crayon::green(' \u2713\n'))
   gc() |> invisible()
 
