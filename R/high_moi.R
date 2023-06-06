@@ -1174,13 +1174,12 @@ combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
   leftover_gRNAs <- setdiff(row.names(perturbation_matrix), unlist(gRNA_grp_list))
   out_leftover <- perturbation_matrix[leftover_gRNAs,]
   out_grped <- sapply(X = names(gRNA_grp_list), FUN = function(grp_name) {
-    mat_sub <- perturbation_matrix[gRNA_grp_list[[grp_name]],]
+    mat_sub <- perturbation_matrix[gRNA_grp_list[[grp_name]],,drop=FALSE]
     Matrix::colSums(mat_sub)
   }) |> Matrix::t()
   out_grped <- out_grped >= 1
   out <- rbind(out_leftover, out_grped)
 }
-
 
 #' Threshold gRNA count matrix
 #'
