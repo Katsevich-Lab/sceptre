@@ -54,6 +54,7 @@
 #' calibration_check <- FALSE
 #' moi <- "low"
 #' control_group <- "complement"
+#' resampling_mechanism <- "permutations"
 #' grna_group_data_frame <- grna_group_data_frame_lowmoi
 #'
 #' # 1. obtain the set of pairs to analyze
@@ -77,7 +78,7 @@
 run_sceptre <- function(response_matrix, grna_matrix,
                         covariate_data_frame, grna_group_data_frame,
                         formula_object, response_grna_group_pairs,
-                        calibration_check, moi, control_group,
+                        calibration_check, moi, control_group, resampling_mechanism,
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
@@ -90,7 +91,8 @@ run_sceptre <- function(response_matrix, grna_matrix,
   # 1. check function input arguments
   check_inputs(response_matrix, grna_matrix, covariate_data_frame,
                grna_group_data_frame, formula_object, calibration_check,
-               response_grna_group_pairs, regression_method, moi, control_group) |> invisible()
+               response_grna_group_pairs, regression_method, moi,
+               control_group, resampling_mechanism) |> invisible()
 
   # 2. order the pairs to analyze data frame, gene first and then grna second
   response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs)
@@ -134,9 +136,13 @@ run_sceptre <- function(response_matrix, grna_matrix,
   ####################
   # PART 2: RUN METHOD
   ####################
-  ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
-                                 covariate_matrix, response_grna_group_pairs,
-                                 synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                                 B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                 n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+  if (resampling_mechanism == "permutation") {
+    ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
+                                   covariate_matrix, response_grna_group_pairs,
+                                   synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                   B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+  } else {
+
+  }
 }
