@@ -1,6 +1,7 @@
 check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
                          grna_group_data_frame, formula_object, calibration_check,
-                         response_grna_group_pairs, regression_method, moi, control_group) {
+                         response_grna_group_pairs, regression_method, moi,
+                         control_group, resampling_mechanism) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -89,6 +90,10 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
       stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
     }
   }
+
+  # 13. verify that resampling_mechanism is one of "permutations" or "crt"
+  if (!(resampling_mechanism %in% c("permutations", "crt") ))
+
   return(NULL)
 }
 
