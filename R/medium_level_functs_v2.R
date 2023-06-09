@@ -6,17 +6,6 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
   # 1. setup
   result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
   out_counter <- 1L
-  all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
-  grna_group_idxs <- if (!is.null(grna_assignments$grna_group_idxs)) grna_assignments$grna_group_idxs else NA
-  indiv_nt_grna_idxs <- if (!is.null(grna_assignments$indiv_nt_grna_idxs)) grna_assignments$indiv_nt_grna_idxs else NA
-  args_to_pass <- list(synthetic_idxs = synthetic_idxs,
-                       B1 = B1, B2 = B2, B3 = B3,
-                       fit_skew_normal = fit_skew_normal,
-                       return_resampling_dist = return_resampling_dist,
-                       covariate_matrix = covariate_matrix,
-                       all_nt_idxs = all_nt_idxs,
-                       grna_group_idxs = grna_group_idxs,
-                       indiv_nt_grna_idxs = indiv_nt_grna_idxs)
   if (calibration_check && !control_group_complement) {
     low_level_association_funct <- "calibration_ntcells_perm_test"
   } else if (calibration_check && control_group_complement) {
@@ -27,6 +16,17 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
     low_level_association_funct <- "discovery_complement_perm_test"
   }
   run_outer_regression <- low_level_association_funct != "discovery_ntcells_perm_test"
+  all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
+  grna_group_idxs <- if (!is.null(grna_assignments$grna_group_idxs)) grna_assignments$grna_group_idxs else NA
+  indiv_nt_grna_idxs <- if (!is.null(grna_assignments$indiv_nt_grna_idxs)) grna_assignments$indiv_nt_grna_idxs else NA
+  args_to_pass <- list(synthetic_idxs = synthetic_idxs,
+                       B1 = B1, B2 = B2, B3 = B3,
+                       fit_skew_normal = fit_skew_normal,
+                       return_resampling_dist = return_resampling_dist,
+                       covariate_matrix = if (run_outer_regression) NA else covariate_matrix,
+                       all_nt_idxs = all_nt_idxs,
+                       grna_group_idxs = grna_group_idxs,
+                       indiv_nt_grna_idxs = indiv_nt_grna_idxs)
   n_cells <- nrow(covariate_matrix)
   if (low_level_association_funct == "calibration_ntcells_perm_test") {
     covariate_matrix <- covariate_matrix[all_nt_idxs,]
@@ -57,7 +57,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
 
     # 5. run QC if conducting a discovery analysis
     if (!calibration_check) {
-      gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs)
+      gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
       curr_df <- gene_wise_qc_result$curr_df
       pass_qc <- gene_wise_qc_result$pass_qc
       any_pass_qc <- gene_wise_qc_result$any_pass_qc
@@ -110,11 +110,11 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
 }
 
 
-do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs) {
+do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
   # 1. compute n nonzero treatment per grna group
-  grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_assignments$grna_group_idxs))
+  grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_group_idxs))
   n_nonzero_trt_curr <- compute_n_nonzero_trt_vector(expression_vector = expression_vector,
-                                                     grna_group_idxs = grna_assignments$grna_group_idxs,
+                                                     grna_group_idxs = grna_group_idxs,
                                                      grna_group_posits = grna_group_posits)
   # 2. compute n nonzero control
   if (!control_group_complement) { # nt cell control group

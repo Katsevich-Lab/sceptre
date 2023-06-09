@@ -105,7 +105,6 @@ covariate_data_frame <- covariate_data_frame_lowmoi
 calibration_check <- FALSE
 moi <- "low"
 control_group <- "complement"
-calibration_check <- FALSE
 grna_group_data_frame <- grna_group_data_frame_lowmoi
 
 # 1. obtain the set of pairs to analyze
