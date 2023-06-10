@@ -14,6 +14,7 @@ run_sceptre(
   calibration_check,
   moi,
   control_group,
+  resampling_mechanism,
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
   grna_assign_threshold = 5L,
@@ -105,6 +106,7 @@ covariate_data_frame <- covariate_data_frame_lowmoi
 calibration_check <- FALSE
 moi <- "low"
 control_group <- "complement"
+resampling_mechanism <- "permutations"
 grna_group_data_frame <- grna_group_data_frame_lowmoi
 
 # 1. obtain the set of pairs to analyze

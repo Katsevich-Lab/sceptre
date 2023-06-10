@@ -181,7 +181,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix,
 # formula_object <- formula(~ lg_gRNA_lib_size + lg_gene_lib_size + p_mito + batch)
 # response_grna_group_pairs <- generate_all_pairs(response_matrix, grna_group_data_frame)
 # calibration_check <- FALSE
-run_sceptre_highmoi <- function(response_matrix, grna_matrix,
+.run_sceptre_highmoi <- function(response_matrix, grna_matrix,
                                 covariate_data_frame, grna_group_data_frame,
                                 formula_object, response_grna_group_pairs,
                                 calibration_check, threshold = 5, n_nonzero_trt_thresh = 7L,
@@ -241,7 +241,7 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
                                 return_debugging_metrics, regression_method, print_progress)
 }
 
-run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
+.run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
                                  covariate_matrix, response_grna_group_pairs,
                                  synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                  B1, B2, B3, calibration_check, discovery_test_stat,
@@ -357,7 +357,7 @@ run_lowmoi_in_memory <- function(response_matrix, grna_assignments,
 }
 
 
-run_high_moi_in_memory <- function(response_matrix, grna_assignments,
+.run_high_moi_in_memory <- function(response_matrix, grna_assignments,
                                    covariate_matrix, response_grna_group_pairs,
                                    synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                    B1, B2, B3, calibration_check, discovery_test_stat,
@@ -453,7 +453,7 @@ run_high_moi_in_memory <- function(response_matrix, grna_assignments,
   return(ret)
 }
 
-highmoi_discovery_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, grna_groups, pieces_precomp, expression_vector) {
+.highmoi_discovery_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, grna_groups, pieces_precomp, expression_vector) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   n_cells <- length(expression_vector)
   # compute the D matrix
@@ -478,7 +478,7 @@ highmoi_discovery_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, 
 }
 
 
-lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
+.lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     grna_group <- grna_groups[i]
@@ -520,7 +520,7 @@ lowmoi_approximate_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_sk
 }
 
 
-lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
+.lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   # compute the D matrix
   D <- compute_D_matrix(Zt_wZ = pieces_precomp$Zt_wZ, wZ = pieces_precomp$wZ)
@@ -544,7 +544,7 @@ lowmoi_undercover_stat <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, 
 }
 
 
-lowmoi_exact_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
+.lowmoi_exact_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_group_idxs, covariate_matrix, all_nt_idxs, regression_method, indiv_nt_grna_idxs, grna_groups, pieces_precomp, expression_vector_nt, expression_vector, response_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     grna_group <- grna_groups[i]
@@ -594,7 +594,7 @@ lowmoi_exact_stat_discovery <- function(synthetic_idxs, B1, B2, B3, fit_skew_nor
 }
 
 
-backup_distilled <- function(curr_expression_vector, curr_covariate_matrix,
+.backup_distilled <- function(curr_expression_vector, curr_covariate_matrix,
                              response_precomp, n_cntrl, n_trt, synthetic_idxs,
                              B1, B2, B3, fit_skew_normal, return_resampling_dist) {
   # 2. get the precomp pieces
@@ -617,7 +617,7 @@ backup_distilled <- function(curr_expression_vector, curr_covariate_matrix,
 }
 
 
-compute_D_matrix <- function(Zt_wZ, wZ) {
+.compute_D_matrix <- function(Zt_wZ, wZ) {
   P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
   U <- P_decomp$vectors
   Lambda_minus_half <- 1/sqrt(P_decomp$values)
@@ -626,7 +626,7 @@ compute_D_matrix <- function(Zt_wZ, wZ) {
 }
 
 
-get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
+.get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
   undercover_nts <- strsplit(x = undercover_group, split = "&", fixed = TRUE)[[1]]
   control_cells <- indiv_nt_grna_idxs[setdiff(names(indiv_nt_grna_idxs), undercover_nts)] |>
     unlist() |> stats::setNames(NULL)
@@ -636,7 +636,7 @@ get_undercover_idx_vector <- function(undercover_group, indiv_nt_grna_idxs) {
 }
 
 
-get_discovery_idx_vector <- function(curr_grna_group, grna_group_idxs, n_cells) {
+.get_discovery_idx_vector <- function(curr_grna_group, grna_group_idxs, n_cells) {
   trt_idxs <- grna_group_idxs[[curr_grna_group]]
   cntrl_idxs <- seq(1L, n_cells)[-trt_idxs]
   idxs <- c(cntrl_idxs, trt_idxs)

@@ -3,7 +3,7 @@
 #include "shared_low_level_functions.h"
 using namespace Rcpp;
 
-
+/*
 // [[Rcpp::export]]
 double compute_observed_distilled_statistic(NumericVector a, NumericVector b, int n_cntrl) {
   double top = 0, bottom = 0;
@@ -101,3 +101,4 @@ List run_low_level_test_distilled(NumericVector y,
 
   return(out);
 }
+*/

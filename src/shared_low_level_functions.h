@@ -1,11 +1,10 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-#ifndef ESTIMATE_LOG_FOLD_CHANGE
-#define ESTIMATE_LOG_FOLD_CHANGE
-double estimate_log_fold_change(NumericVector y, NumericVector mu, int n_cntrl, int n_trt);
+#ifndef ESTIMATE_LOG_FOLD_CHANGE_V2
+#define ESTIMATE_LOG_FOLD_CHANGE_V2
+double estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt);
 #endif
-
 
 #ifndef COMPUTE_EMPIRICAL_P_VALUE
 #define COMPUTE_EMPIRICAL_P_VALUE

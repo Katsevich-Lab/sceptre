@@ -8,11 +8,12 @@ using boost::math::skew_normal;
 #include <math.h>
 #include <algorithm>
 
-double estimate_log_fold_change(NumericVector y, NumericVector mu, int n_cntrl, int n_trt) {
+
+double estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt) {
   double sum_y = 0, sum_mu = 0, n_trt_double = (double) n_trt;
-  for (int i = n_cntrl; i < y.length(); i ++) {
-    sum_y += y[i];
-    sum_mu += mu[i];
+  for (int i = 0; i < n_trt; i ++) {
+    sum_y += y[trt_idxs[i] - 1];
+    sum_mu += mu[trt_idxs[i] - 1];
   }
   return(log2(sum_y/n_trt_double) - log2(sum_mu/n_trt_double));
 }
