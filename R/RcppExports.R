@@ -30,20 +30,8 @@ hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
-compute_observed_distilled_statistic <- function(a, b, n_cntrl) {
-    .Call(`_sceptre_compute_observed_distilled_statistic`, a, b, n_cntrl)
-}
-
-compute_null_distilled_statistics <- function(a, b, start_pos, B, n_trt, synthetic_idxs) {
-    .Call(`_sceptre_compute_null_distilled_statistics`, a, b, start_pos, B, n_trt, synthetic_idxs)
-}
-
-run_low_level_test_distilled <- function(y, mu, a, b, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
-    .Call(`_sceptre_run_low_level_test_distilled`, y, mu, a, b, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
-}
-
-run_low_level_test_full_v2 <- function(y, mu, a, w, D, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
-    .Call(`_sceptre_run_low_level_test_full_v2`, y, mu, a, w, D, n_cntrl, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
+run_low_level_test_full_v3 <- function(y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
+    .Call(`_sceptre_run_low_level_test_full_v3`, y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
 }
 
 sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot) {
