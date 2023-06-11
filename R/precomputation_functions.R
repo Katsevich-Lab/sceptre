@@ -54,6 +54,19 @@ perform_response_precomputation <- function(expressions, covariate_matrix, regre
 }
 
 
+perform_grna_precomputation <- function(trt_idxs, covariate_matrix, return_fitted_values) {
+  indicator <- integer(length = nrow(covariate_matrix))
+  indicator[trt_idxs] <- 1L
+  logistic_fit <- stats::glm.fit(y = indicator, x = covariate_matrix, family = stats::binomial())
+  if (return_fitted_values) {
+    out <- logistic_fit$fitted.values
+  } else {
+    out <- logistic_fit$coefficients
+  }
+  return(out)
+}
+
+
 compute_D_matrix <- function(Zt_wZ, wZ) {
   P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
   U <- P_decomp$vectors

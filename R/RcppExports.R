@@ -30,6 +30,10 @@ hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
+crt_index_sampler <- function(propensity_scores, B) {
+    .Call(`_sceptre_crt_index_sampler`, propensity_scores, B)
+}
+
 run_low_level_test_full_v3 <- function(y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
     .Call(`_sceptre_run_low_level_test_full_v3`, y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
 }

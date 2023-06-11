@@ -198,7 +198,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group) {
+harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism) {
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
     assign(x = "B3", value = 0L, inherits = TRUE)
@@ -207,6 +207,7 @@ harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, co
   if (!fit_skew_normal) assign(x = "B2", value = 0L, inherits = TRUE)
   assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
   assign(x = "control_group_complement", value = (control_group == "complement" || moi == "high"), inherits = TRUE)
+  assign(x = "run_permutations", value = (resampling_mechanism == "permutations"), inherits = TRUE)
   return (NULL)
 }
 
@@ -250,9 +251,9 @@ compute_cell_covariates <- function(matrix_in) {
 }
 
 
-order_pairs_to_analyze <- function(response_grna_group_pairs) {
+order_pairs_to_analyze <- function(response_grna_group_pairs, run_permutations) {
   response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
-  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
+  data.table::setorderv(response_grna_group_pairs, cols = if (run_permutations) "response_id" else "grna_group")
   return(response_grna_group_pairs)
 }
 

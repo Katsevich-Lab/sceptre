@@ -15,7 +15,6 @@ get_idx_vector_discovery_analysis <- function(curr_grna_group, grna_group_idxs) 
 # workhorse function 1: calibrabtion check complement set perm test
 calibration_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
-  n_cells <- length(expression_vector)
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
     idxs <- get_idx_vector_calibration_check(curr_grna_group = curr_grna_group,
@@ -41,8 +40,8 @@ calibration_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_ske
 calibration_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
-    grna_group <- grna_groups[i]
-    idxs <- get_idx_vector_calibration_check(grna_group, indiv_nt_grna_idxs, take_unique = FALSE)
+    curr_grna_group <- grna_groups[i]
+    idxs <- get_idx_vector_calibration_check(curr_grna_group, indiv_nt_grna_idxs, take_unique = FALSE)
     result <- run_low_level_test_full_v3(y = expression_vector,
                                          mu = pieces_precomp$mu,
                                          a = pieces_precomp$a,
@@ -84,7 +83,7 @@ discovery_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_
 # workhorse function 4: discovery analysis nt cells perm test
 discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
-  for (i in seq(grna_groups)) {
+  for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
     idxs <- get_idx_vector_discovery_analysis(curr_grna_group = curr_grna_group, grna_group_idxs = grna_group_idxs)
     trt_idxs <- idxs$trt_idxs

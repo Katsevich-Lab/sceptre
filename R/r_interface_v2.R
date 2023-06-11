@@ -94,25 +94,22 @@ run_sceptre <- function(response_matrix, grna_matrix,
                response_grna_group_pairs, regression_method, moi,
                control_group, resampling_mechanism) |> invisible()
 
-  # 2. order the pairs to analyze data frame, gene first and then grna second
-  response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs)
+  # 2. harmonize arguments (called for side-effects)
+  harmonize_arguments(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism) |> invisible()
 
-  # 3. harmonize arguments (called for side-effects)
-  harmonize_arguments(return_resampling_dist, fit_skew_normal, moi, control_group) |> invisible()
-
-  # 4. make the response matrix row accessible
+  # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
 
-  # 5. convert the cell covariate data frame into a design matrix
+  # 4. convert the cell covariate data frame into a design matrix
   covariate_matrix <- convert_covariate_df_to_design_matrix(covariate_data_frame, formula_object)
   # rm(covariate_data_frame)
 
-  # 6. assign gRNAs to cells
+  # 5. assign gRNAs to cells
   grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, calibration_check)
   # rm(grna_matrix)
   cat(crayon::green(' \u2713\n'))
 
-  # 7. construct the negative control pairs
+  # 6. construct the negative control pairs
   if (calibration_check) {
     if (moi == "high") stop("Automatic calibration check not yet supported for high MOI.")
     cat("Constructing negative control pairs.")
@@ -124,21 +121,34 @@ run_sceptre <- function(response_matrix, grna_matrix,
     cat(crayon::green(' \u2713\n'))
   }
 
-  # 8. generate the set of synthetic indicator idxs
-  cat("Generating permutation resamples.")
-  n_cells <- nrow(covariate_matrix)
-  synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
-                                                   control_group_complement, calibration_group_size, n_cells)
+  # 7. order the pairs to analyze data frame, gene first and then grna second
+  response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs, run_permutations)
 
+  # 8. generate the set of synthetic indicator idxs
+  if (run_permutations) {
+    cat("Generating permutation resamples.")
+    n_cells <- nrow(covariate_matrix)
+    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
+                                                     control_group_complement, calibration_group_size, n_cells)
+  }
   cat(crayon::green(' \u2713\n'))
   gc() |> invisible()
 
   ####################
   # PART 2: RUN METHOD
   ####################
-  ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
-                                 covariate_matrix, response_grna_group_pairs,
-                                 synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                                 B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                 n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+  if (run_permutations) {
+    ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
+                                   covariate_matrix, response_grna_group_pairs,
+                                   synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                   B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+  } else {
+    ret <- run_crt_in_memory(response_matrix, grna_assignments,
+                             covariate_matrix, response_grna_group_pairs,
+                             return_resampling_dist, fit_skew_normal,
+                             B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                             n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+  }
+  return(ret)
 }

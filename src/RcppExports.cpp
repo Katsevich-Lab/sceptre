@@ -63,6 +63,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// crt_index_sampler
+SEXP crt_index_sampler(NumericVector propensity_scores, int B);
+RcppExport SEXP _sceptre_crt_index_sampler(SEXP propensity_scoresSEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type propensity_scores(propensity_scoresSEXP);
+    Rcpp::traits::input_parameter< int >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(crt_index_sampler(propensity_scores, B));
+    return rcpp_result_gen;
+END_RCPP
+}
 // run_low_level_test_full_v3
 List run_low_level_test_full_v3(NumericVector y, NumericVector mu, NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs, int n_trt, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_skew_normal, bool return_resampling_dist);
 RcppExport SEXP _sceptre_run_low_level_test_full_v3(SEXP ySEXP, SEXP muSEXP, SEXP aSEXP, SEXP wSEXP, SEXP DSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_skew_normalSEXP, SEXP return_resampling_distSEXP) {
@@ -340,6 +352,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
     {"_sceptre_fisher_yates_samlper", (DL_FUNC) &_sceptre_fisher_yates_samlper, 3},
     {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
+    {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_run_low_level_test_full_v3", (DL_FUNC) &_sceptre_run_low_level_test_full_v3, 13},
     {"_sceptre_sample_combinations", (DL_FUNC) &_sceptre_sample_combinations, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},

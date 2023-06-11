@@ -23,3 +23,9 @@ IntegerVector synth_idx_list_to_matrix(SEXP synthetic_idx_ptr) {
   v.attr("dim") = Dimension(M, B);
   return v;
 }
+
+
+// [[Rcpp::export]]
+// List synth_idx_list_to_r_list(SEXP synthetic_idx_ptr) {
+
+// }
