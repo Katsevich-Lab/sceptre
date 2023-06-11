@@ -138,3 +138,79 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
   # 6. return a list containing pass_qc and if any pass qc
   return(list(curr_df = curr_df, pass_qc = pass_qc, any_pass_qc = any_pass_qc))
 }
+
+
+run_crt_in_memory <- function(response_matrix, grna_assignments,
+                              covariate_matrix, response_grna_group_pairs,
+                              return_resampling_dist, fit_skew_normal,
+                              B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                              n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress) {
+  if (!control_group_complement) stop("Function not yet implemented for control group NT cells.")
+  # 1. setup
+  result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
+  precomp_list <- vector(mode = "list", length(unique(response_grna_group_pairs$response_id)))
+  out_counter <- 1L
+  all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
+  grna_group_idxs <- if (!is.null(grna_assignments$grna_group_idxs)) grna_assignments$grna_group_idxs else NA
+  indiv_nt_grna_idxs <- if (!is.null(grna_assignments$indiv_nt_grna_idxs)) grna_assignments$indiv_nt_grna_idxs else NA
+  if (calibration_check) {
+    low_level_association_funct <- "calibration_complement_crt"
+  } else {
+    low_level_association_funct <- "discovery_complement_crt"
+  }
+  n_cells <- nrow(covariate_matrix)
+
+  # 2. perform the gene precomputations; loop over each gene and regress that gene onto the technical factors
+  response_ids <- unique(response_grna_group_pairs$response_id)
+  for (response_idx in seq_along(response_ids)) {
+    if ((response_idx == 1 || response_idx %% 10 == 0) && print_progress) {
+      cat(paste0("Running precomputation on gene ", as.character(response_ids[response_idx]), " (", response_idx, " of ", length(response_ids), ")\n"))
+    }
+    if (response_idx %% 200 == 0) gc() |> invisible()
+    response_id <- as.character(response_ids[response_idx])
+    # 3. load the expressions of the current response
+    expression_vector <- load_csr_row(j = response_matrix@j,
+                                      p = response_matrix@p,
+                                      x = response_matrix@x,
+                                      row_idx = which(rownames(response_matrix) == response_id),
+                                      n_cells = n_cells)
+
+    # 4. perform the gene precomputation and add to precomputation list
+    response_precomp <- perform_response_precomputation(expressions = expression_vector,
+                                                        covariate_matrix = covariate_matrix,
+                                                        regression_method = "pois_glm")
+    precomp_list[[response_idx]] <- response_precomp
+  }
+  names(precomp_list) <- response_ids
+
+  # 5. loop over gRNA groups
+  grna_groups <- unique(response_grna_group_pairs$grna_group)
+  for (grna_group_idx in seq_along(grna_groups)) {
+    if ((grna_group_idx == 1 || grna_group_idx %% 10 == 0) && print_progress) {
+      cat(paste0("Analyzing pairs containing gRNA group ", as.character(grna_groups[grna_group_idx]), " (", grna_group_idx, " of ", length(grna_groups), ")\n"))
+    }
+    if (grna_group_idx %% 200 == 0) gc() |> invisible()
+    curr_grna_group <- as.character(grna_groups[grna_group_idx])
+
+    # 6. obtain the set of indices for this grna group
+    idxs <- if (calibration_check) {
+      get_idx_vector_calibration_check(curr_grna_group = curr_grna_group,
+                                       indiv_nt_grna_idxs = indiv_nt_grna_idxs,
+                                       take_unique = FALSE)
+    } else {
+      get_idx_vector_discovery_analysis(curr_grna_group = curr_grna_group,
+                                        grna_group_idxs = grna_group_idxs)
+    }
+
+    # 7. perform the grna precomputation
+    propensity_scores <- perform_grna_precomputation(trt_idxs = idxs$trt_idxs,
+                                                     covariate_matrix = covariate_matrix,
+                                                     return_fitted_values = TRUE)
+
+    # 8. obtain the synthetic grna group indices
+    # consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation.
+    synthetic_idxs <- crt_index_sampler(propensity_scores = propensity_scores,
+                                        B = B1 + B2 + B3)
+
+    }
+}
