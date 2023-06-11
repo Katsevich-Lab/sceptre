@@ -136,13 +136,9 @@ run_sceptre <- function(response_matrix, grna_matrix,
   ####################
   # PART 2: RUN METHOD
   ####################
-  if (resampling_mechanism == "permutation") {
-    ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
-                                   covariate_matrix, response_grna_group_pairs,
-                                   synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                                   B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                   n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
-  } else {
-
-  }
+  ret <- run_perm_test_in_memory(response_matrix, grna_assignments,
+                                 covariate_matrix, response_grna_group_pairs,
+                                 synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                 B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                                 n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
 }
