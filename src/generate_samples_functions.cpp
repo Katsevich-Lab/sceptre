@@ -3,6 +3,23 @@
 #include <cmath>
 using namespace Rcpp;
 
+
+void draw_wor_sample(std::mt19937& generator, std::uniform_real_distribution<double>& distribution, const std::vector<double>& i_doub_array, std::vector<int>& x, int n_tot, int M) {
+  for (int i = 0; i < n_tot; i ++) x[i] = i;
+  double n_tot_doub = (double) n_tot, u, temp;
+  int pos;
+  // perform the swap
+  for (int i = 0; i < M; i ++) {
+    u = distribution(generator);
+    pos = floor((n_tot_doub - i_doub_array[i]) * u);
+    temp = x[pos];
+    x[pos] = x[n_tot - i - 1];
+    x[n_tot - i - 1] = temp;
+  }
+  return;
+}
+
+
 //' @title Fisher-Yates sampler
 //' @description This function draws a without replacement sample using the Fisher-Yates sampling algorithm
 //' @param n_tot the total number of cells
@@ -23,29 +40,13 @@ SEXP fisher_yates_samlper(int n_tot, int M, int B) {
   std::vector<double> i_doub_array(M);
   for (int i = 0; i < M; i ++) i_doub_array[i] = (double) i;
 
-  // initialize remaining pieces
-  double n_tot_doub = (double) n_tot, u, temp;
-  int pos;
-
   // loop from 0 to B, generating WOR samples
   for (int j = 0; j < B; j ++) {
-    // fill x, initialize v
-    for (int i = 0; i < n_tot; i ++) x[i] = i;
     std::vector<int> v(M);
-
     // perform the swap
-    for (int i = 0; i < M; i ++) {
-      u = distribution(generator);
-      pos = floor((n_tot_doub - i_doub_array[i]) * u);
-      temp = x[pos];
-      x[pos] = x[n_tot - i - 1];
-      x[n_tot - i - 1] = temp;
-    }
-
+    draw_wor_sample(generator, distribution, i_doub_array, x, n_tot, M);
     // load the m WOR samples into v
-    for (int i = n_tot - M; i < n_tot; i ++) {
-      v[i - n_tot + M] = x[i];
-    }
+    for (int i = n_tot - M; i < n_tot; i ++) v[i - n_tot + M] = x[i];
     // store v within synth_idx_list
     (*synth_idx_list)[j] = v;
   }
@@ -131,7 +132,7 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
 
 
 // [[Rcpp::export]]
-SEXP crt_index_sampler(NumericVector propensity_scores, int B) {
+SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
   // initialize output list of vectors
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
 
@@ -139,16 +140,43 @@ SEXP crt_index_sampler(NumericVector propensity_scores, int B) {
   std::mt19937 generator(4);
   std::uniform_real_distribution<double> distribution(0, 1);
   double u;
+  bool check;
 
   // generate B resampled treatment vectors
   for (int i = 0; i < B; i ++) {
     std::vector<int> v;
-    for (int j = 0; j < propensity_scores.size(); j ++) {
+    for (int j = 0; j < fitted_probabilities.size(); j ++) {
       u = distribution(generator);
-      if (propensity_scores[j] < u) v.push_back(j);
+      if (fitted_probabilities[j] > u) v.push_back(j);
     }
     (*synth_idx_list)[i] = v;
   }
   Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
   return ptr;
+}
+
+
+// [[Rcpp::export]]
+void crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
+  // initialize output list of vectors
+  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
+
+  // initialize random distributions
+  std::mt19937 generator(4);
+  std::uniform_real_distribution<double> unif_distribution(0, 1);
+  std::binomial_distribution<int> binom_distribution;
+  std::vector<int> x(B);
+  int M;
+  double u;
+
+  for (int i = 0; i < fitted_probabilities.size(); i ++) {
+    // binomial draw with probability of succes fitted_probabilities[i]
+    binom_distribution = std::binomial_distribution<int>(B, fitted_probabilities[i]);
+    M = binom_distribution(generator);
+    // sample without replacement from 0...(B-1) n_tot times
+    for (int i = 0; i < B; i ++) x[i] = i;
+
+  }
+
+  return;
 }

@@ -186,7 +186,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
   # 5. loop over gRNA groups
   grna_groups <- unique(response_grna_group_pairs$grna_group)
   for (grna_group_idx in seq_along(grna_groups)) {
-    if ((grna_group_idx == 1 || grna_group_idx %% 10 == 0) && print_progress) {
+    if ((grna_group_idx == 1 || grna_group_idx %% 5 == 0) && print_progress) {
       cat(paste0("Analyzing pairs containing gRNA group ", as.character(grna_groups[grna_group_idx]), " (", grna_group_idx, " of ", length(grna_groups), ")\n"))
     }
     if (grna_group_idx %% 200 == 0) gc() |> invisible()
@@ -203,14 +203,12 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
     }
 
     # 7. perform the grna precomputation
-    propensity_scores <- perform_grna_precomputation(trt_idxs = idxs$trt_idxs,
-                                                     covariate_matrix = covariate_matrix,
-                                                     return_fitted_values = TRUE)
+    fitted_probabilities <- perform_grna_precomputation(trt_idxs = idxs$trt_idxs,
+                                                        covariate_matrix = covariate_matrix,
+                                                        return_fitted_values = TRUE)
 
-    # 8. obtain the synthetic grna group indices
-    # consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation.
-    synthetic_idxs <- crt_index_sampler(propensity_scores = propensity_scores,
+    # 8. obtain the synthetic grna group indices (consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation. Also consider Gene's idea.)
+    synthetic_idxs <- crt_index_sampler(fitted_probabilities = fitted_probabilities,
                                         B = B1 + B2 + B3)
-
     }
 }

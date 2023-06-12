@@ -26,6 +26,25 @@ IntegerVector synth_idx_list_to_matrix(SEXP synthetic_idx_ptr) {
 
 
 // [[Rcpp::export]]
-// List synth_idx_list_to_r_list(SEXP synthetic_idx_ptr) {
+List synth_idx_list_to_r_list(SEXP synthetic_idx_ptr) {
+  Rcpp::XPtr<std::vector<std::vector<int>>> synth_idx_list(synthetic_idx_ptr);
+  // create long vector containing all entries
+  int B = (*synth_idx_list).size();
+  List out(B);
+  for (int i = 0; i < B; i ++) {
+    out[i] = (*synth_idx_list)[i];
+  }
+  return(out);
+}
 
-// }
+
+// [[Rcpp::export]]
+void print_synth_idx_list_row(SEXP synthetic_idx_ptr, int idx) {
+  Rcpp::XPtr<std::vector<std::vector<int>>> synth_idx_list(synthetic_idx_ptr);
+  int M = (*synth_idx_list)[idx].size();
+  for (int i = 0; i < M; i ++) {
+    Rcout << (*synth_idx_list)[idx][i];
+    Rcout << " ";
+  }
+  return;
+}
