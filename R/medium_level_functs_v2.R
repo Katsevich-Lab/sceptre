@@ -1,45 +1,38 @@
+# helper function 1
+get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L) {
+  if ((response_idx == 1 || response_idx %% print_multiple == 0) && print_progress) {
+    cat(paste0("Analyzing pairs containing response ", as.character(response_ids[response_idx]),
+               " (", response_idx, " of ", length(response_ids), ")\n"))
+  }
+  if (response_idx %% gc_multiple == 0) gc() |> invisible()
+  response_id <- as.character(response_ids[response_idx])
+  return(response_id)
+}
+
+# core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments,
                                     covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                     B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
                                     n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress) {
-  # 1. setup
+  # 0. define several variables
   result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
   out_counter <- 1L
-  if (calibration_check && !control_group_complement) {
-    low_level_association_funct <- "calibration_ntcells_perm_test"
-  } else if (calibration_check && control_group_complement) {
-    low_level_association_funct <- "calibration_complement_perm_test"
-  } else if (!calibration_check && !control_group_complement) {
-    low_level_association_funct <- "discovery_ntcells_perm_test"
-  } else if (!calibration_check && control_group_complement) {
-    low_level_association_funct <- "discovery_complement_perm_test"
-  }
-  run_outer_regression <- low_level_association_funct != "discovery_ntcells_perm_test"
+  subset_to_nt_cells <- calibration_check && !control_group_complement
+  run_outer_regression <- calibration_check || control_group_complement
   all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
   grna_group_idxs <- if (!is.null(grna_assignments$grna_group_idxs)) grna_assignments$grna_group_idxs else NA
   indiv_nt_grna_idxs <- if (!is.null(grna_assignments$indiv_nt_grna_idxs)) grna_assignments$indiv_nt_grna_idxs else NA
-  args_to_pass <- list(synthetic_idxs = synthetic_idxs,
-                       B1 = B1, B2 = B2, B3 = B3,
-                       fit_skew_normal = fit_skew_normal,
-                       return_resampling_dist = return_resampling_dist,
-                       covariate_matrix = if (run_outer_regression) NA else covariate_matrix,
-                       all_nt_idxs = all_nt_idxs,
-                       grna_group_idxs = grna_group_idxs,
-                       indiv_nt_grna_idxs = indiv_nt_grna_idxs)
   n_cells <- nrow(covariate_matrix)
-  if (low_level_association_funct == "calibration_ntcells_perm_test") {
-    covariate_matrix <- covariate_matrix[all_nt_idxs,]
-  }
+  get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
+
+  # 1. subset covariate matrix to nt cells (if applicable)
+  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
 
   # 2. loop over the response IDs
   response_ids <- unique(response_grna_group_pairs$response_id)
   for (response_idx in seq_along(response_ids)) {
-    if ((response_idx == 1 || response_idx %% 5 == 0) && print_progress) {
-      cat(paste0("Analyzing pairs containing response ", as.character(response_ids[response_idx]), " (", response_idx, " of ", length(response_ids), ")\n"))
-    }
-    if (response_idx %% 200 == 0) gc() |> invisible()
-    response_id <- as.character(response_ids[response_idx])
+    response_id <- get_id_from_idx(response_idx, print_progress, response_ids)
 
     # 3. load the expressions of the current response
     expression_vector <- load_csr_row(j = response_matrix@j,
@@ -73,6 +66,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
       }
       curr_df <- curr_df[pass_qc,]
     }
+    grna_groups <- as.character(curr_df$grna_group)
 
     # 6. perform outer regression (if applicable)
     if (run_outer_regression) {
@@ -84,17 +78,14 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
                                                       response_precomp$fitted_coefs,
                                                       response_precomp$theta,
                                                       full_test_stat = TRUE)
+      curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_skew_normal,
+                                                         return_resampling_dist, grna_groups,
+                                                         expression_vector, pieces_precomp, get_idx_f)
     } else {
-      pieces_precomp <- NA
+      curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_skew_normal,
+                                                          return_resampling_dist, covariate_matrix, all_nt_idxs,
+                                                          grna_group_idxs, grna_groups, expression_vector)
     }
-
-    # 7. update the args_to_pass
-    args_to_pass$grna_groups <- as.character(curr_df$grna_group)
-    args_to_pass$expression_vector <- expression_vector
-    args_to_pass$pieces_precomp <- pieces_precomp
-
-    # 8. pass the arguments to the appropriate low-level assocation testing function
-    curr_response_result <- do.call(what = low_level_association_funct, args = args_to_pass)
 
     # 9. combine the response-wise results into a data table; insert into list
     result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
@@ -179,6 +170,9 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
                                                         covariate_matrix = covariate_matrix,
                                                         regression_method = "pois_glm")
     precomp_list[[response_idx]] <- response_precomp
+
+    # 5. perform the gene-wise QC
+
   }
   names(precomp_list) <- response_ids
 
@@ -200,6 +194,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
       get_idx_vector_discovery_analysis(curr_grna_group = curr_grna_group,
                                         grna_group_idxs = grna_group_idxs)
     }
+
     trt_idxs <- idxs$trt_idxs
     n_trt <- idxs$n_trt
 
