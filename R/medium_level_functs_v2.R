@@ -192,7 +192,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
     if (grna_group_idx %% 200 == 0) gc() |> invisible()
     curr_grna_group <- as.character(grna_groups[grna_group_idx])
 
-    # 6. obtain the set of indices for this grna group
+    # 6. obtain the set of indices for this grna group (consider making into a function)
     idxs <- if (calibration_check) {
       get_idx_vector_calibration_check(curr_grna_group = curr_grna_group,
                                        indiv_nt_grna_idxs = indiv_nt_grna_idxs,
@@ -201,6 +201,8 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
       get_idx_vector_discovery_analysis(curr_grna_group = curr_grna_group,
                                         grna_group_idxs = grna_group_idxs)
     }
+    trt_idxs <- idxs$n_trt
+    n_trt <- idxs$n_trt
 
     # 7. perform the grna precomputation
     fitted_probabilities <- perform_grna_precomputation(trt_idxs = idxs$trt_idxs,
@@ -210,5 +212,45 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
     # 8. obtain the synthetic grna group indices (consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation. Also consider Gene's idea.)
     synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities,
                                              B = B1 + B2 + B3)
+
+    # 9. obtain the grna groups to analyze
+    l <- response_grna_group_pairs$grna_group == curr_grna_group
+    curr_df <- response_grna_group_pairs[l,]
+
+    ####################################
+    # Possibly inside low-level function
+    ####################################
+
+    # 10. loop over the genes
+    curr_response_ids <- as.character(curr_df$response_id)
+    for (curr_response_id in curr_response_ids) {
+      # obtain precomputation for gene
+      curr_expression_vector <- load_csr_row(j = response_matrix@j,
+                                             p = response_matrix@p,
+                                             x = response_matrix@x,
+                                             row_idx = which(rownames(response_matrix) == curr_response_id),
+                                             n_cells = n_cells)
+      response_precomp <- precomp_list[[curr_response_id]]
+
+      # get the precomputation pieces (consider option to not recompute D)
+      precomp_pieces <- compute_precomputation_pieces(expression_vector = curr_expression_vector,
+                                                      covariate_matrix = covariate_matrix,
+                                                      fitted_coefs = response_precomp$fitted_coefs,
+                                                      theta = response_precomp$theta,
+                                                      full_test_stat = TRUE)
+
+      # compute the result
+      result <- run_low_level_test_full_v3(y = curr_expression_vector,
+                                           mu = precomp_pieces$mu,
+                                           a = precomp_pieces$a,
+                                           w = precomp_pieces$w,
+                                           D = precomp_pieces$D,
+                                           n_trt = n_trt,
+                                           trt_idxs = idxs$trt_idxs,
+                                           synthetic_idxs = synthetic_idxs,
+                                           B1 = B1, B2 = B2, B3 = B3,
+                                           fit_skew_normal = fit_skew_normal,
+                                           return_resampling_dist = return_resampling_dist)
     }
+  }
 }
