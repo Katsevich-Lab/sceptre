@@ -1,8 +1,20 @@
+# helper function 0: get_idx_vector function factory
+get_idx_vector_factory <- function(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi) {
+    f <- function(curr_grna_group) {
+      if (calibration_check) {
+        get_idx_vector_calibration_check(curr_grna_group, indiv_nt_grna_idxs, low_moi)
+      } else {
+        get_idx_vector_discovery_analysis(grna_group_idxs)
+      }
+    }
+    return(f)
+}
+
 # helper function 1: calibration check complement set
-get_idx_vector_calibration_check <- function(curr_grna_group, indiv_nt_grna_idxs, take_unique) {
+get_idx_vector_calibration_check <- function(curr_grna_group, indiv_nt_grna_idxs, low_moi) {
   undercover_nts <- strsplit(x = curr_grna_group, split = "&", fixed = TRUE)[[1]]
   trt_idxs <- indiv_nt_grna_idxs[undercover_nts] |> unlist() |> stats::setNames(NULL)
-  if (take_unique) trt_idxs <- unique(trt_idxs)
+  if (!low_moi) trt_idxs <- unique(trt_idxs)
   return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
 }
 
@@ -12,14 +24,12 @@ get_idx_vector_discovery_analysis <- function(curr_grna_group, grna_group_idxs) 
   return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
 }
 
-# workhorse function 1: calibrabtion check complement set perm test
-calibration_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
+# permutation workhorse function 1 (glm factored out)
+perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_groups, expression_vector, pieces_precomp, get_idx_f) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
-    idxs <- get_idx_vector_calibration_check(curr_grna_group = curr_grna_group,
-                                             indiv_nt_grna_idxs = indiv_nt_grna_idxs,
-                                             take_unique = FALSE)
+    idxs <- get_idx_f(curr_grna_group)
     result <- run_low_level_test_full_v4(y = expression_vector,
                                          mu = pieces_precomp$mu,
                                          a = pieces_precomp$a,
@@ -37,54 +47,9 @@ calibration_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_ske
   return(result_list_inner)
 }
 
-# workhorse function 2: calibration_ntcells_perm_test
-calibration_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
-  result_list_inner <- vector(mode = "list", length = length(grna_groups))
-  for (i in seq_along(grna_groups)) {
-    curr_grna_group <- grna_groups[i]
-    idxs <- get_idx_vector_calibration_check(curr_grna_group, indiv_nt_grna_idxs, take_unique = FALSE)
-    result <- run_low_level_test_full_v4(y = expression_vector,
-                                         mu = pieces_precomp$mu,
-                                         a = pieces_precomp$a,
-                                         w = pieces_precomp$w,
-                                         D = pieces_precomp$D,
-                                         n_trt = idxs$n_trt,
-                                         use_all_cells = FALSE,
-                                         trt_idxs = idxs$trt_idxs,
-                                         synthetic_idxs = synthetic_idxs,
-                                         B1 = B1, B2 = B2, B3 = B3,
-                                         fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
-    result_list_inner[[i]] <- result
-  }
-  return(result_list_inner)
-}
 
-# workhorse function 3: discovery analysis complement set perm test
-discovery_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
-  result_list_inner <- vector(mode = "list", length = length(grna_groups))
-  for (i in seq_along(grna_groups)) {
-    curr_grna_group <- grna_groups[i]
-    idxs <- get_idx_vector_discovery_analysis(curr_grna_group, grna_group_idxs)
-    result <- run_low_level_test_full_v4(y = expression_vector,
-                                         mu = pieces_precomp$mu,
-                                         a = pieces_precomp$a,
-                                         w = pieces_precomp$w,
-                                         D = pieces_precomp$D,
-                                         trt_idxs = idxs$trt_idxs,
-                                         n_trt = idxs$n_trt,
-                                         use_all_cells = FALSE,
-                                         synthetic_idxs = synthetic_idxs,
-                                         B1 = B1, B2 = B2, B3 = B3,
-                                         fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
-    result_list_inner[[i]] <- result
-  }
-  return(result_list_inner)
-}
-
-# workhorse function 4: discovery analysis nt cells perm test
-discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, indiv_nt_grna_idxs, grna_groups, expression_vector, pieces_precomp) {
+# workhorse function 2 (glm to be run)
+discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, grna_groups, expression_vector) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
