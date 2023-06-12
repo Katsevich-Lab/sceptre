@@ -20,12 +20,13 @@ calibration_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_ske
     idxs <- get_idx_vector_calibration_check(curr_grna_group = curr_grna_group,
                                              indiv_nt_grna_idxs = indiv_nt_grna_idxs,
                                              take_unique = FALSE)
-    result <- run_low_level_test_full_v3(y = expression_vector,
+    result <- run_low_level_test_full_v4(y = expression_vector,
                                          mu = pieces_precomp$mu,
                                          a = pieces_precomp$a,
                                          w = pieces_precomp$w,
                                          D = pieces_precomp$D,
                                          trt_idxs = idxs$trt_idxs,
+                                         use_all_cells = FALSE,
                                          n_trt = idxs$n_trt,
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
@@ -42,12 +43,13 @@ calibration_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_n
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
     idxs <- get_idx_vector_calibration_check(curr_grna_group, indiv_nt_grna_idxs, take_unique = FALSE)
-    result <- run_low_level_test_full_v3(y = expression_vector,
+    result <- run_low_level_test_full_v4(y = expression_vector,
                                          mu = pieces_precomp$mu,
                                          a = pieces_precomp$a,
                                          w = pieces_precomp$w,
                                          D = pieces_precomp$D,
                                          n_trt = idxs$n_trt,
+                                         use_all_cells = FALSE,
                                          trt_idxs = idxs$trt_idxs,
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
@@ -64,13 +66,14 @@ discovery_complement_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
     idxs <- get_idx_vector_discovery_analysis(curr_grna_group, grna_group_idxs)
-    result <- run_low_level_test_full_v3(y = expression_vector,
+    result <- run_low_level_test_full_v4(y = expression_vector,
                                          mu = pieces_precomp$mu,
                                          a = pieces_precomp$a,
                                          w = pieces_precomp$w,
                                          D = pieces_precomp$D,
                                          trt_idxs = idxs$trt_idxs,
                                          n_trt = idxs$n_trt,
+                                         use_all_cells = FALSE,
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
                                          fit_skew_normal = fit_skew_normal,
@@ -105,12 +108,13 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_nor
                                                     theta = response_precomp$theta,
                                                     full_test_stat = TRUE)
     # 4. run the association test
-    result <- run_low_level_test_full_v3(y = curr_expression_vector,
+    result <- run_low_level_test_full_v4(y = curr_expression_vector,
                                          mu = precomp_pieces$mu,
                                          a = precomp_pieces$a,
                                          w = precomp_pieces$w,
                                          D = precomp_pieces$D,
                                          n_trt = n_trt,
+                                         use_all_cells = FALSE,
                                          trt_idxs = seq(1L, n_trt),
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,

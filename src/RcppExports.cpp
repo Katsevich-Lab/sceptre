@@ -109,9 +109,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// run_low_level_test_full_v3
-List run_low_level_test_full_v3(NumericVector y, NumericVector mu, NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs, int n_trt, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_skew_normal, bool return_resampling_dist);
-RcppExport SEXP _sceptre_run_low_level_test_full_v3(SEXP ySEXP, SEXP muSEXP, SEXP aSEXP, SEXP wSEXP, SEXP DSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_skew_normalSEXP, SEXP return_resampling_distSEXP) {
+// run_low_level_test_full_v4
+List run_low_level_test_full_v4(NumericVector y, NumericVector mu, NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs, int n_trt, bool use_all_cells, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_skew_normal, bool return_resampling_dist);
+RcppExport SEXP _sceptre_run_low_level_test_full_v4(SEXP ySEXP, SEXP muSEXP, SEXP aSEXP, SEXP wSEXP, SEXP DSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP use_all_cellsSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_skew_normalSEXP, SEXP return_resampling_distSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -122,13 +122,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type D(DSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type trt_idxs(trt_idxsSEXP);
     Rcpp::traits::input_parameter< int >::type n_trt(n_trtSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_all_cells(use_all_cellsSEXP);
     Rcpp::traits::input_parameter< SEXP >::type synthetic_idxs(synthetic_idxsSEXP);
     Rcpp::traits::input_parameter< int >::type B1(B1SEXP);
     Rcpp::traits::input_parameter< int >::type B2(B2SEXP);
     Rcpp::traits::input_parameter< int >::type B3(B3SEXP);
     Rcpp::traits::input_parameter< bool >::type fit_skew_normal(fit_skew_normalSEXP);
     Rcpp::traits::input_parameter< bool >::type return_resampling_dist(return_resampling_distSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_low_level_test_full_v3(y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist));
+    rcpp_result_gen = Rcpp::wrap(run_low_level_test_full_v4(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -390,7 +391,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
     {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
-    {"_sceptre_run_low_level_test_full_v3", (DL_FUNC) &_sceptre_run_low_level_test_full_v3, 13},
+    {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 14},
     {"_sceptre_sample_combinations", (DL_FUNC) &_sceptre_sample_combinations, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_sample_undercover_pairs", (DL_FUNC) &_sceptre_sample_undercover_pairs, 6},

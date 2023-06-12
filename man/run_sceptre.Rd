@@ -124,6 +124,7 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
+resampling_mechanism = "permutations",
 calibration_check = TRUE,
 moi = "low",
 control_group = "complement")
