@@ -98,8 +98,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
 
     # 9. combine the response-wise results into a data table; insert into list
     result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
-                                                                return_debugging_metrics, return_resampling_dist,
-                                                                response_precomp$precomp_str)
+                                                                return_debugging_metrics, return_resampling_dist)
     out_counter <- out_counter + 1L
   }
 
@@ -201,7 +200,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
       get_idx_vector_discovery_analysis(curr_grna_group = curr_grna_group,
                                         grna_group_idxs = grna_group_idxs)
     }
-    trt_idxs <- idxs$n_trt
+    trt_idxs <- idxs$trt_idxs
     n_trt <- idxs$n_trt
 
     # 7. perform the grna precomputation
@@ -211,7 +210,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
 
     # 8. obtain the synthetic grna group indices (consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation. Also consider Gene's idea.)
     synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities,
-                                             B = B1 + B2 + B3)
+                                             B = B1 + B2)
 
     # 9. obtain the grna groups to analyze
     l <- response_grna_group_pairs$grna_group == curr_grna_group
@@ -223,7 +222,9 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
 
     # 10. loop over the genes
     curr_response_ids <- as.character(curr_df$response_id)
-    for (curr_response_id in curr_response_ids) {
+    result_list_inner <- vector(mode = "list", length = length(curr_response_ids))
+    for (curr_response_idx in seq_along(curr_response_ids)) {
+      curr_response_id <- curr_response_ids[curr_response_idx]
       # obtain precomputation for gene
       curr_expression_vector <- load_csr_row(j = response_matrix@j,
                                              p = response_matrix@p,
@@ -240,17 +241,28 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
                                                       full_test_stat = TRUE)
 
       # compute the result
-      result <- run_low_level_test_full_v3(y = curr_expression_vector,
+      result <- run_low_level_test_full_v4(y = curr_expression_vector,
                                            mu = precomp_pieces$mu,
                                            a = precomp_pieces$a,
                                            w = precomp_pieces$w,
                                            D = precomp_pieces$D,
                                            n_trt = n_trt,
+                                           use_all_cells = TRUE,
                                            trt_idxs = idxs$trt_idxs,
                                            synthetic_idxs = synthetic_idxs,
-                                           B1 = B1, B2 = B2, B3 = B3,
+                                           B1 = B1, B2 = B2, B3 = 0L,
                                            fit_skew_normal = fit_skew_normal,
                                            return_resampling_dist = return_resampling_dist)
+      result_list_inner[[curr_response_idx]] <- result
     }
+    # combine the grna group-wise results
+    result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, result_list_inner,
+                                                                return_debugging_metrics, return_resampling_dist)
+    out_counter <- out_counter + 1L
   }
+
+  # combine and sort result
+  ret <- data.table::rbindlist(result_list_outer, fill = TRUE)
+  data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
+  return(ret)
 }

@@ -1,11 +1,9 @@
-construct_data_frame_v2 <- function(curr_df, curr_response_result, return_debugging_metrics, return_resampling_dist, precomp_str, low_level_association_funct) {
+construct_data_frame_v2 <- function(curr_df, curr_response_result, return_debugging_metrics, return_resampling_dist) {
     curr_df$p_value <- sapply(X = curr_response_result, FUN = function(l) l$p, simplify = TRUE)
     curr_df$log_2_fold_change <- sapply(curr_response_result, FUN = function(l) l$lfc)
     if (return_debugging_metrics) {
       curr_df$sn_fit_used <- sapply(curr_response_result, FUN = function(l) l$sn_fit_used)
       curr_df$round <- sapply(curr_response_result, FUN = function(l) l$round)
-      curr_df$regression_method <- factor(precomp_str)
-      curr_df$test_statistic <- factor(low_level_association_funct)
     }
     if (return_resampling_dist) {
       curr_df$z_orig <- sapply(curr_response_result, FUN = function(l) l$z_orig)

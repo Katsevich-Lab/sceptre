@@ -27,7 +27,7 @@ double compute_observed_full_statistic_v2(NumericVector a, NumericVector w, Nume
 }
 
 
-std::vector<double> compute_null_full_statistics(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, SEXP synthetic_idxs) {
+std::vector<double> compute_null_full_statistics(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, bool use_all_cells, SEXP synthetic_idxs) {
   // dereference the synthetic treatment idxs
   Rcpp::XPtr<std::vector<std::vector<int>>> synth_idx_list(synthetic_idxs);
 
@@ -39,6 +39,7 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a, const N
 
   // iterate over the B tests
   for (int k = start_pos; k < B + start_pos; k ++) {
+    if (use_all_cells) n_trt = (*synth_idx_list)[k].size();
     curr_vect = &(*synth_idx_list)[k][0];
     lower_right = 0;
     inner_sum = 0;
@@ -69,6 +70,7 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a, const N
 }
 
 
+/*
 // [[Rcpp::export]]
 List run_low_level_test_full_v3(NumericVector y,
                                 NumericVector mu,
@@ -128,4 +130,66 @@ List run_low_level_test_full_v3(NumericVector y,
   }
   return(out);
 }
+*/
 
+// [[Rcpp::export]]
+List run_low_level_test_full_v4(NumericVector y,
+                                NumericVector mu,
+                                NumericVector a,
+                                NumericVector w,
+                                NumericMatrix D,
+                                IntegerVector trt_idxs,
+                                int n_trt,
+                                bool use_all_cells,
+                                SEXP synthetic_idxs,
+                                int B1,
+                                int B2,
+                                int B3,
+                                bool fit_skew_normal,
+                                bool return_resampling_dist) {
+  double P_THRESH = 0.02, p;
+  bool sn_fit_used = false;
+  int round = 1;
+  List out;
+
+  // estimate the log fold change
+  double lfc = estimate_log_fold_change_v2(y, mu, trt_idxs, n_trt);
+
+
+  // compute the original statistic
+  double z_orig = compute_observed_full_statistic_v2(a, w, D, trt_idxs);
+
+
+  // compute the round 1 vector of null statistics and p-value
+  std::vector<double> null_statistics = compute_null_full_statistics(a, w, D, 0, B1, n_trt, use_all_cells, synthetic_idxs);
+  p = compute_empirical_p_value(null_statistics, z_orig, 0);
+
+  if ((p <= P_THRESH) & !return_resampling_dist) {
+    // round 2: if fit_skew_normal true, draw round 2 null statistics and get the SN p-value
+    if (fit_skew_normal) {
+      // compute the round 2 vector of null statistics
+      null_statistics = compute_null_full_statistics(a, w, D, B1, B2, n_trt, use_all_cells, synthetic_idxs);
+
+      // compute the skew-normal p-value (set to -1 if fit bad)
+      p = fit_and_evaluate_skew_normal(z_orig, null_statistics);
+      sn_fit_used = p > -0.5;
+      round = 2;
+    }
+
+    // round 3: if skew normal fit failed, or if fit_skew_normal false, draw round 3 statistics and compute empirical p-value
+    if (!fit_skew_normal || !sn_fit_used) {
+      if (B3 > 0) null_statistics = compute_null_full_statistics(a, w, D, B1 + B2, B3, n_trt, use_all_cells, synthetic_idxs);
+      p = compute_empirical_p_value(null_statistics, z_orig, 0);
+      round = 3;
+    }
+  }
+
+  // construct output
+  if (return_resampling_dist) {
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("sn_fit_used") = sn_fit_used, Named("round") = round, Named("resampling_dist") = null_statistics);
+  } else {
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("sn_fit_used") = sn_fit_used, Named("round") = round);
+  }
+
+  return(out);
+}
