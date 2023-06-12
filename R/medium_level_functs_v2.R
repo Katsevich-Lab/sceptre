@@ -9,6 +9,38 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
   return(response_id)
 }
 
+
+# helper function 2: gene-wise QC
+do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
+  # 1. compute n nonzero treatment per grna group
+  grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_group_idxs))
+  n_nonzero_trt_curr <- compute_n_nonzero_trt_vector(expression_vector = expression_vector,
+                                                     grna_group_idxs = grna_group_idxs,
+                                                     grna_group_posits = grna_group_posits)
+  # 2. compute n nonzero control
+  if (!control_group_complement) { # nt cell control group
+    expression_vector_nt <- expression_vector[all_nt_idxs]
+    n_nonzero_cntrl_curr <- sum(expression_vector_nt >= 1)
+  } else { # complement set control group
+    n_nonzero_total <- sum(expression_vector >= 1)
+    n_nonzero_cntrl_curr <- n_nonzero_total - n_nonzero_trt_curr
+  }
+
+  # 3. put these vectors into the curr_df
+  curr_df$n_nonzero_trt <- n_nonzero_trt_curr
+  curr_df$n_nonzero_cntrl <- n_nonzero_cntrl_curr
+
+  # 4. determine the rows of curr_df that pass pairwise qc
+  pass_qc <- (n_nonzero_trt_curr >= n_nonzero_trt_thresh) & (n_nonzero_cntrl_curr >= n_nonzero_cntrl_thresh)
+
+  # 5. check if any rows pass pairwise qc
+  any_pass_qc <- any(pass_qc)
+
+  # 6. return a list containing pass_qc and if any pass qc
+  return(list(curr_df = curr_df, pass_qc = pass_qc, any_pass_qc = any_pass_qc))
+}
+
+
 # core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments,
                                     covariate_matrix, response_grna_group_pairs,
@@ -40,9 +72,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
                                       x = response_matrix@x,
                                       row_idx = which(rownames(response_matrix) == response_id),
                                       n_cells = n_cells)
-    if (low_level_association_funct == "calibration_ntcells_perm_test") {
-      expression_vector <- expression_vector[all_nt_idxs]
-    }
+    if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
     # 4. obtain the gRNA groups to analyze
     l <- response_grna_group_pairs$response_id == response_id
@@ -97,36 +127,6 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments,
   ret <- data.table::rbindlist(result_list_outer, fill = TRUE)
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
   return(ret)
-}
-
-
-do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-  # 1. compute n nonzero treatment per grna group
-  grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_group_idxs))
-  n_nonzero_trt_curr <- compute_n_nonzero_trt_vector(expression_vector = expression_vector,
-                                                     grna_group_idxs = grna_group_idxs,
-                                                     grna_group_posits = grna_group_posits)
-  # 2. compute n nonzero control
-  if (!control_group_complement) { # nt cell control group
-    expression_vector_nt <- expression_vector[all_nt_idxs]
-    n_nonzero_cntrl_curr <- sum(expression_vector_nt >= 1)
-  } else { # complement set control group
-    n_nonzero_total <- sum(expression_vector >= 1)
-    n_nonzero_cntrl_curr <- n_nonzero_total - n_nonzero_trt_curr
-  }
-
-  # 3. put these vectors into the curr_df
-  curr_df$n_nonzero_trt <- n_nonzero_trt_curr
-  curr_df$n_nonzero_cntrl <- n_nonzero_cntrl_curr
-
-  # 4. determine the rows of curr_df that pass pairwise qc
-  pass_qc <- (n_nonzero_trt_curr >= n_nonzero_trt_thresh) & (n_nonzero_cntrl_curr >= n_nonzero_cntrl_thresh)
-
-  # 5. check if any rows pass pairwise qc
-  any_pass_qc <- any(pass_qc)
-
-  # 6. return a list containing pass_qc and if any pass qc
-  return(list(curr_df = curr_df, pass_qc = pass_qc, any_pass_qc = any_pass_qc))
 }
 
 
