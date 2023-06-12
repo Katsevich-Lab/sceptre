@@ -208,7 +208,7 @@ run_crt_in_memory <- function(response_matrix, grna_assignments,
                                                         return_fitted_values = TRUE)
 
     # 8. obtain the synthetic grna group indices (consider also other idea for sampling the crt indices: fix cell; get probability for that cell; draw single binomial sample s with that probability across B; then, sample WOR s elements from [1, ..., B]. Finally, do a sparse matrix transpose operation. Also consider Gene's idea.)
-    synthetic_idxs <- crt_index_sampler(fitted_probabilities = fitted_probabilities,
-                                        B = B1 + B2 + B3)
+    synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities,
+                                             B = B1 + B2 + B3)
     }
 }

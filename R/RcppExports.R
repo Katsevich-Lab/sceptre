@@ -27,16 +27,6 @@ fisher_yates_samlper <- function(n_tot, M, B) {
     .Call(`_sceptre_fisher_yates_samlper`, n_tot, M, B)
 }
 
-#' @title Fisher-Yates sampler
-#' @description This function draws a without replacement sample using the Fisher-Yates sampling algorithm
-#' @param n_tot the total number of cells
-#' @param M the maximum number of cells in a given gRNA group
-#' @param B the number of WOR samples to generate
-#' @noRd
-fisher_yates_samlper_v2 <- function(n_tot, M, B) {
-    .Call(`_sceptre_fisher_yates_samlper_v2`, n_tot, M, B)
-}
-
 #' @title Hybrid Fisher-Yates/IWOR sampler
 #' @description This function draws an inductive without replacement sample using the hybrid Fisher-Yates/IWOR sampling algorithm (developed by Barry et al, to be described in a forthcoming preprint)
 #' @param N the number of control cells
@@ -53,7 +43,7 @@ crt_index_sampler <- function(fitted_probabilities, B) {
 }
 
 crt_index_sampler_fast <- function(fitted_probabilities, B) {
-    invisible(.Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B))
+    .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
 }
 
 run_low_level_test_full_v3 <- function(y, mu, a, w, D, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {

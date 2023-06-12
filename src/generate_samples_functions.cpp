@@ -140,7 +140,6 @@ SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
   std::mt19937 generator(4);
   std::uniform_real_distribution<double> distribution(0, 1);
   double u;
-  bool check;
 
   // generate B resampled treatment vectors
   for (int i = 0; i < B; i ++) {
@@ -157,26 +156,30 @@ SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
 
 
 // [[Rcpp::export]]
-void crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
-  // initialize output list of vectors
+SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
+  // initialize output vector
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
 
-  // initialize random distributions
+  // initialize the random number generator
   std::mt19937 generator(4);
   std::uniform_real_distribution<double> unif_distribution(0, 1);
-  std::binomial_distribution<int> binom_distribution;
+
+  // initialize remaining pieces
+  std::vector<double> i_doub_array(B);
+  for (int i = 0; i < B; i ++) i_doub_array[i] = (double) i;
   std::vector<int> x(B);
   int M;
-  double u;
 
-  for (int i = 0; i < fitted_probabilities.size(); i ++) {
-    // binomial draw with probability of succes fitted_probabilities[i]
-    binom_distribution = std::binomial_distribution<int>(B, fitted_probabilities[i]);
+  for (int j = 0; j < fitted_probabilities.size(); j ++) {
+    std::binomial_distribution<double> binom_distribution(B, fitted_probabilities[j]);
+    // draw M
     M = binom_distribution(generator);
-    // sample without replacement from 0...(B-1) n_tot times
-    for (int i = 0; i < B; i ++) x[i] = i;
-
+    // sample WOR of size M from 1 ... B
+    draw_wor_sample(generator, unif_distribution, i_doub_array, x, B, M);
+    // place j into the sampled positions
+    for (int i = B - M; i < B; i ++) (*synth_idx_list)[x[i]].push_back(j);
   }
 
-  return;
+  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
+  return ptr;
 }
