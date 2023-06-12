@@ -4,7 +4,7 @@ get_idx_vector_factory <- function(calibration_check, indiv_nt_grna_idxs, grna_g
       if (calibration_check) {
         get_idx_vector_calibration_check(curr_grna_group, indiv_nt_grna_idxs, low_moi)
       } else {
-        get_idx_vector_discovery_analysis(grna_group_idxs)
+        get_idx_vector_discovery_analysis(curr_grna_group, grna_group_idxs)
       }
     }
     return(f)
