@@ -41,8 +41,9 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
 
 # core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                    return_resampling_dist, fit_skew_normal,B1, B2, B3, calibration_check, control_group,
-                                    n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress) {
+                                    synthetic_idxs, return_resampling_dist, fit_skew_normal,
+                                    B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
+                                    n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress) {
   # 0. define several variables
   result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
   out_counter <- 1L
@@ -203,10 +204,12 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     if (run_outer_regression) {
       curr_response_result <- crt_glm_factored_out(B1, B2, fit_skew_normal, return_resampling_dist,
                                                    response_ids, gene_precomp_list, covariate_matrix,
-                                                   get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs, n_cells)
+                                                   get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
+                                                   n_cells, response_matrix)
     } else {
       curr_response_result <- discovery_ntcells_crt(B1, B2, fit_skew_normal, return_resampling_dist, get_idx_f,
-                                                    response_ids, covariate_matrix, curr_grna_group, all_nt_idxs, n_cells)
+                                                    response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
+                                                    n_cells, response_matrix)
     }
     result_list_outer[[grna_group_idx]] <- construct_data_frame_v2(curr_df, curr_response_result,
                                                                    return_debugging_metrics, return_resampling_dist)
