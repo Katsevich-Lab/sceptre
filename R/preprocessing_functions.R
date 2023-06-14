@@ -251,9 +251,9 @@ compute_cell_covariates <- function(matrix_in) {
 }
 
 
-order_pairs_to_analyze <- function(response_grna_group_pairs, run_permutations) {
+order_pairs_to_analyze <- function(response_grna_group_pairs) {
   response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
-  data.table::setorderv(response_grna_group_pairs, cols = if (run_permutations) "response_id" else "grna_group")
+  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
   return(response_grna_group_pairs)
 }
 
