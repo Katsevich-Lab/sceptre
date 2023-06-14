@@ -100,15 +100,6 @@ data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
 data(grna_group_data_frame_lowmoi) # gRNA group information
 
-response_matrix <- response_matrix_lowmoi
-grna_matrix <- grna_matrix_lowmoi
-covariate_data_frame <- covariate_data_frame_lowmoi
-calibration_check <- FALSE
-moi <- "low"
-control_group <- "complement"
-resampling_mechanism <- "permutations"
-grna_group_data_frame <- grna_group_data_frame_lowmoi
-
 # 1. obtain the set of pairs to analyze
 response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
 grna_group_data_frame_lowmoi)

@@ -48,15 +48,6 @@
 #' data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
 #' data(grna_group_data_frame_lowmoi) # gRNA group information
 #'
-#' response_matrix <- response_matrix_lowmoi
-#' grna_matrix <- grna_matrix_lowmoi
-#' covariate_data_frame <- covariate_data_frame_lowmoi
-#' calibration_check <- FALSE
-#' moi <- "low"
-#' control_group <- "complement"
-#' resampling_mechanism <- "permutations"
-#' grna_group_data_frame <- grna_group_data_frame_lowmoi
-#'
 #' # 1. obtain the set of pairs to analyze
 #' response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
 #' grna_group_data_frame_lowmoi)
@@ -123,7 +114,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
   }
 
   # 7. order the pairs to analyze data frame, gene first and then grna second
-  response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs, run_permutations)
+  response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs)
 
   # 8. generate the set of synthetic indicator idxs
   if (run_permutations) {
@@ -145,11 +136,9 @@ run_sceptre <- function(response_matrix, grna_matrix,
                                    B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
                                    n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
   } else {
-    ret <- run_crt_in_memory(response_matrix, grna_assignments,
-                             covariate_matrix, response_grna_group_pairs,
-                             return_resampling_dist, fit_skew_normal,
-                             B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                             n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+    ret <- run_crt_in_memory_v2(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
+                                return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group,
+                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
   }
   return(ret)
 }
