@@ -69,8 +69,8 @@
 #' control_group = "complement")
 run_sceptre <- function(response_matrix, grna_matrix,
                         covariate_data_frame, grna_group_data_frame,
-                        formula_object, response_grna_group_pairs,
-                        calibration_check, moi, control_group, resampling_mechanism,
+                        response_grna_group_pairs, moi, formula_object,
+                        calibration_check, control_group, resampling_mechanism,
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
@@ -122,8 +122,8 @@ run_sceptre <- function(response_matrix, grna_matrix,
     n_cells <- nrow(covariate_matrix)
     synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
                                                      control_group_complement, calibration_group_size, n_cells)
+    cat(crayon::green(' \u2713\n'))
   }
-  cat(crayon::green(' \u2713\n'))
   gc() |> invisible()
 
   ####################
