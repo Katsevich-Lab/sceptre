@@ -45,8 +45,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                     B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
                                     n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress) {
   # 0. define several variables
-  result_list_outer <- vector(mode = "list", length = 2 * length(unique(response_grna_group_pairs$response_id)))
-  out_counter <- 1L
+  gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
   all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
@@ -75,23 +74,12 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     l <- response_grna_group_pairs$response_id == response_id
     curr_df <- response_grna_group_pairs[l,]
 
-    # 5. run QC if conducting a discovery analysis
     if (!calibration_check) {
-      gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
-      curr_df <- gene_wise_qc_result$curr_df
-      pass_qc <- gene_wise_qc_result$pass_qc
-      any_pass_qc <- gene_wise_qc_result$any_pass_qc
-      # if no row passes qc, then jump to next iteration
-      if (!any_pass_qc) {
-        result_list_outer[[out_counter]] <- curr_df
-        out_counter <- out_counter + 1L
-        next
-      } else {
-        # if some rows pass qc, remove those that fail to pass qc, and keep those that do
-        result_list_outer[[out_counter]] <- curr_df[!pass_qc,]
-        out_counter <- out_counter + 1L
-      }
-      curr_df <- curr_df[pass_qc,]
+      gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement,
+                                            curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+      gene_fail_qc_list[[response_idx]] <- gene_wise_qc_result$curr_df[!gene_wise_qc_result$pass_qc,]
+      if (!gene_wise_qc_result$any_pass_qc) next
+      curr_df <- gene_wise_qc_result$curr_df[gene_wise_qc_result$pass_qc,]
     }
     grna_groups <- as.character(curr_df$grna_group)
 
@@ -115,13 +103,17 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     }
 
     # 9. combine the response-wise results into a data table; insert into list
-    result_list_outer[[out_counter]] <- construct_data_frame_v2(curr_df, curr_response_result,
+    gene_pass_qc_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result,
                                                                 return_debugging_metrics, return_resampling_dist)
-    out_counter <- out_counter + 1L
   }
 
+
   # combine and sort result
-  ret <- data.table::rbindlist(result_list_outer, fill = TRUE)
+  ret <- data.table::rbindlist(gene_pass_qc_list)
+  if (!calibration_check) {
+    ret_fail_qc <- data.table::rbindlist(gene_fail_qc_list)
+    ret <- data.table::rbindlist(list(ret, ret_fail_qc), fill = TRUE)
+  }
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
   return(ret)
 }
