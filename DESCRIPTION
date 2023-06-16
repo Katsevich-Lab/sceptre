@@ -37,7 +37,6 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
-    MASS,
     Matrix,
     methods,
     Rcpp (>= 1.0.9),
@@ -45,6 +44,7 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
+    MASS,
     knitr,
     doParallel,
     foreach,
