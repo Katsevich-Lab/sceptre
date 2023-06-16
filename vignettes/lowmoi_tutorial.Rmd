@@ -142,7 +142,9 @@ The gRNA IDs, which uniquely identify each individual gRNA, are stored as row na
 grna_matrix_lowmoi |> rownames() |> head()
 ```
 
-Like the gene expression matrix, the gRNA-by-cell matrix either should be a standard R matrix or a sparse R matrix. Users optionally can pass a logical (i.e., `TRUE`/`FALSE`) matrix of cell-to-gRNA assignments; see the documentation of `run_sceptre_lowmoi` via (`?run_sceptre_lowmoi`) for more details.
+Like the gene expression matrix, the gRNA-by-cell matrix either should be a standard R matrix or a sparse R matrix.
+
+By default, `sceptre` assigns to each cell the gRNA with highest UMI count. Other gRNAs with nonzero UMI counts often represent background noise during the sequencing and alignment steps. There may be some cells that actually have more than one gRNA, but `sceptre` currently does not take this into account, assigning to each cell exactly one gRNA. Users may apply a different gRNA-to-cell assignment themselves, and then pass a logical `grna_matrix` (i.e., `TRUE`/`FALSE`) to `sceptre` instead of a count matrix. However, this matrix must have only one gRNA assigned to each cell. See the documentation of `run_sceptre_lowmoi` via (`?run_sceptre_lowmoi`) for more details. 
 
 iii\. The **cell covariate matrix** records the value of each cell-specific covariate (e.g., sequencing batch, sequencing depth) in each cell. The example cell covariate matrix is stored in the variable `covariate_data_frame_lowmoi`.
 
