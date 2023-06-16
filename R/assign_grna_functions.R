@@ -5,7 +5,7 @@ assign_grnas_to_cells <- function(grna_matrix, grna_group_data_frame, grna_assig
   if (low_moi) {
     grna_assignments <- assign_grnas_to_cells_lowmoi(grna_matrix, grna_group_data_frame, calibration_check, control_group_complement)
   } else {
-    grna_assignments <- assign_grnas_to_cells_highmoi(grna_matrix, threshold, grna_group_data_frame, calibration_check)
+    grna_assignments <- assign_grnas_to_cells_highmoi(grna_matrix, grna_assign_threshold, grna_group_data_frame, calibration_check)
   }
  return(grna_assignments)
 }

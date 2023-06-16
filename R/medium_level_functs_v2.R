@@ -185,7 +185,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   grna_groups <- unique(response_grna_group_pairs$grna_group)
   result_list_outer <- vector(mode = "list", length = length(grna_groups))
   for (grna_group_idx in seq_along(grna_groups)) {
-    # curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, grna_groups)
+    curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, grna_groups)
 
     # 11. obtain the genes to analyze
     l <- response_grna_group_pairs$grna_group == curr_grna_group

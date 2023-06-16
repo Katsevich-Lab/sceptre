@@ -1,46 +1,5 @@
 gasperini_dir <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/processed/")
 
-##########################
-# STEP 0: LOAD ONDISC DATA
-##########################
-n_cells <- 40000
-# gene and grna odm files
-gene_odm_fp <- paste0(gasperini_dir, "gene/matrix.odm")
-gene_metadata_fp <- paste0(gasperini_dir, "gene/metadata.rds")
-gene_odm <- ondisc::read_odm(odm_fp = gene_odm_fp, metadata_fp = gene_metadata_fp)
-
-grna_odm_fp <- paste0(gasperini_dir, "grna_expression/matrix.odm")
-grna_metadata_fp <-  paste0(gasperini_dir, "grna_expression/metadata.rds")
-grna_odm <- ondisc::read_odm(odm_fp = grna_odm_fp, metadata_fp = grna_metadata_fp)
-
-#######################################
-# STEP 1: CREATE GENE EXPRESSION MATRIX
-#######################################
-set.seed(4)
-feat_ids <- gene_odm |>
-  ondisc::get_feature_ids()
-my_feats <- sample(feat_ids, 290)
-
-exp_mat <- gene_odm[my_feats,]
-response_matrix_highmoi <- exp_mat[[my_feats,]]
-response_matrix_highmoi <- methods::as(response_matrix_highmoi, "TsparseMatrix")
-rownames(response_matrix_lowmoi) <- my_feats
-
-#######################################
-# STEP 2: CREATE GRNA EXPRESSION MATRIX
-#######################################
-grna_odm <- grna_odm
-grna_matrix_lowmoi <- grna_odm[[seq(1, nrow(grna_odm)),]]
-rownames(grna_matrix_lowmoi) <- grna_odm |> ondisc::get_feature_ids()
-
-
-
-
-
-
-
-
-
 # 0. set the Gasperini directory load the group, gene, and grna data
 gasp_fp <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/processed/")
 pairs_grouped <- readRDS(paste0(gasp_fp, "/pairs_grouped.rds")) |> dplyr::distinct()
@@ -89,39 +48,37 @@ grna_group_data_frame_highmoi <- rbind(grna_feature_df |>
 
 # 4. construct the respomse and grna matrices; downsample cells
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))
-cell_ids <- sample(seq(1, dim(multimodal_odm)[[1]][2]), 40000)
+cell_ids <- sample(seq(1, dim(multimodal_odm)[[1]][2]), 40002)
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
 # 5. get the gene matrix
 gene_sub <- ondisc::get_modality(multimodal_odm_downsample, "gene")
-my_gene_ids <- discovery_pairs$response_id
+my_gene_ids <- unique(discovery_pairs$response_id)
 gene_matrix <- gene_sub[[my_gene_ids,]]
 rownames(gene_matrix) <- my_gene_ids
 
 # 6. get the grna matrix
 grna_sub <- ondisc::get_modality(multimodal_odm_downsample, "grna")
-my_grna_ids <- grna_group_data_frame_highmoi$grna_id
+my_grna_ids <- unique(grna_group_data_frame_highmoi$grna_id)
 grna_matrix <- grna_sub[[my_grna_ids,]]
 rownames(grna_matrix) <- my_grna_ids
 
-# 7. get the cell covariate matrix
-multimodal_odm_downsample |>
-  ondisc::get_cell_covariates() |>
-  dplyr::select(grna_n_umis, gene_n_umis, gene_p_mito, gene_batch) |>
-  `rownames<-`(NULL)
-
-# 8. Compute the covariate matrix
+# 7. Compute the covariate matrix
 covariate_matrix <- multimodal_odm_downsample |>
   ondisc::get_cell_covariates() |>
   dplyr::select(grna_n_umis, gene_n_umis, p_mito = gene_p_mito, batch = gene_batch) |>
   `rownames<-`(NULL)
 
-# 9. sort according to batch; rename
+# 8. sort according to batch; also remove cells containing no gRNAs
 cell_order <- order(covariate_matrix$batch)
 response_matrix_highmoi <- gene_matrix[,cell_order]
 grna_matrix_highmoi <- grna_matrix[,cell_order]
 covariate_data_frame_highmoi <- covariate_matrix[cell_order,]
-discovery_pairs_highmoi <- discovery_pairs
+cells_to_rm <- covariate_data_frame_highmoi$grna_n_umis == 0
+response_matrix_highmoi <- response_matrix_highmoi[,!cells_to_rm]
+grna_matrix_highmoi <- grna_matrix_highmoi[,!cells_to_rm]
+covariate_data_frame_highmoi <- covariate_data_frame_highmoi[!cells_to_rm,]
 
-# 10. save the data
-usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi, covariate_data_frame_highmoi, grna_group_data_frame_highmoi, discovery_pairs_highmoi)
+# 9. save the data
+discovery_pairs_highmoi <- discovery_pairs
+usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi, covariate_data_frame_highmoi, grna_group_data_frame_highmoi, discovery_pairs_highmoi, overwrite = TRUE)
