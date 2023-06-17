@@ -89,8 +89,8 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   }
 
   # 13. verify that the moi is consistent with the control group
-  if (moi == "high" && control_group == "complement") {
-    stop("The control group cannot be set the the complement set in high MOI.")
+  if (moi == "high" && control_group == "nt_cells") {
+    stop("The control group cannot be the NT cells in high MOI.")
   }
 
   # 14. verify that control_group is NT cells
