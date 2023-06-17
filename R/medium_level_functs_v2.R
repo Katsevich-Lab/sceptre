@@ -156,7 +156,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     if (!calibration_check) {
       gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement,
                                             curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
-      gene_wise_qc_result$curr_df$pass_qc <- gene_wise_qc_result$pass_qc # possibly make part of calling function
+      gene_wise_qc_result$curr_df$pass_qc <- gene_wise_qc_result$pass_qc
       gene_ess_list[[response_idx]] <- gene_wise_qc_result$curr_df
       if (!gene_wise_qc_result$any_pass_qc) next
     }
