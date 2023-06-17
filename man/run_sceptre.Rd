@@ -148,7 +148,15 @@ response_grna_group_pairs <- discovery_pairs_highmoi
 # 2. set the formula object
 formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 
-# 3. automatic calibration check is not yet programmed in high MOI
+# 3. automatic calibration check
+calibration_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+grna_matrix = grna_matrix_highmoi,
+covariate_data_frame = covariate_data_frame_highmoi,
+grna_group_data_frame = grna_group_data_frame_highmoi,
+response_grna_group_pairs = discovery_pairs_highmoi,
+moi = "high",
+formula_object = formula_object,
+calibration_check = TRUE)
 
 # 4. run discovery analysis
 discovery_result <- run_sceptre(response_matrix = response_matrix_highmoi,

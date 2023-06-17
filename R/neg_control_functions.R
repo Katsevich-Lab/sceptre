@@ -1,6 +1,6 @@
-construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, grna_group_data_frame, response_grna_group_pairs, control_group_complement) {
+construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, grna_group_data_frame, response_grna_group_pairs, control_group_complement, low_moi) {
   # 1. set a few variables
-  N_POSSIBLE_GROUPS_THRESHOLD <- 20000
+  N_POSSIBLE_GROUPS_THRESHOLD <- 1000L
   nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
   n_nt_grnas <- length(nt_grna_names)
 
@@ -15,9 +15,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
     to_analyze_response_idxs = dt$response_idx
     to_analyze_grna_idxs = dt$grna_idx
   } else {
-    to_analyze_response_idxs <- integer()
-    to_analyze_grna_idxs <- integer()
-    grna_group_idxs <- list()
+    to_analyze_response_idxs <- to_analyze_grna_idxs <- grna_group_idxs <- integer()
   }
   out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v2(j = response_matrix@j,
                                                      p = response_matrix@p,
@@ -43,7 +41,10 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
     possible_groups_m <- iterate_over_combinations(n_nt_grnas, calibration_group_size, n_possible_groups)
   } else {
     # sample from the set of combinations
-    possible_groups_m <- sample_combinations(calibration_group_size, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot)
+    possible_groups_m <- sample_combinations(calibration_group_size, n_calibration_pairs, n_nonzero_trt_thresh,
+                                             n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot)
+
+
   }
 
   # 5. sample WOR from the set of undercover pairs

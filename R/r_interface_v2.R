@@ -94,7 +94,15 @@
 #' # 2. set the formula object
 #' formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 #'
-#' # 3. automatic calibration check is not yet programmed in high MOI
+#' # 3. automatic calibration check
+#' calibration_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+#' grna_matrix = grna_matrix_highmoi,
+#' covariate_data_frame = covariate_data_frame_highmoi,
+#' grna_group_data_frame = grna_group_data_frame_highmoi,
+#' response_grna_group_pairs = discovery_pairs_highmoi,
+#' moi = "high",
+#' formula_object = formula_object,
+#' calibration_check = TRUE)
 #'
 #' # 4. run discovery analysis
 #' discovery_result <- run_sceptre(response_matrix = response_matrix_highmoi,
@@ -149,7 +157,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
     response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size,
                                                                   grna_assignments, response_matrix, n_nonzero_trt_thresh,
                                                                   n_nonzero_cntrl_thresh, grna_group_data_frame,
-                                                                  response_grna_group_pairs, control_group_complement)
+                                                                  response_grna_group_pairs, control_group_complement, low_moi)
     cat(crayon::green(' \u2713\n'))
   }
 
