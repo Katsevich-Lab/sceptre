@@ -1,29 +1,29 @@
 #' Run `sceptre`
 #'
-#' @param response_matrix
-#' @param grna_matrix
-#' @param covariate_data_frame
-#' @param grna_group_data_frame
-#' @param response_grna_group_pairs
-#' @param moi
-#' @param formula_object
-#' @param calibration_check
-#' @param control_group
-#' @param resampling_mechanism
-#' @param n_nonzero_trt_thresh
-#' @param n_nonzero_cntrl_thresh
-#' @param grna_assign_threshold
-#' @param return_debugging_metrics
-#' @param return_resampling_dist
-#' @param fit_skew_normal
-#' @param calibration_group_size
-#' @param n_calibration_pairs
-#' @param B1
-#' @param B2
-#' @param B3
-#' @param print_progress
+#' @param response_matrix TBD
+#' @param grna_matrix TBD
+#' @param covariate_data_frame TBD
+#' @param grna_group_data_frame TBD
+#' @param response_grna_group_pairs TBD
+#' @param moi TBD
+#' @param formula_object TBD
+#' @param calibration_check TBD
+#' @param control_group TBD
+#' @param resampling_mechanism TBD
+#' @param n_nonzero_trt_thresh TBD
+#' @param n_nonzero_cntrl_thresh TBD
+#' @param grna_assign_threshold TBD
+#' @param return_debugging_metrics TBD
+#' @param return_resampling_dist TBD
+#' @param fit_skew_normal TBD
+#' @param calibration_group_size TBD
+#' @param n_calibration_pairs TBD
+#' @param B1 TBD
+#' @param B2 TBD
+#' @param B3 TBD
+#' @param print_progress TBD
 #'
-#' @return
+#' @return the results
 #' @export
 #'
 #' @examples
@@ -56,6 +56,7 @@
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' formula_object = formula_object,
 #' response_grna_group_pairs = response_grna_group_pairs,
+#' moi = "low",
 #' calibration_check = TRUE)
 #'
 #' # 4. plot the calibration result to ensure adequate calibration
@@ -68,6 +69,7 @@
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' formula_object = formula_object,
 #' response_grna_group_pairs = response_grna_group_pairs,
+#' moi = "low",
 #' calibration_check = FALSE)
 #'
 #' # 6. compare discovery p-values to the negative control p-values; make a volcano plot
@@ -102,14 +104,12 @@
 #' response_grna_group_pairs = discovery_pairs_highmoi,
 #' moi = "high",
 #' formula_object = formula_object,
-#' calibration_check = FALSE,
-#' control_group = "complement",
-#' resampling_mechanism = "permutations")
+#' calibration_check = FALSE)
 #' }
 run_sceptre <- function(response_matrix, grna_matrix,
                         covariate_data_frame, grna_group_data_frame,
                         response_grna_group_pairs, moi, formula_object,
-                        calibration_check, control_group, resampling_mechanism,
+                        calibration_check, control_group = "default", resampling_mechanism = "default",
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
@@ -126,7 +126,8 @@ run_sceptre <- function(response_matrix, grna_matrix,
                control_group, resampling_mechanism) |> invisible()
 
   # 2. harmonize arguments (called for side-effects)
-  harmonize_arguments(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism) |> invisible()
+  harmonize_arguments(return_resampling_dist, fit_skew_normal, moi,
+                      control_group, resampling_mechanism) |> invisible()
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)

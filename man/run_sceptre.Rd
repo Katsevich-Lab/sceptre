@@ -13,8 +13,8 @@ run_sceptre(
   moi,
   formula_object,
   calibration_check,
-  control_group,
-  resampling_mechanism,
+  control_group = "default",
+  resampling_mechanism = "default",
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
   grna_assign_threshold = 5L,
@@ -30,7 +30,52 @@ run_sceptre(
 )
 }
 \arguments{
-\item{print_progress}{}
+\item{response_matrix}{TBD}
+
+\item{grna_matrix}{TBD}
+
+\item{covariate_data_frame}{TBD}
+
+\item{grna_group_data_frame}{TBD}
+
+\item{response_grna_group_pairs}{TBD}
+
+\item{moi}{TBD}
+
+\item{formula_object}{TBD}
+
+\item{calibration_check}{TBD}
+
+\item{control_group}{TBD}
+
+\item{resampling_mechanism}{TBD}
+
+\item{n_nonzero_trt_thresh}{TBD}
+
+\item{n_nonzero_cntrl_thresh}{TBD}
+
+\item{grna_assign_threshold}{TBD}
+
+\item{return_debugging_metrics}{TBD}
+
+\item{return_resampling_dist}{TBD}
+
+\item{fit_skew_normal}{TBD}
+
+\item{calibration_group_size}{TBD}
+
+\item{n_calibration_pairs}{TBD}
+
+\item{B1}{TBD}
+
+\item{B2}{TBD}
+
+\item{B3}{TBD}
+
+\item{print_progress}{TBD}
+}
+\value{
+the results
 }
 \description{
 Run \code{sceptre}
@@ -65,6 +110,7 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
+moi = "low",
 calibration_check = TRUE)
 
 # 4. plot the calibration result to ensure adequate calibration
@@ -77,6 +123,7 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
+moi = "low",
 calibration_check = FALSE)
 
 # 6. compare discovery p-values to the negative control p-values; make a volcano plot
@@ -111,8 +158,6 @@ grna_group_data_frame = grna_group_data_frame_highmoi,
 response_grna_group_pairs = discovery_pairs_highmoi,
 moi = "high",
 formula_object = formula_object,
-calibration_check = FALSE,
-control_group = "complement",
-resampling_mechanism = "permutations")
+calibration_check = FALSE)
 }
 }
