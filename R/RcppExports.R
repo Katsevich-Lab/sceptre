@@ -58,20 +58,12 @@ iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possi
     .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
-sample_undercover_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL) {
-    .Call(`_sceptre_sample_undercover_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL)
+sample_undercover_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, low_moi, j, p, n_cells, n_genes, indiv_nt_grna_idxs) {
+    .Call(`_sceptre_sample_undercover_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, low_moi, j, p, n_cells, n_genes, indiv_nt_grna_idxs)
 }
 
 increment_matrix <- function(m) {
     invisible(.Call(`_sceptre_increment_matrix`, m))
-}
-
-load_nonzero_posits <- function(j, p, column_idx, y) {
-    invisible(.Call(`_sceptre_load_nonzero_posits`, j, p, column_idx, y))
-}
-
-compute_nt_nonzero_matrix_and_n_ok_pairs <- function(j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs) {
-    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs`, j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs)
 }
 
 compute_nt_nonzero_matrix_and_n_ok_pairs_v2 <- function(j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, compute_n_ok_pairs, control_group_complement) {

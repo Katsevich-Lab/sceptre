@@ -19,7 +19,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
   }
   out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v2(j = response_matrix@j,
                                                      p = response_matrix@p,
-                                                     n_cells = response_matrix@Dim[2],
+                                                     n_cells = ncol(response_matrix),
                                                      grna_group_idxs = grna_group_idxs,
                                                      indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
                                                      all_nt_idxs = if (!control_group_complement) grna_assignments$all_nt_idxs else integer(),
@@ -43,13 +43,13 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
     # sample from the set of combinations
     possible_groups_m <- sample_combinations(calibration_group_size, n_calibration_pairs, n_nonzero_trt_thresh,
                                              n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot)
-
-
   }
 
   # 5. sample WOR from the set of undercover pairs
-  samp <- sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m,
-                                  n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+  samp <- sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_calibration_pairs,
+                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, low_moi,
+                                  j = response_matrix@j, p = response_matrix@p, n_cells = ncol(response_matrix),
+                                  n_genes = nrow(response_matrix), indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs)
 
   # 6. construct the data frame of negative control pairs
   response_ids <- factor(rownames(response_matrix))

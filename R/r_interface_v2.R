@@ -151,7 +151,6 @@ run_sceptre <- function(response_matrix, grna_matrix,
 
   # 6. construct the negative control pairs
   if (calibration_check) {
-    if (moi == "high") stop("Automatic calibration check not yet supported for high MOI.")
     cat("Constructing negative control pairs.")
     if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
     response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size,
@@ -161,10 +160,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
     cat(crayon::green(' \u2713\n'))
   }
 
-  # 7. order the pairs to analyze data frame, gene first and then grna second
-  response_grna_group_pairs <- order_pairs_to_analyze(response_grna_group_pairs)
-
-  # 8. generate the set of synthetic indicator idxs
+  # 7. generate the set of synthetic indicator idxs
   if (run_permutations) {
     cat("Generating permutation resamples.")
     n_cells <- nrow(covariate_matrix)
