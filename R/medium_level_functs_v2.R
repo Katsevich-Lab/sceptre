@@ -1,7 +1,7 @@
 # helper function 1
-get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L) {
+get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L, feature = "response") {
   if ((response_idx == 1 || response_idx %% print_multiple == 0) && print_progress) {
-    cat(paste0("Analyzing pairs containing response ", as.character(response_ids[response_idx]),
+    cat(paste0("Analyzing pairs containing ", feature, " ", as.character(response_ids[response_idx]),
                " (", response_idx, " of ", length(response_ids), ")\n"))
   }
   if (response_idx %% gc_multiple == 0) gc() |> invisible()
@@ -164,7 +164,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     # 6. perform the gene precomputation and add to precomputation list
     if (run_outer_regression) {
       if ((response_idx == 1 || response_idx %% 5L == 0) && print_progress) {
-      cat(paste0("Running precomputation on gene ", as.character(response_ids[response_idx]),
+      cat(paste0("Running precomputation on response ", as.character(response_ids[response_idx]),
                  " (", response_idx, " of ", length(response_ids), ")\n"))
       }
       response_precomp <- perform_response_precomputation(expressions = expression_vector,
@@ -185,7 +185,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   grna_groups <- unique(response_grna_group_pairs$grna_group)
   result_list_outer <- vector(mode = "list", length = length(grna_groups))
   for (grna_group_idx in seq_along(grna_groups)) {
-    curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, grna_groups)
+    curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, grna_groups, feature = "gRNA group")
 
     # 11. obtain the genes to analyze
     l <- response_grna_group_pairs$grna_group == curr_grna_group
