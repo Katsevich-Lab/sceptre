@@ -79,20 +79,27 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   }
 
   # 11. verify that control group is either nt_cells or complement
-  if (!control_group %in% c("nt_cells", "complement")) {
-    stop("`control_group` should be either `nt_cells` or `complement`.")
+  if (!control_group %in% c("nt_cells", "complement", "default")) {
+    stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 12. if we are in low MOI and the control group is set to the nt_cells set, NT cells must be present; verify.
-  if (moi == "low" && control_group == "nt_cells") {
+  # 12. verify that resampling_mechanism is one of "permutations" or "crt"
+  if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
+    stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
+  }
+
+  # 13. verify that the moi is consistent with the control group
+  if (moi == "high" && control_group == "complement") {
+    stop("The control group cannot be set the the complement set in high MOI.")
+  }
+
+  # 14. verify that control_group is NT cells
+  if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
     if (!nt_present) {
       stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
     }
   }
-
-  # 13. verify that resampling_mechanism is one of "permutations" or "crt"
-  if (!(resampling_mechanism %in% c("permutations", "crt") ))
 
   return(NULL)
 }
@@ -199,12 +206,24 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 
 
 harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism) {
+  # if resampling distribution is to be returned,
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
     assign(x = "B3", value = 0L, inherits = TRUE)
     assign(x = "fit_skew_normal", value = FALSE, inherits = TRUE)
   }
-  if (!fit_skew_normal) assign(x = "B2", value = 0L, inherits = TRUE)
+
+  # handle moi/control_group/resampling_mechanism
+  if (moi == "high") {
+    control_group <- "complement"
+    if (resampling_mechanism == "default") resampling_mechanism <- "crt"
+  }
+  if (moi == "low") {
+    if (control_group == "default") control_group <- "nt_cells"
+    if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
+  }
+
+  # assign variables to global
   assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
   assign(x = "control_group_complement", value = (control_group == "complement" || moi == "high"), inherits = TRUE)
   assign(x = "run_permutations", value = (resampling_mechanism == "permutations"), inherits = TRUE)
