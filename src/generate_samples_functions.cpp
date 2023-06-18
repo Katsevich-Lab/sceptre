@@ -171,7 +171,7 @@ SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
   int M;
 
   for (int j = 0; j < fitted_probabilities.size(); j ++) {
-    std::binomial_distribution<double> binom_distribution(B, fitted_probabilities[j]);
+    std::binomial_distribution<int> binom_distribution(B, fitted_probabilities[j]);
     // draw M
     M = binom_distribution(generator);
     // sample WOR of size M from 1 ... B
