@@ -116,8 +116,8 @@
 #' }
 run_sceptre <- function(response_matrix, grna_matrix,
                         covariate_data_frame, grna_group_data_frame,
-                        response_grna_group_pairs, moi, formula_object,
-                        calibration_check, control_group = "default", resampling_mechanism = "default",
+                        moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
+                        control_group = "default", resampling_mechanism = "default",
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
