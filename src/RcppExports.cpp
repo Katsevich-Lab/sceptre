@@ -230,6 +230,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_boost_sampler
+NumericVector test_boost_sampler(int n);
+RcppExport SEXP _sceptre_test_boost_sampler(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_boost_sampler(n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_std_sampler
+NumericVector test_std_sampler(int n);
+RcppExport SEXP _sceptre_test_std_sampler(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_std_sampler(n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_empirical_p_value
 double compute_empirical_p_value(const std::vector<double>& null_statistics, double z_orig, int side);
 RcppExport SEXP _sceptre_compute_empirical_p_value(SEXP null_statisticsSEXP, SEXP z_origSEXP, SEXP sideSEXP) {
@@ -370,6 +392,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2, 12},
     {"_sceptre_compute_n_nonzero_trt_vector", (DL_FUNC) &_sceptre_compute_n_nonzero_trt_vector, 3},
+    {"_sceptre_test_boost_sampler", (DL_FUNC) &_sceptre_test_boost_sampler, 1},
+    {"_sceptre_test_std_sampler", (DL_FUNC) &_sceptre_test_std_sampler, 1},
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},
     {"_sceptre_check_sn_tail", (DL_FUNC) &_sceptre_check_sn_tail, 4},
