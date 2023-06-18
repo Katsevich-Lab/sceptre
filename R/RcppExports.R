@@ -74,6 +74,14 @@ compute_n_nonzero_trt_vector <- function(expression_vector, grna_group_idxs, grn
     .Call(`_sceptre_compute_n_nonzero_trt_vector`, expression_vector, grna_group_idxs, grna_group_posits)
 }
 
+test_boost_sampler <- function(n) {
+    .Call(`_sceptre_test_boost_sampler`, n)
+}
+
+test_std_sampler <- function(n) {
+    .Call(`_sceptre_test_std_sampler`, n)
+}
+
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {
     .Call(`_sceptre_compute_empirical_p_value`, null_statistics, z_orig, side)
 }
