@@ -1,10 +1,10 @@
-#include <random>
+#include <boost/random.hpp>
 #include <Rcpp.h>
 #include <cmath>
 using namespace Rcpp;
 
 
-void draw_wor_sample(std::mt19937& generator, std::uniform_real_distribution<double>& distribution, const std::vector<double>& i_doub_array, std::vector<int>& x, int n_tot, int M) {
+void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_real_distribution<double>& distribution, const std::vector<double>& i_doub_array, std::vector<int>& x, int n_tot, int M) {
   for (int i = 0; i < n_tot; i ++) x[i] = i;
   double n_tot_doub = (double) n_tot, u, temp;
   int pos;
@@ -33,8 +33,8 @@ SEXP fisher_yates_samlper(int n_tot, int M, int B) {
   std::vector<int> x(n_tot);
 
   // initialize the random number generator
-  std::mt19937 generator(4);
-  std::uniform_real_distribution<double> distribution(0, 1);
+  boost::random::mt19937 generator(4);
+  boost::random::uniform_real_distribution<double> distribution(0, 1);
 
   // initialize array of i doubles
   std::vector<double> i_doub_array(M);
@@ -75,8 +75,8 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
   for (int i = 0; i < M + 1; i ++) i_doub_array[i] = (double) i;
 
   // initialize the random number generator
-  std::mt19937 generator(4);
-  std::uniform_real_distribution<double> distribution(0, 1);
+  boost::random::mt19937 generator(4);
+  boost::random::uniform_real_distribution<double> distribution(0, 1);
 
   // initialize required variables
   double N_doub = (double) N, m_doub = (double) m, i_doub, p, u;
@@ -137,8 +137,8 @@ SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
 
   // initialize the random number generator
-  std::mt19937 generator(4);
-  std::uniform_real_distribution<double> distribution(0, 1);
+  boost::random::mt19937 generator(4);
+  boost::random::uniform_real_distribution<double> distribution(0, 1);
   double u;
 
   // generate B resampled treatment vectors
@@ -161,8 +161,8 @@ SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
 
   // initialize the random number generator
-  std::mt19937 generator(4);
-  std::uniform_real_distribution<double> unif_distribution(0, 1);
+  boost::random::mt19937 generator(4);
+  boost::random::uniform_real_distribution<double> unif_distribution(0, 1);
 
   // initialize remaining pieces
   std::vector<double> i_doub_array(B);
@@ -171,7 +171,7 @@ SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
   int M;
 
   for (int j = 0; j < fitted_probabilities.size(); j ++) {
-    std::binomial_distribution<int> binom_distribution(B, fitted_probabilities[j]);
+    boost::random::binomial_distribution<int> binom_distribution(B, fitted_probabilities[j]);
     // draw M
     M = binom_distribution(generator);
     // sample WOR of size M from 1 ... B
