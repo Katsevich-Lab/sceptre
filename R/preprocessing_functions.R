@@ -23,7 +23,9 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
   }
 
-  # 4. if the pairs to analyze have been specified...
+  # 4. if running a discovery analysis, ensure response_grna_group_pairs is present; check characteristics
+  if (!calibration_check && is.null(response_grna_group_pairs)) stop("`response_grna_group_pairs` must be specified when running a discovery analysis.")
+  if (!is.null(response_grna_group_pairs)) {
     # i. verify that `grna_group` and `response_id` are columns
     all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
     # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
@@ -38,6 +40,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
       stop("The column `grna_group` of the `response_grna_group_pairs` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`.")
     }
+  }
 
   # 5. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
