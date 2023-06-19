@@ -134,8 +134,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sample_combinations
-IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, double n_possible_groups, IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot);
-RcppExport SEXP _sceptre_sample_combinations(SEXP undercover_group_sizeSEXP, SEXP n_pairs_to_sampleSEXP, SEXP N_NONZERO_TRTSEXP, SEXP N_NONZERO_CNTRLSEXP, SEXP n_possible_groupsSEXP, SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP) {
+IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, double n_possible_groups, IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, int N_POSSIBLE_GROUPS_THRESHOLD);
+RcppExport SEXP _sceptre_sample_combinations(SEXP undercover_group_sizeSEXP, SEXP n_pairs_to_sampleSEXP, SEXP N_NONZERO_TRTSEXP, SEXP N_NONZERO_CNTRLSEXP, SEXP n_possible_groupsSEXP, SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -146,7 +146,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type n_possible_groups(n_possible_groupsSEXP);
     Rcpp::traits::input_parameter< IntegerMatrix >::type n_nonzero_m(n_nonzero_mSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type n_nonzero_tot(n_nonzero_totSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_combinations(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot));
+    Rcpp::traits::input_parameter< int >::type N_POSSIBLE_GROUPS_THRESHOLD(N_POSSIBLE_GROUPS_THRESHOLDSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_combinations(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -386,7 +387,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 14},
-    {"_sceptre_sample_combinations", (DL_FUNC) &_sceptre_sample_combinations, 7},
+    {"_sceptre_sample_combinations", (DL_FUNC) &_sceptre_sample_combinations, 8},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_sample_undercover_pairs", (DL_FUNC) &_sceptre_sample_undercover_pairs, 12},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},

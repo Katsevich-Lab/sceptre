@@ -34,7 +34,7 @@ void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx, std::
 
 
 // [[Rcpp::export]]
-IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, double n_possible_groups, IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot) {
+IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, double n_possible_groups, IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, int N_POSSIBLE_GROUPS_THRESHOLD) {
   // initialize set to store sampled vectors
   std::unordered_set<std::vector<int>, boost::hash<std::vector<int>>> H;
   std::vector<int> sample;
@@ -62,6 +62,7 @@ IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_s
 
   // 2. estimate the number of grna groups to generate
   int n_grna_groups = ceil((MULT_FACTOR * n_pairs_to_sample)/(p_hat * n_genes));
+  n_grna_groups = std::max(n_grna_groups, N_POSSIBLE_GROUPS_THRESHOLD);
   if ((double) n_grna_groups >= n_possible_groups) n_grna_groups = (int) n_possible_groups;
 
   // 3. sample n_grna_groups grna groups via rejection sampling

@@ -42,7 +42,8 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
   } else {
     # sample from the set of combinations
     possible_groups_m <- sample_combinations(calibration_group_size, n_calibration_pairs, n_nonzero_trt_thresh,
-                                             n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot)
+                                             n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot,
+                                             N_POSSIBLE_GROUPS_THRESHOLD)
   }
 
   # 5. sample WOR from the set of undercover pairs
@@ -58,8 +59,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
   df <- data.frame(response_id = response_ids[samp$response_idxs],
                    grna_group = undercover_groups[samp$grna_group_idxs],
                    n_nonzero_trt = samp$n_nonzero_trt_v,
-                   n_nonzero_cntrl = samp$n_nonzero_cntrl_v) |>
-    dplyr::arrange(response_id, grna_group)
+                   n_nonzero_cntrl = samp$n_nonzero_cntrl_v)
 
   # 7. check the number of rows of df, and issue a warning if less than the required amount
   if (nrow(df) < n_calibration_pairs) {
