@@ -11,7 +11,7 @@ assign_grnas_to_cells <- function(grna_matrix, grna_group_data_frame, grna_assig
 }
 
 
-assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_data_frame, calibration_check) {
+assign_grnas_to_cells_highmoi <- function(grna_matrix, grna_assign_threshold, grna_group_data_frame, calibration_check) {
   out <- list()
 
   # 1. make the matrix row-accessible
@@ -28,7 +28,7 @@ assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_dat
     curr_grna_ids <- grna_group_data_frame$grna_id[l]
     row_idxs <- match(x = curr_grna_ids, grna_ids)
     cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                     row_idxs = row_idxs, threshold = threshold)
+                                     row_idxs = row_idxs, threshold = grna_assign_threshold)
     return(cell_idxs)
   })
   out$grna_group_idxs <- grna_group_idxs
@@ -40,7 +40,7 @@ assign_grnas_to_cells_highmoi <- function(grna_matrix, threshold, grna_group_dat
     indiv_nt_grna_idxs <- sapply(nt_grnas, function(nt_grna) {
       row_idx <- match(x = nt_grna, grna_ids)
       cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                       row_idxs = row_idx, threshold = threshold)
+                                       row_idxs = row_idx, threshold = grna_assign_threshold)
       return(cell_idxs)
     })
     out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs

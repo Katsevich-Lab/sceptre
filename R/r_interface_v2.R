@@ -145,7 +145,8 @@ run_sceptre <- function(response_matrix, grna_matrix,
   # rm(covariate_data_frame)
 
   # 5. assign gRNAs to cells
-  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold, low_moi, control_group_complement, calibration_check)
+  grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold,
+                                            low_moi, control_group_complement, calibration_check)
   # rm(grna_matrix)
   cat(crayon::green(' \u2713\n'))
 
