@@ -50,8 +50,8 @@ run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_
     .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
 }
 
-sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot) {
-    .Call(`_sceptre_sample_combinations`, undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot)
+sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD) {
+    .Call(`_sceptre_sample_combinations`, undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
