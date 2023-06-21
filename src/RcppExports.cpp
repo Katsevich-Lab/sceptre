@@ -362,7 +362,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // group_and_threshold
-IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, double threshold);
+IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, int threshold);
 RcppExport SEXP _sceptre_group_and_threshold(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxsSEXP, SEXP thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -371,7 +371,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type row_idxs(row_idxsSEXP);
-    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type threshold(thresholdSEXP);
     rcpp_result_gen = Rcpp::wrap(group_and_threshold(j, p, x, row_idxs, threshold));
     return rcpp_result_gen;
 END_RCPP

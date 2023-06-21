@@ -96,10 +96,9 @@ IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVecto
 
 
 // [[Rcpp::export]]
-IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, double threshold) {
+IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, int threshold) {
   int row_idx, col_idx, start, end, counter = 0;
   double count;
-  threshold -= 0.5;
   std::unordered_set<int> set;
   for (int i = 0; i < row_idxs.size(); i++) {
     row_idx = row_idxs[i] - 1;
@@ -107,7 +106,7 @@ IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVecto
     for (int k = start; k < end; k ++) {
       count = x[k];
       col_idx = j[k];
-      if (count > threshold) {
+      if (count >= threshold) {
         set.insert(col_idx + 1);
       }
     }
