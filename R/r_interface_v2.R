@@ -179,7 +179,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
                                    covariate_matrix, response_grna_group_pairs,
                                    synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                    B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                   n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, side_code, print_progress)
+                                   n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, print_progress)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                 return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group,
