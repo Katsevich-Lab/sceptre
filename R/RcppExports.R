@@ -94,10 +94,6 @@ check_sn_tail <- function(y, xi_hat, omega_hat, alpha_hat) {
     .Call(`_sceptre_check_sn_tail`, y, xi_hat, omega_hat, alpha_hat)
 }
 
-check_sn_tail_v2 <- function(y, xi_hat, omega_hat, alpha_hat) {
-    .Call(`_sceptre_check_sn_tail_v2`, y, xi_hat, omega_hat, alpha_hat)
-}
-
 fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
     .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
 }

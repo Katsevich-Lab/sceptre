@@ -72,7 +72,7 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   double omega = sd_y/sd_z;
   double xi = m_y - omega * mu_z;
 
-  return std::vector<double> {xi, omega, alpha};
+  return std::vector<double> {xi, omega, alpha, m_y, sd_y};
 }
 
 
@@ -102,32 +102,16 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
   return good_fit;
 }
 
-// [[Rcpp::export]]
-bool check_sn_tail_v2(NumericVector y, double xi_hat, double omega_hat, double alpha_hat) {
-  // define variables
-  double n = y.size(), ratio, quantile, p, sn_tail_prob;
-  double RATIO_THRESH = 2.0;
-  int idx;
-  bool good_fit = true;
 
-  // initialize the fitted skew normal distribution
-  skew_normal dist(xi_hat, omega_hat, alpha_hat);
-
-  // loop over the probabilities
-  for (int i = 180; i < 199; i ++) {
-    p = ((double) i)/200.0;
-    idx = ceil(n * p);
-    quantile = y[idx];
-    sn_tail_prob = cdf(complement(dist, quantile));
-    ratio = (1.0 - p)/sn_tail_prob;
-    if (ratio > RATIO_THRESH) {
-      good_fit = false;
-      break;
-    }
-  }
-  return good_fit;
+bool check_for_outliers (std::vector<double>& null_statistics, double mu, double sd) {
+  double min_z = null_statistics[0], max_z = null_statistics[null_statistics.size() - 1];
+  double RATIO_THRESH = 1.5;
+  double B = (double) null_statistics.size();
+  double R_max = max_z/(mu + sd * sqrt(2 * log(B)));
+  double R_min = min_z/(mu - sd * sqrt(2 * log(B)));
+  bool ok = (R_max <= RATIO_THRESH && R_min <= RATIO_THRESH);
+  return ok;
 }
-
 
 // [[Rcpp::export]]
 double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
@@ -144,19 +128,25 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
 
   // 4. determine the tail to check; if z_orig >= median, right; else, left
   bool check_right_tail = (z_orig >= median);
-  bool tail_ok;
+  bool outlier_ok = false, fit_ok = false, use_sn = false;
 
-  // 5. check the appropriate tail and, if applicable, compute p-value
-  if (check_right_tail) { // right tail check
-    tail_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
-  } else { // left tail check
-    std::reverse(null_statistics.begin(), null_statistics.end());
-    for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
-    tail_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+  // 5. check for outliers in both tails
+  outlier_ok = check_for_outliers(null_statistics, fitted_params[3], fitted_params[4]);
+
+  // 6. check for goodness of fit in the appropriate tail
+  if (outlier_ok) {
+    if (check_right_tail) { // right tail check
+      fit_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
+    } else { // left tail check
+      std::reverse(null_statistics.begin(), null_statistics.end());
+      for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
+      fit_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+    }
   }
 
-  // 6. if the tail is OK, compute the SN p-value (using the appropriate tail)
-  if (tail_ok) {
+  // 7. compute the SN p-value (using the appropriate tail) if there are no outliers and the fit is OK
+  use_sn = outlier_ok && fit_ok;
+  if (use_sn) {
     skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
     if (side_code == 0) { // two-tailed
       p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));

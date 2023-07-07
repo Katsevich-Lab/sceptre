@@ -292,20 +292,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// check_sn_tail_v2
-bool check_sn_tail_v2(NumericVector y, double xi_hat, double omega_hat, double alpha_hat);
-RcppExport SEXP _sceptre_check_sn_tail_v2(SEXP ySEXP, SEXP xi_hatSEXP, SEXP omega_hatSEXP, SEXP alpha_hatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type xi_hat(xi_hatSEXP);
-    Rcpp::traits::input_parameter< double >::type omega_hat(omega_hatSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha_hat(alpha_hatSEXP);
-    rcpp_result_gen = Rcpp::wrap(check_sn_tail_v2(y, xi_hat, omega_hat, alpha_hat));
-    return rcpp_result_gen;
-END_RCPP
-}
 // fit_and_evaluate_skew_normal
 double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code);
 RcppExport SEXP _sceptre_fit_and_evaluate_skew_normal(SEXP z_origSEXP, SEXP null_statisticsSEXP, SEXP side_codeSEXP) {
@@ -414,7 +400,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},
     {"_sceptre_check_sn_tail", (DL_FUNC) &_sceptre_check_sn_tail, 4},
-    {"_sceptre_check_sn_tail_v2", (DL_FUNC) &_sceptre_check_sn_tail_v2, 4},
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 3},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
