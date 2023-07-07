@@ -57,3 +57,4 @@ Suggests:
     VGAM,
     rmarkdown
 VignetteBuilder: knitr
+URL: https://github.com/Katsevich-Lab/sceptre

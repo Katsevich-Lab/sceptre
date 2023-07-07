@@ -1,4 +1,4 @@
-url: timothy-barry.github.io/sceptre/
+url: https://katsevich-lab.github.io/sceptre/
 
 authors:
   "Timothy Barry":
@@ -12,8 +12,13 @@ development:
 template:
   bootstrap: 5
 
+#navbar:
+#  type: default
+
 navbar:
-  type: default
+  structure:
+    left:  [reference, articles, news]
+    right: [search, github]
 
 reference:
 

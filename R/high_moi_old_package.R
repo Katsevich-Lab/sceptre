@@ -1181,7 +1181,6 @@ combine_perturbations <- function(perturbation_matrix, gRNA_groups_table) {
   out <- rbind(out_leftover, out_grped)
 }
 
-
 #' Threshold gRNA count matrix
 #'
 #' Thresholds a gRNA count matrix, producing a perturbation matrix.

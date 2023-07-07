@@ -115,49 +115,58 @@ bool check_for_outliers (std::vector<double>& null_statistics, double mu, double
 
 // [[Rcpp::export]]
 double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
+  // 0. define variables
+  double p = -1.0;
+  bool finite_params = true;
+
   // 1. fit the skew normal
   std::vector<double> fitted_params = fit_skew_normal_funct(null_statistics);
-  double p = -1.0;
 
-  // 2. sort the vector of null statistics
-  sort(null_statistics.begin(), null_statistics.end(), std::less<double>());
-
-  // 3. compute the median of the null statistics
-  int median_idx = (null_statistics.size() - 1)/2;
-  double median = null_statistics[median_idx];
-
-  // 4. determine the tail to check; if z_orig >= median, right; else, left
-  bool check_right_tail = (z_orig >= median);
-  bool outlier_ok = false, fit_ok = false, use_sn = false;
-
-  // 5. check for outliers in both tails
-  outlier_ok = check_for_outliers(null_statistics, fitted_params[3], fitted_params[4]);
-
-  // 6. check for goodness of fit in the appropriate tail
-  if (outlier_ok) {
-    if (check_right_tail) { // right tail check
-      fit_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
-    } else { // left tail check
-      std::reverse(null_statistics.begin(), null_statistics.end());
-      for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
-      fit_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
-    }
+  // 2. verify that the fitted parameters are finite
+  for (int i = 0; i < fitted_params.size(); i ++) {
+    if (!std::isfinite(fitted_params[i])) finite_params = false;
   }
 
-  // 7. compute the SN p-value (using the appropriate tail) if there are no outliers and the fit is OK
-  use_sn = outlier_ok && fit_ok;
-  if (use_sn) {
-    skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
-    if (side_code == 0) { // two-tailed
-      p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
-    } else if (side_code == 1) { // right-tailed
-      p = cdf(complement(dist, z_orig));
-    } else { // left-tailed
-      p = cdf(dist, z_orig);
-    }
-    if (p <= 1.0e-250) p = 1.0e-250;
-  }
+  if (finite_params) {
+    // 3. sort the vector of null statistics
+    sort(null_statistics.begin(), null_statistics.end(), std::less<double>());
 
-  // 7. return p
+    // 4. compute the median of the null statistics
+    int median_idx = (null_statistics.size() - 1)/2;
+    double median = null_statistics[median_idx];
+
+    // 5. determine the tail to check; if z_orig >= median, right; else, left
+    bool check_right_tail = (z_orig >= median);
+    bool outlier_ok, fit_ok = false, use_sn;
+
+    // 6. check for outliers in both tails
+    outlier_ok = check_for_outliers(null_statistics, fitted_params[3], fitted_params[4]);
+
+    // 7. check for goodness of fit in the appropriate tail
+    if (outlier_ok) {
+      if (check_right_tail) { // right tail check
+        fit_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
+      } else { // left tail check
+        std::reverse(null_statistics.begin(), null_statistics.end());
+        for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
+        fit_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+      }
+    }
+
+    // 8. compute the SN p-value (using the appropriate tail) if there are no outliers and the fit is OK
+    use_sn = outlier_ok && fit_ok;
+    if (use_sn) {
+      skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
+      if (side_code == 0) { // two-tailed
+        p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
+      } else if (side_code == 1) { // right-tailed
+        p = cdf(complement(dist, z_orig));
+      } else { // left-tailed
+        p = cdf(dist, z_orig);
+      }
+      if (p <= 1.0e-250) p = 1.0e-250;
+    }
+  }
+  // 9. return p
   return p;
 }
