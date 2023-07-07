@@ -46,8 +46,8 @@ crt_index_sampler_fast <- function(fitted_probabilities, B) {
     .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
 }
 
-run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist) {
-    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist)
+run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, side_code) {
+    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, side_code)
 }
 
 sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD) {
@@ -94,8 +94,12 @@ check_sn_tail <- function(y, xi_hat, omega_hat, alpha_hat) {
     .Call(`_sceptre_check_sn_tail`, y, xi_hat, omega_hat, alpha_hat)
 }
 
-fit_and_evaluate_skew_normal <- function(z_orig, null_statistics) {
-    .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics)
+check_sn_tail_v2 <- function(y, xi_hat, omega_hat, alpha_hat) {
+    .Call(`_sceptre_check_sn_tail_v2`, y, xi_hat, omega_hat, alpha_hat)
+}
+
+fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
+    .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {

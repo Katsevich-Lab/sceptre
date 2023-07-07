@@ -102,9 +102,35 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
   return good_fit;
 }
 
+// [[Rcpp::export]]
+bool check_sn_tail_v2(NumericVector y, double xi_hat, double omega_hat, double alpha_hat) {
+  // define variables
+  double n = y.size(), ratio, quantile, p, sn_tail_prob;
+  double RATIO_THRESH = 2.0;
+  int idx;
+  bool good_fit = true;
+
+  // initialize the fitted skew normal distribution
+  skew_normal dist(xi_hat, omega_hat, alpha_hat);
+
+  // loop over the probabilities
+  for (int i = 180; i < 199; i ++) {
+    p = ((double) i)/200.0;
+    idx = ceil(n * p);
+    quantile = y[idx];
+    sn_tail_prob = cdf(complement(dist, quantile));
+    ratio = (1.0 - p)/sn_tail_prob;
+    if (ratio > RATIO_THRESH) {
+      good_fit = false;
+      break;
+    }
+  }
+  return good_fit;
+}
+
 
 // [[Rcpp::export]]
-double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics) {
+double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
   // 1. fit the skew normal
   std::vector<double> fitted_params = fit_skew_normal_funct(null_statistics);
   double p = -1.0;
@@ -132,7 +158,13 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
   // 6. if the tail is OK, compute the SN p-value (using the appropriate tail)
   if (tail_ok) {
     skew_normal dist(fitted_params[0], fitted_params[1], fitted_params[2]);
-    p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
+    if (side_code == 0) { // two-tailed
+      p = 2.0 * (check_right_tail ? cdf(complement(dist, z_orig)) : cdf(dist, z_orig));
+    } else if (side_code == 1) { // right-tailed
+      p = cdf(complement(dist, z_orig));
+    } else { // left-tailed
+      p = cdf(dist, z_orig);
+    }
     if (p <= 1.0e-250) p = 1.0e-250;
   }
 

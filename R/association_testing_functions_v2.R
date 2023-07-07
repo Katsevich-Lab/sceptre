@@ -27,7 +27,8 @@ get_idx_vector_discovery_analysis <- function(curr_grna_group, grna_group_idxs) 
 
 
 # workhorse function 1: permutations, glm factored out
-perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, grna_groups, expression_vector, pieces_precomp, get_idx_f) {
+perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist,
+                                       grna_groups, expression_vector, pieces_precomp, get_idx_f, side_code) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
@@ -43,7 +44,8 @@ perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_skew_norm
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
                                          fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
+                                         return_resampling_dist = return_resampling_dist,
+                                         side_code = side_code)
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)
@@ -51,7 +53,9 @@ perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_skew_norm
 
 
 # workhorse function 2: permutations, glm run inside
-discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, covariate_matrix, all_nt_idxs, grna_group_idxs, grna_groups, expression_vector) {
+discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist,
+                                        covariate_matrix, all_nt_idxs, grna_group_idxs, grna_groups,
+                                        expression_vector, side_code) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
@@ -86,7 +90,8 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_nor
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
                                          fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
+                                         return_resampling_dist = return_resampling_dist,
+                                         side_code = side_code)
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)
@@ -97,7 +102,7 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_skew_nor
 crt_glm_factored_out <- function(B1, B2, fit_skew_normal, return_resampling_dist,
                                  response_ids, gene_precomp_list, covariate_matrix,
                                  get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
-                                 n_cells, response_matrix) {
+                                 n_cells, response_matrix, side_code) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # precomputation on grna
   idxs <- get_idx_f(curr_grna_group)
@@ -135,7 +140,8 @@ crt_glm_factored_out <- function(B1, B2, fit_skew_normal, return_resampling_dist
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = 0L,
                                          fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
+                                         return_resampling_dist = return_resampling_dist,
+                                         side_code = side_code)
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)
@@ -144,7 +150,7 @@ crt_glm_factored_out <- function(B1, B2, fit_skew_normal, return_resampling_dist
 # workhorse function 4: crt, glm run inside
 discovery_ntcells_crt <- function(B1, B2, fit_skew_normal, return_resampling_dist, get_idx_f,
                                   response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
-                                  n_cells, response_matrix) {
+                                  n_cells, response_matrix, side_code) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # initialize the idxs
   idxs <- get_idx_f(curr_grna_group)
@@ -190,7 +196,8 @@ discovery_ntcells_crt <- function(B1, B2, fit_skew_normal, return_resampling_dis
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = 0L,
                                          fit_skew_normal = fit_skew_normal,
-                                         return_resampling_dist = return_resampling_dist)
+                                         return_resampling_dist = return_resampling_dist,
+                                         side_code = side_code)
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)

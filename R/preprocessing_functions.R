@@ -1,7 +1,7 @@
 check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
                          grna_group_data_frame, formula_object, calibration_check,
                          response_grna_group_pairs, regression_method, moi,
-                         control_group, resampling_mechanism) {
+                         control_group, resampling_mechanism, side) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -102,6 +102,11 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     if (!nt_present) {
       stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
     }
+  }
+
+  # 15. verify that "side" is among "both", "left", or "right"
+  if (!(side %in% c("both", "left", "right"))) {
+    stop("'side' must be one of 'both', 'left', or 'right'.")
   }
 
   return(NULL)
@@ -208,7 +213,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism) {
+harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism, side) {
   # if resampling distribution is to be returned,
   if (return_resampling_dist) {
     assign(x = "B2", value = 0L, inherits = TRUE)
@@ -230,6 +235,7 @@ harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, co
   assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
   assign(x = "control_group_complement", value = (control_group == "complement" || moi == "high"), inherits = TRUE)
   assign(x = "run_permutations", value = (resampling_mechanism == "permutations"), inherits = TRUE)
+  assign(x = "side_code", value = which(side == c("left", "both", "right")) - 2L, inherits = TRUE)
   return (NULL)
 }
 

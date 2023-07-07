@@ -18,22 +18,22 @@ assign_grnas_to_cells_highmoi <- function(grna_matrix, grna_assign_threshold, gr
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
 
-  if (!calibration_check) {
-    # 2. obtain the grna ids and groups
-    grna_groups <- as.character(unique(grna_group_data_frame$grna_group))
-    grna_groups <- grna_groups[grna_groups != "non-targeting"]
+  # 2. obtain the grna ids and groups
+  grna_groups <- as.character(unique(grna_group_data_frame$grna_group))
+  grna_groups <- grna_groups[grna_groups != "non-targeting"]
 
-    # 3. loop over the targeting grna groups, obtaining the cell assignments for each
-    grna_group_idxs <- sapply(grna_groups, function(grna_group) {
-      l <- grna_group_data_frame$grna_group == grna_group
-      curr_grna_ids <- grna_group_data_frame$grna_id[l]
-      row_idxs <- match(x = curr_grna_ids, grna_ids)
-      cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                       row_idxs = row_idxs, threshold = grna_assign_threshold)
-      return(cell_idxs)
-    })
-    out$grna_group_idxs <- grna_group_idxs
-  } else {
+  # 3. loop over the targeting grna groups, obtaining the cell assignments for each
+  grna_group_idxs <- sapply(grna_groups, function(grna_group) {
+    l <- grna_group_data_frame$grna_group == grna_group
+    curr_grna_ids <- grna_group_data_frame$grna_id[l]
+    row_idxs <- match(x = curr_grna_ids, grna_ids)
+    cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                                     row_idxs = row_idxs, threshold = grna_assign_threshold)
+    return(cell_idxs)
+  })
+  out$grna_group_idxs <- grna_group_idxs
+
+  if (calibration_check) {
     # 4. if running a calibration check, also the individual NT gRNAs
     nt_grnas <- grna_group_data_frame |>
       dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")

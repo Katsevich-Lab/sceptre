@@ -26,5 +26,5 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
 
 #ifndef FIT_AND_EVALUATE_SKEW_NORMAL
 #define FIT_AND_EVALUATE_SKEW_NORMAL
-double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics);
+double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code);
 #endif
