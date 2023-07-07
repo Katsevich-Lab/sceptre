@@ -118,7 +118,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
                         covariate_data_frame, grna_group_data_frame,
                         moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
                         control_group = "default", resampling_mechanism = "default",
-                        n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
+                        n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
                         grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
                         return_resampling_dist = FALSE, fit_skew_normal = TRUE,
                         calibration_group_size = NULL, n_calibration_pairs = NULL,
@@ -131,11 +131,11 @@ run_sceptre <- function(response_matrix, grna_matrix,
   check_inputs(response_matrix, grna_matrix, covariate_data_frame,
                grna_group_data_frame, formula_object, calibration_check,
                response_grna_group_pairs, regression_method, moi,
-               control_group, resampling_mechanism) |> invisible()
+               control_group, resampling_mechanism, side) |> invisible()
 
   # 2. harmonize arguments (called for side-effects)
   harmonize_arguments(return_resampling_dist, fit_skew_normal, moi,
-                      control_group, resampling_mechanism) |> invisible()
+                      control_group, resampling_mechanism, side) |> invisible()
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -179,11 +179,12 @@ run_sceptre <- function(response_matrix, grna_matrix,
                                    covariate_matrix, response_grna_group_pairs,
                                    synthetic_idxs, return_resampling_dist, fit_skew_normal,
                                    B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                   n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+                                   n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, side_code, print_progress)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                 return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group,
-                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics, print_progress)
+                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics,
+                                side_code, print_progress)
   }
   return(ret)
 }

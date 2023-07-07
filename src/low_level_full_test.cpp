@@ -84,7 +84,8 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int B2,
                                 int B3,
                                 bool fit_skew_normal,
-                                bool return_resampling_dist) {
+                                bool return_resampling_dist,
+                                int side_code) {
   double P_THRESH = 0.02, p;
   bool sn_fit_used = false;
   int round = 1;
@@ -98,7 +99,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
 
   // compute the round 1 vector of null statistics and p-value
   std::vector<double> null_statistics = compute_null_full_statistics(a, w, D, 0, B1, n_trt, use_all_cells, synthetic_idxs);
-  p = compute_empirical_p_value(null_statistics, z_orig, 0);
+  p = compute_empirical_p_value(null_statistics, z_orig, side_code);
 
   if ((p <= P_THRESH) & !return_resampling_dist) {
     // round 2: if fit_skew_normal true, draw round 2 null statistics and get the SN p-value
@@ -107,7 +108,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
       null_statistics = compute_null_full_statistics(a, w, D, B1, B2, n_trt, use_all_cells, synthetic_idxs);
 
       // compute the skew-normal p-value (set to -1 if fit bad)
-      p = fit_and_evaluate_skew_normal(z_orig, null_statistics);
+      p = fit_and_evaluate_skew_normal(z_orig, null_statistics, side_code);
       sn_fit_used = p > -0.5;
       round = 2;
     }
@@ -115,7 +116,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
     // round 3: if skew normal fit failed, or if fit_skew_normal false, draw round 3 statistics and compute empirical p-value
     if (!fit_skew_normal || !sn_fit_used) {
       if (B3 > 0) null_statistics = compute_null_full_statistics(a, w, D, B1 + B2, B3, n_trt, use_all_cells, synthetic_idxs);
-      p = compute_empirical_p_value(null_statistics, z_orig, 0);
+      p = compute_empirical_p_value(null_statistics, z_orig, side_code);
       round = 3;
     }
   }
