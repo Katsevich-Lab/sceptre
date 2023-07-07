@@ -72,12 +72,12 @@ List run_low_level_test_distilled(NumericVector y,
   std::vector<double> null_statistics = compute_null_distilled_statistics(a, b, 0, B1, n_trt, synthetic_idxs);
   p = compute_empirical_p_value(null_statistics, z_orig, 0);
 
+
   if ((p <= P_THRESH) & !return_resampling_dist) {
     // round 2: if fit_skew_normal true, draw round 2 null statistics and get the SN p-value
     if (fit_skew_normal) {
       // compute the round 2 vector of null statistics
       null_statistics = compute_null_distilled_statistics(a, b, B1, B2, n_trt, synthetic_idxs);
-
       // compute the skew-normal p-value (set to -1 if fit bad)
       p = fit_and_evaluate_skew_normal(z_orig, null_statistics);
       sn_fit_used = p > -0.5;
