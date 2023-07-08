@@ -1,23 +1,19 @@
 check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
                          grna_group_data_frame, formula_object, calibration_check,
-                         response_grna_group_pairs, regression_method, moi,
-                         control_group, resampling_mechanism, side) {
+                         response_grna_group_pairs, moi, control_group, resampling_mechanism, side) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
     stop("The data frame `grna_group_data_frame` must have columns `grna_id` and `grna_group`. The `grna_group` column should specify the group to which each `grna_id` belongs.")
   }
 
-  # 2. check for the presence of "non-targeting" in the grna_group column
-  nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
-  if (!nt_present) {
-    stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
-  }
-  # verify also that >= 2 NT gRNAs are present when running a calibration check
-  n_nt_grnas <- grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |> nrow()
-  if (calibration_check && (n_nt_grnas <= 1)) {
-    stop("Two or more non-targeting gRNAs must be present when running a calibration check.")
+  # 2. check for the presence of "non-targeting" in the grna_group column, which must be present when running a calibration check
+  if (calibration_check) {
+   n_nt_grnas <- grna_group_data_frame |>
+      dplyr::filter(grna_group == "non-targeting") |> nrow()
+    if (n_nt_grnas <= 1) {
+      stop("Two or more non-targeting gRNAs must be present when running a calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting'.")
+    }
   }
 
   # 3. verify that the row names are unique for both response and grna modalities
