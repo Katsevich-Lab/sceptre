@@ -42,8 +42,8 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
 # core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, return_resampling_dist, fit_skew_normal,
-                                    B1, B2, B3, calibration_check, control_group, n_nonzero_trt_thresh,
-                                    n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, print_progress) {
+                                    B1, B2, B3, calibration_check, control_group_complement, n_nonzero_trt_thresh,
+                                    n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, low_moi, print_progress) {
   # 0. define several variables
   gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
   subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -120,8 +120,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group,
-                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, print_progress) {
+                                 return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group_complement,
+                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics, side_code, low_moi, print_progress) {
   # 0. define several variables
   gene_ess_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
   subset_to_nt_cells <- calibration_check && !control_group_complement
