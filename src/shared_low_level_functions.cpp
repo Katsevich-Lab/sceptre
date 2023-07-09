@@ -114,7 +114,7 @@ bool check_for_outliers (std::vector<double>& null_statistics, double mu, double
 }
 
 // [[Rcpp::export]]
-double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
+std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
   // 0. define variables
   double p = -1.0;
   bool finite_params = true;
@@ -167,6 +167,6 @@ double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_sta
       if (p <= 1.0e-250) p = 1.0e-250;
     }
   }
-  // 9. return p
-  return p;
+  // 9. return p, xi, omega, alpha
+  return std::vector<double> {fitted_params[0], fitted_params[1], fitted_params[2], p};
 }
