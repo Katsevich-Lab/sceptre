@@ -2,15 +2,19 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, return_debugg
     curr_df$p_value <- sapply(X = curr_response_result, FUN = function(l) l$p, simplify = TRUE)
     curr_df$log_2_fold_change <- sapply(curr_response_result, FUN = function(l) l$lfc)
     if (return_debugging_metrics) {
-      curr_df$sn_fit_used <- sapply(curr_response_result, FUN = function(l) l$sn_fit_used)
-      curr_df$round <- sapply(curr_response_result, FUN = function(l) l$round)
+      curr_df$stage <- sapply(curr_response_result, FUN = function(l) l$stage)
+      curr_df$z_orig <- sapply(curr_response_result, FUN = function(l) l$z_orig)
+      curr_df$xi <- sapply(curr_response_result, FUN = function(l) l$sn_params[1L])
+      curr_df$omega <- sapply(curr_response_result, FUN = function(l) l$sn_params[2L])
+      curr_df$alpha <- sapply(curr_response_result, FUN = function(l) l$sn_params[3L])
     }
     if (return_resampling_dist) {
-      curr_df$z_orig <- sapply(curr_response_result, FUN = function(l) l$z_orig)
-      m <- sapply(curr_response_result, FUN = function(l) l$resampling_dist, simplify = FALSE) |>
-        unlist() |> matrix(nrow = nrow(curr_df), byrow = TRUE)
-      colnames(m) <- paste0("z_null_", seq(1L, ncol(m)))
-      curr_df <- cbind(curr_df, data.table::as.data.table(m))
+      to_append <- lapply(curr_response_result, FUN = function(l) {
+        m <- data.table::as.data.table(matrix(l$resampling_dist, nrow = 1))
+        colnames(m) <- paste0("z_null_", seq(1L, ncol(m)))
+        m
+      }) |> data.table::rbindlist(fill = TRUE)
+      curr_df <- cbind(curr_df, to_append)
     }
     return(curr_df)
 }

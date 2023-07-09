@@ -88,7 +88,9 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int side_code) {
   double P_THRESH = 0.02, p;
   bool sn_fit_used = false;
-  int round = 1;
+  NumericVector sn_params = NumericVector::create(NA_REAL, NA_REAL, NA_REAL);
+  std::vector<double> fit_sn_out;
+  int stage = 1;
   List out;
 
   // estimate the log fold change
@@ -97,35 +99,37 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   // compute the original statistic
   double z_orig = compute_observed_full_statistic_v2(a, w, D, trt_idxs);
 
-  // compute the round 1 vector of null statistics and p-value
+  // compute the stage 1 vector of null statistics and p-value
   std::vector<double> null_statistics = compute_null_full_statistics(a, w, D, 0, B1, n_trt, use_all_cells, synthetic_idxs);
   p = compute_empirical_p_value(null_statistics, z_orig, side_code);
 
-  if ((p <= P_THRESH) & !return_resampling_dist) {
-    // round 2: if fit_skew_normal true, draw round 2 null statistics and get the SN p-value
+  if (p <= P_THRESH) {
+    // stage 2: if fit_skew_normal true, draw stage 2 null statistics and get the SN p-value
     if (fit_skew_normal) {
-      // compute the round 2 vector of null statistics
+      // compute the stage 2 vector of null statistics
       null_statistics = compute_null_full_statistics(a, w, D, B1, B2, n_trt, use_all_cells, synthetic_idxs);
 
       // compute the skew-normal p-value (set to -1 if fit bad)
-      p = fit_and_evaluate_skew_normal(z_orig, null_statistics, side_code);
+      fit_sn_out = fit_and_evaluate_skew_normal(z_orig, null_statistics, side_code);
+      p = fit_sn_out[3];
       sn_fit_used = p > -0.5;
-      round = 2;
+      if (sn_fit_used) for (int i = 0; i < 3; i ++) sn_params[i] = fit_sn_out[i];
+      stage = 2;
     }
 
-    // round 3: if skew normal fit failed, or if fit_skew_normal false, draw round 3 statistics and compute empirical p-value
+    // stage 3: if skew normal fit failed, or if fit_skew_normal false, draw stage 3 statistics and compute empirical p-value
     if (!fit_skew_normal || !sn_fit_used) {
       if (B3 > 0) null_statistics = compute_null_full_statistics(a, w, D, B1 + B2, B3, n_trt, use_all_cells, synthetic_idxs);
       p = compute_empirical_p_value(null_statistics, z_orig, side_code);
-      round = 3;
+      stage = 3;
     }
   }
 
   // construct output
   if (return_resampling_dist) {
-    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("sn_fit_used") = sn_fit_used, Named("round") = round, Named("resampling_dist") = null_statistics);
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = stage, Named("sn_params") = sn_params, Named("resampling_dist") = null_statistics);
   } else {
-    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("sn_fit_used") = sn_fit_used, Named("round") = round);
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = stage, Named("sn_params") = sn_params);
   }
 
   return(out);

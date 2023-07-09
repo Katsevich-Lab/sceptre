@@ -104,7 +104,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
     # 9. combine the response-wise results into a data table; insert into list
     gene_pass_qc_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result,
-                                                                return_debugging_metrics, return_resampling_dist)
+                                                                 return_debugging_metrics, return_resampling_dist)
   }
 
 

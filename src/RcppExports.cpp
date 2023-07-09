@@ -293,7 +293,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // fit_and_evaluate_skew_normal
-double fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code);
+std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code);
 RcppExport SEXP _sceptre_fit_and_evaluate_skew_normal(SEXP z_origSEXP, SEXP null_statisticsSEXP, SEXP side_codeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
