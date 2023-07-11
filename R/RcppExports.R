@@ -98,6 +98,10 @@ fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
     .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
 }
 
+compute_sn_tail_probability <- function(z, xi, omega, alpha, left_tail) {
+    .Call(`_sceptre_compute_sn_tail_probability`, z, xi, omega, alpha, left_tail)
+}
+
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
     .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }

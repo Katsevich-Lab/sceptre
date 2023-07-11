@@ -226,14 +226,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-harmonize_arguments <- function(return_resampling_dist, fit_skew_normal, moi, control_group, resampling_mechanism, side) {
-  # if resampling distribution is to be returned,
-  if (return_resampling_dist) {
-    assign(x = "B2", value = 0L, inherits = TRUE)
-    assign(x = "B3", value = 0L, inherits = TRUE)
-    assign(x = "fit_skew_normal", value = FALSE, inherits = TRUE)
-  }
-
+harmonize_arguments <- function(fit_skew_normal, moi, control_group, resampling_mechanism, side) {
   # handle moi/control_group/resampling_mechanism
   if (moi == "high") {
     control_group <- "complement"

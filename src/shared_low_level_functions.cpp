@@ -170,3 +170,15 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
   // 9. return p, xi, omega, alpha
   return std::vector<double> {fitted_params[0], fitted_params[1], fitted_params[2], p};
 }
+
+// [[Rcpp::export]]
+double compute_sn_tail_probability(double z, double xi, double omega, double alpha, bool left_tail) {
+  double out;
+  skew_normal dist(xi, omega, alpha);
+  if (left_tail) {
+    out = cdf(dist, z);
+  } else {
+    out = cdf(complement(dist, z));
+  }
+  return out;
+}

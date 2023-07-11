@@ -305,6 +305,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_sn_tail_probability
+double compute_sn_tail_probability(double z, double xi, double omega, double alpha, bool left_tail);
+RcppExport SEXP _sceptre_compute_sn_tail_probability(SEXP zSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP, SEXP left_tailSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type z(zSEXP);
+    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
+    Rcpp::traits::input_parameter< double >::type omega(omegaSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< bool >::type left_tail(left_tailSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_sn_tail_probability(z, xi, omega, alpha, left_tail));
+    return rcpp_result_gen;
+END_RCPP
+}
 // load_csr_row
 NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells);
 RcppExport SEXP _sceptre_load_csr_row(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP) {
@@ -401,6 +416,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},
     {"_sceptre_check_sn_tail", (DL_FUNC) &_sceptre_check_sn_tail, 4},
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 3},
+    {"_sceptre_compute_sn_tail_probability", (DL_FUNC) &_sceptre_compute_sn_tail_probability, 5},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
