@@ -16,8 +16,7 @@ run_sceptre_lowmoi(
   resampling_mechanism = "permutations",
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
-  return_debugging_metrics = FALSE,
-  return_resampling_dist = FALSE,
+  output_amount = 1L,
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
@@ -49,10 +48,6 @@ run_sceptre_lowmoi(
 \item{n_nonzero_trt_thresh}{(optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "treatment cells" (i.e., cells that have received a targeting gRNA) with nonzero expression. \code{sceptre} filters for response-gRNA group pairs with an \code{n_nonzero_trt} value equal to or greater than \code{n_nonzero_trt_thresh}.}
 
 \item{n_nonzero_cntrl_thresh}{(optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "control cells" (i.e., cells that have received a non-targeting gRNA) with nonzero expression. \code{sceptre} filters for pairs with a \code{n_nonzero_control} value equal to or greater than \code{n_nonzero_control_thresh}.}
-
-\item{return_debugging_metrics}{(optional; lower importance; default \code{FALSE}) return metrics that facilitate debugging calibration issues? (See "Note" for details.)}
-
-\item{return_resampling_dist}{(optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?}
 
 \item{fit_skew_normal}{(optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?}
 
@@ -117,26 +112,24 @@ formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) +
 bio_rep + p_mito)
 
 # 3. run the calibration check analysis (NOTE: calibration_check set to TRUE)
-calibration_result <- run_sceptre(response_matrix = response_matrix_lowmoi,
+calibration_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
 grna_matrix = grna_matrix_lowmoi,
 covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
-moi = "low",
 calibration_check = TRUE)
 
 # 4. plot the calibration result to ensure adequate calibration
 plot_calibration_result(calibration_result)
 
 # 5. run the discovery analysis (NOTE: calibration_check set to FALSE)
-discovery_result <- run_sceptre(response_matrix = response_matrix_lowmoi,
+discovery_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
 grna_matrix = grna_matrix_lowmoi,
 covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs,
-moi = "low",
 calibration_check = FALSE)
 
 # 6. compare discovery p-values to the negative control p-values; make a volcano plot

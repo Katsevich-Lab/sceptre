@@ -49,13 +49,11 @@
 #' \item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_skew_normal} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
 #' \item{When \code{return_resampling_dist} is set to \code{TRUE}, \code{sceptre} uses only a single round of permutation testing, returning \code{B1} resampled statistics for each pair. \code{return_resampling_dist} should be set to \code{TRUE} for debugging purposes only.}
 #' }
-run_sceptre <- function(response_matrix, grna_matrix,
-                        covariate_data_frame, grna_group_data_frame,
+run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                         moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
                         control_group = "default", resampling_mechanism = "default",
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
-                        grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
-                        return_resampling_dist = FALSE, fit_skew_normal = TRUE,
+                        grna_assign_threshold = 5L, output_amount = 1L, fit_skew_normal = TRUE,
                         calibration_group_size = NULL, n_calibration_pairs = NULL,
                         B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   ###############
@@ -68,8 +66,7 @@ run_sceptre <- function(response_matrix, grna_matrix,
                response_grna_group_pairs, moi, control_group, resampling_mechanism, side) |> invisible()
 
   # 2. harmonize arguments (called for side-effects)
-  harmonize_arguments(return_resampling_dist, fit_skew_normal, moi,
-                      control_group, resampling_mechanism, side) |> invisible()
+  harmonize_arguments(fit_skew_normal, moi, control_group, resampling_mechanism, side) |> invisible()
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -110,14 +107,13 @@ run_sceptre <- function(response_matrix, grna_matrix,
   ####################
   if (run_permutations) {
     ret <- run_perm_test_in_memory(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                   synthetic_idxs, return_resampling_dist, fit_skew_normal, B1, B2, B3,
-                                   calibration_check, control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                   return_debugging_metrics, side_code, low_moi, print_progress)
+                                   synthetic_idxs, output_amount, fit_skew_normal, B1, B2, B3, calibration_check,
+                                   control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                   side_code, low_moi, print_progress)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                return_resampling_dist, fit_skew_normal, B1, B2, B3, calibration_check, control_group_complement,
-                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, return_debugging_metrics,
-                                side_code, low_moi, print_progress)
+                                output_amount, fit_skew_normal, B1, B2, B3, calibration_check, control_group_complement,
+                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, print_progress)
   }
   return(ret)
 }
@@ -144,26 +140,24 @@ run_sceptre <- function(response_matrix, grna_matrix,
 #' bio_rep + p_mito)
 #'
 #' # 3. run the calibration check analysis (NOTE: calibration_check set to TRUE)
-#' calibration_result <- run_sceptre(response_matrix = response_matrix_lowmoi,
+#' calibration_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
 #' grna_matrix = grna_matrix_lowmoi,
 #' covariate_data_frame = covariate_data_frame_lowmoi,
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' formula_object = formula_object,
 #' response_grna_group_pairs = response_grna_group_pairs,
-#' moi = "low",
 #' calibration_check = TRUE)
 #'
 #' # 4. plot the calibration result to ensure adequate calibration
 #' plot_calibration_result(calibration_result)
 #'
 #' # 5. run the discovery analysis (NOTE: calibration_check set to FALSE)
-#' discovery_result <- run_sceptre(response_matrix = response_matrix_lowmoi,
+#' discovery_result <- run_sceptre_lowmoi(response_matrix = response_matrix_lowmoi,
 #' grna_matrix = grna_matrix_lowmoi,
 #' covariate_data_frame = covariate_data_frame_lowmoi,
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' formula_object = formula_object,
 #' response_grna_group_pairs = response_grna_group_pairs,
-#' moi = "low",
 #' calibration_check = FALSE)
 #'
 #' # 6. compare discovery p-values to the negative control p-values; make a volcano plot
@@ -176,17 +170,15 @@ run_sceptre <- function(response_matrix, grna_matrix,
 run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                                response_grna_group_pairs, formula_object, calibration_check, control_group = "nt_cells",
                                resampling_mechanism = "permutations", n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
-                               return_debugging_metrics = FALSE, return_resampling_dist = FALSE, fit_skew_normal = TRUE,
-                               calibration_group_size = NULL, n_calibration_pairs = NULL, B1 = 499L,
-                               B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
+                               side = "both", output_amount = 1L, fit_skew_normal = TRUE, calibration_group_size = NULL,
+                               n_calibration_pairs = NULL, B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
               covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame,
-              response_grna_group_pairs = response_grna_group_pairs, moi = "low",
+              response_grna_group_pairs = response_grna_group_pairs, moi = "low", side = side,
               formula_object = formula_object, calibration_check = calibration_check,
               control_group = control_group, resampling_mechanism = resampling_mechanism,
               n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-              grna_assign_threshold = NA, return_debugging_metrics = return_debugging_metrics,
-              return_resampling_dist = return_resampling_dist, fit_skew_normal = fit_skew_normal,
+              grna_assign_threshold = NA, output_amount = output_amount, fit_skew_normal = fit_skew_normal,
               calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,
               B1 = B1, B2 = B2, B3 = B3)
 }
@@ -213,22 +205,20 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 #'
 #' # 3. automatic calibration check
-#' calibration_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+#' calibration_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
 #' grna_matrix = grna_matrix_highmoi,
 #' covariate_data_frame = covariate_data_frame_highmoi,
 #' grna_group_data_frame = grna_group_data_frame_highmoi,
 #' response_grna_group_pairs = discovery_pairs_highmoi,
-#' moi = "high",
 #' formula_object = formula_object,
 #' calibration_check = TRUE)
 #'
 #' # 4. run discovery analysis
-#' discovery_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+#' discovery_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
 #' grna_matrix = grna_matrix_highmoi,
 #' covariate_data_frame = covariate_data_frame_highmoi,
 #' grna_group_data_frame = grna_group_data_frame_highmoi,
 #' response_grna_group_pairs = discovery_pairs_highmoi,
-#' moi = "high",
 #' formula_object = formula_object,
 #' calibration_check = FALSE)
 #' }
@@ -237,18 +227,15 @@ run_sceptre_highmoi <- function(response_matrix, grna_matrix,
                                 formula_object, calibration_check, response_grna_group_pairs = NULL,
                                 control_group = "default", resampling_mechanism = "default",
                                 n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
-                                grna_assign_threshold = 5L, return_debugging_metrics = FALSE,
-                                return_resampling_dist = FALSE, fit_skew_normal = TRUE,
+                                grna_assign_threshold = 5L, output_amount = 1L, fit_skew_normal = TRUE,
                                 calibration_group_size = NULL, n_calibration_pairs = NULL,
                                 B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
-              covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame,
-              response_grna_group_pairs = response_grna_group_pairs, moi = "high",
-              formula_object = formula_object, calibration_check = calibration_check,
-              control_group = control_group, resampling_mechanism = resampling_mechanism,
+              covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame, side = side,
+              response_grna_group_pairs = response_grna_group_pairs, moi = "high", formula_object = formula_object,
+              calibration_check = calibration_check, control_group = control_group, resampling_mechanism = resampling_mechanism,
               n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-              grna_assign_threshold = grna_assign_threshold, return_debugging_metrics = return_debugging_metrics,
-              return_resampling_dist = return_resampling_dist, fit_skew_normal = fit_skew_normal,
+              grna_assign_threshold = grna_assign_threshold, output_amount = output_amount, fit_skew_normal = fit_skew_normal,
               calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,
               B1 = B1, B2 = B2, B3 = B3)
 }

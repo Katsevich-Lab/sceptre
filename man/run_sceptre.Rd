@@ -19,8 +19,7 @@ run_sceptre(
   n_nonzero_cntrl_thresh = 7L,
   side = "both",
   grna_assign_threshold = 5L,
-  return_debugging_metrics = FALSE,
-  return_resampling_dist = FALSE,
+  output_amount = 1L,
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
@@ -59,10 +58,6 @@ run_sceptre(
 
 \item{grna_assign_threshold}{(optional; lower importance; default 5) the threshold used to assign gRNAs to cells on high MOI data. (A given gRNA is assigned to a given cell if the UMI count of the gRNA within the cell is greater than or equal to the threshold.)}
 
-\item{return_debugging_metrics}{(optional; lower importance; default \code{FALSE}) return metrics that facilitate debugging calibration issues? (See "Note" for details.)}
-
-\item{return_resampling_dist}{(optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?}
-
 \item{fit_skew_normal}{(optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?}
 
 \item{calibration_group_size}{(optional; lower importance; default \code{NULL}) the number of NT gRNAs to assign to each negative control gRNA group in the calibration check analysis. By default, \code{sceptre} sets \code{calibration_group_size} to the median group size of the targeting gRNAs.}
@@ -76,6 +71,10 @@ run_sceptre(
 \item{B3}{(optional; lower importance; default 24999) the number of null test statistics to compute the third round of the permutation test.}
 
 \item{print_progress}{(optional; default TRUE) print the progress of the function?}
+
+\item{return_debugging_metrics}{(optional; lower importance; default \code{FALSE}) return metrics that facilitate debugging calibration issues? (See "Note" for details.)}
+
+\item{return_resampling_dist}{(optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?}
 }
 \value{
 a data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.

@@ -1,14 +1,14 @@
-construct_data_frame_v2 <- function(curr_df, curr_response_result, return_debugging_metrics, return_resampling_dist) {
+construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount) {
     curr_df$p_value <- sapply(X = curr_response_result, FUN = function(l) l$p, simplify = TRUE)
     curr_df$log_2_fold_change <- sapply(curr_response_result, FUN = function(l) l$lfc)
-    if (return_debugging_metrics) {
+    if (output_amount >= 2L) {
       curr_df$stage <- sapply(curr_response_result, FUN = function(l) l$stage)
       curr_df$z_orig <- sapply(curr_response_result, FUN = function(l) l$z_orig)
       curr_df$xi <- sapply(curr_response_result, FUN = function(l) l$sn_params[1L])
       curr_df$omega <- sapply(curr_response_result, FUN = function(l) l$sn_params[2L])
       curr_df$alpha <- sapply(curr_response_result, FUN = function(l) l$sn_params[3L])
     }
-    if (return_resampling_dist) {
+    if (output_amount >= 3L) {
       to_append <- lapply(curr_response_result, FUN = function(l) {
         m <- data.table::as.data.table(matrix(l$resampling_dist, nrow = 1))
         colnames(m) <- paste0("z_null_", seq(1L, ncol(m)))

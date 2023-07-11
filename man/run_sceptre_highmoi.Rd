@@ -18,8 +18,7 @@ run_sceptre_highmoi(
   n_nonzero_cntrl_thresh = 7L,
   side = "both",
   grna_assign_threshold = 5L,
-  return_debugging_metrics = FALSE,
-  return_resampling_dist = FALSE,
+  output_amount = 1L,
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
@@ -49,22 +48,20 @@ response_grna_group_pairs <- discovery_pairs_highmoi
 formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 
 # 3. automatic calibration check
-calibration_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+calibration_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
 grna_matrix = grna_matrix_highmoi,
 covariate_data_frame = covariate_data_frame_highmoi,
 grna_group_data_frame = grna_group_data_frame_highmoi,
 response_grna_group_pairs = discovery_pairs_highmoi,
-moi = "high",
 formula_object = formula_object,
 calibration_check = TRUE)
 
 # 4. run discovery analysis
-discovery_result <- run_sceptre(response_matrix = response_matrix_highmoi,
+discovery_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
 grna_matrix = grna_matrix_highmoi,
 covariate_data_frame = covariate_data_frame_highmoi,
 grna_group_data_frame = grna_group_data_frame_highmoi,
 response_grna_group_pairs = discovery_pairs_highmoi,
-moi = "high",
 formula_object = formula_object,
 calibration_check = FALSE)
 }
