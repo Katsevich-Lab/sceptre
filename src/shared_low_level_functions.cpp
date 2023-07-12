@@ -148,8 +148,9 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
         fit_ok = check_sn_tail(null_statistics, fitted_params[0], fitted_params[1], fitted_params[2]);
       } else { // left tail check
         std::reverse(null_statistics.begin(), null_statistics.end());
-        for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0;
+        for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0; // flip sign
         fit_ok = check_sn_tail(null_statistics, -fitted_params[0], fitted_params[1], -fitted_params[2]);
+        for (int i = 0; i < null_statistics.size(); i ++) null_statistics[i] *= -1.0; // flip sign back
       }
     }
 
