@@ -19,10 +19,10 @@ grna_feature_df <- grna_feature_df |>
 
 # 1. Construct the discovery pairs data frame, which contains both cis and positive control pairs
 set.seed(4)
-my_cis_grna_groups <- pairs_grouped |>
+my_cis_grna_groups <- c(pairs_grouped |>
   dplyr::filter(site_type == "cis") |>
   dplyr::pull(grna_group) |>
-  sample(15)
+  sample(12), "chr8.847_top_two", "chr9.1594_top_two", "chr9.2869_top_two", "chr9.3633_top_two", "chr9.871_top_two")
 cis_pairs <- pairs_grouped |>
   dplyr::filter(grna_group %in% my_cis_grna_groups)
 my_pc_grna_groups <- pairs_grouped |>
@@ -80,5 +80,7 @@ grna_matrix_highmoi <- grna_matrix_highmoi[,!cells_to_rm]
 covariate_data_frame_highmoi <- covariate_data_frame_highmoi[!cells_to_rm,]
 
 # 9. save the data
-discovery_pairs_highmoi <- discovery_pairs
-usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi, covariate_data_frame_highmoi, grna_group_data_frame_highmoi, discovery_pairs_highmoi, overwrite = TRUE)
+discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis")
+pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl")
+usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi, covariate_data_frame_highmoi, grna_group_data_frame_highmoi, discovery_pairs_highmoi, pc_pairs_highmoi, overwrite = TRUE)
+

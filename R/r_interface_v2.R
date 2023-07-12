@@ -209,7 +209,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' grna_matrix = grna_matrix_highmoi,
 #' covariate_data_frame = covariate_data_frame_highmoi,
 #' grna_group_data_frame = grna_group_data_frame_highmoi,
-#' response_grna_group_pairs = discovery_pairs_highmoi,
+#' response_grna_group_pairs = response_grna_group_pairs,
 #' formula_object = formula_object,
 #' calibration_check = TRUE)
 #'
@@ -218,7 +218,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' grna_matrix = grna_matrix_highmoi,
 #' covariate_data_frame = covariate_data_frame_highmoi,
 #' grna_group_data_frame = grna_group_data_frame_highmoi,
-#' response_grna_group_pairs = discovery_pairs_highmoi,
+#' response_grna_group_pairs = response_grna_group_pairs,
 #' formula_object = formula_object,
 #' calibration_check = FALSE)
 #' }
