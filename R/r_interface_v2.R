@@ -184,7 +184,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 }
 
 
-#' Run `sceptre` (high MOI)
+#' Run `sceptre` (high MOI; experimental)
 #'
 #' @export
 #'
@@ -192,48 +192,71 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' \dontrun{
 #' library(Matrix)
 #'
-#' data(response_matrix_highmoi) # response-by-cell expression matrix
-#' data(grna_matrix_highmoi) # gRNA-by-cell expression matrix
-#' data(covariate_data_frame_highmoi) # cell-by-covariate data frame
-#' data(grna_group_data_frame_highmoi) # gRNA group information
-#' data(discovery_pairs_highmoi)
+#' # 0. load the data
+#' data(response_matrix_highmoi_experimental) # response-by-cell expression matrix
+#' data(grna_matrix_highmoi_experimental) # gRNA-by-cell expression matrix
+#' data(covariate_data_frame_highmoi_experimental) # cell-by-covariate data frame
+#' data(grna_group_data_frame_highmoi_experimental) # gRNA group information
+#' data(discovery_pairs_highmoi_experimental)
 #'
-#' # 1. set the pairs to analyze
-#' response_grna_group_pairs <- discovery_pairs_highmoi
-#'
-#' # 2. set the formula object
+#' # 1. set the formula object
 #' formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 #'
-#' # 3. automatic calibration check
-#' calibration_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
-#' grna_matrix = grna_matrix_highmoi,
-#' covariate_data_frame = covariate_data_frame_highmoi,
-#' grna_group_data_frame = grna_group_data_frame_highmoi,
-#' response_grna_group_pairs = response_grna_group_pairs,
+#' # 2. run the calibration check
+#' calibration_result <- run_sceptre_highmoi_experimental(
+#' response_matrix = response_matrix_highmoi_experimental,
+#' grna_matrix = grna_matrix_highmoi_experimental,
+#' covariate_data_frame = covariate_data_frame_highmoi_experimental,
+#' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+#' response_grna_group_pairs = discovery_pairs_highmoi_experimental,
 #' formula_object = formula_object,
+#' side = "left",
 #' calibration_check = TRUE)
 #'
+#' # 3. verify calibration
+#' plot_calibration_result(calibration_result)
+#'
 #' # 4. run discovery analysis
-#' discovery_result <- run_sceptre_highmoi(response_matrix = response_matrix_highmoi,
-#' grna_matrix = grna_matrix_highmoi,
-#' covariate_data_frame = covariate_data_frame_highmoi,
-#' grna_group_data_frame = grna_group_data_frame_highmoi,
-#' response_grna_group_pairs = response_grna_group_pairs,
+#' discovery_result <- run_sceptre_highmoi_experimental(
+#' response_matrix = response_matrix_highmoi_experimental,
+#' grna_matrix = grna_matrix_highmoi_experimental,
+#' covariate_data_frame = covariate_data_frame_highmoi_experimental,
+#' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+#' response_grna_group_pairs = discovery_pairs_highmoi_experimental,
 #' formula_object = formula_object,
+#' side = "left",
+#' calibration_check = FALSE)
+#'
+#' # 5. compare discovery p-values to the negative control p-values; make a volcano plot
+#' compare_calibration_and_discovery_results(calibration_result, discovery_result)
+#' make_volcano_plot(discovery_result)
+#'
+#' # 6. obtain the discovery set
+#' discovery_set <- obtain_discovery_set(discovery_result)
+#'
+#' # 7. optional: positive control analysis
+#' pc_result <- run_sceptre_highmoi_experimental(
+#' response_matrix = response_matrix_highmoi_experimental,
+#' grna_matrix = grna_matrix_highmoi_experimental,
+#' covariate_data_frame = covariate_data_frame_highmoi_experimental,
+#' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+#' response_grna_group_pairs = pc_pairs_highmoi_experimental,
+#' formula_object = formula_object,
+#' side = "left",
 #' calibration_check = FALSE)
 #' }
-run_sceptre_highmoi <- function(response_matrix, grna_matrix,
+run_sceptre_highmoi_experimental <- function(response_matrix, grna_matrix,
                                 covariate_data_frame, grna_group_data_frame,
                                 formula_object, calibration_check, response_grna_group_pairs = NULL,
-                                control_group = "default", resampling_mechanism = "default",
-                                n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
-                                grna_assign_threshold = 5L, output_amount = 1L, fit_skew_normal = TRUE,
+                                resampling_mechanism = "default", n_nonzero_trt_thresh = 7L,
+                                n_nonzero_cntrl_thresh = 7L, side = "both", grna_assign_threshold = 5L,
+                                output_amount = 1L, fit_skew_normal = TRUE,
                                 calibration_group_size = NULL, n_calibration_pairs = NULL,
                                 B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
               covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame, side = side,
               response_grna_group_pairs = response_grna_group_pairs, moi = "high", formula_object = formula_object,
-              calibration_check = calibration_check, control_group = control_group, resampling_mechanism = resampling_mechanism,
+              calibration_check = calibration_check, control_group = "default", resampling_mechanism = resampling_mechanism,
               n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
               grna_assign_threshold = grna_assign_threshold, output_amount = output_amount, fit_skew_normal = fit_skew_normal,
               calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,

@@ -79,8 +79,17 @@ response_matrix_highmoi <- response_matrix_highmoi[,!cells_to_rm]
 grna_matrix_highmoi <- grna_matrix_highmoi[,!cells_to_rm]
 covariate_data_frame_highmoi <- covariate_data_frame_highmoi[!cells_to_rm,]
 
-# 9. save the data
+# 9. rename the data objects
 discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis")
 pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl")
-usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi, covariate_data_frame_highmoi, grna_group_data_frame_highmoi, discovery_pairs_highmoi, pc_pairs_highmoi, overwrite = TRUE)
 
+response_matrix_highmoi_experimental <- response_matrix_highmoi
+grna_matrix_highmoi_experimental <- grna_matrix_highmoi
+covariate_data_frame_highmoi_experimental <- covariate_data_frame_highmoi
+grna_group_data_frame_highmoi_experimental <- grna_group_data_frame_highmoi
+discovery_pairs_highmoi_experimental <- discovery_pairs_highmoi
+pc_pairs_highmoi_experimental <- pc_pairs_highmoi
+
+usethis::use_data(response_matrix_highmoi_experimental, grna_matrix_highmoi_experimental,
+                  covariate_data_frame_highmoi_experimental, grna_group_data_frame_highmoi_experimental,
+                  discovery_pairs_highmoi_experimental, pc_pairs_highmoi_experimental, overwrite = TRUE)
