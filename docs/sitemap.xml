@@ -10,6 +10,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/associated_papers.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/articles/highmoi_tutorial.html</loc>
   </url>
   <url>
@@ -49,6 +52,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/compute_cell_covariates.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/covariate_data_frame_highmoi_experimental.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/covariate_data_frame_lowmoi.html</loc>
   </url>
   <url>
@@ -62,6 +68,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/data.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/discovery_pairs_highmoi_experimental.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/gRNA_groups_table.html</loc>
@@ -97,7 +106,13 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/generate_all_pairs.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/grna_group_data_frame_highmoi_experimental.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/grna_group_data_frame_lowmoi.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/grna_matrix_highmoi_experimental.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/grna_matrix_lowmoi.html</loc>
@@ -124,6 +139,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/obtain_discovery_set.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/pc_pairs_highmoi_experimental.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot_calibration_result.html</loc>
   </url>
   <url>
@@ -137,6 +155,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/regularize_gene_sizes_at_scale.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/response_matrix_highmoi_experimental.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/response_matrix_lowmoi.html</loc>
@@ -154,6 +175,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/run_gene_precomputation_at_scale_round_2.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/run_sceptre.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/run_sceptre_gRNA_gene_pair.html</loc>
   </url>
   <url>
@@ -161,6 +185,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/run_sceptre_highmoi.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/run_sceptre_highmoi_experimental.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/run_sceptre_in_memory.html</loc>

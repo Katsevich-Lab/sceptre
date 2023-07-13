@@ -221,7 +221,7 @@ plot_resampling_distribution <- function(result_df, row_number) {
   if (length(null_dist_idxs) == 0) stop("Columns z_null_1, z_null_2, z_null_3, ... must be present in `result_df` to use this function. Rerun your calibration check or discovery analysis, setting `output_amount` to 3.")
 
   # extract the null and observed z-scores
-  z_null <- as.numeric(result_df[row_number, null_dist_idxs]) |> na.omit()
+  z_null <- as.numeric(result_df[row_number, null_dist_idxs]) |> stats::na.omit()
   z_obs <- as.numeric(result_df[row_number, "z_orig"])
 
   # extract the fitted skew-normal parameters

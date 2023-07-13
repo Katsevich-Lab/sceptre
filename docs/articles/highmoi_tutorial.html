@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/associated_papers.html">Associated papers</a>
     <a class="dropdown-item" href="../articles/highmoi_tutorial.html">High MOI sceptre tutorial</a>
     <a class="dropdown-item" href="../articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
     <a class="dropdown-item" href="../articles/quality_control_in_low_moi.html">Low MOI Quality Control</a>
@@ -77,7 +78,6 @@
                         <h4 data-toc-skip class="author">Tim Barry &amp;
 Gene Katsevich</h4>
             
-            <h4 data-toc-skip class="date">April 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/Katsevich-Lab/sceptre/blob/HEAD/vignettes/highmoi_tutorial.Rmd" class="external-link"><code>vignettes/highmoi_tutorial.Rmd</code></a></small>
       <div class="d-none name"><code>highmoi_tutorial.Rmd</code></div>
@@ -85,6 +85,14 @@ Gene Katsevich</h4>
 
     
     
+<p><strong>Update July 2023</strong>: We have released a new,
+experimental high MOI function, which we expect to be faster, more
+memory efficient, and more powerful than the current high MOI function
+on most datasets. One can access the documentation for the experimental
+high MOI function via <code><a href="../reference/run_sceptre_highmoi_experimental.html">?run_sceptre_highmoi_experimental</a></code>. We
+expect to deprecate the current high MOI function and replace it with
+the experimental high MOI function by September 2023.</p>
+<hr>
 <p>This vignette illustrates application of <code>sceptre</code> to an
 example high-multiplicity-of-infection (MOI) single-cell CRISPR screen
 dataset. We begin by installing and loading all required packages,
@@ -605,7 +613,7 @@ capable of detecting true relationships), we assess the power of the
 test on the positive control pairs. We extract the positive control
 <em>p</em>-values and examine their values.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pos_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"positive_control"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">pos_control_p_vals</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"positive_control"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">p_value</span><span class="op">)</span></span>
 <span><span class="va">pos_control_p_vals</span></span>
 <span><span class="co">#&gt; [1] 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 2.232103e-13</span></span></code></pre></div>
 <p>The positive control <em>p</em>-values are all small, indicating that
@@ -618,7 +626,7 @@ the test is powerful.</p>
 <em>p</em>-values corresponding to the candidate pairs and apply a
 Benjamini-Hochberg (BH) correction to adjust for multiple testing.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">candidate_pair_results</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"candidate"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">candidate_pair_results</span> <span class="op">&lt;-</span> <span class="va">result</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pair_type</span> <span class="op">==</span> <span class="st">"candidate"</span><span class="op">)</span></span>
 <span><span class="va">candidate_pair_results_p_adj</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>p_val_adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></span><span class="op">(</span><span class="va">p_value</span>, method <span class="op">=</span> <span class="st">"BH"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">candidate_pair_results_p_adj</span><span class="op">)</span></span>
@@ -635,7 +643,7 @@ Benjamini-Hochberg (BH) correction to adjust for multiple testing.</p>
 0.1 significant; the discovery set (i.e., the set of significant pairs)
 has a false discovery rate (FDR) of 10%.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results_p_adj</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">p_val_adj</span> <span class="op">&lt;=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">discovery_set</span> <span class="op">&lt;-</span> <span class="va">candidate_pair_results_p_adj</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">p_val_adj</span> <span class="op">&lt;=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
 <p>The discovery set in this case is empty, as we tested only fifteen
 candidate pairs.</p>
 <p><strong>Note</strong>: It is crucial to apply BH <em>only</em> to the

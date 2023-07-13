@@ -1,0 +1,20 @@
+---
+title: "Associated papers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The following series of papers introduces the sceptre methodology, applies sceptre to discover biology, and — more broadly — interrogates and aims to resolve statistical and computational challenges at play in single-cell CRISPR screen analysis.
+
+- (Low MOI analyis) T Barry, K Mason, K Roeder, E Katsevich. "Robust differential expression testing for single-cell CRISPR screens at low multiplicity of infection." BioRxiv preprint, 2023. [(new!)]{style="color:red"}
+
+- (Application of sceptre to GWAS loci) J Morris, C Caragine, Z Daniloski, J Domingo, T Barry, L Lu, K Davis, M Ziosi, D Glinos, S Hao, E Mimitou, P Smibert, K Roeder, E Katsevich, T Lappalainen, N Sanjana. "Discovery of target genes and pathways at GWAS loci by pooled single-cell CRISPR screens." Science, 2023. [(new!)]{style="color:red"}
+
+- (High MOI analysis) T Barry, X Wang, J Morris, K Roeder, E Katsevich. "SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis." Genome Biology, 2021.
+
+- (Effect size estimation) T Barry, K Roeder, E Katsevich. "Exponential family measurement error models for single-cell CRISPR screens." arXiv preprint, 2022.
+
+Please consider citing the most relevant among these papers if you find sceptre helpful in your research.

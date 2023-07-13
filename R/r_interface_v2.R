@@ -173,26 +173,59 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
 #' # 7. obtain the discovery set for downstream analysis
 #' discovery_set <- obtain_discovery_set(discovery_result)
 #' }
-run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
-                               response_grna_group_pairs, formula_object, calibration_check, control_group = "nt_cells",
-                               resampling_mechanism = "permutations", n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
-                               side = "both", output_amount = 1L, fit_parametric_curve = TRUE, calibration_group_size = NULL,
-                               n_calibration_pairs = NULL, B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
-  run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
-              covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame,
-              response_grna_group_pairs = response_grna_group_pairs, moi = "low", side = side,
-              formula_object = formula_object, calibration_check = calibration_check,
-              control_group = control_group, resampling_mechanism = resampling_mechanism,
-              n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-              grna_assign_threshold = NA, output_amount = output_amount, fit_parametric_curve = fit_parametric_curve,
-              calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,
-              B1 = B1, B2 = B2, B3 = B3)
-}
+run_sceptre_lowmoi <-
+  function(response_matrix,
+           grna_matrix,
+           covariate_data_frame,
+           grna_group_data_frame,
+           response_grna_group_pairs,
+           formula_object,
+           calibration_check,
+           control_group = "nt_cells",
+           resampling_mechanism = "permutations",
+           n_nonzero_trt_thresh = 7L,
+           n_nonzero_cntrl_thresh = 7L,
+           side = "both",
+           output_amount = 1L,
+           fit_parametric_curve = TRUE,
+           calibration_group_size = NULL,
+           n_calibration_pairs = NULL,
+           B1 = 499L,
+           B2 = 4999L,
+           B3 = 24999L,
+           print_progress = TRUE) {
+    run_sceptre(
+      response_matrix = response_matrix,
+      grna_matrix = grna_matrix,
+      covariate_data_frame = covariate_data_frame,
+      grna_group_data_frame = grna_group_data_frame,
+      response_grna_group_pairs = response_grna_group_pairs,
+      moi = "low",
+      side = side,
+      formula_object = formula_object,
+      calibration_check = calibration_check,
+      control_group = control_group,
+      resampling_mechanism = resampling_mechanism,
+      n_nonzero_trt_thresh = n_nonzero_trt_thresh,
+      n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+      grna_assign_threshold = NA,
+      output_amount = output_amount,
+      fit_parametric_curve = fit_parametric_curve,
+      calibration_group_size = calibration_group_size,
+      n_calibration_pairs = n_calibration_pairs,
+      B1 = B1,
+      B2 = B2,
+      B3 = B3
+    )
+  }
 
 
 #' Run \code{sceptre} (high MOI; experimental)
 #'
+#' This is the new, experimental high MOI function. The user interface of this function is nearly identical to that of the low MOI function. Therefore, we recommend that users work through the [low MOI tutorial](https://katsevich-lab.github.io/sceptre/articles/lowmoi_tutorial.html) before using this function.
+#'
 #' @export
+#' @inherit run_sceptre
 #'
 #' @examples
 #' \dontrun{
@@ -206,7 +239,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' data(discovery_pairs_highmoi_experimental)       # discovery gRNA group / gene pairs
 #'
 #' # 1. set the formula object
-#' formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
+#' formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
 #'
 #' # 2. run the calibration check
 #' calibration_result <- run_sceptre_highmoi_experimental(
@@ -254,23 +287,27 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #'   calibration_check = FALSE
 #' )
 #' }
-run_sceptre_highmoi_experimental <- function(
-  response_matrix, 
-  grna_matrix,
-  covariate_data_frame, 
-  grna_group_data_frame,
-  formula_object, 
-  calibration_check, 
-  response_grna_group_pairs = NULL,
-  resampling_mechanism = "default",
-  n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
-  side = "both",
-  grna_assign_threshold = 5L,
-  output_amount = 1L,
-  fit_parametric_curve = TRUE,
-  calibration_group_size = NULL, n_calibration_pairs = NULL,
-  B1 = 499L, B2 = 4999L, B3 = 24999L,
-  print_progress = TRUE
+run_sceptre_highmoi_experimental <- function(response_matrix,
+                                             grna_matrix,
+                                             covariate_data_frame,
+                                             grna_group_data_frame,
+                                             formula_object,
+                                             calibration_check,
+                                             response_grna_group_pairs = NULL,
+                                             resampling_mechanism = "default",
+                                             n_nonzero_trt_thresh = 7L,
+                                             n_nonzero_cntrl_thresh = 7L,
+                                             side = "both",
+                                             grna_assign_threshold = 5L,
+                                             output_amount = 1L,
+                                             fit_parametric_curve = TRUE,
+                                             calibration_group_size = NULL,
+                                             n_calibration_pairs = NULL,
+                                             B1 = 499L,
+                                             B2 = 4999L,
+                                             B3 = 24999L,
+                                             print_progress = TRUE
+
 ) {
     run_sceptre(
       response_matrix = response_matrix,
