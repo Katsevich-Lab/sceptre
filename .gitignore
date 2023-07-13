@@ -5,7 +5,7 @@
 .DS_Store
 inst/doc
 .travis.yml
-/src/*.o
-/src/*.o-*
-/src/*.d
-/src/*.so
+src/*.o
+src/*.o-*
+src/*.d
+src/*.so
