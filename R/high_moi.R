@@ -134,7 +134,7 @@
 #'
 #' @return NULL
 #' @noRd
-.highmoi_run_gRNA_precomputation_at_scale <- function(pod_id, gRNA_precomp_dir, combined_perturbation_matrix, covariate_matrix, log_dir, B, seed) {
+.highmoi_run_gRNA_precomputation_at_scale <- function(gene_matrix, pod_id, gRNA_precomp_dir, combined_perturbation_matrix, covariate_matrix, log_dir, B, seed) {
   # Activate the sink for the log file
   if (!is.null(log_dir)) .highmoi_activate_sink(paste0(log_dir, "/gRNA_precomp_", pod_id, ".Rout"))
   # determine the gRNAs on which to run the precomputation
@@ -398,25 +398,25 @@
 #' \dontrun{
 #' library(dplyr)
 #' # 1. load the data
-#' data(gene_matrix) # i. gene expression matrix
-#' data(gRNA_matrix) # ii. gRNA expression matrix
-#' data(covariate_matrix) # iii. covariate matrix
-#' data(gRNA_groups_table) # iv. gRNAs grouped by target site
-#' data(gene_gRNA_group_pairs) # v. gene-gRNA group pairs to analyze
+#' data(gene_matrix_highmoi) # i. gene expression matrix
+#' data(gRNA_matrix_highmoi) # ii. gRNA expression matrix
+#' data(covariate_matrix_highmoi) # iii. covariate matrix
+#' data(gRNA_groups_table_highmoi) # iv. gRNAs grouped by target site
+#' data(gene_gRNA_group_pairs_highmoi) # v. gene-gRNA group pairs to analyze
 #'
 #' # 2. threshold and combine gRNA matrix
-#' combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix) |>
-#' combine_perturbations(gRNA_groups_table)
+#' combined_perturbation_matrix <- threshold_gRNA_matrix(gRNA_matrix_highmoi) |>
+#' combine_perturbations(gRNA_groups_table_highmoi)
 #'
 #' # 3. select the gene-gRNA group pairs to analyze
 #' set.seed(4)
-#' gene_gRNA_group_pairs <- gene_gRNA_group_pairs |> sample_n(25)
-#
-#' # 3. run method (takes ~40s on an 8-core Macbook Pro)
-#' result <- run_sceptre_highmoi(gene_matrix = gene_matrix,
+#' gene_gRNA_group_pairs_highmoi <- gene_gRNA_group_pairs_highmoi |> sample_n(25)
+#'
+#' # 4. run method (takes ~40s on an 8-core Macbook Pro)
+#' result <- run_sceptre_highmoi(gene_matrix = gene_matrix_highmoi,
 #' combined_perturbation_matrix = combined_perturbation_matrix,
-#' covariate_matrix = covariate_matrix,
-#' gene_gRNA_group_pairs = gene_gRNA_group_pairs,
+#' covariate_matrix = covariate_matrix_highmoi,
+#' gene_gRNA_group_pairs = gene_gRNA_group_pairs_highmoi,
 #' side = "left")
 #' }
 run_sceptre_highmoi <- function(gene_matrix, combined_perturbation_matrix, covariate_matrix, gene_gRNA_group_pairs, side = "both", storage_dir = tempdir(), regularization_amount = 0.0, B = 1000, full_output = FALSE, parallel = FALSE, seed = 4) {
@@ -533,7 +533,8 @@ run_sceptre_highmoi <- function(gene_matrix, combined_perturbation_matrix, covar
   # run gRNA precomputations
   cat("Running perturbation precomputations. ")
   foreach_funct(foreach::foreach(pod_id = seq(1, dicts[["gRNA"]])),
-                .highmoi_run_gRNA_precomputation_at_scale(pod_id = pod_id,
+                .highmoi_run_gRNA_precomputation_at_scale(gene_matrix,
+                                                pod_id = pod_id,
                                                  gRNA_precomp_dir = dirs[["gRNA_precomp_dir"]],
                                                  combined_perturbation_matrix = combined_perturbation_matrix,
                                                  covariate_matrix = covariate_matrix,

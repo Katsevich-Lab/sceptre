@@ -24,6 +24,7 @@ The fitted parametric curve is superimposed over the histogram in purple (if app
 library(Matrix)
 set.seed(5)
 
+\dontrun{
 # 0. load the data associated with the experiment
 data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
@@ -46,4 +47,5 @@ output_amount = 3)
 
 # 2. visualize a resampling distribution
 plot_resampling_distribution(discovery_result, 2)
+}
 }

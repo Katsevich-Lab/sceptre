@@ -2,7 +2,7 @@
 title: "High MOI sceptre tutorial"
 output: rmarkdown::html_vignette
 author: Tim Barry & Gene Katsevich
-date: April 2023
+date: July 2023
 vignette: >
   %\VignetteIndexEntry{High MOI sceptre tutorial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,6 +15,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+**Update July 2023**: We have released a new, experimental high MOI function. We expect the experimental high MOI function to be faster, more memory efficient, and more statistically powerful than the current high MOI function on most datasets. One can access the documentation for the experimental high MOI function via `?run_sceptre_highmoi_experimental`. We expect to deprecate the current high MOI function (and replace it with the experimental high MOI function) by September 2023.
+
+-------------------------------------
 
 This vignette illustrates application of `sceptre` to an example high-multiplicity-of-infection (MOI) single-cell CRISPR screen dataset. We begin by installing and loading all required packages, including the up-to-date version of `sceptre`.
 
@@ -279,7 +283,7 @@ A forthcoming article will give recommendations for what to do if the QQ-plot re
 Next, to verify that the test is powerful (i.e., that the test is capable of detecting true relationships), we assess the power of the test on the positive control pairs. We extract the positive control *p*-values and examine their values.
 
 ```{r}
-pos_control_p_vals <- result |> filter(pair_type == "positive_control") |> pull(p_value)
+pos_control_p_vals <- result |> dplyr::filter(pair_type == "positive_control") |> pull(p_value)
 pos_control_p_vals
 ```
 
@@ -290,7 +294,7 @@ The positive control *p*-values are all small, indicating that the test is power
 Finally, we produce the discovery set. We extract the *p*-values corresponding to the candidate pairs and apply a Benjamini-Hochberg (BH) correction to adjust for multiple testing.
 
 ```{r}
-candidate_pair_results <- result |> filter(pair_type == "candidate")
+candidate_pair_results <- result |> dplyr::filter(pair_type == "candidate")
 candidate_pair_results_p_adj <- candidate_pair_results |>
   mutate(p_val_adj = p.adjust(p_value, method = "BH"))
 head(candidate_pair_results_p_adj)
@@ -299,7 +303,7 @@ head(candidate_pair_results_p_adj)
 We call pairs with an adjusted *p*-value of less or equal than 0.1 significant; the discovery set (i.e., the set of significant pairs) has a false discovery rate (FDR) of 10%.
 
 ```{r}
-discovery_set <- candidate_pair_results_p_adj |> filter(p_val_adj <= 0.1)
+discovery_set <- candidate_pair_results_p_adj |> dplyr::filter(p_val_adj <= 0.1)
 ```
 
 The discovery set in this case is empty, as we tested only fifteen candidate pairs.

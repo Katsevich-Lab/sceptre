@@ -190,6 +190,7 @@ make_volcano_plot <- function(discovery_result, alpha = 0.1, x_limits = c(-1.5, 
 #' library(Matrix)
 #' set.seed(5)
 #'
+#' \dontrun{
 #' # 0. load the data associated with the experiment
 #' data(response_matrix_lowmoi) # response-by-cell expression matrix
 #' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
@@ -212,6 +213,7 @@ make_volcano_plot <- function(discovery_result, alpha = 0.1, x_limits = c(-1.5, 
 #'
 #' # 2. visualize a resampling distribution
 #' plot_resampling_distribution(discovery_result, 2)
+#' }
 plot_resampling_distribution <- function(result_df, row_number) {
   # check for the presence of z_null_1, z_null_2, z_null_3, ...
   df_colnames <- colnames(result_df)
