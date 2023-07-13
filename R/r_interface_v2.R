@@ -1,41 +1,50 @@
-#' Run `sceptre`
+#' Run \code{sceptre}
+#'
+#' Applies \code{sceptre} to analyze a single-cell CRISPR screen dataset.
 #'
 #' @param response_matrix (required) a matrix of raw expression counts. The responses (e.g., genes or proteins) should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the responses. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}.
-#' @param grna_matrix (required) a matrix of gRNA expression counts. The gRNAs should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the gRNAs. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. (See "Notes" for information about passing gRNA matrices containing user-determined gRNA-to-cell assignments.)
-#' @param covariate_data_frame (required) a data frame containing the cell-specific covariates (e.g., sequencing batch, total UMI count, etc.), with cells in the rows and covariates in the columns. The column names should be the names of the covariates.
+#' @param grna_matrix (required) a matrix of gRNA expression counts. The gRNAs should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the gRNAs. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. (See "Notes" for details about passing a gRNA matrix containing user-specified gRNA-to-cell assignments.)
+#' @param covariate_data_frame (required) a data frame containing the cell-specific covariates (e.g., sequencing batch, total UMI count, etc.), with cells in the rows and covariates in the columns.
 #' @param grna_group_data_frame (required) a data frame specifying the "group" to which each individual gRNA belongs. This data frame should contain columns \code{grna_id} and \code{grna_group}, with \code{grna_group} specifying the group membership of a given gRNA in the \code{grna_id} column. Typically, gRNAs that target the same site are grouped into the same gRNA group. Non-targeting gRNAs (if present) should be assigned a gRNA group label of "non-targeting".
-#' @param moi the MOI of the dataset, either "low" or "high"
-#' @param formula_object (required) an R formula object specifying how to adjust for the covariates (in the \code{covariate_data_frame}).
+#' @param moi the MOI of the dataset, either "low" or "high".
+#' @param formula_object (required) an R formula object specifying how to adjust for the covariates in the \code{covariate_data_frame}.
 #' @param response_grna_group_pairs (required) a data frame specifying the set of response-gRNA group pairs to test for association. The data frame should contain columns \code{response_id} and \code{grna_group}.
 #' @param calibration_check (required) a logical (i.e., \code{TRUE}/\code{FALSE}) value indicating whether to run a calibration check (\code{TRUE}) or a discovery analysis (\code{FALSE}). See the "Details" section for a more complete description of the calibration and discovery analyses.
-#' @param side (optional; moderate importance; default "both") the sidedness of the test, either two-sided ("both"), left-tailed ("left"), or right-tailed ("right")
-#' @param control_group (optional; moderate importance; default depends on MOI) the set of cells against which the cells that contain a given targeting perturbation should be compared. The options are "complement" (for the complement set) and "nt" (for the cells containing a non-targeting gRNA). The only valid option for high MOI data is "complement", as few (if any) cells contain exclusively non-targeting gRNAs in high MOI. The default for low MOI data is "complement".
-#' @param resampling_mechanism (optional; moderate importance; default depends on MOI) the resampling mechanism to use to carry out inference, either "crt" (for the conditional randomization test) or "permutations" (for the permutation test)
-#' @param n_nonzero_trt_thresh (optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "treatment cells" (i.e., cells that have received a targeting gRNA) with nonzero expression. \code{sceptre} filters for response-gRNA group pairs with an \code{n_nonzero_trt} value equal to or greater than \code{n_nonzero_trt_thresh}.
-#' @param n_nonzero_cntrl_thresh (optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "control cells" (i.e., cells that have received a non-targeting gRNA) with nonzero expression. \code{sceptre} filters for pairs with a \code{n_nonzero_control} value equal to or greater than \code{n_nonzero_control_thresh}.
-#' @param grna_assign_threshold (optional; lower importance; default 5) the threshold used to assign gRNAs to cells on high MOI data. (A given gRNA is assigned to a given cell if the UMI count of the gRNA within the cell is greater than or equal to the threshold.)
-#' @param return_debugging_metrics (optional; lower importance; default \code{FALSE}) return metrics that facilitate debugging calibration issues? (See "Note" for details.)
-#' @param return_resampling_dist (optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?
-#' @param calibration_group_size (optional; lower importance; default \code{NULL}) the number of NT gRNAs to assign to each negative control gRNA group in the calibration check analysis. By default, \code{sceptre} sets \code{calibration_group_size} to the median group size of the targeting gRNAs.
-#' @param n_calibration_pairs (optional; lower importance; default \code{NULL}) the number of negative control pairs to analyze in the calibration check. By default, the number of negative control pairs that \code{sceptre} analyzes is equal to the number of discovery pairs (i.e., pairs specified in the data frame \code{response_grna_group_pairs}) that passes pairwise QC.
-#' @param fit_parametric_curve (optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?
-#' @param B1 (optional; lower importance; default 499) the number of null test statistics to compute in the first round of the permutation test.
-#' @param B2 (optional; lower importance; default 4999) the number of null test statistics to compute the second round of the permutation test.
-#' @param B3 (optional; lower importance; default 24999) the number of null test statistics to compute the third round of the permutation test.
-#' @param print_progress (optional; default TRUE) print the progress of the function?
+#' @param side (optional; moderate importance; default "both") the sidedness of the test, either two-sided ("both"), left-tailed ("left"), or right-tailed ("right").
+#' @param control_group (optional; moderate importance; default depends on MOI) the set of cells against which the cells that received a given targeting gRNA group are compared, either "complement" (for the complement set) or "nt" (for the cells containing a non-targeting gRNA). The only valid option for high MOI data is "complement", as few (if any) cells contain exclusively non-targeting gRNAs in high MOI. The default for low MOI data is "nt".
+#' @param resampling_mechanism (optional; moderate importance; default depends on MOI) the resampling mechanism used to carry out inference, either "crt" (for the conditional randomization test) or "permutations" (for the permutation test). The default is to use "crt" in high MOI and "permutations" in low MOI.
+#' @param n_nonzero_trt_thresh (optional; moderate importance; default 7) For a given response-gRNA group pair, \code{n_nonzero_trt} is the number of "treatment cells" (i.e., cells that have received the given targeting gRNA group) with nonzero expression. \code{sceptre} filters for response-gRNA group pairs with an \code{n_nonzero_trt} value equal to or greater than \code{n_nonzero_trt_thresh}.
+#' @param n_nonzero_cntrl_thresh (optional; moderate importance; default 7) For a given response-gRNA group pair, \code{n_nonzero_cntrl} is the number of "control cells" (i.e., cells against which the treatment cells are compared) with nonzero expression. \code{sceptre} filters for pairs with a \code{n_nonzero_control} value equal to or greater than \code{n_nonzero_control_thresh}.
+#' @param grna_assign_threshold (optional; lower importance; default 5) the threshold used to assign gRNAs to cells on high MOI data. A given gRNA is assigned to a cell if the UMI count of the gRNA within that cell is greater than or equal to the threshold. (In low MOI, this argument is ignored, as gRNAs are assigned to cells via a maximum as opposed to thresholding operation.)
+#' @param calibration_group_size (optional; lower importance; default \code{NULL}) the number of NT gRNAs to assign to each negative control gRNA group in the calibration check. By default, \code{calibration_group_size} is set equal to the median group size of the targeting gRNA groups.
+#' @param n_calibration_pairs (optional; lower importance; default \code{NULL}) the number of negative control pairs to analyze in the calibration check. By default, this argument is set equal to the number of discovery pairs (i.e., pairs specified in the data frame \code{response_grna_group_pairs}) that passes pairwise QC.
+#' @param fit_parametric_curve (optional; moderate importance; default \code{TRUE}) a logical (i.e., \code{TRUE}/\code{FALSE}) indicating whether to fit a parametric curve to the distribution of null test statistics and to compute a p-value using this fitted parametric curve. Setting this argument to \code{TRUE} (the default) enables \code{sceptre} to return very small p-values.
+#' @param B1 (optional; lower importance; default 499) the number of null test statistics to compute in the first stage of the permutation test.
+#' @param B2 (optional; lower importance; default 4999) the number of null test statistics to compute the second stage of the permutation test.
+#' @param B3 (optional; lower importance; default 24999) the number of null test statistics to compute the third stage of the permutation test.
+#' @param print_progress (optional; lower importance; default TRUE) a logical (i.e., \code{TRUE}/\code{FALSE} value) indicating whether to print the progress of the function.
+#' @param output_amount (optional; lower importance; default 1) an integer specifying the amount of information to return as part of the output, either 1 (least), 2 (intermediate), or 3 (most). (See "Value".)
 #'
-#' @return a data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.
+#' @return A data frame containing the following columns: \code{response_id}, \code{grna_group}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, and \code{p_value}.
 #' \itemize{
-#' \item{\code{response_id}}: the response ID
-#' \item{\code{grna_group}}: the gRNA group. When running a calibration check, \code{grna_group} is a negative control gRNA group constructed by grouping together individual NT gRNAs. When running a discovery analysis, by contrast, \code{grna_group} is a targeting gRNA group.
+#' \item{\code{response_id}}: the ID of the response
+#' \item{\code{grna_group}}: the gRNA group against which the response is tested. When running a calibration check, \code{grna_group} is a negative control gRNA group constructed by grouping together individual NT gRNAs. When running a discovery analysis, by contrast, \code{grna_group} is a targeting gRNA group.
 #' \item{\code{n_nonzero_trt}}: the number of treatment cells (i.e., cells that have received a targeting gRNA) with nonzero expression
 #' \item{\code{n_nonzero_cntrl}}: the number of control cells (i.e., cells that have received a non-targeting gRNA) with nonzero expression
 #' \item{\code{p_value}}: the \code{sceptre} p-value
-#' \item{\code{log_2_fold_change}}: the \code{sceptre}-estimated log (base 2) fold change in expression
+#' \item{\code{log_2_fold_change}}: the \code{sceptre}-estimated log (base 2) fold change in expression, controlling for the covariates
 #' }
-#' Rows are ordered according to \code{p_value}. Response-gRNA group pairs that fail to pass pairwise QC are assigned a p-value and log fold change estimate of \code{NA}.
+#' Rows are ordered according to \code{p_value}. Response-gRNA group pairs that fail to pass pairwise QC are assigned a p-value and log fold change estimate of \code{NA}. When \code{output_amount} is set to 2, the following additional columns are returned:
 #'
-#' @details A typical \code{sceptre} analysis consists of three main steps. First, the user sets up the analysis, which entails specifying (i) the response expression matrix, (ii) the gRNA expression matrix, (iii) the cell covariate data frame, (iv) the gRNA group data frame, (v) the formula object, and (vi) the set of response-gRNA group pairs to test for association. Second, the user carries out the calibration check by passing the above objects to the \code{run_sceptre_lowmoi} function, setting \code{calibration_check} to \code{TRUE}. In carrying out the calibration check, \code{sceptre} automatically constructs a set of negative control response-gRNA group pairs to test for association. The negative control pairs are "matched" to the discovery pairs in three ways: (i) the negative control pairs are subjected to the same pair-wise QC as the discovery pairs, (ii) the number of negative control pairs equals the number of discovery pairs (after applying pair-wise QC), and (iii) the negative control pairs contain the same number of gRNAs per gRNA group as the discovery pairs. After running \code{run_sceptre_lowmoi}, the user verifies calibration of the p-values by plotting the calibration results via \code{plot_calibration_result}. Finally, the user runs a discovery analysis by again calling \code{run_sceptre_lowmoi}, this time setting \code{calibration_check} to \code{FALSE}. The user visualizes the discovery results via calls to \code{compare_calibration_and_discovery_results} and \code{make_volcano_plot} and obtains the final set of discoveries via a call to \code{obtain_discovery_set}.
+#' \itemize{
+#'  \item{\code{stage}}: the stage at which the p-value was computed, one of 1, 2, or 3 (See Notes)
+#'  \item{\code{z_orig}}: the original z-score computed on the raw data
+#'  \item{\code{xi}, \code{omega}, \code{alpha}}: the fitted parameters of the skew-normal distribution. (These columns are set to \code{NA} if a parametric curve was not fitted to the null distribution of test statistics.)
+#' }
+#'
+#' When \code{output_amount} is set to 3, the resampling distribution of the test statistics also is returned, stored in the columns \code{z_null_1}, \code{z_null_2}, \code{z_null_3}, ... .
+#'
+#' @details A typical \code{sceptre} analysis consists of three main steps. First, the user sets up the analysis, which entails specifying (i) the response expression matrix, (ii) the gRNA expression matrix, (iii) the cell covariate data frame, (iv) the gRNA group data frame, (v) the formula object, and (vi) the set of response-gRNA group pairs to test for association. Second, the user carries out the calibration check by passing the above objects to the function \code{run_sceptre}, setting \code{calibration_check} to \code{TRUE}. In carrying out the calibration check, \code{sceptre} automatically constructs a set of negative control response-gRNA group pairs to test for association; these pairs are "matched" to the discovery pairs in several respects. The user verifies calibration of the negative control p-values by plotting the calibration results via \code{plot_calibration_result}. Finally, the user runs the discovery analysis by again calling the function \code{run_sceptre}, this time setting \code{calibration_check} to \code{FALSE}. The user visualizes the discovery results via calls to \code{compare_calibration_and_discovery_results} and \code{make_volcano_plot} and obtains the final set of discoveries via a call to \code{obtain_discovery_set}.
 #'
 #' @note
 #'
@@ -44,18 +53,15 @@
 #' \itemize{
 #' \item{The function \code{compute_cell_covariates} can be used to help compute the \code{covariate_data_frame}, and the function \code{generate_all_pairs} can be used to help compute \code{response_grna_group_pairs}.}
 #' \item{When constructing the \code{formula_object}, it is best practice to log-transform the integer count-based variables (e.g., total UMI count, number of expressed responses).}
-#' \item{By default, \code{sceptre} assigns to each cell the gRNA with highest UMI count. Users may apply a different gRNA-to-cell assignment themselves, and then pass a logical `grna_matrix` (i.e., `TRUE`/`FALSE`) to `sceptre` instead of a count matrix. Each column should contain a single \code{TRUE} value, which indicates which gRNA has infected the given cell. The logical matrix should be a standard (dense) R matrix or a sparse matrix of type \code{lgCMatrix}, \code{lgRMatrix}, \code{lgTMatrix}.}
-#' \item{\code{sceptre} uses three rounds of permutation testing to test a given pair. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to round 2; otherwise, \code{sceptre} returns \code{p1}. In round 2, \code{sceptre} computes \code{B2} null statistics and fits a skew normal distribution to these null statistics. If the skew-normal fit is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to round 3. In round 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}.}
-#' \item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_parametric_curve} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
-#' \item{When \code{return_resampling_dist} is set to \code{TRUE}, \code{sceptre} uses only a single round of permutation testing, returning \code{B1} resampled statistics for each pair. \code{return_resampling_dist} should be set to \code{TRUE} for debugging purposes only.}
+#' \item{By default, \code{sceptre} assigns gRNAs to cells for users. Users instead may assign gRNAs to cells themselves, passing a logical (i.e., \code{TRUE}/\code{FALSE})  \code{grna_matrix} to \code{sceptre}. The logical matrix should be a standard (dense) R matrix or a sparse matrix of type \code{lgCMatrix}, \code{lgRMatrix}, \code{lgTMatrix}.} In low MOI each column should contain a single \code{TRUE} value, which indicates which gRNA has infected the given cell.
+#' \item{\code{sceptre} tests a given pair for association in three stages. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to stage 2; otherwise, \code{sceptre} returns \code{p1}. In stage 2, \code{sceptre} computes \code{B2} null statistics and fits a parametric curve (by default, a skew normal distribution) to these null statistics. If the fit of the parametric curve is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to stage 3. In stage 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}. When \code{resampling_mechanism} is set to "crt" (the default for high MOI data), the stage 3 empirical p-value is computed using the null test statistics from stage 2 (to save compute).}
 #' }
 run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                         moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
-                        control_group = "default", resampling_mechanism = "default",
-                        n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
-                        grna_assign_threshold = 5L, output_amount = 1L, fit_parametric_curve = TRUE,
-                        calibration_group_size = NULL, n_calibration_pairs = NULL,
-                        B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
+                        control_group = "default", resampling_mechanism = "default", side = "both",
+                        fit_parametric_curve = TRUE, n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
+                        grna_assign_threshold = 5L, calibration_group_size = NULL, n_calibration_pairs = NULL,
+                        B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE, output_amount = 1L) {
   ###############
   # PART 1: SETUP
   ###############
@@ -118,7 +124,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
   return(ret)
 }
 
-#' Run `sceptre` (low MOI)
+#' Run \code{sceptre} (low MOI)
 #'
 #' @inherit run_sceptre
 #' @examples
@@ -184,7 +190,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 }
 
 
-#' Run `sceptre` (high MOI; experimental)
+#' Run \code{sceptre} (high MOI; experimental)
 #'
 #' @export
 #'

@@ -98,8 +98,12 @@ fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
     .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
 }
 
-compute_sn_tail_probability <- function(z, xi, omega, alpha, left_tail) {
-    .Call(`_sceptre_compute_sn_tail_probability`, z, xi, omega, alpha, left_tail)
+compute_sn_density <- function(x_grid, xi, omega, alpha) {
+    .Call(`_sceptre_compute_sn_density`, x_grid, xi, omega, alpha)
+}
+
+compute_sn_density_2 <- function(x, xi, omega, alpha) {
+    .Call(`_sceptre_compute_sn_density_2`, x, xi, omega, alpha)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
