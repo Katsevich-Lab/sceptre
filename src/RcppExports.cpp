@@ -110,8 +110,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // run_low_level_test_full_v4
-SEXP run_low_level_test_full_v4(NumericVector y, NumericVector mu, NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs, int n_trt, bool use_all_cells, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_skew_normal, bool return_resampling_dist, int side_code);
-RcppExport SEXP _sceptre_run_low_level_test_full_v4(SEXP ySEXP, SEXP muSEXP, SEXP aSEXP, SEXP wSEXP, SEXP DSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP use_all_cellsSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_skew_normalSEXP, SEXP return_resampling_distSEXP, SEXP side_codeSEXP) {
+SEXP run_low_level_test_full_v4(NumericVector y, NumericVector mu, NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs, int n_trt, bool use_all_cells, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_parametric_curve, bool return_resampling_dist, int side_code);
+RcppExport SEXP _sceptre_run_low_level_test_full_v4(SEXP ySEXP, SEXP muSEXP, SEXP aSEXP, SEXP wSEXP, SEXP DSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP use_all_cellsSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_parametric_curveSEXP, SEXP return_resampling_distSEXP, SEXP side_codeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -127,10 +127,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type B1(B1SEXP);
     Rcpp::traits::input_parameter< int >::type B2(B2SEXP);
     Rcpp::traits::input_parameter< int >::type B3(B3SEXP);
-    Rcpp::traits::input_parameter< bool >::type fit_skew_normal(fit_skew_normalSEXP);
+    Rcpp::traits::input_parameter< bool >::type fit_parametric_curve(fit_parametric_curveSEXP);
     Rcpp::traits::input_parameter< bool >::type return_resampling_dist(return_resampling_distSEXP);
     Rcpp::traits::input_parameter< int >::type side_code(side_codeSEXP);
-    rcpp_result_gen = Rcpp::wrap(run_low_level_test_full_v4(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_skew_normal, return_resampling_dist, side_code));
+    rcpp_result_gen = Rcpp::wrap(run_low_level_test_full_v4(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code));
     return rcpp_result_gen;
 END_RCPP
 }

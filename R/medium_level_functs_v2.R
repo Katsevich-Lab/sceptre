@@ -41,7 +41,7 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
 
 # core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                    synthetic_idxs, output_amount, fit_skew_normal, B1, B2, B3, calibration_check,
+                                    synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                     side_code, low_moi, print_progress) {
   # 0. define several variables
@@ -93,11 +93,11 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                                       response_precomp$fitted_coefs,
                                                       response_precomp$theta,
                                                       full_test_stat = TRUE)
-      curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_skew_normal,
+      curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
                                                          output_amount, grna_groups, expression_vector,
                                                          pieces_precomp, get_idx_f, side_code)
     } else {
-      curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_skew_normal,
+      curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
                                                           output_amount, covariate_matrix, all_nt_idxs,
                                                           grna_group_idxs, grna_groups, expression_vector, side_code)
     }
@@ -119,7 +119,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 output_amount, fit_skew_normal, B1, B2, B3, calibration_check, control_group_complement,
+                                 output_amount, fit_parametric_curve, B1, B2, B3, calibration_check, control_group_complement,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, print_progress) {
   # 0. define several variables
   gene_ess_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
@@ -193,12 +193,12 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
 
     # 12. call the low-level analysis function
     if (run_outer_regression) {
-      curr_response_result <- crt_glm_factored_out(B1, B2, fit_skew_normal, output_amount,
+      curr_response_result <- crt_glm_factored_out(B1, B2, fit_parametric_curve, output_amount,
                                                    response_ids, gene_precomp_list, covariate_matrix,
                                                    get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
                                                    n_cells, response_matrix, side_code)
     } else {
-      curr_response_result <- discovery_ntcells_crt(B1, B2, fit_skew_normal, output_amount, get_idx_f,
+      curr_response_result <- discovery_ntcells_crt(B1, B2, fit_parametric_curve, output_amount, get_idx_f,
                                                     response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
                                                     n_cells, response_matrix, side_code)
     }

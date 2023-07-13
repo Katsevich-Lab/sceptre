@@ -18,7 +18,7 @@ run_sceptre_lowmoi(
   n_nonzero_cntrl_thresh = 7L,
   side = "both",
   output_amount = 1L,
-  fit_skew_normal = TRUE,
+  fit_parametric_curve = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
   B1 = 499L,
@@ -52,7 +52,7 @@ run_sceptre_lowmoi(
 
 \item{side}{(optional; moderate importance; default "both") the sidedness of the test, either two-sided ("both"), left-tailed ("left"), or right-tailed ("right")}
 
-\item{fit_skew_normal}{(optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?}
+\item{fit_parametric_curve}{(optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?}
 
 \item{calibration_group_size}{(optional; lower importance; default \code{NULL}) the number of NT gRNAs to assign to each negative control gRNA group in the calibration check analysis. By default, \code{sceptre} sets \code{calibration_group_size} to the median group size of the targeting gRNAs.}
 
@@ -92,7 +92,7 @@ The notes are arranged roughly in order of most important to least important.
 \item{When constructing the \code{formula_object}, it is best practice to log-transform the integer count-based variables (e.g., total UMI count, number of expressed responses).}
 \item{By default, \code{sceptre} assigns to each cell the gRNA with highest UMI count. Users may apply a different gRNA-to-cell assignment themselves, and then pass a logical \code{grna_matrix} (i.e., \code{TRUE}/\code{FALSE}) to \code{sceptre} instead of a count matrix. Each column should contain a single \code{TRUE} value, which indicates which gRNA has infected the given cell. The logical matrix should be a standard (dense) R matrix or a sparse matrix of type \code{lgCMatrix}, \code{lgRMatrix}, \code{lgTMatrix}.}
 \item{\code{sceptre} uses three rounds of permutation testing to test a given pair. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to round 2; otherwise, \code{sceptre} returns \code{p1}. In round 2, \code{sceptre} computes \code{B2} null statistics and fits a skew normal distribution to these null statistics. If the skew-normal fit is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to round 3. In round 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}.}
-\item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_skew_normal} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
+\item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_parametric_curve} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
 \item{When \code{return_resampling_dist} is set to \code{TRUE}, \code{sceptre} uses only a single round of permutation testing, returning \code{B1} resampled statistics for each pair. \code{return_resampling_dist} should be set to \code{TRUE} for debugging purposes only.}
 }
 }

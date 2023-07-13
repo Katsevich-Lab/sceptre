@@ -18,7 +18,7 @@ run_sceptre_highmoi_experimental(
   side = "both",
   grna_assign_threshold = 5L,
   output_amount = 1L,
-  fit_skew_normal = TRUE,
+  fit_parametric_curve = TRUE,
   calibration_group_size = NULL,
   n_calibration_pairs = NULL,
   B1 = 499L,
@@ -76,7 +76,7 @@ make_volcano_plot(discovery_result)
 # 6. obtain the discovery set
 discovery_set <- obtain_discovery_set(discovery_result)
 
-# 7. run positive control analysis (optional)
+# 7. optional: positive control analysis
 pc_result <- run_sceptre_highmoi_experimental(
 response_matrix = response_matrix_highmoi_experimental,
 grna_matrix = grna_matrix_highmoi_experimental,
