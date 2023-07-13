@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/associated_papers.html">Associated papers</a>
     <a class="dropdown-item" href="../articles/highmoi_tutorial.html">High MOI sceptre tutorial</a>
     <a class="dropdown-item" href="../articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
     <a class="dropdown-item" href="../articles/quality_control_in_low_moi.html">Low MOI Quality Control</a>
@@ -52,6 +53,11 @@
       <small>Source: <a href="https://github.com/Katsevich-Lab/sceptre/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="sceptre-030-2023-07-13">sceptre 0.3.0 (2023-07-13)<a class="anchor" aria-label="anchor" href="#sceptre-030-2023-07-13"></a></h2>
+<p>Version 0.3.0 introduces a new, experimental high MOI function. We expect the experimental high MOI function to be faster, more memory efficient, and more powerful than the current high MOI function on most datasets. The current high MOI function likely will be deprecated in the next version of the package in favor of the experimental function. Please let us know about your experience using the experimental high MOI function, in particular whether you run into any bugs.</p>
+<p>We also have added a new plotting function, namely <code>plot_resampling_distribution</code>. Small changes to the API of the <code>run_sceptre_lowmoi</code> function are detailed in the function documentation.</p>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="sceptre-020-2023-04-03">sceptre 0.2.0 (2023-04-03)<a class="anchor" aria-label="anchor" href="#sceptre-020-2023-04-03"></a></h2>
 <p>Version 0.2.0 is our biggest update yet. We have added functionality for low MOI analysis! The low MOI module is based new statistical methods and computational algorithms.</p>

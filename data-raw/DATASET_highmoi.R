@@ -66,7 +66,7 @@ rownames(grna_matrix) <- my_grna_ids
 # 7. Compute the covariate matrix
 covariate_matrix <- multimodal_odm_downsample |>
   ondisc::get_cell_covariates() |>
-  dplyr::select(grna_n_umis, gene_n_umis, p_mito = gene_p_mito, batch = gene_batch) |>
+  dplyr::select(grna_n_umis, grna_n_nonzero, gene_n_umis, gene_n_nonzero, p_mito = gene_p_mito, batch = gene_batch) |>
   `rownames<-`(NULL)
 
 # 8. sort according to batch; also remove cells containing no gRNAs

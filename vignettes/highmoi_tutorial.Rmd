@@ -2,7 +2,6 @@
 title: "High MOI sceptre tutorial"
 output: rmarkdown::html_vignette
 author: Tim Barry & Gene Katsevich
-date: July 2023
 vignette: >
   %\VignetteIndexEntry{High MOI sceptre tutorial}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-**Update July 2023**: We have released a new, experimental high MOI function. We expect the experimental high MOI function to be faster, more memory efficient, and more statistically powerful than the current high MOI function on most datasets. One can access the documentation for the experimental high MOI function via `?run_sceptre_highmoi_experimental`. We expect to deprecate the current high MOI function (and replace it with the experimental high MOI function) by September 2023.
+**Update July 2023**: We have released a new, experimental high MOI function, which we expect to be faster, more memory efficient, and more powerful than the current high MOI function on most datasets. One can access the documentation for the experimental high MOI function via `?run_sceptre_highmoi_experimental`. We expect to deprecate the current high MOI function and replace it with the experimental high MOI function by September 2023.
 
 -------------------------------------
 

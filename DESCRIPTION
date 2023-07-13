@@ -1,6 +1,6 @@
 Package: sceptre
 Title: Robust Differential Expression Analysis for Single-Cell CRISPR Screens
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: 
     c(person(given = "Timothy",
            family = "Barry",

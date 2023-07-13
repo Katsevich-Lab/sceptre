@@ -10,47 +10,40 @@ NULL
 #' A gene-by-cell expression matrix.
 #'
 #' @inheritSection highmoi_data Overview
-#' @usage data(response_matrix_highmoi_experimental)
-"response_matrix_highmoi_experimental"
+#' @usage data(gene_matrix_highmoi)
+"gene_matrix_highmoi"
 
 #' gRNA expression matrix
 #'
 #' A gRNA-by-cell expression matrix.
 #'
 #' @inheritSection highmoi_data Overview
-#' @usage data(grna_matrix_highmoi_experimental)
-"grna_matrix_highmoi_experimental"
+#' @usage data(gRNA_matrix_highmoi)
+"gRNA_matrix_highmoi"
 
 #' Covariate matrix
 #'
 #' A matrix of cell-specific technical factors:
 #' \describe{
-#'   \item{`grna_n_umis`}{(numeric) total number of gRNA UMIs sequenced in cell}
-#'   \item{`gene_n_umis`}{(numeric) total number of gene UMIs sequenced in cell}
+#'   \item{`lg_gRNA_lib_size`}{(numeric) log-transformed gRNA library size}
+#'   \item{`lg_gene_lib_size`}{(numeric) log-transformed gene library size}
 #'   \item{`p_mito`}{(numeric) fraction of sequenced gene transcripts that map to mitochondrial genes}
 #'   \item{`batch`}{(factor) sequencing batch (`batch_1`, `batch_2`)}
 #' }
 #' @inheritSection highmoi_data Overview
-#' @usage data(covariate_data_frame_highmoi_experimental)
-"covariate_data_frame_highmoi_experimental"
+#' @usage data(covariate_matrix_highmoi)
+"covariate_matrix_highmoi"
 
-#' Discovery gene-gRNA group pairs
+#' Gene-gRNA group pairs
 #'
-#' The discovery response-gRNA group pairs that we seek to test for association, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
+#' The pairs of genes and gRNA groups that we seek to test for association. Columns `gene_id` (required), `gRNA_group` (required), and `pair_type` (optional).
 #' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi_experimental)
-"discovery_pairs_highmoi_experimental"
-
-#' Positive control gene-gRNA group pairs
-#'
-#' The positive control response-gRNA group pairs, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
-#' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi_experimental)
-"pc_pairs_highmoi_experimental"
+#' @usage data(gene_gRNA_group_pairs_highmoi)
+"gene_gRNA_group_pairs_highmoi"
 
 #' gRNA groups table
 #'
-#' A data frame that maps each gRNA ID to its gRNA group.
+#' A data frame that maps each gRNA ID to its gRNA group and gRNA type. The columns are `gRNA_id` (required), `gRNA_group` (required), and `gRNA_type` (optional).
 #' @inheritSection highmoi_data Overview
-#' @usage data(grna_group_data_frame_highmoi_experimental)
-"grna_group_data_frame_highmoi_experimental"
+#' @usage data(gRNA_groups_table_highmoi)
+"gRNA_groups_table_highmoi"

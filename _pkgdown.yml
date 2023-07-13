@@ -22,7 +22,6 @@ navbar:
 
 reference:
 
-
 - title: Low MOI functions
   contents:
   - run_sceptre_lowmoi
@@ -32,6 +31,19 @@ reference:
   - compare_calibration_and_discovery_results
   - make_volcano_plot
   - obtain_discovery_set
+  - plot_resampling_distribution
+
+- title: Experimental high MOI function
+  contents:
+  - run_sceptre_highmoi_experimental
+  - run_sceptre
+
+- title: High MOI functions
+  contents:
+  - run_sceptre_highmoi
+  - threshold_gRNA_matrix
+  - combine_perturbations
+  - make_qq_plot
 
 - title: Low MOI example data
   contents:
@@ -41,13 +53,6 @@ reference:
   - grna_matrix_lowmoi
   - lowmoi_data
 
-- title: High MOI functions
-  contents:
-  - run_sceptre_highmoi
-  - threshold_gRNA_matrix
-  - combine_perturbations
-  - make_qq_plot
-
 - title: High MOI example data
   contents:
   - gene_matrix_highmoi
@@ -56,6 +61,15 @@ reference:
   - gRNA_groups_table_highmoi
   - gene_gRNA_group_pairs_highmoi
   - highmoi_data
+
+- title: Experimental high MOI example data
+  contents:
+  - response_matrix_highmoi_experimental
+  - grna_matrix_highmoi_experimental
+  - covariate_data_frame_highmoi_experimental
+  - discovery_pairs_highmoi_experimental
+  - pc_pairs_highmoi_experimental
+  - grna_group_data_frame_highmoi_experimental
 
 - title: Package information
   contents:
