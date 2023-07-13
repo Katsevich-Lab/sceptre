@@ -45,5 +45,5 @@ calibration_check = FALSE,
 output_amount = 3)
 
 # 2. visualize a resampling distribution
-plot_resampling_distribution(discovery_result, 1)
+plot_resampling_distribution(discovery_result, 2)
 }
