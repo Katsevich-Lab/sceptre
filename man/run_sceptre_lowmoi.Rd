@@ -16,6 +16,7 @@ run_sceptre_lowmoi(
   resampling_mechanism = "permutations",
   n_nonzero_trt_thresh = 7L,
   n_nonzero_cntrl_thresh = 7L,
+  side = "both",
   output_amount = 1L,
   fit_skew_normal = TRUE,
   calibration_group_size = NULL,
@@ -48,6 +49,8 @@ run_sceptre_lowmoi(
 \item{n_nonzero_trt_thresh}{(optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "treatment cells" (i.e., cells that have received a targeting gRNA) with nonzero expression. \code{sceptre} filters for response-gRNA group pairs with an \code{n_nonzero_trt} value equal to or greater than \code{n_nonzero_trt_thresh}.}
 
 \item{n_nonzero_cntrl_thresh}{(optional; moderate importance; default 7) for a given response-gRNA group pair, the number of "control cells" (i.e., cells that have received a non-targeting gRNA) with nonzero expression. \code{sceptre} filters for pairs with a \code{n_nonzero_control} value equal to or greater than \code{n_nonzero_control_thresh}.}
+
+\item{side}{(optional; moderate importance; default "both") the sidedness of the test, either two-sided ("both"), left-tailed ("left"), or right-tailed ("right")}
 
 \item{fit_skew_normal}{(optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?}
 
