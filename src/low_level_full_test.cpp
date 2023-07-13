@@ -83,7 +83,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int B1,
                                 int B2,
                                 int B3,
-                                bool fit_skew_normal,
+                                bool fit_parametric_curve,
                                 bool return_resampling_dist,
                                 int side_code) {
   double P_THRESH = 0.02, p;
@@ -104,8 +104,8 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   p = compute_empirical_p_value(null_statistics, z_orig, side_code);
 
   if (p <= P_THRESH) {
-    // stage 2: if fit_skew_normal true, draw stage 2 null statistics and get the SN p-value
-    if (fit_skew_normal) {
+    // stage 2: if fit_parametric_curve true, draw stage 2 null statistics and get the SN p-value
+    if (fit_parametric_curve) {
       // compute the stage 2 vector of null statistics
       null_statistics = compute_null_full_statistics(a, w, D, B1, B2, n_trt, use_all_cells, synthetic_idxs);
 
@@ -117,8 +117,8 @@ SEXP run_low_level_test_full_v4(NumericVector y,
       stage = 2;
     }
 
-    // stage 3: if skew normal fit failed, or if fit_skew_normal false, draw stage 3 statistics and compute empirical p-value
-    if (!fit_skew_normal || !sn_fit_used) {
+    // stage 3: if skew normal fit failed, or if fit_parametric_curve false, draw stage 3 statistics and compute empirical p-value
+    if (!fit_parametric_curve || !sn_fit_used) {
       if (B3 > 0) null_statistics = compute_null_full_statistics(a, w, D, B1 + B2, B3, n_trt, use_all_cells, synthetic_idxs);
       p = compute_empirical_p_value(null_statistics, z_orig, side_code);
       stage = 3;

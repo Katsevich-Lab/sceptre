@@ -226,7 +226,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-harmonize_arguments <- function(fit_skew_normal, moi, control_group, resampling_mechanism, side) {
+harmonize_arguments <- function(fit_parametric_curve, moi, control_group, resampling_mechanism, side) {
   # handle moi/control_group/resampling_mechanism
   if (moi == "high") {
     control_group <- "complement"

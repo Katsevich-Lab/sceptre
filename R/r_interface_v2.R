@@ -18,7 +18,7 @@
 #' @param return_resampling_dist (optional; lower importance; default \code{FALSE}) return the resampling distribution of the null test statistics?
 #' @param calibration_group_size (optional; lower importance; default \code{NULL}) the number of NT gRNAs to assign to each negative control gRNA group in the calibration check analysis. By default, \code{sceptre} sets \code{calibration_group_size} to the median group size of the targeting gRNAs.
 #' @param n_calibration_pairs (optional; lower importance; default \code{NULL}) the number of negative control pairs to analyze in the calibration check. By default, the number of negative control pairs that \code{sceptre} analyzes is equal to the number of discovery pairs (i.e., pairs specified in the data frame \code{response_grna_group_pairs}) that passes pairwise QC.
-#' @param fit_skew_normal (optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?
+#' @param fit_parametric_curve (optional; lower importance; default \code{TRUE}) fit a skew-normal distribution to the null distribution of test statistics and use this fitted distribution to compute a more accurate p-value?
 #' @param B1 (optional; lower importance; default 499) the number of null test statistics to compute in the first round of the permutation test.
 #' @param B2 (optional; lower importance; default 4999) the number of null test statistics to compute the second round of the permutation test.
 #' @param B3 (optional; lower importance; default 24999) the number of null test statistics to compute the third round of the permutation test.
@@ -46,14 +46,14 @@
 #' \item{When constructing the \code{formula_object}, it is best practice to log-transform the integer count-based variables (e.g., total UMI count, number of expressed responses).}
 #' \item{By default, \code{sceptre} assigns to each cell the gRNA with highest UMI count. Users may apply a different gRNA-to-cell assignment themselves, and then pass a logical `grna_matrix` (i.e., `TRUE`/`FALSE`) to `sceptre` instead of a count matrix. Each column should contain a single \code{TRUE} value, which indicates which gRNA has infected the given cell. The logical matrix should be a standard (dense) R matrix or a sparse matrix of type \code{lgCMatrix}, \code{lgRMatrix}, \code{lgTMatrix}.}
 #' \item{\code{sceptre} uses three rounds of permutation testing to test a given pair. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to round 2; otherwise, \code{sceptre} returns \code{p1}. In round 2, \code{sceptre} computes \code{B2} null statistics and fits a skew normal distribution to these null statistics. If the skew-normal fit is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to round 3. In round 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}.}
-#' \item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_skew_normal} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
+#' \item{When \code{return_debugging_metrics} is set to \code{TRUE}, the columns \code{sn_fit_used}, \code{round}, and \code{regression_method} are included in the output data frame. \code{sn_fit_used} indicates whether a p-value was calculated via the skew-normal distribution; \code{sn_fit_used} is \code{FALSE} if (i) \code{sceptre} computes the p-value in round 1 or round 3 or if (ii) \code{fit_parametric_curve} is set to \code{FALSE} by the user. \code{round} indicates the round (among rounds 1, 2, and 3) in which the p-value was computed. Finally, \code{regression_method} is a string indicating the method that was used to regress the gene expression vector onto the cell covariate matrix and estimate the negative binomial theta parameter.}
 #' \item{When \code{return_resampling_dist} is set to \code{TRUE}, \code{sceptre} uses only a single round of permutation testing, returning \code{B1} resampled statistics for each pair. \code{return_resampling_dist} should be set to \code{TRUE} for debugging purposes only.}
 #' }
 run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                         moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
                         control_group = "default", resampling_mechanism = "default",
                         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L, side = "both",
-                        grna_assign_threshold = 5L, output_amount = 1L, fit_skew_normal = TRUE,
+                        grna_assign_threshold = 5L, output_amount = 1L, fit_parametric_curve = TRUE,
                         calibration_group_size = NULL, n_calibration_pairs = NULL,
                         B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   ###############
@@ -66,7 +66,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
                response_grna_group_pairs, moi, control_group, resampling_mechanism, side) |> invisible()
 
   # 2. harmonize arguments (called for side-effects)
-  harmonize_arguments(fit_skew_normal, moi, control_group, resampling_mechanism, side) |> invisible()
+  harmonize_arguments(fit_parametric_curve, moi, control_group, resampling_mechanism, side) |> invisible()
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -107,12 +107,12 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
   ####################
   if (run_permutations) {
     ret <- run_perm_test_in_memory(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                   synthetic_idxs, output_amount, fit_skew_normal, B1, B2, B3, calibration_check,
+                                   synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                    control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                    side_code, low_moi, print_progress)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                output_amount, fit_skew_normal, B1, B2, B3, calibration_check, control_group_complement,
+                                output_amount, fit_parametric_curve, B1, B2, B3, calibration_check, control_group_complement,
                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, print_progress)
   }
   return(ret)
@@ -170,7 +170,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
 run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                                response_grna_group_pairs, formula_object, calibration_check, control_group = "nt_cells",
                                resampling_mechanism = "permutations", n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
-                               side = "both", output_amount = 1L, fit_skew_normal = TRUE, calibration_group_size = NULL,
+                               side = "both", output_amount = 1L, fit_parametric_curve = TRUE, calibration_group_size = NULL,
                                n_calibration_pairs = NULL, B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
               covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame,
@@ -178,7 +178,7 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
               formula_object = formula_object, calibration_check = calibration_check,
               control_group = control_group, resampling_mechanism = resampling_mechanism,
               n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-              grna_assign_threshold = NA, output_amount = output_amount, fit_skew_normal = fit_skew_normal,
+              grna_assign_threshold = NA, output_amount = output_amount, fit_parametric_curve = fit_parametric_curve,
               calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,
               B1 = B1, B2 = B2, B3 = B3)
 }
@@ -246,19 +246,19 @@ run_sceptre_lowmoi <- function(response_matrix, grna_matrix, covariate_data_fram
 #' calibration_check = FALSE)
 #' }
 run_sceptre_highmoi_experimental <- function(response_matrix, grna_matrix,
-                                covariate_data_frame, grna_group_data_frame,
-                                formula_object, calibration_check, response_grna_group_pairs = NULL,
-                                resampling_mechanism = "default", n_nonzero_trt_thresh = 7L,
-                                n_nonzero_cntrl_thresh = 7L, side = "both", grna_assign_threshold = 5L,
-                                output_amount = 1L, fit_skew_normal = TRUE,
-                                calibration_group_size = NULL, n_calibration_pairs = NULL,
-                                B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
+                                             covariate_data_frame, grna_group_data_frame,
+                                             formula_object, calibration_check, response_grna_group_pairs = NULL,
+                                             resampling_mechanism = "default", n_nonzero_trt_thresh = 7L,
+                                             n_nonzero_cntrl_thresh = 7L, side = "both", grna_assign_threshold = 5L,
+                                             output_amount = 1L, fit_parametric_curve = TRUE,
+                                             calibration_group_size = NULL, n_calibration_pairs = NULL,
+                                             B1 = 499L, B2 = 4999L, B3 = 24999L, print_progress = TRUE) {
   run_sceptre(response_matrix = response_matrix, grna_matrix = grna_matrix,
               covariate_data_frame = covariate_data_frame, grna_group_data_frame = grna_group_data_frame, side = side,
               response_grna_group_pairs = response_grna_group_pairs, moi = "high", formula_object = formula_object,
               calibration_check = calibration_check, control_group = "default", resampling_mechanism = resampling_mechanism,
               n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-              grna_assign_threshold = grna_assign_threshold, output_amount = output_amount, fit_skew_normal = fit_skew_normal,
+              grna_assign_threshold = grna_assign_threshold, output_amount = output_amount, fit_parametric_curve = fit_parametric_curve,
               calibration_group_size = calibration_group_size, n_calibration_pairs = n_calibration_pairs,
               B1 = B1, B2 = B2, B3 = B3)
 }
