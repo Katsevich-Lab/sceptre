@@ -35,39 +35,41 @@ Run \code{sceptre} (high MOI; experimental)
 library(Matrix)
 
 # 0. load the data
-data(response_matrix_highmoi_experimental) # response-by-cell expression matrix
-data(grna_matrix_highmoi_experimental) # gRNA-by-cell expression matrix
-data(covariate_data_frame_highmoi_experimental) # cell-by-covariate data frame
+data(response_matrix_highmoi_experimental)       # response-by-cell expression matrix
+data(grna_matrix_highmoi_experimental)           # gRNA-by-cell expression matrix
+data(covariate_data_frame_highmoi_experimental)  # cell-by-covariate data frame
 data(grna_group_data_frame_highmoi_experimental) # gRNA group information
-data(discovery_pairs_highmoi_experimental)
+data(discovery_pairs_highmoi_experimental)       # discovery gRNA group / gene pairs
 
 # 1. set the formula object
 formula_object <- formula(~log(grna_n_umis) + log(gene_n_umis) + batch + p_mito)
 
 # 2. run the calibration check
 calibration_result <- run_sceptre_highmoi_experimental(
-response_matrix = response_matrix_highmoi_experimental,
-grna_matrix = grna_matrix_highmoi_experimental,
-covariate_data_frame = covariate_data_frame_highmoi_experimental,
-grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
-response_grna_group_pairs = discovery_pairs_highmoi_experimental,
-formula_object = formula_object,
-side = "left",
-calibration_check = TRUE)
+  response_matrix = response_matrix_highmoi_experimental,
+  grna_matrix = grna_matrix_highmoi_experimental,
+  covariate_data_frame = covariate_data_frame_highmoi_experimental,
+  grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+  response_grna_group_pairs = discovery_pairs_highmoi_experimental,
+  formula_object = formula_object,
+  side = "left",
+  calibration_check = TRUE
+)
 
 # 3. verify calibration
 plot_calibration_result(calibration_result)
 
 # 4. run discovery analysis
 discovery_result <- run_sceptre_highmoi_experimental(
-response_matrix = response_matrix_highmoi_experimental,
-grna_matrix = grna_matrix_highmoi_experimental,
-covariate_data_frame = covariate_data_frame_highmoi_experimental,
-grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
-response_grna_group_pairs = discovery_pairs_highmoi_experimental,
-formula_object = formula_object,
-side = "left",
-calibration_check = FALSE)
+  response_matrix = response_matrix_highmoi_experimental,
+  grna_matrix = grna_matrix_highmoi_experimental,
+  covariate_data_frame = covariate_data_frame_highmoi_experimental,
+  grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+  response_grna_group_pairs = discovery_pairs_highmoi_experimental,
+  formula_object = formula_object,
+  side = "left",
+  calibration_check = FALSE
+)
 
 # 5. compare discovery p-values to the negative control p-values; make a volcano plot
 compare_calibration_and_discovery_results(calibration_result, discovery_result)
@@ -78,13 +80,14 @@ discovery_set <- obtain_discovery_set(discovery_result)
 
 # 7. optional: positive control analysis
 pc_result <- run_sceptre_highmoi_experimental(
-response_matrix = response_matrix_highmoi_experimental,
-grna_matrix = grna_matrix_highmoi_experimental,
-covariate_data_frame = covariate_data_frame_highmoi_experimental,
-grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
-response_grna_group_pairs = pc_pairs_highmoi_experimental,
-formula_object = formula_object,
-side = "left",
-calibration_check = FALSE)
+  response_matrix = response_matrix_highmoi_experimental,
+  grna_matrix = grna_matrix_highmoi_experimental,
+  covariate_data_frame = covariate_data_frame_highmoi_experimental,
+  grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+  response_grna_group_pairs = pc_pairs_highmoi_experimental,
+  formula_object = formula_object,
+  side = "left",
+  calibration_check = FALSE
+)
 }
 }
