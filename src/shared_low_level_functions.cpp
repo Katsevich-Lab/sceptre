@@ -173,13 +173,15 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
 }
 
 // [[Rcpp::export]]
-double compute_sn_tail_probability(double z, double xi, double omega, double alpha, bool left_tail) {
-  double out;
+NumericVector compute_sn_density(NumericVector x_grid, double xi, double omega, double alpha) {
+  NumericVector out(x_grid.size());
   skew_normal dist(xi, omega, alpha);
-  if (left_tail) {
-    out = cdf(dist, z);
-  } else {
-    out = cdf(complement(dist, z));
-  }
+  for (int i = 0; i < x_grid.size(); i ++) out[i] = pdf(dist, x_grid[i]);
   return out;
+}
+
+// [[Rcpp::export]]
+double compute_sn_density_2(double x, double xi, double omega, double alpha) {
+  skew_normal dist(xi, omega, alpha);;
+  return pdf(dist, x);
 }

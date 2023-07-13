@@ -14,7 +14,7 @@ make_volcano_plot(
 )
 }
 \arguments{
-\item{discovery_result}{(required) the output of a call to \code{run_sceptre_lowmoi} with \code{calibration_check} set to \code{FALSE}}
+\item{discovery_result}{(required) the output of a call to \code{run_sceptre_lowmoi} (or \code{run_sceptre_highmoi_experimental}) with \code{calibration_check} set to \code{FALSE}}
 
 \item{alpha}{(optional; default 0.1) the nominal type-I error control level}
 

@@ -305,18 +305,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_sn_tail_probability
-double compute_sn_tail_probability(double z, double xi, double omega, double alpha, bool left_tail);
-RcppExport SEXP _sceptre_compute_sn_tail_probability(SEXP zSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP, SEXP left_tailSEXP) {
+// compute_sn_density
+NumericVector compute_sn_density(NumericVector x_grid, double xi, double omega, double alpha);
+RcppExport SEXP _sceptre_compute_sn_density(SEXP x_gridSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type z(zSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x_grid(x_gridSEXP);
     Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
     Rcpp::traits::input_parameter< double >::type omega(omegaSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< bool >::type left_tail(left_tailSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_sn_tail_probability(z, xi, omega, alpha, left_tail));
+    rcpp_result_gen = Rcpp::wrap(compute_sn_density(x_grid, xi, omega, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_sn_density_2
+double compute_sn_density_2(double x, double xi, double omega, double alpha);
+RcppExport SEXP _sceptre_compute_sn_density_2(SEXP xSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
+    Rcpp::traits::input_parameter< double >::type omega(omegaSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_sn_density_2(x, xi, omega, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -416,7 +429,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},
     {"_sceptre_check_sn_tail", (DL_FUNC) &_sceptre_check_sn_tail, 4},
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 3},
-    {"_sceptre_compute_sn_tail_probability", (DL_FUNC) &_sceptre_compute_sn_tail_probability, 5},
+    {"_sceptre_compute_sn_density", (DL_FUNC) &_sceptre_compute_sn_density, 4},
+    {"_sceptre_compute_sn_density_2", (DL_FUNC) &_sceptre_compute_sn_density_2, 4},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
