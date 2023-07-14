@@ -13,7 +13,7 @@
 
 `sceptre` is a method for single-cell CRISPR screen data analysis.
 `sceptre` tests for association between CRISPR perturbations and the
-expressions of genes and estimates the effect sizes of perturbations on
+expressions of genes and estimates the effect size of perturbations on
 changes in gene expression. `sceptre` achieves state-of-the-art
 calibration and power by leveraging several theoretical advances in
 assumption-lean and computationally efficient differential expression
