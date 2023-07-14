@@ -36,7 +36,6 @@ reference:
 - title: Experimental high MOI function
   contents:
   - run_sceptre_highmoi_experimental
-  - run_sceptre
 
 - title: High MOI functions
   contents:

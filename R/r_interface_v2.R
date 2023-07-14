@@ -56,6 +56,7 @@
 #' \item{By default, \code{sceptre} assigns gRNAs to cells for users. Users instead may assign gRNAs to cells themselves, passing a logical (i.e., \code{TRUE}/\code{FALSE})  \code{grna_matrix} to \code{sceptre}. The logical matrix should be a standard (dense) R matrix or a sparse matrix of type \code{lgCMatrix}, \code{lgRMatrix}, \code{lgTMatrix}.} In low MOI each column should contain a single \code{TRUE} value, which indicates which gRNA has infected the given cell.
 #' \item{\code{sceptre} tests a given pair for association in three stages. First, \code{sceptre} computes \code{B1} null statistics and calculates an initial empirical p-value \code{p1} using these null statistics. If \code{p1} is promising (i.e., \code{p1} < 0.02), then \code{sceptre} proceeds to stage 2; otherwise, \code{sceptre} returns \code{p1}. In stage 2, \code{sceptre} computes \code{B2} null statistics and fits a parametric curve (by default, a skew normal distribution) to these null statistics. If the fit of the parametric curve is good, then \code{sceptre} returns \code{p2}. Otherwise, \code{sceptre} proceeds to stage 3. In stage 3, \code{sceptre} computes \code{B3} null statistics and calculates an empirical p-value \code{p3} using these null statistics. \code{sceptre} then returns \code{p3}. When \code{resampling_mechanism} is set to "crt" (the default for high MOI data), the stage 3 empirical p-value is computed using the null test statistics from stage 2 (to save compute).}
 #' }
+#' @keywords internal
 run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna_group_data_frame,
                         moi, formula_object, calibration_check, response_grna_group_pairs = NULL,
                         control_group = "default", resampling_mechanism = "default", side = "both",
@@ -173,8 +174,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
 #' # 7. obtain the discovery set for downstream analysis
 #' discovery_set <- obtain_discovery_set(discovery_result)
 #' }
-run_sceptre_lowmoi <-
-  function(response_matrix,
+run_sceptre_lowmoi <- function(response_matrix,
            grna_matrix,
            covariate_data_frame,
            grna_group_data_frame,
