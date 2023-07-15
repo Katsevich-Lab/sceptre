@@ -128,6 +128,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
 #' Run \code{sceptre} (low MOI)
 #'
 #' @inherit run_sceptre
+#' @export
 #' @examples
 #' \dontrun{
 #' library(Matrix)
