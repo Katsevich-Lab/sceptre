@@ -91,7 +91,6 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
   # 6. construct the negative control pairs
   if (calibration_check) {
     cat("Constructing negative control pairs.")
-    if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
     response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size,
                                                                   grna_assignments, response_matrix, n_nonzero_trt_thresh,
                                                                   n_nonzero_cntrl_thresh, grna_group_data_frame,

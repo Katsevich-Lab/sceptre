@@ -22,7 +22,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   if (length(response_ids) != length(unique(response_ids))) stop("The rownames of the `response_matrix` must be unique.")
   if (length(grna_ids) != length(unique(grna_ids))) stop("The rownames of the `grna_matrix` must be unique.")
 
-  # 3. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
+  # 4. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
   problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
   if (length(problematic_grna_ids) >= 1) {
     stop(paste0("The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: ", paste0(grna_ids[problematic_grna_ids], collapse = ", ")))
@@ -31,7 +31,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
   }
 
-  # 4. if running a discovery analysis, ensure response_grna_group_pairs is present; check characteristics
+  # 5. if running a discovery analysis, ensure response_grna_group_pairs is present; check characteristics
   if (!calibration_check && is.null(response_grna_group_pairs)) stop("`response_grna_group_pairs` must be specified when running a discovery analysis.")
   if (!is.null(response_grna_group_pairs)) {
     # i. verify that `grna_group` and `response_id` are columns
@@ -50,20 +50,22 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     }
   }
 
-  # 5. check that there are no offsets in the formula object
+  # 6. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
 
-  # 6. check the covariate data frame has at least one column and that the variables in the formula object are a subset of the column names of the covariate data frame
+  # 7. check the covariate data frame has at least one column
   if (ncol(covariate_data_frame) == 0) {
     stop("The global cell covariate matrix must contain at least one column.")
   }
+
+  # 8. check that the variables in the formula object are a subset of the column names of the covariate data frame
   formula_object_vars <- all.vars(formula_object)
   check_var <- formula_object_vars %in% colnames(covariate_data_frame)
   if (!all(check_var)) {
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
 
-  # 7. check type of input matrices
+  # 9. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
     ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
     if (!ok_class) {
@@ -73,38 +75,38 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   check_matrix_class(response_matrix, "response_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix"))
   check_matrix_class(grna_matrix, "grna_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "lgTMatrix", "lgCMatrix", "lgRMatrix"))
 
-  # 8. check for agreement in number of cells
+  # 10. check for agreement in number of cells
   check_ncells <- (ncol(response_matrix) == ncol(grna_matrix)) && (ncol(response_matrix) == nrow(covariate_data_frame))
   if (!check_ncells) {
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
   }
 
-  # 9. ensure that "non-targeting" is not a group in the pairs to analyze data frame
+  # 11. ensure that "non-targeting" is not a group in the pairs to analyze data frame
   if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
     stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
   }
 
-  # 10. verify that moi and control group are specified
+  # 12. verify that moi is specified
   if (!(moi %in% c("low", "high"))) {
     stop("`moi` should be either `low` or `high`.")
   }
 
-  # 11. verify that control group is either nt_cells or complement
+  # 13. verify that control group is either nt_cells, complement, or default
   if (!control_group %in% c("nt_cells", "complement", "default")) {
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 12. verify that resampling_mechanism is one of "permutations" or "crt"
+  # 14. verify that resampling_mechanism is one of "permutations", "crt", or "default"
   if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
 
-  # 13. verify that the moi is consistent with the control group
+  # 15. verify that the moi is consistent with the control group
   if (moi == "high" && control_group == "nt_cells") {
     stop("The control group cannot be the NT cells in high MOI.")
   }
 
-  # 14. verify that control_group is NT cells
+  # 16. verify that control_group is NT cells
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
     if (!nt_present) {
@@ -112,7 +114,7 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     }
   }
 
-  # 15. verify that "side" is among "both", "left", or "right"
+  # 17. verify that "side" is among "both", "left", or "right"
   if (!(side %in% c("both", "left", "right"))) {
     stop("'side' must be one of 'both', 'left', or 'right'.")
   }
