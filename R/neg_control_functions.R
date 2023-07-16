@@ -1,7 +1,4 @@
 construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, grna_group_data_frame, response_grna_group_pairs, control_group_complement, low_moi) {
-  # 0. get the calibration group size
-  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
-
   # 1. set a few variables
   N_POSSIBLE_GROUPS_THRESHOLD <- 100L
   nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])

@@ -26,7 +26,10 @@ setClass("sceptre_object",
 
                       # cached objects
                       response_precomputations = "list",
-                      negative_control_pairs = "data.frame"))
+                      negative_control_pairs = "data.frame",
+
+                      # results
+                      calibration_result = "data.frame"))
 
 #' Create a `sceptre` object
 #'
@@ -59,7 +62,8 @@ setClass("sceptre_object",
 #' response_grna_group_pairs = response_grna_group_pairs)
 #'
 #' # 3. run calibration check
-#'
+#' sceptre_object <- run_calibration_check(sceptre_object)
+#' plot_calibration_result(sceptre_object)
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   covariate_data_frame, grna_group_data_frame, moi) {
   # 0. initialize output
@@ -121,7 +125,7 @@ plan_analysis <- function(sceptre_object,
 
 run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                   n_calibration_pairs = NULL, output_amount = 1, print_progress = TRUE) {
-  # 1. perform argument check
+  # 1. do argument check
   check_calibration_check_inputs(grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                  control_group_complement = sceptre_object@control_group_complement) |> invisible()
 
@@ -132,8 +136,10 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                             low_moi = sceptre_object@low_moi,
                                             control_group_complement = sceptre_object@control_group_complement,
                                             calibration_check = TRUE)
+
   # 3. construct the negative control pairs
   cat("Constructing negative control pairs.")
+  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
   response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs = n_calibration_pairs,
                                                                 calibration_group_size = calibration_group_size,
                                                                 grna_assignments = grna_assignments,
@@ -146,14 +152,55 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                                                 low_moi = sceptre_object@low_moi)
   cat(crayon::green(' \u2713\n'))
 
-  # 7. generate the set of synthetic indicator idxs (if running permutations)
-  if (run_permutations) {
+  # 4. generate the set of synthetic indicator idxs (if running permutations)
+  if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
-    n_cells <- nrow(covariate_matrix)
-    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
-                                                     control_group_complement, calibration_group_size, n_cells)
+    n_cells <- nrow(sceptre_object@covariate_matrix)
+    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments = grna_assignments,
+                                                     B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+                                                     calibration_check = TRUE,
+                                                     control_group_complement = sceptre_object@control_group_complement,
+                                                     calibration_group_size = calibration_group_size,
+                                                     n_cells = n_cells)
     cat(crayon::green(' \u2713\n'))
   }
   gc() |> invisible()
 
+  # 5. run the method
+  if (sceptre_object@run_permutations) {
+    ret <- run_perm_test_in_memory(response_matrix = sceptre_object@response_matrix,
+                                   grna_assignments = grna_assignments,
+                                   covariate_matrix = sceptre_object@covariate_matrix,
+                                   response_grna_group_pairs = response_grna_group_pairs,
+                                   synthetic_idxs = synthetic_idxs,
+                                   output_amount = output_amount,
+                                   fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                   B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                   B3 = sceptre_object@B3, calibration_check = TRUE,
+                                   control_group_complement = sceptre_object@control_group_complement,
+                                   n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                   side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                   print_progress = print_progress)
+  } else {
+    ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
+                                grna_assignments = grna_assignments,
+                                covariate_matrix = sceptre_object@covariate_matrix,
+                                response_grna_group_pairs = response_grna_group_pairs,
+                                output_amount = output_amount,
+                                fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                B3 = sceptre_object@B3, calibration_check = TRUE,
+                                control_group_complement = sceptre_object@control_group_complement,
+                                n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                print_progress = print_progress)
+  }
+
+  # save the calibration check result and gene precomputations
+  sceptre_object@calibration_result <- ret
+
+  return(sceptre_object)
 }
+

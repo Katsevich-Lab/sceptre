@@ -25,8 +25,8 @@
 #' @examples
 #' # See the example in the run_sceptre_lowmoi help file.
 #' ?run_sceptre_lowmoi
-plot_calibration_result <- function(calibration_result, alpha = 0.1, multiple_testing_correction = "BH", return_indiv_plots = FALSE) {
-  # set the theme
+plot_calibration_result <- function(sceptre_object, alpha = 0.1, multiple_testing_correction = "BH", return_indiv_plots = FALSE) {
+  calibration_result <- sceptre_object@calibration_result
   my_theme <- get_my_theme()
 
   # compute n rejections

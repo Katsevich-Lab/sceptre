@@ -54,5 +54,6 @@ formula_object = formula_object,
 response_grna_group_pairs = response_grna_group_pairs)
 
 # 3. run calibration check
-
+sceptre_object <- run_calibration_check(sceptre_object)
+plot_calibration_result(sceptre_object)
 }
