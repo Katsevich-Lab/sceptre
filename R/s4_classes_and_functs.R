@@ -27,9 +27,12 @@ setClass("sceptre_object",
                       # cached objects
                       response_precomputations = "list",
                       negative_control_pairs = "data.frame",
+                      calibration_check_run = "logical",
+                      last_function_called = "character",
 
                       # results
-                      calibration_result = "data.frame"))
+                      calibration_result = "data.frame",
+                      discovery_result = "data.frame"))
 
 #' Create a `sceptre` object
 #'
@@ -38,7 +41,9 @@ setClass("sceptre_object",
 #' @export
 #'
 #' @examples
+#' #################
 #' # Low MOI example
+#' #################
 #' data(response_matrix_lowmoi) # response-by-cell expression matrix
 #' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 #' data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
@@ -64,6 +69,31 @@ setClass("sceptre_object",
 #' # 3. run calibration check
 #' sceptre_object <- run_calibration_check(sceptre_object)
 #' plot_calibration_result(sceptre_object)
+#'
+#' ##################
+#' # High MOI example
+#' ##################
+#' data(response_matrix_highmoi_experimental)
+#' data(grna_matrix_highmoi_experimental)
+#' data(covariate_data_frame_highmoi_experimental)
+#' data(grna_group_data_frame_highmoi_experimental)
+#'
+#' # 1. create the sceptre object
+#' sceptre_object <- create_sceptre_object(
+#' response_matrix = response_matrix_highmoi_experimental,
+#' grna_matrix = grna_matrix_highmoi_experimental,
+#' covariate_data_frame = covariate_data_frame_highmoi_experimental,
+#' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+#' moi = "high")
+#'
+#' #' # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+#' formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
+#' data(discovery_pairs_highmoi_experimental)
+#'
+#' sceptre_object <- plan_analysis(
+#' sceptre_object = sceptre_object,
+#' formula_object = formula_object,
+#' response_grna_group_pairs = response_grna_group_pairs)
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   covariate_data_frame, grna_group_data_frame, moi) {
   # 0. initialize output
@@ -168,7 +198,7 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
 
   # 5. run the method
   if (sceptre_object@run_permutations) {
-    ret <- run_perm_test_in_memory(response_matrix = sceptre_object@response_matrix,
+    out <- run_perm_test_in_memory(response_matrix = sceptre_object@response_matrix,
                                    grna_assignments = grna_assignments,
                                    covariate_matrix = sceptre_object@covariate_matrix,
                                    response_grna_group_pairs = response_grna_group_pairs,
@@ -181,6 +211,7 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                    n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
                                    n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                    side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                   response_precomputations = sceptre_object@response_precomputations,
                                    print_progress = print_progress)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
@@ -199,8 +230,7 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
   }
 
   # save the calibration check result and gene precomputations
-  sceptre_object@calibration_result <- ret
-
+  sceptre_object@calibration_result <- out$ret
+  sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
-

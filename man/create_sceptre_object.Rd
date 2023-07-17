@@ -30,7 +30,9 @@ an object of class \code{sceptre_object}
 Create a \code{sceptre} object
 }
 \examples{
+#################
 # Low MOI example
+#################
 data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
@@ -56,4 +58,20 @@ response_grna_group_pairs = response_grna_group_pairs)
 # 3. run calibration check
 sceptre_object <- run_calibration_check(sceptre_object)
 plot_calibration_result(sceptre_object)
+
+##################
+# High MOI example
+##################
+data(response_matrix_highmoi_experimental)
+data(grna_matrix_highmoi_experimental)
+data(covariate_data_frame_highmoi_experimental)
+data(grna_group_data_frame_highmoi_experimental)
+
+# 1. create the sceptre object
+sceptre_object <- create_sceptre_object(
+response_matrix = response_matrix_highmoi_experimental,
+grna_matrix = grna_matrix_highmoi_experimental,
+covariate_data_frame = covariate_data_frame_highmoi_experimental,
+grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+moi = "high")
 }
