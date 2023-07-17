@@ -11,8 +11,8 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   if (calibration_check) {
    n_nt_grnas <- grna_group_data_frame |>
       dplyr::filter(grna_group == "non-targeting") |> nrow()
-    if (n_nt_grnas <= 1) {
-      stop("Two or more non-targeting gRNAs must be present when running a calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting'.")
+    if (n_nt_grnas == 0L) {
+      stop("At least one non-targeting gRNA must be present when running a calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting'.")
     }
   }
 
