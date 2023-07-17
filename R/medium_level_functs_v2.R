@@ -43,7 +43,7 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                    side_code, low_moi, print_progress) {
+                                    side_code, low_moi, response_precomputations, print_progress) {
   # 0. define several variables
   gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
   subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -85,9 +85,17 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
     # 6. perform outer regression (if applicable)
     if (run_outer_regression) {
-      response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                          covariate_matrix = covariate_matrix,
-                                                          regression_method = "pois_glm")
+      # if running a discovery analysis using complement set and precomp is available, load
+      if (!calibration_check && !is.null(response_precomputations[[response_id]])) {
+        response_precomp <- response_precomputations[[response_id]]
+      } else {
+        # perform the regression to get the coefficients
+        response_precomp <- perform_response_precomputation(expressions = expression_vector,
+                                                            covariate_matrix = covariate_matrix,
+                                                            regression_method = "pois_glm")
+        # if running a calibration check using the complement set, save
+        if (calibration_check && control_group_complement) response_precomputations[[response_id]] <- response_precomp
+      }
       pieces_precomp <- compute_precomputation_pieces(expression_vector,
                                                       covariate_matrix,
                                                       response_precomp$fitted_coefs,
@@ -114,7 +122,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     ret <- data.table::rbindlist(list(ret, ret_fail_qc), fill = TRUE)
   }
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
-  return(ret)
+  return(list(ret = ret, response_precomp = response_precomp))
 }
 
 
