@@ -56,7 +56,7 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, cov
 }
 
 
-check_plan_analysis_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
+check_prepare_analysis_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
                                        grna_group_data_frame, formula_object, response_grna_group_pairs,
                                        control_group, resampling_mechanism, side, low_moi) {
   # 5. if response_grna_group_pairs has been supplied, check its characteristics
@@ -119,23 +119,10 @@ check_plan_analysis_inputs <- function(response_matrix, grna_matrix, covariate_d
 }
 
 
-check_calibration_check_inputs <- function(grna_group_data_frame, control_group_complement) {
-  n_nt_grnas <- grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |> nrow()
-  if (control_group_complement) {
-    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
-  } else {
-    if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
-  }
-
-  return(NULL)
-}
-
-
-set_fields_plan_analysis <- function(sceptre_object, fit_parametric_curve, low_moi,
-                                     control_group, resampling_mechanism, side,
-                                     B1, B2, B3, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                     response_grna_group_pairs, grna_assign_threshold) {
+set_fields_prepare_analysis <- function(sceptre_object, fit_parametric_curve, low_moi,
+                                        control_group, resampling_mechanism, side,
+                                        B1, B2, B3, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                        response_grna_group_pairs, grna_assign_threshold) {
   if (!low_moi) {
     control_group <- "complement"
     if (resampling_mechanism == "default") resampling_mechanism <- "crt"
@@ -160,4 +147,22 @@ set_fields_plan_analysis <- function(sceptre_object, fit_parametric_curve, low_m
   }
   sceptre_object@grna_assign_threshold <- grna_assign_threshold
   return(sceptre_object)
+}
+
+
+check_calibration_check_inputs <- function(grna_group_data_frame, control_group_complement) {
+  n_nt_grnas <- grna_group_data_frame |>
+    dplyr::filter(grna_group == "non-targeting") |> nrow()
+  if (control_group_complement) {
+    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
+  } else {
+    if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
+  }
+
+  return(NULL)
+}
+
+
+check_discovery_analysis_inputs <- function(grna_group_data_frame) {
+
 }
