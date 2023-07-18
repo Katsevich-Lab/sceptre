@@ -23,6 +23,7 @@ setClass("sceptre_object",
                       n_nonzero_cntrl_thresh = "integer",
                       B1 = "integer", B2 = "integer", B3 = "integer",
                       grna_assign_threshold = "integer",
+                      formula_object = "formula",
 
                       # cached objects
                       response_precomputations = "list",
@@ -61,7 +62,7 @@ setClass("sceptre_object",
 #' formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
 #' response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
 #' grna_group_data_frame_lowmoi)
-#' sceptre_object <- plan_analysis(
+#' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
 #' formula_object = formula_object,
 #' response_grna_group_pairs = response_grna_group_pairs)
@@ -86,14 +87,18 @@ setClass("sceptre_object",
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 #' moi = "high")
 #'
-#' #' # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+#' # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
 #' formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
 #' data(discovery_pairs_highmoi_experimental)
-#'
-#' sceptre_object <- plan_analysis(
+#' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
 #' formula_object = formula_object,
-#' response_grna_group_pairs = response_grna_group_pairs)
+#' response_grna_group_pairs = discovery_pairs_highmoi_experimental,
+#' resampling_mechanism = "permutations")
+#'
+#' # 3. run the calibration check
+#' sceptre_object <- run_calibration_check(sceptre_object)
+#' plot_calibration_result(sceptre_object)
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   covariate_data_frame, grna_group_data_frame, moi) {
   # 0. initialize output
@@ -112,23 +117,25 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
   out@covariate_data_frame <- covariate_data_frame
   out@grna_group_data_frame <- grna_group_data_frame
   out@low_moi <- (moi == "low")
+  out@calibration_check_run <- FALSE
+  out@last_function_called <- "create_sceptre_object"
   return(out)
 }
 
 
-plan_analysis <- function(sceptre_object,
-                          formula_object,
-                          response_grna_group_pairs = NULL,
-                          side = "both",
-                          fit_parametric_curve = TRUE,
-                          control_group = "default",
-                          resampling_mechanism = "default",
-                          n_nonzero_trt_thresh = 7L,
-                          n_nonzero_cntrl_thresh = 7L,
-                          grna_assign_threshold = 5L,
-                          B1 = 499L, B2 = 4999L, B3 = 24999L) {
+prepare_analysis <- function(sceptre_object,
+                             formula_object,
+                             response_grna_group_pairs = NULL,
+                             side = "both",
+                             fit_parametric_curve = TRUE,
+                             control_group = "default",
+                             resampling_mechanism = "default",
+                             n_nonzero_trt_thresh = 7L,
+                             n_nonzero_cntrl_thresh = 7L,
+                             grna_assign_threshold = 5L,
+                             B1 = 499L, B2 = 4999L, B3 = 24999L) {
   # 1. check inputs
-  check_plan_analysis_inputs(response_matrix = sceptre_object@response_matrix,
+  check_prepare_analysis_inputs(response_matrix = sceptre_object@response_matrix,
                              grna_matrix = sceptre_object@grna_matrix,
                              covariate_data_frame = sceptre_object@covariate_data_frame,
                              grna_group_data_frame = sceptre_object@grna_group_data_frame,
@@ -139,15 +146,18 @@ plan_analysis <- function(sceptre_object,
                              side = side, low_moi = sceptre_object@low_moi) |> invisible()
 
   # 2. update fields of sceptre object
-  sceptre_object <- set_fields_plan_analysis(sceptre_object, fit_parametric_curve, sceptre_object@low_moi,
-                                             control_group, resampling_mechanism, side, B1, B2, B3,
-                                             n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_grna_group_pairs,
-                                             grna_assign_threshold)
+  sceptre_object <- set_fields_prepare_analysis(sceptre_object, fit_parametric_curve, sceptre_object@low_moi,
+                                                control_group, resampling_mechanism, side, B1, B2, B3,
+                                                n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_grna_group_pairs,
+                                                grna_assign_threshold)
 
   # 3. create the covariate matrix, check it for correctness, and insert it into object
   sceptre_object@covariate_matrix <- convert_covariate_df_to_design_matrix(
     sceptre_object@covariate_data_frame,
     formula_object)
+
+  # 4. set the last function called
+  sceptre_object@last_function_called <- "prepare_analysis"
 
   return(sceptre_object)
 }
@@ -232,5 +242,15 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
   # save the calibration check result and gene precomputations
   sceptre_object@calibration_result <- out$ret
   sceptre_object@response_precomputations <- out$response_precomputations
+  sceptre_object@last_function_called <- "run_calibration_check"
   return(sceptre_object)
+}
+
+
+run_discovery_analysis <- function(sceptre_object, calibration_group_size = NULL,
+                                   n_calibration_pairs = NULL, output_amount = 1, print_progress = TRUE) {
+  # 1. do argument check
+  check_discovery_analysis_inputs(grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                  control_group_complement = sceptre_object@control_group_complement) |> invisible()
+
 }

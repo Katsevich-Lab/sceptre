@@ -86,7 +86,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     # 6. perform outer regression (if applicable)
     if (run_outer_regression) {
       # if running a discovery analysis using complement set and precomp is available, load
-      if (!calibration_check && !is.null(response_precomputations[[response_id]])) {
+      if (!is.null(response_precomputations[[response_id]])) {
         response_precomp <- response_precomputations[[response_id]]
       } else {
         # perform the regression to get the coefficients
@@ -94,7 +94,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                                             covariate_matrix = covariate_matrix,
                                                             regression_method = "pois_glm")
         # if running a calibration check using the complement set, save
-        if (calibration_check && control_group_complement) response_precomputations[[response_id]] <- response_precomp
+        response_precomputations[[response_id]] <- response_precomp
       }
       pieces_precomp <- compute_precomputation_pieces(expression_vector,
                                                       covariate_matrix,
@@ -122,7 +122,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     ret <- data.table::rbindlist(list(ret, ret_fail_qc), fill = TRUE)
   }
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
-  return(list(ret = ret, response_precomp = response_precomp))
+  return(list(ret = ret, response_precomputations = response_precomputations))
 }
 
 
