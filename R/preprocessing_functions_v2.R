@@ -1,5 +1,5 @@
 check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
-                                      grna_group_data_frame, moi) {
+                                               grna_group_data_frame, moi) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -57,8 +57,8 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, cov
 
 
 check_prepare_analysis_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
-                                       grna_group_data_frame, formula_object, response_grna_group_pairs,
-                                       control_group, resampling_mechanism, side, low_moi) {
+                                          grna_group_data_frame, formula_object, response_grna_group_pairs,
+                                          control_group, resampling_mechanism, side, low_moi) {
   # 5. if response_grna_group_pairs has been supplied, check its characteristics
   if (!is.null(response_grna_group_pairs)) {
     # i. verify that `grna_group` and `response_id` are columns
@@ -119,37 +119,6 @@ check_prepare_analysis_inputs <- function(response_matrix, grna_matrix, covariat
 }
 
 
-set_fields_prepare_analysis <- function(sceptre_object, fit_parametric_curve, low_moi,
-                                        control_group, resampling_mechanism, side,
-                                        B1, B2, B3, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                        response_grna_group_pairs, grna_assign_threshold) {
-  if (!low_moi) {
-    control_group <- "complement"
-    if (resampling_mechanism == "default") resampling_mechanism <- "crt"
-  }
-  if (low_moi) {
-    if (control_group == "default") control_group <- "nt_cells"
-    if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
-  }
-
-  # assign variables sceptre object
-  sceptre_object@control_group_complement <- control_group == "complement"
-  sceptre_object@run_permutations <- resampling_mechanism == "permutations"
-  sceptre_object@side_code <- which(side == c("left", "both", "right")) - 2L
-  sceptre_object@fit_parametric_curve <- fit_parametric_curve
-  sceptre_object@B1 <- B1
-  sceptre_object@B2 <- B2
-  sceptre_object@B3 <- B3
-  sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
-  sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
-  if (!is.null(response_grna_group_pairs)) {
-    sceptre_object@response_grna_group_pairs <- response_grna_group_pairs
-  }
-  sceptre_object@grna_assign_threshold <- grna_assign_threshold
-  return(sceptre_object)
-}
-
-
 check_calibration_check_inputs <- function(grna_group_data_frame, control_group_complement) {
   n_nt_grnas <- grna_group_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> nrow()
@@ -160,9 +129,4 @@ check_calibration_check_inputs <- function(grna_group_data_frame, control_group_
   }
 
   return(NULL)
-}
-
-
-check_discovery_analysis_inputs <- function(grna_group_data_frame) {
-
 }

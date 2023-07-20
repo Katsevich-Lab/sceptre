@@ -48,12 +48,12 @@ moi = "low")
 
 # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
 formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
-response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
+discovery_pairs <- generate_all_pairs(response_matrix_lowmoi,
 grna_group_data_frame_lowmoi)
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
 formula_object = formula_object,
-response_grna_group_pairs = response_grna_group_pairs)
+discovery_pairs = discovery_pairs)
 
 # 3. run calibration check
 sceptre_object <- run_calibration_check(sceptre_object)
@@ -78,11 +78,15 @@ moi = "high")
 # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
 formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
 data(discovery_pairs_highmoi_experimental)
+data(pc_pairs_highmoi_experimental)
+
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
 formula_object = formula_object,
-response_grna_group_pairs = discovery_pairs_highmoi_experimental,
-resampling_mechanism = "permutations")
+discovery_pairs = discovery_pairs_highmoi_experimental,
+positive_control_pairs = pc_pairs_highmoi_experimental,
+resampling_mechanism = "permutations",
+side = "left")
 
 # 3. run the calibration check
 sceptre_object <- run_calibration_check(sceptre_object)
