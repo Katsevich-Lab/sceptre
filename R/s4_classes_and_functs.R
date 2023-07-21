@@ -28,9 +28,11 @@ setClass("sceptre_object",
 
                       # cached objects
                       response_precomputations = "list",
+                      grna_assignments = "list",
                       calibration_check_run = "logical",
                       power_check_run = "logical",
                       discovery_analysis_run = "logical",
+                      analysis_prepared = "logical",
                       last_function_called = "character",
 
                       # results
@@ -53,42 +55,52 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   n_covariates <- ncol(object@covariate_data_frame)
   covariates <- paste0(colnames(object@covariate_data_frame), collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
-  last_function_called <- object@last_function_called
-  cat(paste0("A sceptre_object with the following fixed data attributes:\n\t\U2022 ",
+  cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
              crayon::blue(n_cells), " cells\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
              crayon::blue(moi), " multiplicity-of-infection \n\t\U2022 ",
              crayon::blue(n_nt_grnas), " non-targeting gRNAs \n\t\U2022 ",
-             crayon::blue(n_targeting_grnas), " targeting gRNAs (spread across ", crayon::blue(n_targeting_grna_groups), " gRNA groups) \n\t\U2022 ",
+             crayon::blue(n_targeting_grnas), " targeting gRNAs (distributed across ", crayon::blue(n_targeting_grna_groups), " gRNA groups) \n\t\U2022 ",
              crayon::blue(n_covariates), " covariates (", covariates, ")"))
 })
 
-
-setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
+# print method for sceptre class
+setMethod("print", signature = signature("sceptre_object"), function(x) {
   show(x)
-  args <- list(...)
-  if (!is.null(args[["full_output"]]) && args[["full_output"]]) {
-    n_discovery_pairs <- nrow(x@discovery_pairs)
-    n_pc_pairs <- nrow(x@positive_control_pairs)
-    cat(paste0("\n\nThis sceptre_object has the following user-specified analysis parameters: \n\t\U2022 ",
-               "Discovery pairs:", if (n_discovery_pairs == 0) {" not provided"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")}, "\n\t\U2022 ",
-               "Positive control pairs:", if (n_pc_pairs == 0) {" not provided"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")}, "\n\t\U2022 ",
-               "Formula object: ", if (length(x@formula_object) == 0L) "not provided" else crayon::blue(as.character(x@formula_object)[2]), "\n\t\U2022 ",
-               "Side: ", if (length(x@side_code) == 0L) "not provided" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]), "\n\t\U2022 ",
-               "Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not provided" else crayon::blue(x@fit_parametric_curve), "\n\t\U2022 ",
-               "Control group: ", if (length(x@control_group_complement) == 0L) "not provided" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")), "\n\t\U2022 ",
-               "Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not provided" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")), "\n\t\U2022 ",
-               "N. nonzero treatment cells QC threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not provided" else crayon::blue(x@n_nonzero_trt_thresh), "\n\t\U2022 ",
-               "N. nonzero control cells QC threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not provided" else crayon::blue(x@n_nonzero_cntrl_thresh), "\n\t\U2022 ",
-               "B1: ", if (length(x@B1) == 0L) "not provided" else crayon::blue(x@B1), ", ",
-               "B2: ", if (length(x@B2) == 0L) "not provided" else crayon::blue(x@B2), ", ",
-               "B3: ", if (length(x@B3) == 0L) "not provided" else crayon::blue(x@B3),
-               if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not provided" else crayon::blue(x@grna_assign_threshold))}
-               ))
-  cat(paste0("\n\nMost recent function called: ", crayon::blue(x@last_function_called)))
-  }
+  get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
+  cat(paste0("\n\nAnalysis status:\n",
+             "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
+             "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
+             "\t", get_mark(x@power_check_run), " run_power_check()\n",
+             "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
+
+  n_discovery_pairs <- nrow(x@discovery_pairs)
+  n_pc_pairs <- nrow(x@positive_control_pairs)
+  cat(paste0("\n\nUser-specified analysis parameters: \n",
+             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not provided"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")},
+             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not provided"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
+             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not provided" else crayon::blue(as.character(x@formula_object)[2]),
+             "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not provided" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
+             "\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not provided" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")),
+             "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not provided" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
+             "\n\t\U2022 N nonzero treatment cells QC threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not provided" else crayon::blue(x@n_nonzero_trt_thresh),
+             "\n\t\U2022 N nonzero control cells QC threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not provided" else crayon::blue(x@n_nonzero_cntrl_thresh),
+             if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not provided" else crayon::blue(x@grna_assign_threshold))},
+             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not provided" else crayon::blue(x@fit_parametric_curve),
+             "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not provided" else crayon::blue(x@B1), ", ",
+             "B2: ", if (length(x@B2) == 0L) "not provided" else crayon::blue(x@B2), ", ",
+             "B3: ", if (length(x@B3) == 0L) "not provided" else crayon::blue(x@B3)
+  ))
 })
 
+# plot function for sceptre object
+setMethod("plot", signature = signature("sceptre_object"), function(x) {
+  last_function_called <- x@last_function_called
+  if (last_function_called == "run_calibration_check") {
+    p <- plot_calibration_result(x)
+  }
+  return(p)
+})
 
 #' Create a `sceptre` object
 #'
@@ -100,6 +112,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 #' #################
 #' # Low MOI example
 #' #################
+#' # 0. obtain the data required for a single-cell screen analysis
 #' data(response_matrix_lowmoi) # response-by-cell expression matrix
 #' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 #' data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
@@ -113,22 +126,33 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' moi = "low")
 #'
-#' # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+#' # 2. obtain the formula object and pairs to analyze
 #' formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
 #' discovery_pairs <- generate_all_pairs(response_matrix_lowmoi,
 #' grna_group_data_frame_lowmoi)
+#'
+#' # 3. prepare the analysis
 #' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
 #' formula_object = formula_object,
 #' discovery_pairs = discovery_pairs)
 #'
-#' # 3. run calibration check
+#' # 4. run the calibration check
 #' sceptre_object <- run_calibration_check(sceptre_object)
-#' plot_calibration_result(sceptre_object)
+#' plot(sceptre_object)
+#'
+#' # 5. (optional) run the power check
+#' sceptre_object <- run_power_check(sceptre_object)
+#' plot(sceptre_object)
+#'
+#' # 6. run discovery analysis
+#' sceptre_object <- run_discovery_analysis(sceptre_object)
+#' plot(sceptre_object)
 #'
 #' ##################
 #' # High MOI example
 #' ##################
+#' # 0. obtain the data required for a single-cell screen analysis
 #' data(response_matrix_highmoi_experimental)
 #' data(grna_matrix_highmoi_experimental)
 #' data(covariate_data_frame_highmoi_experimental)
@@ -142,11 +166,12 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 #' moi = "high")
 #'
-#' # 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+#' # 2. set the formula, positive control pairs, and discovery pairs
 #' formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
 #' data(discovery_pairs_highmoi_experimental)
 #' data(pc_pairs_highmoi_experimental)
 #'
+#' # 3. prepare the analysis
 #' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
 #' formula_object = formula_object,
@@ -155,9 +180,15 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 #' resampling_mechanism = "permutations",
 #' side = "left")
 #'
-#' # 3. run the calibration check
+#' # 4. run the calibration check; plot the result
 #' sceptre_object <- run_calibration_check(sceptre_object)
-#' plot_calibration_result(sceptre_object)
+#' plot(sceptre_object)
+#'
+#' # 5. (optional) run the power check
+#' sceptre_object <- run_power_check(sceptre_object)
+#'
+#' # 6. run discovery analysis
+#' sceptre_object <- run_discovery_analysis(sceptre_object)
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   covariate_data_frame, grna_group_data_frame, moi) {
   # 0. initialize output
@@ -183,10 +214,9 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
   out@calibration_check_run <- FALSE
   out@power_check_run <- FALSE
   out@discovery_analysis_run <- FALSE
+  out@analysis_prepared <- FALSE
   out@calibration_result <- data.frame()
   out@discovery_result <- data.frame()
-
-  # most recent funtion
   out@last_function_called <- "create_sceptre_object"
 
   return(out)
@@ -211,7 +241,7 @@ prepare_analysis <- function(sceptre_object,
                                 covariate_data_frame = sceptre_object@covariate_data_frame,
                                 grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                 formula_object = formula_object,
-                                response_grna_group_pairs = discovery_pairs,
+                                response_grna_group_pairs_list = list(discovery_pairs, positive_control_pairs),
                                 control_group = control_group,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi) |> invisible()
@@ -244,16 +274,23 @@ prepare_analysis <- function(sceptre_object,
   sceptre_object@calibration_check_run <- FALSE
   sceptre_object@power_check_run <- FALSE
   sceptre_object@discovery_analysis_run <- FALSE
+  sceptre_object@analysis_prepared <- TRUE
   sceptre_object@calibration_result <- data.frame()
   sceptre_object@power_result <- data.frame()
   sceptre_object@discovery_result <- data.frame()
+  sceptre_object@last_function_called <- "prepare_analysis"
 
-  # 3. create the covariate matrix, check it for correctness, and insert it into object
+  # 4. create the covariate matrix, check it for correctness, and insert it into object
   sceptre_object@covariate_matrix <- convert_covariate_df_to_design_matrix(
     sceptre_object@covariate_data_frame, formula_object)
 
-  # 4. set the last function called
-  sceptre_object@last_function_called <- "prepare_analysis"
+  # 5. assign grnas
+  grna_assignments <- assign_grnas_to_cells(grna_matrix = sceptre_object@grna_matrix,
+                                            grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                            grna_assign_threshold = sceptre_object@grna_assign_threshold,
+                                            low_moi = sceptre_object@low_moi,
+                                            control_group_complement = sceptre_object@control_group_complement)
+  sceptre_object@grna_assignments <- grna_assignments
 
   return(sceptre_object)
 }
@@ -262,16 +299,12 @@ prepare_analysis <- function(sceptre_object,
 run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                   n_calibration_pairs = NULL, output_amount = 1, print_progress = TRUE) {
   # 1. do argument check
-  check_calibration_check_inputs(grna_group_data_frame = sceptre_object@grna_group_data_frame,
+  check_calibration_check_inputs(analysis_prepared = sceptre_object@analysis_prepared,
+                                 grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                  control_group_complement = sceptre_object@control_group_complement) |> invisible()
 
-  # 2. assign gRNAs to cells
-  grna_assignments <- assign_grnas_to_cells(grna_matrix = sceptre_object@grna_matrix,
-                                            grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                            grna_assign_threshold = sceptre_object@grna_assign_threshold,
-                                            low_moi = sceptre_object@low_moi,
-                                            control_group_complement = sceptre_object@control_group_complement,
-                                            calibration_check = TRUE)
+  # 2. get grna assignments
+  grna_assignments <- sceptre_object@grna_assignments
 
   # 3. construct the negative control pairs
   cat("Constructing negative control pairs.")
@@ -283,7 +316,7 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                                                 n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
                                                                 n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                                                 grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                                                response_grna_group_pairs = sceptre_object@response_grna_group_pairs,
+                                                                response_grna_group_pairs = sceptre_object@discovery_pairs,
                                                                 control_group_complement = sceptre_object@control_group_complement,
                                                                 low_moi = sceptre_object@low_moi)
   cat(crayon::green(' \u2713\n'))
@@ -335,18 +368,144 @@ run_calibration_check <- function(sceptre_object, calibration_group_size = NULL,
                                 print_progress = print_progress)
   }
 
-  # save the calibration check result and gene precomputations
+  # update fields of sceptre object
   sceptre_object@calibration_result <- out$ret
   sceptre_object@response_precomputations <- out$response_precomputations
+  sceptre_object@calibration_check_run <- TRUE
   sceptre_object@last_function_called <- "run_calibration_check"
   return(sceptre_object)
 }
 
 
-run_discovery_analysis <- function(sceptre_object, calibration_group_size = NULL,
-                                   n_calibration_pairs = NULL, output_amount = 1, print_progress = TRUE) {
+run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE) {
   # 1. do argument check
-  check_discovery_analysis_inputs(grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                  control_group_complement = sceptre_object@control_group_complement) |> invisible()
+  check_discovery_analysis_inputs(response_grna_group_pairs = sceptre_object@positive_control_pairs,
+                                  control_group_complement = sceptre_object@control_group_complement,
+                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                  calibration_check_run = sceptre_object@calibration_check_run,
+                                  pc_analysis = TRUE) |> invisible()
 
+  # 2. get grna assignments
+  grna_assignments <- sceptre_object@grna_assignments
+
+  # 4. generate the set of synthetic indicator idxs (if running permutations)
+  if (sceptre_object@run_permutations) {
+    cat("Generating permutation resamples.")
+    n_cells <- nrow(sceptre_object@covariate_matrix)
+    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments = grna_assignments,
+                                                     B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+                                                     calibration_check = FALSE,
+                                                     control_group_complement = sceptre_object@control_group_complement,
+                                                     calibration_group_size = NULL,
+                                                     n_cells = n_cells)
+    cat(crayon::green(' \u2713\n'))
+  }
+  gc() |> invisible()
+
+  # 5. run the method
+  if (sceptre_object@run_permutations) {
+    out <- run_perm_test_in_memory(response_matrix = sceptre_object@response_matrix,
+                                   grna_assignments = grna_assignments,
+                                   covariate_matrix = sceptre_object@covariate_matrix,
+                                   response_grna_group_pairs = sceptre_object@positive_control_pairs,
+                                   synthetic_idxs = synthetic_idxs,
+                                   output_amount = output_amount,
+                                   fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                   B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                   B3 = sceptre_object@B3, calibration_check = FALSE,
+                                   control_group_complement = sceptre_object@control_group_complement,
+                                   n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                   side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                   response_precomputations = sceptre_object@response_precomputations,
+                                   print_progress = print_progress)
+  } else {
+    ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
+                                grna_assignments = grna_assignments,
+                                covariate_matrix = sceptre_object@covariate_matrix,
+                                response_grna_group_pairs = sceptre_object@positive_control_pairs,
+                                output_amount = output_amount,
+                                fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                B3 = sceptre_object@B3, calibration_check = FALSE,
+                                control_group_complement = sceptre_object@control_group_complement,
+                                n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                print_progress = print_progress)
+  }
+
+  # update fields of sceptre object
+  sceptre_object@power_result <- out$ret
+  sceptre_object@response_precomputations <- out$response_precomputations
+  sceptre_object@power_check_run <- TRUE
+  sceptre_object@last_function_called <- "run_power_check"
+  return(sceptre_object)
+}
+
+
+run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE) {
+  # 1. do argument check
+  check_discovery_analysis_inputs(response_grna_group_pairs = sceptre_object@discovery_pairs,
+                                  control_group_complement = sceptre_object@control_group_complement,
+                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                  calibration_check_run = sceptre_object@calibration_check_run,
+                                  pc_analysis = FALSE) |> invisible()
+
+  # 2. get grna assignments
+  grna_assignments <- sceptre_object@grna_assignments
+
+  # 4. generate the set of synthetic indicator idxs (if running permutations)
+  if (sceptre_object@run_permutations) {
+    cat("Generating permutation resamples.")
+    n_cells <- nrow(sceptre_object@covariate_matrix)
+    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments = grna_assignments,
+                                                     B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+                                                     calibration_check = FALSE,
+                                                     control_group_complement = sceptre_object@control_group_complement,
+                                                     calibration_group_size = NULL,
+                                                     n_cells = n_cells)
+    cat(crayon::green(' \u2713\n'))
+  }
+  gc() |> invisible()
+
+  # 5. run the method
+  if (sceptre_object@run_permutations) {
+    out <- run_perm_test_in_memory(response_matrix = sceptre_object@response_matrix,
+                                   grna_assignments = grna_assignments,
+                                   covariate_matrix = sceptre_object@covariate_matrix,
+                                   response_grna_group_pairs = sceptre_object@discovery_pairs,
+                                   synthetic_idxs = synthetic_idxs,
+                                   output_amount = output_amount,
+                                   fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                   B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                   B3 = sceptre_object@B3, calibration_check = FALSE,
+                                   control_group_complement = sceptre_object@control_group_complement,
+                                   n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                   side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                   response_precomputations = sceptre_object@response_precomputations,
+                                   print_progress = print_progress)
+  } else {
+    ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
+                                grna_assignments = grna_assignments,
+                                covariate_matrix = sceptre_object@covariate_matrix,
+                                response_grna_group_pairs = sceptre_object@discovery_pairs,
+                                output_amount = output_amount,
+                                fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                                B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+                                B3 = sceptre_object@B3, calibration_check = FALSE,
+                                control_group_complement = sceptre_object@control_group_complement,
+                                n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+                                print_progress = print_progress)
+  }
+
+  # update fields of sceptre object
+  sceptre_object@discovery_result <- out$ret
+  sceptre_object@response_precomputations <- out$response_precomputations
+  sceptre_object@discovery_analysis_run <- TRUE
+  sceptre_object@last_function_called <- "run_discovery_analysis"
+  return(sceptre_object)
 }

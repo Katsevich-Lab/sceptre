@@ -33,6 +33,7 @@ Create a \code{sceptre} object
 #################
 # Low MOI example
 #################
+# 0. obtain the data required for a single-cell screen analysis
 data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
@@ -46,22 +47,33 @@ covariate_data_frame = covariate_data_frame_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 moi = "low")
 
-# 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+# 2. obtain the formula object and pairs to analyze
 formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
 discovery_pairs <- generate_all_pairs(response_matrix_lowmoi,
 grna_group_data_frame_lowmoi)
+
+# 3. prepare the analysis
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
 formula_object = formula_object,
 discovery_pairs = discovery_pairs)
 
-# 3. run calibration check
+# 4. run the calibration check
 sceptre_object <- run_calibration_check(sceptre_object)
-plot_calibration_result(sceptre_object)
+plot(sceptre_object)
+
+# 5. (optional) run the power check
+sceptre_object <- run_power_check(sceptre_object)
+plot(sceptre_object)
+
+# 6. run discovery analysis
+sceptre_object <- run_discovery_analysis(sceptre_object)
+plot(sceptre_object)
 
 ##################
 # High MOI example
 ##################
+# 0. obtain the data required for a single-cell screen analysis
 data(response_matrix_highmoi_experimental)
 data(grna_matrix_highmoi_experimental)
 data(covariate_data_frame_highmoi_experimental)
@@ -75,11 +87,12 @@ covariate_data_frame = covariate_data_frame_highmoi_experimental,
 grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 moi = "high")
 
-# 2. plan analysis; this includes setting the formula and obtaining the pairs to analyze
+# 2. set the formula, positive control pairs, and discovery pairs
 formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
 data(discovery_pairs_highmoi_experimental)
 data(pc_pairs_highmoi_experimental)
 
+# 3. prepare the analysis
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
 formula_object = formula_object,
@@ -88,7 +101,13 @@ positive_control_pairs = pc_pairs_highmoi_experimental,
 resampling_mechanism = "permutations",
 side = "left")
 
-# 3. run the calibration check
+# 4. run the calibration check; plot the result
 sceptre_object <- run_calibration_check(sceptre_object)
-plot_calibration_result(sceptre_object)
+plot(sceptre_object)
+
+# 5. (optional) run the power check
+sceptre_object <- run_power_check(sceptre_object)
+
+# 6. run discovery analysis
+sceptre_object <- run_discovery_analysis(sceptre_object)
 }

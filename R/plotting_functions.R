@@ -157,7 +157,7 @@ get_my_theme <- function(element_text_size = 11) {
 make_volcano_plot <- function(discovery_result, alpha = 0.1, x_limits = c(-1.5, 1.5), transparency = 0.5, point_size = 0.9, multiple_testing_correction = "BH") {
   discovery_result <- discovery_result |> stats::na.omit()
   disc_set <- obtain_discovery_set(discovery_result, alpha, multiple_testing_correction)
-  p_thresh <- max(disc_set$p_value)
+  p_thresh <- if (nrow(disc_set) >= 1L) max(disc_set$p_value) else NA
   p_lower_lim <- 1e-12
   out <- ggplot2::ggplot(data = discovery_result |> dplyr::mutate(reject = p_value < p_thresh,
                                                                   p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
@@ -167,7 +167,7 @@ make_volcano_plot <- function(discovery_result, alpha = 0.1, x_limits = c(-1.5, 
     ggplot2::geom_point(alpha = transparency, size = point_size) +
     ggplot2::scale_y_continuous(trans = revlog_trans(10), limits = c(1, 1e-12), expand = c(0.02, 0)) +
     get_my_theme() + ggplot2::xlab("Log fold change") + ggplot2::ylab("P-value") +
-    ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") +
+    (if (!is.na(p_thresh)) ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") else NULL) +
     ggplot2::theme(legend.position = "none") + ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
     ggplot2::ggtitle("P-value vs. log fold change")
   return(out)
