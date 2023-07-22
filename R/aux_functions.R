@@ -62,3 +62,13 @@ generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
     dplyr::pull(grna_group) |> unique() |> factor()
   expand.grid(response_id = response_ids, grna_group = grna_groups)
 }
+
+
+auto_construct_formula_object <- function(cell_covariate_names) {
+  count_based_covariates <- grepl(pattern = "n_umis|n_nonzero", x = cell_covariate_names)
+  idxs <- as.integer(count_based_covariates) + 1L
+  prefix <- c("", "log(")[idxs]
+  postfix <- c("", ")")[idxs]
+  form_str <- paste0("~ ", paste0(prefix, cell_covariate_names, postfix, collapse = " + "))
+  return(as.formula(form_str))
+}
