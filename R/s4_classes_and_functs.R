@@ -246,7 +246,10 @@ prepare_analysis <- function(sceptre_object,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi) |> invisible()
 
-  # 2. update analysis parameter fields of sceptre object
+  # 2. check whether to update cached objects
+  discard_response_precomputations <- !identical(sceptre_object@formula_object, formula_object)
+
+  # 3. update analysis parameter fields of sceptre object
   if (!sceptre_object@low_moi) {
     control_group <- "complement"
     if (resampling_mechanism == "default") resampling_mechanism <- "crt"
@@ -266,11 +269,11 @@ prepare_analysis <- function(sceptre_object,
   sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
   sceptre_object@discovery_pairs <- discovery_pairs
   sceptre_object@positive_control_pairs <- positive_control_pairs
-  sceptre_object@formula_object <- formula_object
   sceptre_object@grna_assign_threshold <- grna_assign_threshold
+  sceptre_object@formula_object <- formula_object
 
-  # 3. update cached fields
-  sceptre_object@response_precomputations <- list()
+  # 4. update cached fields
+  if (discard_response_precomputations) sceptre_object@response_precomputations <- list()
   sceptre_object@calibration_check_run <- FALSE
   sceptre_object@power_check_run <- FALSE
   sceptre_object@discovery_analysis_run <- FALSE
@@ -280,11 +283,11 @@ prepare_analysis <- function(sceptre_object,
   sceptre_object@discovery_result <- data.frame()
   sceptre_object@last_function_called <- "prepare_analysis"
 
-  # 4. create the covariate matrix, check it for correctness, and insert it into object
+  # 5. create the covariate matrix, check it for correctness, and insert it into object
   sceptre_object@covariate_matrix <- convert_covariate_df_to_design_matrix(
     sceptre_object@covariate_data_frame, formula_object)
 
-  # 5. assign grnas
+  # 6. assign grnas
   grna_assignments <- assign_grnas_to_cells(grna_matrix = sceptre_object@grna_matrix,
                                             grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                             grna_assign_threshold = sceptre_object@grna_assign_threshold,
