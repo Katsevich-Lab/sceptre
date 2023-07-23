@@ -69,15 +69,11 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 })
 
 # print method for sceptre class
-setMethod("print", signature = signature("sceptre_object"), function(x) {
+setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
+  args <- list(...)
+  print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
-  cat(paste0("\n\nAnalysis status:\n",
-             "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
-             "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
-             "\t", get_mark(x@power_check_run), " run_power_check()\n",
-             "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
-
   n_discovery_pairs <- nrow(x@discovery_pairs)
   n_pc_pairs <- nrow(x@positive_control_pairs)
   cat(paste0("\n\nUser-specified analysis parameters: \n",
@@ -85,18 +81,28 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
              "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
              "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2]),
              "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
-             "\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")),
-             "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
-             "\n\t\U2022 N nonzero treatment cells QC threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
-             "\n\t\U2022 N nonzero control cells QC threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
+             "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
+             "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not specified" else crayon::blue(x@grna_assign_threshold))},
-             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
-             "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
-             "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
-             "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3),
-             "\n\t\U2022 Calibration check N pairs: ", if (length(x@n_calibration_pairs) == 0L) "not specified" else { if (is.na(x@n_calibration_pairs)) crayon::blue("match discovery pairs") else crayon::blue(x@n_calibration_pairs)},
-             "\n\t\U2022 Calibration check group size: ", if (length(x@calibration_group_size) == 0L) "not specified" else { if (is.na(x@calibration_group_size)) crayon::blue("match discovery pairs") else crayon::blue(x@calibration_group_size)}
+             if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
+             if (!print_full_output) NULL else {
+                paste0(
+                  "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
+                  "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
+                  "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
+                  "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
+                  "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3),
+                  "\n\t\U2022 Calibration check N pairs: ", if (length(x@n_calibration_pairs) == 0L) "not specified" else { if (is.na(x@n_calibration_pairs)) crayon::blue("match discovery pairs") else crayon::blue(x@n_calibration_pairs)},
+                  "\n\t\U2022 Calibration check group size: ", if (length(x@calibration_group_size) == 0L) "not specified" else { if (is.na(x@calibration_group_size)) crayon::blue("match discovery pairs") else crayon::blue(x@calibration_group_size)}
+                )
+             }
   ))
+
+  cat(paste0("\n\nAnalysis status:\n",
+             "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
+             "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
+             "\t", get_mark(x@power_check_run), " run_power_check()\n",
+             "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
 })
 
 
@@ -172,15 +178,13 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 #' moi = "high")
 #'
-#' # 2. set the formula, positive control pairs, and discovery pairs
-#' formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
+#' # 2. set the discovery pairs and positive control pairs
 #' data(discovery_pairs_highmoi_experimental)
 #' data(pc_pairs_highmoi_experimental)
 #'
 #' # 3. prepare the analysis
 #' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
-#' formula_object = formula_object,
 #' discovery_pairs = discovery_pairs_highmoi_experimental,
 #' positive_control_pairs = pc_pairs_highmoi_experimental,
 #' resampling_mechanism = "permutations",
@@ -230,9 +234,9 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
 
 
 prepare_analysis <- function(sceptre_object,
-                             formula_object,
                              discovery_pairs = data.frame(),
                              positive_control_pairs = data.frame(),
+                             formula_object = "default",
                              side = "both",
                              fit_parametric_curve = TRUE,
                              control_group = "default",
@@ -243,7 +247,24 @@ prepare_analysis <- function(sceptre_object,
                              B1 = 499L, B2 = 4999L, B3 = 24999L,
                              calibration_group_size = NA_integer_,
                              n_calibration_pairs = NA_integer_) {
-  # 1. check inputs
+  # 1. sort out the default arguments; control group, resampling mechanism, formula object, discovery pairs
+  if (!sceptre_object@low_moi) {
+    control_group <- "complement"
+    if (identical(resampling_mechanism, "default")) resampling_mechanism <- "crt"
+  }
+  if (sceptre_object@low_moi) {
+    if (identical(control_group, "default")) control_group <- "nt_cells"
+    if (identical(resampling_mechanism, "default")) resampling_mechanism <- "permutations"
+  }
+  if (identical(formula_object, "default")) {
+    formula_object <- auto_construct_formula_object(sceptre_object@covariate_data_frame)
+  }
+  if (identical(discovery_pairs, "all")) {
+    discovery_pairs <- generate_all_pairs(sceptre_object@response_matrix,
+                                          sceptre_object@grna_group_data_frame)
+  }
+
+  # 2. check inputs
   check_prepare_analysis_inputs(response_matrix = sceptre_object@response_matrix,
                                 grna_matrix = sceptre_object@grna_matrix,
                                 covariate_data_frame = sceptre_object@covariate_data_frame,
@@ -254,21 +275,12 @@ prepare_analysis <- function(sceptre_object,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi) |> invisible()
 
-  # 2. sort out the default arguments
-  if (!sceptre_object@low_moi) {
-    control_group <- "complement"
-    if (resampling_mechanism == "default") resampling_mechanism <- "crt"
-  }
-  if (sceptre_object@low_moi) {
-    if (control_group == "default") control_group <- "nt_cells"
-    if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
-  }
+  # 3. check whether to update cached objects
   control_group_complement <- control_group == "complement"
   run_permutations <- resampling_mechanism == "permutations"
   side_code <- which(side == c("left", "both", "right")) - 2L
-
-  # 3. check whether to update cached objects
-  discard_response_precomputations <- !identical(sceptre_object@formula_object, formula_object)
+  discard_response_precomputations <- !((length(sceptre_object@formula_object) >= 2) &&
+                                         identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
   discard_grna_assignments <- !identical(sceptre_object@grna_assign_threshold, grna_assign_threshold)
   discard_negative_control_pairs <- !(identical(sceptre_object@n_calibration_pairs, n_calibration_pairs) &&
                                       identical(sceptre_object@calibration_group_size, calibration_group_size) &&

@@ -86,15 +86,13 @@ covariate_data_frame = covariate_data_frame_highmoi_experimental,
 grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 moi = "high")
 
-# 2. set the formula, positive control pairs, and discovery pairs
-formula_object <- formula(~log(grna_n_umis) + log(grna_n_nonzero) + log(gene_n_umis) + log(gene_n_nonzero) + batch + p_mito)
+# 2. set the discovery pairs and positive control pairs
 data(discovery_pairs_highmoi_experimental)
 data(pc_pairs_highmoi_experimental)
 
 # 3. prepare the analysis
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
-formula_object = formula_object,
 discovery_pairs = discovery_pairs_highmoi_experimental,
 positive_control_pairs = pc_pairs_highmoi_experimental,
 resampling_mechanism = "permutations",
