@@ -5,7 +5,7 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
   n_nt_grnas <- length(nt_grna_names)
 
   # 2. compute nt_n_nonzero_matrix and n pairs
-  if (is.null(n_calibration_pairs)) {
+  if (is.na(n_calibration_pairs)) {
     grna_group_idxs <- grna_assignments$grna_group_idxs
     dt <- data.table::data.table(response_idx = match(x = response_grna_group_pairs$response_id,
                                                       table = rownames(response_matrix)),
@@ -27,11 +27,11 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
                                                      to_analyze_grna_idxs = to_analyze_grna_idxs,
                                                      n_nonzero_trt_thresh = n_nonzero_trt_thresh,
                                                      n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
-                                                     compute_n_ok_pairs = is.null(n_calibration_pairs),
+                                                     compute_n_ok_pairs = is.na(n_calibration_pairs),
                                                      control_group_complement = control_group_complement)
   n_nonzero_m <- out$n_nonzero_mat
   n_nonzero_tot <- out$n_nonzero_tot
-  if (is.null(n_calibration_pairs)) n_calibration_pairs <- out$n_ok_pairs
+  if (is.na(n_calibration_pairs)) n_calibration_pairs <- out$n_ok_pairs
 
   # 3. compute the number of possible groups; compute the possible groups
   n_possible_groups <- choose(n_nt_grnas, calibration_group_size)

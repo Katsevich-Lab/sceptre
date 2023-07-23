@@ -4,22 +4,11 @@
 \alias{generate_all_pairs}
 \title{Generate all pairs}
 \usage{
-generate_all_pairs(response_matrix, grna_group_data_frame)
-}
-\arguments{
-\item{response_matrix}{(required) a matrix of raw expression counts. The responses (e.g., genes or proteins) should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the responses. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}.}
-
-\item{grna_group_data_frame}{(required) a data frame specifying the "group" to which each individual gRNA belongs. This data frame should contain columns \code{grna_id} and \code{grna_group}, with \code{grna_group} specifying the group membership of a given gRNA in the \code{grna_id} column. Typically, gRNAs that target the same site are grouped into the same gRNA group. Non-targeting gRNAs (if present) should be assigned a gRNA group label of "non-targeting".}
+generate_all_pairs(sceptre_object)
 }
 \value{
 a data frame containing the columns \code{response_id} and \code{grna_group} in which each response is mapped to the entire set of targeting gRNA groups.
 }
 \description{
 The \code{generate_all_pairs()} function generates all possible response-gRNA group pairs that can be constructed from a given \code{response_matrix} and \code{grna_group_data_frame}.
-}
-\examples{
-data(response_matrix_lowmoi)
-data(grna_group_data_frame_lowmoi)
-response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
-grna_group_data_frame_lowmoi)
 }

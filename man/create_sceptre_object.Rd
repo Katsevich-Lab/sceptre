@@ -49,8 +49,7 @@ moi = "low")
 
 # 2. obtain the formula object and pairs to analyze
 formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
-discovery_pairs <- generate_all_pairs(response_matrix_lowmoi,
-grna_group_data_frame_lowmoi)
+discovery_pairs <- generate_all_pairs(sceptre_object)
 
 # 3. prepare the analysis
 sceptre_object <- prepare_analysis(
