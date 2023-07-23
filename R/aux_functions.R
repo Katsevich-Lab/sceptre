@@ -61,11 +61,21 @@ generate_all_pairs <- function(sceptre_object) {
 }
 
 
-auto_construct_formula_object <- function(cell_covariate_names) {
-  count_based_covariates <- grepl(pattern = "n_umis|n_nonzero", x = cell_covariate_names)
-  idxs <- as.integer(count_based_covariates) + 1L
-  prefix <- c("", "log(")[idxs]
-  postfix <- c("", ")")[idxs]
-  form_str <- paste0("~ ", paste0(prefix, cell_covariate_names, postfix, collapse = " + "))
-  return(as.formula(form_str))
+auto_construct_formula_object <- function(cell_covariates) {
+  cell_covariate_names <- colnames(cell_covariates)
+  form_str <- sapply(cell_covariate_names, function(curr_name) {
+    count_based_covariate <- grepl(pattern = "n_umis|n_nonzero", x = curr_name)
+    if (count_based_covariate) {
+      if (any(cell_covariates[[curr_name]] == 0)) {
+        out <- paste0("log(", curr_name, "+1)")
+      } else {
+        out <- paste0("log(", curr_name, ")")
+      }
+    } else {
+      out <- curr_name
+    }
+    return(out)
+  }) |> paste0(collapse = " + ")
+  form <- paste0("~ ", form_str) |> as.formula()
+  return(form)
 }
