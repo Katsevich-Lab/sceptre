@@ -31,6 +31,8 @@ setClass("sceptre_object",
                       # cached objects
                       response_precomputations = "list",
                       grna_assignments = "list",
+                      negative_control_pairs = "data.frame",
+
                       calibration_check_run = "logical",
                       power_check_run = "logical",
                       discovery_analysis_run = "logical",
@@ -79,21 +81,21 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   n_discovery_pairs <- nrow(x@discovery_pairs)
   n_pc_pairs <- nrow(x@positive_control_pairs)
   cat(paste0("\n\nUser-specified analysis parameters: \n",
-             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not yet set"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")},
-             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not yet set"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
-             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not yet set" else crayon::blue(as.character(x@formula_object)[2]),
-             "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not yet set" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
-             "\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not yet set" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")),
-             "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not yet set" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
-             "\n\t\U2022 N nonzero treatment cells QC threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not yet set" else crayon::blue(x@n_nonzero_trt_thresh),
-             "\n\t\U2022 N nonzero control cells QC threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not yet set" else crayon::blue(x@n_nonzero_cntrl_thresh),
-             if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not yet set" else crayon::blue(x@grna_assign_threshold))},
-             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not yet set" else crayon::blue(x@fit_parametric_curve),
-             "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not yet set" else crayon::blue(x@B1), ", ",
-             "B2: ", if (length(x@B2) == 0L) "not yet set" else crayon::blue(x@B2), ", ",
-             "B3: ", if (length(x@B3) == 0L) "not yet set" else crayon::blue(x@B3),
-             "\n\t\U2022 Calibration check N pairs: ", if (length(x@n_calibration_pairs) == 0L) "not yet set" else { if (is.na(x@n_calibration_pairs)) crayon::blue("match to discovery pairs") else crayon::blue(x@n_calibration_pairs)},
-             "\n\t\U2022 Calibration check group size: ", if (length(x@calibration_group_size) == 0L) "not yet set" else { if (is.na(x@calibration_group_size)) crayon::blue("match to discovery pairs") else crayon::blue(x@calibration_group_size)}
+             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")},
+             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
+             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2]),
+             "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
+             "\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")),
+             "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
+             "\n\t\U2022 N nonzero treatment cells QC threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
+             "\n\t\U2022 N nonzero control cells QC threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
+             if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not specified" else crayon::blue(x@grna_assign_threshold))},
+             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
+             "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
+             "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
+             "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3),
+             "\n\t\U2022 Calibration check N pairs: ", if (length(x@n_calibration_pairs) == 0L) "not specified" else { if (is.na(x@n_calibration_pairs)) crayon::blue("match discovery pairs") else crayon::blue(x@n_calibration_pairs)},
+             "\n\t\U2022 Calibration check group size: ", if (length(x@calibration_group_size) == 0L) "not specified" else { if (is.na(x@calibration_group_size)) crayon::blue("match discovery pairs") else crayon::blue(x@calibration_group_size)}
   ))
 })
 
@@ -133,8 +135,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #'
 #' # 2. obtain the formula object and pairs to analyze
 #' formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
-#' discovery_pairs <- generate_all_pairs(response_matrix_lowmoi,
-#' grna_group_data_frame_lowmoi)
+#' discovery_pairs <- generate_all_pairs(sceptre_object)
 #'
 #' # 3. prepare the analysis
 #' sceptre_object <- prepare_analysis(
@@ -253,11 +254,7 @@ prepare_analysis <- function(sceptre_object,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi) |> invisible()
 
-  # 2. check whether to update cached objects
-  discard_response_precomputations <- !identical(sceptre_object@formula_object, formula_object)
-  discard_grna_assignments <- !identical(sceptre_object@grna_assign_threshold, grna_assign_threshold)
-
-  # 3. update analysis parameter fields of sceptre object
+  # 2. sort out the default arguments
   if (!sceptre_object@low_moi) {
     control_group <- "complement"
     if (resampling_mechanism == "default") resampling_mechanism <- "crt"
@@ -266,9 +263,25 @@ prepare_analysis <- function(sceptre_object,
     if (control_group == "default") control_group <- "nt_cells"
     if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
   }
-  sceptre_object@control_group_complement <- control_group == "complement"
-  sceptre_object@run_permutations <- resampling_mechanism == "permutations"
-  sceptre_object@side_code <- which(side == c("left", "both", "right")) - 2L
+  control_group_complement <- control_group == "complement"
+  run_permutations <- resampling_mechanism == "permutations"
+  side_code <- which(side == c("left", "both", "right")) - 2L
+
+  # 3. check whether to update cached objects
+  discard_response_precomputations <- !identical(sceptre_object@formula_object, formula_object)
+  discard_grna_assignments <- !identical(sceptre_object@grna_assign_threshold, grna_assign_threshold)
+  discard_negative_control_pairs <- !(identical(sceptre_object@n_calibration_pairs, n_calibration_pairs) &&
+                                      identical(sceptre_object@calibration_group_size, calibration_group_size) &&
+                                      identical(sceptre_object@grna_assign_threshold, grna_assign_threshold) &&
+                                      identical(sceptre_object@n_nonzero_trt_thresh, n_nonzero_trt_thresh) &&
+                                      identical(sceptre_object@n_nonzero_cntrl_thresh, n_nonzero_cntrl_thresh) &&
+                                      identical(sceptre_object@discovery_pairs, discovery_pairs) &&
+                                      identical(sceptre_object@control_group_complement, control_group_complement))
+
+  # update fields
+  sceptre_object@control_group_complement <- control_group_complement
+  sceptre_object@run_permutations <- run_permutations
+  sceptre_object@side_code <- side_code
   sceptre_object@fit_parametric_curve <- fit_parametric_curve
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
@@ -282,8 +295,13 @@ prepare_analysis <- function(sceptre_object,
   sceptre_object@calibration_group_size <- calibration_group_size
   sceptre_object@n_calibration_pairs <- n_calibration_pairs
 
-  # 4. update cached fields
+  # 4. update cached fields (three fields cached: response precomputations, grna assignments, and negative control pairs)
   if (discard_response_precomputations) sceptre_object@response_precomputations <- list()
+  if (discard_negative_control_pairs) {
+    sceptre_object@negative_control_pairs <- data.frame()
+  } else {
+    print("keeping negative control pairs")
+  }
   sceptre_object@calibration_check_run <- FALSE
   sceptre_object@power_check_run <- FALSE
   sceptre_object@discovery_analysis_run <- FALSE
@@ -321,18 +339,28 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
   grna_assignments <- sceptre_object@grna_assignments
 
   # 3. construct the negative control pairs
+  if (is.na(sceptre_object@calibration_group_size)) {
+    calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
+  }  else {
+    calibration_group_size <- sceptre_object@calibration_group_size
+  }
+
   cat("Constructing negative control pairs.")
-  if (is.na(sceptre_object@calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
-  response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs = sceptre_object@n_calibration_pairs,
-                                                                calibration_group_size = sceptre_object@calibration_group_size,
-                                                                grna_assignments = grna_assignments,
-                                                                response_matrix = sceptre_object@response_matrix,
-                                                                n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-                                                                n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
-                                                                grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                                                response_grna_group_pairs = sceptre_object@discovery_pairs,
-                                                                control_group_complement = sceptre_object@control_group_complement,
-                                                                low_moi = sceptre_object@low_moi)
+  if (nrow(sceptre_object@negative_control_pairs) == 0L) {
+    print("Constructing negative control pairs.")
+    response_grna_group_pairs <- construct_negative_control_pairs(response_matrix = sceptre_object@response_matrix,
+                                                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                                                  low_moi = sceptre_object@low_moi,
+                                                                  n_calibration_pairs = sceptre_object@n_calibration_pairs,
+                                                                  calibration_group_size = calibration_group_size,
+                                                                  grna_assignments = grna_assignments,
+                                                                  n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                                                  n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                                                  response_grna_group_pairs = sceptre_object@discovery_pairs,
+                                                                  control_group_complement = sceptre_object@control_group_complement)
+  } else {
+    response_grna_group_pairs <- sceptre_object@negative_control_pairs
+  }
   cat(crayon::green(' \u2713\n'))
 
   # 4. generate the set of synthetic indicator idxs (if running permutations)
@@ -384,6 +412,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
 
   # update fields of sceptre object
   sceptre_object@calibration_result <- out$ret
+  sceptre_object@negative_control_pairs <- response_grna_group_pairs
   sceptre_object@response_precomputations <- out$response_precomputations
   sceptre_object@calibration_check_run <- TRUE
   sceptre_object@last_function_called <- "run_calibration_check"

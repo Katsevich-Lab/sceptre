@@ -50,12 +50,9 @@ obtain_discovery_set <- function(discovery_result, alpha = 0.1, multiple_testing
 #'
 #' @return a data frame containing the columns \code{response_id} and \code{grna_group} in which each response is mapped to the entire set of targeting gRNA groups.
 #' @export
-#' @examples
-#' data(response_matrix_lowmoi)
-#' data(grna_group_data_frame_lowmoi)
-#' response_grna_group_pairs <- generate_all_pairs(response_matrix_lowmoi,
-#' grna_group_data_frame_lowmoi)
-generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
+generate_all_pairs <- function(sceptre_object) {
+  response_matrix <- sceptre_object@response_matrix
+  grna_group_data_frame <- sceptre_object@grna_group_data_frame
   response_ids <- rownames(response_matrix) |> factor()
   grna_groups <- grna_group_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |>
