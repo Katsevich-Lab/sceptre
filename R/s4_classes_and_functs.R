@@ -297,11 +297,7 @@ prepare_analysis <- function(sceptre_object,
 
   # 4. update cached fields (three fields cached: response precomputations, grna assignments, and negative control pairs)
   if (discard_response_precomputations) sceptre_object@response_precomputations <- list()
-  if (discard_negative_control_pairs) {
-    sceptre_object@negative_control_pairs <- data.frame()
-  } else {
-    print("keeping negative control pairs")
-  }
+  if (discard_negative_control_pairs) sceptre_object@negative_control_pairs <- data.frame()
   sceptre_object@calibration_check_run <- FALSE
   sceptre_object@power_check_run <- FALSE
   sceptre_object@discovery_analysis_run <- FALSE
@@ -347,7 +343,6 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
 
   cat("Constructing negative control pairs.")
   if (nrow(sceptre_object@negative_control_pairs) == 0L) {
-    print("Constructing negative control pairs.")
     response_grna_group_pairs <- construct_negative_control_pairs(response_matrix = sceptre_object@response_matrix,
                                                                   grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                                                   low_moi = sceptre_object@low_moi,
