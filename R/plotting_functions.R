@@ -1,3 +1,13 @@
+get_my_theme <- function(element_text_size = 11) {
+  ggplot2::theme_bw() + ggplot2::theme(axis.line = ggplot2::element_line(color = "black"),
+                                       panel.grid.major = ggplot2::element_blank(),
+                                       panel.grid.minor = ggplot2::element_blank(),
+                                       panel.border = ggplot2::element_blank(),
+                                       panel.background = ggplot2::element_blank(),
+                                       plot.title = ggplot2::element_text(hjust = 0.5, size = element_text_size),
+                                       legend.text = ggplot2::element_text(size = 11))
+}
+
 #' Plot calibration result
 #'
 #' The \code{plot_calibration_result()} function helps to visualize the results of a calibration check.
@@ -128,17 +138,6 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
 }
 
 
-get_my_theme <- function(element_text_size = 11) {
-  ggplot2::theme_bw() + ggplot2::theme(axis.line = ggplot2::element_line(color = "black"),
-                                       panel.grid.major = ggplot2::element_blank(),
-                                       panel.grid.minor = ggplot2::element_blank(),
-                                       panel.border = ggplot2::element_blank(),
-                                       panel.background = ggplot2::element_blank(),
-                                       plot.title = ggplot2::element_text(hjust = 0.5, size = element_text_size),
-                                       legend.text = ggplot2::element_text(size = 11))
-}
-
-
 #' Make volcano plot
 #'
 #' The \code{make_volcano_plot()} function creates a volcano plot of the discovery results. Each point in the plot corresponds to a response-gRNA group pair; the estimated log-2 fold change of the pair is plotted on the x-axis, and the (negative log-10 transformed) p-value is plotted on the y-axis.
@@ -241,4 +240,33 @@ plot_resampling_distribution <- function(result_df, row_number) {
     ggplot2::scale_y_continuous(expand = c(0, 0))
 
   return(p)
+}
+
+
+plot_covariates <- function(sceptre_object) {
+  covariate_df <- sceptre_object@covariate_data_frame
+  covariate_names <- colnames(covariate_df)
+  plots <- sapply(X = covariate_names, FUN = function(covariate_name) {
+    vect <- covariate_df[,covariate_name]
+    if (is(vect, "numeric")) {
+      p <- data.frame(vect = vect) |>
+        ggplot2::ggplot(ggplot2::aes(x = vect)) +
+        ggplot2::geom_histogram(bins = 30, color = "black", fill = "grey80") +
+        ggplot2::xlab(covariate_name) +
+        get_my_theme() +
+        ggplot2::theme(axis.title.y = ggplot2::element_blank()) +
+        ggplot2::scale_y_continuous(expand = c(0, 0))
+    } else { # factor/character/logical
+      p <- data.frame(vect = vect) |>
+        ggplot2::ggplot(ggplot2::aes(x = vect)) +
+        ggplot2::geom_bar(color = "black", fill = "grey80") +
+        ggplot2::xlab(covariate_name) +
+        get_my_theme() +
+        ggplot2::theme(axis.title.y = ggplot2::element_blank()) +
+        ggplot2::scale_y_continuous(expand = c(0, 0))
+    }
+    return(p)
+  }, simplify = FALSE)
+
+  cowplot::plot_grid(plotlist = plots, align = "vh", nrow = 2)
 }

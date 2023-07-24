@@ -77,3 +77,21 @@ auto_construct_formula_object <- function(cell_covariates) {
   form <- paste0("~ ", form_str) |> as.formula()
   return(form)
 }
+
+
+auto_compute_cell_covariates <- function(response_matrix, grna_matrix, moi, extra_covariates) {
+  # compute the response covariates
+  covariate_df <- compute_cell_covariates(response_matrix)
+  colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
+  # if in high moi, compute the grna covariates
+  if (moi == "high") {
+    grna_covariate_df <- compute_cell_covariates(grna_matrix)
+    colnames(grna_covariate_df) <- paste0("grna_", colnames(grna_covariate_df))
+    covariate_df <- cbind(covariate_df, grna_covariate_df)
+  }
+  # if extra covariates have been provided, add those
+  if (!is.null(extra_covariates)) {
+    covariate_df <- cbind(covariate_df, extra_covariates)
+  }
+  return(covariate_df)
+}

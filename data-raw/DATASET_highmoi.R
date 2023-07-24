@@ -66,18 +66,14 @@ rownames(grna_matrix) <- my_grna_ids
 # 7. Compute the covariate matrix
 covariate_matrix <- multimodal_odm_downsample |>
   ondisc::get_cell_covariates() |>
-  dplyr::select(grna_n_umis, grna_n_nonzero, gene_n_umis, gene_n_nonzero, p_mito = gene_p_mito, batch = gene_batch) |>
+  dplyr::select(batch = gene_batch) |>
   `rownames<-`(NULL)
 
 # 8. sort according to batch; also remove cells containing no gRNAs
 cell_order <- order(covariate_matrix$batch)
 response_matrix_highmoi <- gene_matrix[,cell_order]
 grna_matrix_highmoi <- grna_matrix[,cell_order]
-covariate_data_frame_highmoi <- covariate_matrix[cell_order,]
-cells_to_rm <- covariate_data_frame_highmoi$grna_n_umis == 0
-response_matrix_highmoi <- response_matrix_highmoi[,!cells_to_rm]
-grna_matrix_highmoi <- grna_matrix_highmoi[,!cells_to_rm]
-covariate_data_frame_highmoi <- covariate_data_frame_highmoi[!cells_to_rm,]
+covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop=FALSE]
 
 # 9. rename the data objects
 discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis")
@@ -85,11 +81,11 @@ pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl")
 
 response_matrix_highmoi_experimental <- response_matrix_highmoi
 grna_matrix_highmoi_experimental <- grna_matrix_highmoi
-covariate_data_frame_highmoi_experimental <- covariate_data_frame_highmoi
+extra_covariates_highmoi_experimental <- covariate_data_frame_highmoi
 grna_group_data_frame_highmoi_experimental <- grna_group_data_frame_highmoi
 discovery_pairs_highmoi_experimental <- discovery_pairs_highmoi
 pc_pairs_highmoi_experimental <- pc_pairs_highmoi
 
 usethis::use_data(response_matrix_highmoi_experimental, grna_matrix_highmoi_experimental,
-                  covariate_data_frame_highmoi_experimental, grna_group_data_frame_highmoi_experimental,
+                  extra_covariates_highmoi_experimental, grna_group_data_frame_highmoi_experimental,
                   discovery_pairs_highmoi_experimental, pc_pairs_highmoi_experimental, overwrite = TRUE)

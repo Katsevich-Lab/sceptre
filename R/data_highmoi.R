@@ -25,14 +25,11 @@ NULL
 #'
 #' A matrix of cell-specific technical factors:
 #' \describe{
-#'   \item{`grna_n_umis`}{(numeric) total number of gRNA UMIs sequenced in cell}
-#'   \item{`gene_n_umis`}{(numeric) total number of gene UMIs sequenced in cell}
-#'   \item{`p_mito`}{(numeric) fraction of sequenced gene transcripts that map to mitochondrial genes}
 #'   \item{`batch`}{(factor) sequencing batch (`batch_1`, `batch_2`)}
 #' }
 #' @inheritSection highmoi_data Overview
-#' @usage data(covariate_data_frame_highmoi_experimental)
-"covariate_data_frame_highmoi_experimental"
+#' @usage data(extra_covariates_highmoi_experimental)
+"extra_covariates_highmoi_experimental"
 
 #' Discovery gene-gRNA group pairs
 #'
