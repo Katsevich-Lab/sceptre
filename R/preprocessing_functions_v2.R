@@ -1,5 +1,4 @@
-check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
-                                               grna_group_data_frame, moi) {
+check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -26,11 +25,6 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, cov
     stop("The column `grna_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the grna expression matrix.")
   }
 
-  # 7. check the covariate data frame has at least one column
-  if (ncol(covariate_data_frame) == 0) {
-    stop("The global cell covariate matrix must contain at least one column.")
-  }
-
   # 9. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
     ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
@@ -42,9 +36,19 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, cov
   check_matrix_class(grna_matrix, "grna_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "lgTMatrix", "lgCMatrix", "lgRMatrix"))
 
   # 10. check for agreement in number of cells
-  check_ncells <- (ncol(response_matrix) == ncol(grna_matrix)) && (ncol(response_matrix) == nrow(covariate_data_frame))
+  check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
+  if (!is.null(extra_covariates)) {
+    check_ncells <- check_ncells && (ncol(response_matrix) == nrow(extra_covariates))
+  }
   if (!check_ncells) {
-    stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
+    stop("The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide.")
+  }
+
+  # 11. check that column names of extra_covariates are not already taken
+  reserved_covariate_names <- c("response_n_nonzero", "response_n_umis", "response_p_mito", "grna_n_nonzero", "grna_n_umis")
+  extra_covariate_names <- colnames(extra_covariates)
+  if (any(extra_covariate_names %in% reserved_covariate_names)) {
+    stop("The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame.")
   }
 
   # 12. verify that moi is specified

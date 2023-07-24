@@ -73,18 +73,24 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
+  cat(paste0("\n\nAnalysis status:\n",
+             "\t", get_mark(TRUE), " create_sceptre_object()\n",
+             "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
+             "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
+             "\t", get_mark(x@power_check_run), " run_power_check()\n",
+             "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   n_discovery_pairs <- nrow(x@discovery_pairs)
   n_pc_pairs <- nrow(x@positive_control_pairs)
   cat(paste0("\n\nUser-specified analysis parameters: \n",
              "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")},
              "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
-             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2]),
              "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (x@low_moi) NULL else {paste0("\n\t\U2022 gRNA assignment threshold: ", if (length(x@grna_assign_threshold) == 0L) "not specified" else crayon::blue(x@grna_assign_threshold))},
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
+             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2]),
              if (!print_full_output) NULL else {
                 paste0(
                   "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
@@ -97,12 +103,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
                 )
              }
   ))
-
-  cat(paste0("\n\nAnalysis status:\n",
-             "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
-             "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
-             "\t", get_mark(x@power_check_run), " run_power_check()\n",
-             "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
 })
 
 
@@ -167,16 +167,16 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' # 0. obtain the data required for a single-cell screen analysis
 #' data(response_matrix_highmoi_experimental)
 #' data(grna_matrix_highmoi_experimental)
-#' data(covariate_data_frame_highmoi_experimental)
+#' data(extra_covariates_highmoi_experimental)
 #' data(grna_group_data_frame_highmoi_experimental)
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- create_sceptre_object(
 #' response_matrix = response_matrix_highmoi_experimental,
 #' grna_matrix = grna_matrix_highmoi_experimental,
-#' covariate_data_frame = covariate_data_frame_highmoi_experimental,
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
-#' moi = "high")
+#' moi = "high",
+#' extra_covariates = extra_covariates_highmoi_experimental)
 #'
 #' # 2. set the discovery pairs and positive control pairs
 #' data(discovery_pairs_highmoi_experimental)
@@ -200,18 +200,21 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' # 6. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object)
 create_sceptre_object <- function(response_matrix, grna_matrix,
-                                  covariate_data_frame, grna_group_data_frame, moi) {
+                                  grna_group_data_frame, moi, extra_covariates = NULL) {
   # 0. initialize output
   out <- new("sceptre_object")
 
   # 1. perform initial check
-  check_create_sceptre_object_inputs(response_matrix, grna_matrix, covariate_data_frame,
-                                     grna_group_data_frame, moi) |> invisible()
+  check_create_sceptre_object_inputs(response_matrix, grna_matrix,
+                                     grna_group_data_frame, moi, extra_covariates) |> invisible()
 
-  # 2. make the response matrix row accessible
+  # 2. compute the covariates
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, moi, extra_covariates)
+
+  # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
 
-  # 3. update fields in output object and return
+  # 4. update fields in output object and return
   # data fields
   out@response_matrix <- response_matrix
   out@grna_matrix <- grna_matrix
@@ -220,13 +223,10 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
   out@low_moi <- (moi == "low")
 
   # cached fields
-  out@response_precomputations <- list()
   out@calibration_check_run <- FALSE
   out@power_check_run <- FALSE
   out@discovery_analysis_run <- FALSE
   out@analysis_prepared <- FALSE
-  out@calibration_result <- data.frame()
-  out@discovery_result <- data.frame()
   out@last_function_called <- "create_sceptre_object"
 
   return(out)

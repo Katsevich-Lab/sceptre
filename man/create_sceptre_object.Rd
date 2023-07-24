@@ -7,17 +7,15 @@
 create_sceptre_object(
   response_matrix,
   grna_matrix,
-  covariate_data_frame,
   grna_group_data_frame,
-  moi
+  moi,
+  extra_covariates = NULL
 )
 }
 \arguments{
 \item{response_matrix}{(required) a matrix of raw expression counts. The responses (e.g., genes or proteins) should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the responses. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}.}
 
 \item{grna_matrix}{(required) a matrix of gRNA expression counts. The gRNAs should be in the rows, and the cells should be in the columns. The row names should be the unique IDs of the gRNAs. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. (See "Notes" for details about passing a gRNA matrix containing user-specified gRNA-to-cell assignments.)}
-
-\item{covariate_data_frame}{(required) a data frame containing the cell-specific covariates (e.g., sequencing batch, total UMI count, etc.), with cells in the rows and covariates in the columns.}
 
 \item{grna_group_data_frame}{(required) a data frame specifying the "group" to which each individual gRNA belongs. This data frame should contain columns \code{grna_id} and \code{grna_group}, with \code{grna_group} specifying the group membership of a given gRNA in the \code{grna_id} column. Typically, gRNAs that target the same site are grouped into the same gRNA group. Non-targeting gRNAs (if present) should be assigned a gRNA group label of "non-targeting".}
 
@@ -75,16 +73,16 @@ plot(sceptre_object)
 # 0. obtain the data required for a single-cell screen analysis
 data(response_matrix_highmoi_experimental)
 data(grna_matrix_highmoi_experimental)
-data(covariate_data_frame_highmoi_experimental)
+data(extra_covariates_highmoi_experimental)
 data(grna_group_data_frame_highmoi_experimental)
 
 # 1. create the sceptre object
 sceptre_object <- create_sceptre_object(
 response_matrix = response_matrix_highmoi_experimental,
 grna_matrix = grna_matrix_highmoi_experimental,
-covariate_data_frame = covariate_data_frame_highmoi_experimental,
 grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
-moi = "high")
+moi = "high",
+extra_covariates = extra_covariates_highmoi_experimental)
 
 # 2. set the discovery pairs and positive control pairs
 data(discovery_pairs_highmoi_experimental)
