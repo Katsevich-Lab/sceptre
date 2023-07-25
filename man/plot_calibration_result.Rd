@@ -8,7 +8,9 @@ plot_calibration_result(
   sceptre_object,
   alpha = 0.1,
   multiple_testing_correction = "BH",
-  return_indiv_plots = FALSE
+  return_indiv_plots = FALSE,
+  point_size = 0.55,
+  transparency = 0.8
 )
 }
 \arguments{
@@ -27,15 +29,15 @@ The \code{plot_calibration_result()} function helps to visualize the results of 
 \details{
 The plot contains four panels.
 \itemize{
-\item{upper left:} a Q-Q plot of the p-values on an untransformed scale. The p-values should lie along the diagonal line.
-\item{upper right:} a Q-Q plot of the p-values on a negative log-10 transformed scale. The p-values should lie along the diagonal line, and the majority of the p-values should fall within the gray confidence band.
+\item{upper left:} a QQ plot of the p-values on an untransformed scale. The p-values should lie along the diagonal line.
+\item{upper right:} a QQ plot of the p-values on a negative log-10 transformed scale. The p-values should lie along the diagonal line, and the majority of the p-values should fall within the gray confidence band.
 \item{bottom left:} a histogram of the estimated log-2 fold changes in expression. The histogram should be roughly symmetric and centered at zero.
 \item{bottom right:} a text box displaying (i) the number of false discoveries made on the negative control pairs and (ii) the mean estimated log-fold change. The number of false discoveries ideally should be zero, although a small, positive integer (such as 1, 2, or 3) also is OK. The mean estimated log-fold change should be a numeric value close to zero.
 }
 }
 \note{
 \itemize{
-\item{The untransformed and transformed Q-Q plots are both informative: the former enables us to see the bulk of the p-value distribution, while the latter enables visualize the tail.}
+\item{The untransformed and transformed QQ plots are both informative: the former enables us to see the bulk of the p-value distribution, while the latter enables visualize the tail.}
 \item{The number of false discoveries depends both on \code{alpha} and \code{multiple_testing_correction}. The default value of these arguments is 0.1 and "BH". This corresponds to a BH correction at nominal false discovery rate (FDR) 0.1.}
 \item{Technical point: when applying BH at level 0.1 to a collection of strictly null p-values, BH controls family-wise error rate (FWER) at level 0.1 as well as FDR at level 0.1. FWER is the probability of making one or more false discoveries. Thus, with probability 0.9, the number of rejections that BH makes on (well-calibrated) null p-values at level 0.1 is 0. This implies that \code{sceptre} (or any method for that matter) should make about zero false discoveries on negative control p-values data after applying a BH correction at level 0.1.}
 }

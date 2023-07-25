@@ -6,25 +6,20 @@
 \usage{
 make_volcano_plot(
   discovery_result,
-  alpha = 0.1,
+  p_thresh,
   x_limits = c(-1.5, 1.5),
   transparency = 0.5,
-  point_size = 0.9,
-  multiple_testing_correction = "BH"
+  point_size = 0.55
 )
 }
 \arguments{
 \item{discovery_result}{(required) the output of a call to \code{run_sceptre_lowmoi} (or \code{run_sceptre_highmoi_experimental}) with \code{calibration_check} set to \code{FALSE}}
-
-\item{alpha}{(optional; default 0.1) the nominal type-I error control level}
 
 \item{x_limits}{a vector of length two giving the lower and upper limits of the volcano plot}
 
 \item{transparency}{a number in the range (0, 1) indicating the transparency of the points}
 
 \item{point_size}{a positive number indicating the size of the points}
-
-\item{multiple_testing_correction}{(optional; default "BH") the multiple testing correction method (one of "BH", "bonferroni", "BY", or "holm")}
 }
 \value{
 a ggplot2 object
