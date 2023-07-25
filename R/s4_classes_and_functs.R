@@ -9,6 +9,7 @@ setClass("sceptre_object",
                       response_matrix = "response_matrix_class",
                       grna_matrix = "grna_matrix_class",
                       covariate_data_frame = "data.frame",
+                      user_specified_covariates = "character",
                       covariate_matrix = "matrix",
                       grna_group_data_frame = "data.frame",
                       low_moi = "logical",
@@ -73,13 +74,13 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
+  get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   cat(paste0("\n\nAnalysis status:\n",
              "\t", get_mark(TRUE), " create_sceptre_object()\n",
              "\t", get_mark(x@analysis_prepared), " prepare_analysis()\n",
              "\t", get_mark(x@calibration_check_run), " run_calibration_check()\n",
              "\t", get_mark(x@power_check_run), " run_power_check()\n",
              "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
-  get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   n_discovery_pairs <- nrow(x@discovery_pairs)
   n_pc_pairs <- nrow(x@positive_control_pairs)
   cat(paste0("\n\nUser-specified analysis parameters: \n",
