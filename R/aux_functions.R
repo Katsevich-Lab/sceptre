@@ -59,8 +59,11 @@ generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
 }
 
 
-auto_construct_formula_object <- function(cell_covariates) {
+auto_construct_formula_object <- function(cell_covariates, low_moi) {
   cell_covariate_names <- colnames(cell_covariates)
+  if (low_moi) { # by default, do not use grna count-based covariates in low moi
+    cell_covariate_names <- cell_covariate_names[cell_covariate_names != c("grna_n_umis", "grna_n_nonzero")]
+  }
   form_str <- sapply(cell_covariate_names, function(curr_name) {
     count_based_covariate <- grepl(pattern = "n_umis|n_nonzero", x = curr_name)
     if (count_based_covariate) {
@@ -79,17 +82,17 @@ auto_construct_formula_object <- function(cell_covariates) {
 }
 
 
-auto_compute_cell_covariates <- function(response_matrix, grna_matrix, moi, extra_covariates) {
+auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_covariates) {
   # compute the response covariates
   covariate_df <- compute_cell_covariates(response_matrix)
   colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
-  # if in high moi, compute the grna covariates
-  if (moi == "high") {
-    grna_covariate_df <- compute_cell_covariates(grna_matrix)
-    colnames(grna_covariate_df) <- paste0("grna_", colnames(grna_covariate_df))
-    covariate_df <- cbind(covariate_df, grna_covariate_df)
-  }
-  # if extra covariates have been provided, add those
+
+  # compute the grna covariates
+  grna_covariate_df <- compute_cell_covariates(grna_matrix)
+  colnames(grna_covariate_df) <- paste0("grna_", colnames(grna_covariate_df))
+  covariate_df <- cbind(covariate_df, grna_covariate_df)
+
+  # if extra covariates have been provided, add those as well
   if (!is.null(extra_covariates)) {
     covariate_df <- cbind(covariate_df, extra_covariates)
   }

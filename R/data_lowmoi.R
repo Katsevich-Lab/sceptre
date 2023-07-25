@@ -24,18 +24,15 @@ NULL
 "grna_matrix_lowmoi"
 
 
-#' Covariate data frame
+#' Extra covariates
 #'
-#' A data frame containing the cell-specific technical factors:
+#' A data frame containing the cell-specific technical factors beyond those that `sceptre` can compute:
 #' \describe{
-#'   \item{\code{response_n_umis}}{(numeric) the total number of gene transcripts sequenced in the cell}
-#'   \item{\code{response_n_nonzero}}{(numeric) the total number of genes expressed in the cell}
 #'   \item{\code{bio_rep}}{(factor) the biological replicate in which the cell was sequenced (\code{rep_1}, \code{rep_2}, or \code{rep_3})}
-#'   \item{\code{p_mito}}{(numeric) the fraction of transcripts mapping to mitochondrial genes}
 #' }
 #' @inheritSection lowmoi_data Overview
 #' @usage data(covariate_data_frame_lowmoi)
-"covariate_data_frame_lowmoi"
+"extra_covariates_lowmoi"
 
 
 #' gRNA group data frame

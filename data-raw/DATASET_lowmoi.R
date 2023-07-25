@@ -43,8 +43,7 @@ rownames(grna_matrix_lowmoi) <- grna_odm |> ondisc::get_feature_ids()
 global_cell_covariates <- mm_odm |> ondisc::get_cell_covariates()
 rownames(global_cell_covariates) <- NULL
 covariate_data_frame_lowmoi <- global_cell_covariates |>
-  dplyr::select(gene_n_umis, gene_n_nonzero, bio_rep, p_mito) |>
-  dplyr::rename("response_n_umis" = "gene_n_umis", "response_n_nonzero" = "gene_n_nonzero")
+  dplyr::select(bio_rep)
 
 ##########################
 # STEP 4: GRNA GROUP TABLE
@@ -57,14 +56,14 @@ grna_group_data_frame_lowmoi <- data.frame(grna_id = rownames(grna_features),
   dplyr::arrange(grna_group)
 
 ################################################
-# STEP 5: SORT ACCORDING TO BIOLOGICAL REPLICATE 
+# STEP 5: SORT ACCORDING TO BIOLOGICAL REPLICATE
 ################################################
 cell_order <- order(global_cell_covariates$bio_rep)
 response_matrix_lowmoi <- response_matrix_lowmoi[,cell_order]
 grna_matrix_lowmoi <- grna_matrix_lowmoi[,cell_order]
-covariate_data_frame_lowmoi <- covariate_data_frame_lowmoi[cell_order,]
+extra_covariates_lowmoi <- covariate_data_frame_lowmoi[cell_order,,drop=FALSE]
 
 ######################################
 # STEP 6: SAVE THE DATA IN THE PACKAGE
 ######################################
-usethis::use_data(response_matrix_lowmoi, grna_matrix_lowmoi, covariate_data_frame_lowmoi, grna_group_data_frame_lowmoi, overwrite = TRUE)
+usethis::use_data(response_matrix_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_group_data_frame_lowmoi, overwrite = TRUE)
