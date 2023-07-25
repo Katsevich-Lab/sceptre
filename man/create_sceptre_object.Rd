@@ -34,26 +34,21 @@ Create a \code{sceptre} object
 # 0. obtain the data required for a single-cell screen analysis
 data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
-data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
+data(extra_covariates_lowmoi) # cell-by-covariate data frame
 data(grna_group_data_frame_lowmoi) # gRNA group information
 
 # 1. create the sceptre object
 sceptre_object <- create_sceptre_object(
 response_matrix = response_matrix_lowmoi,
 grna_matrix = grna_matrix_lowmoi,
-covariate_data_frame = covariate_data_frame_lowmoi,
+extra_covariates = extra_covariates_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 moi = "low")
 
-# 2. obtain the formula object and pairs to analyze
-formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
-discovery_pairs <- generate_all_pairs(sceptre_object)
-
-# 3. prepare the analysis
+# 2. prepare the analysis
 sceptre_object <- prepare_analysis(
 sceptre_object = sceptre_object,
-formula_object = formula_object,
-discovery_pairs = discovery_pairs)
+discovery_pairs = "all")
 
 # 4. run the calibration check
 sceptre_object <- run_calibration_check(sceptre_object)

@@ -58,7 +58,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   n_targeting_grnas <- nrow(targeting_grnas_df)
 
   n_covariates <- ncol(object@covariate_data_frame)
-  covariates <- paste0(colnames(object@covariate_data_frame), collapse = ", ")
+  covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
              crayon::blue(n_cells), " cells\n\t\U2022 ",
@@ -129,26 +129,21 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' # 0. obtain the data required for a single-cell screen analysis
 #' data(response_matrix_lowmoi) # response-by-cell expression matrix
 #' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
-#' data(covariate_data_frame_lowmoi) # cell-by-covariate data frame
+#' data(extra_covariates_lowmoi) # cell-by-covariate data frame
 #' data(grna_group_data_frame_lowmoi) # gRNA group information
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- create_sceptre_object(
 #' response_matrix = response_matrix_lowmoi,
 #' grna_matrix = grna_matrix_lowmoi,
-#' covariate_data_frame = covariate_data_frame_lowmoi,
+#' extra_covariates = extra_covariates_lowmoi,
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' moi = "low")
 #'
-#' # 2. obtain the formula object and pairs to analyze
-#' formula_object <- formula(~log(response_n_umis) + log(response_n_nonzero) + bio_rep + p_mito)
-#' discovery_pairs <- generate_all_pairs(sceptre_object)
-#'
-#' # 3. prepare the analysis
+#' # 2. prepare the analysis
 #' sceptre_object <- prepare_analysis(
 #' sceptre_object = sceptre_object,
-#' formula_object = formula_object,
-#' discovery_pairs = discovery_pairs)
+#' discovery_pairs = "all")
 #'
 #' # 4. run the calibration check
 #' sceptre_object <- run_calibration_check(sceptre_object)
@@ -210,7 +205,7 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
                                      grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, moi, extra_covariates)
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates)
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -258,7 +253,7 @@ prepare_analysis <- function(sceptre_object,
     if (identical(resampling_mechanism, "default")) resampling_mechanism <- "permutations"
   }
   if (identical(formula_object, "default")) {
-    formula_object <- auto_construct_formula_object(sceptre_object@covariate_data_frame)
+    formula_object <- auto_construct_formula_object(sceptre_object@covariate_data_frame, sceptre_object@low_moi)
   }
   if (identical(discovery_pairs, "all")) {
     discovery_pairs <- generate_all_pairs(sceptre_object@response_matrix,
