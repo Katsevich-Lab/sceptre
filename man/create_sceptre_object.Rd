@@ -100,4 +100,5 @@ sceptre_object <- run_power_check(sceptre_object)
 
 # 6. run discovery analysis
 sceptre_object <- run_discovery_analysis(sceptre_object)
+plot(sceptre_object)
 }

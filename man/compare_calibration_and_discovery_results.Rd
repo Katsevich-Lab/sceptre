@@ -7,8 +7,12 @@
 compare_calibration_and_discovery_results(
   calibration_result,
   discovery_result,
-  alpha = 0.1,
-  multiple_testing_correction = "BH"
+  p_thresh,
+  transform_scale = TRUE,
+  include_legend = FALSE,
+  include_y_axis_text = TRUE,
+  point_size = 0.55,
+  transparency = 0.8
 )
 }
 \arguments{
@@ -21,10 +25,10 @@ compare_calibration_and_discovery_results(
 \item{multiple_testing_correction}{(optional; default "BH") the multiple testing correction method (one of "BH", "bonferroni", "BY", or "holm")}
 }
 \value{
-A ggplot2 object containing the Q-Q plot.
+A ggplot2 object containing the QQ plot.
 }
 \description{
-The \code{compare_calibration_and_discovery_results()} function compares two sets of p-values: the negative control p-values (i.e., those obtained from the calibration check) and the discovery p-values (i.e., those obtained from the discovery analysis). These two sets of p-values are plotted on the same Q-Q plot, with the negative control p-values colored in red and the discovery p-values colored in blue. The negative control p-values should lie along the diagonal line and fall mostly within the gray confidence band, indicating control of the false discovery rate. By contrast, the discovery p-values should lie above the diagonal line, indicating the presence of signal in the discovery set.
+The \code{compare_calibration_and_discovery_results()} function compares two sets of p-values: the negative control p-values (i.e., those obtained from the calibration check) and the discovery p-values (i.e., those obtained from the discovery analysis). These two sets of p-values are plotted on the same QQ plot, with the negative control p-values colored in red and the discovery p-values colored in blue. The negative control p-values should lie along the diagonal line and fall mostly within the gray confidence band, indicating control of the false discovery rate. By contrast, the discovery p-values should lie above the diagonal line, indicating the presence of signal in the discovery set.
 }
 \details{
 The horizontal dashed line indicates the multiple testing threshold. Blue points above the horizontal dashed line are called as discoveries.
