@@ -1,28 +1,46 @@
 plot_covariates <- function(sceptre_object) {
   covariate_df <- sceptre_object@covariate_data_frame
-  covariate_names <- colnames(covariate_df)
-  plots <- sapply(X = covariate_names, FUN = function(covariate_name) {
-    vect <- covariate_df[,covariate_name]
-    if (is(vect, "numeric")) {
-      p <- data.frame(vect = vect) |>
-        ggplot2::ggplot(ggplot2::aes(x = vect)) +
-        ggplot2::geom_histogram(bins = 30, color = "black", fill = "grey80") +
-        ggplot2::xlab(covariate_name) +
-        get_my_theme() +
-        ggplot2::theme(axis.title.y = ggplot2::element_blank()) +
-        ggplot2::scale_y_continuous(expand = c(0, 0))
-    } else { # factor/character/logical
-      p <- data.frame(vect = vect) |>
-        ggplot2::ggplot(ggplot2::aes(x = vect)) +
-        ggplot2::geom_bar(color = "black", fill = "grey80") +
-        ggplot2::xlab(covariate_name) +
-        get_my_theme() +
-        ggplot2::theme(axis.title.y = ggplot2::element_blank()) +
-        ggplot2::scale_y_continuous(expand = c(0, 0))
-    }
-    return(p)
-  }, simplify = FALSE)
 
+  #full_names_upper <- c("Response n nonzero", "Response n UMIs", "Response percent mito", "gRNA n nonzero", "gRNA n UMIs")
+  #full_names_code <- c("response_n_nonzero", "response_n_umis", "response_p_mito", "grna_n_nonzero", "grna_n_umis")
+  #my_names <- c("response_p_mito", "response_n_umis", )
+  #full_names[match(x = my_names, table = full_names)]
+  # determine the covariates to plot
+  # to_plot <- c("response_n_umis", "grna_n_umis") # always plot UMI counts for both modalities
+  # next, select two of the user covariates and plot those
+  # if leftover, randomly sample and additional covariate to plot
+
+
+  # histogram plotting code
+  make_histogram <- function(vect, log_trans_x, plot_name) {
+    p <- data.frame(vect = vect) |>
+      ggplot2::ggplot(ggplot2::aes(x = vect)) +
+      ggplot2::geom_histogram(bins = 30, color = "black", fill = "grey90") +
+      ggplot2::xlab(covariate_name) +
+      get_my_theme() +
+      ggplot2::theme(axis.title.y = ggplot2::element_blank(),
+                     axis.title.x = ggplot2::element_blank()) +
+      ggplot2::scale_x_continuous(trans = "log10") +
+      ggplot2::scale_y_continuous(expand = c(0, 0)) +
+      ggplot2::ggtitle(plot_name)
+  }
+
+  # barplot plotting code
+  make_barplot <- function(vect, plot_name) {
+    p <- data.frame(vect = vect) |>
+      ggplot2::ggplot(ggplot2::aes(x = vect, fill = vect)) +
+      ggplot2::geom_bar(col = "black") +
+      get_my_theme() +
+      ggplot2::scale_y_continuous(expand = c(0, 0)) +
+      ggplot2::theme(axis.title.x = ggplot2::element_blank(),
+                     axis.text.x = ggplot2::element_blank(),
+                     axis.title.y = ggplot2::element_blank(),
+                     axis.ticks.x = ggplot2::element_blank(),
+                     legend.title = ggplot2::element_blank()) +
+      ggplot2::ggtitle(plot_name)
+  }
+
+  # create plots
   cowplot::plot_grid(plotlist = plots, align = "vh", nrow = 2)
 }
 
