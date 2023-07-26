@@ -8,6 +8,8 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
   }
 
   # 2. check for the presence of "non-targeting" in the grna_group column, which must be present when running a calibration check
+  response_ids <- rownames(response_matrix)
+  grna_ids <- rownames(grna_matrix)
   if (calibration_check) {
    n_nt_grnas <- grna_group_data_frame |>
       dplyr::filter(grna_group == "non-targeting") |> nrow()
@@ -15,10 +17,11 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
       stop("At least one non-targeting gRNA must be present when running a calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting'.")
     }
   }
+  if (!all(grna_group_data_frame$grna_id %in% grna_ids)) {
+    stop("The column `grna_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the grna expression matrix.")
+  }
 
   # 3. verify that the row names are unique for both response and grna modalities
-  response_ids <- rownames(response_matrix)
-  grna_ids <- rownames(grna_matrix)
   if (length(response_ids) != length(unique(response_ids))) stop("The rownames of the `response_matrix` must be unique.")
   if (length(grna_ids) != length(unique(grna_ids))) stop("The rownames of the `grna_matrix` must be unique.")
 
@@ -39,10 +42,6 @@ check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
     # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
     if (!all(response_grna_group_pairs$response_id %in% response_ids)) {
       stop("The column `response_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the response expression matrix.")
-    }
-    # iii. check that the grna ids in the  `grna_group_data_frame` data frame are a subset of the grna ids
-    if (!all(grna_group_data_frame$grna_id %in% grna_ids)) {
-      stop("The column `grna_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the grna expression matrix.")
     }
     # iv. check that the `grna_group` column of the `response_grna_group_pairs` data frame is a subset of the `grna_group` column of the `grna_group_data_frame`
     if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
