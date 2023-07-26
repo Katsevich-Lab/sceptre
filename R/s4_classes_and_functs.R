@@ -9,10 +9,10 @@ setClass("sceptre_object",
                       response_matrix = "response_matrix_class",
                       grna_matrix = "grna_matrix_class",
                       covariate_data_frame = "data.frame",
-                      user_specified_covariates = "character",
                       covariate_matrix = "matrix",
                       grna_group_data_frame = "data.frame",
                       low_moi = "logical",
+                      user_specified_covariates = "character",
 
                       # analysis parameters
                       discovery_pairs = "data.frame",
@@ -220,6 +220,7 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
   out@covariate_data_frame <- covariate_data_frame
   out@grna_group_data_frame <- grna_group_data_frame
   out@low_moi <- (moi == "low")
+  out@user_specified_covariates <- colnames(extra_covariates)
 
   # cached fields
   out@calibration_check_run <- FALSE
