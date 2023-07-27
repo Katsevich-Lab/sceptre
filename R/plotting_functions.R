@@ -1,28 +1,38 @@
-plot_covariates <- function(sceptre_object) {
+plot_covariates <- function(sceptre_object, return_indiv_plots = FALSE) {
+  # obtain the covariate df, user covariates, and auto covariates
   covariate_df <- sceptre_object@covariate_data_frame
+  user_specified_covariates <- sceptre_object@user_specified_covariates
 
-  #full_names_upper <- c("Response n nonzero", "Response n UMIs", "Response percent mito", "gRNA n nonzero", "gRNA n UMIs")
-  #full_names_code <- c("response_n_nonzero", "response_n_umis", "response_p_mito", "grna_n_nonzero", "grna_n_umis")
-  #my_names <- c("response_p_mito", "response_n_umis", )
-  #full_names[match(x = my_names, table = full_names)]
-  # determine the covariates to plot
-  # to_plot <- c("response_n_umis", "grna_n_umis") # always plot UMI counts for both modalities
-  # next, select two of the user covariates and plot those
-  # if leftover, randomly sample and additional covariate to plot
-
+  # get the user-specified and automatic covariates to plot
+  set.seed(4L)
+  user_covariates_to_plot <- sample(x = user_specified_covariates, replace = FALSE,
+          size = min(2L, length(user_specified_covariates)))
+  auto_covariate_ordering <- c("response_n_umis", "grna_n_umis",
+    if ("response_p_mito" %in% colnames(covariate_df)) "response_p_mito" else NULL,
+    "response_n_nonzero", "grna_n_nonzero")
+  auto_covariates_to_plot <- auto_covariate_ordering[seq(1L, 4L - length(user_covariates_to_plot))]
 
   # histogram plotting code
   make_histogram <- function(vect, log_trans_x, plot_name) {
+    zero_present <- any(vect == 0)
     p <- data.frame(vect = vect) |>
       ggplot2::ggplot(ggplot2::aes(x = vect)) +
       ggplot2::geom_histogram(bins = 30, color = "black", fill = "grey90") +
-      ggplot2::xlab(covariate_name) +
       get_my_theme() +
       ggplot2::theme(axis.title.y = ggplot2::element_blank(),
                      axis.title.x = ggplot2::element_blank()) +
-      ggplot2::scale_x_continuous(trans = "log10") +
       ggplot2::scale_y_continuous(expand = c(0, 0)) +
       ggplot2::ggtitle(plot_name)
+    if (log_trans_x) {
+      if (zero_present) {
+        p <- p + ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 10),
+                                             n.breaks = 4L)
+      } else {
+        p <- p +  ggplot2::scale_x_continuous(trans = "log10")
+      }
+    }
+
+    return(p)
   }
 
   # barplot plotting code
@@ -38,10 +48,27 @@ plot_covariates <- function(sceptre_object) {
                      axis.ticks.x = ggplot2::element_blank(),
                      legend.title = ggplot2::element_blank()) +
       ggplot2::ggtitle(plot_name)
+    return(p)
   }
 
-  # create plots
-  cowplot::plot_grid(plotlist = plots, align = "vh", nrow = 2)
+  # combine the covariates
+  covariates_to_plot <- c(user_covariates_to_plot, auto_covariates_to_plot)
+  ps <- sapply(covariates_to_plot, FUN = function(curr_covariate) {
+    vect <- covariate_df[,curr_covariate]
+    tit <- gsub(x = curr_covariate, pattern = "_", fixed = TRUE, replacement = " ")
+    if (is(vect, "numeric")) {
+      make_histogram(vect, grepl(pattern = "n_umis|n_nonzero", x = curr_covariate), tit)
+    } else {
+      make_barplot(vect, tit)
+    }
+  }, simplify = FALSE)
+
+  if (return_indiv_plots) {
+    out <- ps
+  } else {
+    out <- cowplot::plot_grid(plotlist = ps, nrow = 2, labels = "auto", align = "h")
+  }
+  return(out)
 }
 
 
