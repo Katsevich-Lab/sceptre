@@ -43,9 +43,8 @@ do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complem
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                    side_code, low_moi, response_precomputations, print_progress) {
+                                    side_code, low_moi, response_precomputations, print_progress, parallel) {
   # 0. define several variables
-  gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(unique(response_grna_group_pairs$response_id)))
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
   all_nt_idxs <- if (!is.null(grna_assignments$all_nt_idxs)) grna_assignments$all_nt_idxs else NA
@@ -53,75 +52,100 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   indiv_nt_grna_idxs <- if (!is.null(grna_assignments$indiv_nt_grna_idxs)) grna_assignments$indiv_nt_grna_idxs else NA
   n_cells <- nrow(covariate_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
+  response_ids <- unique(response_grna_group_pairs$response_id)
 
   # 1. subset covariate matrix to nt cells (if applicable)
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
 
-  # 2. loop over the response IDs
-  response_ids <- unique(response_grna_group_pairs$response_id)
-  for (response_idx in seq_along(response_ids)) {
-    response_id <- get_id_from_idx(response_idx, print_progress, response_ids)
+  # 2. define function to loop subset of response IDs
+  analyze_given_response_ids <- function(curr_response_ids) {
+    gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(curr_response_ids))
+    precomp_out_list <- list()
 
-    # 3. load the expressions of the current response
-    expression_vector <- load_csr_row(j = response_matrix@j,
-                                      p = response_matrix@p,
-                                      x = response_matrix@x,
-                                      row_idx = which(rownames(response_matrix) == response_id),
-                                      n_cells = n_cells)
-    if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
+    for (response_idx in seq_along(curr_response_ids)) {
+      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids)
 
-    # 4. obtain the gRNA groups to analyze
-    l <- response_grna_group_pairs$response_id == response_id
-    curr_df <- response_grna_group_pairs[l,]
+      # 3. load the expressions of the current response
+      expression_vector <- load_csr_row(j = response_matrix@j,
+                                        p = response_matrix@p,
+                                        x = response_matrix@x,
+                                        row_idx = which(rownames(response_matrix) == response_id),
+                                        n_cells = n_cells)
+      if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
-    if (!calibration_check) {
-      gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement,
-                                            curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
-      gene_fail_qc_list[[response_idx]] <- gene_wise_qc_result$curr_df[!gene_wise_qc_result$pass_qc,]
-      if (!gene_wise_qc_result$any_pass_qc) next
-      curr_df <- gene_wise_qc_result$curr_df[gene_wise_qc_result$pass_qc,]
-    }
-    grna_groups <- as.character(curr_df$grna_group)
+      # 4. obtain the gRNA groups to analyze
+      l <- response_grna_group_pairs$response_id == response_id
+      curr_df <- response_grna_group_pairs[l,]
 
-    # 6. perform outer regression (if applicable)
-    if (run_outer_regression) {
-      # if precomp is available, load
-      if (!is.null(response_precomputations[[response_id]])) {
-        response_precomp <- response_precomputations[[response_id]]
-      } else {
-        # perform the regression to get the coefficients
-        response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                            covariate_matrix = covariate_matrix,
-                                                            regression_method = "pois_glm")
-        # save precomputation
-        response_precomputations[[response_id]] <- response_precomp
+      if (!calibration_check) {
+        gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement,
+                                              curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+        gene_fail_qc_list[[response_idx]] <- gene_wise_qc_result$curr_df[!gene_wise_qc_result$pass_qc,]
+        if (!gene_wise_qc_result$any_pass_qc) next
+        curr_df <- gene_wise_qc_result$curr_df[gene_wise_qc_result$pass_qc,]
       }
-      pieces_precomp <- compute_precomputation_pieces(expression_vector,
-                                                      covariate_matrix,
-                                                      response_precomp$fitted_coefs,
-                                                      response_precomp$theta,
-                                                      full_test_stat = TRUE)
-      curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-                                                         output_amount, grna_groups, expression_vector,
-                                                         pieces_precomp, get_idx_f, side_code)
-    } else {
-      curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-                                                          output_amount, covariate_matrix, all_nt_idxs,
-                                                          grna_group_idxs, grna_groups, expression_vector, side_code)
+      grna_groups <- as.character(curr_df$grna_group)
+
+      # 6. perform outer regression (if applicable)
+      if (run_outer_regression) {
+        # if precomp is available, load
+        if (!is.null(response_precomputations[[response_id]])) {
+          response_precomp <- response_precomputations[[response_id]]
+        } else {
+          # perform the regression to get the coefficients
+          response_precomp <- perform_response_precomputation(expressions = expression_vector,
+                                                              covariate_matrix = covariate_matrix,
+                                                              regression_method = "pois_glm")
+          # save precomputation
+          precomp_out_list[[response_id]] <- response_precomp
+        }
+        pieces_precomp <- compute_precomputation_pieces(expression_vector,
+                                                        covariate_matrix,
+                                                        response_precomp$fitted_coefs,
+                                                        response_precomp$theta,
+                                                        full_test_stat = TRUE)
+        curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
+                                                           output_amount, grna_groups, expression_vector,
+                                                           pieces_precomp, get_idx_f, side_code)
+      } else {
+        curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
+                                                            output_amount, covariate_matrix, all_nt_idxs,
+                                                            grna_group_idxs, grna_groups, expression_vector, side_code)
+      }
+
+      # 9. combine the response-wise results into a data table; insert into list
+      gene_pass_qc_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result, output_amount)
     }
 
-    # 9. combine the response-wise results into a data table; insert into list
-    gene_pass_qc_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result, output_amount)
+    # prepare output
+    ret_pass_qc <- data.table::rbindlist(gene_pass_qc_list, fill = TRUE)
+    ret_fail_qc <- data.table::rbindlist(gene_fail_qc_list, fill = TRUE)
+    return(list(ret_pass_qc = ret_pass_qc, ret_fail_qc = ret_fail_qc, precomp_out_list = precomp_out_list))
   }
 
+  # 3. partition the response IDs
+  partitioned_response_ids <- partition_response_ids(response_ids = response_ids, parallel = parallel)
 
-  # combine and sort result
-  ret <- data.table::rbindlist(gene_pass_qc_list, fill = TRUE)
-  if (!calibration_check) {
-    ret_fail_qc <- data.table::rbindlist(gene_fail_qc_list)
-    ret <- data.table::rbindlist(list(ret, ret_fail_qc), fill = TRUE)
+  # 4. run the analysis
+  if (!parallel) {
+    res <- lapply(partitioned_response_ids, analyze_given_response_ids)
+  } else {
+    cat("Running analysis in parallel. (Print messages not available.)")
+    res <- parallel::mclapply(partitioned_response_ids, analyze_given_response_ids,
+                              mc.cores = length(partitioned_response_ids))
+    cat(crayon::green(' \u2713\n'))
   }
+
+  # 5. combine and sort result
+  ret_pass_qc <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
+    data.table::rbindlist(fill = TRUE)
+  ret_fail_qc <- lapply(res, function(chunk) chunk[["ret_fail_qc"]]) |>
+    data.table::rbindlist(fill = TRUE)
+  ret <- data.table::rbindlist(list(ret_pass_qc, ret_fail_qc), fill = TRUE)
   data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
+  precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> purrr::flatten()
+  response_precomputations <- c(response_precomputations, precomp_out_list)
+
   return(list(ret = ret, response_precomputations = response_precomputations))
 }
 
