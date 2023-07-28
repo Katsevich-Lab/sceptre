@@ -335,7 +335,7 @@ prepare_analysis <- function(sceptre_object,
 }
 
 
-run_calibration_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE) {
+run_calibration_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 1. do argument check
   check_calibration_check_inputs(analysis_prepared = sceptre_object@analysis_prepared,
                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
@@ -398,7 +398,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
                                    n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                    side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
                                    response_precomputations = sceptre_object@response_precomputations,
-                                   print_progress = print_progress)
+                                   print_progress = print_progress, parallel = parallel)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
                                 grna_assignments = grna_assignments,
@@ -425,7 +425,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
 }
 
 
-run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE) {
+run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 1. do argument check
   check_discovery_analysis_inputs(response_grna_group_pairs = sceptre_object@positive_control_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
@@ -466,7 +466,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                    n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                    side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
                                    response_precomputations = sceptre_object@response_precomputations,
-                                   print_progress = print_progress)
+                                   print_progress = print_progress, parallel = parallel)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
                                 grna_assignments = grna_assignments,
@@ -492,7 +492,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 }
 
 
-run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE) {
+run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 1. do argument check
   check_discovery_analysis_inputs(response_grna_group_pairs = sceptre_object@discovery_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
@@ -533,7 +533,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                    n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                    side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
                                    response_precomputations = sceptre_object@response_precomputations,
-                                   print_progress = print_progress)
+                                   print_progress = print_progress, parallel = parallel)
   } else {
     ret <- run_crt_in_memory_v2(response_matrix = sceptre_object@response_matrix,
                                 grna_assignments = grna_assignments,

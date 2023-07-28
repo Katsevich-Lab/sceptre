@@ -98,3 +98,19 @@ auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_cov
   }
   return(covariate_df)
 }
+
+
+partition_response_ids <- function(response_ids, parallel) {
+  groups_set <- FALSE
+  if (parallel) {
+    n_cores <- parallel::detectCores(logical = FALSE)
+    if (length(response_ids) >= n_cores) {
+      set.seed(4)
+      s <- sample(response_ids)
+      out <- split(s, cut(seq_along(s), n_cores, labels = paste0("group_", seq(1, n_cores))))
+      groups_set <- TRUE
+    }
+  }
+  if (!groups_set) out <- list(group_1 = response_ids)
+  return(out)
+}
