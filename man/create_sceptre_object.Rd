@@ -58,6 +58,9 @@ plot(sceptre_object)
 sceptre_object <- run_discovery_analysis(sceptre_object)
 plot(sceptre_object)
 
+# 6. obtain the results for downstream analysis
+discovery_result <- get_result_data_frame(sceptre_object, "discovery")
+
 ##################
 # High MOI example
 ##################
@@ -97,4 +100,7 @@ sceptre_object <- run_power_check(sceptre_object)
 # 6. run discovery analysis
 sceptre_object <- run_discovery_analysis(sceptre_object)
 plot(sceptre_object)
+
+# 7. obtain the results for downstream analysis
+discovery_result <- get_result_data_frame(sceptre_object, "discovery")
 }

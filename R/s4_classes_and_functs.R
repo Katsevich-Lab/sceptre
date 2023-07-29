@@ -157,6 +157,9 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' sceptre_object <- run_discovery_analysis(sceptre_object)
 #' plot(sceptre_object)
 #'
+#' # 6. obtain the results for downstream analysis
+#' discovery_result <- get_result_data_frame(sceptre_object, "discovery")
+#'
 #' ##################
 #' # High MOI example
 #' ##################
@@ -196,6 +199,9 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' # 6. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object)
 #' plot(sceptre_object)
+#'
+#' # 7. obtain the results for downstream analysis
+#' discovery_result <- get_result_data_frame(sceptre_object, "discovery")
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   grna_group_data_frame, moi, extra_covariates = NULL) {
   # 0. initialize output
@@ -557,3 +563,31 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   sceptre_object@last_function_called <- "run_discovery_analysis"
   return(sceptre_object)
 }
+
+
+get_result_data_frame <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_testing_correction = "BH") {
+  if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
+    stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
+  }
+  if (analysis_type == "calibration" && !sceptre_object@calibration_check_run) {
+    stop("Calibration check has not yet been run.")
+  }
+  if (analysis_type == "power" && !sceptre_object@power_check_run) {
+    stop("Power check has not yet been run.")
+  }
+  if (analysis_type == "discovery" && !sceptre_object@discovery_analysis_run) {
+    stop("Discovery analysis not yet run.")
+  }
+  field_to_extract <- switch(EXPR = analysis_type,
+                             calibration = "calibration_result",
+                             power = "power_result",
+                             discovery = "discovery_result")
+  out <- slot(sceptre_object, field_to_extract)
+  # if calibration check or discovery analysis, apply multiplicity correction
+  if (analysis_type %in% c("calibration", "discovery")) {
+    out <- out |>
+      dplyr::mutate(reject = stats::p.adjust(p_value, method = multiple_testing_correction) < alpha)
+  }
+  return(out)
+}
+
