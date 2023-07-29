@@ -27,7 +27,6 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount
 #' @inheritParams compare_calibration_and_discovery_results
 #'
 #' @return a subset of \code{discovery_result} containing the discoveries.
-#' @export
 #' @examples
 #' # See the example in the run_sceptre_lowmoi help file.
 #' ?run_sceptre_lowmoi
@@ -49,7 +48,6 @@ obtain_discovery_set <- function(discovery_result, alpha = 0.1, multiple_testing
 #' @inheritParams run_sceptre_lowmoi
 #'
 #' @return a data frame containing the columns \code{response_id} and \code{grna_group} in which each response is mapped to the entire set of targeting gRNA groups.
-#' @export
 generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
   response_ids <- rownames(response_matrix) |> factor()
   grna_groups <- grna_group_data_frame |>
