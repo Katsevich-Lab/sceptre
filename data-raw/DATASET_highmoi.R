@@ -76,8 +76,10 @@ grna_matrix_highmoi <- grna_matrix[,cell_order]
 covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop=FALSE]
 
 # 9. rename the data objects
-discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis")
-pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl")
+discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis") |>
+  dplyr::select(-type)
+pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl") |>
+  dplyr::select(-type)
 
 response_matrix_highmoi_experimental <- response_matrix_highmoi
 grna_matrix_highmoi_experimental <- grna_matrix_highmoi

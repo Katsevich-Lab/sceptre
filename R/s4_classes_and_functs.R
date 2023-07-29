@@ -158,7 +158,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' plot(sceptre_object)
 #'
 #' # 6. obtain the results for downstream analysis
-#' discovery_result <- get_result_data_frame(sceptre_object, "discovery")
+#' discovery_result <- get_result(sceptre_object, "discovery")
 #'
 #' ##################
 #' # High MOI example
@@ -201,7 +201,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x) {
 #' plot(sceptre_object)
 #'
 #' # 7. obtain the results for downstream analysis
-#' discovery_result <- get_result_data_frame(sceptre_object, "discovery")
+#' discovery_result <- get_result(sceptre_object, "discovery")
 create_sceptre_object <- function(response_matrix, grna_matrix,
                                   grna_group_data_frame, moi, extra_covariates = NULL) {
   # 0. initialize output
@@ -565,7 +565,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 }
 
 
-get_result_data_frame <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_testing_correction = "BH") {
+get_result <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_testing_correction = "BH") {
   if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
     stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
   }
