@@ -182,6 +182,6 @@ NumericVector compute_sn_density(NumericVector x_grid, double xi, double omega, 
 
 // [[Rcpp::export]]
 double compute_sn_density_2(double x, double xi, double omega, double alpha) {
-  skew_normal dist(xi, omega, alpha);;
+  skew_normal dist(xi, omega, alpha);
   return pdf(dist, x);
 }
