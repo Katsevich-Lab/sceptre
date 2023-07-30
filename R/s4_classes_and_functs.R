@@ -33,6 +33,10 @@ setClass("sceptre_object",
                       response_precomputations = "list",
                       grna_assignments = "list",
                       negative_control_pairs = "data.frame",
+                      M_matrix = "matrix",
+                      n_nonzero_tot_vector = "integer",
+                      n_ok_discovery_pairs = "integer",
+                      n_ok_positive_control_pairs = "integer",
 
                       calibration_check_run = "logical",
                       power_check_run = "logical",
@@ -82,10 +86,14 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\t", get_mark(x@power_check_run), " run_power_check()\n",
              "\t", get_mark(x@discovery_analysis_run), " run_discovery_analysis()"))
   n_discovery_pairs <- nrow(x@discovery_pairs)
+  disc_pair_qc_performed <- !is.na(x@n_ok_discovery_pairs)
   n_pc_pairs <- nrow(x@positive_control_pairs)
+  pc_pair_qc_performed <- !is.na(x@n_ok_positive_control_pairs)
   cat(paste0("\n\nUser-specified analysis parameters: \n",
-             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs")},
-             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs")},
+             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
+                                                                                                      if (disc_pair_qc_performed) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
+             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
+                                                                                                        if (pc_pair_qc_performed) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Side: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
@@ -337,6 +345,12 @@ prepare_analysis <- function(sceptre_object,
     sceptre_object@grna_assignments <- grna_assignments
   }
 
+  # 7. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
+  sceptre_object <- compute_pairwise_qc_information(grna_assignments, sceptre_object)
+
+  # 8. compute the number of discovery pairs and (if applicable) pc pairs passing qc
+  sceptre_object <- compute_n_ok_pairs(sceptre_object, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+
   return(sceptre_object)
 }
 
@@ -365,8 +379,6 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
                                                                   n_calibration_pairs = sceptre_object@n_calibration_pairs,
                                                                   calibration_group_size = calibration_group_size,
                                                                   grna_assignments = grna_assignments,
-                                                                  n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-                                                                  n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                                                                   response_grna_group_pairs = sceptre_object@discovery_pairs,
                                                                   control_group_complement = sceptre_object@control_group_complement)
   } else {

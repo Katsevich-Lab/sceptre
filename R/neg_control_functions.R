@@ -1,4 +1,4 @@
-construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, grna_group_data_frame, response_grna_group_pairs, control_group_complement, low_moi) {
+construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix, grna_group_data_frame, response_grna_group_pairs, control_group_complement, low_moi) {
   # 1. set a few variables
   N_POSSIBLE_GROUPS_THRESHOLD <- 100L
   nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
@@ -25,13 +25,10 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
                                                      all_nt_idxs = if (!control_group_complement) grna_assignments$all_nt_idxs else integer(),
                                                      to_analyze_response_idxs = to_analyze_response_idxs,
                                                      to_analyze_grna_idxs = to_analyze_grna_idxs,
-                                                     n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-                                                     n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
                                                      compute_n_ok_pairs = is.na(n_calibration_pairs),
                                                      control_group_complement = control_group_complement)
   n_nonzero_m <- out$n_nonzero_mat
   n_nonzero_tot <- out$n_nonzero_tot
-  if (is.na(n_calibration_pairs)) n_calibration_pairs <- out$n_ok_pairs
 
   # 3. compute the number of possible groups; compute the possible groups
   n_possible_groups <- choose(n_nt_grnas, calibration_group_size)
@@ -85,3 +82,5 @@ get_undercover_group_names <- function(possible_groups_m, nt_grna_names) {
     paste0(nt_grna_names[r], collapse = "&")
   })
 }
+
+
