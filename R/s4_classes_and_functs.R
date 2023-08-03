@@ -373,14 +373,16 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, print_progr
 
   cat("Constructing negative control pairs.")
   if (nrow(sceptre_object@negative_control_pairs) == 0L) {
-    response_grna_group_pairs <- construct_negative_control_pairs(response_matrix = sceptre_object@response_matrix,
-                                                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                                                  low_moi = sceptre_object@low_moi,
-                                                                  n_calibration_pairs = sceptre_object@n_calibration_pairs,
+    response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs = sceptre_object@n_calibration_pairs,
                                                                   calibration_group_size = calibration_group_size,
                                                                   grna_assignments = grna_assignments,
-                                                                  response_grna_group_pairs = sceptre_object@discovery_pairs,
-                                                                  control_group_complement = sceptre_object@control_group_complement)
+                                                                  response_matrix = sceptre_object@response_matrix,
+                                                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                                                  low_moi = sceptre_object@low_moi,
+                                                                  n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                                                  n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                                                  n_nonzero_m = sceptre_object@M_matrix,
+                                                                  n_nonzero_tot = sceptre_object@n_nonzero_tot_vector)
   } else {
     response_grna_group_pairs <- sceptre_object@negative_control_pairs
   }
