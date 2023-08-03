@@ -5,7 +5,7 @@
 \alias{pc_pairs_highmoi_experimental}
 \title{Positive control gene-gRNA group pairs}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 10 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 10 rows and 2 columns.
 }
 \usage{
 data(discovery_pairs_highmoi_experimental)
