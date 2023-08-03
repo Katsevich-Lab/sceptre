@@ -232,7 +232,11 @@ create_sceptre_object <- function(response_matrix, grna_matrix,
   out@covariate_data_frame <- covariate_data_frame
   out@grna_group_data_frame <- grna_group_data_frame
   out@low_moi <- (moi == "low")
-  out@user_specified_covariates <- colnames(extra_covariates)
+  if(!is.null(extra_covariates)){
+    out@user_specified_covariates <-  colnames(extra_covariates)
+  } else{
+    out@user_specified_covariates <- character(0)
+  }
 
   # cached fields
   out@calibration_check_run <- FALSE
