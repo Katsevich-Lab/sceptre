@@ -11,7 +11,7 @@ compute_pairwise_qc_information <- function(grna_assignments, sceptre_object) {
                                  response_id = response_grna_group_pairs$response_id,
                                  grna_idx = match(x = response_grna_group_pairs$grna_group,
                                                   table = names(grna_group_idxs)),
-                                 grna_id = response_grna_group_pairs$grna_group,
+                                 grna_group = response_grna_group_pairs$grna_group,
                                  discovery = response_grna_group_pairs$discovery) |>
       data.table::setorder(cols = "response_idx")
     to_analyze_response_idxs <- dt$response_idx
@@ -31,10 +31,10 @@ compute_pairwise_qc_information <- function(grna_assignments, sceptre_object) {
                                                      compute_n_ok_pairs = compute_effective_sample_sizes,
                                                      control_group_complement = control_group_complement)
   if (compute_effective_sample_sizes) {
-    response_grna_group_pairs$n_nonzero_trt <- out$n_nonzero_trt
-    response_grna_group_pairs$n_nonzero_cntrl <- out$n_nonzero_cntrl
-    discovery_pairs <- response_grna_group_pairs[response_grna_group_pairs$discovery,] |> dplyr::select(-discovery)
-    positive_control_pairs <- response_grna_group_pairs[!response_grna_group_pairs$discovery,] |> dplyr::select(-discovery)
+    dt$n_nonzero_trt <- out$n_nonzero_trt
+    dt$n_nonzero_cntrl <- out$n_nonzero_cntrl
+    discovery_pairs <- dt[dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
+    positive_control_pairs <- dt[!dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
   }
 
   # update the fields of the sceptre_object
