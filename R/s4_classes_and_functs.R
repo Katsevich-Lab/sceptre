@@ -604,7 +604,8 @@ get_result <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_test
   # if calibration check or discovery analysis, apply multiplicity correction
   if (analysis_type %in% c("calibration", "discovery")) {
     out <- out |>
-      dplyr::mutate(reject = stats::p.adjust(p_value, method = multiple_testing_correction) < alpha)
+      dplyr::mutate(reject = stats::p.adjust(p_value, method = multiple_testing_correction) < alpha) |>
+      dplyr::select(-pass_qc)
   }
   return(out)
 }
