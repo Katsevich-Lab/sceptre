@@ -66,7 +66,7 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
   ###############
   # PART 1: SETUP
   ###############
-  cat("Running setup. ")
+  if(print_progress) cat("Running setup. ")
   # 1. check function input arguments
   check_inputs(response_matrix, grna_matrix, covariate_data_frame,
                grna_group_data_frame, formula_object, calibration_check,
@@ -86,26 +86,26 @@ run_sceptre <- function(response_matrix, grna_matrix, covariate_data_frame, grna
   grna_assignments <- assign_grnas_to_cells(grna_matrix, grna_group_data_frame, grna_assign_threshold,
                                             low_moi, control_group_complement, calibration_check)
   # rm(grna_matrix)
-  cat(crayon::green(' \u2713\n'))
+  if(print_progress) cat(crayon::green(' \u2713\n'))
 
   # 6. construct the negative control pairs
   if (calibration_check) {
-    cat("Constructing negative control pairs.")
+    if(print_progress) cat("Constructing negative control pairs.")
     if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(grna_group_data_frame)
     response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs, calibration_group_size,
                                                                   grna_assignments, response_matrix, n_nonzero_trt_thresh,
                                                                   n_nonzero_cntrl_thresh, grna_group_data_frame,
                                                                   response_grna_group_pairs, control_group_complement, low_moi)
-    cat(crayon::green(' \u2713\n'))
+    if(print_progress) cat(crayon::green(' \u2713\n'))
   }
 
   # 7. generate the set of synthetic indicator idxs
   if (run_permutations) {
-    cat("Generating permutation resamples.")
+    if(print_progress) cat("Generating permutation resamples.")
     n_cells <- nrow(covariate_matrix)
     synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments, B1 + B2 + B3, calibration_check,
                                                      control_group_complement, calibration_group_size, n_cells)
-    cat(crayon::green(' \u2713\n'))
+    if(print_progress) cat(crayon::green(' \u2713\n'))
   }
   gc() |> invisible()
 
@@ -216,7 +216,8 @@ run_sceptre_lowmoi <- function(response_matrix,
       n_calibration_pairs = n_calibration_pairs,
       B1 = B1,
       B2 = B2,
-      B3 = B3
+      B3 = B3,
+      print_progress = print_progress
     )
   }
 
