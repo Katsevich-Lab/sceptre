@@ -1,6 +1,9 @@
-compute_pairwise_qc_information <- function(grna_assignments, sceptre_object) {
-  response_matrix <- sceptre_object@response_matrix; discovery_pairs <- sceptre_object@discovery_pairs
-  positive_control_pairs <- sceptre_object@positive_control_pairs; control_group_complement <- sceptre_object@control_group_complement
+compute_pairwise_qc_information <- function(sceptre_object) {
+  grna_assignments <- sceptre_object@grna_assignments
+  response_matrix <- sceptre_object@response_matrix
+  discovery_pairs <- sceptre_object@discovery_pairs
+  positive_control_pairs <- sceptre_object@positive_control_pairs
+  control_group_complement <- sceptre_object@control_group_complement
   compute_effective_sample_sizes <- (nrow(discovery_pairs) >= 1L || nrow(positive_control_pairs) >= 1L)
   if (compute_effective_sample_sizes) {
     grna_group_idxs <- grna_assignments$grna_group_idxs
@@ -33,21 +36,21 @@ compute_pairwise_qc_information <- function(grna_assignments, sceptre_object) {
   if (compute_effective_sample_sizes) {
     dt$n_nonzero_trt <- out$n_nonzero_trt
     dt$n_nonzero_cntrl <- out$n_nonzero_cntrl
-    discovery_pairs <- dt[dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
-    positive_control_pairs <- dt[!dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
+    sceptre_object@discovery_pairs_with_info <- dt[dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
+    sceptre_object@positive_control_pairs_with_info <- dt[!dt$discovery, c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")]
   }
 
   # update the fields of the sceptre_object
-  sceptre_object@discovery_pairs <- discovery_pairs
-  sceptre_object@positive_control_pairs <- positive_control_pairs
   sceptre_object@M_matrix <- out$n_nonzero_mat
   sceptre_object@n_nonzero_tot_vector <- out$n_nonzero_tot
   return(sceptre_object)
 }
 
 
-compute_n_ok_pairs <- function(sceptre_object, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-  data_frame_names <- c("discovery_pairs", "positive_control_pairs")
+compute_qc_metrics <- function(sceptre_object) {
+  n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
+  n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
+  data_frame_names <- c("discovery_pairs_with_info", "positive_control_pairs_with_info")
   n_ok_pair_names <- c("n_ok_discovery_pairs", "n_ok_positive_control_pairs")
   for (i in c(1L, 2L)) {
     data_frame_name <- data_frame_names[i]
