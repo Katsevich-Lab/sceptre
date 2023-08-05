@@ -316,3 +316,38 @@ plot_discovery_result <- function(sceptre_object, return_indiv_plots = FALSE, al
   }
   return(p_out)
 }
+
+
+make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object) {
+  my_cols <- c("indianred2", "mediumseagreen")
+  my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
+  discovery_pairs <- sceptre_object@discovery_pairs
+  ggplot2::ggplot(data = discovery_pairs,
+                  mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)) +
+    ggplot2::geom_point(alpha = 0.8, size = 0.8) + get_my_theme() +
+    ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+                                breaks = my_breaks) +
+    ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+                                breaks = my_breaks) +
+    ggplot2::geom_hline(yintercept = sceptre_object@n_nonzero_cntrl_thresh) +
+    ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh) +
+    ggplot2::xlab("N nonzero trt. cells") +
+    ggplot2::ylab("N nonzero cntrl. cells") +
+    ggplot2::theme(legend.position = "none") +
+    ggplot2::scale_color_manual(values = my_cols)
+}
+
+make_n_nonzero_trt_histogram <- function(sceptre_object) {
+  my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
+  discovery_pairs <- sceptre_object@discovery_pairs
+  ggplot2::ggplot(data = data.frame(x = discovery_pairs$n_nonzero_trt),
+                  mapping = ggplot2::aes(x = x)) +
+    ggplot2::geom_histogram(fill = "grey90", col = "black", bins = 25) +
+    ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+                                breaks = my_breaks, expand = c(1e-2, 1e-2)) +
+    ggplot2::scale_y_continuous(expand = c(0, 0)) +
+    ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh, col = "darkred", linewidth = 0.8) +
+    ggplot2::xlab("N nonzero treatment cells") +
+    ggplot2::ylab("Count") +
+    get_my_theme()
+}

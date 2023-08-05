@@ -1,4 +1,4 @@
-# helper function 1
+# helper function
 get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L, feature = "response") {
   if ((response_idx == 1 || response_idx %% print_multiple == 0) && print_progress) {
     cat(paste0("Analyzing pairs containing ", feature, " ", as.character(response_ids[response_idx]),
@@ -9,35 +9,6 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
   return(response_id)
 }
 
-# helper function 2: gene-wise QC
-do_genewise_qc <- function(expression_vector, all_nt_idxs, control_group_complement, curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-  # 1. compute n nonzero treatment per grna group
-  grna_group_posits <- match(x = curr_df$grna_group, table = names(grna_group_idxs))
-  n_nonzero_trt_curr <- compute_n_nonzero_trt_vector(expression_vector = expression_vector,
-                                                     grna_group_idxs = grna_group_idxs,
-                                                     grna_group_posits = grna_group_posits)
-  # 2. compute n nonzero control
-  if (!control_group_complement) { # nt cell control group
-    expression_vector_nt <- expression_vector[all_nt_idxs]
-    n_nonzero_cntrl_curr <- sum(expression_vector_nt >= 1)
-  } else { # complement set control group
-    n_nonzero_total <- sum(expression_vector >= 1)
-    n_nonzero_cntrl_curr <- n_nonzero_total - n_nonzero_trt_curr
-  }
-
-  # 3. put these vectors into the curr_df
-  curr_df$n_nonzero_trt <- n_nonzero_trt_curr
-  curr_df$n_nonzero_cntrl <- n_nonzero_cntrl_curr
-
-  # 4. determine the rows of curr_df that pass pairwise qc
-  pass_qc <- (n_nonzero_trt_curr >= n_nonzero_trt_thresh) & (n_nonzero_cntrl_curr >= n_nonzero_cntrl_thresh)
-
-  # 5. check if any rows pass pairwise qc
-  any_pass_qc <- any(pass_qc)
-
-  # 6. return a list containing pass_qc and if any pass qc
-  return(list(curr_df = curr_df, pass_qc = pass_qc, any_pass_qc = any_pass_qc))
-}
 
 # core function 1: run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
@@ -59,8 +30,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
   # 2. define function to loop subset of response IDs
   analyze_given_response_ids <- function(curr_response_ids) {
-    gene_pass_qc_list <- gene_fail_qc_list <- vector(mode = "list", length = length(curr_response_ids))
     precomp_out_list <- list()
+    result_out_list <- vector(mode = "list", length = length(curr_response_ids))
 
     for (response_idx in seq_along(curr_response_ids)) {
       response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids)
@@ -76,14 +47,6 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
       # 4. obtain the gRNA groups to analyze
       l <- response_grna_group_pairs$response_id == response_id
       curr_df <- response_grna_group_pairs[l,]
-
-      if (!calibration_check) {
-        gene_wise_qc_result <- do_genewise_qc(expression_vector, all_nt_idxs, control_group_complement,
-                                              curr_df, grna_group_idxs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
-        gene_fail_qc_list[[response_idx]] <- gene_wise_qc_result$curr_df[!gene_wise_qc_result$pass_qc,]
-        if (!gene_wise_qc_result$any_pass_qc) next
-        curr_df <- gene_wise_qc_result$curr_df[gene_wise_qc_result$pass_qc,]
-      }
       grna_groups <- as.character(curr_df$grna_group)
 
       # 6. perform outer regression (if applicable)
@@ -114,13 +77,12 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
       }
 
       # 9. combine the response-wise results into a data table; insert into list
-      gene_pass_qc_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result, output_amount)
+      result_out_list[[response_idx]] <- construct_data_frame_v2(curr_df, curr_response_result, output_amount)
     }
 
     # prepare output
-    ret_pass_qc <- data.table::rbindlist(gene_pass_qc_list, fill = TRUE)
-    ret_fail_qc <- data.table::rbindlist(gene_fail_qc_list, fill = TRUE)
-    return(list(ret_pass_qc = ret_pass_qc, ret_fail_qc = ret_fail_qc, precomp_out_list = precomp_out_list))
+    ret_pass_qc <- data.table::rbindlist(result_out_list, fill = TRUE)
+    return(list(ret_pass_qc = ret_pass_qc, precomp_out_list = precomp_out_list))
   }
 
   # 3. partition the response IDs
@@ -139,14 +101,10 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   # 5. combine and sort result
   ret_pass_qc <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
     data.table::rbindlist(fill = TRUE)
-  ret_fail_qc <- lapply(res, function(chunk) chunk[["ret_fail_qc"]]) |>
-    data.table::rbindlist(fill = TRUE)
-  ret <- data.table::rbindlist(list(ret_pass_qc, ret_fail_qc), fill = TRUE)
-  data.table::setorderv(ret, cols = c("p_value", "response_id"), na.last = TRUE)
   precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> purrr::flatten()
   response_precomputations <- c(response_precomputations, precomp_out_list)
 
-  return(list(ret = ret, response_precomputations = response_precomputations))
+  return(list(ret_pass_qc = ret_pass_qc, response_precomputations = response_precomputations))
 }
 
 

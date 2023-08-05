@@ -1,128 +1,3 @@
-check_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
-                         grna_group_data_frame, formula_object, calibration_check,
-                         response_grna_group_pairs, moi, control_group, resampling_mechanism, side) {
-  # 1. check column names of grna_group_data_frame
-  colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
-  if (!colnames_present) {
-    stop("The data frame `grna_group_data_frame` must have columns `grna_id` and `grna_group`. The `grna_group` column should specify the group to which each `grna_id` belongs.")
-  }
-
-  # 2. check for the presence of "non-targeting" in the grna_group column, which must be present when running a calibration check
-  if (calibration_check) {
-   n_nt_grnas <- grna_group_data_frame |>
-      dplyr::filter(grna_group == "non-targeting") |> nrow()
-    if (n_nt_grnas <= 1) {
-      stop("Two or more non-targeting gRNAs must be present when running a calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting'.")
-    }
-  }
-
-  # 3. verify that the row names are unique for both response and grna modalities
-  response_ids <- rownames(response_matrix)
-  grna_ids <- rownames(grna_matrix)
-  if (length(response_ids) != length(unique(response_ids))) stop("The rownames of the `response_matrix` must be unique.")
-  if (length(grna_ids) != length(unique(grna_ids))) stop("The rownames of the `grna_matrix` must be unique.")
-
-  # 4. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
-  problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
-  if (length(problematic_grna_ids) >= 1) {
-    stop(paste0("The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: ", paste0(grna_ids[problematic_grna_ids], collapse = ", ")))
-  }
-  if (any(grna_ids == "non-targeting")) {
-    stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
-  }
-
-  # 5. if running a discovery analysis, ensure response_grna_group_pairs is present; check characteristics
-  if (!calibration_check && is.null(response_grna_group_pairs)) stop("`response_grna_group_pairs` must be specified when running a discovery analysis.")
-  if (!is.null(response_grna_group_pairs)) {
-    # i. verify that `grna_group` and `response_id` are columns
-    all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
-    # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
-    if (!all(response_grna_group_pairs$response_id %in% response_ids)) {
-      stop("The column `response_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the response expression matrix.")
-    }
-    # iii. check that the grna ids in the  `grna_group_data_frame` data frame are a subset of the grna ids
-    if (!all(grna_group_data_frame$grna_id %in% grna_ids)) {
-      stop("The column `grna_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the grna expression matrix.")
-    }
-    # iv. check that the `grna_group` column of the `response_grna_group_pairs` data frame is a subset of the `grna_group` column of the `grna_group_data_frame`
-    if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
-      stop("The column `grna_group` of the `response_grna_group_pairs` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`.")
-    }
-  }
-
-  # 6. check that there are no offsets in the formula object
-  if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
-
-  # 7. check the covariate data frame has at least one column
-  if (ncol(covariate_data_frame) == 0) {
-    stop("The global cell covariate matrix must contain at least one column.")
-  }
-
-  # 8. check that the variables in the formula object are a subset of the column names of the covariate data frame
-  formula_object_vars <- all.vars(formula_object)
-  check_var <- formula_object_vars %in% colnames(covariate_data_frame)
-  if (!all(check_var)) {
-    stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
-  }
-
-  # 9. check type of input matrices
-  check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
-    ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
-    if (!ok_class) {
-      stop(paste0("`", input_matrix_name, "` must be an object of class ", paste0(allowed_matrix_classes, collapse = ", "), "."))
-    }
-  }
-  check_matrix_class(response_matrix, "response_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix"))
-  check_matrix_class(grna_matrix, "grna_matrix", c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "lgTMatrix", "lgCMatrix", "lgRMatrix"))
-
-  # 10. check for agreement in number of cells
-  check_ncells <- (ncol(response_matrix) == ncol(grna_matrix)) && (ncol(response_matrix) == nrow(covariate_data_frame))
-  if (!check_ncells) {
-    stop("The number of cells in the `response_matrix`, `grna_matrix`, and `covariate_data_frame` must coincide.")
-  }
-
-  # 11. ensure that "non-targeting" is not a group in the pairs to analyze data frame
-  if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
-    stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`.")
-  }
-
-  # 12. verify that moi is specified
-  if (!(moi %in% c("low", "high"))) {
-    stop("`moi` should be either `low` or `high`.")
-  }
-
-  # 13. verify that control group is either nt_cells, complement, or default
-  if (!control_group %in% c("nt_cells", "complement", "default")) {
-    stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
-  }
-
-  # 14. verify that resampling_mechanism is one of "permutations", "crt", or "default"
-  if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
-    stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
-  }
-
-  # 15. verify that the moi is consistent with the control group
-  if (moi == "high" && control_group == "nt_cells") {
-    stop("The control group cannot be the NT cells in high MOI.")
-  }
-
-  # 16. verify that control_group is NT cells
-  if (control_group == "nt_cells") {
-    nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
-    if (!nt_present) {
-      stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
-    }
-  }
-
-  # 17. verify that "side" is among "both", "left", or "right"
-  if (!(side %in% c("both", "left", "right"))) {
-    stop("'side' must be one of 'both', 'left', or 'right'.")
-  }
-
-  return(NULL)
-}
-
-
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
   # if a logical matrix, convert to the corresponding numeric matrix; consider more efficient implementation later
   if (methods::is(matrix_in, "lgRMatrix")) {
@@ -210,7 +85,9 @@ convert_pointer_to_index_vector_v2 <- function(p) {
 #'
 #' @return the design matrix
 #' @noRd
-convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_object) {
+convert_covariate_df_to_design_matrix <- function(sceptre_object) {
+  covariate_data_frame <- sceptre_object@covariate_data_frame
+  formula_object <- sceptre_object@formula_object
   global_cell_covariates_new <- stats::model.matrix(object = formula_object, data = covariate_data_frame)
   # verify that the global cell covariates are OK after transformation
   for (col_name in colnames(global_cell_covariates_new)) {
@@ -224,27 +101,8 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
   if (rank_matrix != ncol(global_cell_covariates_new)) {
     stop("The `formula_object` contains redundant information. This often occurs when one variable is `nested` inside another. For example, if the data frame contains a column `lane` with levels `lane_1`, `lane_2`, `lane_3`, and `lane_4` and a column `batch` with levels `batch_1` and `batch_2`, and if `lane_1` and `lane_2` are contained entirely within `batch_1` while `lane_3` and `lane_4` are contained entirely within `batch`2`, then `batch` is redundant. In this case `batch` should be removed from the formula object.")
   }
-  return(global_cell_covariates_new)
-}
-
-
-harmonize_arguments <- function(fit_parametric_curve, moi, control_group, resampling_mechanism, side) {
-  # handle moi/control_group/resampling_mechanism
-  if (moi == "high") {
-    control_group <- "complement"
-    if (resampling_mechanism == "default") resampling_mechanism <- "crt"
-  }
-  if (moi == "low") {
-    if (control_group == "default") control_group <- "nt_cells"
-    if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
-  }
-
-  # assign variables to global
-  assign(x = "low_moi", value = (moi == "low"), inherits = TRUE)
-  assign(x = "control_group_complement", value = (control_group == "complement" || moi == "high"), inherits = TRUE)
-  assign(x = "run_permutations", value = (resampling_mechanism == "permutations"), inherits = TRUE)
-  assign(x = "side_code", value = which(side == c("left", "both", "right")) - 2L, inherits = TRUE)
-  return (NULL)
+  sceptre_object@covariate_matrix <- global_cell_covariates_new
+  return(sceptre_object)
 }
 
 
@@ -287,13 +145,6 @@ compute_cell_covariates <- function(matrix_in) {
 }
 
 
-order_pairs_to_analyze <- function(response_grna_group_pairs) {
-  response_grna_group_pairs <- data.table::as.data.table(response_grna_group_pairs)
-  data.table::setorderv(response_grna_group_pairs, cols = "response_id")
-  return(response_grna_group_pairs)
-}
-
-
 get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_check, control_group_complement, calibration_group_size, n_cells) {
   if (calibration_check && !control_group_complement) { # 1. calibration check, nt cells (low MOI only)
     indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
@@ -322,4 +173,83 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
   }
 
   return(out)
+}
+
+
+handle_default_arguments <- function(sceptre_object, control_group, resampling_mechanism, formula_object, discovery_pairs) {
+  if (!sceptre_object@low_moi) {
+    control_group <- "complement"
+    if (identical(resampling_mechanism, "default")) resampling_mechanism <- "crt"
+  }
+  if (sceptre_object@low_moi) {
+    if (identical(control_group, "default")) control_group <- "nt_cells"
+    if (identical(resampling_mechanism, "default")) resampling_mechanism <- "permutations"
+  }
+  if (identical(formula_object, "default")) {
+    formula_object <- auto_construct_formula_object(sceptre_object@covariate_data_frame, sceptre_object@low_moi)
+  }
+  if (identical(discovery_pairs, "all")) {
+    discovery_pairs <- generate_all_pairs(sceptre_object@response_matrix,
+                                          sceptre_object@grna_group_data_frame)
+  }
+  return(list(control_group = control_group, resampling_mechanism = resampling_mechanism,
+              formula_object = formula_object, discovery_pairs = discovery_pairs))
+}
+
+
+check_whether_to_update_cached_objects <- function(sceptre_object, formula_object, grna_assign_threshold, n_calibration_pairs, calibration_group_size,
+                                                   n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, discovery_pairs, control_group) {
+  control_group_complement <- control_group == "complement"
+  discard_response_precomputations <- !((length(sceptre_object@formula_object) >= 2) &&
+                                          identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
+  discard_grna_assignments <- !identical(sceptre_object@grna_assign_threshold, grna_assign_threshold)
+  discard_negative_control_pairs <- !(identical(sceptre_object@n_calibration_pairs, n_calibration_pairs) &&
+                                      identical(sceptre_object@calibration_group_size, calibration_group_size) &&
+                                      identical(sceptre_object@grna_assign_threshold, grna_assign_threshold) &&
+                                      identical(sceptre_object@n_nonzero_trt_thresh, n_nonzero_trt_thresh) &&
+                                      identical(sceptre_object@n_nonzero_cntrl_thresh, n_nonzero_cntrl_thresh) &&
+                                      identical(sceptre_object@discovery_pairs, discovery_pairs) &&
+                                      identical(sceptre_object@control_group_complement, control_group_complement))
+  return(list(discard_response_precomputations = discard_response_precomputations,
+              discard_grna_assignments = discard_grna_assignments,
+              discard_negative_control_pairs = discard_negative_control_pairs))
+}
+
+
+update_uncached_fields <- function(sceptre_object, control_group, resampling_mechanism,
+                                   side, fit_parametric_curve, B1, B2, B3, n_nonzero_trt_thresh,
+                                   n_nonzero_cntrl_thresh, discovery_pairs, positive_control_pairs,
+                                   grna_assign_threshold, formula_object, calibration_group_size,
+                                   n_calibration_pairs) {
+  # code control_group, resampling_mechanism, and side arguments
+  control_group_complement <- control_group == "complement"
+  run_permutations <- resampling_mechanism == "permutations"
+  side_code <- which(side == c("left", "both", "right")) - 2L
+
+  # update
+  sceptre_object@control_group_complement <- control_group_complement
+  sceptre_object@run_permutations <- run_permutations
+  sceptre_object@side_code <- side_code
+  sceptre_object@fit_parametric_curve <- fit_parametric_curve
+  sceptre_object@B1 <- B1
+  sceptre_object@B2 <- B2
+  sceptre_object@B3 <- B3
+  sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
+  sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
+  sceptre_object@discovery_pairs <- discovery_pairs
+  sceptre_object@positive_control_pairs <- positive_control_pairs
+  sceptre_object@grna_assign_threshold <- grna_assign_threshold
+  sceptre_object@formula_object <- formula_object
+  sceptre_object@calibration_group_size <- calibration_group_size
+  sceptre_object@n_calibration_pairs <- n_calibration_pairs
+  sceptre_object@calibration_check_run <- FALSE
+  sceptre_object@power_check_run <- FALSE
+  sceptre_object@discovery_analysis_run <- FALSE
+  sceptre_object@analysis_prepared <- TRUE
+  sceptre_object@calibration_result <- data.frame()
+  sceptre_object@power_result <- data.frame()
+  sceptre_object@discovery_result <- data.frame()
+  sceptre_object@last_function_called <- "prepare_analysis"
+
+  return(sceptre_object)
 }

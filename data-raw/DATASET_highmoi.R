@@ -83,7 +83,9 @@ pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl") |>
 
 response_matrix_highmoi_experimental <- response_matrix_highmoi
 grna_matrix_highmoi_experimental <- grna_matrix_highmoi
-extra_covariates_highmoi_experimental <- covariate_data_frame_highmoi
+extra_covariates_highmoi_experimental <- covariate_data_frame_highmoi |>
+  dplyr::mutate(batch = factor(batch, levels = c("prep_batch_1", "prep_batch_2"),
+                               labels = c("b1", "b2")))
 grna_group_data_frame_highmoi_experimental <- grna_group_data_frame_highmoi
 discovery_pairs_highmoi_experimental <- discovery_pairs_highmoi
 pc_pairs_highmoi_experimental <- pc_pairs_highmoi
