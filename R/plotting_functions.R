@@ -317,11 +317,12 @@ plot_discovery_result <- function(sceptre_object, return_indiv_plots = FALSE, al
   return(p_out)
 }
 
-
 make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object) {
-  my_cols <- c("indianred2", "mediumseagreen")
+  my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
-  discovery_pairs <- sceptre_object@discovery_pairs
+  discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
+    dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
+    dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
   ggplot2::ggplot(data = discovery_pairs,
                   mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)) +
     ggplot2::geom_point(alpha = 0.8, size = 0.8) + get_my_theme() +
@@ -333,21 +334,76 @@ make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object) {
     ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh) +
     ggplot2::xlab("N nonzero trt. cells") +
     ggplot2::ylab("N nonzero cntrl. cells") +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::scale_color_manual(values = my_cols)
+    ggplot2::theme(legend.position = "bot") +
+    ggplot2::scale_color_manual(values = my_cols) +
+    ggplot2::ggtitle("Pairwise QC plot") +
+    ggplot2::theme(legend.position = c(0.85, 0.15),
+                   legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
+                   legend.title = ggplot2::element_blank()) +
+    ggplot2::guides(color = ggplot2::guide_legend(
+      keywidth = 0.0,
+      keyheight = 0.15,
+      default.unit = "inch",
+      override.aes = list(size = 1.25)))
 }
 
-make_n_nonzero_trt_histogram <- function(sceptre_object) {
-  my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
-  discovery_pairs <- sceptre_object@discovery_pairs
-  ggplot2::ggplot(data = data.frame(x = discovery_pairs$n_nonzero_trt),
+make_cells_per_grna_group_plot <- function(sceptre_object) {
+  n_cells_per_grna_group <- sapply(sceptre_object@grna_assignments$grna_group_idxs, length)
+  df <- data.frame(x = n_cells_per_grna_group,
+                   y = names(sceptre_object@grna_assignments$grna_group_idxs)) |>
+    dplyr::arrange(n_cells_per_grna_group) |>
+    dplyr::mutate(y = factor(y, labels = y, levels = y))
+  p <- ggplot2::ggplot(data = df,
+                       mapping = ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_bar(stat = "identity", width = 0.5, fill = "darkblue", col = "black") +
+    get_my_theme() + ggplot2::scale_x_continuous(expand = c(0, 0)) +
+    ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                   axis.ticks.y = ggplot2::element_blank()) +
+    ggplot2::xlab("N cells") + ggplot2::ylab("gRNA group") +
+    ggplot2::ggtitle("N cells per gRNA group")
+  return(list(plot = p, median = median(n_cells_per_grna_group)))
+}
+
+make_n_grna_groups_per_cell_plot <- function(sceptre_object) {
+  n_grna_groups_per_cell <- sceptre_object@grna_assignments$grna_group_idxs |>
+    unlist() |> tabulate()
+  df <- data.frame(x = n_grna_groups_per_cell)
+  p <- ggplot2::ggplot(data = df,
                   mapping = ggplot2::aes(x = x)) +
-    ggplot2::geom_histogram(fill = "grey90", col = "black", bins = 25) +
-    ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
-                                breaks = my_breaks, expand = c(1e-2, 1e-2)) +
-    ggplot2::scale_y_continuous(expand = c(0, 0)) +
-    ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh, col = "darkred", linewidth = 0.8) +
-    ggplot2::xlab("N nonzero treatment cells") +
-    ggplot2::ylab("Count") +
-    get_my_theme()
+    ggplot2::geom_histogram(binwidth = 1, fill = "grey90", color = "darkblue") +
+    ggplot2::scale_y_continuous(trans = "log10", expand = c(0, 0)) +
+    get_my_theme() + ggplot2::ylab("Count") +
+    ggplot2::ggtitle("N gRNA groups per cell") +
+    ggplot2::xlab("gRNA groups per cell") +
+  return(list(plot = p, median = median(n_grna_groups_per_cell)))
+}
+
+plot_prepare_analysis <- function(sceptre_object, return_indiv_plots = FALSE) {
+  p_a_out <- make_cells_per_grna_group_plot(sceptre_object)
+  str <- paste0("Median cells per\ngRNA group: ", p_a_out$median)
+  p_a <- p_a_out$plot
+  if (!sceptre_object@low_moi) {
+    p_b_out <- make_n_grna_groups_per_cell_plot(sceptre_object)
+    str <- paste0(str, "\n\nMedian gRNA groups\nper cell: ", p_b_out$median)
+    p_b <- p_b_out$plot
+  } else {
+    p_b <- make_n_nonzero_trt_histogram(sceptre_object)
+  }
+  p_c <- ggplot2::ggplot() +
+    ggplot2::annotate(geom = "text", label = str, x = 1.0, y = 1.0) +
+    ggplot2::theme_void() +
+    ggplot2::xlim(c(0, 2)) +
+    ggplot2::ylim(c(0, 2))
+  p_d <- make_n_nonzero_cntrl_vs_trt_cells_plot(sceptre_object)
+
+  if (return_indiv_plots) {
+    p_out <- if (sceptre_object@low_moi)  list(p_a, p_c, p_d) else list(p_a, p_b, p_c, p_d)
+  } else {
+    if (sceptre_object@low_moi) {
+      p_out <- cowplot::plot_grid(cowplot::plot_grid(p_a, p_c, nrow = 1), p_d, nrow = 2)
+    } else {
+      p_out <- cowplot::plot_grid(p_a, p_b, p_c, p_d, nrow = 2, align = "h")
+    }
+  }
+  return(p_out)
 }
