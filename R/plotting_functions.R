@@ -17,7 +17,7 @@ plot_covariates <- function(sceptre_object, return_indiv_plots = FALSE) {
     zero_present <- any(vect == 0)
     p <- data.frame(vect = vect) |>
       ggplot2::ggplot(ggplot2::aes(x = vect)) +
-      ggplot2::geom_histogram(bins = 30, color = "black", fill = "grey90") +
+      ggplot2::geom_histogram(bins = 30, color = "darkblue", fill = "grey90") +
       get_my_theme() +
       ggplot2::theme(axis.title.y = ggplot2::element_blank(),
                      axis.title.x = ggplot2::element_blank()) +
@@ -368,17 +368,22 @@ make_n_grna_groups_per_cell_plot <- function(sceptre_object) {
   n_grna_groups_per_cell <- sceptre_object@grna_assignments$grna_group_idxs |>
     unlist() |> tabulate()
   df <- data.frame(x = n_grna_groups_per_cell)
-  p <- ggplot2::ggplot(data = df,
-                  mapping = ggplot2::aes(x = x)) +
+  p <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = x)) +
     ggplot2::geom_histogram(binwidth = 1, fill = "grey90", color = "darkblue") +
     ggplot2::scale_y_continuous(trans = "log10", expand = c(0, 0)) +
     get_my_theme() + ggplot2::ylab("Count") +
     ggplot2::ggtitle("N gRNA groups per cell") +
-    ggplot2::xlab("gRNA groups per cell") +
+    ggplot2::xlab("gRNA groups per cell")
   return(list(plot = p, median = median(n_grna_groups_per_cell)))
 }
 
 plot_prepare_analysis <- function(sceptre_object, return_indiv_plots = FALSE) {
+  # perform checking
+  if (!sceptre_object@analysis_prepared) {
+    stop("Analysis must be prepared before calling `plot_prepare_analysis` function.")
+  }
+
+  # make plot
   p_a_out <- make_cells_per_grna_group_plot(sceptre_object)
   str <- paste0("Median cells per\ngRNA group: ", p_a_out$median)
   p_a <- p_a_out$plot
@@ -386,8 +391,6 @@ plot_prepare_analysis <- function(sceptre_object, return_indiv_plots = FALSE) {
     p_b_out <- make_n_grna_groups_per_cell_plot(sceptre_object)
     str <- paste0(str, "\n\nMedian gRNA groups\nper cell: ", p_b_out$median)
     p_b <- p_b_out$plot
-  } else {
-    p_b <- make_n_nonzero_trt_histogram(sceptre_object)
   }
   p_c <- ggplot2::ggplot() +
     ggplot2::annotate(geom = "text", label = str, x = 1.0, y = 1.0) +
@@ -397,10 +400,10 @@ plot_prepare_analysis <- function(sceptre_object, return_indiv_plots = FALSE) {
   p_d <- make_n_nonzero_cntrl_vs_trt_cells_plot(sceptre_object)
 
   if (return_indiv_plots) {
-    p_out <- if (sceptre_object@low_moi)  list(p_a, p_c, p_d) else list(p_a, p_b, p_c, p_d)
+    p_out <- if (sceptre_object@low_moi) list(p_a, p_c, p_d) else list(p_a, p_b, p_c, p_d)
   } else {
     if (sceptre_object@low_moi) {
-      p_out <- cowplot::plot_grid(cowplot::plot_grid(p_a, p_c, nrow = 1), p_d, nrow = 2)
+      p_out <- cowplot::plot_grid(cowplot::plot_grid(p_a, p_c, nrow = 1, rel_widths = c(0.65, 0.35)), p_d, nrow = 2)
     } else {
       p_out <- cowplot::plot_grid(p_a, p_b, p_c, p_d, nrow = 2, align = "h")
     }
