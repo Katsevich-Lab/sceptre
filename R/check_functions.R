@@ -44,14 +44,30 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, grn
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide.")
   }
 
-  # 9. check that column names of extra_covariates are not already taken
+  # 9. if applicable, check that the cell barcodes match across the grna, gene, and covariate matrices
+  check_barcodes_provided <- function(barcodes) {
+    !is.null(barcodes) && !all(grepl(pattern = "^[0-9]+$", x = barcodes))
+  }
+  response_cell_barcodes <- colnames(response_matrix)
+  grna_cell_barcodes <- colnames(grna_matrix)
+  covariate_cell_barcodes <- rownames(extra_covariates)
+  if (check_barcodes_provided(response_cell_barcodes) &&
+      check_barcodes_provided(grna_cell_barcodes) &&
+      check_barcodes_provided(covariate_cell_barcodes)) {
+    if (!(identical(response_cell_barcodes, grna_cell_barcodes) &&
+          identical(response_cell_barcodes, covariate_cell_barcodes))) {
+        stop("You have provided cell barcodes in the `response_matrix`, `grna_matrix`, and `extra_covariates`. These cell barcodes must have the same ordering across objects.")
+    }
+  }
+
+  # 10. check that column names of extra_covariates are not already taken
   reserved_covariate_names <- c("response_n_nonzero", "response_n_umis", "response_p_mito", "grna_n_nonzero", "grna_n_umis")
   extra_covariate_names <- colnames(extra_covariates)
   if (any(extra_covariate_names %in% reserved_covariate_names)) {
     stop("The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame.")
   }
 
-  # 10. verify that the types of the extra covariates are acceptable
+  # 11. verify that the types of the extra covariates are acceptable
   for (extra_covariate_name in extra_covariate_names) {
     v <- extra_covariates[,extra_covariate_name]
     accept_type <- is(v, "numeric") || is(v, "character") || is(v, "factor")
@@ -60,7 +76,7 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, grn
     }
   }
 
-  # 11. verify that moi is specified
+  # 12. verify that moi is specified
   if (!(moi %in% c("low", "high"))) {
     stop("`moi` should be either `low` or `high`.")
   }
