@@ -41,7 +41,7 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
                                    dplyr::mutate(y = scales$y$trans$inverse(y)) |>
                                    # apply the formulas for the confidence bands
                                    dplyr::mutate(
-                                     r = rank(y),
+                                     r = rank(y, ties.method = "first"),
                                      x = quantile_fun(stats::ppoints(dplyr::n())[r]),
                                      ymin = quantile_fun(stats::qbeta(p = (1 - ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
                                      ymax = quantile_fun(stats::qbeta(p = (1 + ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r))
