@@ -38,6 +38,7 @@ setClass("sceptre_object",
            positive_control_pairs_with_info = "data.frame",
            negative_control_pairs = "data.frame",
            grna_assignments = "list",
+           grna_assignment_extra_info = "list",
 
            # cached objects
            response_precomputations = "list",

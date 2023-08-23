@@ -263,10 +263,6 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
 }
 
 
-# step 4: run qc
-
-
-
 # step 5: calibration check
 
 # step 6: positive power check
