@@ -2,7 +2,7 @@
 % Please edit documentation in R/s4_classes_and_functs.R
 \name{create_sceptre_object}
 \alias{create_sceptre_object}
-\title{Create a \code{sceptre} object}
+\title{Carry out an analysis using \code{sceptre}}
 \usage{
 create_sceptre_object(
   response_matrix,
@@ -61,7 +61,7 @@ create_sceptre_object(
 an object of class \code{sceptre_object}
 }
 \description{
-Create a \code{sceptre} object
+Carry out an analysis using \code{sceptre}
 }
 \examples{
 #################
@@ -82,9 +82,13 @@ grna_group_data_frame = grna_group_data_frame_lowmoi,
 moi = "low")
 
 # 2. prepare the analysis
-sceptre_object <- prepare_analysis(
+sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = "all")
+
+# 3. assign gRNAs as run cellwise and pairwise QC
+sceptre_object <- sceptre_object |> assign_grnas()
+sceptre_object <- sceptre_object |> run_qc()
 
 # 4. run the calibration check
 sceptre_object <- run_calibration_check(sceptre_object)
@@ -119,24 +123,28 @@ data(discovery_pairs_highmoi_experimental)
 data(pc_pairs_highmoi_experimental)
 
 # 3. prepare the analysis
-sceptre_object <- prepare_analysis(
+sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = discovery_pairs_highmoi_experimental,
 positive_control_pairs = pc_pairs_highmoi_experimental,
 resampling_mechanism = "permutations",
 side = "left")
 
-# 4. run the calibration check; plot the result
+# 4. assign gRNAs as run cellwise and pairwise QC
+sceptre_object <- sceptre_object |> assign_grnas()
+sceptre_object <- sceptre_object |> run_qc()
+
+# 5. run the calibration check; plot the result
 sceptre_object <- run_calibration_check(sceptre_object)
 plot(sceptre_object)
 
-# 5. (optional) run the power check
+# 6. (optional) run the power check
 sceptre_object <- run_power_check(sceptre_object)
 
-# 6. run discovery analysis
+# 7. run discovery analysis
 sceptre_object <- run_discovery_analysis(sceptre_object)
 plot(sceptre_object)
 
-# 7. obtain the results for downstream analysis
+# 8. obtain the results for downstream analysis
 discovery_result <- get_result(sceptre_object, "discovery")
 }

@@ -150,6 +150,45 @@ check_prepare_analysis_inputs <- function(response_matrix, grna_matrix, covariat
 }
 
 
+check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters) {
+  # 1. check assignment method
+  if (sceptre_object@low_moi) { # Low MOI
+    if (assignment_method != "maximum") {
+      stop("The gRNA assignment method must be `maximum` in low MOI.")
+    }
+  } else { # high MOI
+    if (!(assignment_method %in% c("thresholding", "mixture"))) {
+      stop("The gRNA assignment method must be `thresholding` or `mixture` in high MOI.")
+    }
+  }
+
+  # 2. check hyperparameters
+  if (assignment_method == "maximum") { # maximum option
+    hyperparam_names <- names(hyperparameters)
+    if (!setequal(hyperparam_names, "umi_fraction_threshold")) {
+      stop("The names of the hyperparameters must be `umi_fraction_threshold`.")
+    }
+    if (!(hyperparameters[["umi_fraction_threshold"]] > 0.0 && hyperparameters[["umi_fraction_threshold"]] < 1.0)) {
+      stop("`umi_fraction_threshold` must be greater than 0.0 and be less than 1.0.")
+    }
+  }
+
+  if (assignment_method == "thresholding") { # thresholding operation
+    hyperparam_names <- names(hyperparameters)
+    if (!setequal(hyperparam_names, "threshold")) {
+      stop("The names of the hyperparameters must be `threshold`.")
+    }
+    if (hyperparameters[["threshold"]] < 1) {
+      stop("`threshold` must be greater than or equal to 1.")
+    }
+  }
+
+  if (assignment_method == "mixture") { # mixture model
+    stop("mixture method is not yet implemented.")
+  }
+}
+
+
 check_calibration_check_inputs <- function(analysis_prepared, grna_group_data_frame, control_group_complement) {
   if (!analysis_prepared) {
     stop("Prepare the analysis via prepare_analysis() before running a calibration check.")
@@ -190,4 +229,35 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
   }
 
   return(NULL)
+}
+
+
+get_function_rank_vector <- function() {
+  map <- stats::setNames(object = c(1L, 2L, 3L, 4L, 5L, 6L, 6L),
+                         nm = c("create_sceptre_object", "set_analysis_parameters",
+                                "assign_grnas", "run_qc", "run_calibration_check",
+                                "run_power_check", "run_discovery_analysis"))
+  return(map)
+}
+
+
+function_rank_map <- function(function_name = NULL, rank = NULL) {
+  map <- get_function_rank_vector()
+  if (!is.null(function_name)) {
+    out <- map[[function_name]]
+  }
+  if (!is.null(rank)) {
+    out <- names(map)[which(map == rank)]
+  }
+  return(out)
+}
+
+
+check_function_call <- function(sceptre_object, function_name) {
+  prev_funct_rank <- function_rank_map(function_name = sceptre_object@last_function_called)
+  curr_funct_rank <- function_rank_map(function_name = function_name)
+  if (curr_funct_rank - prev_funct_rank >= 2L) {
+    funct_to_call <- function_rank_map(rank = curr_funct_rank - 1L)
+    stop("You must call the function `", funct_to_call, "` before you call the function `", function_name, "`.")
+  }
 }
