@@ -2,22 +2,33 @@
 # If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
 # If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
 assign_grnas_to_cells <- function(sceptre_object) {
+  # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
-  grna_assign_threshold <- sceptre_object@grna_assign_threshold
   low_moi <- sceptre_object@low_moi
-  control_group_complement <- sceptre_object@control_group_complement
-  if (low_moi) {
-    grna_assignments <- assign_grnas_to_cells_lowmoi(grna_matrix, grna_group_data_frame, control_group_complement)
+  grna_assignment_method <- sceptre_object@grna_assignment_method
+
+  # assign grnas via the selected strategy
+  grna_assignments <- if (grna_assignment_method == "thresholding") {
+    assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
+                                       grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
+                                       grna_group_data_frame = grna_group_data_frame)
+  } else if (grna_assignment_method == "maximum") {
+    assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
+                                  grna_group_data_frame = grna_group_data_frame,
+                                  control_group_complement = sceptre_object@control_group_complement)
+  } else if (grna_assignment_method == "mixture") {
+    stop("Mixture assignment method not yet implemented.")
   } else {
-    grna_assignments <- assign_grnas_to_cells_highmoi(grna_matrix, grna_assign_threshold, grna_group_data_frame)
+    stop("gRNA assignment method not recognized.")
   }
+
   sceptre_object@grna_assignments <- grna_assignments
   return(sceptre_object)
 }
 
 
-assign_grnas_to_cells_highmoi <- function(grna_matrix, grna_assign_threshold, grna_group_data_frame) {
+assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_group_data_frame) {
   out <- list()
 
   # 1. make the matrix row-accessible
@@ -55,7 +66,7 @@ assign_grnas_to_cells_highmoi <- function(grna_matrix, grna_assign_threshold, gr
 }
 
 
-assign_grnas_to_cells_lowmoi <- function(grna_matrix, grna_group_data_frame, control_group_complement) {
+assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, control_group_complement) {
   out <- list()
 
   # 1. make grna matrix column accessible
