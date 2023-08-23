@@ -376,8 +376,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_colwise_max
-IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells);
-RcppExport SEXP _sceptre_compute_colwise_max(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_cellsSEXP) {
+List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells, NumericVector grna_lib_size);
+RcppExport SEXP _sceptre_compute_colwise_max(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_cellsSEXP, SEXP grna_lib_sizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -385,7 +385,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_colwise_max(i, p, x, n_cells));
+    Rcpp::traits::input_parameter< NumericVector >::type grna_lib_size(grna_lib_sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_colwise_max(i, p, x, n_cells, grna_lib_size));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -432,7 +433,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
-    {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 4},
+    {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
     {"_sceptre_group_and_threshold", (DL_FUNC) &_sceptre_group_and_threshold, 5},
     {NULL, NULL, 0}
 };

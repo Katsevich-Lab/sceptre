@@ -9,14 +9,17 @@ assign_grnas_to_cells <- function(sceptre_object) {
   grna_assignment_method <- sceptre_object@grna_assignment_method
 
   # assign grnas via the selected strategy
-  grna_assignments <- if (grna_assignment_method == "thresholding") {
-    assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
-                                       grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
-                                       grna_group_data_frame = grna_group_data_frame)
+  if (grna_assignment_method == "thresholding") {
+    grna_assignments <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
+                                                           grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
+                                                           grna_group_data_frame = grna_group_data_frame)
   } else if (grna_assignment_method == "maximum") {
-    assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
-                                  grna_group_data_frame = grna_group_data_frame,
-                                  control_group_complement = sceptre_object@control_group_complement)
+    out_list <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
+                                              grna_group_data_frame = grna_group_data_frame,
+                                              control_group_complement = sceptre_object@control_group_complement,
+                                              grna_lib_size = sceptre_object@covariate_data_frame$grna_n_umis)
+    grna_assignments <- out_list$gnra_assignments
+    sceptre_object@grna_assignment_extra_info$frac_umis <- out_list$frac_umis
   } else if (grna_assignment_method == "mixture") {
     stop("Mixture assignment method not yet implemented.")
   } else {
@@ -66,15 +69,17 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 }
 
 
-assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, control_group_complement) {
+assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, control_group_complement, grna_lib_size) {
   out <- list()
 
   # 1. make grna matrix column accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
 
   # 2. get the individual grna assignments
-  grna_idx <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p,
-                                  x = grna_matrix@x, n_cells = ncol(grna_matrix))
+  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p,
+                           x = grna_matrix@x, n_cells = ncol(grna_matrix),
+                           grna_lib_size = grna_lib_size)
+  grna_idx <- l$assignment_vect
   grna_rownames <- factor(rownames(grna_matrix))
   indiv_grna_id_assignments <- grna_rownames[grna_idx]
 
@@ -90,7 +95,7 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, co
   }) |> stats::setNames(unique_grna_groups)
   out$grna_group_idxs <- grna_group_idxs
 
-  # 5. if we are running a calibration check, return the indices of the individual nt grnas
+  # 5. return the indices of the individual nt grnas
   nt_grnas <- grna_group_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")
   indiv_nt_grna_idxs <- lapply(nt_grnas, function(nt_grna) {
@@ -111,5 +116,5 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, co
     out$all_nt_idxs <- all_nt_idxs
   }
 
-  return(out)
+  return(list(gnra_assignments = out, frac_umis = l$frac_umis))
 }

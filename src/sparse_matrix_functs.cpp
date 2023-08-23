@@ -73,8 +73,9 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
 
 
 // [[Rcpp::export]]
-IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells) {
-  IntegerVector out(n_cells);
+List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells, NumericVector grna_lib_size) {
+  IntegerVector assignment_vect(n_cells);
+  NumericVector frac_umis(n_cells);
   int p_start, p_end, curr_maximizer;
   double curr_max;
 
@@ -89,9 +90,10 @@ IntegerVector compute_colwise_max(IntegerVector i, IntegerVector p, NumericVecto
         curr_maximizer = i[l];
       }
     }
-    out[k] = curr_maximizer + 1;
+    assignment_vect[k] = curr_maximizer + 1;
+    frac_umis[k] =curr_max/grna_lib_size[k];
   }
-  return(out);
+  return(List::create(Named("assignment_vect") = assignment_vect, Named("frac_umis") = frac_umis));
 }
 
 
