@@ -38,7 +38,8 @@ setClass("sceptre_object",
            positive_control_pairs_with_info = "data.frame",
            negative_control_pairs = "data.frame",
            grna_assignments = "list",
-           grna_assignment_extra_info = "list",
+           multiple_grnas = "integer",
+           cells_in_use = "integer",
 
            # cached objects
            response_precomputations = "list",
@@ -67,7 +68,9 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
-             crayon::blue(n_cells), " cells\n\t\U2022 ",
+             crayon::blue(n_cells), " cells", if (length(sceptre_object@cells_in_use) >= 1) {
+               paste0(" (", crayon::blue(length(sceptre_object@cells_in_use)), " after cell-wise QC)")
+             } else NULL, "\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
              crayon::blue(moi), " multiplicity-of-infection \n\t\U2022 ",
              crayon::blue(n_nt_grnas), " non-targeting gRNAs \n\t\U2022 ",

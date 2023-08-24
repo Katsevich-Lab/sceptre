@@ -8,25 +8,36 @@ assign_grnas_to_cells <- function(sceptre_object) {
   low_moi <- sceptre_object@low_moi
   grna_assignment_method <- sceptre_object@grna_assignment_method
 
-  # assign grnas via the selected strategy
+  # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "thresholding") {
     grna_assignments <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
                                                            grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
                                                            grna_group_data_frame = grna_group_data_frame)
+    multiple_grnas <- integer()
   } else if (grna_assignment_method == "maximum") {
     out_list <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
                                               grna_group_data_frame = grna_group_data_frame,
                                               control_group_complement = sceptre_object@control_group_complement,
                                               grna_lib_size = sceptre_object@covariate_data_frame$grna_n_umis)
-    grna_assignments <- out_list$gnra_assignments
-    sceptre_object@grna_assignment_extra_info$frac_umis <- out_list$frac_umis
+    grna_assignments <- out_list$grna_assignments
+    multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
   } else if (grna_assignment_method == "mixture") {
     stop("Mixture assignment method not yet implemented.")
   } else {
     stop("gRNA assignment method not recognized.")
   }
 
+  # if nt cells as control group, update grna assignments
+  if (!sceptre_object@control_group_complement) {
+    l <- update_indiv_grna_assignments_for_complement_set(indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs)
+    grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
+    grna_assignments$all_nt_idxs <- l$all_nt_idxs
+  }
+
+  # update sceptre object with grna_assignments and multiple_grnas
   sceptre_object@grna_assignments <- grna_assignments
+  sceptre_object@multiple_grnas <- multiple_grnas
+
   return(sceptre_object)
 }
 
@@ -64,13 +75,12 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
     return(cell_idxs)
   })
   out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-
   return(out)
 }
 
 
 assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, control_group_complement, grna_lib_size) {
-  out <- list()
+  grna_assignments <- list()
 
   # 1. make grna matrix column accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
@@ -93,7 +103,7 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, co
   grna_group_idxs <- lapply(unique_grna_groups, function(unique_grna_group) {
     which(grna_group_assignments == unique_grna_group)
   }) |> stats::setNames(unique_grna_groups)
-  out$grna_group_idxs <- grna_group_idxs
+  grna_assignments$grna_group_idxs <- grna_group_idxs
 
   # 5. return the indices of the individual nt grnas
   nt_grnas <- grna_group_data_frame |>
@@ -101,20 +111,23 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, co
   indiv_nt_grna_idxs <- lapply(nt_grnas, function(nt_grna) {
     which(nt_grna == indiv_grna_id_assignments)
   }) |> stats::setNames(nt_grnas)
+  grna_assignments$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
+
+  return(list(grna_assignments = grna_assignments, frac_umis = l$frac_umis))
+}
+
+
+update_indiv_grna_assignments_for_complement_set <- function(indiv_nt_grna_idxs) {
+  out <- list()
+  nt_grnas <- names(indiv_nt_grna_idxs)
+  all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
+  n_cells_per_nt <- sapply(indiv_nt_grna_idxs, length)
+  stop <- cumsum(n_cells_per_nt)
+  start <- c(0L, stop[-length(stop)]) + 1L
+  indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
+    seq(start[i], stop[i])
+  }) |> stats::setNames(nt_grnas)
   out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-
-  # 6. handle NT cells as the control group
-  if (!control_group_complement) { # NT cell control group
-    all_nt_idxs <- stats::setNames(unlist(indiv_nt_grna_idxs), NULL)
-    n_cells_per_nt <- sapply(indiv_nt_grna_idxs, length)
-    stop <- cumsum(n_cells_per_nt)
-    start <- c(0L, stop[-length(stop)]) + 1L
-    indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-      seq(start[i], stop[i])
-    }) |> stats::setNames(nt_grnas)
-    out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-    out$all_nt_idxs <- all_nt_idxs
-  }
-
-  return(list(gnra_assignments = out, frac_umis = l$frac_umis))
+  out$all_nt_idxs <- all_nt_idxs
+  return(out)
 }
