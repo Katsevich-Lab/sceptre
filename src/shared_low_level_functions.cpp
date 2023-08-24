@@ -171,17 +171,3 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
   // 9. return p, xi, omega, alpha
   return std::vector<double> {fitted_params[0], fitted_params[1], fitted_params[2], p};
 }
-
-// [[Rcpp::export]]
-NumericVector compute_sn_density(NumericVector x_grid, double xi, double omega, double alpha) {
-  NumericVector out(x_grid.size());
-  skew_normal dist(xi, omega, alpha);
-  for (int i = 0; i < x_grid.size(); i ++) out[i] = pdf(dist, x_grid[i]);
-  return out;
-}
-
-// [[Rcpp::export]]
-double compute_sn_density_2(double x, double xi, double omega, double alpha) {
-  skew_normal dist(xi, omega, alpha);
-  return pdf(dist, x);
-}

@@ -37,8 +37,9 @@ setClass("sceptre_object",
            discovery_pairs_with_info = "data.frame",
            positive_control_pairs_with_info = "data.frame",
            negative_control_pairs = "data.frame",
+           grna_assignments_raw = "list",
            grna_assignments = "list",
-           multiple_grnas = "integer",
+           cells_w_multiple_grnas = "integer",
            cells_in_use = "integer",
 
            # cached objects

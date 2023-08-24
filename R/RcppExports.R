@@ -70,16 +70,8 @@ compute_nt_nonzero_matrix_and_n_ok_pairs_v2 <- function(j, p, n_cells, grna_grou
     .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2`, j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, compute_n_ok_pairs, control_group_complement)
 }
 
-compute_n_nonzero_trt_vector <- function(expression_vector, grna_group_idxs, grna_group_posits) {
-    .Call(`_sceptre_compute_n_nonzero_trt_vector`, expression_vector, grna_group_idxs, grna_group_posits)
-}
-
-test_boost_sampler <- function(n) {
-    .Call(`_sceptre_test_boost_sampler`, n)
-}
-
-test_std_sampler <- function(n) {
-    .Call(`_sceptre_test_std_sampler`, n)
+compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
+    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
 }
 
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {
@@ -96,14 +88,6 @@ check_sn_tail <- function(y, xi_hat, omega_hat, alpha_hat) {
 
 fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
     .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
-}
-
-compute_sn_density <- function(x_grid, xi, omega, alpha) {
-    .Call(`_sceptre_compute_sn_density`, x_grid, xi, omega, alpha)
-}
-
-compute_sn_density_2 <- function(x, xi, omega, alpha) {
-    .Call(`_sceptre_compute_sn_density_2`, x, xi, omega, alpha)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
