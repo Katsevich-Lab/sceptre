@@ -85,7 +85,7 @@ check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, grn
 }
 
 
-check_prepare_analysis_inputs <- function(response_matrix, grna_matrix, covariate_data_frame,
+check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariate_data_frame,
                                           grna_group_data_frame, formula_object, response_grna_group_pairs_list,
                                           control_group, resampling_mechanism, side, low_moi) {
   # 5. if response_grna_group_pairs has been supplied, check its characteristics
@@ -189,6 +189,15 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
 }
 
 
+check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range) {
+  if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
+    stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
+  }
+
+  return(NULL)
+}
+
+
 check_calibration_check_inputs <- function(analysis_prepared, grna_group_data_frame, control_group_complement) {
   if (!analysis_prepared) {
     stop("Prepare the analysis via prepare_analysis() before running a calibration check.")
@@ -240,7 +249,6 @@ get_function_rank_vector <- function() {
   return(map)
 }
 
-
 function_rank_map <- function(function_name = NULL, rank = NULL) {
   map <- get_function_rank_vector()
   if (!is.null(function_name)) {
@@ -251,7 +259,6 @@ function_rank_map <- function(function_name = NULL, rank = NULL) {
   }
   return(out)
 }
-
 
 check_function_call <- function(sceptre_object, function_name) {
   prev_funct_rank <- function_rank_map(function_name = sceptre_object@last_function_called)
