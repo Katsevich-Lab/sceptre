@@ -24,6 +24,7 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
 }
 
 
+// output: a vector y whose length is equal to the number of cells, containing a true/false indicating presence/absence of a gene expression
 void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx, std::vector<bool>& y) {
   int start = p[column_idx];
   int end = p[column_idx + 1];
@@ -198,10 +199,10 @@ void increment_matrix(IntegerMatrix m) {
 }
 
 
-// this function outputs three pieces:
+// this function outputs four pieces:
 // 1. N nonzero mat; this is the number of nonzero cells for each gene-NT gRNA pair (same regardless of control group)
-// 2. n_ok_pairs; this is the number of discovery pairs that is OK (i.e., passes pairwise QC)
-// 3. n_nonzero_tot; this is the vector giving the number of nonzero cells per gene; when using the NT cells as the complement, we restrict our attention to the NT cells; when using the complement set as the control group, by contrast, we sum over all cells.
+// 2. n_nonzero_tot; this is the vector giving the number of nonzero cells per gene; when using the NT cells as the complement, we restrict our attention to the NT cells; when using the complement set as the control group, by contrast, we sum over all cells.
+// 3,4. n nonzero trt, n nonzero cntrl vectors
 // [[Rcpp::export]]
 List compute_nt_nonzero_matrix_and_n_ok_pairs_v2(IntegerVector j, IntegerVector p, int n_cells, List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, bool compute_n_ok_pairs, bool control_group_complement) {
   // 0. initialize variables and objects
@@ -262,4 +263,3 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v2(IntegerVector j, IntegerVector 
   return List::create(Named("n_nonzero_mat") = M, Named("n_nonzero_tot") = n_nonzero_tot,
                       Named("n_nonzero_trt") = n_nonzero_trt, Named("n_nonzero_cntrl") = n_nonzero_cntrl);
 }
-

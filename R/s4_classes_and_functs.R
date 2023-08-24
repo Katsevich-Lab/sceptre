@@ -205,19 +205,6 @@ set_analysis_parameters <- function(sceptre_object,
 
   # return
   return(sceptre_object)
-
-  # compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
-  # sceptre_object <- compute_pairwise_qc_information(sceptre_object)
-  # compute the number of discovery pairs and (if applicable) pc pairs passing qc
-  # sceptre_object <- compute_qc_metrics(sceptre_object)
-  #if (update_cached_objects$discard_negative_control_pairs) {
-  #  cat("reseting negative control pairs\n")
-  #  sceptre_object@negative_control_pairs <- data.frame()
-  #}
-  #if (update_cached_objects$discard_grna_assignments) {
-  #  cat("reseting grna assignments\n")
-  #  sceptre_object <- assign_grnas_to_cells(sceptre_object)
-  #}
 }
 
 
@@ -243,8 +230,6 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
 
   # 3. reset results
   sceptre_object <- reset_results(sceptre_object)
-
-  # 4. determine whether to update cached fields (perhaps add later)
 
   # 5. update uncached fields
   sceptre_object@grna_assignment_method <- assignment_method
@@ -278,7 +263,20 @@ run_qc <- function(sceptre_object,
   # 5. update uncached fields of the sceptre object
   sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
   sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
+  sceptre_object@last_function_called <- "run_qc"
 
   # 6. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, additional_cells_to_remove)
+
+  # 7. update the grna assignments given the cellwise qc
+  sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
+
+  # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
+  sceptre_object <- compute_pairwise_qc_information(sceptre_object)
+
+  # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
+  sceptre_object <- compute_qc_metrics(sceptre_object)
+
+  # return
+  return(sceptre_object)
 }

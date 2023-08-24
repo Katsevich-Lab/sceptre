@@ -217,38 +217,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_n_nonzero_trt_vector
-IntegerVector compute_n_nonzero_trt_vector(NumericVector expression_vector, List grna_group_idxs, IntegerVector grna_group_posits);
-RcppExport SEXP _sceptre_compute_n_nonzero_trt_vector(SEXP expression_vectorSEXP, SEXP grna_group_idxsSEXP, SEXP grna_group_positsSEXP) {
+// compute_nt_nonzero_matrix_and_n_ok_pairs_v3
+List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, bool control_group_complement, IntegerVector cells_in_use);
+RcppExport SEXP _sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP grna_group_idxsSEXP, SEXP indiv_nt_grna_idxsSEXP, SEXP all_nt_idxsSEXP, SEXP to_analyze_response_idxsSEXP, SEXP to_analyze_grna_idxsSEXP, SEXP control_group_complementSEXP, SEXP cells_in_useSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type expression_vector(expression_vectorSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_sub(n_cells_subSEXP);
     Rcpp::traits::input_parameter< List >::type grna_group_idxs(grna_group_idxsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type grna_group_posits(grna_group_positsSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_n_nonzero_trt_vector(expression_vector, grna_group_idxs, grna_group_posits));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_boost_sampler
-NumericVector test_boost_sampler(int n);
-RcppExport SEXP _sceptre_test_boost_sampler(SEXP nSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_boost_sampler(n));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_std_sampler
-NumericVector test_std_sampler(int n);
-RcppExport SEXP _sceptre_test_std_sampler(SEXP nSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_std_sampler(n));
+    Rcpp::traits::input_parameter< List >::type indiv_nt_grna_idxs(indiv_nt_grna_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type all_nt_idxs(all_nt_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_response_idxs(to_analyze_response_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_grna_idxs(to_analyze_grna_idxsSEXP);
+    Rcpp::traits::input_parameter< bool >::type control_group_complement(control_group_complementSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_nt_nonzero_matrix_and_n_ok_pairs_v3(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -300,34 +286,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<double>& >::type null_statistics(null_statisticsSEXP);
     Rcpp::traits::input_parameter< int >::type side_code(side_codeSEXP);
     rcpp_result_gen = Rcpp::wrap(fit_and_evaluate_skew_normal(z_orig, null_statistics, side_code));
-    return rcpp_result_gen;
-END_RCPP
-}
-// compute_sn_density
-NumericVector compute_sn_density(NumericVector x_grid, double xi, double omega, double alpha);
-RcppExport SEXP _sceptre_compute_sn_density(SEXP x_gridSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x_grid(x_gridSEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    Rcpp::traits::input_parameter< double >::type omega(omegaSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_sn_density(x_grid, xi, omega, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
-// compute_sn_density_2
-double compute_sn_density_2(double x, double xi, double omega, double alpha);
-RcppExport SEXP _sceptre_compute_sn_density_2(SEXP xSEXP, SEXP xiSEXP, SEXP omegaSEXP, SEXP alphaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type x(xSEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    Rcpp::traits::input_parameter< double >::type omega(omegaSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_sn_density_2(x, xi, omega, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -421,15 +379,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_sample_undercover_pairs", (DL_FUNC) &_sceptre_sample_undercover_pairs, 12},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2, 10},
-    {"_sceptre_compute_n_nonzero_trt_vector", (DL_FUNC) &_sceptre_compute_n_nonzero_trt_vector, 3},
-    {"_sceptre_test_boost_sampler", (DL_FUNC) &_sceptre_test_boost_sampler, 1},
-    {"_sceptre_test_std_sampler", (DL_FUNC) &_sceptre_test_std_sampler, 1},
+    {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},
     {"_sceptre_check_sn_tail", (DL_FUNC) &_sceptre_check_sn_tail, 4},
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 3},
-    {"_sceptre_compute_sn_density", (DL_FUNC) &_sceptre_compute_sn_density, 4},
-    {"_sceptre_compute_sn_density_2", (DL_FUNC) &_sceptre_compute_sn_density_2, 4},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},

@@ -13,30 +13,23 @@ assign_grnas_to_cells <- function(sceptre_object) {
     grna_assignments <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
                                                            grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
                                                            grna_group_data_frame = grna_group_data_frame)
-    multiple_grnas <- integer()
+    cells_w_multiple_grnas <- integer()
   } else if (grna_assignment_method == "maximum") {
     out_list <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
                                               grna_group_data_frame = grna_group_data_frame,
                                               control_group_complement = sceptre_object@control_group_complement,
                                               grna_lib_size = sceptre_object@covariate_data_frame$grna_n_umis)
     grna_assignments <- out_list$grna_assignments
-    multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
+    cells_w_multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
   } else if (grna_assignment_method == "mixture") {
     stop("Mixture assignment method not yet implemented.")
   } else {
     stop("gRNA assignment method not recognized.")
   }
 
-  # if nt cells as control group, update grna assignments
-  if (!sceptre_object@control_group_complement) {
-    l <- update_indiv_grna_assignments_for_complement_set(indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs)
-    grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
-    grna_assignments$all_nt_idxs <- l$all_nt_idxs
-  }
-
-  # update sceptre object with grna_assignments and multiple_grnas
-  sceptre_object@grna_assignments <- grna_assignments
-  sceptre_object@multiple_grnas <- multiple_grnas
+  # update sceptre object with grna_assignments and cells_w_multiple_grnas
+  sceptre_object@grna_assignments_raw <- grna_assignments
+  sceptre_object@cells_w_multiple_grnas <- cells_w_multiple_grnas
 
   return(sceptre_object)
 }
@@ -117,7 +110,7 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, co
 }
 
 
-update_indiv_grna_assignments_for_complement_set <- function(indiv_nt_grna_idxs) {
+update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
   out <- list()
   nt_grnas <- names(indiv_nt_grna_idxs)
   all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
