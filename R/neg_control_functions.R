@@ -1,13 +1,11 @@
-construct_negative_control_pairs <- function(n_calibration_pairs, calibration_group_size,
-                                             grna_assignments, response_matrix,
-                                             grna_group_data_frame, low_moi,
-                                             n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                             n_nonzero_m, n_nonzero_tot) {
+construct_negative_control_pairs_v2 <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix,
+                                                grna_group_data_frame, low_moi, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                                n_nonzero_m, n_nonzero_tot, cells_in_use, discovery_pairs_with_info) {
   # 1. set a few variables
   N_POSSIBLE_GROUPS_THRESHOLD <- 100L
   nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
   n_nt_grnas <- length(nt_grna_names)
-  if (is.na(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+  n_genes <- nrow(response_matrix)
 
   # 2. compute the number of possible groups; compute the possible groups
   n_possible_groups <- choose(n_nt_grnas, calibration_group_size)
@@ -17,16 +15,19 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
     possible_groups_m <- iterate_over_combinations(n_nt_grnas, calibration_group_size, n_possible_groups)
   } else {
     # sample from the set of combinations
-    possible_groups_m <- sample_combinations(calibration_group_size, n_calibration_pairs, n_nonzero_trt_thresh,
-                                             n_nonzero_cntrl_thresh, n_possible_groups, n_nonzero_m, n_nonzero_tot,
-                                             N_POSSIBLE_GROUPS_THRESHOLD)
+    p_hat <- mean(discovery_pairs_with_info$pass_qc)
+    possible_groups_m <- sample_combinations_v2(calibration_group_size, n_calibration_pairs, n_possible_groups,
+                                                n_nt_grnas, as.numeric(n_genes), N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
   }
 
   # 3. sample WOR from the set of undercover pairs
-  samp <- sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_calibration_pairs,
-                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, low_moi,
-                                  j = response_matrix@j, p = response_matrix@p, n_cells = ncol(response_matrix),
-                                  n_genes = nrow(response_matrix), indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs)
+  calculate_ess_using_m_matrix <- sceptre_object@low_moi || calibration_group_size == 1L
+  samp <- sample_undercover_pairs_v2(n_nonzero_m = n_nonzero_m, n_nonzero_tot = n_nonzero_tot, possible_groups_m = possible_groups_m,
+                                     n_genes = n_genes, n_calibration_pairs = n_calibration_pairs,
+                                     n_nonzero_trt_thresh = n_nonzero_trt_thresh, n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+                                     calculate_ess_using_m_matrix = calculate_ess_using_m_matrix, j = response_matrix@j,
+                                     p = response_matrix@p, n_cells_orig = ncol(response_matrix), n_cells_sub = length(cells_in_use),
+                                     indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs, cells_in_use = cells_in_use)
 
   # 4. construct the data frame of negative control pairs
   response_ids <- factor(rownames(response_matrix))
@@ -47,12 +48,12 @@ construct_negative_control_pairs <- function(n_calibration_pairs, calibration_gr
 
 
 compute_calibration_group_size <- function(grna_group_data_frame) {
-    median_group_size <- grna_group_data_frame |>
-      dplyr::filter(grna_group != "non-targeting") |>
-      dplyr::pull(grna_group) |> table() |> stats::median() |> round()
-    n_ntc <- grna_group_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
-    calibration_group_size <- min(median_group_size, floor(n_ntc/2))
-    return(calibration_group_size)
+  median_group_size <- grna_group_data_frame |>
+    dplyr::filter(grna_group != "non-targeting") |>
+    dplyr::pull(grna_group) |> table() |> stats::median() |> round()
+  n_ntc <- grna_group_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
+  calibration_group_size <- min(median_group_size, floor(n_ntc/2))
+  return(calibration_group_size)
 }
 
 

@@ -171,3 +171,15 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
   // 9. return p, xi, omega, alpha
   return std::vector<double> {fitted_params[0], fitted_params[1], fitted_params[2], p};
 }
+
+
+// output: a vector y whose length is equal to the number of cells, containing a true/false indicating presence/absence of a gene expression
+void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx, std::vector<bool>& y_orig,
+                         std::vector<bool>& y_sub, std::vector<int>& cells_in_use_zero_idx) {
+  int start = p[column_idx];
+  int end = p[column_idx + 1];
+  for (int k = 0; k < y_orig.size(); k ++) y_orig[k] = false;
+  for (int k = start; k < end; k ++) y_orig[j[k]] = true;
+  for (int k = 0; k < y_sub.size(); k++) y_sub[k] = y_orig[cells_in_use_zero_idx[k]];
+  return;
+}

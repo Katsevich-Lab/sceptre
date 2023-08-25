@@ -1,4 +1,49 @@
-run_calibration_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
+run_calibration_check_v2 <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
+                                     calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
+  # 0. verify that function called in correct order
+  check_function_call(sceptre_object, "run_calibration_check")
+
+  # 1. handle the default arguments
+  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
+  if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+
+  # 2. check inputs
+  check_calibration_check_inputs(sceptre_object) |> invisible()
+
+  # 3. construct the negative control pairs
+  cat("Constructing negative control pairs.")
+  response_grna_group_pairs <- construct_negative_control_pairs(n_calibration_pairs = n_calibration_pairs,
+                                                                calibration_group_size = calibration_group_size,
+                                                                grna_assignments = sceptre_object@grna_assignments,
+                                                                response_matrix = sceptre_object@response_matrix,
+                                                                grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                                                low_moi = sceptre_object@low_moi,
+                                                                n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+                                                                n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+                                                                n_nonzero_m = sceptre_object@M_matrix,
+                                                                n_nonzero_tot = sceptre_object@n_nonzero_tot_vector,
+                                                                cells_in_use = sceptre_object@cells_in_use)
+  cat(crayon::green(' \u2713\n'))
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
+                                  calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
   # 1. do argument check
   check_calibration_check_inputs(analysis_prepared = sceptre_object@analysis_prepared,
                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,

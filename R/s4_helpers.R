@@ -153,5 +153,8 @@ reset_results <- function(sceptre_object) {
   sceptre_object@calibration_result <- data.frame()
   sceptre_object@discovery_result <- data.frame()
   sceptre_object@power_result <- data.frame()
+  sceptre_object@n_ok_discovery_pairs <- integer()
+  sceptre_object@n_ok_positive_control_pairs <- integer()
+  sceptre_object@cells_in_use <- integer()
   return(sceptre_object)
 }

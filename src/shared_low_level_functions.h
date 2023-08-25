@@ -28,3 +28,9 @@ bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_ha
 #define FIT_AND_EVALUATE_SKEW_NORMAL
 std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code);
 #endif
+
+#ifndef LOAD_NONZERO_POSITS
+#define LOAD_NONZERO_POSITS
+void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx, std::vector<bool>& y_orig,
+                         std::vector<bool>& y_sub, std::vector<int>& cells_in_use_zero_idx);
+#endif
