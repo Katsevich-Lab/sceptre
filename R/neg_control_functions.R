@@ -1,6 +1,15 @@
-construct_negative_control_pairs_v2 <- function(n_calibration_pairs, calibration_group_size, grna_assignments, response_matrix,
-                                                grna_group_data_frame, low_moi, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                                n_nonzero_m, n_nonzero_tot, cells_in_use, discovery_pairs_with_info) {
+construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pairs, calibration_group_size) {
+  grna_assignments <- sceptre_object@grna_assignments
+  response_matrix <- sceptre_object@response_matrix
+  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  low_moi <- sceptre_object@low_moi
+  n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
+  n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
+  n_nonzero_m <- sceptre_object@M_matrix
+  n_nonzero_tot <- sceptre_object@n_nonzero_tot_vector
+  cells_in_use <- sceptre_object@cells_in_use
+  discovery_pairs_with_info <- sceptre_object@discovery_pairs_with_info
+
   # 1. set a few variables
   N_POSSIBLE_GROUPS_THRESHOLD <- 100L
   nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
@@ -52,7 +61,7 @@ compute_calibration_group_size <- function(grna_group_data_frame) {
     dplyr::filter(grna_group != "non-targeting") |>
     dplyr::pull(grna_group) |> table() |> stats::median() |> round()
   n_ntc <- grna_group_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
-  calibration_group_size <- min(median_group_size, floor(n_ntc/2))
+  calibration_group_size <- as.integer(min(median_group_size, floor(n_ntc/2)))
   return(calibration_group_size)
 }
 

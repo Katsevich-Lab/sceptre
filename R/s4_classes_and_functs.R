@@ -231,6 +231,13 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   # 3. reset results
   sceptre_object <- reset_results(sceptre_object)
 
+  # 4. determine whether to reset response precomputations
+  reset_response_precomps <- !(identical(sceptre_object@grna_assignment_method, assignment_method) &&
+                               identical(sceptre_object@grna_assignment_hyperparameters, hyperparameters))
+  if (reset_response_precomps) {
+    sceptre_object@response_precomputations <- list()
+  }
+
   # 5. update uncached fields
   sceptre_object@grna_assignment_method <- assignment_method
   sceptre_object@grna_assignment_hyperparameters <- hyperparameters
@@ -238,8 +245,6 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
 
   # 6. assign the grnas
   sceptre_object <- assign_grnas_to_cells(sceptre_object)
-
-  # NOTE: THINK ABOUT CACHING OF RESPONSE PRECOMPUTATIONS.
 
   # return
   return(sceptre_object)

@@ -41,6 +41,8 @@ setClass("sceptre_object",
            grna_assignments = "list",
            cells_w_multiple_grnas = "integer",
            cells_in_use = "integer",
+           calibration_group_size = "integer",
+           n_calibration_pairs = "integer",
 
            # cached objects
            response_precomputations = "list",
