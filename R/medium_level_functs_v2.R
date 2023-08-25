@@ -14,7 +14,7 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                    side_code, low_moi, response_precomputations, print_progress, parallel) {
+                                    side_code, low_moi, response_precomputations, cells_in_use, print_progress, parallel) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -25,7 +25,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
 
-  # 1. subset covariate matrix to nt cells (if applicable)
+  # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
+  covariate_matrix <- covariate_matrix[cells_in_use,]
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
 
   # 2. define function to loop subset of response IDs
@@ -41,7 +42,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                         p = response_matrix@p,
                                         x = response_matrix@x,
                                         row_idx = which(rownames(response_matrix) == response_id),
-                                        n_cells = n_cells)
+                                        n_cells = n_cells)[cells_in_use]
       if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
       # 4. obtain the gRNA groups to analyze
@@ -99,12 +100,12 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   }
 
   # 5. combine and sort result
-  ret_pass_qc <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
-    data.table::rbindlist(fill = TRUE)
+  result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |> data.table::rbindlist(fill = TRUE)
+  data.table::setorderv(result, cols = c("p_value", "response_id"), na.last = TRUE)
   precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> purrr::flatten()
   response_precomputations <- c(response_precomputations, precomp_out_list)
 
-  return(list(ret_pass_qc = ret_pass_qc, response_precomputations = response_precomputations))
+  return(list(result = result, response_precomputations = response_precomputations))
 }
 
 

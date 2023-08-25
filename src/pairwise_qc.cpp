@@ -43,11 +43,11 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
     }
 
     // 1.2 update n_nonzero_tot for this gene
+    n_nonzero_tot[column_idx] = 0;
     if (!control_group_complement) {
-      n_nonzero_tot[column_idx] = 0;
       for (int k = 0; k < n_nt_grnas; k ++) n_nonzero_tot[column_idx] += M(k, column_idx);
     } else {
-      n_nonzero_tot[column_idx] = p[column_idx + 1] - p[column_idx]; // or, the number of trues in the y_sub vector
+      for (int k = 0; k < y_sub.size(); k++) if (y_sub[k]) n_nonzero_tot[column_idx] ++;
     }
 
     // iterate through the discovery pairs containing this gene
