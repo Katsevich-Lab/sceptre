@@ -231,11 +231,6 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
     }
   }
 
-  # 3. check that the calibration check has been run
-  if (!sceptre_object@calibration_check_run) {
-    warning("Either the calibration check has not yet been run, or the analysis parameters have been updated since the calibration check was last run. We recommend running the calibration check (via the calibration_check() function) before continuing with the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".")
-  }
-
   return(NULL)
 }
 
