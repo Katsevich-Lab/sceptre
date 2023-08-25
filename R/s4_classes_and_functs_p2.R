@@ -114,7 +114,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   args_to_pass <- list(response_matrix = sceptre_object@response_matrix,
                        grna_assignments = sceptre_object@grna_assignments,
                        covariate_matrix = sceptre_object@covariate_matrix,
-                       response_grna_group_pairs = response_grna_group_pairs,
+                       response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),
                        output_amount = output_amount,
                        fit_parametric_curve = sceptre_object@fit_parametric_curve,
                        B1 = sceptre_object@B1, B2 = sceptre_object@B2,
@@ -135,7 +135,10 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
     do.call(what = "run_crt_in_memory_v2", args = args_to_pass)
   }
 
-  # return the output
+  # wrangle the result and return
+  final_result <- data.table::rbindlist(list(out$result, response_grna_group_pairs |> dplyr::filter(!pass_qc)), fill = TRUE)
+  data.table::setorderv(final_result, cols = c("p_value", "response_id"), na.last = TRUE)
+  out$result <- final_result
   return(out)
 }
 

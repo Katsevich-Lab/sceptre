@@ -236,7 +236,7 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
 
 get_function_rank_vector <- function() {
-  map <- stats::setNames(object = c(1L, 2L, 3L, 4L, 5L, 6L, 6L),
+  map <- stats::setNames(object = c(1L, 2L, 3L, 4L, 5L, 5L, 5L),
                          nm = c("create_sceptre_object", "set_analysis_parameters",
                                 "assign_grnas", "run_qc", "run_calibration_check",
                                 "run_power_check", "run_discovery_analysis"))

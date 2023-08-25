@@ -265,10 +265,6 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 
 
 plot_discovery_result <- function(sceptre_object, return_indiv_plots = FALSE, alpha = 0.1, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55, multiple_testing_correction = "BH") {
-  # perform check
-  if (!(sceptre_object@calibration_check_run && sceptre_object@discovery_analysis_run)) {
-    stop("The calibration check and discovery analysis must have been run before calling this function.")
-  }
   # first, compute the rejection set
   discovery_result <- sceptre_object@discovery_result |> na.omit()
   calibration_result <- sceptre_object@calibration_result

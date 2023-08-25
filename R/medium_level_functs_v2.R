@@ -101,7 +101,6 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
   # 5. combine and sort result
   result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |> data.table::rbindlist(fill = TRUE)
-  data.table::setorderv(result, cols = c("p_value", "response_id"), na.last = TRUE)
   precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> purrr::flatten()
   response_precomputations <- c(response_precomputations, precomp_out_list)
 
