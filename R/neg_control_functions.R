@@ -45,7 +45,8 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
   df <- data.frame(response_id = response_ids[samp$response_idxs],
                    grna_group = undercover_groups[samp$grna_group_idxs],
                    n_nonzero_trt = samp$n_nonzero_trt_v,
-                   n_nonzero_cntrl = samp$n_nonzero_cntrl_v)
+                   n_nonzero_cntrl = samp$n_nonzero_cntrl_v,
+                   pass_qc = TRUE)
 
   # 5. check the number of rows of df, and issue a warning if less than the required amount
   if (nrow(df) < n_calibration_pairs) {

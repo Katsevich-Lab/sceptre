@@ -138,11 +138,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 # plot function for sceptre object
 setMethod("plot", signature = signature("sceptre_object"), function(x) {
   last_function_called <- x@last_function_called
-  if (last_function_called == "create_sceptre_object") {
-    p <- plot_covariates(x)
-  } else if (last_function_called == "prepare_analysis") {
-    p <- plot_prepare_analysis(x)
-  } else if (last_function_called == "run_calibration_check") {
+  if (last_function_called == "run_calibration_check") {
     p <- plot_calibration_result(x)
   } else if (last_function_called == "run_discovery_analysis") {
     p <- plot_discovery_result(x)
