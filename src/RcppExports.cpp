@@ -134,21 +134,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_combinations
-IntegerMatrix sample_combinations(int undercover_group_size, double n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, double n_possible_groups, IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, int N_POSSIBLE_GROUPS_THRESHOLD);
-RcppExport SEXP _sceptre_sample_combinations(SEXP undercover_group_sizeSEXP, SEXP n_pairs_to_sampleSEXP, SEXP N_NONZERO_TRTSEXP, SEXP N_NONZERO_CNTRLSEXP, SEXP n_possible_groupsSEXP, SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP) {
+// sample_combinations_v2
+IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups, int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat);
+RcppExport SEXP _sceptre_sample_combinations_v2(SEXP calibration_group_sizeSEXP, SEXP n_calibration_pairsSEXP, SEXP n_possible_groupsSEXP, SEXP n_nt_grnasSEXP, SEXP n_genesSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP, SEXP p_hatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type undercover_group_size(undercover_group_sizeSEXP);
-    Rcpp::traits::input_parameter< double >::type n_pairs_to_sample(n_pairs_to_sampleSEXP);
-    Rcpp::traits::input_parameter< int >::type N_NONZERO_TRT(N_NONZERO_TRTSEXP);
-    Rcpp::traits::input_parameter< int >::type N_NONZERO_CNTRL(N_NONZERO_CNTRLSEXP);
+    Rcpp::traits::input_parameter< int >::type calibration_group_size(calibration_group_sizeSEXP);
+    Rcpp::traits::input_parameter< double >::type n_calibration_pairs(n_calibration_pairsSEXP);
     Rcpp::traits::input_parameter< double >::type n_possible_groups(n_possible_groupsSEXP);
-    Rcpp::traits::input_parameter< IntegerMatrix >::type n_nonzero_m(n_nonzero_mSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type n_nonzero_tot(n_nonzero_totSEXP);
+    Rcpp::traits::input_parameter< int >::type n_nt_grnas(n_nt_grnasSEXP);
+    Rcpp::traits::input_parameter< double >::type n_genes(n_genesSEXP);
     Rcpp::traits::input_parameter< int >::type N_POSSIBLE_GROUPS_THRESHOLD(N_POSSIBLE_GROUPS_THRESHOLDSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_combinations(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD));
+    Rcpp::traits::input_parameter< double >::type p_hat(p_hatSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_combinations_v2(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -165,28 +164,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// sample_undercover_pairs
-List sample_undercover_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_pairs_to_sample, int N_NONZERO_TRT, int N_NONZERO_CNTRL, bool low_moi, IntegerVector j, IntegerVector p, int n_cells, int n_genes, List indiv_nt_grna_idxs);
-RcppExport SEXP _sceptre_sample_undercover_pairs(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_pairs_to_sampleSEXP, SEXP N_NONZERO_TRTSEXP, SEXP N_NONZERO_CNTRLSEXP, SEXP low_moiSEXP, SEXP jSEXP, SEXP pSEXP, SEXP n_cellsSEXP, SEXP n_genesSEXP, SEXP indiv_nt_grna_idxsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type n_nonzero_m(n_nonzero_mSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type n_nonzero_tot(n_nonzero_totSEXP);
-    Rcpp::traits::input_parameter< IntegerMatrix >::type possible_groups_m(possible_groups_mSEXP);
-    Rcpp::traits::input_parameter< int >::type n_pairs_to_sample(n_pairs_to_sampleSEXP);
-    Rcpp::traits::input_parameter< int >::type N_NONZERO_TRT(N_NONZERO_TRTSEXP);
-    Rcpp::traits::input_parameter< int >::type N_NONZERO_CNTRL(N_NONZERO_CNTRLSEXP);
-    Rcpp::traits::input_parameter< bool >::type low_moi(low_moiSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
-    Rcpp::traits::input_parameter< List >::type indiv_nt_grna_idxs(indiv_nt_grna_idxsSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, low_moi, j, p, n_cells, n_genes, indiv_nt_grna_idxs));
-    return rcpp_result_gen;
-END_RCPP
-}
 // increment_matrix
 void increment_matrix(IntegerMatrix m);
 RcppExport SEXP _sceptre_increment_matrix(SEXP mSEXP) {
@@ -197,23 +174,27 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// compute_nt_nonzero_matrix_and_n_ok_pairs_v2
-List compute_nt_nonzero_matrix_and_n_ok_pairs_v2(IntegerVector j, IntegerVector p, int n_cells, List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, bool compute_n_ok_pairs, bool control_group_complement);
-RcppExport SEXP _sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2(SEXP jSEXP, SEXP pSEXP, SEXP n_cellsSEXP, SEXP grna_group_idxsSEXP, SEXP indiv_nt_grna_idxsSEXP, SEXP all_nt_idxsSEXP, SEXP to_analyze_response_idxsSEXP, SEXP to_analyze_grna_idxsSEXP, SEXP compute_n_ok_pairsSEXP, SEXP control_group_complementSEXP) {
+// sample_undercover_pairs_v2
+List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, bool calculate_ess_using_m_matrix, IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, List indiv_nt_grna_idxs, IntegerVector cells_in_use);
+RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP, SEXP calculate_ess_using_m_matrixSEXP, SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP indiv_nt_grna_idxsSEXP, SEXP cells_in_useSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type n_nonzero_m(n_nonzero_mSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type n_nonzero_tot(n_nonzero_totSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type possible_groups_m(possible_groups_mSEXP);
+    Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
+    Rcpp::traits::input_parameter< int >::type n_calibration_pairs(n_calibration_pairsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_nonzero_trt_thresh(n_nonzero_trt_threshSEXP);
+    Rcpp::traits::input_parameter< int >::type n_nonzero_cntrl_thresh(n_nonzero_cntrl_threshSEXP);
+    Rcpp::traits::input_parameter< bool >::type calculate_ess_using_m_matrix(calculate_ess_using_m_matrixSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    Rcpp::traits::input_parameter< List >::type grna_group_idxs(grna_group_idxsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_sub(n_cells_subSEXP);
     Rcpp::traits::input_parameter< List >::type indiv_nt_grna_idxs(indiv_nt_grna_idxsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type all_nt_idxs(all_nt_idxsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_response_idxs(to_analyze_response_idxsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_grna_idxs(to_analyze_grna_idxsSEXP);
-    Rcpp::traits::input_parameter< bool >::type compute_n_ok_pairs(compute_n_ok_pairsSEXP);
-    Rcpp::traits::input_parameter< bool >::type control_group_complement(control_group_complementSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_nt_nonzero_matrix_and_n_ok_pairs_v2(j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, compute_n_ok_pairs, control_group_complement));
+    Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs_v2(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -374,11 +355,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 15},
-    {"_sceptre_sample_combinations", (DL_FUNC) &_sceptre_sample_combinations, 8},
+    {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
-    {"_sceptre_sample_undercover_pairs", (DL_FUNC) &_sceptre_sample_undercover_pairs, 12},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
-    {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2, 10},
+    {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 14},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
     {"_sceptre_fit_skew_normal_funct", (DL_FUNC) &_sceptre_fit_skew_normal_funct, 1},

@@ -239,6 +239,8 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   # 6. assign the grnas
   sceptre_object <- assign_grnas_to_cells(sceptre_object)
 
+  # NOTE: THINK ABOUT CACHING OF RESPONSE PRECOMPUTATIONS.
+
   # return
   return(sceptre_object)
 }
@@ -260,6 +262,9 @@ run_qc <- function(sceptre_object,
   # 3. reset results
   sceptre_object <- reset_results(sceptre_object)
 
+  # 4. obtain previous cells_in_use for caching purposes
+  current_cells_in_use <- sceptre_object@cells_in_use
+
   # 5. update uncached fields of the sceptre object
   sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
   sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
@@ -268,13 +273,18 @@ run_qc <- function(sceptre_object,
   # 6. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, additional_cells_to_remove)
 
-  # 7. update the grna assignments given the cellwise qc
+  # 7. determine whether to reset response precomputation
+  if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
+    sceptre_object@response_precomputations <- list()
+  }
+
+  # 8. update the grna assignments given the cellwise qc
   sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
 
-  # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
+  # 9. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
   sceptre_object <- compute_pairwise_qc_information(sceptre_object)
 
-  # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
+  # 10. compute the number of discovery pairs and (if applicable) pc pairs passing qc
   sceptre_object <- compute_qc_metrics(sceptre_object)
 
   # return

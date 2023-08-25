@@ -50,24 +50,20 @@ run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_
     .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
 }
 
-sample_combinations <- function(undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD) {
-    .Call(`_sceptre_sample_combinations`, undercover_group_size, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, n_possible_groups, n_nonzero_m, n_nonzero_tot, N_POSSIBLE_GROUPS_THRESHOLD)
+sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
+    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
     .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
-sample_undercover_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, low_moi, j, p, n_cells, n_genes, indiv_nt_grna_idxs) {
-    .Call(`_sceptre_sample_undercover_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_pairs_to_sample, N_NONZERO_TRT, N_NONZERO_CNTRL, low_moi, j, p, n_cells, n_genes, indiv_nt_grna_idxs)
-}
-
 increment_matrix <- function(m) {
     invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
-compute_nt_nonzero_matrix_and_n_ok_pairs_v2 <- function(j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, compute_n_ok_pairs, control_group_complement) {
-    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v2`, j, p, n_cells, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, compute_n_ok_pairs, control_group_complement)
+sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use) {
+    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use)
 }
 
 compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {

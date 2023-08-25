@@ -1,17 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
-
-// output: a vector y whose length is equal to the number of cells, containing a true/false indicating presence/absence of a gene expression
-void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx,
-                         std::vector<bool>& y_orig, std::vector<bool>& y_sub,
-                         std::vector<int>& cells_in_use_zero_idx) {
-  int start = p[column_idx];
-  int end = p[column_idx + 1];
-  for (int k = 0; k < y_orig.size(); k ++) y_orig[k] = false;
-  for (int k = start; k < end; k ++) y_orig[j[k]] = true;
-  for (int k = 0; k < y_sub.size(); k++) y_sub[k] = y_orig[cells_in_use_zero_idx[k]];
-  return;
-}
+#include "shared_low_level_functions.h"
 
 // this function outputs four pieces:
 // 1. N nonzero mat; this is the number of nonzero cells for each gene-NT gRNA pair (same regardless of control group)
@@ -34,7 +23,6 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
   std::vector<bool> y_orig(n_cells_orig);
   std::vector<int> cells_in_use_zero_idx(n_cells_sub);
   for (int i = 0; i < cells_in_use_zero_idx.size(); i ++) cells_in_use_zero_idx[i] = cells_in_use[i] - 1;
-
 
   // 1. iterate over genes
   for (int column_idx = 0; column_idx < n_genes; column_idx++) {

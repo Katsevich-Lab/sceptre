@@ -198,10 +198,9 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
 }
 
 
-check_calibration_check_inputs <- function(analysis_prepared, grna_group_data_frame, control_group_complement) {
-  if (!analysis_prepared) {
-    stop("Prepare the analysis via prepare_analysis() before running a calibration check.")
-  }
+check_calibration_check_inputs <- function(sceptre_object) {
+  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  control_group_complement <- sceptre_object@control_group_complement
   n_nt_grnas <- grna_group_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> nrow()
   if (control_group_complement) {
