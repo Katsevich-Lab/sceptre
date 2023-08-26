@@ -37,7 +37,7 @@
 #' data(grna_group_data_frame_lowmoi) # gRNA group information
 #'
 #' # 1. create the sceptre object
-#' sceptre_object <- create_sceptre_object(
+#' sceptre_object <- import_data(
 #' response_matrix = response_matrix_lowmoi,
 #' grna_matrix = grna_matrix_lowmoi,
 #' extra_covariates = extra_covariates_lowmoi,
@@ -49,19 +49,15 @@
 #' sceptre_object = sceptre_object,
 #' discovery_pairs = "all")
 #'
-#' # 3. assign gRNAs as run cellwise and pairwise QC
-#' sceptre_object <- sceptre_object |> assign_grnas()
-#' sceptre_object <- sceptre_object |> run_qc()
-#'
-#' # 4. run the calibration check
+#' # 3. run the calibration check
 #' sceptre_object <- run_calibration_check(sceptre_object)
 #' plot(sceptre_object)
 #'
-#' # 5. run discovery analysis
+#' # 4. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object)
 #' plot(sceptre_object)
 #'
-#' # 6. obtain the results for downstream analysis
+#' # 5. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "discovery")
 #'
 #' ##################
@@ -74,7 +70,7 @@
 #' data(grna_group_data_frame_highmoi_experimental)
 #'
 #' # 1. create the sceptre object
-#' sceptre_object <- create_sceptre_object(
+#' sceptre_object <- import_data(
 #' response_matrix = response_matrix_highmoi_experimental,
 #' grna_matrix = grna_matrix_highmoi_experimental,
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
@@ -93,26 +89,22 @@
 #' resampling_mechanism = "permutations",
 #' side = "left")
 #'
-#' # 4. assign gRNAs as run cellwise and pairwise QC
-#' sceptre_object <- sceptre_object |> assign_grnas()
-#' sceptre_object <- sceptre_object |> run_qc()
-#'
-#' # 5. run the calibration check; plot the result
+#' # 4. run the calibration check; plot the result
 #' sceptre_object <- run_calibration_check(sceptre_object)
 #' plot(sceptre_object)
 #'
-#' # 6. (optional) run the power check
+#' # 5. (optional) run the power check
 #' sceptre_object <- run_power_check(sceptre_object)
 #'
-#' # 7. run discovery analysis
+#' # 6. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object)
 #' plot(sceptre_object)
 #'
-#' # 8. obtain the results for downstream analysis
+#' # 7. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "discovery")
-create_sceptre_object <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL) {
+import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL) {
   # 1. perform initial check
-  check_create_sceptre_object_inputs(response_matrix, grna_matrix,
+  check_import_data_inputs(response_matrix, grna_matrix,
                                      grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
@@ -129,7 +121,7 @@ create_sceptre_object <- function(response_matrix, grna_matrix, grna_group_data_
   sceptre_object@grna_group_data_frame <- grna_group_data_frame
   sceptre_object@low_moi <- (moi == "low")
   if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
-  sceptre_object@last_function_called <- "create_sceptre_object"
+  sceptre_object@last_function_called <- "import_data"
   return(sceptre_object)
 }
 
@@ -143,7 +135,9 @@ set_analysis_parameters <- function(sceptre_object,
                                     fit_parametric_curve = TRUE,
                                     control_group = "default",
                                     resampling_mechanism = "default",
-                                    B1 = 499L, B2 = 4999L, B3 = 24999L) {
+                                    B1 = 499L, B2 = 4999L, B3 = 24999L,
+                                    multiple_testing_method = "BH",
+                                    multiple_testing_alpha = 0.1) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "set_analysis_parameters")
 
@@ -198,6 +192,8 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@B2 <- B2
   sceptre_object@B3 <- B3
   sceptre_object@last_function_called <- "set_analysis_parameters"
+  sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
+  sceptre_object@multiple_testing_method <- multiple_testing_method
   sceptre_object <- convert_covariate_df_to_design_matrix(sceptre_object)
 
   # 6. update cached fields
@@ -215,7 +211,7 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
 
   # 1. handle the default arguments
   if (identical(assignment_method, "default")) {
-    assignment_method <- if (sceptre_object@low_moi) "maximum" else "mixture"
+    assignment_method <- if (sceptre_object@low_moi) "maximum" else "thresholding"
   }
   if (identical(hyperparameters, "default")) {
     hyperparameters <- if (assignment_method == "maximum") {

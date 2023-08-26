@@ -1,6 +1,7 @@
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
-  # 0. verify that function called in correct order
+  # 0. advance function (if necessary), and check function call
+  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object)
   check_function_call(sceptre_object, "run_calibration_check")
 
   # 1. handle the default arguments
@@ -31,7 +32,8 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
   # 6. update fields of sceptre object with results
   sceptre_object@last_function_called <- "run_calibration_check"
-  sceptre_object@calibration_result <- out$result
+  sceptre_object@calibration_result <- out$result |>
+    dplyr::mutate(reject = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
   sceptre_object@negative_control_pairs <- response_grna_group_pairs
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
@@ -40,6 +42,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
+  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object)
   check_function_call(sceptre_object, "run_power_check")
 
   # 1. extract relevant arguments
@@ -70,6 +73,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
+  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object)
   check_function_call(sceptre_object, "run_discovery_analysis")
 
   # 1. extract relevant arguments
@@ -92,7 +96,8 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 
   # 4. update fields of sceptre object with results
   sceptre_object@last_function_called <- "run_discovery_analysis"
-  sceptre_object@discovery_result <- out$result
+  sceptre_object@discovery_result <- out$result |>
+    dplyr::mutate(reject = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
@@ -145,7 +150,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
 }
 
 
-get_result <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_testing_correction = "BH") {
+get_result <- function(sceptre_object, analysis_type) {
   if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
     stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
   }
@@ -163,11 +168,14 @@ get_result <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_test
                              power = "power_result",
                              discovery = "discovery_result")
   out <- slot(sceptre_object, field_to_extract)
-  # if calibration check or discovery analysis, apply multiplicity correction
-  if (analysis_type %in% c("calibration", "discovery")) {
-    out <- out |>
-      dplyr::mutate(reject = stats::p.adjust(p_value, method = multiple_testing_correction) < alpha) |>
-      dplyr::select(-pass_qc)
-  }
   return(out)
+}
+
+
+advance_set_analysis_parameters_by_two <- function(sceptre_object) {
+  if (sceptre_object@last_function_called == "set_analysis_parameters") {
+    cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default options.\n"))
+    sceptre_object <- sceptre_object |> assign_grnas() |> run_qc()
+  }
+  return(sceptre_object)
 }
