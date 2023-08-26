@@ -49,7 +49,8 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
                                   grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                  pc_analysis = TRUE) |> invisible()
+                                  pc_analysis = TRUE,
+                                  calibration_result = sceptre_object@calibration_result) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -78,7 +79,8 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
                                   grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                  pc_analysis = FALSE) |> invisible()
+                                  pc_analysis = FALSE,
+                                  calibration_result = sceptre_object@calibration_result) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -147,13 +149,13 @@ get_result <- function(sceptre_object, analysis_type, alpha = 0.1, multiple_test
   if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
     stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
   }
-  if (analysis_type == "calibration" && !sceptre_object@calibration_check_run) {
+  if (analysis_type == "calibration" && nrow(sceptre_object@calibration_result) == 0L) {
     stop("Calibration check has not yet been run.")
   }
-  if (analysis_type == "power" && !sceptre_object@power_check_run) {
+  if (analysis_type == "power" && nrow(sceptre_object@power_result) == 0L) {
     stop("Power check has not yet been run.")
   }
-  if (analysis_type == "discovery" && !sceptre_object@discovery_analysis_run) {
+  if (analysis_type == "discovery" && nrow(sceptre_object@discovery_result) == 0L) {
     stop("Discovery analysis not yet run.")
   }
   field_to_extract <- switch(EXPR = analysis_type,
