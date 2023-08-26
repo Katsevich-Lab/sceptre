@@ -2,7 +2,7 @@
 
 export(compare_calibration_and_discovery_results)
 export(compute_cell_covariates)
-export(create_sceptre_object)
+export(import_data)
 export(make_volcano_plot)
 export(plot_calibration_result)
 export(plot_resampling_distribution)

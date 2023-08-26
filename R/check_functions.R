@@ -1,4 +1,4 @@
-check_create_sceptre_object_inputs <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates) {
+check_import_data_inputs <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates) {
   # 1. check column names of grna_group_data_frame
   colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
   if (!colnames_present) {
@@ -236,7 +236,7 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
   # 3. check for the presence of a calibration result
   if (nrow(calibration_result) == 0L) {
-    cat(crayon::red(paste0("Warning: We recommend running the calibration check (via `run run_calibration_check()`) before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n")))
+    cat(crayon::red(paste0("Warning: The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n")))
   }
 
   return(NULL)
@@ -245,7 +245,7 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
 get_function_rank_vector <- function() {
   map <- stats::setNames(object = c(1L, 2L, 3L, 4L, 5L, 5L, 5L),
-                         nm = c("create_sceptre_object", "set_analysis_parameters",
+                         nm = c("import_data", "set_analysis_parameters",
                                 "assign_grnas", "run_qc", "run_calibration_check",
                                 "run_power_check", "run_discovery_analysis"))
   return(map)

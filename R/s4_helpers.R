@@ -28,6 +28,8 @@ setClass("sceptre_object",
            B1 = "integer", B2 = "integer", B3 = "integer",
            grna_assignment_method = "character",
            grna_assignment_hyperparameters = "list",
+           multiple_testing_alpha = "numeric",
+           multiple_testing_method = "character",
 
            # computed objects
            M_matrix = "matrix",
@@ -88,21 +90,22 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   show(x)
 
   # first, print analysis status; determine the functions that have been run
+  function_rank_vector <- get_function_rank_vector()
+  current_function <- sceptre_object@last_function_called
+  curr_rank <- function_rank_vector[[current_function]]
+  if (curr_rank <= 4) {
+    completed_functs <- names(function_rank_vector)[function_rank_vector <= curr_rank]
+  } else {
+    completed_functs <- names(function_rank_vector)[function_rank_vector <= 4]
+    if (nrow(x@calibration_result) >= 1L) completed_functs <- c(completed_functs, "run_calibration_check")
+    if (nrow(x@power_result) >= 1L) completed_functs <- c(completed_functs, "run_power_check")
+    if (nrow(x@discovery_result) >= 1L) completed_functs <- c(completed_functs, "run_discovery_analysis")
+  }
+  funct_run_vect <- sapply(names(function_rank_vector), function(funct) funct %in% completed_functs)
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
-  ordered_functs <- names(get_function_rank_vector())
-  curr_funct <- x@last_function_called
-  functs_called <- ordered_functs[seq(1, which(curr_funct == ordered_functs))]
-  cat("\n\nAnalysis status:\n")
-  # special case: has run_power_check been called?
-  if (curr_funct == "run_discovery_analysis" && nrow(sceptre_object@power_result) == 0L) {
-    functs_called <- functs_called[functs_called != "run_power_check"]
-  }
-  functs_not_called <- ordered_functs[!(ordered_functs %in% functs_called)]
-  for (funct_called in functs_called) {
-    cat(paste0("\t", get_mark(TRUE), " ", funct_called, "()\n"))
-  }
-  for (funct_not_called in functs_not_called) {
-    cat(paste0("\t", get_mark(FALSE), " ", funct_not_called, "()\n"))
+  cat("\n\nAnalaysis status:\n")
+  for (i in seq_along(funct_run_vect)) {
+    cat(paste0("\t", get_mark(funct_run_vect[i]), " ", names(funct_run_vect)[i], "()\n"))
   }
 
   # second, print analysis parameters
@@ -119,25 +122,47 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
-             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2]),
              if (!print_full_output) NULL else {
                paste0(
                  "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
                  "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
                  "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
                  "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
-                 "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3),
-                 "\n\t\U2022 Calibration check N pairs: ", if (length(x@n_calibration_pairs) == 0L) "not specified" else { if (is.na(x@n_calibration_pairs)) crayon::blue("match discovery pairs") else crayon::blue(x@n_calibration_pairs)},
-                 "\n\t\U2022 Calibration check group size: ", if (length(x@calibration_group_size) == 0L) "not specified" else { if (is.na(x@calibration_group_size)) crayon::blue("match discovery pairs") else crayon::blue(x@calibration_group_size)}
-               )
-             }
+                 "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3))
+             },
+             "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
   ))
+
+  # finally, print gRNA-to-cell assignment information
+  if (print_full_output) {
+    calib_check_run <- funct_run_vect[["run_calibration_check"]]
+    discovery_analysis_run <- funct_run_vect[["run_discovery_analysis"]]
+    if (calib_check_run) {
+      n_false_rejections <- sum(x@calibration_result$reject)
+      mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
+      n_calib_pairs <- nrow(x@calibration_result)
+    }
+    if (discovery_analysis_run) {
+      n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
+      n_discovery_pairs <- x@n_ok_discovery_pairs
+    }
+    cat("\n\ngRNA-to-cell assignment information:\n")
+    # number of gRNAs/cell; number of cells/gRNA; number of gRNA groups/cell; number of cells/gRNA group
+    cat(paste0("\n\nSummary of results:",
+               "\n\t\U2022 N negative control pairs falsely rejected: ", if (calib_check_run) crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)) else "calibration check not run",
+               "\n\t\U2022 Mean log-2 FC of negative control pairs: ", if (calib_check_run) crayon::blue(mean_lfc) else "calibration check not run",
+               "\n\t\U2022 N discovery pairs rejected: ", if (discovery_analysis_run) crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs)) else "discovery analysis not run"
+      ))
+  }
 })
 
 
 # plot function for sceptre object
 setMethod("plot", signature = signature("sceptre_object"), function(x) {
   last_function_called <- x@last_function_called
+  if (last_function_called %in% c("import_data", "set_analysis_parameters", "assign_grnas", "run_qc", "run_power_check")) {
+    stop("There is no generic plot function configured for the ", last_function_called, "() step.")
+  }
   if (last_function_called == "run_calibration_check") {
     p <- plot_calibration_result(x)
   } else if (last_function_called == "run_discovery_analysis") {
