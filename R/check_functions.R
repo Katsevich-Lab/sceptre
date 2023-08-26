@@ -217,7 +217,10 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             control_group_complement,
                                             grna_group_data_frame,
                                             calibration_check_run,
-                                            pc_analysis) {
+                                            pc_analysis,
+                                            calibration_result) {
+
+
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
     stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function prepare_analysis()."))
@@ -229,6 +232,11 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
     if (!nt_present) {
       stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the complement set."))
     }
+  }
+
+  # 3. check for the presence of a calibration result
+  if (nrow(calibration_result) == 0L) {
+    cat(crayon::red(paste0("Warning: We recommend running the calibration check (via `run run_calibration_check()`) before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n")))
   }
 
   return(NULL)
