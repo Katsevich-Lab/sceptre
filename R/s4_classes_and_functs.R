@@ -214,14 +214,18 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   check_function_call(sceptre_object, "assign_grnas")
 
   # 1. handle the default arguments
-  if (assignment_method == "default") {
-    assignment_method <- if (sceptre_object@low_moi) "maximum" else "thresholding"
+  if (identical(assignment_method, "default")) {
+    assignment_method <- if (sceptre_object@low_moi) "maximum" else "mixture"
   }
-  if (hyperparameters == "default") {
-    hyperparameters <- if (sceptre_object@low_moi) {
+  if (identical(hyperparameters, "default")) {
+    hyperparameters <- if (assignment_method == "maximum") {
       list(umi_fraction_threshold = 0.5)
-    } else {
+    } else if (assignment_method == "thresholding")  {
       list(threshold = 5L)
+    } else if (assignment_method == "mixture") {
+      list()
+    } else {
+      list()
     }
   }
 

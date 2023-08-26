@@ -22,7 +22,7 @@ assign_grnas_to_cells <- function(sceptre_object) {
     grna_assignments <- out_list$grna_assignments
     cells_w_multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
   } else if (grna_assignment_method == "mixture") {
-    stop("Mixture assignment method not yet implemented.")
+    out_list <- assign_grnas_to_cells_mixture(grna_matrix, grna_group_data_frame)
   } else {
     stop("gRNA assignment method not recognized.")
   }
