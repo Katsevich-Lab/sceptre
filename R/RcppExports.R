@@ -13,6 +13,10 @@ print_synth_idx_list_row <- function(synthetic_idx_ptr, idx) {
     invisible(.Call(`_sceptre_print_synth_idx_list_row`, synthetic_idx_ptr, idx))
 }
 
+test <- function() {
+    invisible(.Call(`_sceptre_test`))
+}
+
 estimate_theta <- function(y, mu, dfr, limit, eps) {
     .Call(`_sceptre_estimate_theta`, y, mu, dfr, limit, eps)
 }

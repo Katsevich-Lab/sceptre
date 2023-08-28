@@ -6,18 +6,12 @@
 \usage{
 plot_calibration_result(
   sceptre_object,
-  alpha = 0.1,
-  multiple_testing_correction = "BH",
   return_indiv_plots = FALSE,
   point_size = 0.55,
   transparency = 0.8
 )
 }
 \arguments{
-\item{alpha}{(optional; default 0.1) the nominal type-I error control level}
-
-\item{multiple_testing_correction}{(optional; default "BH") the multiple testing correction method (one of "BH", "bonferroni", "BY", or "holm")}
-
 \item{return_indiv_plots}{(optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?}
 }
 \value{

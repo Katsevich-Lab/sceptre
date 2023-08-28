@@ -151,8 +151,8 @@ set_analysis_parameters <- function(sceptre_object,
     if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
   }
   if (identical(formula_object, "default")) {
-    formula_object <- auto_construct_formula_object(sceptre_object@covariate_data_frame,
-                                                    sceptre_object@low_moi)
+    formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
+                                                    include_grna_covariates = !sceptre_object@low_moi)
   }
   if (identical(discovery_pairs, "all")) {
     discovery_pairs <- generate_all_pairs(sceptre_object@response_matrix,
@@ -194,7 +194,8 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@last_function_called <- "set_analysis_parameters"
   sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
   sceptre_object@multiple_testing_method <- multiple_testing_method
-  sceptre_object <- convert_covariate_df_to_design_matrix(sceptre_object)
+  sceptre_object@covariate_matrix  <- convert_covariate_df_to_design_matrix(covariate_data_frame = sceptre_object@covariate_data_frame,
+                                                                            formula_object = formula_object)
 
   # 6. update cached fields
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()

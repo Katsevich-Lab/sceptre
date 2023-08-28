@@ -50,10 +50,10 @@ generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
 }
 
 
-auto_construct_formula_object <- function(cell_covariates, low_moi) {
+auto_construct_formula_object <- function(cell_covariates, include_grna_covariates) {
   cell_covariate_names <- colnames(cell_covariates)
-  if (low_moi) { # by default, do not use grna count-based covariates in low moi
-    cell_covariate_names <- cell_covariate_names[cell_covariate_names != c("grna_n_umis", "grna_n_nonzero")]
+  if (!include_grna_covariates) { # by default, do not use grna count-based covariates in low moi
+    cell_covariate_names <- cell_covariate_names[!(cell_covariate_names %in% c("grna_n_umis", "grna_n_nonzero"))]
   }
   form_str <- sapply(cell_covariate_names, function(curr_name) {
     count_based_covariate <- grepl(pattern = "n_umis|n_nonzero", x = curr_name)

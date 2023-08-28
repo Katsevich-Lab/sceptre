@@ -43,6 +43,15 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// test
+void test();
+RcppExport SEXP _sceptre_test() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test();
+    return R_NilValue;
+END_RCPP
+}
 // estimate_theta
 List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, double eps);
 RcppExport SEXP _sceptre_estimate_theta(SEXP ySEXP, SEXP muSEXP, SEXP dfrSEXP, SEXP limitSEXP, SEXP epsSEXP) {
@@ -349,6 +358,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_synth_idx_list_to_matrix", (DL_FUNC) &_sceptre_synth_idx_list_to_matrix, 1},
     {"_sceptre_synth_idx_list_to_r_list", (DL_FUNC) &_sceptre_synth_idx_list_to_r_list, 1},
     {"_sceptre_print_synth_idx_list_row", (DL_FUNC) &_sceptre_print_synth_idx_list_row, 2},
+    {"_sceptre_test", (DL_FUNC) &_sceptre_test, 0},
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
     {"_sceptre_fisher_yates_samlper", (DL_FUNC) &_sceptre_fisher_yates_samlper, 3},
     {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
