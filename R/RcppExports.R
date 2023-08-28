@@ -54,6 +54,14 @@ run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_
     .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
 }
 
+compute_tolerance_cpp <- function(curr_log_lik, prev_log_lik) {
+    .Call(`_sceptre_compute_tolerance_cpp`, curr_log_lik, prev_log_lik)
+}
+
+run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {
+    .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
+}
+
 sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
     .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
 }

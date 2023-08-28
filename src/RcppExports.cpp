@@ -143,6 +143,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_tolerance_cpp
+double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik);
+RcppExport SEXP _sceptre_compute_tolerance_cpp(SEXP curr_log_likSEXP, SEXP prev_log_likSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type curr_log_lik(curr_log_likSEXP);
+    Rcpp::traits::input_parameter< double >::type prev_log_lik(prev_log_likSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_tolerance_cpp(curr_log_lik, prev_log_lik));
+    return rcpp_result_gen;
+END_RCPP
+}
+// run_reduced_em_algo_cpp
+List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_guesses, NumericVector g, NumericVector g_mus_pert0, NumericVector log_g_factorial);
+RcppExport SEXP _sceptre_run_reduced_em_algo_cpp(SEXP pi_guessesSEXP, SEXP g_pert_guessesSEXP, SEXP gSEXP, SEXP g_mus_pert0SEXP, SEXP log_g_factorialSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type pi_guesses(pi_guessesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type g_pert_guesses(g_pert_guessesSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type g(gSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type g_mus_pert0(g_mus_pert0SEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type log_g_factorial(log_g_factorialSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_reduced_em_algo_cpp(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sample_combinations_v2
 IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups, int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat);
 RcppExport SEXP _sceptre_sample_combinations_v2(SEXP calibration_group_sizeSEXP, SEXP n_calibration_pairsSEXP, SEXP n_possible_groupsSEXP, SEXP n_nt_grnasSEXP, SEXP n_genesSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP, SEXP p_hatSEXP) {
@@ -365,6 +392,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 15},
+    {"_sceptre_compute_tolerance_cpp", (DL_FUNC) &_sceptre_compute_tolerance_cpp, 2},
+    {"_sceptre_run_reduced_em_algo_cpp", (DL_FUNC) &_sceptre_run_reduced_em_algo_cpp, 5},
     {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
