@@ -74,7 +74,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
              crayon::blue(n_cells), " cells", if (length(sceptre_object@cells_in_use) >= 1) {
-               paste0(" (", crayon::blue(length(sceptre_object@cells_in_use)), " after cell-wise QC)")
+               paste0(" (", crayon::blue(length(sceptre_object@cells_in_use)), " after cellwise QC)")
              } else NULL, "\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
              crayon::blue(moi), " multiplicity-of-infection \n\t\U2022 ",
@@ -103,7 +103,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   }
   funct_run_vect <- sapply(names(function_rank_vector), function(funct) funct %in% completed_functs)
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
-  cat("\n\nAnalaysis status:\n")
+  cat("\n\nAnalysis status:\n")
   for (i in seq_along(funct_run_vect)) {
     cat(paste0("\t", get_mark(funct_run_vect[i]), " ", names(funct_run_vect)[i], "()\n"))
   }
@@ -146,7 +146,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
       n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
       n_discovery_pairs <- x@n_ok_discovery_pairs
     }
-    cat("\n\ngRNA-to-cell assignment information:\n")
+    cat("\n\ngRNA-to-cell assignment metrics (before cellwise QC):\n")
     # number of gRNAs/cell; number of cells/gRNA; number of gRNA groups/cell; number of cells/gRNA group
     cat(paste0("\n\nSummary of results:",
                "\n\t\U2022 N negative control pairs falsely rejected: ", if (calib_check_run) crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)) else "calibration check not run",

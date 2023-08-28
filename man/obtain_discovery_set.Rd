@@ -10,13 +10,6 @@ obtain_discovery_set(
   multiple_testing_correction = "BH"
 )
 }
-\arguments{
-\item{discovery_result}{(required) the output of a call to \code{run_sceptre_lowmoi} (or \code{run_sceptre_highmoi_experimental}) with \code{calibration_check} set to \code{FALSE}}
-
-\item{alpha}{(optional; default 0.1) the nominal type-I error control level}
-
-\item{multiple_testing_correction}{(optional; default "BH") the multiple testing correction method (one of "BH", "bonferroni", "BY", or "holm")}
-}
 \value{
 a subset of \code{discovery_result} containing the discoveries.
 }

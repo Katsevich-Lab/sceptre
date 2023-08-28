@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <math.h>
 using namespace Rcpp;
 
 /*************************************************************************************
@@ -46,5 +47,15 @@ void print_synth_idx_list_row(SEXP synthetic_idx_ptr, int idx) {
     Rcout << (*synth_idx_list)[idx][i];
     Rcout << " ";
   }
+  return;
+}
+
+
+// [[Rcpp::export]]
+void test() {
+  double a = 1.9, b = 0.0;
+  // double c = -a/b;
+  double d = log(-1.0);
+  Rcout << d;
   return;
 }

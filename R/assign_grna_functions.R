@@ -7,6 +7,7 @@ assign_grnas_to_cells <- function(sceptre_object) {
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
   low_moi <- sceptre_object@low_moi
   grna_assignment_method <- sceptre_object@grna_assignment_method
+  cell_covariate_data_frame <- sceptre_object@covariate_data_frame
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "thresholding") {
@@ -22,7 +23,7 @@ assign_grnas_to_cells <- function(sceptre_object) {
     grna_assignments <- out_list$grna_assignments
     cells_w_multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
   } else if (grna_assignment_method == "mixture") {
-    out_list <- assign_grnas_to_cells_mixture(grna_matrix, grna_group_data_frame)
+    out_list <- assign_grnas_to_cells_mixture(grna_matrix, grna_group_data_frame, cell_covariate_data_frame)
   } else {
     stop("gRNA assignment method not recognized.")
   }

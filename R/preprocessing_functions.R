@@ -85,9 +85,7 @@ convert_pointer_to_index_vector_v2 <- function(p) {
 #'
 #' @return the design matrix
 #' @noRd
-convert_covariate_df_to_design_matrix <- function(sceptre_object) {
-  covariate_data_frame <- sceptre_object@covariate_data_frame
-  formula_object <- sceptre_object@formula_object
+convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_object) {
   global_cell_covariates_new <- stats::model.matrix(object = formula_object, data = covariate_data_frame)
   # verify that the global cell covariates are OK after transformation
   for (col_name in colnames(global_cell_covariates_new)) {
@@ -101,7 +99,7 @@ convert_covariate_df_to_design_matrix <- function(sceptre_object) {
   if (rank_matrix != ncol(global_cell_covariates_new)) {
     stop("The `formula_object` contains redundant information. This often occurs when one variable is `nested` inside another. For example, if the data frame contains a column `lane` with levels `lane_1`, `lane_2`, `lane_3`, and `lane_4` and a column `batch` with levels `batch_1` and `batch_2`, and if `lane_1` and `lane_2` are contained entirely within `batch_1` while `lane_3` and `lane_4` are contained entirely within `batch`2`, then `batch` is redundant. In this case `batch` should be removed from the formula object.")
   }
-  sceptre_object@covariate_matrix <- global_cell_covariates_new
+  return(global_cell_covariates_new)
   return(sceptre_object)
 }
 
