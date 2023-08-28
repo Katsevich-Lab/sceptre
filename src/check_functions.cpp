@@ -53,9 +53,8 @@ void print_synth_idx_list_row(SEXP synthetic_idx_ptr, int idx) {
 
 // [[Rcpp::export]]
 void test() {
-  double a = 1.9, b = 0.0;
-  // double c = -a/b;
-  double d = log(-1.0);
-  Rcout << d;
+  double a = -std::numeric_limits<double>::infinity();
+  double b = -19248.91;
+  Rcout << (a > b);
   return;
 }
