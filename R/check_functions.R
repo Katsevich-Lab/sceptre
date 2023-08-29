@@ -143,7 +143,7 @@ check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariat
 
   # 17. verify that "side" is among "both", "left", or "right"
   if (!(side %in% c("both", "left", "right"))) {
-    stop("'side' must be one of 'both', 'left', or 'right'.")
+    stop("`side` must be one of 'both', 'left', or 'right'.")
   }
 
   return(NULL)
@@ -151,41 +151,61 @@ check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariat
 
 
 check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters) {
-  # 1. check assignment method
-  if (sceptre_object@low_moi) { # Low MOI
-    if (assignment_method != "maximum") {
-      stop("The gRNA assignment method must be `maximum` in low MOI.")
-    }
-  } else { # high MOI
-    if (!(assignment_method %in% c("thresholding", "mixture"))) {
-      stop("The gRNA assignment method must be `thresholding` or `mixture` in high MOI.")
-    }
+  if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
+    stop("`assignment_method` must be `mixture`, `maximum`, or `thresholding`.")
   }
 
-  # 2. check hyperparameters
-  if (assignment_method == "maximum") { # maximum option
-    hyperparam_names <- names(hyperparameters)
+  # 1. check that assignment method is OK for high MOI
+  if (!sceptre_object@low_moi && assignment_method == "maximum") {
+      stop("`assignment_method` cannot be `maximum` in high-MOI.")
+  }
+
+  # 2. check the hyperparameters
+  hyperparam_names <- names(hyperparameters)
+  # i. maximum option
+  if (assignment_method == "maximum") {
     if (!setequal(hyperparam_names, "umi_fraction_threshold")) {
-      stop("The names of the hyperparameters must be `umi_fraction_threshold`.")
+      stop("The hyperparameter list must contain the single entry `umi_fraction_threshold`.")
     }
     if (!(hyperparameters[["umi_fraction_threshold"]] > 0.0 && hyperparameters[["umi_fraction_threshold"]] < 1.0)) {
-      stop("`umi_fraction_threshold` must be greater than 0.0 and be less than 1.0.")
+      stop("`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0.")
     }
   }
-
-  if (assignment_method == "thresholding") { # thresholding operation
-    hyperparam_names <- names(hyperparameters)
+  # ii. thresholding operation
+  if (assignment_method == "thresholding") {
     if (!setequal(hyperparam_names, "threshold")) {
-      stop("The names of the hyperparameters must be `threshold`.")
+      stop("The hyperparameter list must contain the single entry `threshold`.")
     }
     if (hyperparameters[["threshold"]] < 1) {
-      stop("`threshold` must be greater than or equal to 1.")
+      stop("`threshold` should be an integer greater than or equal to 1.")
     }
   }
-
-  if (assignment_method == "mixture") { # mixture model
-    stop("mixture method is not yet implemented.")
+  # iii. mixture model
+  if (assignment_method == "mixture") {
+    if (!setequal(hyperparam_names, c("n_em_rep", "pi_guess_range", "g_pert_guess_range", "n_nonzero_cells_cutoff", "backup_threshold"))) {
+      stop("The hyperparameter list must contain the fields `n_em_rep`, `pi_guess_range`, `g_pert_guess_range`, `n_nonzero_cells_cutoff`, `backup_threshold`.")
+    }
+    if (hyperparameters[["n_em_rep"]] <= 0 || hyperparameters[["n_em_rep"]] >= 100) {
+      stop("`n_em_rep` should be an integer greater than zero and less than 100.")
+    }
+    pi_guess_range <- hyperparameters[["pi_guess_range"]]
+    if (length(pi_guess_range) != 2 || any(pi_guess_range < 0) ||
+        any(pi_guess_range > 1) || pi_guess_range[2] <= pi_guess_range[1]) {
+      stop("`pi_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,1].")
+    }
+    g_pert_guess_range <- hyperparameters[["g_pert_guess_range"]]
+    if (length(g_pert_guess_range) != 2 || any(g_pert_guess_range < 0) ||
+        any(pi_guess_range > 20) || g_pert_guess_range[2] <= g_pert_guess_range[1]) {
+      stop("`g_pert_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,20].")
+    }
+    if (hyperparameters[["n_nonzero_cells_cutoff"]] <= 0) {
+      stop("`n_nonzero_cells_cutoff` should be an integer greater than or equal to 1.")
+    }
+    if (hyperparameters[["backup_threshold"]] <= 0) {
+      stop("`backup_threshold` should be an integer greater than or equal to 1.")
+    }
   }
+  return(NULL)
 }
 
 
@@ -193,7 +213,6 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
   if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
     stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
   }
-
   return(NULL)
 }
 
@@ -219,8 +238,6 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             calibration_check_run,
                                             pc_analysis,
                                             calibration_result) {
-
-
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
     stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function prepare_analysis()."))

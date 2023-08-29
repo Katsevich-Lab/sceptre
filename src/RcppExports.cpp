@@ -365,6 +365,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_n_grnas_per_cell_vector
+IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells);
+RcppExport SEXP _sceptre_compute_n_grnas_per_cell_vector(SEXP grna_assignmentsSEXP, SEXP n_cellsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type grna_assignments(grna_assignmentsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_n_grnas_per_cell_vector(grna_assignments, n_cells));
+    return rcpp_result_gen;
+END_RCPP
+}
 // group_and_threshold
 IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, int threshold);
 RcppExport SEXP _sceptre_group_and_threshold(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxsSEXP, SEXP thresholdSEXP) {
@@ -407,6 +419,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
+    {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_group_and_threshold", (DL_FUNC) &_sceptre_group_and_threshold, 5},
     {NULL, NULL, 0}
 };

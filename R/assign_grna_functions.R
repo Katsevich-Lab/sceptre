@@ -8,106 +8,76 @@ assign_grnas_to_cells <- function(sceptre_object) {
   low_moi <- sceptre_object@low_moi
   grna_assignment_method <- sceptre_object@grna_assignment_method
   cell_covariate_data_frame <- sceptre_object@covariate_data_frame
+  grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
+  n_cells <- ncol(grna_matrix)
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
+  if (grna_assignment_method == "mixture") {
+    initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix,
+                                                             cell_covariate_data_frame = cell_covariate_data_frame,
+                                                             grna_assignment_hyperparameters = grna_assignment_hyperparameters)
+    run_process_initial_assignment_list <- TRUE
+  }
   if (grna_assignment_method == "thresholding") {
-    grna_assignments <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
-                                                           grna_assign_threshold = sceptre_object@grna_assignment_hyperparameters$threshold,
-                                                           grna_group_data_frame = grna_group_data_frame)
-    cells_w_multiple_grnas <- integer()
-  } else if (grna_assignment_method == "maximum") {
+    initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
+                                                                  grna_assign_threshold = grna_assignment_hyperparameters$threshold)
+    run_process_initial_assignment_list <- TRUE
+  }
+  if (grna_assignment_method == "maximum") {
     out_list <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
                                               grna_group_data_frame = grna_group_data_frame,
-                                              control_group_complement = sceptre_object@control_group_complement,
-                                              grna_lib_size = sceptre_object@covariate_data_frame$grna_n_umis)
+                                              grna_lib_size = cell_covariate_data_frame$grna_n_umis)
     grna_assignments <- out_list$grna_assignments
     cells_w_multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
-  } else if (grna_assignment_method == "mixture") {
-    out_list <- assign_grnas_to_cells_mixture(grna_matrix, grna_group_data_frame, cell_covariate_data_frame)
-  } else {
-    stop("gRNA assignment method not recognized.")
+  }
+
+  # process the initial assignment list
+  if (run_process_initial_assignment_list) {
+    processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
+                                                                grna_group_data_frame = grna_group_data_frame,
+                                                                n_cells = n_cells, low_moi = low_moi)
+    sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
+    sceptre_object@cells_w_multiple_grnas <- processed_assignment_out$cells_w_multiple_grnas
+
   }
 
   # update sceptre object with grna_assignments and cells_w_multiple_grnas
-  sceptre_object@grna_assignments_raw <- grna_assignments
-  sceptre_object@cells_w_multiple_grnas <- cells_w_multiple_grnas
-
+  #sceptre_object@grna_assignments_raw <- grna_assignments
+  #sceptre_object@cells_w_multiple_grnas <- cells_w_multiple_grnas
   return(sceptre_object)
 }
 
 
-assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_group_data_frame) {
-  out <- list()
-
-  # 1. make the matrix row-accessible
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_ids <- rownames(grna_matrix)
-
-  # 2. obtain the grna ids and groups
-  grna_groups <- as.character(unique(grna_group_data_frame$grna_group))
-  grna_groups <- grna_groups[grna_groups != "non-targeting"]
-
-  # 3. loop over the targeting grna groups, obtaining the cell assignments for each
-  grna_group_idxs <- sapply(grna_groups, function(grna_group) {
-    l <- grna_group_data_frame$grna_group == grna_group
-    curr_grna_ids <- grna_group_data_frame$grna_id[l]
-    row_idxs <- match(x = curr_grna_ids, grna_ids)
-    cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                     row_idxs = row_idxs, threshold = grna_assign_threshold)
-    return(cell_idxs)
-  })
-  out$grna_group_idxs <- grna_group_idxs
-
-
-  # 4. when running a calibration check, also the individual NT gRNAs
-  nt_grnas <- grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")
-  indiv_nt_grna_idxs <- sapply(nt_grnas, function(nt_grna) {
-    row_idx <- match(x = nt_grna, grna_ids)
-    cell_idxs <- group_and_threshold(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                                     row_idxs = row_idx, threshold = grna_assign_threshold)
-    return(cell_idxs)
-  })
-  out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
+process_initial_assignment_list <- function(initial_assignment_list, grna_group_data_frame, n_cells, low_moi) {
+  # 0. compute the number of cells per grna
+  cells_per_grna <- sapply(initial_assignment_list, length)
+  # 1. compute the vector of grnas per cell
+  grnas_per_cell <- compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
+  # 2. determine the cells that contain multiple grnas (if in low MOI)
+  cells_w_multiple_grnas <- if (low_moi) which(grnas_per_cell >= 1L) else integer()
+  # 3. pool together targeting gRNAs via the or operation
+  targeting_grna_group_data_table <- grna_group_data_frame |>
+    dplyr::filter(grna_group != "non-targeting") |> data.table::as.data.table()
+  targeting_grna_groups <- targeting_grna_group_data_table$grna_group |> unique()
+  grna_group_idxs <- lapply(targeting_grna_groups, function(targeting_grna_group) {
+    curr_grna_ids <- targeting_grna_group_data_table[
+      targeting_grna_group_data_table$grna_group == targeting_grna_group,]$grna_id
+    initial_assignment_list[curr_grna_ids] |> unlist() |> unique()
+  }) |> stats::setNames(targeting_grna_groups)
+  # 4. obtain the individual non-targeting grna idxs
+  nontargeting_grna_ids <- grna_group_data_frame |>
+    dplyr::filter(grna_group == "non-targeting") |> dplyr::pull(grna_id)
+  indiv_nt_grna_idxs <- initial_assignment_list[nontargeting_grna_ids]
+  # 5. construct the grna_group_idxs list
+  grna_assignments_raw <- list(grna_group_idxs = grna_group_idxs,
+                               indiv_nt_grna_idxs = indiv_nt_grna_idxs)
+  # 6. compute the number of cells per targeting grna group
+  cells_per_targeting_grna_group <- sapply(grna_group_idxs, length)
+  # 7. compute the number of targeting grna groups per cell
+  out <- list(grna_assignments_raw = grna_assignments_raw, cells_per_grna = cells_per_grna,
+              grnas_per_cell = grnas_per_cell, cells_w_multiple_grnas = cells_w_multiple_grnas,
+              cells_per_targeting_grna_group = cells_per_targeting_grna_group)
   return(out)
-}
-
-
-assign_grnas_to_cells_maximum <- function(grna_matrix, grna_group_data_frame, control_group_complement, grna_lib_size) {
-  grna_assignments <- list()
-
-  # 1. make grna matrix column accessible
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
-
-  # 2. get the individual grna assignments
-  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p,
-                           x = grna_matrix@x, n_cells = ncol(grna_matrix),
-                           grna_lib_size = grna_lib_size)
-  grna_idx <- l$assignment_vect
-  grna_rownames <- factor(rownames(grna_matrix))
-  indiv_grna_id_assignments <- grna_rownames[grna_idx]
-
-  # 3. obtain the grna group assignments
-  grna_group_assignments <- grna_group_data_frame$grna_group[match(x = indiv_grna_id_assignments,
-                                                                   table = grna_group_data_frame$grna_id)]
-
-  # 4. convert the grna group assignments into a map
-  unique_grna_groups <- unique(grna_group_data_frame$grna_group)
-  unique_grna_groups <- unique_grna_groups[unique_grna_groups != "non-targeting"]
-  grna_group_idxs <- lapply(unique_grna_groups, function(unique_grna_group) {
-    which(grna_group_assignments == unique_grna_group)
-  }) |> stats::setNames(unique_grna_groups)
-  grna_assignments$grna_group_idxs <- grna_group_idxs
-
-  # 5. return the indices of the individual nt grnas
-  nt_grnas <- grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |> dplyr::pull("grna_id")
-  indiv_nt_grna_idxs <- lapply(nt_grnas, function(nt_grna) {
-    which(nt_grna == indiv_grna_id_assignments)
-  }) |> stats::setNames(nt_grnas)
-  grna_assignments$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-
-  return(list(grna_assignments = grna_assignments, frac_umis = l$frac_umis))
 }
 
 
