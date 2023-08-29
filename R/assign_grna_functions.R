@@ -10,6 +10,7 @@ assign_grnas_to_cells <- function(sceptre_object, parallel) {
   cell_covariate_data_frame <- sceptre_object@covariate_data_frame
   grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
   n_cells <- ncol(grna_matrix)
+  maximum_assignment <- grna_assignment_method == "maximum"
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "mixture") {
@@ -17,44 +18,88 @@ assign_grnas_to_cells <- function(sceptre_object, parallel) {
                                                              cell_covariate_data_frame = cell_covariate_data_frame,
                                                              grna_assignment_hyperparameters = grna_assignment_hyperparameters,
                                                              parallel = parallel)
-    run_process_initial_assignment_list <- TRUE
   }
   if (grna_assignment_method == "thresholding") {
     initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
                                                                   grna_assign_threshold = grna_assignment_hyperparameters$threshold)
-    run_process_initial_assignment_list <- TRUE
   }
   if (grna_assignment_method == "maximum") {
-    out_list <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
-                                              grna_group_data_frame = grna_group_data_frame,
-                                              grna_lib_size = cell_covariate_data_frame$grna_n_umis)
-    grna_assignments <- out_list$grna_assignments
-    cells_w_multiple_grnas <- which(out_list$frac_umis < sceptre_object@grna_assignment_hyperparameters$umi_fraction_threshold)
+    max_result <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
+                                                grna_lib_size = cell_covariate_data_frame$grna_n_umis,
+                                                umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold)
+    initial_assignment_list <- max_result$initial_assignment_list
   }
 
   # process the initial assignment list
-  if (run_process_initial_assignment_list) {
-    processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
-                                                                grna_group_data_frame = grna_group_data_frame,
-                                                                n_cells = n_cells, low_moi = low_moi)
-    sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
-    sceptre_object@cells_w_multiple_grnas <- processed_assignment_out$cells_w_multiple_grnas
-    sceptre_object@cells_per_grna <- processed_assignment_out$cells_per_grna
-    sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
-    sceptre_object@cells_per_targeting_grna_group <- processed_assignment_out$cells_per_targeting_grna_group
-  }
-
+  processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
+                                                              grna_group_data_frame = grna_group_data_frame,
+                                                              n_cells = n_cells, low_moi = low_moi,
+                                                              maximum_assignment = maximum_assignment)
+  sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
+  sceptre_object@cells_per_grna <- processed_assignment_out$cells_per_grna
+  sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
+  sceptre_object@cells_per_targeting_grna_group <- processed_assignment_out$cells_per_targeting_grna_group
+  sceptre_object@cells_w_multiple_grnas <- if (!maximum_assignment) processed_assignment_out$cells_w_multiple_grnas else max_result$cells_w_multiple_grnas
   return(sceptre_object)
 }
 
 
-process_initial_assignment_list <- function(initial_assignment_list, grna_group_data_frame, n_cells, low_moi) {
+assign_grnas_to_cells_thresholding <- function(grna_matrix = grna_matrix,
+                                               grna_assign_threshold = grna_assignment_hyperparameters$threshold) {
+  # 1. make the grna expression matrix row-accessible
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+  grna_ids <- rownames(grna_matrix)
+
+  # 2. perform the assignments
+  initial_assignment_list <- sapply(grna_ids, function(grna_id) {
+    g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                      row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
+    which(g >= grna_assign_threshold)
+  })
+
+  return(initial_assignment_list)
+}
+
+
+assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fraction_threshold) {
+ # 1. make grna matrix column accessible
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
+
+  # 2. compute the column-wise max and fraction of reads coming from the assigned grna
+  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p,
+                           x = grna_matrix@x, n_cells = ncol(grna_matrix),
+                           grna_lib_size = grna_lib_size)
+
+  # 3. construct a list in which each individual grna is mapped to the set of cells containing it
+  indiv_grna_id_assignments <- l$assignment_vect
+  grna_rownames <- rownames(grna_matrix)
+  initial_assignment_list <- lapply(X = seq_along(grna_rownames), FUN = function(i) {
+    which(i == indiv_grna_id_assignments)
+  }) |> stats::setNames(grna_rownames)
+
+  # 4. obtain the cells containing multiple grnas
+  cells_w_multiple_grnas <- which(l$frac_umis <= umi_fraction_threshold)
+
+  return(list(initial_assignment_list = initial_assignment_list,
+              cells_w_multiple_grnas = cells_w_multiple_grnas))
+}
+
+
+process_initial_assignment_list <- function(initial_assignment_list, grna_group_data_frame, n_cells, low_moi, maximum_assignment) {
   # 0. compute the number of cells per grna
   cells_per_grna <- sapply(initial_assignment_list, length)
   # 1. compute the vector of grnas per cell
-  grnas_per_cell <- compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
-  # 2. determine the cells that contain multiple grnas (if in low MOI)
-  cells_w_multiple_grnas <- if (low_moi) which(grnas_per_cell >= 2L) else integer()
+  grnas_per_cell <- if (!maximum_assignment) {
+    compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
+  } else {
+    rep(1L, n_cells)
+  }
+  # 2. determine the cells that contain multiple grnas (if in low MOI and not using maximum_assignment)
+  if (low_moi && !maximum_assignment) {
+    cells_w_multiple_grnas <- which(grnas_per_cell >= 2L)
+  } else {
+    cells_w_multiple_grnas <- integer()
+  }
   # 3. pool together targeting gRNAs via the or operation
   targeting_grna_group_data_table <- grna_group_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |> data.table::as.data.table()

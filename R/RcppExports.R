@@ -118,7 +118,3 @@ compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
     .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
 }
 
-group_and_threshold <- function(j, p, x, row_idxs, threshold) {
-    .Call(`_sceptre_group_and_threshold`, j, p, x, row_idxs, threshold)
-}
-
