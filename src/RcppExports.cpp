@@ -377,21 +377,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// group_and_threshold
-IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, int threshold);
-RcppExport SEXP _sceptre_group_and_threshold(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxsSEXP, SEXP thresholdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type row_idxs(row_idxsSEXP);
-    Rcpp::traits::input_parameter< int >::type threshold(thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_and_threshold(j, p, x, row_idxs, threshold));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_synth_idx_list_to_matrix", (DL_FUNC) &_sceptre_synth_idx_list_to_matrix, 1},
@@ -420,7 +405,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
-    {"_sceptre_group_and_threshold", (DL_FUNC) &_sceptre_group_and_threshold, 5},
     {NULL, NULL, 0}
 };
 
