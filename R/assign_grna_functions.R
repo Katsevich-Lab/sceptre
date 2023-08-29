@@ -1,7 +1,7 @@
 # The possible fields in the output are grna_group_idxs, all_nt_idxs, indiv_nt_grna_idxs.
 # If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
 # If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
-assign_grnas_to_cells <- function(sceptre_object) {
+assign_grnas_to_cells <- function(sceptre_object, parallel) {
   # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
@@ -15,7 +15,8 @@ assign_grnas_to_cells <- function(sceptre_object) {
   if (grna_assignment_method == "mixture") {
     initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix,
                                                              cell_covariate_data_frame = cell_covariate_data_frame,
-                                                             grna_assignment_hyperparameters = grna_assignment_hyperparameters)
+                                                             grna_assignment_hyperparameters = grna_assignment_hyperparameters,
+                                                             parallel = parallel)
     run_process_initial_assignment_list <- TRUE
   }
   if (grna_assignment_method == "thresholding") {
@@ -38,12 +39,11 @@ assign_grnas_to_cells <- function(sceptre_object) {
                                                                 n_cells = n_cells, low_moi = low_moi)
     sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
     sceptre_object@cells_w_multiple_grnas <- processed_assignment_out$cells_w_multiple_grnas
-
+    sceptre_object@cells_per_grna <- processed_assignment_out$cells_per_grna
+    sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
+    sceptre_object@cells_per_targeting_grna_group <- processed_assignment_out$cells_per_targeting_grna_group
   }
 
-  # update sceptre object with grna_assignments and cells_w_multiple_grnas
-  #sceptre_object@grna_assignments_raw <- grna_assignments
-  #sceptre_object@cells_w_multiple_grnas <- cells_w_multiple_grnas
   return(sceptre_object)
 }
 
@@ -54,7 +54,7 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_group_
   # 1. compute the vector of grnas per cell
   grnas_per_cell <- compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
   # 2. determine the cells that contain multiple grnas (if in low MOI)
-  cells_w_multiple_grnas <- if (low_moi) which(grnas_per_cell >= 1L) else integer()
+  cells_w_multiple_grnas <- if (low_moi) which(grnas_per_cell >= 2L) else integer()
   # 3. pool together targeting gRNAs via the or operation
   targeting_grna_group_data_table <- grna_group_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |> data.table::as.data.table()
