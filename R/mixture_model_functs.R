@@ -1,4 +1,4 @@
-assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters) {
+assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, parallel) {
   # 0. get random starting guesses for pi and g_pert
   starting_guesses <- get_random_starting_guesses(n_em_rep = grna_assignment_hyperparameters$n_em_rep,
                                                   pi_guess_range = grna_assignment_hyperparameters$pi_guess_range,
@@ -14,19 +14,33 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
 
-  # 3. iterate over grna ids, obtaining the assignments for each
-  initial_assignment_list <- sapply(seq_along(grna_ids), function(i) {
-    grna_id <- grna_ids[i]
-    if (i == 1 || i %% 5 == 0) cat(paste0("Carrying out gRNA-to-cell assignments for gRNA ", grna_id, " (", i, " of ", length(grna_ids), ")\n"))
-    g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                      row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
-    assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
-                                         g_pert_guesses = starting_guesses$g_pert_guesses,
-                                         g = g, covariate_matrix = covariate_matrix, use_glm = TRUE,
-                                         n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,
-                                         backup_threshold = grna_assignment_hyperparameters$backup_threshold)
-    return(assignments)
-  }, simplify = FALSE) |> stats::setNames(grna_ids)
+  # 3. define the function to perform assignments for a set of grnas
+  analyze_given_grna_ids <- function(curr_grna_ids) {
+    initial_assignment_list <- sapply(seq_along(curr_grna_ids), function(i) {
+      grna_id <- curr_grna_ids[i]
+      if (i == 1 || i %% 5 == 0) cat(paste0("Carrying out gRNA-to-cell assignments for gRNA ", grna_id, " (", i, " of ", length(curr_grna_ids), ")\n"))
+      g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                        row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
+      assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
+                                           g_pert_guesses = starting_guesses$g_pert_guesses,
+                                           g = g, covariate_matrix = covariate_matrix, use_glm = TRUE,
+                                           n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,
+                                           backup_threshold = grna_assignment_hyperparameters$backup_threshold)
+      return(assignments)
+    }, simplify = FALSE) |> stats::setNames(curr_grna_ids)
+  }
+
+  # 4. run the analysis
+  grna_ids_partitioned <- partition_response_ids(grna_ids, parallel)
+  if (!parallel) {
+      res <- lapply(grna_ids_partitioned, analyze_given_grna_ids)
+  } else {
+    cat("Running gRNA assignments in parallel. (Print messages not available.)")
+    res <- parallel::mclapply(grna_ids_partitioned, analyze_given_grna_ids,
+                              mc.cores = length(grna_ids_partitioned))
+    cat(crayon::green(' \u2713\n'))
+  }
+  initial_assignment_list <- res |> purrr::flatten()
 
   # return
   return (initial_assignment_list)

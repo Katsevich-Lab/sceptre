@@ -92,7 +92,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
 
-  # first, print analysis status; determine the functions that have been run
+  # 0. determine the functions that have been run
   function_rank_vector <- get_function_rank_vector()
   current_function <- sceptre_object@last_function_called
   curr_rank <- function_rank_vector[[current_function]]
@@ -105,13 +105,15 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
     if (nrow(x@discovery_result) >= 1L) completed_functs <- c(completed_functs, "run_discovery_analysis")
   }
   funct_run_vect <- sapply(names(function_rank_vector), function(funct) funct %in% completed_functs)
+
+  # 1. print analysis status
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   cat("\n\nAnalysis status:\n")
   for (i in seq_along(funct_run_vect)) {
     cat(paste0("\t", get_mark(funct_run_vect[i]), " ", names(funct_run_vect)[i], "()\n"))
   }
 
-  # second, print analysis parameters
+  # 2. print analysis parameters
   n_discovery_pairs <- nrow(x@discovery_pairs)
   disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
   n_pc_pairs <- nrow(x@positive_control_pairs)
@@ -136,26 +138,36 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
   ))
 
-  # finally, print gRNA-to-cell assignment information
-  if (print_full_output) {
-    calib_check_run <- funct_run_vect[["run_calibration_check"]]
-    discovery_analysis_run <- funct_run_vect[["run_discovery_analysis"]]
-    if (calib_check_run) {
-      n_false_rejections <- sum(x@calibration_result$reject)
-      mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
-      n_calib_pairs <- nrow(x@calibration_result)
-    }
-    if (discovery_analysis_run) {
-      n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
-      n_discovery_pairs <- x@n_ok_discovery_pairs
-    }
-    cat("\n\ngRNA-to-cell assignment metrics (before cellwise QC):\n")
-    # number of gRNAs/cell; number of cells/gRNA; number of gRNA groups/cell; number of cells/gRNA group
-    cat(paste0("\n\nSummary of results:",
-               "\n\t\U2022 N negative control pairs falsely rejected: ", if (calib_check_run) crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)) else "calibration check not run",
-               "\n\t\U2022 Mean log-2 FC of negative control pairs: ", if (calib_check_run) crayon::blue(mean_lfc) else "calibration check not run",
-               "\n\t\U2022 N discovery pairs rejected: ", if (discovery_analysis_run) crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs)) else "discovery analysis not run"
-      ))
+  # 3. print the gRNA-to-cell assignment information
+  grna_assignment_run <- funct_run_vect[["assign_grnas"]]
+  if (grna_assignment_run) {
+    cat(paste0("\n\ngRNA-to-cell assignment information:",
+               "\n\t\U2022 Assignment method: ", crayon::blue(sceptre_object@grna_assignment_method),
+               "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(sceptre_object@cells_per_grna |> mean() |> round(2)),
+               "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(sceptre_object@cells_per_targeting_grna_group |> mean() |> round(2)),
+               "\n\t\U2022 Mean N gRNAs per cell: ", crayon::blue(sceptre_object@grnas_per_cell |> mean() |> round(2))))
+  }
+
+  # 4. print the results summary
+  calib_check_run <- funct_run_vect[["run_calibration_check"]]
+  discovery_analysis_run <- funct_run_vect[["run_discovery_analysis"]]
+  power_check_run <- funct_run_vect[["run_power_check"]]
+  if (calib_check_run || discovery_analysis_run) cat("\n\nSummary of results:")
+  if (calib_check_run) {
+    n_false_rejections <- sum(x@calibration_result$reject)
+    mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
+    n_calib_pairs <- nrow(x@calibration_result)
+    cat(paste0("\n\t\U2022 N", crayon::red(" negative control "), "pairs rejected: ", crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)),
+               "\n\t\U2022 Mean log-2 FC for", crayon::red(" negative control "), "pairs: ", crayon::blue(mean_lfc)))
+  }
+  if (power_check_run) {
+    median_pc_p_value <- median(x@power_result$p_value, na.rm = TRUE)
+    cat(paste0("\n\t\U2022 Median", crayon::green(" positive control "), "p-value: ", crayon::blue(signif(median_pc_p_value, 2))))
+  }
+  if (discovery_analysis_run) {
+    n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
+    n_discovery_pairs <- x@n_ok_discovery_pairs
+    cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "rejected: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
   }
 })
 

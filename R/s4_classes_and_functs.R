@@ -206,7 +206,7 @@ set_analysis_parameters <- function(sceptre_object,
 
 
 # step 3: assign grnas to cells
-assign_grnas <- function(sceptre_object, assignment_method = "default", hyperparameters = "default") {
+assign_grnas <- function(sceptre_object, assignment_method = "default", hyperparameters = "default", parallel = FALSE) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "assign_grnas")
 
@@ -244,7 +244,7 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   sceptre_object@last_function_called <- "assign_grnas"
 
   # 6. assign the grnas
-  sceptre_object <- assign_grnas_to_cells(sceptre_object)
+  sceptre_object <- assign_grnas_to_cells(sceptre_object, parallel)
 
   # return
   return(sceptre_object)
