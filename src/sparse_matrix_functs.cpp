@@ -98,6 +98,21 @@ List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int 
 
 
 // [[Rcpp::export]]
+IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells) {
+  IntegerVector out(n_cells);
+  IntegerVector current_assignments;
+  for (int i = 0; i < grna_assignments.size(); i ++) {
+    current_assignments = grna_assignments[i];
+    for (int j = 0; j < current_assignments.size(); j ++) {
+      out[current_assignments[j] - 1] ++;
+    }
+  }
+  return out;
+}
+
+
+// PROBABLY DEPRECATE BELOW THIS POINT
+// [[Rcpp::export]]
 IntegerVector group_and_threshold(IntegerVector j, IntegerVector p, NumericVector x, IntegerVector row_idxs, int threshold) {
   int row_idx, col_idx, start, end, counter = 0;
   double count;

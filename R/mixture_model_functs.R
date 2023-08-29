@@ -1,29 +1,36 @@
-assign_grnas_to_cells_mixture <- function(grna_matrix, grna_group_data_frame, cell_covariate_data_frame, n_em_rep = 5L) {
+assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters) {
   # 0. get random starting guesses for pi and g_pert
-  starting_guesses <- get_random_starting_guesses(n_em_rep)
-  pi_guesses <- starting_guesses$pi_guesses
-  g_pert_guesses <- starting_guesses$g_pert_guesses
+  starting_guesses <- get_random_starting_guesses(n_em_rep = grna_assignment_hyperparameters$n_em_rep,
+                                                  pi_guess_range = grna_assignment_hyperparameters$pi_guess_range,
+                                                  g_pert_guess_range = grna_assignment_hyperparameters$g_pert_guess_range)
 
   # 1. obtain the covariate matrix
   formula_object <- auto_construct_formula_object(cell_covariates = cell_covariate_data_frame,
                                                   include_grna_covariates = TRUE)
   covariate_matrix <- convert_covariate_df_to_design_matrix(covariate_data_frame = cell_covariate_data_frame,
                                                             formula_object = formula_object)
+
   # 2. make the grna expression matrix row-accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
 
   # 3. iterate over grna ids, obtaining the assignments for each
-  assignment_list <- sapply(grna_ids, function(grna_id) {
-    print(grna_id)
+  initial_assignment_list <- sapply(seq_along(grna_ids), function(i) {
+    grna_id <- grna_ids[i]
+    if (i == 1 || i %% 5 == 0) cat(paste0("Carrying out gRNA-to-cell assignments for gRNA ", grna_id, " (", i, " of ", length(grna_ids), ")\n"))
     g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                       row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
-    assignments <- obtain_em_assignments(pi_guesses, g_pert_guesses, g, covariate_matrix,
-                                         use_glm = TRUE, n_nonzero_cells_cutoff = 10L, backup_threshold = 5)
+    assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
+                                         g_pert_guesses = starting_guesses$g_pert_guesses,
+                                         g = g, covariate_matrix = covariate_matrix, use_glm = TRUE,
+                                         n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,
+                                         backup_threshold = grna_assignment_hyperparameters$backup_threshold)
     return(assignments)
-  }, simplify = FALSE)
-}
+  }, simplify = FALSE) |> stats::setNames(grna_ids)
 
+  # return
+  return (initial_assignment_list)
+}
 
 obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matrix, use_glm,
                                   n_nonzero_cells_cutoff, backup_threshold) {
@@ -34,8 +41,6 @@ obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matri
     if (use_glm) {
       pois_fit <- suppressWarnings(stats::glm.fit(y = g, x = covariate_matrix, family = stats::poisson()))
       g_mus_pert0 <- pois_fit$fitted.values
-    } else {
-      stop("not yet implemented.")
     }
     # 2. compute log(g!)
     log_g_factorial <- lgamma(g+1)
@@ -59,9 +64,9 @@ obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matri
 }
 
 
-get_random_starting_guesses <- function(n_em_rep = 5, pi_guess_range = c(1e-5, 0.1), exp_g_pert_guess_range = c(10, 5000)) {
+get_random_starting_guesses <- function(n_em_rep = 5, pi_guess_range = c(1e-5, 0.1), g_pert_guess_range = c(10, 5000)) {
   set.seed(4)
   pi_guesses <- stats::runif(n = n_em_rep, min = pi_guess_range[1], max = pi_guess_range[2])
-  g_pert_guesses <- stats::runif(n = n_em_rep, min = log(exp_g_pert_guess_range[1]), max = log(exp_g_pert_guess_range[2]))
+  g_pert_guesses <- stats::runif(n = n_em_rep, min = g_pert_guess_range[1], max = g_pert_guess_range[2])
   list(pi_guesses = pi_guesses, g_pert_guesses = g_pert_guesses)
 }

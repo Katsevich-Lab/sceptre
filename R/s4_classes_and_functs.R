@@ -212,16 +212,17 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
 
   # 1. handle the default arguments
   if (identical(assignment_method, "default")) {
-    assignment_method <- if (sceptre_object@low_moi) "maximum" else "thresholding"
+    assignment_method <- if (sceptre_object@low_moi) "maximum" else "mixture"
   }
   if (identical(hyperparameters, "default")) {
     hyperparameters <- if (assignment_method == "maximum") {
       list(umi_fraction_threshold = 0.5)
     } else if (assignment_method == "thresholding")  {
-      list(threshold = 5L)
+      list(threshold = 5)
     } else if (assignment_method == "mixture") {
-      list()
-    } else {
+      list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1), g_pert_guess_range = log(c(10, 5000)),
+           n_nonzero_cells_cutoff = 10L, backup_threshold = 5)
+    } else if (assignment_method == "user_supplied") {
       list()
     }
   }
