@@ -182,7 +182,7 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
   }
   # iii. mixture model
   if (assignment_method == "mixture") {
-    if (!setequal(hyperparam_names, c("n_em_rep", "pi_guess_range", "g_pert_guess_range", "n_nonzero_cells_cutoff", "backup_threshold"))) {
+    if (!setequal(hyperparam_names, c("n_em_rep", "pi_guess_range", "g_pert_guess_range", "n_nonzero_cells_cutoff", "backup_threshold", "probability_threshold"))) {
       stop("The hyperparameter list must contain the fields `n_em_rep`, `pi_guess_range`, `g_pert_guess_range`, `n_nonzero_cells_cutoff`, `backup_threshold`.")
     }
     if (hyperparameters[["n_em_rep"]] <= 0 || hyperparameters[["n_em_rep"]] >= 100) {
@@ -203,6 +203,9 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
     }
     if (hyperparameters[["backup_threshold"]] <= 0) {
       stop("`backup_threshold` should be an integer greater than or equal to 1.")
+    }
+    if (hyperparameters[["probability_threshold"]] <= 0 || hyperparameters[["probability_threshold"]] >= 1) {
+      stop("`probability_threshold` should be a numeric in the interval (0,1).")
     }
   }
   return(NULL)

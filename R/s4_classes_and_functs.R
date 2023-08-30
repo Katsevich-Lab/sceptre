@@ -214,17 +214,22 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   if (identical(assignment_method, "default")) {
     assignment_method <- if (sceptre_object@low_moi) "maximum" else "mixture"
   }
-  if (identical(hyperparameters, "default")) {
-    hyperparameters <- if (assignment_method == "maximum") {
-      list(umi_fraction_threshold = 0.5)
-    } else if (assignment_method == "thresholding")  {
-      list(threshold = 5)
-    } else if (assignment_method == "mixture") {
-      list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1), g_pert_guess_range = log(c(10, 5000)),
-           n_nonzero_cells_cutoff = 10L, backup_threshold = 5)
-    } else if (assignment_method == "user_supplied") {
-      list()
-    }
+  hyperparameters_default <- if (assignment_method == "maximum") {
+    list(umi_fraction_threshold = 0.5)
+  } else if (assignment_method == "thresholding")  {
+    list(threshold = 5)
+  } else if (assignment_method == "mixture") {
+    list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1),
+      g_pert_guess_range = log(c(10, 5000)), n_nonzero_cells_cutoff = 10L,
+      backup_threshold = 5, probability_threshold = 0.9)
+  } else if (assignment_method == "user_supplied") {
+    list()
+  }
+  if (identical(hyperparameters, "default")) hyperparameters <- hyperparameters_default
+  if (is(hyperparameters, "list")) {
+    hyperparam_names <- names(hyperparameters)
+    for (hyperparam_name in hyperparam_names) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
+    hyperparameters <- hyperparameters_default
   }
 
   # 2. check inputs
@@ -234,8 +239,9 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   sceptre_object <- reset_results(sceptre_object)
 
   # 4. determine whether to reset response precomputations
-  reset_response_precomps <- !(identical(sceptre_object@grna_assignment_method, assignment_method) &&
-                               identical(sceptre_object@grna_assignment_hyperparameters, hyperparameters))
+  reset_response_precomps <- sceptre_object@low_moi &&
+    (!identical(sceptre_object@grna_assignment_method, assignment_method) ||
+     !identical(sceptre_object@grna_assignment_hyperparameters, hyperparameters))
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()
 
   # 5. update uncached fields

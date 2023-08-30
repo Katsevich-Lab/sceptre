@@ -25,7 +25,8 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
                                            g_pert_guesses = starting_guesses$g_pert_guesses,
                                            g = g, covariate_matrix = covariate_matrix, use_glm = TRUE,
                                            n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,
-                                           backup_threshold = grna_assignment_hyperparameters$backup_threshold)
+                                           backup_threshold = grna_assignment_hyperparameters$backup_threshold,
+                                           probability_threshold = grna_assignment_hyperparameters$probability_threshold)
       return(assignments)
     }, simplify = FALSE) |> stats::setNames(curr_grna_ids)
   }
@@ -47,7 +48,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
 }
 
 obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matrix, use_glm,
-                                  n_nonzero_cells_cutoff, backup_threshold) {
+                                  n_nonzero_cells_cutoff, backup_threshold, probability_threshold) {
   threshold_em_probabilities <- TRUE
   n_nonzero <- sum(g >= 1)
   if (n_nonzero >= n_nonzero_cells_cutoff) {
@@ -62,7 +63,7 @@ obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matri
     fit_cpp <- run_reduced_em_algo_cpp(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
     # obtain the assignments
     if (fit_cpp$outer_converged && fit_cpp$outer_log_lik != -Inf) {
-      assignments <- which(fit_cpp$outer_Ti1s >= 0.5)
+      assignments <- which(fit_cpp$outer_Ti1s >= probability_threshold)
     } else {
       threshold_em_probabilities <- FALSE
     }
