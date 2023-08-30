@@ -20,27 +20,6 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount
 }
 
 
-#' Obtain discovery set
-#'
-#' The \code{obtain_discovery_set()} function returns the discovery set from an input discovery result.
-#'
-#' @inheritParams compare_calibration_and_discovery_results
-#'
-#' @return a subset of \code{discovery_result} containing the discoveries.
-#' @examples
-#' # See the example in the run_sceptre_lowmoi help file.
-#' ?run_sceptre_lowmoi
-obtain_discovery_set <- function(discovery_result, alpha = 0.1, multiple_testing_correction = "BH") {
-  discovery_result |>
-    stats::na.omit() |>
-    dplyr::mutate(p_adj = stats::p.adjust(p_value, method = multiple_testing_correction),
-                  reject = p_adj < alpha) |>
-    dplyr::filter(reject) |>
-    dplyr::select(-p_adj, -reject) |>
-    dplyr::arrange(p_value)
-}
-
-
 generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
   response_ids <- rownames(response_matrix) |> factor()
   grna_groups <- grna_group_data_frame |>

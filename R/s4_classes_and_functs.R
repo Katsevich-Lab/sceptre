@@ -89,6 +89,10 @@
 #' resampling_mechanism = "permutations",
 #' side = "left")
 #'
+#' # optional: explicitly assign grnas, run QC
+#' sceptre_object <- sceptre_object |> assign_grnas()
+#' sceptre_object <- sceptre_object |> run_qc()
+#'
 #' # 4. run the calibration check; plot the result
 #' sceptre_object <- run_calibration_check(sceptre_object)
 #' plot(sceptre_object)
@@ -261,6 +265,7 @@ run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
                    response_n_umis_range = c(0.01, 0.99),
+                   p_mito_threshold = 1,
                    additional_cells_to_remove = integer()) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "run_qc")
@@ -282,7 +287,7 @@ run_qc <- function(sceptre_object,
   sceptre_object@last_function_called <- "run_qc"
 
   # 6. determine the cells to retain after cellwise qc
-  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, additional_cells_to_remove)
+  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, p_mito_threshold, additional_cells_to_remove)
 
   # 7. determine whether to reset response precomputation
   if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {

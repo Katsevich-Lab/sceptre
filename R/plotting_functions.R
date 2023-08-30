@@ -7,6 +7,10 @@ get_my_theme <- function(element_text_size = 11) {
                                        plot.title = ggplot2::element_text(hjust = 0.5, size = element_text_size))
 }
 
+###########################
+# 1. PLOT CALIBRATION CHECK
+###########################
+
 #' Plot calibration result
 #'
 #' The \code{plot_calibration_result()} function helps to visualize the results of a calibration check.
@@ -19,7 +23,6 @@ get_my_theme <- function(element_text_size = 11) {
 #' \item{bottom right:} a text box displaying (i) the number of false discoveries made on the negative control pairs and (ii) the mean estimated log-fold change. The number of false discoveries ideally should be zero, although a small, positive integer (such as 1, 2, or 3) also is OK. The mean estimated log-fold change should be a numeric value close to zero.
 #' }
 #'
-#' @inheritParams compare_calibration_and_discovery_results
 #' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
@@ -34,7 +37,7 @@ get_my_theme <- function(element_text_size = 11) {
 #' @examples
 #' # See the example in the run_sceptre_lowmoi help file.
 #' ?run_sceptre_lowmoi
-plot_calibration_result <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 0.55, transparency = 0.8) {
+plot_calibration_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 0.55, transparency = 0.8) {
   calibration_result <- sceptre_object@calibration_result
   if (nrow(calibration_result) == 0L) stop("Calibration check not yet called.")
   my_theme <- get_my_theme()
@@ -91,6 +94,10 @@ plot_calibration_result <- function(sceptre_object, return_indiv_plots = FALSE, 
   }
   return(out)
 }
+
+############################
+# 2. PLOT DISCOVERY ANALYSIS
+############################
 
 compare_calibration_and_discovery_results <- function(calibration_result, discovery_result, p_thresh,
                                                       transform_scale = TRUE, include_legend = FALSE,
@@ -157,7 +164,7 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 }
 
 
-plot_discovery_result <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
+plot_discovery_analysis <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
   # first, compute the rejection set
   if (nrow(sceptre_object@discovery_result) == 0L) stop("Discovery analysis not run.")
   discovery_result <- sceptre_object@discovery_result |> na.omit()
@@ -205,4 +212,31 @@ plot_discovery_result <- function(sceptre_object, return_indiv_plots = FALSE, x_
     p_out <- cowplot::plot_grid(p1, p2, p3, p4, labels = c("a", "b", "c"), rel_heights = c(0.55, 0.45), nrow = 2)
   }
   return(p_out)
+}
+
+######################
+# 3. PLOT ASSIGN GRNAS
+######################
+plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 9L, grnas_to_plot = NULL) {
+  grna_matrix <- sceptre_object@grna_matrix
+  if (is.null(grnas_to_plot)) {
+    grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), 9L), replace = FALSE)
+  }
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
+    load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                 row_idx = which(grna_id == rownames(grna_matrix)), n_cells = ncol(grna_matrix))
+  }) |> unlist()
+  grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
+  to_plot <- data.frame(grna_id = grna_ids_rep, grna_expressions = grna_expressions) |>
+    dplyr::filter(grna_expressions < 10000)
+  p <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = grna_expressions)) +
+    ggplot2::geom_histogram(bins = 20, col = "midnightblue", fill = "grey90") + get_my_theme() +
+    ggplot2::facet_wrap(grna_id ~ ., scales = "free_x", nrow = floor(sqrt(length(grnas_to_plot)))) +
+    ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+                                breaks = c(0, 1, 3, 7, 50, 500)) +
+    ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 0.5),
+                                breaks = c(0, 10, 100, 1000, 100000), expand = c(0, NA)) +
+    ggplot2::xlab("gRNA count") + ggplot2::ylab("N cells")
+  return(p)
 }

@@ -81,7 +81,7 @@ extra_covariates = extra_covariates_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 moi = "low")
 
-# 2. prepare the analysis
+# 2. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = "all")
@@ -118,13 +118,17 @@ extra_covariates = extra_covariates_highmoi_experimental)
 data(discovery_pairs_highmoi_experimental)
 data(pc_pairs_highmoi_experimental)
 
-# 3. prepare the analysis
+# 3. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = discovery_pairs_highmoi_experimental,
 positive_control_pairs = pc_pairs_highmoi_experimental,
 resampling_mechanism = "permutations",
 side = "left")
+
+# optional: explicitly assign grnas, run QC
+sceptre_object <- sceptre_object |> assign_grnas()
+sceptre_object <- sceptre_object |> run_qc()
 
 # 4. run the calibration check; plot the result
 sceptre_object <- run_calibration_check(sceptre_object)
