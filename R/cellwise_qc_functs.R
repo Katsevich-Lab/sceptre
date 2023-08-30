@@ -1,4 +1,4 @@
-determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, additional_cells_to_remove) {
+determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, p_mito_threshold, additional_cells_to_remove) {
   cells_to_exclude <- integer()
 
   # 1. compute the cells to retain based on n_umis_range
@@ -7,15 +7,21 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, add
   cells_to_exlude_1 <- which(n_umis_vector < expression_cutoffs[1] | n_umis_vector > expression_cutoffs[2])
   cells_to_exclude <- union(cells_to_exclude, cells_to_exlude_1)
 
-  # 2. compute cells to retain based on cells containing multiple grnas (if in low MOI)
+  # 2. compute cells to retain based on p_mito
+  if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
+    cells_to_exclude_2 <- which(sceptre_object@covariate_data_frame$response_p_mito > p_mito_threshold)
+    cells_to_exclude <- union(cells_to_exclude, cells_to_exclude_2)
+  }
+
+  # 3. compute cells to retain based on cells containing multiple grnas (if in low MOI)
   if (sceptre_object@low_moi) {
     cells_to_exclude <- union(cells_to_exclude, sceptre_object@cells_w_multiple_grnas)
   }
 
-  # 3. remove additional cells specified by the user
+  # 4. remove additional cells specified by the user
   cells_to_exclude <- union(cells_to_exclude, additional_cells_to_remove)
 
-  # 4. finally, determine the set of cells to retain, and update the sceptre_object
+  # 5. finally, determine the set of cells to retain, and update the sceptre_object
   n_cells <- ncol(sceptre_object@response_matrix)
   cells_to_retain <- if (length(cells_to_exclude) == 0L) seq(1L, n_cells) else seq(1L, n_cells)[-cells_to_exclude]
   sceptre_object@cells_in_use <- cells_to_retain

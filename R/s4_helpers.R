@@ -76,8 +76,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
-             crayon::blue(n_cells), " cells", if (length(sceptre_object@cells_in_use) >= 1) {
-               paste0(" (", crayon::blue(length(sceptre_object@cells_in_use)), " after cellwise QC)")
+             crayon::blue(n_cells), " cells", if (length(object@cells_in_use) >= 1) {
+               paste0(" (", crayon::blue(length(object@cells_in_use)), " after cellwise QC)")
              } else NULL, "\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
              crayon::blue(moi), " multiplicity-of-infection \n\t\U2022 ",
@@ -94,7 +94,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 
   # 0. determine the functions that have been run
   function_rank_vector <- get_function_rank_vector()
-  current_function <- sceptre_object@last_function_called
+  current_function <- x@last_function_called
   curr_rank <- function_rank_vector[[current_function]]
   if (curr_rank <= 4) {
     completed_functs <- names(function_rank_vector)[function_rank_vector <= curr_rank]
@@ -142,10 +142,10 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   grna_assignment_run <- funct_run_vect[["assign_grnas"]]
   if (grna_assignment_run) {
     cat(paste0("\n\ngRNA-to-cell assignment information:",
-               "\n\t\U2022 Assignment method: ", crayon::blue(sceptre_object@grna_assignment_method),
-               "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(sceptre_object@cells_per_grna |> mean() |> round(2)),
-               "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(sceptre_object@cells_per_targeting_grna_group |> mean() |> round(2)),
-               "\n\t\U2022 Mean N gRNAs per cell: ", crayon::blue(sceptre_object@grnas_per_cell |> mean() |> round(2))))
+               "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
+               "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(x@cells_per_grna |> mean() |> round(2)),
+               "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(x@cells_per_targeting_grna_group |> mean() |> round(2)),
+               "\n\t\U2022 Mean N gRNAs per cell: ", crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
   }
 
   # 4. print the results summary
@@ -193,6 +193,5 @@ reset_results <- function(sceptre_object) {
   sceptre_object@power_result <- data.frame()
   sceptre_object@n_ok_discovery_pairs <- integer()
   sceptre_object@n_ok_positive_control_pairs <- integer()
-  sceptre_object@cells_in_use <- integer()
   return(sceptre_object)
 }
