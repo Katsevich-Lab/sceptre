@@ -208,7 +208,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   } else {
     cat("Running analysis in parallel. (Print messages not available.)")
     res <- parallel::mclapply(partitioned_grna_group_ids, perform_association_analysis,
-                              mc.cores = length(partitioned_response_ids))
+                              mc.cores = length(partitioned_grna_group_ids))
     cat(crayon::green(' \u2713\n'))
   }
   result <- res |> data.table::rbindlist(fill = TRUE)
