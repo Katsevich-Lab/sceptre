@@ -282,6 +282,7 @@ function_rank_map <- function(function_name = NULL, rank = NULL) {
   return(out)
 }
 
+
 check_function_call <- function(sceptre_object, function_name) {
   prev_funct_rank <- function_rank_map(function_name = sceptre_object@last_function_called)
   curr_funct_rank <- function_rank_map(function_name = function_name)
@@ -289,4 +290,21 @@ check_function_call <- function(sceptre_object, function_name) {
     funct_to_call <- function_rank_map(rank = curr_funct_rank - 1L)
     stop("You must call the function `", funct_to_call, "` before you call the function `", function_name, "`.")
   }
+}
+
+
+get_funct_run_vect <- function(sceptre_object) {
+  function_rank_vector <- get_function_rank_vector()
+  current_function <- sceptre_object@last_function_called
+  curr_rank <- function_rank_vector[[current_function]]
+  if (curr_rank <= 4) {
+    completed_functs <- names(function_rank_vector)[function_rank_vector <= curr_rank]
+  } else {
+    completed_functs <- names(function_rank_vector)[function_rank_vector <= 4]
+    if (nrow(sceptre_object@calibration_result) >= 1L) completed_functs <- c(completed_functs, "run_calibration_check")
+    if (nrow(sceptre_object@power_result) >= 1L) completed_functs <- c(completed_functs, "run_power_check")
+    if (nrow(sceptre_object@discovery_result) >= 1L) completed_functs <- c(completed_functs, "run_discovery_analysis")
+  }
+  funct_run_vect <- sapply(names(function_rank_vector), function(funct) funct %in% completed_functs)
+  return(funct_run_vect)
 }

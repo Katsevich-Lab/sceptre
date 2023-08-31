@@ -64,21 +64,23 @@ setClass("sceptre_object",
 
 # show method for sceptre class
 setMethod("show", signature = signature("sceptre_object"), function(object) {
+  # 0. determine the functions that have been run
+  funct_run_vect <- get_funct_run_vect(object)
+
+  # 1. obtain the basic information
   n_cells <- ncol(object@response_matrix)
   n_responses <- nrow(object@response_matrix)
   n_nt_grnas <- object@grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |>
-    nrow()
+    dplyr::filter(grna_group == "non-targeting") |> nrow()
   targeting_grnas_df <- object@grna_group_data_frame |>
     dplyr::filter(grna_group != "non-targeting")
   n_targeting_grna_groups <- length(unique(targeting_grnas_df$grna_group))
   n_targeting_grnas <- nrow(targeting_grnas_df)
-
   n_covariates <- ncol(object@covariate_data_frame)
   covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
-             crayon::blue(n_cells), " cells", if (length(object@cells_in_use) >= 1) {
+             crayon::blue(n_cells), " cells", if (funct_run_vect["run_qc"]) {
                paste0(" (", crayon::blue(length(object@cells_in_use)), " after cellwise QC)")
              } else NULL, "\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
@@ -95,21 +97,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
 
-  # 0. determine the functions that have been run
-  function_rank_vector <- get_function_rank_vector()
-  current_function <- x@last_function_called
-  curr_rank <- function_rank_vector[[current_function]]
-  if (curr_rank <= 4) {
-    completed_functs <- names(function_rank_vector)[function_rank_vector <= curr_rank]
-  } else {
-    completed_functs <- names(function_rank_vector)[function_rank_vector <= 4]
-    if (nrow(x@calibration_result) >= 1L) completed_functs <- c(completed_functs, "run_calibration_check")
-    if (nrow(x@power_result) >= 1L) completed_functs <- c(completed_functs, "run_power_check")
-    if (nrow(x@discovery_result) >= 1L) completed_functs <- c(completed_functs, "run_discovery_analysis")
-  }
-  funct_run_vect <- sapply(names(function_rank_vector), function(funct) funct %in% completed_functs)
-
   # 1. print analysis status
+  funct_run_vect <- get_funct_run_vect(x)
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   cat("\n\nAnalysis status:\n")
   for (i in seq_along(funct_run_vect)) {
@@ -123,9 +112,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
   cat(paste0("\nUser-specified analysis parameters: \n",
              "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
-                                                                                                      if (disc_pair_qc_performed) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
+                                                                                                      if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
-                                                                                                        if (pc_pair_qc_performed) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
+                                                                                                        if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
@@ -195,7 +184,5 @@ reset_results <- function(sceptre_object) {
   sceptre_object@calibration_result <- data.frame()
   sceptre_object@discovery_result <- data.frame()
   sceptre_object@power_result <- data.frame()
-  sceptre_object@n_ok_discovery_pairs <- integer()
-  sceptre_object@n_ok_positive_control_pairs <- integer()
   return(sceptre_object)
 }
