@@ -137,7 +137,6 @@ sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = discovery_pairs_highmoi_experimental,
 positive_control_pairs = pc_pairs_highmoi_experimental,
-resampling_mechanism = "permutations",
 side = "left")
 print(sceptre_object)
 

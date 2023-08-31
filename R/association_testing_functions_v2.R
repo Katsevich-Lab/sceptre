@@ -99,9 +99,9 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametr
 
 # workhorse function 3: crt, glm factored out
 crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
-                                 response_ids, gene_precomp_list, covariate_matrix,
+                                 response_ids, response_precomputations, covariate_matrix,
                                  get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
-                                 n_cells, response_matrix, side_code) {
+                                 response_matrix, side_code, cells_in_use) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # precomputation on grna
   idxs <- get_idx_f(curr_grna_group)
@@ -119,13 +119,13 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
                                       p = response_matrix@p,
                                       x = response_matrix@x,
                                       row_idx = which(rownames(response_matrix) == curr_response_id),
-                                      n_cells = n_cells)
+                                      n_cells = ncol(response_matrix))[cells_in_use]
     if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
     # compute the precomputation pieces
     pieces_precomp <- compute_precomputation_pieces(expression_vector = expression_vector,
                                                     covariate_matrix = covariate_matrix,
-                                                    fitted_coefs = gene_precomp_list[[curr_response_id]]$fitted_coefs,
-                                                    theta = gene_precomp_list[[curr_response_id]]$theta,
+                                                    fitted_coefs = response_precomputations[[curr_response_id]]$fitted_coefs,
+                                                    theta = response_precomputations[[curr_response_id]]$theta,
                                                     full_test_stat = TRUE)
     # run the association test
     result <- run_low_level_test_full_v4(y = expression_vector,
@@ -149,7 +149,7 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
 # workhorse function 4: crt, glm run inside
 discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, get_idx_f,
                                   response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
-                                  n_cells, response_matrix, side_code) {
+                                  response_matrix, side_code, cells_in_use) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # initialize the idxs
   idxs <- get_idx_f(curr_grna_group)
