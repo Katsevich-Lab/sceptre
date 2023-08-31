@@ -3,6 +3,7 @@
 setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix"))
 setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix"))
 
+
 # sceptre object class
 setClass("sceptre_object",
          slots = list(
@@ -87,6 +88,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
              crayon::blue(n_covariates), " covariates (", covariates, ")"))
 })
 
+
 # print method for sceptre class
 setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -128,9 +130,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
+             "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
              if (!print_full_output) NULL else {
                paste0(
-                 "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
                  "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
                  "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
                  "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
@@ -179,7 +181,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   args[["sceptre_object"]] <- x
 
   last_function_called <- x@last_function_called
-  if (last_function_called %in% c("import_data", "set_analysis_parameters", "run_qc", "run_power_check")) {
+  if (last_function_called %in% c("import_data", "set_analysis_parameters", "run_power_check")) {
     stop("There is no generic plot function configured for the ", last_function_called, "() step.")
   }
 
