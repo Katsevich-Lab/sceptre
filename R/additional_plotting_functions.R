@@ -1,4 +1,3 @@
-
 #' Plot resampling distribution
 #'
 #' Plots the resampling distribution of null test statistics for a given response-gRNA group pair.
@@ -99,22 +98,6 @@ make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object) {
       override.aes = list(size = 1.25)))
 }
 
-make_cells_per_grna_group_plot <- function(sceptre_object) {
-  n_cells_per_grna_group <- sapply(sceptre_object@grna_assignments$grna_group_idxs, length)
-  df <- data.frame(x = n_cells_per_grna_group,
-                   y = names(sceptre_object@grna_assignments$grna_group_idxs)) |>
-    dplyr::arrange(n_cells_per_grna_group) |>
-    dplyr::mutate(y = factor(y, labels = y, levels = y))
-  p <- ggplot2::ggplot(data = df,
-                       mapping = ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_bar(stat = "identity", width = 0.5, fill = "darkblue", col = "black") +
-    get_my_theme() + ggplot2::scale_x_continuous(expand = c(0, 0)) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(),
-                   axis.ticks.y = ggplot2::element_blank()) +
-    ggplot2::xlab("N cells") + ggplot2::ylab("gRNA group") +
-    ggplot2::ggtitle("N cells per gRNA group")
-  return(list(plot = p, median = median(n_cells_per_grna_group)))
-}
 
 make_n_grna_groups_per_cell_plot <- function(sceptre_object) {
   n_grna_groups_per_cell <- sceptre_object@grna_assignments$grna_group_idxs |>

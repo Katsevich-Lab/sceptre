@@ -43,21 +43,35 @@
 #' extra_covariates = extra_covariates_lowmoi,
 #' grna_group_data_frame = grna_group_data_frame_lowmoi,
 #' moi = "low")
+#' print(sceptre_object)
 #'
 #' # 2. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
 #' discovery_pairs = "all")
+#' print(sceptre_object)
 #'
-#' # 3. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object)
+#' # 4. optional: explicitly assign grnas, run QC
+#' plot_grna_count_distributions(sceptre_object)
+#' sceptre_object <- sceptre_object |> assign_grnas()
 #' plot(sceptre_object)
+#' print(sceptre_object)
 #'
-#' # 4. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object)
+#' sceptre_object <- sceptre_object |> run_qc()
 #' plot(sceptre_object)
+#' print(sceptre_object)
 #'
-#' # 5. obtain the results for downstream analysis
+#' # 5. run the calibration check
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+#' plot(sceptre_object)
+#' print(sceptre_object)
+#'
+#' # 6. run discovery analysis
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
+#' plot(sceptre_object)
+#' print(sceptre_object)
+#'
+#' # 7. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "discovery")
 #'
 #' ##################
@@ -76,33 +90,43 @@
 #' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 #' moi = "high",
 #' extra_covariates = extra_covariates_highmoi_experimental)
+#' print(sceptre_object)
 #'
-#' # 2. set the discovery pairs and positive control pairs
+#' # 2. set the analysis parameters
 #' data(discovery_pairs_highmoi_experimental)
 #' data(pc_pairs_highmoi_experimental)
 #'
-#' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
 #' discovery_pairs = discovery_pairs_highmoi_experimental,
 #' positive_control_pairs = pc_pairs_highmoi_experimental,
 #' resampling_mechanism = "permutations",
 #' side = "left")
+#' print(sceptre_object)
 #'
-#' # optional: explicitly assign grnas, run QC
-#' sceptre_object <- sceptre_object |> assign_grnas()
-#' sceptre_object <- sceptre_object |> run_qc()
-#'
-#' # 4. run the calibration check; plot the result
-#' sceptre_object <- run_calibration_check(sceptre_object)
+#' # 3 (optional). manually assign grnas, run QC
+#' plot_grna_count_distributions(sceptre_object)
+#' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 #' plot(sceptre_object)
+#' print(sceptre_object)
+#'
+#' sceptre_object <- sceptre_object |> run_qc()
+#' plot(sceptre_object)
+#' print(sceptre_object)
+#'
+#' # 4. run the calibration check
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+#' plot(sceptre_object)
+#' print(sceptre_object)
 #'
 #' # 5. (optional) run the power check
-#' sceptre_object <- run_power_check(sceptre_object)
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+#' print(sceptre_object)
 #'
 #' # 6. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object)
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
+#' print(sceptre_object)
 #'
 #' # 7. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "discovery")
@@ -210,23 +234,23 @@ set_analysis_parameters <- function(sceptre_object,
 
 
 # step 3: assign grnas to cells
-assign_grnas <- function(sceptre_object, assignment_method = "default", hyperparameters = "default", parallel = FALSE) {
+assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", parallel = FALSE) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "assign_grnas")
 
   # 1. handle the default arguments
-  if (identical(assignment_method, "default")) {
-    assignment_method <- if (sceptre_object@low_moi) "maximum" else "mixture"
+  if (identical(method, "default")) {
+    method <- if (sceptre_object@low_moi) "maximum" else "mixture"
   }
-  hyperparameters_default <- if (assignment_method == "maximum") {
-    list(umi_fraction_threshold = 0.5)
-  } else if (assignment_method == "thresholding")  {
+  hyperparameters_default <- if (method == "maximum") {
+    list(umi_fraction_threshold = 0.8)
+  } else if (method == "thresholding")  {
     list(threshold = 5)
-  } else if (assignment_method == "mixture") {
+  } else if (method == "mixture") {
     list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1),
       g_pert_guess_range = log(c(10, 5000)), n_nonzero_cells_cutoff = 10L,
-      backup_threshold = 5, probability_threshold = 0.9)
-  } else if (assignment_method == "user_supplied") {
+      backup_threshold = 5, probability_threshold = 0.8)
+  } else if (method == "user_supplied") {
     list()
   }
   if (identical(hyperparameters, "default")) hyperparameters <- hyperparameters_default
@@ -237,19 +261,19 @@ assign_grnas <- function(sceptre_object, assignment_method = "default", hyperpar
   }
 
   # 2. check inputs
-  check_assign_grna_inputs(sceptre_object, assignment_method, hyperparameters) |> invisible()
+  check_assign_grna_inputs(sceptre_object, method, hyperparameters) |> invisible()
 
   # 3. reset results
   sceptre_object <- reset_results(sceptre_object)
 
   # 4. determine whether to reset response precomputations
   reset_response_precomps <- sceptre_object@low_moi &&
-    (!identical(sceptre_object@grna_assignment_method, assignment_method) ||
+    (!identical(sceptre_object@grna_assignment_method, method) ||
      !identical(sceptre_object@grna_assignment_hyperparameters, hyperparameters))
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()
 
   # 5. update uncached fields
-  sceptre_object@grna_assignment_method <- assignment_method
+  sceptre_object@grna_assignment_method <- method
   sceptre_object@grna_assignment_hyperparameters <- hyperparameters
   sceptre_object@last_function_called <- "assign_grnas"
 

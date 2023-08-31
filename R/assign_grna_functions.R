@@ -2,7 +2,6 @@
 # If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
 # If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
 assign_grnas_to_cells <- function(sceptre_object, parallel) {
-  # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
   low_moi <- sceptre_object@low_moi
@@ -40,6 +39,7 @@ assign_grnas_to_cells <- function(sceptre_object, parallel) {
   sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
   sceptre_object@cells_per_targeting_grna_group <- processed_assignment_out$cells_per_targeting_grna_group
   sceptre_object@cells_w_multiple_grnas <- if (!maximum_assignment) processed_assignment_out$cells_w_multiple_grnas else max_result$cells_w_multiple_grnas
+  sceptre_object@initial_grna_assignment_list <- initial_assignment_list
   return(sceptre_object)
 }
 

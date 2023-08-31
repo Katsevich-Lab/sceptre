@@ -80,21 +80,35 @@ grna_matrix = grna_matrix_lowmoi,
 extra_covariates = extra_covariates_lowmoi,
 grna_group_data_frame = grna_group_data_frame_lowmoi,
 moi = "low")
+print(sceptre_object)
 
 # 2. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = "all")
+print(sceptre_object)
 
-# 3. run the calibration check
-sceptre_object <- run_calibration_check(sceptre_object)
+# 4. optional: explicitly assign grnas, run QC
+plot_grna_count_distributions(sceptre_object)
+sceptre_object <- sceptre_object |> assign_grnas()
 plot(sceptre_object)
+print(sceptre_object)
 
-# 4. run discovery analysis
-sceptre_object <- run_discovery_analysis(sceptre_object)
+sceptre_object <- sceptre_object |> run_qc()
 plot(sceptre_object)
+print(sceptre_object)
 
-# 5. obtain the results for downstream analysis
+# 5. run the calibration check
+sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+plot(sceptre_object)
+print(sceptre_object)
+
+# 6. run discovery analysis
+sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
+plot(sceptre_object)
+print(sceptre_object)
+
+# 7. obtain the results for downstream analysis
 discovery_result <- get_result(sceptre_object, "discovery")
 
 ##################
@@ -113,33 +127,43 @@ grna_matrix = grna_matrix_highmoi_experimental,
 grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
 moi = "high",
 extra_covariates = extra_covariates_highmoi_experimental)
+print(sceptre_object)
 
-# 2. set the discovery pairs and positive control pairs
+# 2. set the analysis parameters
 data(discovery_pairs_highmoi_experimental)
 data(pc_pairs_highmoi_experimental)
 
-# 3. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = discovery_pairs_highmoi_experimental,
 positive_control_pairs = pc_pairs_highmoi_experimental,
 resampling_mechanism = "permutations",
 side = "left")
+print(sceptre_object)
 
-# optional: explicitly assign grnas, run QC
-sceptre_object <- sceptre_object |> assign_grnas()
-sceptre_object <- sceptre_object |> run_qc()
-
-# 4. run the calibration check; plot the result
-sceptre_object <- run_calibration_check(sceptre_object)
+# 3 (optional). manually assign grnas, run QC
+plot_grna_count_distributions(sceptre_object)
+sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 plot(sceptre_object)
+print(sceptre_object)
+
+sceptre_object <- sceptre_object |> run_qc()
+plot(sceptre_object)
+print(sceptre_object)
+
+# 4. run the calibration check
+sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+plot(sceptre_object)
+print(sceptre_object)
 
 # 5. (optional) run the power check
-sceptre_object <- run_power_check(sceptre_object)
+sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+print(sceptre_object)
 
 # 6. run discovery analysis
-sceptre_object <- run_discovery_analysis(sceptre_object)
+sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 plot(sceptre_object)
+print(sceptre_object)
 
 # 7. obtain the results for downstream analysis
 discovery_result <- get_result(sceptre_object, "discovery")

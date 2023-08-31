@@ -256,7 +256,7 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
   # 3. check for the presence of a calibration result
   if (nrow(calibration_result) == 0L) {
-    cat(crayon::red(paste0("Warning: The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n")))
+    cat(crayon::red(paste0("Warning: The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n\n")))
   }
 
   return(NULL)

@@ -39,6 +39,7 @@ setClass("sceptre_object",
            discovery_pairs_with_info = "data.frame",
            positive_control_pairs_with_info = "data.frame",
            negative_control_pairs = "data.frame",
+           initial_grna_assignment_list = "list",
            grna_assignments_raw = "list",
            grna_assignments = "list",
            cells_w_multiple_grnas = "integer",
@@ -173,16 +174,17 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 
 
 # plot function for sceptre object
-setMethod("plot", signature = signature("sceptre_object"), function(x) {
+setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
+  args <- list(...)
+  args[["sceptre_object"]] <- x
+
   last_function_called <- x@last_function_called
-  if (last_function_called %in% c("import_data", "set_analysis_parameters", "assign_grnas", "run_qc", "run_power_check")) {
+  if (last_function_called %in% c("import_data", "set_analysis_parameters", "run_qc", "run_power_check")) {
     stop("There is no generic plot function configured for the ", last_function_called, "() step.")
   }
-  if (last_function_called == "run_calibration_check") {
-    p <- plot_calibration_result(x)
-  } else if (last_function_called == "run_discovery_analysis") {
-    p <- plot_discovery_result(x)
-  }
+
+  funct_to_call <- paste0("plot_", last_function_called)
+  p <- do.call(what = funct_to_call, args = args)
   return(p)
 })
 
