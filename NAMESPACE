@@ -2,8 +2,8 @@
 
 export(compute_cell_covariates)
 export(import_data)
-export(plot_calibration_check)
 export(plot_resampling_distribution)
+export(plot_run_calibration_check)
 import(BH)
 import(Matrix)
 importFrom(Rcpp,sourceCpp)

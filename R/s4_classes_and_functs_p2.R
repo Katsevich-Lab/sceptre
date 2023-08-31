@@ -1,5 +1,6 @@
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. advance function (if necessary), and check function call
   sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
   check_function_call(sceptre_object, "run_calibration_check")
@@ -41,6 +42,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
 
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. verify that function called in correct order
   sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
   check_function_call(sceptre_object, "run_power_check")
@@ -72,7 +74,8 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
-  # 0. verify that function called in correct order
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+   # 0. verify that function called in correct order
   sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
   check_function_call(sceptre_object, "run_discovery_analysis")
 
@@ -174,7 +177,7 @@ get_result <- function(sceptre_object, analysis_type) {
 
 advance_set_analysis_parameters_by_two <- function(sceptre_object, parallel) {
   if (sceptre_object@last_function_called == "set_analysis_parameters") {
-    cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default options.\n"))
+    cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default options.\n\n"))
     sceptre_object <- sceptre_object |> assign_grnas(parallel = parallel) |> run_qc()
   }
   return(sceptre_object)
