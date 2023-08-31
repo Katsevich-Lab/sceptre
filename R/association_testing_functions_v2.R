@@ -147,9 +147,9 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
 }
 
 # workhorse function 4: crt, glm run inside
-discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, get_idx_f,
-                                  response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
-                                  response_matrix, side_code, cells_in_use) {
+discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, get_idx_f, response_ids,
+                                  covariate_matrix, curr_grna_group, all_nt_idxs, response_matrix,
+                                  side_code, cells_in_use) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # initialize the idxs
   idxs <- get_idx_f(curr_grna_group)
@@ -171,7 +171,7 @@ discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, g
                                            p = response_matrix@p,
                                            x = response_matrix@x,
                                            row_idx = which(rownames(response_matrix) == curr_response_id),
-                                           n_cells = n_cells)
+                                           n_cells = ncol(response_matrix))[cells_in_use]
     curr_expression_vector <- curr_expression_vector[combined_idxs]
     # perform the response precomputation
     response_precomp <- perform_response_precomputation(expressions = curr_expression_vector,
