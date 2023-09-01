@@ -310,7 +310,8 @@ run_qc <- function(sceptre_object,
   sceptre_object@last_function_called <- "run_qc"
 
   # 6. determine the cells to retain after cellwise qc
-  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, p_mito_threshold, additional_cells_to_remove)
+  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range,
+                                              p_mito_threshold, additional_cells_to_remove)
 
   # 7. determine whether to reset response precomputation
   if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {

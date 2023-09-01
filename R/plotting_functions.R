@@ -317,13 +317,15 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 ############
 # 5. PLOT QC
 ############
-make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object, transparency = 0.8, point_size = 0.55) {
+plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency = 0.8, point_size = 0.55) {
   my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
   discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
     dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
     dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
-  ggplot2::ggplot(data = discovery_pairs,
+
+  # pairwise QC
+  p_b <- ggplot2::ggplot(data = discovery_pairs,
                   mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)) +
     ggplot2::geom_point(alpha = transparency, size = point_size) + get_my_theme() +
     ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
@@ -337,7 +339,7 @@ make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object, transparency 
     ggplot2::theme(legend.position = "bot") +
     ggplot2::scale_color_manual(values = my_cols) +
     ggplot2::ggtitle("Pairwise QC") +
-    ggplot2::theme(legend.position = c(0.85, 0.15),
+    ggplot2::theme(legend.position = c(0.85, 0.2),
                    legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
                    legend.title = ggplot2::element_blank()) +
     ggplot2::guides(color = ggplot2::guide_legend(
@@ -345,9 +347,28 @@ make_n_nonzero_cntrl_vs_trt_cells_plot <- function(sceptre_object, transparency 
       keyheight = 0.15,
       default.unit = "inch",
       override.aes = list(size = 1.25)))
-}
 
-plot_run_qc <- function(sceptre_object, transparency = 0.8, point_size = 0.55) {
-  p_a <- make_n_nonzero_cntrl_vs_trt_cells_plot(sceptre_object, transparency, point_size)
-  return(p_a)
+  # cellwise QC
+  cell_removal_metrics <- sceptre_object@cell_removal_metrics
+  n_orig_cells <- ncol(sceptre_object@response_matrix)
+  cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
+  df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
+                   Filter = c("expression level", "percent mito", "multiple gRNAs", "user-specified", "any filter"))
+  # make a barplot. remove x-axis text
+  p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
+    ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
+    ggplot2::scale_y_continuous(expand = c(0, NA)) +
+    ggplot2::ylab("Frac. cells removed") +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
+    get_my_theme() +
+    ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +
+    ggplot2::ggtitle("Cellwise QC")
+
+  # combine the plots
+  if (return_indiv_plots) {
+    p_out <- list(p_a, p_b)
+  } else {
+    p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+  }
+  return(p_out)
 }
