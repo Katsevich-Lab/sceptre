@@ -31,6 +31,7 @@ setClass("sceptre_object",
            grna_assignment_hyperparameters = "list",
            multiple_testing_alpha = "numeric",
            multiple_testing_method = "character",
+           cell_removal_metrics = "integer",
 
            # computed objects
            M_matrix = "matrix",

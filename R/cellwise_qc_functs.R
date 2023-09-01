@@ -4,27 +4,38 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, p_m
   # 1. compute the cells to retain based on n_umis_range
   n_umis_vector <- sceptre_object@covariate_data_frame$response_n_umis
   expression_cutoffs <- stats::quantile(x = n_umis_vector, probs = response_n_umis_range)
-  cells_to_exlude_1 <- which(n_umis_vector < expression_cutoffs[1] | n_umis_vector > expression_cutoffs[2])
-  cells_to_exclude <- union(cells_to_exclude, cells_to_exlude_1)
+  cells_to_exlude_extreme <- which(n_umis_vector < expression_cutoffs[1] | n_umis_vector > expression_cutoffs[2])
+  cells_to_exclude <- union(cells_to_exclude, cells_to_exlude_extreme)
+  n_cells_rm_extreme <- length(cells_to_exlude_extreme)
 
   # 2. compute cells to retain based on p_mito
   if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
-    cells_to_exclude_2 <- which(sceptre_object@covariate_data_frame$response_p_mito > p_mito_threshold)
-    cells_to_exclude <- union(cells_to_exclude, cells_to_exclude_2)
+    cells_to_exclude_p_mito <- which(sceptre_object@covariate_data_frame$response_p_mito > p_mito_threshold)
+    cells_to_exclude <- union(cells_to_exclude, cells_to_exclude_p_mito)
+    n_cells_rm_p_mito <- length(cells_to_exclude_p_mito)
+  } else {
+    n_cells_rm_p_mito <- 0L
   }
 
   # 3. compute cells to retain based on cells containing multiple grnas (if in low MOI)
-  if (sceptre_object@low_moi) {
-    cells_to_exclude <- union(cells_to_exclude, sceptre_object@cells_w_multiple_grnas)
-  }
+  cells_to_exclude <- union(cells_to_exclude, sceptre_object@cells_w_multiple_grnas)
+  n_cells_rm_multiple_grnas <- length(sceptre_object@cells_w_multiple_grnas)
 
   # 4. remove additional cells specified by the user
   cells_to_exclude <- union(cells_to_exclude, additional_cells_to_remove)
+  n_cells_rm_user_specified <- length(additional_cells_to_remove)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   n_cells <- ncol(sceptre_object@response_matrix)
   cells_to_retain <- if (length(cells_to_exclude) == 0L) seq(1L, n_cells) else seq(1L, n_cells)[-cells_to_exclude]
   sceptre_object@cells_in_use <- cells_to_retain
+  n_cells_rm_total <- n_cells - length(cells_to_retain)
+  cell_removal_metrics <- c(n_cells_rm_extreme = n_cells_rm_extreme,
+                            n_cells_rm_p_mito = n_cells_rm_p_mito,
+                            n_cells_rm_multiple_grnas = n_cells_rm_multiple_grnas,
+                            n_cells_rm_user_specified = n_cells_rm_user_specified,
+                            n_cells_rm_total = n_cells_rm_total)
+  sceptre_object@cell_removal_metrics <- cell_removal_metrics
   return(sceptre_object)
 }
 
