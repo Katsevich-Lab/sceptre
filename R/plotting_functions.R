@@ -380,73 +380,50 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
 #'
 #' The \code{plot_run_power_check} function helps to visualize the results of a power check.
 #'
-#' The plot contains three panels.
-#' \itemize{
-#' \item{upper left:} a violin plot of the p-values on a log2 scale.
-#' \item{upper right:} histograms showing the counts of the p-values separately for the positive and negative controls, also on a log2 scale.
-#' \item{bottom left:} a text box containing the total number of p-values for each type as well as the number of significant ones, using the threshold set by \code{set_analysis_parameters}.
-#' }
+#' The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
 #'
-#' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
-#' @param bins (optional; default \code{30}) the number of bins for the histograms.
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
+#' @param return_indiv_plots (optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.
+#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to}, for better visualization. If \code{clip_to=0} is used then no clipping is done.
+#' @return a single \code{ggplot2} plot.
 #' @export
-plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, bins=30) {
+plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 1,
+                                 transparency = 0.8,  clip_to = 1e-20) {
   calibration_result <- sceptre_object@power_result
   if (nrow(calibration_result) == 0L) stop("Power check not yet called.")
   my_theme <- get_my_theme()
-  
-  pos_ctrl_log2_pvals <- sceptre_object@power_result$p_value |> log2()
-  neg_ctrl_log2_pvals <- sceptre_object@calibration_result$p_value |> log2()
-  
-  # preparing the text output for the 3rd panel (plot p_c)
-  alpha <- sceptre_object@multiple_testing_alpha
-  string1 <- paste0("Positive control p-values:\n   \U2022 Total number: ", length(pos_ctrl_log2_pvals),
-                    "\n   \U2022 Number significant (at alpha = ", signif(alpha, 1), "): ",
-                    sum(pos_ctrl_log2_pvals < log2(alpha)))
-  string2 <- paste0("\nNegative control p-values:\n   \U2022 Total number: ", length(neg_ctrl_log2_pvals),
-                    "\n   \U2022 Number significant (at alpha = ", signif(alpha, 1), "): ",
-                    sum(neg_ctrl_log2_pvals < log2(alpha)))
-  string <- paste0(string1, string2)
-  
+  set.seed(3)
+  my_cols <- c("mediumseagreen", "firebrick1")
+
+  pos_ctrl_pvals <- sceptre_object@power_result$p_value
+  neg_ctrl_pvals <- sceptre_object@calibration_result$p_value
+
+  group_names <- c("Positive Control", "Negative Control")
   df <- data.frame(
     lab = rep(
-      c("Positive Control", "Negative Control"),
-      c(length(pos_ctrl_log2_pvals), length(neg_ctrl_log2_pvals))
+      group_names,
+      c(length(pos_ctrl_pvals), length(neg_ctrl_pvals))
     ) |>
-      factor(levels = c(c("Positive Control", "Negative Control"))),
-    log2_pval = c(pos_ctrl_log2_pvals, neg_ctrl_log2_pvals)
+      factor(levels = group_names),
+    p_values = c(pos_ctrl_pvals, neg_ctrl_pvals) %>%
+      pmax(clip_to)
   )
-  
-  p_a <- ggplot2::ggplot(
+
+  p <- ggplot2::ggplot(
     data = df,
-    mapping = ggplot2::aes(x = lab, y = log2_pval)
-  ) +
-    ggplot2::geom_violin() +
-    ggplot2::labs(x = "p-value type", y = bquote("log"[2] * "(p-value)"),
-                  title = "Violin Plot of Positive vs. Negative Control p-values") +
-    my_theme
-  
-  p_b <- ggplot2::ggplot(
-    data = df,
-    mapping = ggplot2::aes(x = log2_pval)
-  ) +
-    ggplot2::geom_histogram(bins=bins) +
-    ggplot2::facet_grid(~lab) +
-    ggplot2::labs(x = bquote("log"[2] * "(p-value)"),
-                  title = "Histograms of Positive and Negative Control p-values") +
-    my_theme
-  
-  p_c <- ggplot2::ggplot() +
-    ggplot2::annotate(geom = "text", label = string, x = .35, y = 1.2, hjust=0) +
-    ggplot2::theme_void() +
-    ggplot2::xlim(c(0, 2)) +
-    ggplot2::ylim(c(0, 2))
-  
-  if (return_indiv_plots) {
-    out <- list(p_a, p_b, p_c)
-  } else {
-    out <- cowplot::plot_grid(p_a, p_b, p_c, nrow = 2, rel_heights = c(0.55, 0.45))
+    mapping = ggplot2::aes(x = lab, y = p_values, color=lab)
+  )
+  if(clip_to > 0) {
+    p <- p + ggplot2::geom_hline(yintercept = clip_to, linetype = "dashed", color="grey90")
   }
-  return(out)
+  p <- p +
+    ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
+    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
+    ggplot2::scale_color_manual(values=my_cols, guide="none") +
+    ggplot2::labs(
+      x = "Perturbation response pair type",
+      y = "p-value",
+      title = "Comparison of positive and negative control p-values") +
+    my_theme
+
+  return(p)
 }
