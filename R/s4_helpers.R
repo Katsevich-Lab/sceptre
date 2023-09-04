@@ -111,7 +111,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
   n_pc_pairs <- nrow(x@positive_control_pairs)
   pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
-  cat(paste0("\nUser-specified analysis parameters: \n",
+  cat(paste0("\nAnalysis parameters: \n",
              "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
                                                                                                       if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
