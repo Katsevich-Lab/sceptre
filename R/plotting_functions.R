@@ -417,10 +417,10 @@ plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, poi
   }
   p <- p +
     ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10)) +
-    ggplot2::scale_color_manual(values=my_cols, guide="none") +
+    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0)) +
+    ggplot2::scale_color_manual(values = my_cols, guide = "none") +
     ggplot2::labs(
-      x = "Perturbation response pair type",
+      x = "Pair type",
       y = "p-value",
       title = "Comparison of positive and negative control p-values") +
     my_theme
