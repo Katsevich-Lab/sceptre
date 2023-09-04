@@ -383,7 +383,7 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
 #' The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
 #'
 #' @param return_indiv_plots (optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.
-#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this values are clipped to this value, for better visualization. If set to \code{0} then no clipping is done.
+#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to}, for better visualization. If \code{clip_to=0} is used then no clipping is done.
 #' @return a single \code{ggplot2} plot.
 #' @export
 plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 1,
