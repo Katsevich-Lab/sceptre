@@ -171,7 +171,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   args[["sceptre_object"]] <- x
 
   last_function_called <- x@last_function_called
-  if (last_function_called %in% c("import_data", "set_analysis_parameters", "run_power_check")) {
+  if (last_function_called %in% c("import_data", "set_analysis_parameters")) {
     stop("There is no generic plot function configured for the ", last_function_called, "() step.")
   }
 

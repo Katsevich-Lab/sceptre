@@ -1,3 +1,61 @@
+#' Import data from cellranger
+#'
+#' @param directories a vector of directories containing the count matrices
+#'
+#' @return a sceptre_object initialized
+#' @export
+#'
+#' @examples
+#' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"
+#' directories <- paste0(base_dir, "gemgroup", 1:3)
+#' sceptre_object <- import_data_from_cellranger(directories = directories, moi = "low")
+import_data_from_cellranger <- function(directories, moi) {
+  # 1. check that directories exist
+  for (curr_directory in directories) {
+    if (!dir.exists(curr_directory)) stop(paste0("The directory ", curr_directory, " does not exist."))
+  }
+
+  # 2. create the vector of matrix, features, and barcode files
+  input_files <- sapply(X = directories, function(curr_directory) {
+    fs <- list.files(curr_directory)
+    grep_strs <- c("*barcodes.tsv($|.gz)", "*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
+    out <- sapply(grep_strs, function(grep_str) {
+      file_names <- grep(pattern = grep_str, x = fs, value = TRUE)
+      if (length(file_names) >= 2L) {
+        stop(paste0("There are multiple ", grep_str, " files within the directory ", curr_directory, "."))
+      }
+      if (length(file_names) == 0L) {
+        stop(paste0("The directory ", curr_directory, " contains zero ", grep_str, " files."))
+      }
+      return(paste0(curr_directory, "/", file_names))
+    }) |> stats::setNames(c("barcodes", "features", "matrix"))
+  }, simplify = FALSE) |> stats::setNames(NULL)
+
+  # 3. obtain the barcodes, features, and matrix fp vectors
+  barcode_fps <- sapply(X = input_files, FUN = function(i) i[["barcodes"]])
+  feature_fps <- sapply(X = input_files, FUN = function(i) i[["features"]])
+  matrix_fps <- sapply(X = input_files, FUN = function(i) i[["matrix"]])
+
+  # 4. obtain the feature data frame
+  feature_df <- data.table::fread(file = feature_fps[1],
+                                  colClasses = c("character", "character", "character"),
+                                  col.names = c("feature_id", "feature_name", "modality"))
+
+  # 5. check aspects of the feature df
+  if (!all(feature_df$modality %in% c("Gene Expression", "CRISPR Guide Capture")) ||
+      !("Gene Expression" %in% feature_df$modality) ||
+      !("CRISPR Guide Capture" %in% feature_df$modality)) {
+    stop("The features.tsv file should contain modalities `Gene Expression` and `CRISPR Guide Capture`.")
+  }
+  gene_modality_idxs <- which(feature_df$modality == "Gene Expression")
+  grna_modality_idxs <- which(feature_df$modality == "CRISPR Guide Capture")
+
+  # 5. initialize the gene and grna csr matrices
+  gene_matrix <- list(x = numeric(), p = integer(), j = integer())
+
+}
+
+
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
   # if a logical matrix, convert to the corresponding numeric matrix; consider more efficient implementation later
   if (methods::is(matrix_in, "lgRMatrix")) {
