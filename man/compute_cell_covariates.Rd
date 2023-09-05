@@ -4,7 +4,7 @@
 \alias{compute_cell_covariates}
 \title{Compute cell covariates}
 \usage{
-compute_cell_covariates(matrix_in)
+compute_cell_covariates(matrix_in, feature_names, compute_p_mito)
 }
 \arguments{
 \item{matrix_in}{a matrix with features (e.g., genes, gRNAs, or proteins) in the rows and cells in the columns. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. Row names are optional.}

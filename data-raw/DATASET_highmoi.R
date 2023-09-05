@@ -81,15 +81,15 @@ discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis") |>
 pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl") |>
   dplyr::select(-type)
 
-response_matrix_highmoi_experimental <- response_matrix_highmoi
-grna_matrix_highmoi_experimental <- grna_matrix_highmoi
-extra_covariates_highmoi_experimental <- covariate_data_frame_highmoi |>
+response_matrix_highmoi <- response_matrix_highmoi
+grna_matrix_highmoi <- grna_matrix_highmoi
+extra_covariates_highmoi <- covariate_data_frame_highmoi |>
   dplyr::mutate(batch = factor(batch, levels = c("prep_batch_1", "prep_batch_2"),
                                labels = c("b1", "b2")))
-grna_group_data_frame_highmoi_experimental <- grna_group_data_frame_highmoi
-discovery_pairs_highmoi_experimental <- discovery_pairs_highmoi
-pc_pairs_highmoi_experimental <- pc_pairs_highmoi
+grna_group_data_frame_highmoi <- grna_group_data_frame_highmoi
+discovery_pairs_highmoi <- discovery_pairs_highmoi
+pc_pairs_highmoi <- pc_pairs_highmoi
 
-usethis::use_data(response_matrix_highmoi_experimental, grna_matrix_highmoi_experimental,
-                  extra_covariates_highmoi_experimental, grna_group_data_frame_highmoi_experimental,
-                  discovery_pairs_highmoi_experimental, pc_pairs_highmoi_experimental, overwrite = TRUE)
+usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi,
+                  extra_covariates_highmoi, grna_group_data_frame_highmoi,
+                  discovery_pairs_highmoi, pc_pairs_highmoi, overwrite = TRUE)

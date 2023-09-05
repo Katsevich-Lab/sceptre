@@ -10,16 +10,16 @@ NULL
 #' A gene-by-cell expression matrix.
 #'
 #' @inheritSection highmoi_data Overview
-#' @usage data(response_matrix_highmoi_experimental)
-"response_matrix_highmoi_experimental"
+#' @usage data(response_matrix_highmoi)
+"response_matrix_highmoi"
 
 #' gRNA expression matrix
 #'
 #' A gRNA-by-cell expression matrix.
 #'
 #' @inheritSection highmoi_data Overview
-#' @usage data(grna_matrix_highmoi_experimental)
-"grna_matrix_highmoi_experimental"
+#' @usage data(grna_matrix_highmoi)
+"grna_matrix_highmoi"
 
 #' Covariate matrix
 #'
@@ -28,26 +28,26 @@ NULL
 #'   \item{`batch`}{(factor) sequencing batch (`batch_1`, `batch_2`)}
 #' }
 #' @inheritSection highmoi_data Overview
-#' @usage data(extra_covariates_highmoi_experimental)
-"extra_covariates_highmoi_experimental"
+#' @usage data(extra_covariates_highmoi)
+"extra_covariates_highmoi"
 
 #' Discovery gene-gRNA group pairs
 #'
 #' The discovery response-gRNA group pairs that we seek to test for association, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
 #' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi_experimental)
-"discovery_pairs_highmoi_experimental"
+#' @usage data(discovery_pairs_highmoi)
+"discovery_pairs_highmoi"
 
 #' Positive control gene-gRNA group pairs
 #'
 #' The positive control response-gRNA group pairs, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
 #' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi_experimental)
-"pc_pairs_highmoi_experimental"
+#' @usage data(discovery_pairs_highmoi)
+"pc_pairs_highmoi"
 
 #' gRNA groups table
 #'
 #' A data frame that maps each gRNA ID to its gRNA group.
 #' @inheritSection highmoi_data Overview
-#' @usage data(grna_group_data_frame_highmoi_experimental)
-"grna_group_data_frame_highmoi_experimental"
+#' @usage data(grna_group_data_frame_highmoi)
+"grna_group_data_frame_highmoi"
