@@ -78,28 +78,28 @@
 #' # High MOI example
 #' ##################
 #' # 0. obtain the data required for a single-cell screen analysis
-#' data(response_matrix_highmoi_experimental)
-#' data(grna_matrix_highmoi_experimental)
-#' data(extra_covariates_highmoi_experimental)
-#' data(grna_group_data_frame_highmoi_experimental)
+#' data(response_matrix_highmoi)
+#' data(grna_matrix_highmoi)
+#' data(extra_covariates_highmo)
+#' data(grna_group_data_frame_highmoi)
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
-#' response_matrix = response_matrix_highmoi_experimental,
-#' grna_matrix = grna_matrix_highmoi_experimental,
-#' grna_group_data_frame = grna_group_data_frame_highmoi_experimental,
+#' response_matrix = response_matrix_highmoi,
+#' grna_matrix = grna_matrix_highmoi,
+#' grna_group_data_frame = grna_group_data_frame_highmoi,
 #' moi = "high",
-#' extra_covariates = extra_covariates_highmoi_experimental)
+#' extra_covariates = extra_covariates_highmoi)
 #' print(sceptre_object)
 #'
 #' # 2. set the analysis parameters
-#' data(discovery_pairs_highmoi_experimental)
-#' data(pc_pairs_highmoi_experimental)
+#' data(discovery_pairs_highmoi)
+#' data(pc_pairs_highmoi)
 #'
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
-#' discovery_pairs = discovery_pairs_highmoi_experimental,
-#' positive_control_pairs = pc_pairs_highmoi_experimental,
+#' discovery_pairs = discovery_pairs_highmoi,
+#' positive_control_pairs = pc_pairs_highmoi,
 #' side = "left")
 #' print(sceptre_object)
 #'
