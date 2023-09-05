@@ -377,6 +377,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// increment_vector
+void increment_vector(IntegerVector x, int value);
+RcppExport SEXP _sceptre_increment_vector(SEXP xSEXP, SEXP valueSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type value(valueSEXP);
+    increment_vector(x, value);
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_synth_idx_list_to_matrix", (DL_FUNC) &_sceptre_synth_idx_list_to_matrix, 1},
@@ -405,6 +416,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
+    {"_sceptre_increment_vector", (DL_FUNC) &_sceptre_increment_vector, 2},
     {NULL, NULL, 0}
 };
 

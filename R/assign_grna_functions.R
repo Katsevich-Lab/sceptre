@@ -124,19 +124,3 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_group_
               cells_per_targeting_grna_group = cells_per_targeting_grna_group)
   return(out)
 }
-
-
-update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
-  out <- list()
-  nt_grnas <- names(indiv_nt_grna_idxs)
-  all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
-  n_cells_per_nt <- sapply(indiv_nt_grna_idxs, length)
-  stop <- cumsum(n_cells_per_nt)
-  start <- c(0L, stop[-length(stop)]) + 1L
-  indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-    seq(start[i], stop[i])
-  }) |> stats::setNames(nt_grnas)
-  out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-  out$all_nt_idxs <- all_nt_idxs
-  return(out)
-}

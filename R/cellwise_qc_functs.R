@@ -41,9 +41,12 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, p_m
 
 
 update_grna_assignments_given_qc <- function(sceptre_object) {
+  # 0. define several varaibles
   cells_in_use <- sceptre_object@cells_in_use
   grna_assignments_raw <- sceptre_object@grna_assignments_raw
   n_cells <- ncol(sceptre_object@response_matrix)
+
+  # 1. define update idxs funct
   update_idxs <- function(v, cells_in_use, n_cells) {
     v_log <- logical(length = n_cells)
     v_log[v] <- TRUE
@@ -52,19 +55,37 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     return(v_updated)
   }
 
-  # 1. for each gRNA group and NT gRNA, subset the grna vector and the update the indices
-  grna_group_idxs_new <- sapply(grna_assignments_raw$grna_group_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
-  nt_idxs_new <- sapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
+  # 2. for each gRNA group and NT gRNA, subset the grna vector and the update the indices
+  grna_group_idxs_new <- sapply(grna_group_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
+  nt_idxs_new <- sapply(indiv_nt_grna_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
+  # remove those nt grnas with 0 cells (after QC)
+  nt_idxs_new <- nt_idxs_new[sapply(nt_idxs_new, length) != 0L]
   grna_assignments <- list(grna_group_idxs = grna_group_idxs_new, indiv_nt_grna_idxs = nt_idxs_new)
 
-  # 2. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
+  # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
   if (!sceptre_object@control_group_complement) {
     l <- update_indiv_grna_assignments_for_nt_cells(grna_assignments$indiv_nt_grna_idxs)
     grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
     grna_assignments$all_nt_idxs <- l$all_nt_idxs
   }
 
-  # 3. update the sceptre_object and return
+  # 4. update the sceptre_object and return
   sceptre_object@grna_assignments <- grna_assignments
   return(sceptre_object)
+}
+
+
+update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
+  out <- list()
+  nt_grnas <- names(indiv_nt_grna_idxs)
+  all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
+  n_cells_per_nt <- sapply(indiv_nt_grna_idxs, length)
+  stop <- cumsum(n_cells_per_nt)
+  start <- c(0L, stop[-length(stop)]) + 1L
+  indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
+    seq(start[i], stop[i])
+  }) |> stats::setNames(nt_grnas)
+  out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
+  out$all_nt_idxs <- all_nt_idxs
+  return(out)
 }

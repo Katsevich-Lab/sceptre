@@ -10,7 +10,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
 
   # 2. check inputs
-  check_calibration_check_inputs(sceptre_object) |> invisible()
+  check_calibration_check_inputs(sceptre_object, n_calibration_pairs) |> invisible()
 
   # 3. construct the negative control pairs
   cat("Constructing negative control pairs.")
@@ -20,8 +20,8 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   cat(crayon::green(' \u2713\n'))
 
   # 4. update uncached objects
-  sceptre_object@calibration_group_size <- calibration_group_size
-  sceptre_object@n_calibration_pairs <- n_calibration_pairs
+  sceptre_object@calibration_group_size <- as.integer(calibration_group_size)
+  sceptre_object@n_calibration_pairs <- as.integer(n_calibration_pairs)
 
   # 5. run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -55,7 +55,8 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                   control_group_complement = sceptre_object@control_group_complement,
                                   grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                   pc_analysis = TRUE,
-                                  calibration_result = sceptre_object@calibration_result) |> invisible()
+                                  calibration_result = sceptre_object@calibration_result,
+                                  n_ok_pairs = sceptre_object@n_ok_positive_control_pairs) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -87,7 +88,8 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                   control_group_complement = sceptre_object@control_group_complement,
                                   grna_group_data_frame = sceptre_object@grna_group_data_frame,
                                   pc_analysis = FALSE,
-                                  calibration_result = sceptre_object@calibration_result) |> invisible()
+                                  calibration_result = sceptre_object@calibration_result,
+                                  n_ok_pairs = sceptre_object@n_ok_discovery_pairs) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
