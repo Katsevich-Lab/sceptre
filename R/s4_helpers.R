@@ -34,6 +34,7 @@ setClass("sceptre_object",
            cell_removal_metrics = "integer",
 
            # computed objects
+           mitochondrial_gene = "logical",
            M_matrix = "matrix",
            n_nonzero_tot_vector = "integer",
            n_ok_discovery_pairs = "integer",
