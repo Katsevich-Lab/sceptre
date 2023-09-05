@@ -129,13 +129,16 @@
 #'
 #' # 7. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "discovery")
-import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL) {
+import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, feature_names = NULL) {
+  # 0. handle default parameters
+  if (is.null(feature_names)) feature_names <- rownames(response_matrix)
+
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix,
                                      grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates)
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates, feature_names)
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -289,7 +292,7 @@ run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
                    response_n_umis_range = c(0.01, 0.99),
-                   p_mito_threshold = 1,
+                   p_mito_threshold = 0.15,
                    additional_cells_to_remove = integer()) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "run_qc")

@@ -52,13 +52,13 @@ auto_construct_formula_object <- function(cell_covariates, include_grna_covariat
 }
 
 
-auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_covariates) {
+auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_covariates, feature_names) {
   # compute the response covariates
-  covariate_df <- compute_cell_covariates(response_matrix)
+  covariate_df <- compute_cell_covariates(response_matrix, feature_names, TRUE)
   colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
 
   # compute the grna covariates
-  grna_covariate_df <- compute_cell_covariates(grna_matrix)
+  grna_covariate_df <- compute_cell_covariates(grna_matrix, feature_names, FALSE)
   colnames(grna_covariate_df) <- paste0("grna_", colnames(grna_covariate_df))
   covariate_df <- cbind(covariate_df, grna_covariate_df)
 

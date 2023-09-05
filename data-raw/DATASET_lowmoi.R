@@ -23,7 +23,7 @@ feat_ids <- mm_odm |>
   ondisc::get_feature_ids()
 
 mt_feats <- grep(pattern = "^MT-", x = feat_ids, value = TRUE)
-my_feats <- c(sample(feat_ids, 285), sample(mt_feats, 5))
+my_feats <- c(sample(feat_ids, 289), sample(mt_feats, 1))
 
 exp_mat <- mm_odm@modalities$gene[my_feats,]
 response_matrix_lowmoi <- exp_mat[[my_feats,]]

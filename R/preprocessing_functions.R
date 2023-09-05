@@ -122,12 +122,16 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 #' @examples
 #' data(response_matrix_lowmoi)
 #' cell_covariates <- compute_cell_covariates(response_matrix_lowmoi)
-compute_cell_covariates <- function(matrix_in) {
+compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
   # make response matrix column accessible
   matrix_in <- set_matrix_accessibility(matrix_in, make_row_accessible = FALSE)
   # get MT gene idxs
-  mt_gene_idxs <- grep(pattern = "^MT-", x = rownames(matrix_in))
-  compute_p_mito <- length(mt_gene_idxs) >= 1
+  if (compute_p_mito) {
+    mt_gene_idxs <- grep(pattern = "^MT-", x = feature_names)
+    compute_p_mito <- length(mt_gene_idxs) >= 1
+  } else {
+    mt_gene_idxs <- integer()
+  }
   # call the low-level function
   out <- compute_cell_covariates_cpp(i = matrix_in@i,
                                      p = matrix_in@p,
