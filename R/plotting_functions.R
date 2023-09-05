@@ -227,8 +227,8 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
     p_out <- p_out +
       ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
       ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
-      ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") +
-      ggplot2::ggtitle("QQ plot (tail)")
+      ggplot2::ggtitle("QQ plot (tail)") +
+      (if (!is.na(p_thresh)) ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") else NULL)
   }
 
   if (include_legend) {
