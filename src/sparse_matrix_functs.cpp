@@ -109,3 +109,10 @@ IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells
   }
   return out;
 }
+
+
+// [[Rcpp::export]]
+void increment_vector(IntegerVector x, int value) {
+  for (int i = 0; i < x.size(); i++) x[i] += value;
+  return;
+}

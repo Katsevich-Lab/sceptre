@@ -89,21 +89,23 @@ check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariat
                                           grna_group_data_frame, formula_object, response_grna_group_pairs_list,
                                           control_group, resampling_mechanism, side, low_moi) {
   # 5. if response_grna_group_pairs has been supplied, check its characteristics
-  for (response_grna_group_pairs in response_grna_group_pairs_list) {
+  for (idx in seq_along(response_grna_group_pairs_list)) {
+    response_grna_group_pairs <- response_grna_group_pairs_list[[idx]]
     if (nrow(response_grna_group_pairs) >= 1L) {
+      df_name <- names(response_grna_group_pairs_list)[idx]
       # i. verify that `grna_group` and `response_id` are columns
       all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
       # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
       if (!all(response_grna_group_pairs$response_id %in% rownames(response_matrix))) {
-        stop("The column `response_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the response expression matrix.")
+        stop(paste0("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix."))
       }
       # iii. check that the `grna_group` column of the `response_grna_group_pairs` data frame is a subset of the `grna_group` column of the `grna_group_data_frame`
       if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
-        stop("The column `grna_group` of the `response_grna_group_pairs` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`.")
+        stop(paste0("The column `grna_group` of the `", df_name , "` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`."))
       }
       # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
       if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
-        stop("The `response_grna_group_pairs` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs, run a calibration check.")
+        stop("The `", df_name , "` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs against responses, run the calibration check.")
       }
     }
   }
@@ -220,7 +222,7 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
 }
 
 
-check_calibration_check_inputs <- function(sceptre_object) {
+check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs) {
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
   control_group_complement <- sceptre_object@control_group_complement
   n_nt_grnas <- grna_group_data_frame |>
@@ -231,6 +233,9 @@ check_calibration_check_inputs <- function(sceptre_object) {
     if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
   }
 
+  if (n_calibration_pairs == 0L) {
+    stop("Cannot run a calibration check on zero negative control pairs.")
+  }
   return(NULL)
 }
 
@@ -240,10 +245,10 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             grna_group_data_frame,
                                             calibration_check_run,
                                             pc_analysis,
-                                            calibration_result) {
+                                            calibration_result, n_ok_pairs) {
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
-    stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function prepare_analysis()."))
+    stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
   }
 
   # 2. check that negative control gRNAs are present (if the control group is the complement set)
@@ -257,6 +262,11 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
   # 3. check for the presence of a calibration result
   if (nrow(calibration_result) == 0L) {
     cat(crayon::red(paste0("Warning: The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n\n")))
+  }
+
+  # 4. check that at least one pair passes qc
+  if (n_ok_pairs == 0L) {
+    stop("Zero pairs pass pairwise QC. Cannot run analysis.")
   }
 
   return(NULL)

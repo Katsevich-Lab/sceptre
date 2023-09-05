@@ -118,3 +118,7 @@ compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
     .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
 }
 
+increment_vector <- function(x, value) {
+    invisible(.Call(`_sceptre_increment_vector`, x, value))
+}
+
