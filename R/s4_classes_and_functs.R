@@ -237,7 +237,7 @@ set_analysis_parameters <- function(sceptre_object,
 
 
 # step 3: assign grnas to cells
-assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", parallel = FALSE) {
+assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "assign_grnas")
 
@@ -252,7 +252,9 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
   } else if (method == "mixture") {
     list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1),
       g_pert_guess_range = log(c(10, 5000)), n_nonzero_cells_cutoff = 10L,
-      backup_threshold = 5, probability_threshold = 0.8)
+      backup_threshold = 5, probability_threshold = 0.8,
+      formula_object = auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
+                                                     include_grna_covariates = TRUE))
   } else if (method == "user_supplied") {
     list()
   }
@@ -281,7 +283,7 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
   sceptre_object@last_function_called <- "assign_grnas"
 
   # 6. assign the grnas
-  sceptre_object <- assign_grnas_to_cells(sceptre_object, parallel)
+  sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel)
 
   # return
   return(sceptre_object)

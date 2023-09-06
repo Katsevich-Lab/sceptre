@@ -1,7 +1,7 @@
 # The possible fields in the output are grna_group_idxs, all_nt_idxs, indiv_nt_grna_idxs.
 # If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
 # If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
-assign_grnas_to_cells <- function(sceptre_object, parallel) {
+assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
   grna_matrix <- sceptre_object@grna_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
   low_moi <- sceptre_object@low_moi
@@ -16,6 +16,7 @@ assign_grnas_to_cells <- function(sceptre_object, parallel) {
     initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix,
                                                              cell_covariate_data_frame = cell_covariate_data_frame,
                                                              grna_assignment_hyperparameters = grna_assignment_hyperparameters,
+                                                             print_progress = print_progress,
                                                              parallel = parallel)
   }
   if (grna_assignment_method == "thresholding") {
