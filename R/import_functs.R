@@ -21,7 +21,7 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
   # 2. create the vector of matrix, features, and barcode files
   input_files <- sapply(X = directories, function(curr_directory) {
     fs <- list.files(curr_directory)
-    grep_strs <- c("*barcodes.tsv($|.gz)", "*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
+    grep_strs <- c("*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
     out <- sapply(grep_strs, function(grep_str) {
       file_names <- grep(pattern = grep_str, x = fs, value = TRUE)
       if (length(file_names) >= 2L) {
@@ -31,11 +31,10 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
         stop(paste0("The directory ", curr_directory, " contains zero ", grep_str, " files."))
       }
       return(paste0(curr_directory, "/", file_names))
-    }) |> stats::setNames(c("barcodes", "features", "matrix"))
+    }) |> stats::setNames(c("features", "matrix"))
   }, simplify = FALSE) |> stats::setNames(NULL)
 
   # 3. obtain the barcodes, features, and matrix fp vectors
-  barcode_fps <- sapply(X = input_files, FUN = function(i) i[["barcodes"]])
   feature_fps <- sapply(X = input_files, FUN = function(i) i[["features"]])
   matrix_fps <- sapply(X = input_files, FUN = function(i) i[["matrix"]])
 
@@ -55,6 +54,18 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
   n_cells_per_matrix <- vector(mode = "integer", length = length(directories))
   for (i in seq_along(directories)) {
     cat(paste0("Processing directory ", i, "."))
+    # check that the features df matches
+    features_fp <- feature_fps[i]
+    curr_feature_df <- data.table::fread(file = features_fp,
+                                         colClasses = c("character", "character", "character"),
+                                         col.names = c("feature_id", "feature_name", "modality"))
+    for (col in colnames(feature_df)) {
+      if (any(dplyr::pull(feature_df, dplyr::all_of(col)) !=
+            dplyr::pull(curr_feature_df, dplyr::all_of(col)))) {
+        stop("The features.tsv files must match across directories.")
+      }
+    }
+    # process the matrix
     matrix_fp <- matrix_fps[i]
     matrix_metadata <- get_mtx_metadata(matrix_fp)
     n_cells_per_matrix[i] <- matrix_metadata$n_cells

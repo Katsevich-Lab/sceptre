@@ -84,3 +84,10 @@ partition_response_ids <- function(response_ids, parallel) {
   if (!groups_set) out <- list(group_1 = response_ids)
   return(out)
 }
+
+
+get_log_dir <- function() {
+  log_dir <- paste0(tempdir(), "/sceptre_logs/")
+  if (!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE)
+  return(log_dir)
+}
