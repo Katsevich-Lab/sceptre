@@ -13,7 +13,6 @@ get_my_theme <- function(element_text_size = 11) {
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   if (is.null(grnas_to_plot)) {
-    set.seed(3)
     grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
@@ -41,7 +40,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
   grna_ids <- rownames(grna_matrix)
   lowmoi <- sceptre_object@low_moi
   # sample two grnas to plot
-  set.seed(3)
   if (is.null(grnas_to_plot)) grnas_to_plot <- sample(grna_ids, size = min(n_grnas_to_plot, length(grna_ids)), replace = FALSE)
   to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix))
@@ -174,7 +172,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
 
   p_c <- ggplot2::ggplot(data = calibration_result |> dplyr::filter(abs(log_2_fold_change) < 0.6),
                          mapping = ggplot2::aes(x = log_2_fold_change, ggplot2::after_stat(density))) +
-    ggplot2::geom_histogram(binwidth = 0.05, fill = "grey90", col = "black", boundary = 0) +
+    ggplot2::geom_histogram(binwidth = 0.02, fill = "grey90", col = "black", boundary = 0) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
     ggplot2::xlab("Estimated log fold change") + ggplot2::ylab("Density") +

@@ -80,7 +80,7 @@
 #' # 0. obtain the data required for a single-cell screen analysis
 #' data(response_matrix_highmoi)
 #' data(grna_matrix_highmoi)
-#' data(extra_covariates_highmo)
+#' data(extra_covariates_highmoi)
 #' data(grna_group_data_frame_highmoi)
 #'
 #' # 1. create the sceptre object

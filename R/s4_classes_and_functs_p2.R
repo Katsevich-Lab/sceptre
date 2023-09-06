@@ -27,6 +27,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
                                          response_grna_group_pairs = response_grna_group_pairs,
                                          calibration_check = TRUE,
+                                         analysis_type = "calibration_check",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
                                          parallel = parallel)
@@ -62,6 +63,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
                                          response_grna_group_pairs = response_grna_group_pairs,
                                          calibration_check = FALSE,
+                                         analysis_type = "power_check",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
                                          parallel = parallel)
@@ -76,7 +78,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
-   # 0. verify that function called in correct order
+  # 0. verify that function called in correct order
   sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
   check_function_call(sceptre_object, "run_discovery_analysis")
 
@@ -95,6 +97,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
                                          response_grna_group_pairs = response_grna_group_pairs,
                                          calibration_check = FALSE,
+                                         analysis_type = "discovery_analysis",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
                                          parallel = parallel)
@@ -108,7 +111,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 }
 
 
-run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, output_amount, print_progress, parallel) {
+run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type, output_amount, print_progress, parallel) {
   # if running permutations, generate the permutation idxs
   if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
@@ -137,7 +140,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
                        side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
                        response_precomputations = sceptre_object@response_precomputations,
                        cells_in_use = sceptre_object@cells_in_use,
-                       print_progress = print_progress, parallel = parallel)
+                       print_progress = print_progress, parallel = parallel, analysis_type = analysis_type)
 
   # run the method
   out <- if (sceptre_object@run_permutations) {

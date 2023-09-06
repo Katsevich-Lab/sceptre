@@ -1,8 +1,9 @@
 # helper function
-get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L, feature = "response", str = "Analyzing pairs containing ") {
+get_id_from_idx <- function(response_idx, print_progress, response_ids, print_multiple = 5L, gc_multiple = 200L,
+                            feature = "response", str = "Analyzing pairs containing ", parallel = FALSE, f_name = NULL) {
   if ((response_idx == 1 || response_idx %% print_multiple == 0) && print_progress) {
-    cat(paste0(str, feature, " ", as.character(response_ids[response_idx]),
-               " (", response_idx, " of ", length(response_ids), ")\n"))
+    msg <- paste0(str, feature, " ", as.character(response_ids[response_idx]), " (", response_idx, " of ", length(response_ids), ")\n")
+    if (parallel) write(x = msg, file = f_name, append = TRUE) else cat(msg)
   }
   if (response_idx %% gc_multiple == 0) gc() |> invisible()
   response_id <- as.character(response_ids[response_idx])
@@ -14,7 +15,8 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                    side_code, low_moi, response_precomputations, cells_in_use, print_progress, parallel) {
+                                    side_code, low_moi, response_precomputations, cells_in_use, print_progress,
+                                    parallel, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -30,12 +32,19 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
 
   # 2. define function to loop subset of response IDs
-  analyze_given_response_ids <- function(curr_response_ids) {
+  analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
+    if (parallel && print_progress) {
+      f_name <- paste0(get_log_dir(), analysis_type, "_", proc_id, ".out")
+      file.create(f_name) |> invisible()
+    } else {
+      f_name <- NULL
+    }
     precomp_out_list <- list()
     result_out_list <- vector(mode = "list", length = length(curr_response_ids))
 
     for (response_idx in seq_along(curr_response_ids)) {
-      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids)
+      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids,
+                                     parallel = parallel, f_name = f_name)
 
       # 3. load the expressions of the current response
       expression_vector <- load_csr_row(j = response_matrix@j,
@@ -93,8 +102,10 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   if (!parallel) {
     res <- lapply(partitioned_response_ids, analyze_given_response_ids)
   } else {
-    cat("Running analysis in parallel. (Print messages not available.)")
-    res <- parallel::mclapply(partitioned_response_ids, analyze_given_response_ids,
+    cat("Running analysis in parallel.")
+    if (print_progress) cat(paste0(" See ", get_log_dir(), analysis_type, "_*.out files for progress updates."))
+    res <- parallel::mclapply(seq_along(partitioned_response_ids),
+                              function(proc_id) analyze_given_response_ids(partitioned_response_ids[[proc_id]], proc_id),
                               mc.cores = length(partitioned_response_ids))
     cat(crayon::green(' \u2713\n'))
   }

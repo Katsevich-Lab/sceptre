@@ -16,10 +16,17 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   grna_ids <- rownames(grna_matrix)
 
   # 3. define the function to perform assignments for a set of grnas
-  analyze_given_grna_ids <- function(curr_grna_ids) {
+  analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
+    if (parallel) {
+      f_name <- paste0(get_log_dir(), "assign_grnas_", proc_id, ".out")
+      file.create(f_name) |> invisible()
+    }
     initial_assignment_list <- sapply(seq_along(curr_grna_ids), function(i) {
       grna_id <- curr_grna_ids[i]
-      if (i == 1 || i %% 5 == 0) cat(paste0("Carrying out gRNA-to-cell assignments for gRNA ", grna_id, " (", i, " of ", length(curr_grna_ids), ")\n"))
+      if (i == 1 || i %% 5 == 0) {
+        msg <- paste0("Carrying out gRNA-to-cell assignments for gRNA ", grna_id, " (", i, " of ", length(curr_grna_ids), ")\n")
+        if (parallel) write(x = msg, file = f_name, append = TRUE) else cat(msg)
+      }
       g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                         row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
       assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
@@ -33,16 +40,17 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   }
 
   # 4. run the analysis
-  grna_ids_partitioned <- partition_response_ids(grna_ids, parallel)
   if (!parallel) {
-      res <- lapply(grna_ids_partitioned, analyze_given_grna_ids)
+    initial_assignment_list <- analyze_given_grna_ids(grna_ids)
   } else {
-    cat("Running gRNA assignments in parallel. (Print messages not available.)")
-    res <- parallel::mclapply(grna_ids_partitioned, analyze_given_grna_ids,
+    cat(paste0("Running gRNA assignments in parallel. See ", get_log_dir(), "assign_grnas_*.out files for progress updates."))
+    grna_ids_partitioned <- partition_response_ids(grna_ids, parallel)
+    res <- parallel::mclapply(seq_along(grna_ids_partitioned),
+                              function(proc_id) analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id),
                               mc.cores = length(grna_ids_partitioned))
-    cat(crayon::green(' \u2713\n'))
+    initial_assignment_list <- res |> purrr::flatten()
   }
-  initial_assignment_list <- res |> purrr::flatten()
+
 
   # return
   return (initial_assignment_list)
