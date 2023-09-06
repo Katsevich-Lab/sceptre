@@ -43,7 +43,8 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   if (!parallel) {
     initial_assignment_list <- analyze_given_grna_ids(grna_ids)
   } else {
-    cat(paste0("Running gRNA assignments in parallel. See ", get_log_dir(), "assign_grnas_*.out files for progress updates."))
+    cat(paste0("Running gRNA assignments in parallel. Change directories to ", crayon::blue(get_log_dir()),
+               " and view the files ", crayon::blue("assign_grnas_*.out"), " for progress updates.\n"))
     grna_ids_partitioned <- partition_response_ids(grna_ids, parallel)
     res <- parallel::mclapply(seq_along(grna_ids_partitioned),
                               function(proc_id) analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id),

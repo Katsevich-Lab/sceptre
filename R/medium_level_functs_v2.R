@@ -102,8 +102,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   if (!parallel) {
     res <- lapply(partitioned_response_ids, analyze_given_response_ids)
   } else {
-    cat("Running analysis in parallel.")
-    if (print_progress) cat(paste0(" See ", get_log_dir(), analysis_type, "_*.out files for progress updates."))
+    cat("Running analysis in parallel. ")
+    if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir()), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates.\n"))
     res <- parallel::mclapply(seq_along(partitioned_response_ids),
                               function(proc_id) analyze_given_response_ids(partitioned_response_ids[[proc_id]], proc_id),
                               mc.cores = length(partitioned_response_ids))
@@ -123,7 +123,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                  output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                  control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                 side_code, low_moi, response_precomputations, cells_in_use, print_progress, parallel) {
+                                 side_code, low_moi, response_precomputations, cells_in_use, print_progress, parallel, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -139,11 +139,18 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
 
   # 2. define the run precomputation function
-  run_precomp_on_given_responses <- function(curr_response_ids) {
+  run_precomp_on_given_responses <- function(curr_response_ids, proc_id = NULL) {
+    if (parallel && print_progress) {
+      f_name <- paste0(get_log_dir(), analysis_type, "_", proc_id, ".out")
+      file.create(f_name) |> invisible()
+    } else {
+      f_name <- NULL
+    }
     precomp_out_list <- list()
 
     for (response_idx in seq_along(curr_response_ids)) {
-      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids, str = "Running precomputation on ")
+      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids, str = "Running precomputation on ",
+                                     parallel = parallel, f_name = f_name)
 
       # 3. load the expressions of the current response
       expression_vector <- load_csr_row(j = response_matrix@j,
@@ -174,20 +181,24 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     if (!parallel) {
       res <- lapply(partitioned_response_ids, run_precomp_on_given_responses)
     } else {
-      cat("Running response precomputations in parallel. (Print messages not available.)")
-      res <- parallel::mclapply(partitioned_response_ids, run_precomp_on_given_responses,
+      cat("Running Analysis in parallel. ")
+      if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir()), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates. "))
+      res <- parallel::mclapply(seq_along(partitioned_response_ids),
+                                function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),
                                 mc.cores = length(partitioned_response_ids))
-      cat(crayon::green(' \u2713\n'))
     }
     precomp_out_list <- purrr::flatten(res)
     response_precomputations <- c(response_precomputations, precomp_out_list)
   }
 
   # 6. define the function to analyze the pairs
-  perform_association_analysis <- function(curr_grna_groups) {
+  perform_association_analysis <- function(curr_grna_groups, proc_id) {
     result_out_list <- vector(mode = "list", length = length(curr_grna_groups))
+    f_name <- if (parallel && print_progress) paste0(get_log_dir(), analysis_type, "_", proc_id, ".out") else NULL
+
     for (grna_group_idx in seq_along(curr_grna_groups)) {
-      curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, curr_grna_groups, feature = "gRNA group")
+      curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, curr_grna_groups,
+                                         feature = "gRNA group", parallel = parallel, f_name = f_name)
 
       # 7. obtain the genes to analyze
       l <- response_grna_group_pairs$grna_group == curr_grna_group
@@ -217,8 +228,8 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   if (!parallel) {
     res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
   } else {
-    cat("Running analysis in parallel. (Print messages not available.)")
-    res <- parallel::mclapply(partitioned_grna_group_ids, perform_association_analysis,
+    res <- parallel::mclapply(seq_along(partitioned_grna_group_ids),
+                              function(proc_id) perform_association_analysis(partitioned_grna_group_ids[[proc_id]], proc_id),
                               mc.cores = length(partitioned_grna_group_ids))
     cat(crayon::green(' \u2713\n'))
   }
