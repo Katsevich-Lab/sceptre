@@ -135,7 +135,7 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
 
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix,
-                                     grna_group_data_frame, moi, extra_covariates) |> invisible()
+                           grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
   covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates, feature_names)
@@ -157,6 +157,7 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
 
 
 # step 2: set analysis parameters
+#' @export
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
                                     positive_control_pairs = data.frame(),
@@ -237,6 +238,7 @@ set_analysis_parameters <- function(sceptre_object,
 
 
 # step 3: assign grnas to cells
+#' @export
 assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
   check_function_call(sceptre_object, "assign_grnas")
@@ -290,6 +292,7 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
 }
 
 # step 4: run cellwise and pairwise qc
+#' @export
 run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,

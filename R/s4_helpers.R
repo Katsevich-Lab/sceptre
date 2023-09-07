@@ -64,6 +64,7 @@ setClass("sceptre_object",
            power_result = "data.frame",
            discovery_result = "data.frame"))
 
+
 # show method for sceptre class
 setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 0. determine the functions that have been run
@@ -94,6 +95,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 
 
 # print method for sceptre class
+#' @export
 setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
@@ -167,6 +169,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 
 
 # plot function for sceptre object
+#' @export
 setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
   args[["sceptre_object"]] <- x
