@@ -158,6 +158,7 @@ print(sceptre_object)
 
 # 5. (optional) run the power check
 sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+plot(sceptre_object)
 print(sceptre_object)
 
 # 6. run discovery analysis
