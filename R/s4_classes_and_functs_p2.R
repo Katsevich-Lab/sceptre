@@ -1,3 +1,4 @@
+#' @export
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
@@ -41,7 +42,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   return(sceptre_object)
 }
 
-
+#' @export
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. verify that function called in correct order
@@ -75,7 +76,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   return(sceptre_object)
 }
 
-
+#' @export
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. verify that function called in correct order
@@ -157,7 +158,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   return(out)
 }
 
-
+#' @export
 get_result <- function(sceptre_object, analysis_type) {
   if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
     stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
