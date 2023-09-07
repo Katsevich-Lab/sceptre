@@ -34,23 +34,51 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   return(p)
 }
 
-plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, return_indiv_plots = FALSE) {
+
+
+#' Plot the number of gRNAs per cell
+#'
+#' @param n_grnas_to_plot (optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
+#' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.
+#' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
+#' @param n_max_0_grna_unprtb_plot (optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.
+#'
+#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
+#' @export
+#'
+#'
+#' @examples
+#' # See the example in the run_sceptre_lowmoi help file.
+#' ?run_sceptre_lowmoi
+plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, return_indiv_plots = FALSE, n_max_0_grna_unprtb_plot=1000) {
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
   lowmoi <- sceptre_object@low_moi
-  # sample two grnas to plot
+  # sample grnas to plot
+  set.seed(3)
   if (is.null(grnas_to_plot)) grnas_to_plot <- sample(grna_ids, size = min(n_grnas_to_plot, length(grna_ids)), replace = FALSE)
+
   to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
-    assignment <- multiple_grnas <- logical(length = ncol(grna_matrix))
-    assignment[init_assignments[[grna_id]]] <- TRUE
-    multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE
-    g <- grna_matrix[grna_id,]
+    assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
+    assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
+    multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
+    g <- grna_matrix[grna_id,] # all cell UMI counts for this grna
     data.frame(g = g,
                assignment = ifelse(assignment, "perturbed", "unperturbed") |> factor(),
                grna_id = grna_id |> factor(),
-               multiple_grnas = multiple_grnas)
+               # making this a factor so the ordering never changes
+               multiple_grnas = ifelse(multiple_grnas, "yes", "no") %>% factor(levels=c("no","yes")))
   }) |> data.table::rbindlist()
+
+  # downsampling the unperturbed cells with 0 grna expression, if the number of those cells
+  # exceeds `n_max_0_grna_unprtb_plot`.
+  is_0_grna_and_unperturbed <- with(to_plot_a, assignment == "unperturbed" & g == 0)
+  if(sum(is_0_grna_and_unperturbed) > n_max_0_grna_unprtb_plot) {
+    idx_to_remove <- rownames(to_plot_a)[is_0_grna_and_unperturbed] %>%
+      sample(sum(is_0_grna_and_unperturbed) - n_max_0_grna_unprtb_plot)
+    to_plot_a <- to_plot_a[! rownames(to_plot_a) %in% idx_to_remove, ]
+  }
 
   # plot a
   p_a <- ggplot2::ggplot(data = to_plot_a, mapping = (if (lowmoi) {
@@ -62,14 +90,34 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
     ggplot2::xlab("Assignment") +
     ggplot2::ylab("gRNA count") +
     get_my_theme() +
-    ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
     ggplot2::theme(legend.position = "none") +
+    ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
     ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
+
+  # in low moi we want to have a legend for the shape parameter
+  # to save space, we'll do it inside the first panel and just for
+  # one level of the variable
+  if(lowmoi) {
+    # setting up the data for making the legend as a geom
+    annotate_df <- data.frame(
+      assignment = "perturbed",
+      g = .5,
+      # making sure it's in the first panel
+      grna_id = factor(levels(to_plot_a$grna_id)[1], levels = levels(to_plot_a$grna_id)),
+      multiple_grnas = NA # just need this column here, but the color is overwritten
+    )
+    p_a <- p_a + ggplot2::geom_label(
+      data = annotate_df,
+      label = c("\U25B2 cells with\nmultiple gRNAs"),
+      color="black",
+      size = 3.5
+    )
+  }
 
   # plot b
   n_cells_per_grna <- sceptre_object@cells_per_grna
   to_plot_b <- data.frame(x = n_cells_per_grna,
-                   y = names(n_cells_per_grna)) |>
+                          y = names(n_cells_per_grna)) |>
     dplyr::arrange(n_cells_per_grna) |>
     dplyr::mutate(y = factor(y, labels = y, levels = y))
   p_b <- ggplot2::ggplot(data = to_plot_b,
@@ -86,16 +134,16 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
     p_c <- ggplot2::ggplot() +
       ggplot2::theme_void()
   } else {
-  n_grnas_per_cell <- sceptre_object@grnas_per_cell
-  to_plot_c <- data.frame(x = n_grnas_per_cell)
-  p_c <- ggplot2::ggplot(data = to_plot_c, mapping = ggplot2::aes(x = x)) +
-    ggplot2::geom_histogram(binwidth = 1, fill = "grey90", color = "darkblue") +
-    ggplot2::scale_y_continuous(trans = "log1p",
-                                expand = c(0, 0),
-                                breaks = 10^(1:8)) +
-    get_my_theme() + ggplot2::ylab("Frequency") +
-    ggplot2::ggtitle("gRNAs per cell") +
-    ggplot2::xlab("gRNAs per cell")
+    n_grnas_per_cell <- sceptre_object@grnas_per_cell
+    to_plot_c <- data.frame(x = n_grnas_per_cell)
+    p_c <- ggplot2::ggplot(data = to_plot_c, mapping = ggplot2::aes(x = x)) +
+      ggplot2::geom_histogram(binwidth = 1, fill = "grey90", color = "darkblue") +
+      ggplot2::scale_y_continuous(trans = "log1p",
+                                  expand = c(0, 0),
+                                  breaks = 10^(1:8)) +
+      get_my_theme() + ggplot2::ylab("Frequency") +
+      ggplot2::ggtitle("gRNAs per cell") +
+      ggplot2::xlab("gRNAs per cell")
   }
   if (return_indiv_plots) {
     out <- list(p_a, p_b, p_c)
@@ -103,6 +151,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
     bottom <- cowplot::plot_grid(p_b, p_c, nrow = 1)
     out <- cowplot::plot_grid(p_a, bottom, ncol = 1)
   }
+  out
   return(out)
 }
 
