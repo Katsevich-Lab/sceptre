@@ -76,15 +76,6 @@ convert_pointer_to_index_vector_v2 <- function(p) {
 }
 
 
-#' Convert covariate DF to design matrix
-#'
-#' Converts the `covariate_data_frame` to a design matrix using the `formula_object`.
-#'
-#' @param covariate_data_frame the input covariate data frame
-#' @param formula_object the input formula object
-#'
-#' @return the design matrix
-#' @noRd
 convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_object) {
   global_cell_covariates_new <- stats::model.matrix(object = formula_object, data = covariate_data_frame)
   # verify that the global cell covariates are OK after transformation
@@ -104,24 +95,6 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-#' Compute cell covariates
-#'
-#' The \code{compute_cell_covariates()} function takes as input a feature-by-cell matrix and computes the cell covariates for that matrix.
-#'
-#' @param matrix_in a matrix with features (e.g., genes, gRNAs, or proteins) in the rows and cells in the columns. The matrix can be a standard (dense) matrix or a sparse matrix of class \code{dgCMatrix}, \code{dgRMatrix}, or \code{dgTMatrix}. Row names are optional.
-#'
-#' @return a data frame containing the following cell covariates.
-#' \itemize{
-#' \item{\code{n_nonzero}}: the number of features expressed in the cell
-#' \item{\code{n_umi}}: the total number of UMIs sequenced in the cell
-#' \item{\code{p_mito}}: the fraction of UMIs sequenced in the cell that maps to mitochondrial genes
-#' }
-#' @export
-#' @note The variable \code{p_mito} is computed only if feature names are provided and some feature names begin with "MT-"; these features are assumed to be mitochondrial genes.
-#'
-#' @examples
-#' data(response_matrix_lowmoi)
-#' cell_covariates <- compute_cell_covariates(response_matrix_lowmoi)
 compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
   # make response matrix column accessible
   matrix_in <- set_matrix_accessibility(matrix_in, make_row_accessible = FALSE)

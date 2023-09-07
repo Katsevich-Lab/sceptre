@@ -8,7 +8,6 @@
 #' @param row_number an integer identifying the row of the results data frame to visualize
 #'
 #' @return a plot of the resampling distribution of null test statistics.
-#' @export
 #'
 #' @examples
 #' library(Matrix)
