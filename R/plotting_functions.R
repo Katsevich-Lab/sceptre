@@ -68,14 +68,14 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
                assignment = ifelse(assignment, "perturbed", "unperturbed") |> factor(),
                grna_id = grna_id |> factor(),
                # making this a factor so the ordering never changes
-               multiple_grnas = ifelse(multiple_grnas, "yes", "no") %>% factor(levels=c("no","yes")))
+               multiple_grnas = ifelse(multiple_grnas, "yes", "no") |> factor(levels=c("no","yes")))
   }) |> data.table::rbindlist()
 
   # downsampling the unperturbed cells with 0 grna expression, if the number of those cells
   # exceeds `n_max_0_grna_unprtb_plot`.
   is_0_grna_and_unperturbed <- with(to_plot_a, assignment == "unperturbed" & g == 0)
   if(sum(is_0_grna_and_unperturbed) > n_max_0_grna_unprtb_plot) {
-    idx_to_remove <- rownames(to_plot_a)[is_0_grna_and_unperturbed] %>%
+    idx_to_remove <- rownames(to_plot_a)[is_0_grna_and_unperturbed] |>
       sample(sum(is_0_grna_and_unperturbed) - n_max_0_grna_unprtb_plot)
     to_plot_a <- to_plot_a[! rownames(to_plot_a) %in% idx_to_remove, ]
   }
@@ -451,7 +451,7 @@ plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, poi
       c(length(pos_ctrl_pvals), length(neg_ctrl_pvals))
     ) |>
       factor(levels = group_names),
-    p_values = c(pos_ctrl_pvals, neg_ctrl_pvals) %>%
+    p_values = c(pos_ctrl_pvals, neg_ctrl_pvals) |>
       pmax(clip_to)
   )
 
