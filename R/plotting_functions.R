@@ -10,6 +10,7 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 # 1. PLOT ASSIGN GRNAS
 ######################
+#' @export
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   if (is.null(grnas_to_plot)) {
@@ -34,6 +35,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   return(p)
 }
 
+#' @export
 plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, return_indiv_plots = FALSE) {
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
@@ -262,6 +264,7 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 }
 
 
+#' @export
 plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
   # first, compute the rejection set
   if (nrow(sceptre_object@discovery_result) == 0L) stop("Discovery analysis not run.")
@@ -315,6 +318,7 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 ############
 # 5. PLOT QC
 ############
+#' @export
 plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency = 0.8, point_size = 0.55) {
   my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
