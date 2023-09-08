@@ -110,7 +110,7 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 7. obtain the results for downstream analysis
-discovery_result <- get_result(sceptre_object, "discovery")
+discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 
 ##################
 # High MOI example
@@ -166,6 +166,7 @@ sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 plot(sceptre_object)
 print(sceptre_object)
 
-# 7. obtain the results for downstream analysis
-discovery_result <- get_result(sceptre_object, "discovery")
+# 7. obtain results; write outputs to directory
+discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
+write_outputs_to_directory(sceptre_object = sceptre_object, "~/sc_crispr_outputs/")
 }

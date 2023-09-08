@@ -36,11 +36,12 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   # 6. update fields of sceptre object with results
   sceptre_object@last_function_called <- "run_calibration_check"
   sceptre_object@calibration_result <- out$result |>
-    dplyr::mutate(reject = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
+    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
   sceptre_object@negative_control_pairs <- response_grna_group_pairs
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
+
 
 #' @export
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
@@ -75,6 +76,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
+
 
 #' @export
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {

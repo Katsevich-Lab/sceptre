@@ -184,7 +184,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
   my_theme <- get_my_theme()
 
   # compute n rejections
-  n_rejections <- sum(calibration_result$reject)
+  n_rejections <- sum(calibration_result$significant)
   str1 <- paste0("Number of\nfalse discoveries\n(at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "): ", n_rejections)
   str2 <- paste0("\n\nMean log-fold\nchange: ", signif(mean(calibration_result$log_2_fold_change), 2))
   str <- paste0(str1, str2)
@@ -311,7 +311,7 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
   if (nrow(sceptre_object@discovery_result) == 0L) stop("Discovery analysis not run.")
   discovery_result <- sceptre_object@discovery_result |> na.omit()
   calibration_result <- sceptre_object@calibration_result
-  discovery_set <- discovery_result |> dplyr::filter(reject)
+  discovery_set <- discovery_result |> dplyr::filter(significant)
   p_thresh <- if (nrow(discovery_set) >= 1L) max(discovery_set$p_value) else NA
   # create the bulk QQ plot
   p1 <- compare_calibration_and_discovery_results(calibration_result = calibration_result,
