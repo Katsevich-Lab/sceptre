@@ -158,24 +158,18 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   return(out)
 }
 
+
 #' @export
-get_result <- function(sceptre_object, analysis_type) {
-  if (!(analysis_type %in% c("calibration", "power", "discovery"))) {
-    stop("`analysis_type` must be one of `calibration`, `power`, or `discovery`.")
+get_result <- function(sceptre_object, analysis) {
+  if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
+    stop("`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`.")
   }
-  if (analysis_type == "calibration" && nrow(sceptre_object@calibration_result) == 0L) {
-    stop("Calibration check has not yet been run.")
-  }
-  if (analysis_type == "power" && nrow(sceptre_object@power_result) == 0L) {
-    stop("Power check has not yet been run.")
-  }
-  if (analysis_type == "discovery" && nrow(sceptre_object@discovery_result) == 0L) {
-    stop("Discovery analysis not yet run.")
-  }
-  field_to_extract <- switch(EXPR = analysis_type,
-                             calibration = "calibration_result",
-                             power = "power_result",
-                             discovery = "discovery_result")
+  funts_run <- get_funct_run_vect(sceptre_object)
+  if (!funts_run[[analysis]]) stop(paste0(analysis, " has not yet been run."))
+  field_to_extract <- switch(EXPR = analysis,
+                             run_calibration_check = "calibration_result",
+                             run_power_check = "power_result",
+                             run_discovery_analysis = "discovery_result")
   out <- slot(sceptre_object, field_to_extract)
   return(out)
 }

@@ -141,7 +141,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(x@cells_per_grna |> mean() |> round(2)),
                "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(x@cells_per_targeting_grna_group |> mean() |> round(2)),
-               "\n\t\U2022 Mean N gRNAs per cell: ", crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
+               "\n\t\U2022 Mean N gRNAs per cell (MOI): ", crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
   }
 
   # 4. print the results summary
@@ -153,7 +153,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
     n_false_rejections <- sum(x@calibration_result$reject)
     mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
     n_calib_pairs <- nrow(x@calibration_result)
-    cat(paste0("\n\t\U2022 N", crayon::red(" negative control "), "pairs rejected: ", crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)),
+    cat(paste0("\n\t\U2022 N", crayon::red(" negative control "), "pairs called as significant: ", crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)),
                "\n\t\U2022 Mean log-2 FC for", crayon::red(" negative control "), "pairs: ", crayon::blue(mean_lfc)))
   }
   if (power_check_run) {
@@ -163,7 +163,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   if (discovery_analysis_run) {
     n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
     n_discovery_pairs <- x@n_ok_discovery_pairs
-    cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "rejected: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
+    cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "called as significant: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
   }
 })
 
@@ -190,4 +190,46 @@ reset_results <- function(sceptre_object) {
   sceptre_object@discovery_result <- data.frame()
   sceptre_object@power_result <- data.frame()
   return(sceptre_object)
+}
+
+
+#' @export
+write_outputs_to_directory <- function(sceptre_object, directory) {
+  # 0. create directory
+  if (!dir.exists(directory)) {
+    dir.create(path = directory, recursive = TRUE)
+  }
+
+  # 1. create analysis_summary.txt file
+  summary_file_fp <- paste0(directory, "/analysis_summary.txt")
+  sink(file = summary_file_fp, append = FALSE)
+  print(sceptre_object)
+  sink(NULL)
+
+  # 2. determine the functions that have been called
+  plotting_params <- list(device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
+  p_grna_count_dist <- plot_grna_count_distributions(sceptre_object)
+  plotting_params$plot <- p_grna_count_dist
+  plotting_params$filename <- paste0(directory, "/plot_grna_count_distributions.png")
+  do.call(what = ggplot2::ggsave, args = plotting_params)
+
+  functs_run <- get_funct_run_vect(sceptre_object)
+  functs_run_plots <- functs_run[names(functs_run) %in% c("assign_grnas", "run_qc", "run_calibration_check", "run_power_check", "run_discovery_analysis")]
+  for (funct in names(functs_run_plots)) {
+    if (functs_run_plots[[funct]]) {
+      plotting_params$plot <- do.call(what = paste0("plot_", funct), args = list(sceptre_object))
+      plotting_params$filename <- paste0(directory, "/plot_", funct, ".png")
+      do.call(what = ggplot2::ggsave, args = plotting_params)
+    }
+  }
+
+  # 3. save results
+  for (analysis in c("run_calibration_check", "run_power_check", "run_discovery_analysis")) {
+    if (functs_run_plots[[analysis]]) {
+      res <- get_result(sceptre_object = sceptre_object, analysis = analysis)
+      saveRDS(object = res, file = paste0(directory, "/result_", analysis, ".rds"))
+    }
+  }
+
+  return(NULL)
 }
