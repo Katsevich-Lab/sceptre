@@ -150,7 +150,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   power_check_run <- funct_run_vect[["run_power_check"]]
   if (calib_check_run || discovery_analysis_run) cat("\n\nSummary of results:")
   if (calib_check_run) {
-    n_false_rejections <- sum(x@calibration_result$reject)
+    n_false_rejections <- sum(x@calibration_result$significant)
     mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
     n_calib_pairs <- nrow(x@calibration_result)
     cat(paste0("\n\t\U2022 N", crayon::red(" negative control "), "pairs called as significant: ", crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)),
@@ -161,7 +161,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
     cat(paste0("\n\t\U2022 Median", crayon::green(" positive control "), "p-value: ", crayon::blue(signif(median_pc_p_value, 2))))
   }
   if (discovery_analysis_run) {
-    n_discoveries <- sum(x@discovery_result$reject, na.rm = TRUE)
+    n_discoveries <- sum(x@discovery_result$significant, na.rm = TRUE)
     n_discovery_pairs <- x@n_ok_discovery_pairs
     cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "called as significant: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
   }
