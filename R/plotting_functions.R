@@ -340,7 +340,7 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
   # create the final panel
   n_rejections <- nrow(discovery_set)
   n_pairs <- nrow(discovery_result)
-  str <- paste0("Number of discovery pairs\nrejected (at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "):\n", n_rejections, " of ", n_pairs)
+  str <- paste0("Number of discovery pairs\ncalled as significant\n(at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "): ", n_rejections, " of ", n_pairs)
   p4 <- ggplot2::ggplot() +
     ggplot2::annotate(geom = "text", label = str, x = 1.1, y = 1.2) +
     ggplot2::theme_void() +
