@@ -72,7 +72,7 @@
 #' print(sceptre_object)
 #'
 #' # 7. obtain the results for downstream analysis
-#' discovery_result <- get_result(sceptre_object, "discovery")
+#' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 #'
 #' ##################
 #' # High MOI example
@@ -128,8 +128,9 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 7. obtain the results for downstream analysis
-#' discovery_result <- get_result(sceptre_object, "discovery")
+#' # 7. obtain results; write outputs to directory
+#' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
+#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sc_crispr_outputs/")
 import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, feature_names = NULL) {
   # 0. handle default parameters
   if (is.null(feature_names)) feature_names <- rownames(response_matrix)
