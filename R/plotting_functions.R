@@ -38,7 +38,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     dplyr::filter(grna_expressions < 10000)
 
   max_expression_count <- max(to_plot$grna_expressions)
-  max_single_bin <- max(10, threshold) # 10 is just a nice convenient default
+  max_single_bin <- max(10, threshold-1) # 10 is just a nice convenient default
   bin_upper_bounds <- 0:max_single_bin
   bin_labels <-  as.character(bin_upper_bounds)
   if(max_expression_count > 10) { # now we need to add exp growing bins, w/ more complex labels
@@ -48,11 +48,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     # smallest n such that this biggest bin width is above `max_expression_count`
     num_exp_bins <- log2((max_expression_count - max_single_bin) / 2 + 1) |> ceiling()
     bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2*(2^(1:num_exp_bins) - 1))
-    bin_labels <- c(bin_labels, paste0(max_single_bin + 1, "-", max_single_bin + 2))
-    if(num_exp_bins > 1) {
-      bin_labels <- c(bin_labels, sapply(2:num_exp_bins, function(n)
-        paste0(max_single_bin + 2*(2^(n-1) - 1) + 1, "-", max_single_bin + 2*(2^n - 1))))
-    }
+    bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((1:num_exp_bins)-1) - 1)))
   }
 
   p <- to_plot |>
@@ -72,13 +68,11 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
     ggplot2::xlab("gRNA count") + ggplot2::ylab("Number of cells (log scale)")
   if(!is.null(threshold)) {
-    # adding 1.5 because +1 from the factor starting at "0", and +.5
-    # so it is after the bin rather than through the middle
-    p <- p + ggplot2::geom_vline(xintercept = threshold+1.5, color="mediumseagreen", linetype="dashed")
+    # adding +.5 so it is after the bin rather than through the middle
+    p <- p + ggplot2::geom_vline(xintercept = threshold+.5, color="mediumseagreen", linetype="dashed")
   }
   return(p)
 }
-
 
 #' Plot the number of gRNAs per cell
 #'
