@@ -10,10 +10,22 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 # 1. PLOT ASSIGN GRNAS
 ######################
+#' Plot the number of cells per gRNA count
+#'
+#' @param n_grnas_to_plot  (optional; default \code{4}) the number of different gRNAs to plot
+#' @param grnas_to_plot (optional; \default{NULL}) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.
+#' @param threshold (optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin.
+#'
+#' @return a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bins grow exponentially fast in size.
 #' @export
-plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL) {
+#'
+#' @examples TODO
+plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold=NULL) {
   grna_matrix <- sceptre_object@grna_matrix
+  # rounding up just in case the user provides a non-integer one
+  if(!is.null(threshold)) threshold <- ceiling(threshold)
   if (is.null(grnas_to_plot)) {
+    set.seed(3)
     grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
@@ -24,16 +36,49 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
   to_plot <- data.frame(grna_id = grna_ids_rep, grna_expressions = grna_expressions) |>
     dplyr::filter(grna_expressions < 10000)
-  p <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = grna_expressions)) +
-    ggplot2::geom_histogram(bins = 20, col = "midnightblue", fill = "grey90") + get_my_theme() +
-    ggplot2::facet_wrap(grna_id ~ ., scales = "free_x", nrow = floor(sqrt(length(grnas_to_plot)))) +
-    ggplot2::scale_x_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
-                                breaks = c(0, 1, 3, 7, 50, 500)) +
-    ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 0.5),
-                                breaks = c(0, 10, 100, 1000, 100000), expand = c(0, NA)) +
-    ggplot2::xlab("gRNA count") + ggplot2::ylab("N cells")
+
+  max_expression_count <- max(to_plot$grna_expressions)
+  max_single_bin <- max(10, threshold) # 10 is just a nice convenient default
+  bin_upper_bounds <- 0:max_single_bin
+  bin_labels <-  as.character(bin_upper_bounds)
+  if(max_expression_count > 10) { # now we need to add exp growing bins, w/ more complex labels
+    # this next section relies on the fact that the upper bounds are going to be at locations
+    # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 + 2^2 + 2^3, ...
+    # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
+    # smallest n such that this biggest bin width is above `max_expression_count`
+    num_exp_bins <- log2((max_expression_count - max_single_bin) / 2 + 1) |> ceiling()
+    bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2*(2^(1:num_exp_bins) - 1))
+    bin_labels <- c(bin_labels, paste0(max_single_bin + 1, "-", max_single_bin + 2))
+    if(num_exp_bins > 1) {
+      bin_labels <- c(bin_labels, sapply(2:num_exp_bins, function(n)
+        paste0(max_single_bin + 2*(2^(n-1) - 1) + 1, "-", max_single_bin + 2*(2^n - 1))))
+    }
+  }
+
+  p <- to_plot |>
+    dplyr::mutate(
+      grna_expressions_bin = cut(grna_expressions, breaks = c(-Inf, bin_upper_bounds), labels = bin_labels)
+    ) |>
+    dplyr::group_by(grna_id, grna_expressions_bin) |>
+    dplyr::summarize(bin_counts = dplyr::n(), .groups="drop_last") |>
+    ggplot2::ggplot(mapping = ggplot2::aes(x = grna_expressions_bin , y = bin_counts)) +
+    ggplot2::geom_bar(stat="identity", fill = "grey90", col = "midnightblue") +
+    ggplot2::facet_wrap(grna_id ~ .,  nrow = floor(sqrt(length(grnas_to_plot)))) +
+    ggplot2::scale_y_continuous(
+      trans = scales::pseudo_log_trans(base = 10, sigma = 0.5),
+      breaks = c(0, 10, 100, 1000, 100000), expand = c(0, NA)
+    ) +
+    get_my_theme() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    ggplot2::xlab("gRNA count") + ggplot2::ylab("Number of cells (log scale)")
+  if(!is.null(threshold)) {
+    # adding 1.5 because +1 from the factor starting at "0", and +.5
+    # so it is after the bin rather than through the middle
+    p <- p + ggplot2::geom_vline(xintercept = threshold+1.5, color="mediumseagreen", linetype="dashed")
+  }
   return(p)
 }
+
 
 #' Plot the number of gRNAs per cell
 #'
