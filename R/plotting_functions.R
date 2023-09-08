@@ -465,7 +465,7 @@ plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, poi
     ggplot2::labs(
       x = "Pair type",
       y = "p-value",
-      title = "Comparison of positive and negative control p-values") +
+      title = "Positive and negative control p-values") +
     my_theme
 
   return(p)

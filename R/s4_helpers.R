@@ -208,13 +208,9 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 
   # 2. determine the functions that have been called
   plotting_params <- list(device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
-  p_grna_count_dist <- plot_grna_count_distributions(sceptre_object)
-  plotting_params$plot <- p_grna_count_dist
-  plotting_params$filename <- paste0(directory, "/plot_grna_count_distributions.png")
-  do.call(what = ggplot2::ggsave, args = plotting_params)
-
   functs_run <- get_funct_run_vect(sceptre_object)
   functs_run_plots <- functs_run[names(functs_run) %in% c("assign_grnas", "run_qc", "run_calibration_check", "run_power_check", "run_discovery_analysis")]
+  functs_run_plots <- c(functs_run_plots, "grna_count_distributions" = TRUE)
   for (funct in names(functs_run_plots)) {
     if (functs_run_plots[[funct]]) {
       plotting_params$plot <- do.call(what = paste0("plot_", funct), args = list(sceptre_object))
@@ -227,7 +223,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
   for (analysis in c("run_calibration_check", "run_power_check", "run_discovery_analysis")) {
     if (functs_run_plots[[analysis]]) {
       res <- get_result(sceptre_object = sceptre_object, analysis = analysis)
-      saveRDS(object = res, file = paste0(directory, "/result_", analysis, ".rds"))
+      saveRDS(object = res, file = paste0(directory, "/results_", analysis, ".rds"))
     }
   }
 
