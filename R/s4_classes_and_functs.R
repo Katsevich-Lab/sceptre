@@ -48,7 +48,7 @@
 #' # 2. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
-#' discovery_pairs = "all")
+#' discovery_pairs = return_all_pairs(sceptre_object))
 #' print(sceptre_object)
 #'
 #' # 4. optional: explicitly assign grnas, run QC

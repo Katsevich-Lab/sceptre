@@ -1,4 +1,5 @@
 gasperini_dir <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/processed/")
+gasperini_dir_raw <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/raw/")
 
 # 0. set the Gasperini directory load the group, gene, and grna data
 gasp_fp <- paste0(.get_config_path("LOCAL_GASPERINI_2019_V2_DATA_DIR"), "at-scale/processed/")
@@ -45,6 +46,18 @@ grna_group_data_frame_highmoi <- rbind(grna_feature_df |>
   dplyr::select(grna_id, grna_group),
   data.frame(grna_id = nt_grnas, grna_group = "non-targeting")) |>
   dplyr::arrange(grna_group)
+
+# 3.5 add chromosomal locations to the grna group table
+grna_loc_info <- readr::read_tsv(file = paste0(gasperini_dir_raw, "/GSE120861_gene_gRNAgroup_pair_table.at_scale.txt"),
+                                 col_names = c("chr", "start", "end", "grna_group", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"),
+                                 skip = 1) |>
+  dplyr::select(chr, start, end, grna_group) |>
+  dplyr::distinct()
+targeting_grna_grps <- grna_group_data_frame_highmoi |> dplyr::filter(grna_group != "non-targeting") |> dplyr::pull()
+target_group_loc_info <- grna_loc_info |> dplyr::filter(grna_group %in% targeting_grna_grps) |>
+  dplyr::mutate(start = as.integer(start), end = as.integer(end))
+grna_group_data_frame_highmoi <- dplyr::left_join(x = grna_group_data_frame_highmoi,
+                 y = target_group_loc_info, by = c("grna_group"))
 
 # 4. construct the respomse and grna matrices; downsample cells
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))

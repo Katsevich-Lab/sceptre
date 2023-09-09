@@ -20,15 +20,6 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount
 }
 
 
-generate_all_pairs <- function(response_matrix, grna_group_data_frame) {
-  response_ids <- rownames(response_matrix) |> factor()
-  grna_groups <- grna_group_data_frame |>
-    dplyr::filter(grna_group != "non-targeting") |>
-    dplyr::pull(grna_group) |> unique() |> factor()
-  expand.grid(response_id = response_ids, grna_group = grna_groups)
-}
-
-
 auto_construct_formula_object <- function(cell_covariates, include_grna_covariates) {
   cell_covariate_names <- colnames(cell_covariates)
   if (!include_grna_covariates) { # by default, do not use grna count-based covariates in low moi
