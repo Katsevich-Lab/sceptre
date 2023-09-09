@@ -23,7 +23,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
     }
     initial_assignment_list <- sapply(seq_along(curr_grna_ids), function(i) {
       grna_id <- get_id_from_idx(response_idx = i, print_progress = print_progress, response_ids = curr_grna_ids,
-                                 feature = "gRNA", str = "Performing gRNA-to-cell assignments for", parallel = parallel, f_name = f_name)
+                                 feature = "gRNA", str = "Performing gRNA-to-cell assignments for ", parallel = parallel, f_name = f_name)
       g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                         row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
       assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
