@@ -5,7 +5,7 @@
 \alias{grna_group_data_frame_highmoi}
 \title{gRNA groups table}
 \format{
-An object of class \code{data.frame} with 79 rows and 2 columns.
+An object of class \code{data.frame} with 79 rows and 5 columns.
 }
 \usage{
 data(grna_group_data_frame_highmoi)
