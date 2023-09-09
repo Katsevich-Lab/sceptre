@@ -129,6 +129,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
       ggplot2::theme_void()
   } else {
     n_grnas_per_cell <- sceptre_object@grnas_per_cell
+    moi <- mean(n_grnas_per_cell)
     to_plot_c <- data.frame(x = n_grnas_per_cell)
     p_c <- ggplot2::ggplot(data = to_plot_c, mapping = ggplot2::aes(x = x)) +
       ggplot2::geom_histogram(binwidth = 1, fill = "grey90", color = "darkblue") +
@@ -137,7 +138,10 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
                                   breaks = 10^(1:8)) +
       get_my_theme() + ggplot2::ylab("Frequency") +
       ggplot2::ggtitle("gRNAs per cell") +
-      ggplot2::xlab("gRNAs per cell")
+      ggplot2::xlab("gRNAs per cell") +
+      ggplot2::geom_vline(xintercept = mean(n_grnas_per_cell), col = "darkorchid1", lwd = 1.0) +
+      ggplot2::annotate(geom = "text", label = paste0("MOI = ", round(moi, 2)),
+                        x = Inf, y = Inf, vjust = 2.0, hjust = 1, col = "darkorchid1", size = 3.0)
   }
   if (return_indiv_plots) {
     out <- list(p_a, p_b, p_c)
@@ -401,7 +405,7 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
   p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
     ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
     ggplot2::scale_y_continuous(expand = c(0, NA)) +
-    ggplot2::ylab("Frac. cells removed") +
+    ggplot2::ylab("Percent. cells removed") +
     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
     get_my_theme() +
     ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +
