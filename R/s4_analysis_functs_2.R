@@ -1,10 +1,9 @@
 #' @export
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. advance function (if necessary), and check function call
-  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
-  check_function_call(sceptre_object, "run_calibration_check")
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. handle the default arguments
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
@@ -32,7 +31,6 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
                                          parallel = parallel)
 
   # 6. update fields of sceptre object with results
-  sceptre_object@last_function_called <- "run_calibration_check"
   sceptre_object@calibration_result <- out$result |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
   sceptre_object@negative_control_pairs <- response_grna_group_pairs
@@ -43,10 +41,9 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
 #' @export
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. verify that function called in correct order
-  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
-  check_function_call(sceptre_object, "run_power_check")
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
@@ -69,7 +66,6 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                          parallel = parallel)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@last_function_called <- "run_power_check"
   sceptre_object@power_result <- out$result
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
@@ -78,10 +74,9 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 #' @export
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. verify that function called in correct order
-  sceptre_object <- advance_set_analysis_parameters_by_two(sceptre_object, parallel)
-  check_function_call(sceptre_object, "run_discovery_analysis")
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
+  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
@@ -104,7 +99,6 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                          parallel = parallel)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@last_function_called <- "run_discovery_analysis"
   sceptre_object@discovery_result <- out$result |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
   sceptre_object@response_precomputations <- out$response_precomputations
@@ -164,21 +158,11 @@ get_result <- function(sceptre_object, analysis) {
   if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
     stop("`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`.")
   }
-  funts_run <- get_funct_run_vect(sceptre_object)
-  if (!funts_run[[analysis]]) stop(paste0(analysis, " has not yet been run."))
+  if (!sceptre_object@functs_called[[analysis]]) stop(paste0(analysis, " has not yet been run."))
   field_to_extract <- switch(EXPR = analysis,
                              run_calibration_check = "calibration_result",
                              run_power_check = "power_result",
                              run_discovery_analysis = "discovery_result")
   out <- slot(sceptre_object, field_to_extract)
   return(out)
-}
-
-
-advance_set_analysis_parameters_by_two <- function(sceptre_object, parallel) {
-  if (sceptre_object@last_function_called == "set_analysis_parameters") {
-    cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default options.\n\n"))
-    sceptre_object <- sceptre_object |> assign_grnas(parallel = parallel) |> run_qc()
-  }
-  return(sceptre_object)
 }

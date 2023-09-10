@@ -130,7 +130,7 @@
 #'
 #' # 7. obtain results; write outputs to directory
 #' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
-#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sc_crispr_outputs/")
+#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, feature_names = NULL) {
   # 0. handle default parameters
   if (is.null(feature_names)) feature_names <- rownames(response_matrix)
@@ -153,7 +153,12 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
   sceptre_object@grna_group_data_frame <- grna_group_data_frame
   sceptre_object@low_moi <- (moi == "low")
   if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
+
+  # 5. initialize flags
   sceptre_object@last_function_called <- "import_data"
+  sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
+                                    assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
+                                    run_power_check = FALSE, run_discovery_analysis = FALSE)
   return(sceptre_object)
 }
 
@@ -172,7 +177,7 @@ set_analysis_parameters <- function(sceptre_object,
                                     multiple_testing_method = "BH",
                                     multiple_testing_alpha = 0.1) {
   # 0. verify that function called in correct order
-  check_function_call(sceptre_object, "set_analysis_parameters")
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "set_analysis_parameters")
 
   # 1. handle default arguments
   if (!sceptre_object@low_moi) {
@@ -187,10 +192,6 @@ set_analysis_parameters <- function(sceptre_object,
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
-  if (identical(discovery_pairs, "all")) {
-    discovery_pairs <- generate_all_pairs(sceptre_object@response_matrix,
-                                          sceptre_object@grna_group_data_frame)
-  }
 
   # 2. check inputs
   check_set_analysis_parameters(response_matrix = sceptre_object@response_matrix,
@@ -204,14 +205,11 @@ set_analysis_parameters <- function(sceptre_object,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi) |> invisible()
 
-  # 3. reset results
-  sceptre_object <- reset_results(sceptre_object)
-
-  # 4. determine whether to reset response precomputations
+  # 3. determine whether to reset response precomputations
   reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
                                  identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
 
-  # 5. update uncached fields of the sceptre object
+  # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
   run_permutations <- resampling_mechanism == "permutations"
@@ -225,13 +223,12 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
   sceptre_object@B3 <- B3
-  sceptre_object@last_function_called <- "set_analysis_parameters"
   sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
   sceptre_object@multiple_testing_method <- multiple_testing_method
   sceptre_object@covariate_matrix  <- convert_covariate_df_to_design_matrix(covariate_data_frame = sceptre_object@covariate_data_frame,
                                                                             formula_object = formula_object)
 
-  # 6. update cached fields
+  # 5. update cached fields
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()
 
   # return
@@ -243,7 +240,7 @@ set_analysis_parameters <- function(sceptre_object,
 #' @export
 assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
-  check_function_call(sceptre_object, "assign_grnas")
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
   # 1. handle the default arguments
   if (identical(method, "default")) {
@@ -272,26 +269,23 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
   # 2. check inputs
   check_assign_grna_inputs(sceptre_object, method, hyperparameters) |> invisible()
 
-  # 3. reset results
-  sceptre_object <- reset_results(sceptre_object)
-
-  # 4. determine whether to reset response precomputations
+  # 3. determine whether to reset response precomputations
   reset_response_precomps <- sceptre_object@low_moi &&
     (!identical(sceptre_object@grna_assignment_method, method) ||
      !identical(sceptre_object@grna_assignment_hyperparameters, hyperparameters))
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()
 
-  # 5. update uncached fields
+  # 4. update uncached fields
   sceptre_object@grna_assignment_method <- method
   sceptre_object@grna_assignment_hyperparameters <- hyperparameters
-  sceptre_object@last_function_called <- "assign_grnas"
 
-  # 6. assign the grnas
+  # 5. assign the grnas
   sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel)
 
   # return
   return(sceptre_object)
 }
+
 
 # step 4: run cellwise and pairwise qc
 #' @export
@@ -301,41 +295,37 @@ run_qc <- function(sceptre_object,
                    response_n_umis_range = c(0.01, 0.99),
                    p_mito_threshold = 0.15,
                    additional_cells_to_remove = integer()) {
-  # 0. verify that function called in correct order
-  check_function_call(sceptre_object, "run_qc")
+  # 1. verify that function called in correct order
+  sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
 
   # 2. check inputs
   check_run_qc_inputs(n_nonzero_trt_thresh,
                       n_nonzero_cntrl_thresh,
                       response_n_umis_range) |> invisible()
 
-  # 3. reset results
-  sceptre_object <- reset_results(sceptre_object)
-
-  # 4. obtain previous cells_in_use for caching purposes
+  # 3. obtain previous cells_in_use for caching purposes
   current_cells_in_use <- sceptre_object@cells_in_use
 
-  # 5. update uncached fields of the sceptre object
+  # 4. update uncached fields of the sceptre object
   sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
   sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
-  sceptre_object@last_function_called <- "run_qc"
 
-  # 6. determine the cells to retain after cellwise qc
+  # 5. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range,
                                               p_mito_threshold, additional_cells_to_remove)
 
-  # 7. determine whether to reset response precomputation
+  # 6. determine whether to reset response precomputation
   if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
     sceptre_object@response_precomputations <- list()
   }
 
-  # 8. update the grna assignments given the cellwise qc
+  # 7. update the grna assignments given the cellwise qc
   sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
 
-  # 9. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
+  # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
   sceptre_object <- compute_pairwise_qc_information(sceptre_object)
 
-  # 10. compute the number of discovery pairs and (if applicable) pc pairs passing qc
+  # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
   sceptre_object <- compute_qc_metrics(sceptre_object)
 
   # return

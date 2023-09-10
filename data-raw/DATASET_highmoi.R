@@ -19,11 +19,11 @@ grna_feature_df <- grna_feature_df |>
   `rownames<-`(NULL)
 
 # 1. Construct the discovery pairs data frame, which contains both cis and positive control pairs
-set.seed(4)
+set.seed(6) # 4
 my_cis_grna_groups <- c(pairs_grouped |>
   dplyr::filter(site_type == "cis") |>
-  dplyr::pull(grna_group) |>
-  sample(12), "chr8.847_top_two", "chr9.1594_top_two", "chr9.2869_top_two", "chr9.3633_top_two", "chr9.871_top_two")
+  dplyr::pull(grna_group) |> # 12
+  sample(20), "chr8.847_top_two", "chr9.1594_top_two", "chr9.2869_top_two", "chr9.3633_top_two", "chr9.871_top_two")
 cis_pairs <- pairs_grouped |>
   dplyr::filter(grna_group %in% my_cis_grna_groups)
 my_pc_grna_groups <- pairs_grouped |>
@@ -47,7 +47,7 @@ grna_group_data_frame_highmoi <- rbind(grna_feature_df |>
   data.frame(grna_id = nt_grnas, grna_group = "non-targeting")) |>
   dplyr::arrange(grna_group)
 
-# 3.5 add chromosomal locations to the grna group table
+# 4. add chromosomal locations to the grna group table
 grna_loc_info <- readr::read_tsv(file = paste0(gasperini_dir_raw, "/GSE120861_gene_gRNAgroup_pair_table.at_scale.txt"),
                                  col_names = c("chr", "start", "end", "grna_group", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"),
                                  skip = 1) |>
@@ -59,9 +59,13 @@ target_group_loc_info <- grna_loc_info |> dplyr::filter(grna_group %in% targetin
 grna_group_data_frame_highmoi <- dplyr::left_join(x = grna_group_data_frame_highmoi,
                  y = target_group_loc_info, by = c("grna_group"))
 
+# 5. determine cells that contain at least one gRNA
+my_grna_ids <- unique(grna_group_data_frame_highmoi$grna_id)
+grna_matrix <- grna_odm[[my_grna_ids,]]
+cell_ids <- which(apply(X = as.matrix(grna_matrix >= 5), 2, any))
+
 # 4. construct the respomse and grna matrices; downsample cells
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))
-cell_ids <- sample(seq(1, dim(multimodal_odm)[[1]][2]), 40002)
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
 # 5. get the gene matrix
@@ -86,7 +90,7 @@ covariate_matrix <- multimodal_odm_downsample |>
 cell_order <- order(covariate_matrix$batch)
 response_matrix_highmoi <- gene_matrix[,cell_order]
 grna_matrix_highmoi <- grna_matrix[,cell_order]
-covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop=FALSE]
+covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop = FALSE]
 
 # 9. rename the data objects
 discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis") |>
