@@ -1,4 +1,5 @@
 construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pairs, calibration_group_size) {
+  cat("Constructing negative control pairs.")
   grna_assignments <- sceptre_object@grna_assignments
   response_matrix <- sceptre_object@response_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
@@ -47,10 +48,11 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
                    n_nonzero_trt = samp$n_nonzero_trt_v,
                    n_nonzero_cntrl = samp$n_nonzero_cntrl_v,
                    pass_qc = TRUE)
+  cat(crayon::green(' \u2713\n'))
 
   # 5. check the number of rows of df, and issue a warning if less than the required amount
   if (nrow(df) < n_calibration_pairs) {
-    warning(paste0("Unable to generate ", n_calibration_pairs, " negative control pairs (i.e., the number of discovery pairs that passes pairwise QC). Consider increasing `calibration_group_size`. If possible, consider rerunning the experiment with more negative control gRNAs."))
+    cat(crayon::red(paste0("Note: Unable to generate the number of negative control pairs (", n_calibration_pairs, ") requested. Generating as many negative control pairs as possible.\n")))
   }
 
   return(df)
