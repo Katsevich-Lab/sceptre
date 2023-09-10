@@ -1,74 +1,7 @@
-# response matrix class union
-#' @import Matrix
-setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix"))
-setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix"))
-
-
-# sceptre object class
-setClass("sceptre_object",
-         slots = list(
-           # raw data
-           response_matrix = "response_matrix_class",
-           grna_matrix = "grna_matrix_class",
-           covariate_data_frame = "data.frame",
-           covariate_matrix = "matrix",
-           grna_group_data_frame = "data.frame",
-           low_moi = "logical",
-           user_specified_covariates = "character",
-
-           # analysis parameters
-           discovery_pairs = "data.frame",
-           positive_control_pairs = "data.frame",
-           formula_object = "formula",
-           side_code = "integer",
-           fit_parametric_curve = "logical",
-           control_group_complement = "logical",
-           run_permutations = "logical",
-           n_nonzero_trt_thresh = "integer",
-           n_nonzero_cntrl_thresh = "integer",
-           B1 = "integer", B2 = "integer", B3 = "integer",
-           grna_assignment_method = "character",
-           grna_assignment_hyperparameters = "list",
-           multiple_testing_alpha = "numeric",
-           multiple_testing_method = "character",
-           cell_removal_metrics = "integer",
-
-           # computed objects
-           mitochondrial_gene = "logical",
-           M_matrix = "matrix",
-           n_nonzero_tot_vector = "integer",
-           n_ok_discovery_pairs = "integer",
-           n_ok_positive_control_pairs = "integer",
-           discovery_pairs_with_info = "data.frame",
-           positive_control_pairs_with_info = "data.frame",
-           negative_control_pairs = "data.frame",
-           initial_grna_assignment_list = "list",
-           grna_assignments_raw = "list",
-           grna_assignments = "list",
-           cells_w_multiple_grnas = "integer",
-           cells_per_grna = "integer",
-           grnas_per_cell = "integer",
-           cells_per_targeting_grna_group = "integer",
-           cells_in_use = "integer",
-           calibration_group_size = "integer",
-           n_calibration_pairs = "integer",
-
-           # cached objects
-           response_precomputations = "list",
-
-           # flags
-           last_function_called = "character",
-
-           # results
-           calibration_result = "data.frame",
-           power_result = "data.frame",
-           discovery_result = "data.frame"))
-
-
-# show method for sceptre class
+# show method
 setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 0. determine the functions that have been run
-  funct_run_vect <- get_funct_run_vect(object)
+  funct_run_vect <- object@functs_called
 
   # 1. obtain the basic information
   n_cells <- ncol(object@response_matrix)
@@ -94,7 +27,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 })
 
 
-# print method for sceptre class
+# print method
 #' @export
 setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -102,7 +35,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   show(x)
 
   # 1. print analysis status
-  funct_run_vect <- get_funct_run_vect(x)
+  funct_run_vect <- x@functs_called
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
   cat("\n\nAnalysis status:\n")
   for (i in seq_along(funct_run_vect)) {
@@ -168,7 +101,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 })
 
 
-# plot function for sceptre object
+# plot method
 #' @export
 setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -185,14 +118,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
 })
 
 
-reset_results <- function(sceptre_object) {
-  sceptre_object@calibration_result <- data.frame()
-  sceptre_object@discovery_result <- data.frame()
-  sceptre_object@power_result <- data.frame()
-  return(sceptre_object)
-}
-
-
+# write outputs to directory
 #' @export
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory
@@ -228,4 +154,28 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
   }
 
   return(NULL)
+}
+
+
+perform_status_check_and_update <- function(sceptre_object, curr_funct) {
+  rank_vector <- c(import_data = 1L, set_analysis_parameters = 2L, assign_grnas = 2L,
+                   run_qc = 3L, run_power_check = 4L, run_discovery_analysis = 4L, run_calibration_check = 4L)
+  functs_called <- sceptre_object@functs_called
+  curr_rank <- rank_vector[[curr_funct]]
+  direct_upstream_functs <- names(rank_vector)[rank_vector == curr_rank - 1L]
+  downstream_functs <- names(rank_vector)[rank_vector > curr_rank]
+  # verify that the direct upstream funct has been called
+  if (!all(functs_called[direct_upstream_functs])) {
+    stop(paste0("The function", if (length(direct_upstream_functs) >= 2L) "s " else " ",
+                paste0("`", direct_upstream_functs, "()`", collapse = ", "),
+                " must be called before `", curr_funct, "()` is called."))
+  }
+  # set current funct to true
+  functs_called[curr_funct] <- TRUE
+  # set all downstream functions to false
+  functs_called[downstream_functs] <- FALSE
+  # update sceptre_object and return
+  sceptre_object@functs_called <- functs_called
+  sceptre_object@last_function_called <- curr_funct
+  return(sceptre_object)
 }

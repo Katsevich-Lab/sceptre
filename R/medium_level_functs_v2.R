@@ -181,7 +181,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     if (!parallel) {
       res <- lapply(partitioned_response_ids, run_precomp_on_given_responses)
     } else {
-      cat("Running Analysis in parallel. ")
+      cat("Running analysis in parallel. ")
       if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir()), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates. "))
       res <- parallel::mclapply(seq_along(partitioned_response_ids),
                                 function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),

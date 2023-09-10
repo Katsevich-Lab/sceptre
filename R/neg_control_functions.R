@@ -54,7 +54,6 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
   if (nrow(df) < n_calibration_pairs) {
     cat(crayon::red(paste0("Note: Unable to generate the number of negative control pairs (", n_calibration_pairs, ") requested. Generating as many negative control pairs as possible.\n")))
   }
-
   return(df)
 }
 
