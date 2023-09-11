@@ -96,14 +96,12 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 
   # for plots on the left-most edge, add a y-axis label
   for(i in 0:(n_row - 1))  {
-    print(i)
     plot_list[[1 + i * n_col]] <- plot_list[[1 + i * n_col]] +
       ggplot2::ylab("Cell count (log scale)") +
       ggplot2::theme(axis.title.y = ggplot2::element_text())
   }
   # for plots on the bottom row, add a x-axis label
   for(j in (1 + (n_row - 1) * n_col):length(grnas_to_plot))  {
-    print(j)
     plot_list[[j]] <- plot_list[[j]] + ggplot2::xlab("gRNA count") +
       ggplot2::theme(axis.title.x = ggplot2::element_text())
   }
