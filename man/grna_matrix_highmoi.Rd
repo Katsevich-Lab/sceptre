@@ -5,7 +5,7 @@
 \alias{grna_matrix_highmoi}
 \title{gRNA expression matrix}
 \format{
-An object of class \code{dgTMatrix} with 79 rows and 40002 columns.
+An object of class \code{dgTMatrix} with 95 rows and 45919 columns.
 }
 \usage{
 data(grna_matrix_highmoi)

@@ -5,7 +5,7 @@
 \alias{discovery_pairs_highmoi}
 \title{Discovery gene-gRNA group pairs}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 358 rows and 2 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 535 rows and 2 columns.
 }
 \usage{
 data(discovery_pairs_highmoi)

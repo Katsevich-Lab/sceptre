@@ -83,7 +83,7 @@
 #' data(extra_covariates_highmoi)
 #' data(grna_group_data_frame_highmoi)
 #'
-#' # 1. create the sceptre object
+#' # 0. create the sceptre object
 #' sceptre_object <- import_data(
 #' response_matrix = response_matrix_highmoi,
 #' grna_matrix = grna_matrix_highmoi,
@@ -92,14 +92,18 @@
 #' extra_covariates = extra_covariates_highmoi)
 #' print(sceptre_object)
 #'
-#' # 2. set the analysis parameters
-#' data(discovery_pairs_highmoi)
+#' # 1. obtain the response-gRNA group pairs to analyze
 #' data(pc_pairs_highmoi)
+#' pc_pairs <- pc_pairs_highmoi
+#' discovery_pairs <- return_cis_pairs(sceptre_object,
+#' grna_groups_to_exclude = pc_pairs$grna_group,
+#' distance_threshold = 5e6)
 #'
+#' # 2. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
-#' discovery_pairs = discovery_pairs_highmoi,
-#' positive_control_pairs = pc_pairs_highmoi,
+#' discovery_pairs = discovery_pairs,
+#' positive_control_pairs = pc_pairs,
 #' side = "left")
 #' print(sceptre_object)
 #'
@@ -293,6 +297,7 @@ run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
                    response_n_umis_range = c(0.01, 0.99),
+                   response_n_nonzero_range = c(0.01, 0.99),
                    p_mito_threshold = 0.15,
                    additional_cells_to_remove = integer()) {
   # 1. verify that function called in correct order
@@ -301,7 +306,8 @@ run_qc <- function(sceptre_object,
   # 2. check inputs
   check_run_qc_inputs(n_nonzero_trt_thresh,
                       n_nonzero_cntrl_thresh,
-                      response_n_umis_range) |> invisible()
+                      response_n_umis_range,
+                      response_n_nonzero_range) |> invisible()
 
   # 3. obtain previous cells_in_use for caching purposes
   current_cells_in_use <- sceptre_object@cells_in_use
@@ -311,7 +317,7 @@ run_qc <- function(sceptre_object,
   sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
 
   # 5. determine the cells to retain after cellwise qc
-  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range,
+  sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, response_n_nonzero_range,
                                               p_mito_threshold, additional_cells_to_remove)
 
   # 6. determine whether to reset response precomputation

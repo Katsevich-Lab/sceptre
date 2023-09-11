@@ -64,13 +64,14 @@ my_grna_ids <- unique(grna_group_data_frame_highmoi$grna_id)
 grna_matrix <- grna_odm[[my_grna_ids,]]
 cell_ids <- which(apply(X = as.matrix(grna_matrix >= 5), 2, any))
 
-# 4. construct the respomse and grna matrices; downsample cells
+# 4. construct the response and grna matrices; downsample cells
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
 # 5. get the gene matrix
 gene_sub <- ondisc::get_modality(multimodal_odm_downsample, "gene")
 my_gene_ids <- unique(discovery_pairs$response_id)
+
 gene_matrix <- gene_sub[[my_gene_ids,]]
 rownames(gene_matrix) <- my_gene_ids
 
