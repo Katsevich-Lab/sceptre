@@ -111,6 +111,7 @@ print(sceptre_object)
 
 # 7. obtain the results for downstream analysis
 discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
+write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 
 ##################
 # High MOI example

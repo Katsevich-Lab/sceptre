@@ -235,8 +235,8 @@ check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs) 
   control_group_complement <- sceptre_object@control_group_complement
   n_nt_grnas <- grna_group_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> nrow()
-  if (control_group_complement) {
-    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
+  if (!control_group_complement) {
+    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
   } else {
     if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
   }

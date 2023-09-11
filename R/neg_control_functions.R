@@ -63,7 +63,7 @@ compute_calibration_group_size <- function(grna_group_data_frame) {
     dplyr::filter(grna_group != "non-targeting") |>
     dplyr::pull(grna_group) |> table() |> stats::median() |> round()
   n_ntc <- grna_group_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
-  calibration_group_size <- as.integer(min(median_group_size, floor(n_ntc/2)))
+  calibration_group_size <- as.integer(min(median_group_size, n_ntc))
   return(calibration_group_size)
 }
 
