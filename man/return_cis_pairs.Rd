@@ -6,9 +6,9 @@
 \usage{
 return_cis_pairs(
   sceptre_object,
-  grna_groups_to_exclude = NULL,
-  distance_threshold = 5e+05,
-  ref_genome
+  grna_groups_to_exclude = character(),
+  distance_threshold = 500000L,
+  ref_genome = "10X_GRCh38_2020"
 )
 }
 \arguments{

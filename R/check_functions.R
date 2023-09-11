@@ -214,9 +214,17 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
 }
 
 
-check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range) {
+check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range) {
   if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
     stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
+  }
+  if (min(response_n_umis_range) < 0 || max(response_n_umis_range) > 1 ||
+      length(response_n_umis_range) != 2L || response_n_umis_range[1] > response_n_umis_range[2]) {
+    stop("`response_n_umis_range` must an interval in the range [0,1].")
+  }
+  if (min(response_n_nonzero_range) < 0 || max(response_n_nonzero_range) > 1 ||
+      length(response_n_nonzero_range) != 2L || response_n_nonzero_range[1] > response_n_nonzero_range[2]) {
+    stop("`response_n_nonzero_range` must an interval in the range [0,1].")
   }
   return(NULL)
 }
