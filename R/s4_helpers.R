@@ -134,7 +134,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 
   # 2. determine the functions that have been called
   plotting_params <- list(device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
-  functs_run <- get_funct_run_vect(sceptre_object)
+  functs_run <- sceptre_object@functs_called
   functs_run_plots <- functs_run[names(functs_run) %in% c("assign_grnas", "run_qc", "run_calibration_check", "run_power_check", "run_discovery_analysis")]
   functs_run_plots <- c(functs_run_plots, "grna_count_distributions" = TRUE)
   for (funct in names(functs_run_plots)) {

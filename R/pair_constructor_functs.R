@@ -58,7 +58,7 @@ return_cis_pairs <- function(sceptre_object, grna_groups_to_exclude = character(
 return_all_pairs <- function(sceptre_object, grna_groups_to_exclude = NULL) {
   response_ids <- rownames(sceptre_object@response_matrix) |> factor()
   grna_groups <- sceptre_object@grna_group_data_frame |>
-    dplyr::filter(grna_group != "non-targeting") |>
+    dplyr::filter(!(grna_group %in% c(grna_groups_to_exclude, "non-targeting"))) |>
     dplyr::pull(grna_group) |> unique() |> factor()
   expand.grid(response_id = response_ids, grna_group = grna_groups)
 }
