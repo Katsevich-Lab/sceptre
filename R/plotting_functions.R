@@ -61,7 +61,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   # any bins inside the range of the expressions for each grna_id, but we don't
   # keep empty ones in the tail.
   plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
-    curr_df <- dplyr::filter(to_plot, as.character(grna_id) == curr_grna_id) %>%
+    curr_df <- dplyr::filter(to_plot, as.character(grna_id) == curr_grna_id) |>
       dplyr::mutate(grna_id  = droplevels(grna_id))
     bin_info <- grna_expressions_to_binned_factor(curr_df$grna_expressions)
     p <- curr_df |>
