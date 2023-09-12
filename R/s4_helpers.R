@@ -90,7 +90,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
                "\n\t\U2022 Mean log-2 FC for", crayon::red(" negative control "), "pairs: ", crayon::blue(mean_lfc)))
   }
   if (power_check_run) {
-    median_pc_p_value <- median(x@power_result$p_value, na.rm = TRUE)
+    median_pc_p_value <- stats::median(x@power_result$p_value, na.rm = TRUE)
     cat(paste0("\n\t\U2022 Median", crayon::green(" positive control "), "p-value: ", crayon::blue(signif(median_pc_p_value, 2))))
   }
   if (discovery_analysis_run) {

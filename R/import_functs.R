@@ -119,7 +119,7 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
                                 grna_group_data_frame = grna_group_data_frame,
                                 moi = moi,
                                 extra_covariates = data.frame(batch = batch),
-                                feature_names = gene_names)
+                                response_names = gene_names)
   gc() |> invisible()
   cat(crayon::green(' \u2713\n'))
   return(sceptre_object)

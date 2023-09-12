@@ -163,6 +163,6 @@ get_result <- function(sceptre_object, analysis) {
                              run_calibration_check = "calibration_result",
                              run_power_check = "power_result",
                              run_discovery_analysis = "discovery_result")
-  out <- slot(sceptre_object, field_to_extract)
+  out <- methods::slot(sceptre_object, field_to_extract)
   return(out)
 }

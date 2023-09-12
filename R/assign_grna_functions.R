@@ -45,8 +45,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
 }
 
 
-assign_grnas_to_cells_thresholding <- function(grna_matrix = grna_matrix,
-                                               grna_assign_threshold = grna_assignment_hyperparameters$threshold) {
+assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold) {
   # 1. make the grna expression matrix row-accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)

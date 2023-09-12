@@ -165,7 +165,7 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
 
   # 4. update fields in output object and return
-  sceptre_object <- new("sceptre_object")
+  sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- response_matrix
   sceptre_object@grna_matrix <- grna_matrix
   sceptre_object@covariate_data_frame <- covariate_data_frame
@@ -279,7 +279,7 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
     list()
   }
   if (identical(hyperparameters, "default")) hyperparameters <- hyperparameters_default
-  if (is(hyperparameters, "list")) {
+  if (methods::is(hyperparameters, "list")) {
     hyperparam_names <- names(hyperparameters)
     for (hyperparam_name in hyperparam_names) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
     hyperparameters <- hyperparameters_default

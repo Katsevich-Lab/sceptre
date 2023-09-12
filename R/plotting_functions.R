@@ -390,7 +390,7 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
   # first, compute the rejection set
   if (nrow(sceptre_object@discovery_result) == 0L) stop("Discovery analysis not run.")
-  discovery_result <- sceptre_object@discovery_result |> na.omit()
+  discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
   calibration_result <- sceptre_object@calibration_result
   discovery_set <- discovery_result |> dplyr::filter(significant)
   p_thresh <- if (nrow(discovery_set) >= 1L) max(discovery_set$p_value) else NA
@@ -514,8 +514,7 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
 #' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to}, for better visualization. If \code{clip_to=0} is used then no clipping is done.
 #' @return a single \code{ggplot2} plot.
 #' @export
-plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 1,
-                                 transparency = 0.8,  clip_to = 1e-20) {
+plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
   calibration_result <- sceptre_object@power_result
   if (nrow(calibration_result) == 0L) stop("Power check not yet called.")
   my_theme <- get_my_theme()
@@ -541,7 +540,7 @@ plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, poi
     mapping = ggplot2::aes(x = lab, y = p_values, color=lab)
   )
   if(clip_to > 0) {
-    p <- p + ggplot2::geom_hline(yintercept = clip_to, linetype = "dashed", color="grey90")
+    p <- p + ggplot2::geom_hline(yintercept = clip_to, linetype = "dashed", color = "grey90")
   }
   p <- p +
     ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
