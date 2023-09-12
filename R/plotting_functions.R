@@ -386,6 +386,14 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 }
 
 
+#' Plot run discovery analysis
+#'
+#' @param sceptre_object TBD
+#' @param return_indiv_plots TBD
+#' @param x_limits TBD
+#' @param transparency TBD
+#' @param point_size TBD
+#'
 #' @export
 plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
   # first, compute the rejection set
@@ -443,6 +451,13 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 ############
 # 5. PLOT QC
 ############
+#' Plot run QC
+#'
+#' @param sceptre_object TBD
+#' @param return_indiv_plots TBD
+#' @param transparency TBD
+#' @param point_size TBD
+#'
 #' @export
 plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency = 0.8, point_size = 0.55) {
   my_cols <- c("mediumseagreen", "indianred2")

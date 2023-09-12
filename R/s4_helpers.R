@@ -27,7 +27,9 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 })
 
 
-# print method
+#' Print
+#'
+#' @param x a sceptre_object
 #' @export
 setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -101,7 +103,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 })
 
 
-# plot method
+#' Plot
+#'
+#' @param x a sceptre_object
 #' @export
 setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -116,45 +120,6 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
   p <- do.call(what = funct_to_call, args = args)
   return(p)
 })
-
-
-# write outputs to directory
-#' @export
-write_outputs_to_directory <- function(sceptre_object, directory) {
-  # 0. create directory
-  if (!dir.exists(directory)) {
-    dir.create(path = directory, recursive = TRUE)
-  }
-
-  # 1. create analysis_summary.txt file
-  summary_file_fp <- paste0(directory, "/analysis_summary.txt")
-  sink(file = summary_file_fp, append = FALSE)
-  print(sceptre_object)
-  sink(NULL)
-
-  # 2. determine the functions that have been called
-  plotting_params <- list(device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
-  functs_run <- sceptre_object@functs_called
-  functs_run_plots <- functs_run[names(functs_run) %in% c("assign_grnas", "run_qc", "run_calibration_check", "run_power_check", "run_discovery_analysis")]
-  functs_run_plots <- c(functs_run_plots, "grna_count_distributions" = TRUE)
-  for (funct in names(functs_run_plots)) {
-    if (functs_run_plots[[funct]]) {
-      plotting_params$plot <- do.call(what = paste0("plot_", funct), args = list(sceptre_object))
-      plotting_params$filename <- paste0(directory, "/plot_", funct, ".png")
-      do.call(what = ggplot2::ggsave, args = plotting_params)
-    }
-  }
-
-  # 3. save results
-  for (analysis in c("run_calibration_check", "run_power_check", "run_discovery_analysis")) {
-    if (functs_run_plots[[analysis]]) {
-      res <- get_result(sceptre_object = sceptre_object, analysis = analysis)
-      saveRDS(object = res, file = paste0(directory, "/results_", analysis, ".rds"))
-    }
-  }
-
-  return(NULL)
-}
 
 
 perform_status_check_and_update <- function(sceptre_object, curr_funct) {

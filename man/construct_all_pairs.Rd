@@ -11,7 +11,12 @@ construct_all_pairs(
 )
 }
 \arguments{
-\item{grna_groups_to_exclude}{}
+\item{sceptre_object}{TBD}
+
+\item{grna_groups_to_exclude}{TBD}
+}
+\value{
+TBD
 }
 \description{
 Return all pairs
