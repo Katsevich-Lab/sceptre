@@ -15,7 +15,7 @@ mm_metadata_fp <- paste0(papalexi_dir, "multimodal_metadata.rds")
 mm_odm <- ondisc::read_multimodal_odm(odm_fps = c(gene_odm_fp, grna_odm_fp),
                                       multimodal_metadata_fp = mm_metadata_fp)
 # load the PC pairs
-pc_pairs_lowmoi <- tibble::tibble(response_id = c("STAT1", "JAK2", "CMTM6", "STAT2", "UBE2L6",
+pc_pairs_lowmoi <- tibble::tibble(response_id = c("STAT1", "JAK2", "CMTM6", "STAT2",
                                               "UBE2L6", "STAT3", "TNFRSF14", "IFNGR2", "NFKBIA"),
                                   grna_group = response_id) |> as.data.frame()
 

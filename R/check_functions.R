@@ -107,6 +107,10 @@ check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariat
       if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
         stop("The `", df_name , "` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs against responses, run the calibration check.")
       }
+      # v. ensure that rows are not duplicated
+      if (nrow(response_grna_group_pairs) != nrow(dplyr::distinct(response_grna_group_pairs))) {
+        stop("The `", df_name, "` data frame has duplicate rows.")
+      }
     }
   }
 

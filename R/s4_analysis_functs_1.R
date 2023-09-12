@@ -48,7 +48,8 @@
 #' # 2. obtain the discovery and positive control pairs
 #' data(pc_pairs_lowmoi)
 #' positive_control_pairs <- pc_pairs_lowmoi
-#' discovery_pairs <- return_all_pairs(sceptre_object)
+#' discovery_pairs <- construct_all_pairs(sceptre_object = sceptre_object,
+#' response_grna_group_pairs_to_exclude = positive_control_pairs)
 #'
 #' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
@@ -63,7 +64,7 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.25)
+#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -82,7 +83,7 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 7. obtain the results for downstream analysis
+#' # 8. obtain the results for downstream analysis
 #' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 #'
@@ -95,7 +96,7 @@
 #' data(extra_covariates_highmoi)
 #' data(grna_group_data_frame_highmoi)
 #'
-#' # 0. create the sceptre object
+#' # 1. create the sceptre object
 #' sceptre_object <- import_data(
 #' response_matrix = response_matrix_highmoi,
 #' grna_matrix = grna_matrix_highmoi,
@@ -104,14 +105,14 @@
 #' extra_covariates = extra_covariates_highmoi)
 #' print(sceptre_object)
 #'
-#' # 1. obtain the response-gRNA group pairs to analyze
+#' # 2. obtain the response-gRNA group pairs to analyze
 #' data(pc_pairs_highmoi)
 #' pc_pairs <- pc_pairs_highmoi
-#' discovery_pairs <- return_cis_pairs(sceptre_object,
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
 #' grna_groups_to_exclude = pc_pairs$grna_group,
 #' distance_threshold = 5e6)
 #'
-#' # 2. set the analysis parameters
+#' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
 #' discovery_pairs = discovery_pairs,
@@ -119,7 +120,7 @@
 #' side = "left")
 #' print(sceptre_object)
 #'
-#' # 3 (optional). manually assign grnas, run QC
+#' # 4 (optional). manually assign grnas, run QC
 #' plot_grna_count_distributions(sceptre_object)
 #' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 #' plot(sceptre_object)
@@ -129,22 +130,22 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 4. run the calibration check
+#' # 5. run the calibration check
 #' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 5. (optional) run the power check
+#' # 6. (optional) run the power check
 #' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 6. run discovery analysis
+#' # 7. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 7. obtain results; write outputs to directory
+#' # 8. obtain results; write outputs to directory
 #' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, feature_names = NULL) {
