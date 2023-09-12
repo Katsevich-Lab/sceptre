@@ -31,13 +31,6 @@ NULL
 #' @usage data(extra_covariates_highmoi)
 "extra_covariates_highmoi"
 
-#' Discovery gene-gRNA group pairs
-#'
-#' The discovery response-gRNA group pairs that we seek to test for association, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
-#' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi)
-"discovery_pairs_highmoi"
-
 #' Positive control gene-gRNA group pairs
 #'
 #' The positive control response-gRNA group pairs, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
