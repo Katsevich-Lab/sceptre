@@ -5,7 +5,7 @@
 \alias{response_matrix_lowmoi}
 \title{Response expression matrix}
 \format{
-An object of class \code{dgTMatrix} with 300 rows and 20729 columns.
+An object of class \code{dgTMatrix} with 299 rows and 20729 columns.
 }
 \usage{
 data(response_matrix_lowmoi)

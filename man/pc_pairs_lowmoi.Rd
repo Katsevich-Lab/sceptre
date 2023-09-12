@@ -5,7 +5,7 @@
 \alias{pc_pairs_lowmoi}
 \title{gRNA group data frame}
 \format{
-An object of class \code{data.frame} with 10 rows and 2 columns.
+An object of class \code{data.frame} with 9 rows and 2 columns.
 }
 \usage{
 data(pc_pairs_lowmoi)

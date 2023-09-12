@@ -486,7 +486,7 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
   p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
     ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
     ggplot2::scale_y_continuous(expand = c(0, NA)) +
-    ggplot2::ylab("Percent. cells removed") +
+    ggplot2::ylab("Percent cells removed") +
     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
     get_my_theme() +
     ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +

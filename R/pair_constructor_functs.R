@@ -1,4 +1,4 @@
-#' Return cis pairs
+#' Construct cis pairs
 #'
 #' @param sceptre_object
 #' @param grna_groups_to_exclude
@@ -6,7 +6,8 @@
 #'
 #' @return
 #' @export
-return_cis_pairs <- function(sceptre_object, grna_groups_to_exclude = character(), distance_threshold = 500000L, ref_genome = "10X_GRCh38_2020") {
+construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, grna_groups_to_exclude = character(),
+                             response_grna_group_pairs_to_exclude = data.frame(), ref_genome = "10X_GRCh38_2020") {
   if (ref_genome != "10X_GRCh38_2020") {
     stop("The only reference genome currently available is the GRCh38 (2020) reference genome provided by 10X.")
   }
@@ -44,6 +45,7 @@ return_cis_pairs <- function(sceptre_object, grna_groups_to_exclude = character(
     }) |> data.table::rbindlist()
   }) |> data.table::rbindlist()
 
+  out_pairs <- exclude_pairs(out_pairs, response_grna_group_pairs_to_exclude)
   return(out_pairs)
 }
 
@@ -55,10 +57,26 @@ return_cis_pairs <- function(sceptre_object, grna_groups_to_exclude = character(
 #'
 #' @return
 #' @export
-return_all_pairs <- function(sceptre_object, grna_groups_to_exclude = NULL) {
+construct_all_pairs <- function(sceptre_object, grna_groups_to_exclude = character(), response_grna_group_pairs_to_exclude = data.frame()) {
   response_ids <- rownames(sceptre_object@response_matrix) |> factor()
   grna_groups <- sceptre_object@grna_group_data_frame |>
     dplyr::filter(!(grna_group %in% c(grna_groups_to_exclude, "non-targeting"))) |>
     dplyr::pull(grna_group) |> unique() |> factor()
-  expand.grid(response_id = response_ids, grna_group = grna_groups)
+  out_pairs <- expand.grid(response_id = response_ids, grna_group = grna_groups)
+  out_pairs <- exclude_pairs(out_pairs, response_grna_group_pairs_to_exclude)
+  return(out_pairs)
+}
+
+
+exclude_pairs <- function(pairs_df, pairs_to_exclude_df) {
+  if (nrow(pairs_to_exclude_df) >= 1) {
+    pairs_to_exclude_str <- paste0(pairs_to_exclude_df$response_id,
+                                   pairs_to_exclude_df$grna_group)
+    out <- pairs_df |> dplyr::mutate(pair_str = paste0(response_id, grna_group)) |>
+      dplyr::filter(!(pair_str %in% pairs_to_exclude_str)) |>
+      dplyr::select(-pair_str)
+  } else {
+    out <- pairs_df
+  }
+  return(out)
 }
