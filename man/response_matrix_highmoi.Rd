@@ -5,7 +5,7 @@
 \alias{response_matrix_highmoi}
 \title{Gene expression matrix}
 \format{
-An object of class \code{dgTMatrix} with 528 rows and 45919 columns.
+An object of class \code{dgTMatrix} with 525 rows and 47123 columns.
 }
 \usage{
 data(response_matrix_highmoi)

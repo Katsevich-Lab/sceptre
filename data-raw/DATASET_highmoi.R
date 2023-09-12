@@ -25,13 +25,14 @@ my_cis_grna_groups <- c(pairs_grouped |>
   dplyr::pull(grna_group) |> # 12
   sample(20), "chr8.847_top_two", "chr9.1594_top_two", "chr9.2869_top_two", "chr9.3633_top_two", "chr9.871_top_two")
 cis_pairs <- pairs_grouped |>
-  dplyr::filter(grna_group %in% my_cis_grna_groups)
+  dplyr::filter(grna_group %in% my_cis_grna_groups, gene_id %in% gene_table$gene_id)
 my_pc_grna_groups <- pairs_grouped |>
   dplyr::filter(site_type == "pos_cntrl") |>
   dplyr::pull(grna_group) |>
   sample(10)
 pc_pairs <- pairs_grouped |>
-  dplyr::filter(grna_group %in% my_pc_grna_groups, site_type == "pos_cntrl")
+  dplyr::filter(grna_group %in% my_pc_grna_groups, site_type == "pos_cntrl",
+                gene_id %in% gene_table$gene_id)
 discovery_pairs <- rbind(cis_pairs, pc_pairs) |>
   dplyr::rename(type = site_type, response_id = gene_id)
 
@@ -68,9 +69,11 @@ cell_ids <- which(apply(X = as.matrix(grna_matrix >= 5), 2, any))
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
-# 5. get the gene matrix
+# 5. get the gene matrix, adding a couple MT genes for good measure
 gene_sub <- ondisc::get_modality(multimodal_odm_downsample, "gene")
-my_gene_ids <- unique(discovery_pairs$response_id)
+all_gene_ids <- ondisc::get_feature_ids(gene_sub)
+mt_genes <- gene_table |> dplyr::filter(chr == "chrM", gene_id %in% all_gene_ids) |> dplyr::pull(gene_id)
+my_gene_ids <- c(unique(discovery_pairs$response_id), sample(mt_genes, 2))
 
 gene_matrix <- gene_sub[[my_gene_ids,]]
 rownames(gene_matrix) <- my_gene_ids
@@ -94,8 +97,6 @@ grna_matrix_highmoi <- grna_matrix[,cell_order]
 covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop = FALSE]
 
 # 9. rename the data objects
-discovery_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "cis") |>
-  dplyr::select(-type)
 pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl") |>
   dplyr::select(-type)
 
@@ -105,9 +106,9 @@ extra_covariates_highmoi <- covariate_data_frame_highmoi |>
   dplyr::mutate(batch = factor(batch, levels = c("prep_batch_1", "prep_batch_2"),
                                labels = c("b1", "b2")))
 grna_group_data_frame_highmoi <- grna_group_data_frame_highmoi
-discovery_pairs_highmoi <- discovery_pairs_highmoi
 pc_pairs_highmoi <- pc_pairs_highmoi
+gene_names_highmoi <- gene_table$gene_name[match(rownames(response_matrix_highmoi), gene_table$gene_id)]
 
-usethis::use_data(response_matrix_highmoi, grna_matrix_highmoi,
+usethis::use_data(response_matrix_highmoi, gene_names_highmoi, grna_matrix_highmoi,
                   extra_covariates_highmoi, grna_group_data_frame_highmoi,
                   discovery_pairs_highmoi, pc_pairs_highmoi, overwrite = TRUE)
