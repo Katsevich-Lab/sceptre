@@ -22,6 +22,7 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount
 
 auto_construct_formula_object <- function(cell_covariates, include_grna_covariates) {
   cell_covariate_names <- colnames(cell_covariates)
+  cell_covariate_names <- cell_covariate_names[cell_covariate_names != "response_p_mito"]
   if (!include_grna_covariates) { # by default, do not use grna count-based covariates in low moi
     cell_covariate_names <- cell_covariate_names[!(cell_covariate_names %in% c("grna_n_umis", "grna_n_nonzero"))]
   }
@@ -43,13 +44,13 @@ auto_construct_formula_object <- function(cell_covariates, include_grna_covariat
 }
 
 
-auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_covariates, feature_names) {
+auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_covariates, response_names) {
   # compute the response covariates
-  covariate_df <- compute_cell_covariates(response_matrix, feature_names, TRUE)
+  covariate_df <- compute_cell_covariates(response_matrix, response_names, TRUE)
   colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
 
   # compute the grna covariates
-  grna_covariate_df <- compute_cell_covariates(grna_matrix, feature_names, FALSE)
+  grna_covariate_df <- compute_cell_covariates(grna_matrix, response_names, FALSE)
   colnames(grna_covariate_df) <- paste0("grna_", colnames(grna_covariate_df))
   covariate_df <- cbind(covariate_df, grna_covariate_df)
 

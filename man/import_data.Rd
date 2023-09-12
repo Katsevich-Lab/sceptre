@@ -10,7 +10,7 @@ import_data(
   grna_group_data_frame,
   moi,
   extra_covariates = NULL,
-  feature_names = NULL
+  response_names = NULL
 )
 }
 \arguments{
@@ -133,6 +133,7 @@ data(response_matrix_highmoi)
 data(grna_matrix_highmoi)
 data(extra_covariates_highmoi)
 data(grna_group_data_frame_highmoi)
+data(gene_names_highmoi)
 
 # 1. create the sceptre object
 sceptre_object <- import_data(
@@ -140,7 +141,8 @@ response_matrix = response_matrix_highmoi,
 grna_matrix = grna_matrix_highmoi,
 grna_group_data_frame = grna_group_data_frame_highmoi,
 moi = "high",
-extra_covariates = extra_covariates_highmoi)
+extra_covariates = extra_covariates_highmoi,
+response_names = gene_names_highmoi)
 print(sceptre_object)
 
 # 2. obtain the response-gRNA group pairs to analyze
@@ -164,7 +166,7 @@ sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 plot(sceptre_object)
 print(sceptre_object)
 
-sceptre_object <- sceptre_object |> run_qc()
+sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.25)
 plot(sceptre_object)
 print(sceptre_object)
 

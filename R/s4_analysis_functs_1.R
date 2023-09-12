@@ -95,6 +95,7 @@
 #' data(grna_matrix_highmoi)
 #' data(extra_covariates_highmoi)
 #' data(grna_group_data_frame_highmoi)
+#' data(gene_names_highmoi)
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
@@ -102,7 +103,8 @@
 #' grna_matrix = grna_matrix_highmoi,
 #' grna_group_data_frame = grna_group_data_frame_highmoi,
 #' moi = "high",
-#' extra_covariates = extra_covariates_highmoi)
+#' extra_covariates = extra_covariates_highmoi,
+#' response_names = gene_names_highmoi)
 #' print(sceptre_object)
 #'
 #' # 2. obtain the response-gRNA group pairs to analyze
@@ -126,7 +128,7 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' sceptre_object <- sceptre_object |> run_qc()
+#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -148,16 +150,16 @@
 #' # 8. obtain results; write outputs to directory
 #' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, feature_names = NULL) {
+import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, response_names = NULL) {
   # 0. handle default parameters
-  if (is.null(feature_names)) feature_names <- rownames(response_matrix)
+  if (is.null(response_names)) response_names <- rownames(response_matrix)
 
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix,
                            grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates, feature_names)
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates, response_names)
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -311,7 +313,7 @@ run_qc <- function(sceptre_object,
                    n_nonzero_cntrl_thresh = 7L,
                    response_n_umis_range = c(0.01, 0.99),
                    response_n_nonzero_range = c(0.01, 0.99),
-                   p_mito_threshold = 0.15,
+                   p_mito_threshold = 0.2,
                    additional_cells_to_remove = integer()) {
   # 1. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
