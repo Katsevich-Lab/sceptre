@@ -74,7 +74,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(x@cells_per_grna |> mean() |> round(2)),
                "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(x@cells_per_targeting_grna_group |> mean() |> round(2)),
-               "\n\t\U2022 Mean N gRNAs per cell (MOI): ", crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
+               "\n\t\U2022 Mean N gRNAs per cell (MOI): ", if (x@grna_assignment_method == "maximum") "not computed when using \"maximum\" assignment method" else crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
   }
 
   # 4. print the results summary

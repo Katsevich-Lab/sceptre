@@ -45,10 +45,16 @@
 #' moi = "low")
 #' print(sceptre_object)
 #'
-#' # 2. set the analysis parameters
+#' # 2. obtain the discovery and positive control pairs
+#' data(pc_pairs_lowmoi)
+#' positive_control_pairs <- pc_pairs_lowmoi
+#' discovery_pairs <- return_all_pairs(sceptre_object)
+#'
+#' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
-#' discovery_pairs = return_all_pairs(sceptre_object))
+#' discovery_pairs = discovery_pairs,
+#' positive_control_pairs = positive_control_pairs)
 #' print(sceptre_object)
 #'
 #' # 4. optional: explicitly assign grnas, run QC
@@ -57,7 +63,7 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' sceptre_object <- sceptre_object |> run_qc()
+#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.25)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -66,7 +72,12 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 6. run discovery analysis
+#' # 6. run power check
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+#' plot(sceptre_object)
+#' print(sceptre_object)
+#'
+#' # 7. run discovery analysis
 #' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)

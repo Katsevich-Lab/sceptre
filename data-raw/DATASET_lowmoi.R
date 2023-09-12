@@ -3,6 +3,7 @@ papalexi_dir <- paste0(.get_config_path("LOCAL_SCEPTRE2_DATA_DIR"), "data/papale
 ##########################
 # STEP 0: LOAD ONDISC DATA
 ##########################
+set.seed(9)
 # gene and grna odm files
 gene_odm_fp <- paste0(papalexi_dir, "gene/matrix.odm")
 grna_odm_fp <- paste0(papalexi_dir, "grna_expression/matrix.odm")
@@ -13,17 +14,20 @@ mm_metadata_fp <- paste0(papalexi_dir, "multimodal_metadata.rds")
 # construct mm odm
 mm_odm <- ondisc::read_multimodal_odm(odm_fps = c(gene_odm_fp, grna_odm_fp),
                                       multimodal_metadata_fp = mm_metadata_fp)
+# load the PC pairs
+pc_pairs_lowmoi <- tibble::tibble(response_id = c("STAT1", "JAK2", "CMTM6", "STAT2", "UBE2L6",
+                                              "UBE2L6", "STAT3", "TNFRSF14", "IFNGR2", "NFKBIA"),
+                                  grna_group = response_id) |> as.data.frame()
 
 #######################################
 # STEP 1: CREATE GENE EXPRESSION MATRIX
 #######################################
-set.seed(9)
 feat_ids <- mm_odm |>
   ondisc::get_modality("gene") |>
   ondisc::get_feature_ids()
 
 mt_feats <- grep(pattern = "^MT-", x = feat_ids, value = TRUE)
-my_feats <- c(sample(feat_ids, 289), sample(mt_feats, 1))
+my_feats <- unique(c(sample(feat_ids, 289), sample(mt_feats, 1), pc_pairs_lowmoi$response_id))
 
 exp_mat <- mm_odm@modalities$gene[my_feats,]
 response_matrix_lowmoi <- exp_mat[[my_feats,]]
@@ -66,4 +70,4 @@ extra_covariates_lowmoi <- covariate_data_frame_lowmoi[cell_order,,drop=FALSE]
 ######################################
 # STEP 6: SAVE THE DATA IN THE PACKAGE
 ######################################
-usethis::use_data(response_matrix_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_group_data_frame_lowmoi, overwrite = TRUE)
+usethis::use_data(response_matrix_lowmoi, pc_pairs_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_group_data_frame_lowmoi, overwrite = TRUE)

@@ -394,6 +394,9 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
   calibration_result <- sceptre_object@calibration_result
   discovery_set <- discovery_result |> dplyr::filter(significant)
   p_thresh <- if (nrow(discovery_set) >= 1L) max(discovery_set$p_value) else NA
+  if (nrow(calibration_result) != nrow(discovery_result)) {
+    calibration_result <- data.frame()
+  }
   # create the bulk QQ plot
   p1 <- compare_calibration_and_discovery_results(calibration_result = calibration_result,
                                                   discovery_result = discovery_result,

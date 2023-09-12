@@ -42,3 +42,11 @@ NULL
 #' @inheritSection lowmoi_data Overview
 #' @usage data(grna_group_data_frame_lowmoi)
 "grna_group_data_frame_lowmoi"
+
+#' gRNA group data frame
+#'
+#' A data frame containing the positive control response-gRNA group pairs.
+#'
+#' @inheritSection lowmoi_data Overview
+#' @usage data(pc_pairs_lowmoi)
+"pc_pairs_lowmoi"
