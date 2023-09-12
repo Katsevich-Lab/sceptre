@@ -1,3 +1,13 @@
+#' Run calibration check
+#'
+#' @param sceptre_object
+#'
+#' @param output_amount TBD
+#' @param n_calibration_pairs TBD
+#' @param calibration_group_size TBD
+#' @param print_progress TBD
+#' @param parallel TBD
+#'
 #' @export
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
@@ -39,6 +49,13 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 }
 
 
+#' Run power check
+#'
+#' @param sceptre_object TBD
+#' @param output_amount TBD
+#' @param print_progress TBD
+#' @param parallel TBD
+#'
 #' @export
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
@@ -72,6 +89,13 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 }
 
 
+#' Run discovery analysis
+#'
+#' @param sceptre_object TBD
+#' @param output_amount TBD
+#' @param print_progress TBD
+#' @param parallel TBD
+#'
 #' @export
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
@@ -153,6 +177,11 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
 }
 
 
+#' Get result
+#'
+#' @param sceptre_object TBD
+#' @param analysis TBD
+#'
 #' @export
 get_result <- function(sceptre_object, analysis) {
   if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
@@ -165,4 +194,47 @@ get_result <- function(sceptre_object, analysis) {
                              run_discovery_analysis = "discovery_result")
   out <- methods::slot(sceptre_object, field_to_extract)
   return(out)
+}
+
+
+#' Write outputs to directory
+#'
+#' @param sceptre_object TBD
+#' @param directory TBD
+#'
+#' @export
+write_outputs_to_directory <- function(sceptre_object, directory) {
+  # 0. create directory
+  if (!dir.exists(directory)) {
+    dir.create(path = directory, recursive = TRUE)
+  }
+
+  # 1. create analysis_summary.txt file
+  summary_file_fp <- paste0(directory, "/analysis_summary.txt")
+  sink(file = summary_file_fp, append = FALSE)
+  print(sceptre_object)
+  sink(NULL)
+
+  # 2. determine the functions that have been called
+  plotting_params <- list(device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
+  functs_run <- sceptre_object@functs_called
+  functs_run_plots <- functs_run[names(functs_run) %in% c("assign_grnas", "run_qc", "run_calibration_check", "run_power_check", "run_discovery_analysis")]
+  functs_run_plots <- c(functs_run_plots, "grna_count_distributions" = TRUE)
+  for (funct in names(functs_run_plots)) {
+    if (functs_run_plots[[funct]]) {
+      plotting_params$plot <- do.call(what = paste0("plot_", funct), args = list(sceptre_object))
+      plotting_params$filename <- paste0(directory, "/plot_", funct, ".png")
+      do.call(what = ggplot2::ggsave, args = plotting_params)
+    }
+  }
+
+  # 3. save results
+  for (analysis in c("run_calibration_check", "run_power_check", "run_discovery_analysis")) {
+    if (functs_run_plots[[analysis]]) {
+      res <- get_result(sceptre_object = sceptre_object, analysis = analysis)
+      saveRDS(object = res, file = paste0(directory, "/results_", analysis, ".rds"))
+    }
+  }
+
+  return(NULL)
 }

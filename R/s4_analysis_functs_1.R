@@ -182,7 +182,22 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
 }
 
 
-# step 2: set analysis parameters
+#' Set analysis parameters
+#'
+#' @param sceptre_object TBD
+#' @param discovery_pairs TBD
+#' @param positive_control_pairs TBD
+#' @param formula_object TBD
+#' @param side TBD
+#' @param fit_parametric_curve TBD
+#' @param control_group TBD
+#' @param resampling_mechanism TBD
+#' @param B1 TBD
+#' @param B2 TBD
+#' @param B3 TBD
+#' @param multiple_testing_method TBD
+#' @param multiple_testing_alpha TBD
+#'
 #' @export
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
@@ -255,7 +270,14 @@ set_analysis_parameters <- function(sceptre_object,
 }
 
 
-# step 3: assign grnas to cells
+#' Assign gRNAs to cells
+#'
+#' @param sceptre_object TBD
+#' @param method TBD
+#' @param hyperparameters TBD
+#' @param print_progress TBD
+#' @param parallel TBD
+#'
 #' @export
 assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
@@ -306,7 +328,16 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
 }
 
 
-# step 4: run cellwise and pairwise qc
+#' Run QC
+#'
+#' @param sceptre_object TBD
+#' @param n_nonzero_trt_thresh TBD
+#' @param n_nonzero_cntrl_thresh TBD
+#' @param response_n_umis_range TBD
+#' @param response_n_nonzero_range TBD
+#' @param p_mito_threshold TBD
+#' @param additional_cells_to_remove TBD
+#'
 #' @export
 run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,

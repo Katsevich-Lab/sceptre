@@ -13,7 +13,14 @@ construct_cis_pairs(
 )
 }
 \arguments{
-\item{distance_threshold}{}
+\item{sceptre_object}{TBD}
+
+\item{distance_threshold}{TBD}
+
+\item{grna_groups_to_exclude}{TBD}
+}
+\value{
+TBD
 }
 \description{
 Construct cis pairs

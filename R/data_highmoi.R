@@ -44,3 +44,10 @@ NULL
 #' @inheritSection highmoi_data Overview
 #' @usage data(grna_group_data_frame_highmoi)
 "grna_group_data_frame_highmoi"
+
+#' gene names high MOI
+#'
+#' A vector giving the human-readable "name" of each gene.
+#' @inheritSection highmoi_data Overview
+#' @usage data(gene_names_highmoi)
+"gene_names_highmoi"
