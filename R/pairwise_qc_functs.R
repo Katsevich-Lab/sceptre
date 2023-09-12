@@ -55,10 +55,10 @@ compute_qc_metrics <- function(sceptre_object) {
   for (i in c(1L, 2L)) {
     data_frame_name <- data_frame_names[i]
     n_ok_pairs_name <- n_ok_pair_names[i]
-    if (nrow(slot(sceptre_object, data_frame_name)) >= 1L) {
-      slot(sceptre_object, data_frame_name) <- slot(sceptre_object, data_frame_name) |>
+    if (nrow(methods::slot(sceptre_object, data_frame_name)) >= 1L) {
+      methods::slot(sceptre_object, data_frame_name) <- methods::slot(sceptre_object, data_frame_name) |>
         dplyr::mutate(pass_qc = (n_nonzero_trt >= n_nonzero_trt_thresh & n_nonzero_cntrl >= n_nonzero_cntrl_thresh))
-      slot(sceptre_object, n_ok_pairs_name) <- sum(slot(sceptre_object, data_frame_name)$pass_qc)
+      methods::slot(sceptre_object, n_ok_pairs_name) <- sum(methods::slot(sceptre_object, data_frame_name)$pass_qc)
     }
   }
   return(sceptre_object)

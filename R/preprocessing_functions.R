@@ -91,7 +91,6 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
     stop("The `formula_object` contains redundant information. This often occurs when one variable is `nested` inside another. For example, if the data frame contains a column `lane` with levels `lane_1`, `lane_2`, `lane_3`, and `lane_4` and a column `batch` with levels `batch_1` and `batch_2`, and if `lane_1` and `lane_2` are contained entirely within `batch_1` while `lane_3` and `lane_4` are contained entirely within `batch`2`, then `batch` is redundant. In this case `batch` should be removed from the formula object.")
   }
   return(global_cell_covariates_new)
-  return(sceptre_object)
 }
 
 

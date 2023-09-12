@@ -70,7 +70,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_group_da
   # 11. verify that the types of the extra covariates are acceptable
   for (extra_covariate_name in extra_covariate_names) {
     v <- extra_covariates[,extra_covariate_name]
-    accept_type <- is(v, "numeric") || is(v, "character") || is(v, "factor")
+    accept_type <- methods::is(v, "numeric") || methods::is(v, "character") || methods::is(v, "factor")
     if (!accept_type) {
       stop(paste0("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor."))
     }

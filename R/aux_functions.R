@@ -39,7 +39,7 @@ auto_construct_formula_object <- function(cell_covariates, include_grna_covariat
     }
     return(out)
   }) |> paste0(collapse = " + ")
-  form <- paste0("~ ", form_str) |> as.formula()
+  form <- paste0("~ ", form_str) |> stats::as.formula()
   return(form)
 }
 

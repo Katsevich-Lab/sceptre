@@ -1,10 +1,10 @@
 #' Construct cis pairs
 #'
-#' @param sceptre_object
-#' @param grna_groups_to_exclude
-#' @param distance_threshold
+#' @param sceptre_object TBD
+#' @param grna_groups_to_exclude TBD
+#' @param distance_threshold TBD
 #'
-#' @return
+#' @return TBD
 #' @export
 construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, grna_groups_to_exclude = character(),
                              response_grna_group_pairs_to_exclude = data.frame(), ref_genome = "10X_GRCh38_2020") {
@@ -52,10 +52,10 @@ construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, gr
 
 #' Return all pairs
 #'
-#' @param sceptre_object
-#' @param grna_groups_to_exclude
+#' @param sceptre_object TBD
+#' @param grna_groups_to_exclude TBD
 #'
-#' @return
+#' @return TBD
 #' @export
 construct_all_pairs <- function(sceptre_object, grna_groups_to_exclude = character(), response_grna_group_pairs_to_exclude = data.frame()) {
   response_ids <- rownames(sceptre_object@response_matrix) |> factor()

@@ -1,4 +1,7 @@
-utils::globalVariables(c("log_theta", "mean_gene_exp", "regularized", "pod_id", "id", "gRNA_id", "gene_id", "offset_file", "size_unreg_file", "precomp_file", "result_file", "geom_mean_file", "curve", "fitted", "gaussian", "lower", "upper", "..density..", "y", "%dopar%", "foreach", "registerDoParallel", "xi", "omega", "alpha", "nu", "gene_size_loc", "gene_matrix", "pvalue", "r", "expected", "clower", "cupper", "gRNA_group", "grna_group", "p_value", "response_id", "B2", "B3", "full_test_stat", "p_adj", "reject", "log_2_fold_change", "density", "run_permutations", "side_code", "low_moi", "control_group_complement"))
+utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assignment", "g",
+                         "multiple_grnas", "x", "grna_id", "grna_expressions_bin", "bin_counts",
+                         "significant", "lab", "p_values", "pass_qc", "fraction_cells_removed",
+                         "grna_id", "pass_qc"))
 
 #' sceptre
 #'

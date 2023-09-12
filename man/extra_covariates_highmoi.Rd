@@ -5,7 +5,7 @@
 \alias{extra_covariates_highmoi}
 \title{Covariate matrix}
 \format{
-An object of class \code{data.frame} with 47123 rows and 1 columns.
+An object of class \code{data.frame} with 45919 rows and 1 columns.
 }
 \usage{
 data(extra_covariates_highmoi)
