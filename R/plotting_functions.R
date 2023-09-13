@@ -12,8 +12,9 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 #' Plot the number of cells per gRNA count
 #'
+#' @param sceptre_object TBD
 #' @param n_grnas_to_plot  (optional; default \code{4}) the number of different gRNAs to plot
-#' @param grnas_to_plot (optional; \default{NULL}) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.
+#' @param grnas_to_plot (optional; default NULL) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.
 #' @param threshold (optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
 #'
 #' @return a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bins grow exponentially fast in size.
@@ -114,14 +115,18 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 
 #' Plot the number of gRNAs per cell
 #'
+#' @param sceptre_object TBD
 #' @param n_grnas_to_plot (optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
 #' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.
+#' @param transparency TBD
+#' @param point_size TBD
 #' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
 #' @param n_max_0_grna_unprtb_plot (optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.
+#' @param return_indiv_plots TBD
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
-plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, return_indiv_plots = FALSE, n_max_0_grna_unprtb_plot = 1000) {
+plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
@@ -167,7 +172,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
   # in low moi we want to have a legend for the shape parameter
   # to save space, we'll do it inside the first panel and just for
   # one level of the variable
-  if(lowmoi) {
+  if (lowmoi) {
     # setting up the data for making the legend as a geom
     annotate_df <- data.frame(
       assignment = "perturbed",
@@ -245,7 +250,10 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
 #' \item{bottom right:} a text box displaying (i) the number of false discoveries made on the negative control pairs and (ii) the mean estimated log-fold change. The number of false discoveries ideally should be zero, although a small, positive integer (such as 1, 2, or 3) also is OK. The mean estimated log-fold change should be a numeric value close to zero.
 #' }
 #'
-#' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
+#' @param sceptre_object  TBD
+#' @param return_indiv_plots TBD
+#' @param point_size TBD
+#' @param transparency TBD
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
@@ -295,7 +303,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
     my_theme
 
   p_c <- ggplot2::ggplot(data = calibration_result |> dplyr::filter(abs(log_2_fold_change) < 0.6),
-                         mapping = ggplot2::aes(x = log_2_fold_change, ggplot2::after_stat(density))) +
+                         mapping = ggplot2::aes(x = log_2_fold_change)) +
     ggplot2::geom_histogram(binwidth = 0.02, fill = "grey90", col = "black", boundary = 0) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
@@ -525,11 +533,15 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency
 #'
 #' The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
 #'
+#' @param sceptre_object TBD
+#' @param point_size TBD
+#' @param transparency TBD
+#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.
 #' @param return_indiv_plots (optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.
-#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to}, for better visualization. If \code{clip_to=0} is used then no clipping is done.
+#'
 #' @return a single \code{ggplot2} plot.
 #' @export
-plot_run_power_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
+plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20, return_indiv_plots = FALSE) {
   calibration_result <- sceptre_object@power_result
   if (nrow(calibration_result) == 0L) stop("Power check not yet called.")
   my_theme <- get_my_theme()

@@ -30,6 +30,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' Print
 #'
 #' @param x a sceptre_object
+#' @param ... TDB
 #' @export
 setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
   args <- list(...)
@@ -106,8 +107,11 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
 #' Plot
 #'
 #' @param x a sceptre_object
+#' @param y discarded
+#' @param ... TBD
+#'
 #' @export
-setMethod("plot", signature = signature("sceptre_object"), function(x, ...) {
+setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
   args <- list(...)
   args[["sceptre_object"]] <- x
 

@@ -1,13 +1,15 @@
 #' Construct cis pairs
 #'
 #' @param sceptre_object TBD
-#' @param grna_groups_to_exclude TBD
 #' @param distance_threshold TBD
+#' @param grna_groups_to_exclude TBD
+#' @param response_grna_group_pairs_to_exclude TBD
+#' @param ref_genome TBD
 #'
 #' @return TBD
 #' @export
 construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, grna_groups_to_exclude = character(),
-                             response_grna_group_pairs_to_exclude = data.frame(), ref_genome = "10X_GRCh38_2020") {
+                                response_grna_group_pairs_to_exclude = data.frame(), ref_genome = "10X_GRCh38_2020") {
   if (ref_genome != "10X_GRCh38_2020") {
     stop("The only reference genome currently available is the GRCh38 (2020) reference genome provided by 10X.")
   }
@@ -54,6 +56,7 @@ construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, gr
 #'
 #' @param sceptre_object TBD
 #' @param grna_groups_to_exclude TBD
+#' @param response_grna_group_pairs_to_exclude TBD
 #'
 #' @return TBD
 #' @export
