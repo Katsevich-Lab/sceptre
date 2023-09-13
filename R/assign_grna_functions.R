@@ -1,7 +1,5 @@
-# The possible fields in the output are grna_group_idxs, all_nt_idxs, indiv_nt_grna_idxs.
-# If in high moi, we always return the gRNA-group-to-idx map (grna_group_idxs) for the non-targeting gRNA groups; if we are running a calibration check, we additionally return the individual NT gRNA idxs (indiv_nt_grna_idxs). This latter vector is absolute (i.e., not relative to any other vector).
-# If in low moi, we likewise always return the gRNA-group-to-idx map for the non-targeting gRNA groups. If the control group is the NT cells, we additionally return all_nt_idxs, which is the set of NT cell idxs. Finally, if we are running a calibration check, we return the indices of the individual NT gRNAs. If the control group is the NT cells, then these indices are relative to the NT cells. If the control group is the complement set, then these indices are absolute.
 assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
+  # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
   grna_group_data_frame <- sceptre_object@grna_group_data_frame
   low_moi <- sceptre_object@low_moi
@@ -46,15 +44,16 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
 
 
 assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold) {
-  # 1. make the grna expression matrix row-accessible
+  # 1. make the grna expression matrix row-accessible; ensure threshold is numeric
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
+  grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
   # 2. perform the assignments
   initial_assignment_list <- sapply(grna_ids, function(grna_id) {
-    g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                      row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
-    which(g >= grna_assign_threshold)
+    threshold_count_matrix(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                           row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix),
+                           threshold = grna_assign_threshold)
   })
 
   return(initial_assignment_list)

@@ -126,3 +126,7 @@ increment_vector <- function(x, value) {
     invisible(.Call(`_sceptre_increment_vector`, x, value))
 }
 
+threshold_count_matrix <- function(j, p, x, row_idx, n_cells, threshold) {
+    .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, n_cells, threshold)
+}
+

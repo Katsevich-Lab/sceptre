@@ -26,6 +26,3 @@ a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with b
 \description{
 Plot the number of cells per gRNA count
 }
-\examples{
-TODO
-}

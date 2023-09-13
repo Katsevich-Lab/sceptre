@@ -19,8 +19,6 @@ get_my_theme <- function(element_text_size = 11) {
 #'
 #' @return a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bins grow exponentially fast in size.
 #' @export
-#'
-#' @examples TODO
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   # rounding just in case the user provides a non-integer one
@@ -126,7 +124,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
-plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
+plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
@@ -138,27 +136,31 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
     multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- grna_matrix[grna_id,] # all cell UMI counts for this grna
-    data.frame(g = g,
-               assignment = ifelse(assignment, "perturbed", "unperturbed") |> factor(),
-               grna_id = grna_id |> factor(),
-               # making this a factor so the ordering never changes
-               multiple_grnas = ifelse(multiple_grnas, "yes", "no") |> factor(levels=c("no","yes")))
+    g <- load_csr_row(j = grna_matrix@j,
+                      p = grna_matrix@p,
+                      x = grna_matrix@x,
+                      row_idx = which(grna_id == rownames(grna_matrix)),
+                      n_cells = ncol(grna_matrix))
+    df <- data.frame(g = g,
+                     assignment = ifelse(assignment, "pert", "unpert") |> factor(),
+                     grna_id = grna_id |> factor(),
+                     multiple_grnas = multiple_grnas)
+    # if in low MOI, remove cells containing multiple gRNAs
+    if (sceptre_object@low_moi) df <- df |> dplyr::filter(!multiple_grnas)
+    return(df)
   }) |> data.table::rbindlist()
 
   # downsampling the unperturbed cells with 0 grna expression, if the number of those cells
   # exceeds `n_max_0_grna_unprtb_plot`.
   is_0_grna_and_unperturbed <- with(to_plot_a, assignment == "unperturbed" & g == 0)
-  if(sum(is_0_grna_and_unperturbed) > n_max_0_grna_unprtb_plot) {
+  if (sum(is_0_grna_and_unperturbed) > n_max_0_grna_unprtb_plot) {
     idx_to_remove <- rownames(to_plot_a)[is_0_grna_and_unperturbed] |>
       sample(sum(is_0_grna_and_unperturbed) - n_max_0_grna_unprtb_plot)
     to_plot_a <- to_plot_a[! rownames(to_plot_a) %in% idx_to_remove, ]
   }
 
   # plot a
-  p_a <- ggplot2::ggplot(data = to_plot_a, mapping = (if (lowmoi) {
-    ggplot2::aes(x = assignment, y = g, col = assignment, shape = multiple_grnas)
-  } else ggplot2::aes(x = assignment, y = g, col = assignment))) +
+  p_a <- ggplot2::ggplot(data = to_plot_a, mapping = ggplot2::aes(x = assignment, y = g, col = assignment)) +
     ggplot2::geom_jitter(alpha = transparency, size = point_size) +
     ggplot2::facet_wrap(nrow = 1, facets = grna_id ~ ., scales = "free_y") +
     ggplot2::scale_y_continuous(trans = "log1p", breaks = c(0, 1, 5, 15, 50, 200, 1000, 5000, 10000)) +
@@ -168,27 +170,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
     ggplot2::theme(legend.position = "none") +
     ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
     ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
-
-  # in low moi we want to have a legend for the shape parameter
-  # to save space, we'll do it inside the first panel and just for
-  # one level of the variable
-  if (lowmoi) {
-    # setting up the data for making the legend as a geom
-    annotate_df <- data.frame(
-      assignment = "perturbed",
-      g = .5,
-      # making sure it's in the first panel
-      grna_id = factor(levels(to_plot_a$grna_id)[1], levels = levels(to_plot_a$grna_id)),
-      multiple_grnas = NA # just need this column here, but the color is overwritten
-    )
-    p_a <- p_a + ggplot2::geom_label(
-      data = annotate_df,
-      label = c("\U25B2 cells with\nmultiple gRNAs"),
-      color="black",
-      size = 2.5,
-      label.padding = ggplot2::unit(0.1, "lines"),
-    )
-  }
 
   # plot b
   n_cells_per_grna <- sceptre_object@cells_per_grna
@@ -219,8 +200,8 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
                                   expand = c(0, 0),
                                   breaks = 10^(1:8)) +
       get_my_theme() + ggplot2::ylab("Frequency") +
-      ggplot2::ggtitle("gRNAs per cell") +
-      ggplot2::xlab("gRNAs per cell") +
+      ggplot2::ggtitle("N gRNAs per cell") +
+      ggplot2::xlab("N gRNAs") +
       ggplot2::geom_vline(xintercept = mean(n_grnas_per_cell), col = "darkorchid1", lwd = 1.0) +
       ggplot2::annotate(geom = "text", label = paste0("MOI = ", round(moi, 2)),
                         x = Inf, y = Inf, vjust = 2.0, hjust = 1, col = "darkorchid1", size = 3.0)
@@ -264,9 +245,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 2L, grnas_to_plo
 #' \item{The number of false discoveries depends both on \code{alpha} and \code{multiple_testing_correction}. The default value of these arguments is 0.1 and "BH". This corresponds to a BH correction at nominal false discovery rate (FDR) 0.1.}
 #' \item{Technical point: when applying BH at level 0.1 to a collection of strictly null p-values, BH controls family-wise error rate (FWER) at level 0.1 as well as FDR at level 0.1. FWER is the probability of making one or more false discoveries. Thus, with probability 0.9, the number of rejections that BH makes on (well-calibrated) null p-values at level 0.1 is 0. This implies that \code{sceptre} (or any method for that matter) should make about zero false discoveries on negative control p-values data after applying a BH correction at level 0.1.}
 #' }
-#' @examples
-#' # See the example in the run_sceptre_lowmoi help file.
-#' ?run_sceptre_lowmoi
 plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 0.55, transparency = 0.8) {
   calibration_result <- sceptre_object@calibration_result
   if (nrow(calibration_result) == 0L) stop("Calibration check not yet called.")
@@ -566,7 +544,7 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
     data = df,
     mapping = ggplot2::aes(x = lab, y = p_values, color=lab)
   )
-  if(clip_to > 0) {
+  if (clip_to > 0) {
     p <- p + ggplot2::geom_hline(yintercept = clip_to, linetype = "dashed", color = "grey90")
   }
   p <- p +
