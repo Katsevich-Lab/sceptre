@@ -6,7 +6,7 @@
 \usage{
 plot_assign_grnas(
   sceptre_object,
-  n_grnas_to_plot = 2L,
+  n_grnas_to_plot = 3L,
   grnas_to_plot = NULL,
   transparency = 0.8,
   point_size = 0.9,

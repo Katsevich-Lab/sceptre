@@ -3,6 +3,8 @@
 #include "shared_low_level_functions.h"
 using namespace Rcpp;
 
+// THIS CODE CURRENTLY IS DEPRECATED
+
 /*
 // [[Rcpp::export]]
 double compute_observed_distilled_statistic(NumericVector a, NumericVector b, int n_cntrl) {

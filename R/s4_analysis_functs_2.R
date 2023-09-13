@@ -1,7 +1,6 @@
 #' Run calibration check
 #'
-#' @param sceptre_object
-#'
+#' @param sceptre_object TBD
 #' @param output_amount TBD
 #' @param n_calibration_pairs TBD
 #' @param calibration_group_size TBD

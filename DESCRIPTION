@@ -1,5 +1,5 @@
 Package: sceptre
-Title: Robust Differential Expression Analysis for Single-Cell CRISPR Screens
+Title: Analysis of Single-Cell CRISPR Screen Data
 Version: 0.4.0
 Authors@R: 
     c(person(given = "Timothy",
@@ -10,6 +10,9 @@ Authors@R:
            family = "Katsevich",
            role = c("aut", "ths"),
            email = "ekatsevi@wharton.upenn.edu"),
+           person(given = "Joseph",
+           family = "Deutsch",
+           role = c("ctb")),
            person(given = "John",
            family = "Morris",
            role = c("ctb")),
@@ -23,11 +26,9 @@ Authors@R:
            family = "Roeder",
            role = "ths")
            )
-Description: `sceptre` is a resource-light, fast, and statistically principled software for single-cell CRISPR screen analysis. `sceptre` is powered by methodological and algorithmic advances in robust association testing for single-cell data. 
+Description: `sceptre` powers statistically rigorous, computationally efficient, and user-friendly single-cell CRISPR screen analysis. 
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
-LazyDataCompression: bzip2
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 LinkingTo: Rcpp, BH

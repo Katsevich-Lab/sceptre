@@ -14,7 +14,7 @@ run_calibration_check(
 )
 }
 \arguments{
-\item{sceptre_object}{}
+\item{sceptre_object}{TBD}
 
 \item{output_amount}{TBD}
 
