@@ -31,7 +31,7 @@ NULL
 #'   \item{\code{bio_rep}}{(factor) the biological replicate in which the cell was sequenced (\code{rep_1}, \code{rep_2}, or \code{rep_3})}
 #' }
 #' @inheritSection lowmoi_data Overview
-#' @usage data(covariate_data_frame_lowmoi)
+#' @usage data(extra_covariates_lowmoi)
 "extra_covariates_lowmoi"
 
 
@@ -42,6 +42,7 @@ NULL
 #' @inheritSection lowmoi_data Overview
 #' @usage data(grna_group_data_frame_lowmoi)
 "grna_group_data_frame_lowmoi"
+
 
 #' gRNA group data frame
 #'

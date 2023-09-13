@@ -8,6 +8,10 @@
 }
 \arguments{
 \item{x}{a sceptre_object}
+
+\item{y}{discarded}
+
+\item{...}{TBD}
 }
 \description{
 Plot

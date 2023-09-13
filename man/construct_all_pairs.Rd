@@ -14,6 +14,8 @@ construct_all_pairs(
 \item{sceptre_object}{TBD}
 
 \item{grna_groups_to_exclude}{TBD}
+
+\item{response_grna_group_pairs_to_exclude}{TBD}
 }
 \value{
 TBD

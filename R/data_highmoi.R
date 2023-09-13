@@ -35,7 +35,7 @@ NULL
 #'
 #' The positive control response-gRNA group pairs, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
 #' @inheritSection highmoi_data Overview
-#' @usage data(discovery_pairs_highmoi)
+#' @usage data(pc_pairs_highmoi)
 "pc_pairs_highmoi"
 
 #' gRNA groups table

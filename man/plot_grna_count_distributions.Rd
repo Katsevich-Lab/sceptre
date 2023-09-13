@@ -12,9 +12,11 @@ plot_grna_count_distributions(
 )
 }
 \arguments{
+\item{sceptre_object}{TBD}
+
 \item{n_grnas_to_plot}{(optional; default \code{4}) the number of different gRNAs to plot}
 
-\item{grnas_to_plot}{(optional; \default{NULL}) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.}
+\item{grnas_to_plot}{(optional; default NULL) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.}
 
 \item{threshold}{(optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.}
 }

@@ -18,6 +18,10 @@ construct_cis_pairs(
 \item{distance_threshold}{TBD}
 
 \item{grna_groups_to_exclude}{TBD}
+
+\item{response_grna_group_pairs_to_exclude}{TBD}
+
+\item{ref_genome}{TBD}
 }
 \value{
 TBD

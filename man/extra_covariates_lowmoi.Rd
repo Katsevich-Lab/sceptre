@@ -8,7 +8,7 @@
 An object of class \code{data.frame} with 20729 rows and 1 columns.
 }
 \usage{
-data(covariate_data_frame_lowmoi)
+data(extra_covariates_lowmoi)
 }
 \description{
 A data frame containing the cell-specific technical factors beyond those that \code{sceptre} can compute:

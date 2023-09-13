@@ -10,18 +10,24 @@ plot_assign_grnas(
   grnas_to_plot = NULL,
   transparency = 0.8,
   point_size = 0.9,
-  return_indiv_plots = FALSE,
-  n_max_0_grna_unprtb_plot = 1000
+  n_max_0_grna_unprtb_plot = 1000,
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
+\item{sceptre_object}{TBD}
+
 \item{n_grnas_to_plot}{(optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.}
 
 \item{grnas_to_plot}{(optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?}
+\item{transparency}{TBD}
+
+\item{point_size}{TBD}
 
 \item{n_max_0_grna_unprtb_plot}{(optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.}
+
+\item{return_indiv_plots}{TBD}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).

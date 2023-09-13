@@ -1,14 +1,13 @@
 #' Import data from cellranger
 #'
-#' @param directories a vector of directories containing the count matrices
+#' @param directories TBD
+#' @param moi TBD
+#' @param grna_group_data_frame TBD
 #'
 #' @return a sceptre_object initialized
 #' @export
 #'
 #' @examples
-#' # download the directory
-#' # curl -O https://www.dropbox.com/scl/fi/527tbrn2s9no0kvk1sxys/sceptre_import_ex.zip?rlkey=dymf9c9vvi6l1oqubp44brakc&dl=1
-#' # unzip etc.
 #'
 #' \dontrun{
 #' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"

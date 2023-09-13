@@ -6,16 +6,22 @@
 \usage{
 plot_run_power_check(
   sceptre_object,
-  return_indiv_plots = FALSE,
   point_size = 1,
   transparency = 0.8,
-  clip_to = 1e-20
+  clip_to = 1e-20,
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{return_indiv_plots}{(optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.}
+\item{sceptre_object}{TBD}
 
-\item{clip_to}{(optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to}, for better visualization. If \code{clip_to=0} is used then no clipping is done.}
+\item{point_size}{TBD}
+
+\item{transparency}{TBD}
+
+\item{clip_to}{(optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.}
+
+\item{return_indiv_plots}{(optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.}
 }
 \value{
 a single \code{ggplot2} plot.

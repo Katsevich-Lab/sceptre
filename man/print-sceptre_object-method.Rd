@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{a sceptre_object}
+
+\item{...}{TDB}
 }
 \description{
 Print

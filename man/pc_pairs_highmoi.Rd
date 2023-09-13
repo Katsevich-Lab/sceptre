@@ -8,7 +8,7 @@
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 10 rows and 2 columns.
 }
 \usage{
-data(discovery_pairs_highmoi)
+data(pc_pairs_highmoi)
 }
 \description{
 The positive control response-gRNA group pairs, with columns \code{response_id} (required), \code{grna_group} (required), and \code{type} (optional).

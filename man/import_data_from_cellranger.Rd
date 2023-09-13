@@ -7,7 +7,11 @@
 import_data_from_cellranger(directories, moi, grna_group_data_frame)
 }
 \arguments{
-\item{directories}{a vector of directories containing the count matrices}
+\item{directories}{TBD}
+
+\item{moi}{TBD}
+
+\item{grna_group_data_frame}{TBD}
 }
 \value{
 a sceptre_object initialized
@@ -16,9 +20,6 @@ a sceptre_object initialized
 Import data from cellranger
 }
 \examples{
-# download the directory
-# curl -O https://www.dropbox.com/scl/fi/527tbrn2s9no0kvk1sxys/sceptre_import_ex.zip?rlkey=dymf9c9vvi6l1oqubp44brakc&dl=1
-# unzip etc.
 
 \dontrun{
 base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"

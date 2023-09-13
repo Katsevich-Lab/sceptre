@@ -12,7 +12,13 @@ plot_run_calibration_check(
 )
 }
 \arguments{
-\item{return_indiv_plots}{(optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?}
+\item{sceptre_object}{TBD}
+
+\item{return_indiv_plots}{TBD}
+
+\item{point_size}{TBD}
+
+\item{transparency}{TBD}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
