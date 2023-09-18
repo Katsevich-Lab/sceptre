@@ -447,12 +447,13 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 #' @param point_size TBD
 #'
 #' @export
-plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, transparency = 0.8, point_size = 0.55) {
+plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, downsample_pairs = 10000L, transparency = 0.8, point_size = 0.55) {
   my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
   discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
     dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
     dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
+  if (nrow(discovery_pairs) >= downsample_pairs) discovery_pairs <- discovery_pairs |> dplyr::sample_n(downsample_pairs)
 
   # pairwise QC
   p_b <- ggplot2::ggplot(data = discovery_pairs,
