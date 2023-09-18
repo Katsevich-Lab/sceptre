@@ -31,12 +31,6 @@ NULL
 #' @usage data(extra_covariates_highmoi)
 "extra_covariates_highmoi"
 
-#' Positive control gene-gRNA group pairs
-#'
-#' The positive control response-gRNA group pairs, with columns `response_id` (required), `grna_group` (required), and `type` (optional).
-#' @inheritSection highmoi_data Overview
-#' @usage data(pc_pairs_highmoi)
-"pc_pairs_highmoi"
 
 #' gRNA groups table
 #'
@@ -44,6 +38,7 @@ NULL
 #' @inheritSection highmoi_data Overview
 #' @usage data(grna_group_data_frame_highmoi)
 "grna_group_data_frame_highmoi"
+
 
 #' gene names high MOI
 #'

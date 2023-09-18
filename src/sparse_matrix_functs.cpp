@@ -91,7 +91,7 @@ List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int 
       }
     }
     assignment_vect[k] = curr_maximizer + 1;
-    frac_umis[k] =curr_max/grna_lib_size[k];
+    frac_umis[k] = curr_max/grna_lib_size[k];
   }
   return(List::create(Named("assignment_vect") = assignment_vect, Named("frac_umis") = frac_umis));
 }
@@ -99,8 +99,7 @@ List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int 
 
 // [[Rcpp::export]]
 IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells) {
-  IntegerVector out(n_cells);
-  IntegerVector current_assignments;
+  IntegerVector out(n_cells), current_assignments;
   for (int i = 0; i < grna_assignments.size(); i ++) {
     current_assignments = grna_assignments[i];
     for (int j = 0; j < current_assignments.size(); j ++) {

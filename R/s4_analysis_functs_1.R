@@ -28,10 +28,9 @@
 #' print(sceptre_object)
 #'
 #' # 2. obtain the discovery and positive control pairs
-#' data(pc_pairs_lowmoi)
-#' positive_control_pairs <- pc_pairs_lowmoi
-#' discovery_pairs <- construct_all_pairs(sceptre_object = sceptre_object,
-#' response_grna_group_pairs_to_exclude = positive_control_pairs)
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
+#' positive_control_pairs = positive_control_pairs)
 #'
 #' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
@@ -90,21 +89,20 @@
 #' print(sceptre_object)
 #'
 #' # 2. obtain the response-gRNA group pairs to analyze
-#' data(pc_pairs_highmoi)
-#' pc_pairs <- pc_pairs_highmoi
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 #' discovery_pairs <- construct_cis_pairs(sceptre_object,
-#' grna_groups_to_exclude = pc_pairs$grna_group,
+#' positive_control_pairs = positive_control_pairs,
 #' distance_threshold = 5e6)
 #'
 #' # 3. set the analysis parameters
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
 #' discovery_pairs = discovery_pairs,
-#' positive_control_pairs = pc_pairs,
+#' positive_control_pairs = positive_control_pairs,
 #' side = "left")
 #' print(sceptre_object)
 #'
-#' # 4 (optional). manually assign grnas, run QC
+#' # 4 (optional) manually assign grnas, run QC
 #' plot_grna_count_distributions(sceptre_object)
 #' sceptre_object <- sceptre_object |> assign_grnas()
 #' plot(sceptre_object)
@@ -130,18 +128,17 @@
 #' print(sceptre_object)
 #'
 #' # 8. obtain results; write outputs to directory
-#' discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, response_names = NULL) {
-  # 0. handle default parameters
-  if (is.null(response_names)) response_names <- rownames(response_matrix)
-
+import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix,
                            grna_group_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix, grna_matrix, extra_covariates, response_names)
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix = response_matrix,
+                                                       grna_matrix = grna_matrix,
+                                                       extra_covariates = extra_covariates,
+                                                       response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names)
 
   # 3. make the response matrix row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
@@ -152,6 +149,7 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
   sceptre_object@grna_matrix <- grna_matrix
   sceptre_object@covariate_data_frame <- covariate_data_frame
   sceptre_object@grna_group_data_frame <- grna_group_data_frame
+  sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
   if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
 

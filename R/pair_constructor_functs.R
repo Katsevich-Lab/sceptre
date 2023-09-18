@@ -8,18 +8,18 @@
 #'
 #' @return TBD
 #' @export
-construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, grna_groups_to_exclude = character(),
-                                response_grna_group_pairs_to_exclude = data.frame(), ref_genome = "10X_GRCh38_2020") {
+construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
+                                exclude_pc_grna_groups = TRUE, ref_genome = "10X_GRCh38_2020") {
   if (ref_genome != "10X_GRCh38_2020") {
     stop("The only reference genome currently available is the GRCh38 (2020) reference genome provided by 10X.")
   }
   grna_group_data_frame <- data.table::as.data.table(sceptre_object@grna_group_data_frame)
   gene_ids <- rownames(sceptre_object@response_matrix)
   distance_threshold <- as.integer(distance_threshold)
+  grna_groups_to_exclude <- c("non-targeting", if (exclude_pc_grna_groups) positive_control_pairs$grna_group else NULL)
 
   # 1. subset grna group data frame so as to exclude non-targeting gRNAs and gRNA groups in grna_groups_to_exclude
-  grna_group_data_frame <- grna_group_data_frame |>
-    dplyr::filter(!(grna_group %in% c(grna_groups_to_exclude, "non-targeting")))
+  grna_group_data_frame <- grna_group_data_frame |> dplyr::filter(!(grna_group %in% grna_groups_to_exclude))
 
   # 2. subset gene_table so that only genes within response matrix remain
   gene_table <- gene_table |> dplyr::filter(gene_id %in% gene_ids)
@@ -47,12 +47,13 @@ construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, gr
     }) |> data.table::rbindlist()
   }) |> data.table::rbindlist()
 
-  out_pairs <- exclude_pairs(out_pairs, response_grna_group_pairs_to_exclude)
   return(out_pairs)
 }
 
 
-#' Return all pairs
+#' Construct trans pairs
+#'
+#' A helper function to construct the trans pairs
 #'
 #' @param sceptre_object TBD
 #' @param grna_groups_to_exclude TBD
@@ -60,14 +61,34 @@ construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L, gr
 #'
 #' @return TBD
 #' @export
-construct_all_pairs <- function(sceptre_object, grna_groups_to_exclude = character(), response_grna_group_pairs_to_exclude = data.frame()) {
+construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), exclude_positive_control_pairs = TRUE) {
   response_ids <- rownames(sceptre_object@response_matrix) |> factor()
   grna_groups <- sceptre_object@grna_group_data_frame |>
-    dplyr::filter(!(grna_group %in% c(grna_groups_to_exclude, "non-targeting"))) |>
+    dplyr::filter(!(grna_group %in% "non-targeting")) |>
     dplyr::pull(grna_group) |> unique() |> factor()
   out_pairs <- expand.grid(response_id = response_ids, grna_group = grna_groups)
-  out_pairs <- exclude_pairs(out_pairs, response_grna_group_pairs_to_exclude)
+  if (exclude_positive_control_pairs) out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
   return(out_pairs)
+}
+
+
+#' Construct positive control pairs
+#'
+#' Helper function to construct the positive control pairs.
+#'
+#' @param sceptre_object TBD
+#' @param grna_groups_to_exclude TBD
+#' @param response_grna_group_pairs_to_exclude TBD
+#'
+#' @return TBD
+#' @export
+construct_positive_control_pairs <- function(sceptre_object) {
+  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  response_ids <- rownames(sceptre_object@response_matrix)
+  pc_grna_groups <- grna_group_data_frame$grna_group[
+    grna_group_data_frame$grna_group %in% response_ids] |> unique()
+  df <- data.frame(grna_group = pc_grna_groups, response_id = pc_grna_groups)
+  return(df)
 }
 
 

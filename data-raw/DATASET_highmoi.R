@@ -33,7 +33,7 @@ my_pc_grna_groups <- pairs_grouped |>
 pc_pairs <- pairs_grouped |>
   dplyr::filter(grna_group %in% my_pc_grna_groups, site_type == "pos_cntrl",
                 gene_id %in% gene_table$gene_id)
-discovery_pairs <- rbind(cis_pairs, pc_pairs) |>
+targeting_pairs <- rbind(cis_pairs, pc_pairs) |>
   dplyr::rename(type = site_type, response_id = gene_id)
 
 # 2. sample some set of negative control pairs
@@ -43,7 +43,7 @@ nt_grnas <- grna_feature_df |>
 
 # 3. construct the grna group table
 grna_group_data_frame_highmoi <- rbind(grna_feature_df |>
-  dplyr::filter(grna_group %in% discovery_pairs$grna_group) |>
+  dplyr::filter(grna_group %in% targeting_pairs$grna_group) |>
   dplyr::select(grna_id, grna_group),
   data.frame(grna_id = nt_grnas, grna_group = "non-targeting")) |>
   dplyr::arrange(grna_group)
@@ -60,55 +60,77 @@ target_group_loc_info <- grna_loc_info |> dplyr::filter(grna_group %in% targetin
 grna_group_data_frame_highmoi <- dplyr::left_join(x = grna_group_data_frame_highmoi,
                  y = target_group_loc_info, by = c("grna_group"))
 
-# 5. determine cells that contain at least one gRNA
+# 5. rename some of the grna groups
+renamed_grna_group <- pc_pairs$gene_id[match(x = grna_group_data_frame_highmoi$grna_group, table = pc_pairs$grna_group)]
+grna_group_data_frame_highmoi$grna_group[!is.na(renamed_grna_group)] <- renamed_grna_group[!is.na(renamed_grna_group)]
+enh_group_idxs <- grep(pattern = "chr", x = grna_group_data_frame_highmoi$grna_group)
+enh_groups <- grna_group_data_frame_highmoi$grna_group[enh_group_idxs]
+grna_group_data_frame_highmoi$grna_group[enh_group_idxs] <- factor(x = enh_groups, levels = unique(enh_groups),
+                                                                   labels = paste0("candidate_enh_", seq_along(unique(enh_groups)))) |>
+  as.character()
+
+# 6. reset the start and end positions
+grna_group_data_frame_highmoi <- dplyr::group_by(grna_group_data_frame_highmoi, grna_group) |>
+  dplyr::group_modify(.f = function(tbl, key) {
+    if (!all(is.na(tbl$start))) {
+      group_start <- min(tbl$start)
+      group_end <- max(tbl$end)
+      if (group_end - group_start == 1L) group_end <- group_end + 30
+      posits <- as.integer(floor(seq(group_start, group_end, length.out = nrow(tbl) + 1)))
+      tbl$start <- posits[seq(1, nrow(tbl))]
+      tbl$end <- posits[seq(2, nrow(tbl) + 1)]
+    }
+    return(tbl)
+  }) |> dplyr::relocate(grna_id)
+
+# 7. determine cells that contain at least one gRNA
 my_grna_ids <- unique(grna_group_data_frame_highmoi$grna_id)
 grna_matrix <- grna_odm[[my_grna_ids,]]
 cell_ids <- which(apply(X = as.matrix(grna_matrix >= 5), 2, any))
 
-# 4. construct the response and grna matrices; downsample cells
+# 8. construct the response and grna matrices; downsample cells
 multimodal_odm <- ondisc::multimodal_ondisc_matrix(covariate_ondisc_matrix_list = list(grna = grna_odm, gene = gene_odm))
 multimodal_odm_downsample <- multimodal_odm[,cell_ids]
 
-# 5. get the gene matrix, adding a couple MT genes for good measure
+# 9. get the gene matrix, adding a couple MT genes for good measure
 gene_sub <- ondisc::get_modality(multimodal_odm_downsample, "gene")
 all_gene_ids <- ondisc::get_feature_ids(gene_sub)
 mt_genes <- gene_table |> dplyr::filter(chr == "chrM", gene_id %in% all_gene_ids) |> dplyr::pull(gene_id)
-my_gene_ids <- c(unique(discovery_pairs$response_id), sample(mt_genes, 2))
+my_gene_ids <- c(unique(targeting_pairs$response_id), sample(mt_genes, 2))
 
 gene_matrix <- gene_sub[[my_gene_ids,]]
 rownames(gene_matrix) <- my_gene_ids
 
-# 6. get the grna matrix
+# 10. get the grna matrix
 grna_sub <- ondisc::get_modality(multimodal_odm_downsample, "grna")
 my_grna_ids <- unique(grna_group_data_frame_highmoi$grna_id)
 grna_matrix <- grna_sub[[my_grna_ids,]]
 rownames(grna_matrix) <- my_grna_ids
 
-# 7. Compute the covariate matrix
+# 11. Compute the covariate matrix
 covariate_matrix <- multimodal_odm_downsample |>
   ondisc::get_cell_covariates() |>
   dplyr::select(batch = gene_batch) |>
   `rownames<-`(NULL)
 
-# 8. sort according to batch; also remove cells containing no gRNAs
+# 12. sort according to batch; also remove cells containing no gRNAs
 cell_order <- order(covariate_matrix$batch)
 response_matrix_highmoi <- gene_matrix[,cell_order]
 grna_matrix_highmoi <- grna_matrix[,cell_order]
 covariate_data_frame_highmoi <- covariate_matrix[cell_order,,drop = FALSE]
 
-# 9. rename the data objects
-pc_pairs_highmoi <- discovery_pairs |> dplyr::filter(type == "pos_cntrl") |>
-  dplyr::select(-type)
+# 13. update gRNA ids
+curr_grna_ids <- grna_group_data_frame_highmoi$grna_id
+new_grna_ids <- paste0("grna_", substr(curr_grna_ids, 0, 7))
+grna_group_data_frame_highmoi$grna_id <- new_grna_ids
+rownames(grna_matrix_highmoi) <- new_grna_ids[match(x = rownames(grna_matrix_highmoi), table = curr_grna_ids)]
 
-response_matrix_highmoi <- response_matrix_highmoi
-grna_matrix_highmoi <- grna_matrix_highmoi
+# 14. rename the data objects
 extra_covariates_highmoi <- covariate_data_frame_highmoi |>
   dplyr::mutate(batch = factor(batch, levels = c("prep_batch_1", "prep_batch_2"),
                                labels = c("b1", "b2")))
-grna_group_data_frame_highmoi <- grna_group_data_frame_highmoi
-pc_pairs_highmoi <- pc_pairs_highmoi
 gene_names_highmoi <- gene_table$gene_name[match(rownames(response_matrix_highmoi), gene_table$gene_id)]
 
+# save
 usethis::use_data(response_matrix_highmoi, gene_names_highmoi, grna_matrix_highmoi,
-                  extra_covariates_highmoi, grna_group_data_frame_highmoi,
-                  discovery_pairs_highmoi, pc_pairs_highmoi, overwrite = TRUE)
+                  extra_covariates_highmoi, grna_group_data_frame_highmoi)

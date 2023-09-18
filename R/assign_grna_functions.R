@@ -11,11 +11,9 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "mixture") {
-    initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix,
-                                                             cell_covariate_data_frame = cell_covariate_data_frame,
+    initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix, cell_covariate_data_frame = cell_covariate_data_frame,
                                                              grna_assignment_hyperparameters = grna_assignment_hyperparameters,
-                                                             print_progress = print_progress,
-                                                             parallel = parallel)
+                                                             print_progress = print_progress, parallel = parallel)
   }
   if (grna_assignment_method == "thresholding") {
     initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
@@ -34,9 +32,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
                                                               n_cells = n_cells, low_moi = low_moi,
                                                               maximum_assignment = maximum_assignment)
   sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
-  sceptre_object@cells_per_grna <- processed_assignment_out$cells_per_grna
   sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
-  sceptre_object@cells_per_targeting_grna_group <- processed_assignment_out$cells_per_targeting_grna_group
   sceptre_object@cells_w_multiple_grnas <- if (!maximum_assignment) processed_assignment_out$cells_w_multiple_grnas else max_result$cells_w_multiple_grnas
   sceptre_object@initial_grna_assignment_list <- initial_assignment_list
   return(sceptre_object)
@@ -65,9 +61,8 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
 
   # 2. compute the column-wise max and fraction of reads coming from the assigned grna
-  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p,
-                           x = grna_matrix@x, n_cells = ncol(grna_matrix),
-                           grna_lib_size = grna_lib_size)
+  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p, x = grna_matrix@x,
+                           n_cells = ncol(grna_matrix), grna_lib_size = grna_lib_size)
 
   # 3. construct a list in which each individual grna is mapped to the set of cells containing it
   indiv_grna_id_assignments <- l$assignment_vect
@@ -85,13 +80,15 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
 
 
 process_initial_assignment_list <- function(initial_assignment_list, grna_group_data_frame, n_cells, low_moi, maximum_assignment) {
-  # 0. compute the number of cells per grna
-  cells_per_grna <- sapply(initial_assignment_list, length)
+  # 0. compute the number of cells per grna and targeting gRNA group
+  # cells_per_grna <- sapply(initial_assignment_list, length)
+  # cells_per_targeting_grna_group <- sapply(grna_group_idxs, length)
+
   # 1. compute the vector of grnas per cell
   grnas_per_cell <- if (!maximum_assignment) {
     compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
   } else {
-    rep(1L, n_cells)
+    integer()
   }
   # 2. determine the cells that contain multiple grnas (if in low MOI and not using maximum_assignment)
   if (low_moi && !maximum_assignment) {
@@ -115,11 +112,9 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_group_
   # 5. construct the grna_group_idxs list
   grna_assignments_raw <- list(grna_group_idxs = grna_group_idxs,
                                indiv_nt_grna_idxs = indiv_nt_grna_idxs)
-  # 6. compute the number of cells per targeting grna group
-  cells_per_targeting_grna_group <- sapply(grna_group_idxs, length)
-  # 7. compute the number of targeting grna groups per cell
-  out <- list(grna_assignments_raw = grna_assignments_raw, cells_per_grna = cells_per_grna,
-              grnas_per_cell = grnas_per_cell, cells_w_multiple_grnas = cells_w_multiple_grnas,
-              cells_per_targeting_grna_group = cells_per_targeting_grna_group)
+  # 6. compute the number of targeting grna groups per cell
+  out <- list(grna_assignments_raw = grna_assignments_raw,
+              grnas_per_cell = grnas_per_cell,
+              cells_w_multiple_grnas = cells_w_multiple_grnas)
   return(out)
 }
