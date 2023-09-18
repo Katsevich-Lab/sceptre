@@ -15,6 +15,7 @@ setClass("sceptre_object",
            grna_group_data_frame = "data.frame",
            low_moi = "logical",
            user_specified_covariates = "character",
+           response_names = "character",
 
            # analysis parameters
            discovery_pairs = "data.frame",
@@ -43,14 +44,11 @@ setClass("sceptre_object",
            initial_grna_assignment_list = "list",
            grna_assignments_raw = "list",
            grna_assignments = "list",
+           grnas_per_cell = "integer",
            cells_w_multiple_grnas = "integer",
            cells_in_use = "integer",
-           # consider removing the below entries
            n_ok_discovery_pairs = "integer",
            n_ok_positive_control_pairs = "integer",
-           cells_per_grna = "integer",
-           grnas_per_cell = "integer",
-           cells_per_targeting_grna_group = "integer",
            calibration_group_size = "integer",
            n_calibration_pairs = "integer",
 

@@ -10,7 +10,7 @@ import_data(
   grna_group_data_frame,
   moi,
   extra_covariates = NULL,
-  response_names = NULL
+  response_names = NA_character_
 )
 }
 \arguments{
@@ -49,10 +49,9 @@ moi = "low")
 print(sceptre_object)
 
 # 2. obtain the discovery and positive control pairs
-data(pc_pairs_lowmoi)
-positive_control_pairs <- pc_pairs_lowmoi
-discovery_pairs <- construct_all_pairs(sceptre_object = sceptre_object,
-response_grna_group_pairs_to_exclude = positive_control_pairs)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
+positive_control_pairs = positive_control_pairs)
 
 # 3. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
@@ -111,21 +110,20 @@ response_names = gene_names_highmoi)
 print(sceptre_object)
 
 # 2. obtain the response-gRNA group pairs to analyze
-data(pc_pairs_highmoi)
-pc_pairs <- pc_pairs_highmoi
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(sceptre_object,
-grna_groups_to_exclude = pc_pairs$grna_group,
+positive_control_pairs = positive_control_pairs,
 distance_threshold = 5e6)
 
 # 3. set the analysis parameters
 sceptre_object <- set_analysis_parameters(
 sceptre_object = sceptre_object,
 discovery_pairs = discovery_pairs,
-positive_control_pairs = pc_pairs,
+positive_control_pairs = positive_control_pairs,
 side = "left")
 print(sceptre_object)
 
-# 4 (optional). manually assign grnas, run QC
+# 4 (optional) manually assign grnas, run QC
 plot_grna_count_distributions(sceptre_object)
 sceptre_object <- sceptre_object |> assign_grnas()
 plot(sceptre_object)
@@ -151,6 +149,5 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 8. obtain results; write outputs to directory
-discovery_result <- get_result(sceptre_object, "run_discovery_analysis")
 write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 }

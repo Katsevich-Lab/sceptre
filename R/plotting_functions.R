@@ -172,7 +172,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
 
   # plot b
-  n_cells_per_grna <- sceptre_object@cells_per_grna
+  n_cells_per_grna <- sapply(init_assignments, length)
   to_plot_b <- data.frame(x = n_cells_per_grna,
                           y = names(n_cells_per_grna)) |>
     dplyr::arrange(n_cells_per_grna) |>

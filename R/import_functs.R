@@ -46,7 +46,7 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
   # 4. obtain the feature data frame; determine the ids of each feature
   feature_df <- data.table::fread(file = feature_fps[1],
                                   colClasses = c("character", "character", "character"),
-                                  col.names = c("feature_id", "feature_name", "modality"))
+                                  col.names = c("feature_id", "feature_name", "modality"), header = FALSE)
   if (!("CRISPR Guide Capture" %in% feature_df$modality)) {
     stop("The features.tsv file should contain the modality `CRISPR Guide Capture`.")
   }
@@ -63,13 +63,14 @@ import_data_from_cellranger <- function(directories, moi, grna_group_data_frame)
     features_fp <- feature_fps[i]
     curr_feature_df <- data.table::fread(file = features_fp,
                                          colClasses = c("character", "character", "character"),
-                                         col.names = c("feature_id", "feature_name", "modality"))
+                                         col.names = c("feature_id", "feature_name", "modality"), header = FALSE)
     for (col in colnames(feature_df)) {
       if (any(dplyr::pull(feature_df, dplyr::all_of(col)) !=
             dplyr::pull(curr_feature_df, dplyr::all_of(col)))) {
         stop("The features.tsv files must match across directories.")
       }
     }
+
     # process the matrix
     matrix_fp <- matrix_fps[i]
     matrix_metadata <- get_mtx_metadata(matrix_fp)
@@ -142,4 +143,43 @@ get_mtx_metadata <- function(mtx_file) {
   close(con)
   metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
   list(n_features = metrics[1], n_cells = metrics[2], n_nonzero = metrics[3], n_to_skip = n_to_skip)
+}
+
+
+write_sceptre_object_to_cellranger_format <- function(sceptre_object, directory) {
+  # 0. create directory
+  if (dir.exists(directory)) unlink(directory, recursive = TRUE)
+  dir.create(directory)
+
+  # 1. combine matrices across modalities
+  response_matrix <- sceptre_object@response_matrix |> set_matrix_accessibility(make_row_accessible = FALSE)
+  grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = FALSE)
+  combined_mat <- rbind(response_matrix, grna_matrix)
+
+  # 2. construct the features df
+  response_ids <- rownames(response_matrix)
+  response_names <- sceptre_object@response_names
+  grna_ids <- rownames(grna_matrix)
+  feature_df <- data.frame(response_id = c(response_ids, grna_ids),
+                           response_name = c(response_names, grna_ids),
+                           modality = c(rep("Gene Expression", length(response_ids)),
+                                        rep("CRISPR Guide Capture", length(grna_ids))))
+
+  # 3. split the matrices according to batch; loop over the batches and save the matrix and features file
+  batch_v <- sceptre_object@covariate_data_frame$batch
+  batch_levels_v <- as.character(unique(batch_v))
+  for (i in seq_along(batch_levels_v)) {
+    batch_level <- batch_levels_v[i]
+    mat_sub <- combined_mat[feature_df$response_id, batch_level == batch_v]
+    dir_name <- paste0(directory, "/gem_group_", i)
+    dir.create(dir_name)
+    Matrix::writeMM(obj = mat_sub, file = paste0(dir_name, "/matrix.mtx"))
+    readr::write_tsv(x = feature_df, file = paste0(dir_name, "/features.tsv"), col_names = FALSE)
+    readr::write_tsv(x = data.frame(), file = paste0(dir_name, "/barcodes.tsv"))
+    curr_files <- list.files(dir_name, full.names = TRUE)
+    for (curr_file in curr_files) {
+      R.utils::gzip(filename = curr_file, destname = paste0(curr_file, ".gz"))
+    }
+  }
+  return(NULL)
 }
