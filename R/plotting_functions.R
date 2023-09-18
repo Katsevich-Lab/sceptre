@@ -292,6 +292,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
   p_d <- ggplot2::ggplot() +
     ggplot2::annotate(geom = "text", label = str, x = 1.3, y = 1.2) +
     ggplot2::theme_void() +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "white", color = "white")) +
     ggplot2::xlim(c(0, 2)) +
     ggplot2::ylim(c(0, 2))
 
@@ -422,6 +423,7 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
   p4 <- ggplot2::ggplot() +
     ggplot2::annotate(geom = "text", label = str, x = 1.1, y = 1.2) +
     ggplot2::theme_void() +
+    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "white", color = "white")) +
     ggplot2::xlim(c(0, 2)) +
     ggplot2::ylim(c(0, 2))
 
