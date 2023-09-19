@@ -204,9 +204,9 @@ get_result <- function(sceptre_object, analysis) {
 #' @export
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory
-  if (!dir.exists(directory)) {
-    dir.create(path = directory, recursive = TRUE)
-  }
+  if (!dir.exists(directory)) dir.create(path = directory, recursive = TRUE)
+  fs <- list.files(path = directory, full.names = TRUE)
+  for (f in fs) file.remove(f)
 
   # 1. create analysis_summary.txt file
   summary_file_fp <- paste0(directory, "/analysis_summary.txt")
