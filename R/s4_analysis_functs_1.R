@@ -2,7 +2,7 @@
 #'
 #' @param response_matrix TBD
 #' @param grna_matrix TBD
-#' @param grna_group_data_frame TBD
+#' @param grna_target_data_frame TBD
 #' @param moi TBD
 #' @param extra_covariates TBD
 #' @param response_names TBD
@@ -16,14 +16,14 @@
 #' data(response_matrix_lowmoi) # response-by-cell expression matrix
 #' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 #' data(extra_covariates_lowmoi) # cell-by-covariate data frame
-#' data(grna_group_data_frame_lowmoi) # gRNA group information
+#' data(grna_target_data_frame_lowmoi) # gRNA group information
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
 #' response_matrix = response_matrix_lowmoi,
 #' grna_matrix = grna_matrix_lowmoi,
 #' extra_covariates = extra_covariates_lowmoi,
-#' grna_group_data_frame = grna_group_data_frame_lowmoi,
+#' grna_target_data_frame = grna_target_data_frame_lowmoi,
 #' moi = "low")
 #' print(sceptre_object)
 #'
@@ -74,14 +74,14 @@
 #' data(response_matrix_highmoi)
 #' data(grna_matrix_highmoi)
 #' data(extra_covariates_highmoi)
-#' data(grna_group_data_frame_highmoi)
+#' data(grna_target_data_frame_highmoi)
 #' data(gene_names_highmoi)
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
 #' response_matrix = response_matrix_highmoi,
 #' grna_matrix = grna_matrix_highmoi,
-#' grna_group_data_frame = grna_group_data_frame_highmoi,
+#' grna_target_data_frame = grna_target_data_frame_highmoi,
 #' moi = "high",
 #' extra_covariates = extra_covariates_highmoi,
 #' response_names = gene_names_highmoi)
@@ -128,10 +128,9 @@
 #'
 #' # 8. obtain results; write outputs to directory
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
+import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
   # 1. perform initial check
-  check_import_data_inputs(response_matrix, grna_matrix,
-                           grna_group_data_frame, moi, extra_covariates) |> invisible()
+  check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
   # 2. compute the covariates
   covariate_data_frame <- auto_compute_cell_covariates(response_matrix = response_matrix,
@@ -147,7 +146,8 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
   sceptre_object@response_matrix <- response_matrix
   sceptre_object@grna_matrix <- grna_matrix
   sceptre_object@covariate_data_frame <- covariate_data_frame
-  sceptre_object@grna_group_data_frame <- grna_group_data_frame
+  # sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = factor(grna_id), grna_target = factor(grna_target))
+  sceptre_object@grna_target_data_frame <- grna_target_data_frame
   sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
   if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
@@ -181,8 +181,9 @@ import_data <- function(response_matrix, grna_matrix, grna_group_data_frame, moi
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
                                     positive_control_pairs = data.frame(),
-                                    formula_object = "default",
                                     side = "both",
+                                    grna_grouping_strategy = "union",
+                                    formula_object = "default",
                                     fit_parametric_curve = TRUE,
                                     control_group = "default",
                                     resampling_mechanism = "default",
@@ -207,16 +208,13 @@ set_analysis_parameters <- function(sceptre_object,
   }
 
   # 2. check inputs
-  check_set_analysis_parameters(response_matrix = sceptre_object@response_matrix,
-                                grna_matrix = sceptre_object@grna_matrix,
-                                covariate_data_frame = sceptre_object@covariate_data_frame,
-                                grna_group_data_frame = sceptre_object@grna_group_data_frame,
-                                formula_object = formula_object,
-                                response_grna_group_pairs_list = list(discovery_pairs = discovery_pairs,
-                                                                      positive_control_pairs = positive_control_pairs),
+  check_set_analysis_parameters(sceptre_object = sceptre_object, formula_object = formula_object,
+                                response_grna_target_pairs_list = list(discovery_pairs = discovery_pairs,
+                                                                       positive_control_pairs = positive_control_pairs),
                                 control_group = control_group,
                                 resampling_mechanism = resampling_mechanism,
-                                side = side, low_moi = sceptre_object@low_moi) |> invisible()
+                                side = side, low_moi = sceptre_object@low_moi,
+                                grna_grouping_strategy = grna_grouping_strategy) |> invisible()
 
   # 3. determine whether to reset response precomputations
   reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
@@ -226,8 +224,8 @@ set_analysis_parameters <- function(sceptre_object,
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
   run_permutations <- resampling_mechanism == "permutations"
-  sceptre_object@discovery_pairs <- discovery_pairs
-  sceptre_object@positive_control_pairs <- positive_control_pairs
+  sceptre_object@discovery_pairs <- discovery_pairs # |> dplyr::mutate(grna_target = factor(grna_target), response_id = factor(response_id))
+  sceptre_object@positive_control_pairs <- positive_control_pairs # |> dplyr::mutate(grna_target = factor(grna_target), response_id = factor(response_id))
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
   sceptre_object@fit_parametric_curve <- fit_parametric_curve
@@ -238,10 +236,14 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@B3 <- B3
   sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
   sceptre_object@multiple_testing_method <- multiple_testing_method
+  sceptre_object@grna_grouping_strategy <- grna_grouping_strategy
   sceptre_object@covariate_matrix  <- convert_covariate_df_to_design_matrix(covariate_data_frame = sceptre_object@covariate_data_frame,
                                                                             formula_object = formula_object)
 
-  # 5. update cached fields
+  # 5. modify the grna target df and response grna target dfs
+  sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
+
+  # 6. update cached fields
   if (reset_response_precomps) sceptre_object@response_precomputations <- list()
 
   # return

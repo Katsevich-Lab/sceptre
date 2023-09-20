@@ -7,6 +7,7 @@
 plot_run_qc(
   sceptre_object,
   return_indiv_plots = FALSE,
+  downsample_pairs = 10000L,
   transparency = 0.8,
   point_size = 0.55
 )

@@ -55,9 +55,9 @@ covariate_data_frame_lowmoi <- global_cell_covariates |>
 grna_features <- mm_odm |>
    ondisc::get_modality("grna_expression") |>
    ondisc::get_feature_covariates()
-grna_group_data_frame_lowmoi <- data.frame(grna_id = rownames(grna_features),
-                                           grna_group = factor(grna_features$target)) |>
-  dplyr::arrange(grna_group)
+grna_target_data_frame_lowmoi <- data.frame(grna_id = rownames(grna_features),
+                                            grna_target = factor(grna_features$target)) |>
+  dplyr::arrange(grna_target)
 
 ################################################
 # STEP 5: SORT ACCORDING TO BIOLOGICAL REPLICATE
@@ -70,4 +70,4 @@ extra_covariates_lowmoi <- covariate_data_frame_lowmoi[cell_order,,drop=FALSE]
 ######################################
 # STEP 6: SAVE THE DATA IN THE PACKAGE
 ######################################
-usethis::use_data(response_matrix_lowmoi, pc_pairs_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_group_data_frame_lowmoi, overwrite = TRUE)
+usethis::use_data(response_matrix_lowmoi, pc_pairs_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_target_data_frame_lowmoi, overwrite = TRUE)

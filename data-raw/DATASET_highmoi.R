@@ -130,7 +130,8 @@ extra_covariates_highmoi <- covariate_data_frame_highmoi |>
   dplyr::mutate(batch = factor(batch, levels = c("prep_batch_1", "prep_batch_2"),
                                labels = c("b1", "b2")))
 gene_names_highmoi <- gene_table$gene_name[match(rownames(response_matrix_highmoi), gene_table$gene_id)]
+grna_target_data_frame_highmoi <- grna_group_data_frame_highmoi |> dplyr::rename("grna_target" = "grna_group")
 
 # save
 usethis::use_data(response_matrix_highmoi, gene_names_highmoi, grna_matrix_highmoi,
-                  extra_covariates_highmoi, grna_group_data_frame_highmoi)
+                  extra_covariates_highmoi, grna_target_data_frame_highmoi, overwrite = TRUE)

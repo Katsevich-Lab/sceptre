@@ -9,9 +9,9 @@ construct_positive_control_pairs(sceptre_object)
 \arguments{
 \item{sceptre_object}{TBD}
 
-\item{grna_groups_to_exclude}{TBD}
+\item{grna_targets_to_exclude}{TBD}
 
-\item{response_grna_group_pairs_to_exclude}{TBD}
+\item{response_grna_target_pairs_to_exclude}{TBD}
 }
 \value{
 TBD

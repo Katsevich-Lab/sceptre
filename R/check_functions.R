@@ -1,8 +1,8 @@
-check_import_data_inputs <- function(response_matrix, grna_matrix, grna_group_data_frame, moi, extra_covariates) {
-  # 1. check column names of grna_group_data_frame
-  colnames_present <- all(c("grna_id", "grna_group") %in% colnames(grna_group_data_frame))
+check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) {
+  # 1. check column names of grna_target_data_frame
+  colnames_present <- all(c("grna_id", "grna_target") %in% colnames(grna_target_data_frame))
   if (!colnames_present) {
-    stop("The data frame `grna_group_data_frame` must have columns `grna_id` and `grna_group`. The `grna_group` column should specify the group to which each `grna_id` belongs.")
+    stop("The data frame `grna_target_data_frame` should have columns `grna_id` and `grna_target`. The `grna_target` column should specify the target of each individual `grna_id`.")
   }
 
   # 2. verify that the row names are unique for both response and grna modalities
@@ -17,12 +17,12 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_group_da
     stop(paste0("The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: ", paste0(grna_ids[problematic_grna_ids], collapse = ", ")))
   }
   if (any(grna_ids == "non-targeting")) {
-    stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_group` column of the `grna_group_data_frame`.")
+    stop("No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_target` column of the `grna_target_data_frame`.")
   }
 
   # 6. check that the ids in the grna group data frame are a subset of the ids in the grna matrix
-  if (!all(grna_group_data_frame$grna_id %in% rownames(grna_matrix))) {
-    stop("The column `grna_id` of the `response_grna_group_pairs` data frame must be a subset of the row names of the grna expression matrix.")
+  if (!all(grna_target_data_frame$grna_id %in% rownames(grna_matrix))) {
+    stop("The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix. The row names of the grna expression matrix are as follows: ", paste0(rownames(grna_matrix), collapse = ", "))
   }
 
   # 7. check type of input matrices
@@ -85,71 +85,82 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_group_da
 }
 
 
-check_set_analysis_parameters <- function(response_matrix, grna_matrix, covariate_data_frame,
-                                          grna_group_data_frame, formula_object, response_grna_group_pairs_list,
-                                          control_group, resampling_mechanism, side, low_moi) {
-  # 5. if response_grna_group_pairs has been supplied, check its characteristics
-  for (idx in seq_along(response_grna_group_pairs_list)) {
-    response_grna_group_pairs <- response_grna_group_pairs_list[[idx]]
-    if (nrow(response_grna_group_pairs) >= 1L) {
-      df_name <- names(response_grna_group_pairs_list)[idx]
-      # i. verify that `grna_group` and `response_id` are columns
-      all(c("grna_group", "response_id") %in% colnames(response_grna_group_pairs))
-      # ii. check that the response ids in the `response_grna_group_pairs` data frame are a subset of the response ids
-      if (!all(response_grna_group_pairs$response_id %in% rownames(response_matrix))) {
+check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
+                                          control_group, resampling_mechanism, side, low_moi, grna_grouping_strategy) {
+  response_matrix <- sceptre_object@response_matrix
+  grna_matrix <- sceptre_object@grna_matrix
+  covariate_data_frame <- sceptre_object@covariate_data_frame
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
+
+  # 1. if response_grna_target_pairs has been supplied, check its characteristics
+  for (idx in seq_along(response_grna_target_pairs_list)) {
+    response_grna_target_pairs <- response_grna_target_pairs_list[[idx]]
+    if (nrow(response_grna_target_pairs) >= 1L) {
+      df_name <- names(response_grna_target_pairs_list)[idx]
+      # i. verify that `grna_target` and `response_id` are columns
+      if (!all(c("grna_target", "response_id") %in% colnames(response_grna_target_pairs))) {
+        stop("The data frame `", df_name, "` must contain the columns `grna_target` and `response_id`.")
+      }
+      # ii. check that the response ids in the `response_grna_target_pairs` data frame are a subset of the response ids
+      if (!all(response_grna_target_pairs$response_id %in% rownames(response_matrix))) {
         stop(paste0("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix."))
       }
-      # iii. check that the `grna_group` column of the `response_grna_group_pairs` data frame is a subset of the `grna_group` column of the `grna_group_data_frame`
-      if (!all(response_grna_group_pairs$grna_group %in% grna_group_data_frame$grna_group)) {
-        stop(paste0("The column `grna_group` of the `", df_name , "` data frame must be a subset of the colummn `grna_group` of the `grna_group_data_frame`."))
+      # iii. check that the `grna_target` column of the `response_grna_target_pairs` data frame is a subset of the `grna_target` column of the `grna_target_data_frame`
+      if (!all(response_grna_target_pairs$grna_target %in% sceptre_object@grna_target_data_frame$grna_target)) {
+        stop(paste0("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."))
       }
       # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
-      if ("non-targeting" %in% unique(response_grna_group_pairs$grna_group)) {
+      if ("non-targeting" %in% unique(response_grna_target_pairs$grna_target)) {
         stop("The `", df_name , "` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs against responses, run the calibration check.")
       }
       # v. ensure that rows are not duplicated
-      if (nrow(response_grna_group_pairs) != nrow(dplyr::distinct(response_grna_group_pairs))) {
+      if (nrow(response_grna_target_pairs) != nrow(dplyr::distinct(response_grna_target_pairs))) {
         stop("The `", df_name, "` data frame has duplicate rows.")
       }
     }
   }
 
-  # 6. check that there are no offsets in the formula object
+  # 2. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
 
-  # 8. check that the variables in the formula object are a subset of the column names of the covariate data frame
+  # 3. check that the variables in the formula object are a subset of the column names of the covariate data frame
   formula_object_vars <- all.vars(formula_object)
   check_var <- formula_object_vars %in% colnames(covariate_data_frame)
   if (!all(check_var)) {
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
 
-  # 13. verify that control group is either nt_cells, complement, or default
+  # 4. verify that control group is either nt_cells, complement, or default
   if (!control_group %in% c("nt_cells", "complement", "default")) {
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 14. verify that resampling_mechanism is one of "permutations", "crt", or "default"
+  # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
   if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
 
-  # 15. verify that the moi is consistent with the control group
+  # 6. verify that the moi is consistent with the control group
   if (!low_moi && control_group == "nt_cells") {
     stop("The control group cannot be the NT cells in high MOI.")
   }
 
-  # 16. verify that, if the control_group is NT cells, there are NT gRNAs present
+  # 7. verify that, if the control_group is NT cells, there are NT gRNAs present
   if (control_group == "nt_cells") {
-    nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
+    nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
-      stop(paste0("The string 'non-targeting' must be present in the `grna_group` column of the `grna_group_data_frame`."))
+      stop(paste0("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame`."))
     }
   }
 
-  # 17. verify that "side" is among "both", "left", or "right"
+  # 8. verify that "side" is among "both", "left", or "right"
   if (!(side %in% c("both", "left", "right"))) {
     stop("`side` must be one of 'both', 'left', or 'right'.")
+  }
+
+  # 9. verify that "grna_grouping_strategy" is union or singleton
+  if (!(grna_grouping_strategy %in% c("union", "singleton"))) {
+    stop("`grna_grouping_strategy` must be either 'union' or 'singleton'.")
   }
 
   return(NULL)
@@ -235,14 +246,14 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
 
 
 check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs) {
-  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
   control_group_complement <- sceptre_object@control_group_complement
-  n_nt_grnas <- grna_group_data_frame |>
+  n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> nrow()
   if (!control_group_complement) {
-    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
+    if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.")
   } else {
-    if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_group_data_frame`.")
+    if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.")
   }
 
   if (n_calibration_pairs == 0L) {
@@ -254,7 +265,7 @@ check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs) 
 
 check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             control_group_complement,
-                                            grna_group_data_frame,
+                                            grna_target_data_frame,
                                             calibration_check_run,
                                             pc_analysis,
                                             calibration_result, n_ok_pairs) {
@@ -265,7 +276,7 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
   # 2. check that negative control gRNAs are present (if the control group is the complement set)
   if (control_group_complement) {
-    nt_present <- "non-targeting" %in% grna_group_data_frame$grna_group
+    nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
       stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the complement set."))
     }
