@@ -7,7 +7,7 @@
 import_data(
   response_matrix,
   grna_matrix,
-  grna_group_data_frame,
+  grna_target_data_frame,
   moi,
   extra_covariates = NULL,
   response_names = NA_character_
@@ -18,7 +18,7 @@ import_data(
 
 \item{grna_matrix}{TBD}
 
-\item{grna_group_data_frame}{TBD}
+\item{grna_target_data_frame}{TBD}
 
 \item{moi}{TBD}
 
@@ -37,14 +37,14 @@ Carry out an analysis using \code{sceptre}
 data(response_matrix_lowmoi) # response-by-cell expression matrix
 data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
 data(extra_covariates_lowmoi) # cell-by-covariate data frame
-data(grna_group_data_frame_lowmoi) # gRNA group information
+data(grna_target_data_frame_lowmoi) # gRNA group information
 
 # 1. create the sceptre object
 sceptre_object <- import_data(
 response_matrix = response_matrix_lowmoi,
 grna_matrix = grna_matrix_lowmoi,
 extra_covariates = extra_covariates_lowmoi,
-grna_group_data_frame = grna_group_data_frame_lowmoi,
+grna_target_data_frame = grna_target_data_frame_lowmoi,
 moi = "low")
 print(sceptre_object)
 
@@ -95,14 +95,14 @@ write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/"
 data(response_matrix_highmoi)
 data(grna_matrix_highmoi)
 data(extra_covariates_highmoi)
-data(grna_group_data_frame_highmoi)
+data(grna_target_data_frame_highmoi)
 data(gene_names_highmoi)
 
 # 1. create the sceptre object
 sceptre_object <- import_data(
 response_matrix = response_matrix_highmoi,
 grna_matrix = grna_matrix_highmoi,
-grna_group_data_frame = grna_group_data_frame_highmoi,
+grna_target_data_frame = grna_target_data_frame_highmoi,
 moi = "high",
 extra_covariates = extra_covariates_highmoi,
 response_names = gene_names_highmoi)

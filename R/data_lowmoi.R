@@ -40,8 +40,8 @@ NULL
 #' A data frame containing the gRNA group information. The data frame has two columns: \code{grna_id} and \code{grna_group}. The former column provides the ID of each individual gRNA, and the latter specifies the group to which each individual gRNA belongs. gRNAs that target the same gene transcription start site are assigned to the same group. Non-targeting gRNAs are assigned to a group labeled "non-targeting".
 #'
 #' @inheritSection lowmoi_data Overview
-#' @usage data(grna_group_data_frame_lowmoi)
-"grna_group_data_frame_lowmoi"
+#' @usage data(grna_target_data_frame_lowmoi)
+"grna_target_data_frame_lowmoi"
 
 
 #' gRNA group data frame

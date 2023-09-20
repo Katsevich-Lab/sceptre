@@ -4,14 +4,14 @@
 \alias{import_data_from_cellranger}
 \title{Import data from cellranger}
 \usage{
-import_data_from_cellranger(directories, moi, grna_group_data_frame)
+import_data_from_cellranger(directories, moi, grna_target_data_frame)
 }
 \arguments{
 \item{directories}{TBD}
 
 \item{moi}{TBD}
 
-\item{grna_group_data_frame}{TBD}
+\item{grna_target_data_frame}{TBD}
 }
 \value{
 a sceptre_object initialized
@@ -24,9 +24,9 @@ Import data from cellranger
 \dontrun{
 base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"
 # load the grna group df
-grna_group_data_frame <- readRDS(paste0(base_dir, "grna_group_df.rds"))
+grna_target_data_frame <- readRDS(paste0(base_dir, "grna_group_df.rds"))
 # set paths to the directories containing the cellranger count outputs
 directories <- paste0(base_dir, "gemgroup", 1:3)
-sceptre_object <- import_data_from_cellranger(directories, "low", grna_group_data_frame)
+sceptre_object <- import_data_from_cellranger(directories, "low", grna_target_data_frame)
 }
 }

@@ -1,7 +1,7 @@
 assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
   # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
-  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
   low_moi <- sceptre_object@low_moi
   grna_assignment_method <- sceptre_object@grna_assignment_method
   cell_covariate_data_frame <- sceptre_object@covariate_data_frame
@@ -28,7 +28,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
 
   # process the initial assignment list
   processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
-                                                              grna_group_data_frame = grna_group_data_frame,
+                                                              grna_target_data_frame = grna_target_data_frame,
                                                               n_cells = n_cells, low_moi = low_moi,
                                                               maximum_assignment = maximum_assignment)
   sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
@@ -79,11 +79,7 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
 }
 
 
-process_initial_assignment_list <- function(initial_assignment_list, grna_group_data_frame, n_cells, low_moi, maximum_assignment) {
-  # 0. compute the number of cells per grna and targeting gRNA group
-  # cells_per_grna <- sapply(initial_assignment_list, length)
-  # cells_per_targeting_grna_group <- sapply(grna_group_idxs, length)
-
+process_initial_assignment_list <- function(initial_assignment_list, grna_target_data_frame, n_cells, low_moi, maximum_assignment) {
   # 1. compute the vector of grnas per cell
   grnas_per_cell <- if (!maximum_assignment) {
     compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
@@ -97,7 +93,7 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_group_
     cells_w_multiple_grnas <- integer()
   }
   # 3. pool together targeting gRNAs via the or operation
-  targeting_grna_group_data_table <- grna_group_data_frame |>
+  targeting_grna_group_data_table <- grna_target_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |> data.table::as.data.table()
   targeting_grna_groups <- targeting_grna_group_data_table$grna_group |> unique()
   grna_group_idxs <- lapply(targeting_grna_groups, function(targeting_grna_group) {
@@ -106,7 +102,7 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_group_
     initial_assignment_list[curr_grna_ids] |> unlist() |> unique()
   }) |> stats::setNames(targeting_grna_groups)
   # 4. obtain the individual non-targeting grna idxs
-  nontargeting_grna_ids <- grna_group_data_frame |>
+  nontargeting_grna_ids <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> dplyr::pull(grna_id)
   indiv_nt_grna_idxs <- initial_assignment_list[nontargeting_grna_ids]
   # 5. construct the grna_group_idxs list

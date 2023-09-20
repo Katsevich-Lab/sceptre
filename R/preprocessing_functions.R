@@ -148,3 +148,32 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
 
   return(out)
 }
+
+
+update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
+  grouping_strategy <- sceptre_object@grna_grouping_strategy
+  if (grouping_strategy == "union") {
+    sceptre_object@grna_target_data_frame$grna_group <- sceptre_object@grna_target_data_frame$grna_target
+    sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target
+    sceptre_object@positive_control_pairs$grna_group <- sceptre_object@positive_control_pairs$grna_target
+  }
+  if (grouping_strategy == "singleton") {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+    discovery_pairs <- sceptre_object@discovery_pairs
+    positive_control_pairs <- sceptre_object@positive_control_pairs
+
+    # function to update targeting pairs
+    update_targeting_pairs <- function(targeting_pairs, updated_grna_target_data_frame) {
+      dplyr::left_join(targeting_pairs,
+                       updated_grna_target_data_frame |> dplyr::select(grna_target, grna_group),
+                       by = "grna_target", relationship = "many-to-many")
+    }
+
+    # update each data frame, appending a grna group column
+    updated_grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_group = ifelse(grna_target == "non-targeting", "non-targeting", grna_id))
+    sceptre_object@grna_target_data_frame <- updated_grna_target_data_frame
+    sceptre_object@discovery_pairs <- update_targeting_pairs(discovery_pairs, updated_grna_target_data_frame)
+    sceptre_object@positive_control_pairs <- update_targeting_pairs(positive_control_pairs, updated_grna_target_data_frame)
+  }
+  return(sceptre_object)
+}

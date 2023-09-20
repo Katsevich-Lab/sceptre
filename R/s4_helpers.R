@@ -6,11 +6,11 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 1. obtain the basic information
   n_cells <- ncol(object@response_matrix)
   n_responses <- nrow(object@response_matrix)
-  n_nt_grnas <- object@grna_group_data_frame |>
-    dplyr::filter(grna_group == "non-targeting") |> nrow()
-  targeting_grnas_df <- object@grna_group_data_frame |>
-    dplyr::filter(grna_group != "non-targeting")
-  n_targeting_grna_groups <- length(unique(targeting_grnas_df$grna_group))
+  n_nt_grnas <- object@grna_target_data_frame |>
+    dplyr::filter(grna_target == "non-targeting") |> nrow()
+  targeting_grnas_df <- object@grna_target_data_frame |>
+    dplyr::filter(grna_target != "non-targeting")
+  n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
   n_targeting_grnas <- nrow(targeting_grnas_df)
   n_covariates <- ncol(object@covariate_data_frame)
   covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
@@ -21,7 +21,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
              } else NULL, "\n\t\U2022 ",
              crayon::blue(n_responses), " responses\n\t\U2022 ",
              crayon::blue(moi), " multiplicity-of-infection \n\t\U2022 ",
-             crayon::blue(n_targeting_grnas), " targeting gRNAs (distributed across ", crayon::blue(n_targeting_grna_groups), " gRNA groups) \n\t\U2022 ",
+             crayon::blue(n_targeting_grnas), " targeting gRNAs (distributed across ", crayon::blue(n_targeting_grna_targets), " targets) \n\t\U2022 ",
              crayon::blue(n_nt_grnas), " non-targeting gRNAs \n\t\U2022 ",
              crayon::blue(n_covariates), " covariates (", covariates, ")"))
 })
@@ -60,6 +60,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
+             "\n\t\U2022 gRNA grouping strategy: ", if (length(x@grna_grouping_strategy) == 0L) "not specified" else crayon::blue(x@grna_grouping_strategy),
              if (!print_full_output) NULL else {
                paste0(
                  "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
@@ -78,7 +79,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
     cat(paste0("\n\ngRNA-to-cell assignment information:",
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(mean_cells_per_grna |> round(2)),
-               "\n\t\U2022 Mean N cells per targeting gRNA group: ", crayon::blue(mean_cells_per_grna_group |> round(2)),
                "\n\t\U2022 Mean N gRNAs per cell (MOI): ", if (x@grna_assignment_method == "maximum") "not computed when using \"maximum\" assignment method" else crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
   }
 

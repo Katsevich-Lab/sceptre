@@ -36,8 +36,8 @@ NULL
 #'
 #' A data frame that maps each gRNA ID to its gRNA group.
 #' @inheritSection highmoi_data Overview
-#' @usage data(grna_group_data_frame_highmoi)
-"grna_group_data_frame_highmoi"
+#' @usage data(grna_target_data_frame_highmoi)
+"grna_target_data_frame_highmoi"
 
 
 #' gene names high MOI

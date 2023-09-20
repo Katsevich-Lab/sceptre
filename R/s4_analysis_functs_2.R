@@ -15,7 +15,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. handle the default arguments
-  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_group_data_frame)
+  if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
   if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
 
   # 2. check inputs
@@ -41,7 +41,9 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
   # 6. update fields of sceptre object with results
   sceptre_object@calibration_result <- out$result |>
-    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
+    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
+                    sceptre_object@multiple_testing_alpha) |>
+    apply_grouping_to_result(sceptre_object)
   sceptre_object@negative_control_pairs <- response_grna_group_pairs
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
@@ -67,7 +69,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   # 2. check inputs
   check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
-                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                  grna_target_data_frame = sceptre_object@grna_target_data_frame,
                                   pc_analysis = TRUE,
                                   calibration_result = sceptre_object@calibration_result,
                                   n_ok_pairs = sceptre_object@n_ok_positive_control_pairs) |> invisible()
@@ -82,7 +84,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                          parallel = parallel)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@power_result <- out$result
+  sceptre_object@power_result <- out$result |> apply_grouping_to_result(sceptre_object)
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
@@ -107,7 +109,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   # 2. check inputs
   check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
                                   control_group_complement = sceptre_object@control_group_complement,
-                                  grna_group_data_frame = sceptre_object@grna_group_data_frame,
+                                  grna_target_data_frame = sceptre_object@grna_target_data_frame,
                                   pc_analysis = FALSE,
                                   calibration_result = sceptre_object@calibration_result,
                                   n_ok_pairs = sceptre_object@n_ok_discovery_pairs) |> invisible()
@@ -123,7 +125,9 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 
   # 4. update fields of sceptre object with results
   sceptre_object@discovery_result <- out$result |>
-    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) < sceptre_object@multiple_testing_alpha)
+    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
+                    sceptre_object@multiple_testing_alpha) |>
+    apply_grouping_to_result(sceptre_object)
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
@@ -173,6 +177,22 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   data.table::setorderv(final_result, cols = c("p_value", "response_id"), na.last = TRUE)
   out$result <- final_result
   return(out)
+}
+
+
+apply_grouping_to_result <- function(result, sceptre_object) {
+  grna_grouping_strategy <- sceptre_object@grna_grouping_strategy
+  if (grna_grouping_strategy == "union") {
+    result <- result |> dplyr::rename("grna_target" = "grna_group")
+  }
+  if (grna_grouping_strategy == "singleton") {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
+      dplyr::select(grna_id, grna_target)
+    result <- result |> dplyr::rename("grna_id" = "grna_group") |>
+      dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
+      dplyr::relocate(response_id, grna_id, grna_target)
+  }
+  return (result)
 }
 
 

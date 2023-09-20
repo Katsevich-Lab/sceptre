@@ -2,7 +2,7 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
   cat("Constructing negative control pairs.")
   grna_assignments <- sceptre_object@grna_assignments
   response_matrix <- sceptre_object@response_matrix
-  grna_group_data_frame <- sceptre_object@grna_group_data_frame
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
   low_moi <- sceptre_object@low_moi
   n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
   n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
@@ -58,11 +58,11 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
 }
 
 
-compute_calibration_group_size <- function(grna_group_data_frame) {
-  median_group_size <- grna_group_data_frame |>
+compute_calibration_group_size <- function(grna_target_data_frame) {
+  median_group_size <- grna_target_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |>
     dplyr::pull(grna_group) |> table() |> stats::median() |> round()
-  n_ntc <- grna_group_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
+  n_ntc <- grna_target_data_frame |> dplyr::filter(grna_group == "non-targeting") |> nrow()
   calibration_group_size <- as.integer(min(median_group_size, n_ntc))
   return(calibration_group_size)
 }

@@ -8,8 +8,9 @@ set_analysis_parameters(
   sceptre_object,
   discovery_pairs,
   positive_control_pairs = data.frame(),
-  formula_object = "default",
   side = "both",
+  grna_grouping_strategy = "union",
+  formula_object = "default",
   fit_parametric_curve = TRUE,
   control_group = "default",
   resampling_mechanism = "default",
@@ -27,9 +28,9 @@ set_analysis_parameters(
 
 \item{positive_control_pairs}{TBD}
 
-\item{formula_object}{TBD}
-
 \item{side}{TBD}
+
+\item{formula_object}{TBD}
 
 \item{fit_parametric_curve}{TBD}
 

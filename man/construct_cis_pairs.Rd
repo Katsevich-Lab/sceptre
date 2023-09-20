@@ -8,7 +8,7 @@ construct_cis_pairs(
   sceptre_object,
   positive_control_pairs = data.frame(),
   distance_threshold = 500000L,
-  exclude_pc_grna_groups = TRUE,
+  exclude_positive_control_grna_targets = TRUE,
   ref_genome = "10X_GRCh38_2020"
 )
 }
@@ -19,9 +19,9 @@ construct_cis_pairs(
 
 \item{ref_genome}{TBD}
 
-\item{grna_groups_to_exclude}{TBD}
+\item{grna_targets_to_exclude}{TBD}
 
-\item{response_grna_group_pairs_to_exclude}{TBD}
+\item{response_grna_target_pairs_to_exclude}{TBD}
 }
 \value{
 TBD
