@@ -29,7 +29,7 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
   out_pairs <- lapply(X = unique_chrs, FUN = function(unique_chr) {
     gene_table_curr_chr <- gene_table[gene_table$chr == unique_chr,]
     gene_tss_posits <- gene_table_curr_chr$tss_position
-    gene_ids <- factor(gene_table_curr_chr$gene_id)
+    gene_ids <- gene_table_curr_chr$gene_id
     grna_target_data_frame_curr_chr <- grna_target_data_frame[grna_target_data_frame$chr == unique_chr,]
 
     # 4. loop over unique grna groups in grna group df curr chr
@@ -62,10 +62,10 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #' @return TBD
 #' @export
 construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), exclude_positive_control_pairs = TRUE) {
-  response_ids <- rownames(sceptre_object@response_matrix) |> factor()
+  response_ids <- rownames(sceptre_object@response_matrix)
   grna_targets <- sceptre_object@grna_target_data_frame |>
     dplyr::filter(!(grna_target %in% "non-targeting")) |>
-    dplyr::pull(grna_target) |> unique() |> factor()
+    dplyr::pull(grna_target) |> unique()
   out_pairs <- expand.grid(response_id = response_ids, grna_target = grna_targets)
   if (exclude_positive_control_pairs) out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
   return(out_pairs)

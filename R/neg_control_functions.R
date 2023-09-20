@@ -40,9 +40,9 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
                                      indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs, cells_in_use = cells_in_use)
 
   # 4. construct the data frame of negative control pairs
-  response_ids <- factor(rownames(response_matrix))
+  response_ids <- rownames(response_matrix)
   increment_matrix(possible_groups_m)
-  undercover_groups <- factor(get_undercover_group_names(possible_groups_m, nt_grna_names))
+  undercover_groups <- get_undercover_group_names(possible_groups_m, nt_grna_names)
   df <- data.frame(response_id = response_ids[samp$response_idxs],
                    grna_group = undercover_groups[samp$grna_group_idxs],
                    n_nonzero_trt = samp$n_nonzero_trt_v,
