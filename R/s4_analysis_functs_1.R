@@ -146,8 +146,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   sceptre_object@response_matrix <- response_matrix
   sceptre_object@grna_matrix <- grna_matrix
   sceptre_object@covariate_data_frame <- covariate_data_frame
-  # sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = factor(grna_id), grna_target = factor(grna_target))
-  sceptre_object@grna_target_data_frame <- grna_target_data_frame
+  sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
   sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
   if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
@@ -224,8 +223,8 @@ set_analysis_parameters <- function(sceptre_object,
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
   run_permutations <- resampling_mechanism == "permutations"
-  sceptre_object@discovery_pairs <- discovery_pairs # |> dplyr::mutate(grna_target = factor(grna_target), response_id = factor(response_id))
-  sceptre_object@positive_control_pairs <- positive_control_pairs # |> dplyr::mutate(grna_target = factor(grna_target), response_id = factor(response_id))
+  sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
+  sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
   sceptre_object@fit_parametric_curve <- fit_parametric_curve
