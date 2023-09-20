@@ -124,7 +124,7 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
                                 grna_matrix = out_mats[["CRISPR Guide Capture"]],
                                 grna_target_data_frame = grna_target_data_frame,
                                 moi = moi,
-                                extra_covariates = data.frame(batch = batch),
+                                extra_covariates = if (length(directories) >= 2L) data.frame(batch = batch) else NULL,
                                 response_names = gene_names)
   gc() |> invisible()
   cat(crayon::green(' \u2713\n'))
