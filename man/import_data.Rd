@@ -91,21 +91,12 @@ write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/"
 ##################
 # High MOI example
 ##################
-# 0. obtain the data required for a single-cell screen analysis
-data(response_matrix_highmoi)
-data(grna_matrix_highmoi)
-data(extra_covariates_highmoi)
+# 1. create the sceptre object from CellRanger output
+directories <- paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_", 1:2)
 data(grna_target_data_frame_highmoi)
-data(gene_names_highmoi)
-
-# 1. create the sceptre object
-sceptre_object <- import_data(
-response_matrix = response_matrix_highmoi,
-grna_matrix = grna_matrix_highmoi,
-grna_target_data_frame = grna_target_data_frame_highmoi,
+sceptre_object <- import_data_from_cellranger(directories = directories,
 moi = "high",
-extra_covariates = extra_covariates_highmoi,
-response_names = gene_names_highmoi)
+grna_target_data_frame = grna_target_data_frame_highmoi)
 print(sceptre_object)
 
 # 2. obtain the response-gRNA group pairs to analyze
