@@ -82,6 +82,8 @@ sample_as_vec <- function(x) {
 
 #' Helper function to make a factor with random numbers of entries per level.
 #'
+#' There are guaranteed to be at least two entries per level.
+#'
 #' @param num_factor_levels : int, the number of distinct values for this factor to have
 #' @param num_entries : int, the length of the resulting vector
 #' @param level_name_base : string, all values start with this + "_".
@@ -153,9 +155,6 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
   set.seed(seed)
 
   num_cells <- sum(rep_level_counts)
-  if(num_cells < 12) {
-    stop("At least 12 cells are required.")
-  }
   if(add_factor > 0 && max_num_factor_levels * 2 > num_cells) {
     stop("`max_num_factor_levels` must be decreased so that at least 2 cells per level are possible.")
   }
@@ -178,7 +177,6 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
   }
   if(add_factor > 0) {
     for(i in 1:add_factor) {
-      # at least 12 cells required so guaranteed to get at least 2 cells / level
       num_levs <- sample(2:max_num_factor_levels, 1)
       covariates[[paste0("factor_", i)]] <- make_random_factor(
         num_factor_levels = num_levs, num_entries = num_cells,
