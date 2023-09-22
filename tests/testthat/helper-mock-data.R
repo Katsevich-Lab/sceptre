@@ -145,8 +145,8 @@ make_random_factor <- function(num_factor_levels, num_entries, level_name_base =
 #' # just 2 levels, while the third ended up with 4 levels.
 #' make_mock_extra_covariates(rep_level_counts = c(4, 13, 3), add_numeric = 2, add_count = 1,
 #' add_factor = 3, max_num_factor_levels = 4, seed = 111)
-make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_count = 0, add_factor = 0, max_num_factor_levels = 6, seed = NULL) {
-
+make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_count = 0, add_factor = 0,
+                                       max_num_factor_levels = 6, seed = NULL) {
   if(is.null(seed)) {
     seed = 101001
   }
@@ -201,7 +201,12 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
 #'
 #' @examples
 #' make_mock_grna_target_data(paste0("grna_", 1:12), 4)
-make_mock_grna_target_data <- function(grna_labels, num_targets) {
+make_mock_grna_target_data <- function(grna_labels, num_targets, seed = NULL) {
+  if(is.null(seed)) {
+    seed = 10102
+  }
+  set.seed(seed)
+
   data.frame(
     grna_id = grna_labels,
     grna_target = make_random_factor(
