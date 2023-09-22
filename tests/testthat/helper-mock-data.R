@@ -215,16 +215,15 @@ make_mock_grna_target_data <- function(grna_labels, num_targets) {
 #############
 ## Example ##
 #############
-
-num_cells <- 15
-num_genes <- 18
-num_grnas <- 5
-num_distinct_targets <- 4
-rep_levels <- c(4, 8, 3); stopifnot(sum(rep_levels) == num_cells)
-(mock_response <- make_mock_count_matrix(num_genes = num_genes, num_cells = num_cells, rowname_base = "gene", patterns_at_col_level = FALSE))
-(mock_grna <- make_mock_count_matrix(num_genes = num_grnas, num_cells = num_cells, rowname_base = "grna", patterns_at_col_level = TRUE))
-(mock_covariates <- make_mock_extra_covariates(rep_level_counts = rep_levels))
-## if we want a fancier one
-# make_mock_extra_covariates(rep_level_counts = rep_levels, add_numeric = 2, add_count = 1, add_factor = 3, max_num_factor_levels = 4)
-(mock_grna_target_data_frame <- make_mock_grna_target_data(rownames(mock_response), num_distinct_targets))
+# num_cells <- 15
+# num_genes <- 18
+# num_grnas <- 5
+# num_distinct_targets <- 4
+# rep_levels <- c(4, 8, 3); stopifnot(sum(rep_levels) == num_cells)
+# (mock_response <- make_mock_count_matrix(num_genes = num_genes, num_cells = num_cells, rowname_base = "gene", patterns_at_col_level = FALSE))
+# (mock_grna <- make_mock_count_matrix(num_genes = num_grnas, num_cells = num_cells, rowname_base = "grna", patterns_at_col_level = TRUE))
+# (mock_covariates <- make_mock_extra_covariates(rep_level_counts = rep_levels))
+# ## if we want a fancier one
+# # make_mock_extra_covariates(rep_level_counts = rep_levels, add_numeric = 2, add_count = 1, add_factor = 3, max_num_factor_levels = 4)
+# (mock_grna_target_data_frame <- make_mock_grna_target_data(rownames(mock_response), num_distinct_targets))
 
