@@ -70,4 +70,9 @@ extra_covariates_lowmoi <- covariate_data_frame_lowmoi[cell_order,,drop=FALSE]
 ######################################
 # STEP 6: SAVE THE DATA IN THE PACKAGE
 ######################################
-usethis::use_data(response_matrix_lowmoi, pc_pairs_lowmoi, grna_matrix_lowmoi, extra_covariates_lowmoi, grna_target_data_frame_lowmoi, overwrite = TRUE)
+lowmoi_example_data <- list(response_matrix = response_matrix_lowmoi,
+                            grna_matrix = grna_matrix_lowmoi,
+                            extra_covariates = extra_covariates_lowmoi,
+                            grna_target_data_frame = grna_target_data_frame_lowmoi)
+
+usethis::use_data(lowmoi_example_data, overwrite = TRUE)

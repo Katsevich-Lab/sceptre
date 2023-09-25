@@ -17,6 +17,8 @@ plot_run_qc(
 
 \item{return_indiv_plots}{TBD}
 
+\item{downsample_pairs}{TBD}
+
 \item{transparency}{TBD}
 
 \item{point_size}{TBD}

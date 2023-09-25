@@ -127,7 +127,7 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
                                 extra_covariates = if (length(directories) >= 2L) data.frame(batch = batch) else NULL,
                                 response_names = gene_names)
   gc() |> invisible()
-  cat(crayon::green(' \u2713\n'))
+  cat(crayon::green(' \u2713'))
   return(sceptre_object)
 }
 

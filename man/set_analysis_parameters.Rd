@@ -30,6 +30,8 @@ set_analysis_parameters(
 
 \item{side}{TBD}
 
+\item{grna_grouping_strategy}{TBD}
+
 \item{formula_object}{TBD}
 
 \item{fit_parametric_curve}{TBD}

@@ -13,9 +13,9 @@ construct_trans_pairs(
 \arguments{
 \item{sceptre_object}{TBD}
 
-\item{grna_targets_to_exclude}{TBD}
+\item{positive_control_pairs}{TBD}
 
-\item{response_grna_target_pairs_to_exclude}{TBD}
+\item{exclude_positive_control_pairs}{TBD}
 }
 \value{
 TBD

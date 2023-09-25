@@ -1,77 +1,56 @@
 url: https://katsevich-lab.github.io/sceptre/
-
-authors:
-  "Timothy Barry":
-    href: https://timothy-barry.github.io/
-  "Eugene Katsevich":
-    href: https://ekatsevi.github.io/
-
-development:
-  mode: auto
-
 template:
   bootstrap: 5
 
-#navbar:
-#  type: default
-
-navbar:
-  structure:
-    left:  [reference, articles, news]
-    right: [search, github]
-
 reference:
-
-- title: Low MOI functions
+- title: "Pipeline functions"
+  desc: >
+    The functions that form the basis of the `sceptre` pipeline
   contents:
-  - run_sceptre_lowmoi
-  - compute_cell_covariates
-  - generate_all_pairs
-  - plot_calibration_result
-  - compare_calibration_and_discovery_results
-  - make_volcano_plot
-  - obtain_discovery_set
-  - plot_resampling_distribution
+  - import_data
+  - import_data_from_cellranger
+  - set_analysis_parameters
+  - assign_grnas
+  - run_qc
+  - run_calibration_check
+  - run_power_check
+  - run_discovery_analysis
 
-- title: Experimental high MOI function
+- title: "Plotting functions"
+  desc: >
+    Functions to visualize the analysis
   contents:
-  - run_sceptre_highmoi_experimental
+  - plot,sceptre_object-method
+  - plot_grna_count_distributions
+  - plot_assign_grnas
+  - plot_run_qc
+  - plot_run_calibration_check
+  - plot_run_discovery_analysis
+  - plot_run_power_check
 
-- title: High MOI functions
+- title: "Pair constructor functions"
+  desc: >
+    Functions to facilitate the construction of discovery pairs and positive control pairs
   contents:
-  - run_sceptre_highmoi
-  - threshold_gRNA_matrix
-  - combine_perturbations
-  - make_qq_plot
+  - construct_positive_control_pairs
+  - construct_cis_pairs
+  - construct_trans_pairs
 
-- title: Low MOI example data
+- title: "Information extraction functions"
+  desc: >
+    Functions to extract information and results from a `sceptre_object`
   contents:
-  - covariate_data_frame_lowmoi
-  - response_matrix_lowmoi
-  - grna_group_data_frame_lowmoi
-  - grna_matrix_lowmoi
-  - lowmoi_data
+  - print,sceptre_object-method
+  - write_outputs_to_directory
+  - get_result
 
-- title: High MOI example data
+- title: "Example data"
+  desc: >
+    Example data to illustrate use of the functions
   contents:
-  - gene_matrix_highmoi
-  - gRNA_matrix_highmoi
-  - covariate_matrix_highmoi
-  - gRNA_groups_table_highmoi
-  - gene_gRNA_group_pairs_highmoi
-  - highmoi_data
+  - highmoi_example_data
+  - lowmoi_example_data
 
-- title: Experimental high MOI example data
-  contents:
-  - response_matrix_highmoi_experimental
-  - grna_matrix_highmoi_experimental
-  - covariate_data_frame_highmoi_experimental
-  - discovery_pairs_highmoi_experimental
-  - pc_pairs_highmoi_experimental
-  - grna_group_data_frame_highmoi_experimental
-
-- title: Package information
-  contents:
-  - sceptre
-
-news:
+authors:
+  sidebar:
+    roles: [aut, ctb, ths]
