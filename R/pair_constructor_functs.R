@@ -1,9 +1,9 @@
 #' Construct cis pairs
 #'
 #' @param sceptre_object TBD
+#' @param positive_control_pairs TBD
 #' @param distance_threshold TBD
-#' @param grna_targets_to_exclude TBD
-#' @param response_grna_target_pairs_to_exclude TBD
+#' @param exclude_positive_control_grna_targets TBD
 #' @param ref_genome TBD
 #'
 #' @return TBD
@@ -56,8 +56,8 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #' A helper function to construct the trans pairs
 #'
 #' @param sceptre_object TBD
-#' @param grna_targets_to_exclude TBD
-#' @param response_grna_target_pairs_to_exclude TBD
+#' @param positive_control_pairs TBD
+#' @param exclude_positive_control_pairs TBD
 #'
 #' @return TBD
 #' @export
@@ -77,8 +77,6 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #' Helper function to construct the positive control pairs.
 #'
 #' @param sceptre_object TBD
-#' @param grna_targets_to_exclude TBD
-#' @param response_grna_target_pairs_to_exclude TBD
 #'
 #' @return TBD
 #' @export

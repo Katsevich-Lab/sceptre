@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,17 +18,11 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/sceptre.html">Get started</a>
 </li>
-<li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/associated_papers.html">Associated papers</a>
-    <a class="dropdown-item" href="../articles/highmoi_tutorial.html">High MOI sceptre tutorial</a>
-    <a class="dropdown-item" href="../articles/lowmoi_tutorial.html">Low MOI sceptre tutorial</a>
-    <a class="dropdown-item" href="../articles/quality_control_in_low_moi.html">Low MOI Quality Control</a>
-  </div>
+<li class="active nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
@@ -53,9 +47,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="low-moi-functions">Low MOI functions<a class="anchor" aria-label="anchor" href="#low-moi-functions"></a></h2>
+      <h2 id="pipeline-functions">Pipeline functions<a class="anchor" aria-label="anchor" href="#pipeline-functions"></a></h2>
       
-      
+      <p class="section-desc"></p><p>The functions that form the basis of the <code>sceptre</code> pipeline</p>
 
       
     </div><div id="" class="section level2">
@@ -65,48 +59,94 @@
 
       <dl><dt>
           
-          <code><a href="run_sceptre_lowmoi.html">run_sceptre_lowmoi()</a></code> 
+          <code><a href="import_data.html">import_data()</a></code> 
         </dt>
-        <dd>Run <code>sceptre</code> (low MOI)</dd>
+        <dd>Import data</dd>
       </dl><dl><dt>
           
-          <code><a href="compute_cell_covariates.html">compute_cell_covariates()</a></code> 
+          <code><a href="import_data_from_cellranger.html">import_data_from_cellranger()</a></code> 
         </dt>
-        <dd>Compute cell covariates</dd>
+        <dd>Import data from cellranger</dd>
       </dl><dl><dt>
           
-          <code><a href="generate_all_pairs.html">generate_all_pairs()</a></code> 
+          <code><a href="set_analysis_parameters.html">set_analysis_parameters()</a></code> 
         </dt>
-        <dd>Generate all pairs</dd>
+        <dd>Set analysis parameters</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_calibration_result.html">plot_calibration_result()</a></code> 
+          <code><a href="assign_grnas.html">assign_grnas()</a></code> 
+        </dt>
+        <dd>Assign gRNAs to cells</dd>
+      </dl><dl><dt>
+          
+          <code><a href="run_qc.html">run_qc()</a></code> 
+        </dt>
+        <dd>Run QC</dd>
+      </dl><dl><dt>
+          
+          <code><a href="run_calibration_check.html">run_calibration_check()</a></code> 
+        </dt>
+        <dd>Run calibration check</dd>
+      </dl><dl><dt>
+          
+          <code><a href="run_power_check.html">run_power_check()</a></code> 
+        </dt>
+        <dd>Run power check</dd>
+      </dl><dl><dt>
+          
+          <code><a href="run_discovery_analysis.html">run_discovery_analysis()</a></code> 
+        </dt>
+        <dd>Run discovery analysis</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plotting-functions">Plotting functions<a class="anchor" aria-label="anchor" href="#plotting-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to visualize the analysis</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plot-sceptre_object-method.html">plot(<i>&lt;sceptre_object&gt;</i>)</a></code> 
+        </dt>
+        <dd>Plot</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_grna_count_distributions.html">plot_grna_count_distributions()</a></code> 
+        </dt>
+        <dd>Plot the number of cells per gRNA count</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_assign_grnas.html">plot_assign_grnas()</a></code> 
+        </dt>
+        <dd>Plot the number of gRNAs per cell</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_run_qc.html">plot_run_qc()</a></code> 
+        </dt>
+        <dd>Plot run QC</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_run_calibration_check.html">plot_run_calibration_check()</a></code> 
         </dt>
         <dd>Plot calibration result</dd>
       </dl><dl><dt>
           
-          <code><a href="compare_calibration_and_discovery_results.html">compare_calibration_and_discovery_results()</a></code> 
+          <code><a href="plot_run_discovery_analysis.html">plot_run_discovery_analysis()</a></code> 
         </dt>
-        <dd>Compare calibration and discovery results</dd>
+        <dd>Plot run discovery analysis</dd>
       </dl><dl><dt>
           
-          <code><a href="make_volcano_plot.html">make_volcano_plot()</a></code> 
+          <code><a href="plot_run_power_check.html">plot_run_power_check()</a></code> 
         </dt>
-        <dd>Make volcano plot</dd>
-      </dl><dl><dt>
-          
-          <code><a href="obtain_discovery_set.html">obtain_discovery_set()</a></code> 
-        </dt>
-        <dd>Obtain discovery set</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_resampling_distribution.html">plot_resampling_distribution()</a></code> 
-        </dt>
-        <dd>Plot resampling distribution</dd>
+        <dd>Plot power result</dd>
       </dl></div><div class="section level2">
-      <h2 id="experimental-high-moi-function">Experimental high MOI function<a class="anchor" aria-label="anchor" href="#experimental-high-moi-function"></a></h2>
+      <h2 id="pair-constructor-functions">Pair constructor functions<a class="anchor" aria-label="anchor" href="#pair-constructor-functions"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Functions to facilitate the construction of discovery pairs and positive control pairs</p>
 
       
     </div><div id="" class="section level2">
@@ -116,13 +156,23 @@
 
       <dl><dt>
           
-          <code><a href="run_sceptre_highmoi_experimental.html">run_sceptre_highmoi_experimental()</a></code> 
+          <code><a href="construct_positive_control_pairs.html">construct_positive_control_pairs()</a></code> 
         </dt>
-        <dd>Run <code>sceptre</code> (high MOI; experimental)</dd>
+        <dd>Construct positive control pairs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="construct_cis_pairs.html">construct_cis_pairs()</a></code> 
+        </dt>
+        <dd>Construct cis pairs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="construct_trans_pairs.html">construct_trans_pairs()</a></code> 
+        </dt>
+        <dd>Construct trans pairs</dd>
       </dl></div><div class="section level2">
-      <h2 id="high-moi-functions">High MOI functions<a class="anchor" aria-label="anchor" href="#high-moi-functions"></a></h2>
+      <h2 id="information-extraction-functions">Information extraction functions<a class="anchor" aria-label="anchor" href="#information-extraction-functions"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Functions to extract information and results from a <code>sceptre_object</code></p>
 
       
     </div><div id="" class="section level2">
@@ -132,28 +182,23 @@
 
       <dl><dt>
           
-          <code><a href="run_sceptre_highmoi.html">run_sceptre_highmoi()</a></code> 
+          <code><a href="print-sceptre_object-method.html">print(<i>&lt;sceptre_object&gt;</i>)</a></code> 
         </dt>
-        <dd>Run <code>sceptre</code> on high MOI data</dd>
+        <dd>Print</dd>
       </dl><dl><dt>
           
-          <code><a href="threshold_gRNA_matrix.html">threshold_gRNA_matrix()</a></code> 
+          <code><a href="write_outputs_to_directory.html">write_outputs_to_directory()</a></code> 
         </dt>
-        <dd>Threshold gRNA count matrix</dd>
+        <dd>Write outputs to directory</dd>
       </dl><dl><dt>
           
-          <code><a href="combine_perturbations.html">combine_perturbations()</a></code> 
+          <code><a href="get_result.html">get_result()</a></code> 
         </dt>
-        <dd>Combine perturbations</dd>
-      </dl><dl><dt>
-          
-          <code><a href="make_qq_plot.html">make_qq_plot()</a></code> 
-        </dt>
-        <dd>Make QQ-plot</dd>
+        <dd>Get result</dd>
       </dl></div><div class="section level2">
-      <h2 id="low-moi-example-data">Low MOI example data<a class="anchor" aria-label="anchor" href="#low-moi-example-data"></a></h2>
+      <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Example data to illustrate use of the functions</p>
 
       
     </div><div id="" class="section level2">
@@ -163,134 +208,21 @@
 
       <dl><dt>
           
-          <code><a href="covariate_data_frame_lowmoi.html">covariate_data_frame_lowmoi</a></code> 
+          <code><a href="highmoi_example_data.html">highmoi_example_data</a></code> 
         </dt>
-        <dd>Covariate data frame</dd>
+        <dd>Example high-MOI data</dd>
       </dl><dl><dt>
           
-          <code><a href="response_matrix_lowmoi.html">response_matrix_lowmoi</a></code> 
+          <code><a href="lowmoi_example_data.html">lowmoi_example_data</a></code> 
         </dt>
-        <dd>Response expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="grna_group_data_frame_lowmoi.html">grna_group_data_frame_lowmoi</a></code> 
-        </dt>
-        <dd>gRNA group data frame</dd>
-      </dl><dl><dt>
-          
-          <code><a href="grna_matrix_lowmoi.html">grna_matrix_lowmoi</a></code> 
-        </dt>
-        <dd>gRNA expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="lowmoi_data.html">lowmoi_data</a></code> 
-        </dt>
-        <dd><code>sceptre</code> package example low MOI data</dd>
-      </dl></div><div class="section level2">
-      <h2 id="high-moi-example-data">High MOI example data<a class="anchor" aria-label="anchor" href="#high-moi-example-data"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="gene_matrix_highmoi.html">gene_matrix_highmoi</a></code> 
-        </dt>
-        <dd>Gene expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="gRNA_matrix_highmoi.html">gRNA_matrix_highmoi</a></code> 
-        </dt>
-        <dd>gRNA expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="covariate_matrix_highmoi.html">covariate_matrix_highmoi</a></code> 
-        </dt>
-        <dd>Covariate matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="gRNA_groups_table_highmoi.html">gRNA_groups_table_highmoi</a></code> 
-        </dt>
-        <dd>gRNA groups table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="gene_gRNA_group_pairs_highmoi.html">gene_gRNA_group_pairs_highmoi</a></code> 
-        </dt>
-        <dd>Gene-gRNA group pairs</dd>
-      </dl><dl><dt>
-          
-          <code><a href="highmoi_data.html">highmoi_data</a></code> 
-        </dt>
-        <dd><code>sceptre</code> package example high MOI data</dd>
-      </dl></div><div class="section level2">
-      <h2 id="experimental-high-moi-example-data">Experimental high MOI example data<a class="anchor" aria-label="anchor" href="#experimental-high-moi-example-data"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="response_matrix_highmoi_experimental.html">response_matrix_highmoi_experimental</a></code> 
-        </dt>
-        <dd>Gene expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="grna_matrix_highmoi_experimental.html">grna_matrix_highmoi_experimental</a></code> 
-        </dt>
-        <dd>gRNA expression matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="covariate_data_frame_highmoi_experimental.html">covariate_data_frame_highmoi_experimental</a></code> 
-        </dt>
-        <dd>Covariate matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="discovery_pairs_highmoi_experimental.html">discovery_pairs_highmoi_experimental</a></code> 
-        </dt>
-        <dd>Discovery gene-gRNA group pairs</dd>
-      </dl><dl><dt>
-          
-          <code><a href="pc_pairs_highmoi_experimental.html">discovery_pairs_highmoi_experimental</a></code> 
-        </dt>
-        <dd>Positive control gene-gRNA group pairs</dd>
-      </dl><dl><dt>
-          
-          <code><a href="grna_group_data_frame_highmoi_experimental.html">grna_group_data_frame_highmoi_experimental</a></code> 
-        </dt>
-        <dd>gRNA groups table</dd>
-      </dl></div><div class="section level2">
-      <h2 id="package-information">Package information<a class="anchor" aria-label="anchor" href="#package-information"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="sceptre.html">sceptre</a></code> 
-        </dt>
-        <dd>sceptre</dd>
+        <dd>Example low-MOI data</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="https://timothy-barry.github.io/" class="external-link">Timothy Barry</a>, <a href="https://ekatsevi.github.io/" class="external-link">Eugene Katsevich</a>.</p>
+  <p></p><p>Developed by Timothy Barry, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown-footer-right">

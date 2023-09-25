@@ -443,6 +443,7 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 #'
 #' @param sceptre_object TBD
 #' @param return_indiv_plots TBD
+#' @param downsample_pairs TBD
 #' @param transparency TBD
 #' @param point_size TBD
 #'

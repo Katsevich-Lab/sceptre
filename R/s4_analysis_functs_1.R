@@ -1,4 +1,4 @@
-#' Carry out an analysis using `sceptre`
+#' Import data
 #'
 #' @param response_matrix TBD
 #' @param grna_matrix TBD
@@ -12,18 +12,15 @@
 #' #################
 #' # Low MOI example
 #' #################
-#' # 0. obtain the data required for a single-cell screen analysis
-#' data(response_matrix_lowmoi) # response-by-cell expression matrix
-#' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
-#' data(extra_covariates_lowmoi) # cell-by-covariate data frame
-#' data(grna_target_data_frame_lowmoi) # gRNA group information
+#' \dontrun{
+#' data("lowmoi_example_data")
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
-#' response_matrix = response_matrix_lowmoi,
-#' grna_matrix = grna_matrix_lowmoi,
-#' extra_covariates = extra_covariates_lowmoi,
-#' grna_target_data_frame = grna_target_data_frame_lowmoi,
+#' response_matrix = lowmoi_example_data$response_matrix,
+#' grna_matrix = lowmoi_example_data$grna_matrix,
+#' extra_covariates = lowmoi_example_data$extra_covariates,
+#' grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
 #' moi = "low")
 #' print(sceptre_object)
 #'
@@ -71,7 +68,8 @@
 #' # High MOI example
 #' ##################
 #' # 1. create the sceptre object from CellRanger output
-#' directories <- paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_", 1:2)
+#' directories <- paste0(system.file("extdata", package = "sceptre"),
+#' "/highmoi_example/gem_group_", 1:2)
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(directories = directories,
 #' moi = "high",
@@ -119,6 +117,7 @@
 #'
 #' # 8. obtain results; write outputs to directory
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
+#' }
 import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
@@ -158,6 +157,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @param positive_control_pairs TBD
 #' @param formula_object TBD
 #' @param side TBD
+#' @param grna_grouping_strategy TBD
 #' @param fit_parametric_curve TBD
 #' @param control_group TBD
 #' @param resampling_mechanism TBD

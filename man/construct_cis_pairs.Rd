@@ -15,13 +15,13 @@ construct_cis_pairs(
 \arguments{
 \item{sceptre_object}{TBD}
 
+\item{positive_control_pairs}{TBD}
+
 \item{distance_threshold}{TBD}
 
+\item{exclude_positive_control_grna_targets}{TBD}
+
 \item{ref_genome}{TBD}
-
-\item{grna_targets_to_exclude}{TBD}
-
-\item{response_grna_target_pairs_to_exclude}{TBD}
 }
 \value{
 TBD
