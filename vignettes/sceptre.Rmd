@@ -141,9 +141,9 @@ The second step is to set the analysis parameters, which are the parameters that
     side <- "left"
     ```
 
-3.  **gRNA grouping strategy**. Typically, multiple gRNAs are designed to target a given genomic element. The parameter `grna_grouping_strategy` controls if and how gRNAs that target the same genomic element are grouped. The default option, `"union"`, combines gRNAs that target the same element into a single "grouped gRNA;" this "grouped gRNA" is tested for association against the responses to which the given element is paired. `grna_grouping_strategy` also can be set to "singleton," in which case each gRNA targeting a given element is tested individually against the responses paired to that element. In our analysis of the example data, we use the default "union" strategy.
+3.  **gRNA grouping strategy**. Typically, multiple gRNAs are designed to target a given genomic element. The parameter `grna_grouping_strategy` controls if and how gRNAs that target the same genomic element are grouped. The default option, `"union"`, combines gRNAs that target the same element into a single "grouped gRNA;" this "grouped gRNA" is tested for association against the responses to which the element is paired. `grna_grouping_strategy` also can be set to "singleton," in which case each gRNA targeting a given element is tested individually against the responses paired to that element. In our analysis of the example data, we use the default "union" strategy.
 
-Finally, we set the analysis parameters by calling the function `set_analysis_parameters()`, passing `sceptre_object`, `discovery_pairs`, `positive_control_pairs`, and `side` as arguments. Note that `sceptre_object` and `discovery_pairs` are the only arguments that must be passed to this function.
+Finally, we set the analysis parameters by calling the function `set_analysis_parameters()`, passing `sceptre_object`, `discovery_pairs`, `positive_control_pairs`, and `side` as arguments. Note that `sceptre_object` and `discovery_pairs` are the only required arguments.
 
 ```{r, message=FALSE}
 sceptre_object <- set_analysis_parameters(sceptre_object = sceptre_object,
@@ -173,16 +173,18 @@ ggplot2::ggsave(filename = "grna_count_distribution.png", plot = p, device = "pn
 knitr::include_graphics("grna_count_distribution.png")
 ```
 
-We see that the gRNAs in this dataset display fairly bimodal count distributions. Consider, for example, `gRNA_ATTAGCA` (bottom left corner). Many cells exhibits a UMI count of $\leq 1$ or $\geq 5$ for `gRNA_ATTAGCA`, while only a handful of cells exhibits a UMI count of 2, 3, or 4. The vast majority of cells with a UMI count of 1 likely do not actually contain `gRNA_ATTAGCA`. This is a manifestation of "background contamination," the phenomenon by which gRNA transcripts sometimes map to cells that do not contain the corresponding gRNA.
+The gRNAs in this dataset display fairly bimodal count distributions. Consider, for example, `gRNA_ATTAGCA` (bottom left corner). Many cells exhibits a UMI count of $\leq 1$ or $\geq 5$ for this gRNA, while only a handful of cells exhibits a UMI count of 2, 3, or 4. The vast majority of cells with a UMI count of 1 likely do not actually contain `gRNA_ATTAGCA`. This is an example of "background contamination," the phenomenon by which gRNA transcripts sometimes map to cells that do not contain the corresponding gRNA.
 
-`sceptre` provides three methods for assigning gRNAs to cells, all of which account for background contamination. The default method for high-MOI data is a mixture-model based approach. The gRNA counts are regressed onto the (unobserved) gRNA presence/absence indicator and the cell-specific covariates (e.g., `grna_n_umis`, `batch`) via a latent variable Poisson GLM. The fitted model yields the probability that each cell contains the gRNA, and these probabilities are thresholded to assign the gRNA to cells. The default method in low-MOI is the "maximum" approach: the gRNA that produced the greatest number of UMIs in a given cell is assigned to that cell. Finally, `sceptre` offers the "thresholding" approach: a gRNA is assigned to a cell if the UMI count of the gRNA within the cell exceeds some integer threshold.
+`sceptre` provides three methods for assigning gRNAs to cells, all of which account for the background contamination issue. The default method for high-MOI data is a mixture-model based approach. The gRNA counts are regressed onto the (unobserved) gRNA presence/absence indicator and the cell-specific covariates (e.g., `grna_n_umis`, `batch`) via a latent variable Poisson GLM. The fitted model yields the probability that each cell contains the gRNA, and these probabilities are thresholded to assign the gRNA to cells. The default method in low-MOI is the simpler "maximum" approach: the gRNA that produced the greatest number of UMIs in a given cell is assigned to that cell. A backup option in both low- and high-MOI is the "thresholding" approach: a given gRNA is assigned to a given cell if the UMI count of that gRNA within that cell exceeds some integer threshold.
 
-We carry out the gRNA assignment step by calling the `assign_grnas()` function.
+We carry out the gRNA-to-cell assignments by calling the function `assign_grnas()`. `assign_grnas()` takes two main arguments: `sceptre_object` (required) and `method` (optional); the latter can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. In this example we use the default high-MOI assignment method of `"mixture"`. We also parallelize execution of the function by setting `parallel` to `TRUE`. (Windows users should set `parallel` to `FALSE`, as parallel execution is not yet configured for Windows.)
 
 ```{r,results='hide'}
 sceptre_object <- assign_grnas(sceptre_object = sceptre_object,
                                parallel = TRUE)
 ```
+
+We can call `plot()` on the resulting
 
 ```{r,eval=FALSE}
 plot(sceptre_object)
@@ -195,3 +197,5 @@ knitr::include_graphics("grna_count_assignments.png")
 ```
 
 ## IV. Run quality control (optional)
+
+The fourth step is to run quality control. This step likewise can be skipped, in which case quality control automatically is run with default arguments.
