@@ -26,7 +26,7 @@
 #' @param seed : for the random part of the data
 #'
 #' @return a sparse matrix of class \code{dgTMatrix} mocking a response matrix.
-#' @export
+#'
 #'
 #' @examples
 #' # mock response UMI matrix with 5 rows and 20 columns
@@ -92,7 +92,7 @@ sample_as_vec <- function(x) {
 #' @param shuffle : if TRUE then the values of the vector are shuffled
 #'
 #' @return
-#' @export
+#'
 #'
 #' @examples
 make_random_factor <- function(num_factor_levels, num_entries, level_name_base = "lev", return_factor = TRUE, shuffle = FALSE) {
@@ -138,7 +138,7 @@ make_random_factor <- function(num_factor_levels, num_entries, level_name_base =
 #' @param seed
 #'
 #' @return a data.frame with the specified covariates, with each row corresponding to a cell.
-#' @export
+#'
 #'
 #' @examples
 #' # just doing replicate for 20 cells
@@ -195,7 +195,7 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
 #'
 #' @return : a data.frame with two columns, one giving the provided \code{grna_labels},
 #' and the other giving the newly created \code{grna_target}.
-#' @export
+#'
 #'
 #' @examples
 #' make_mock_grna_target_data(paste0("grna_", 1:12), 4)
@@ -228,5 +228,5 @@ make_mock_grna_target_data <- function(grna_labels, num_targets, seed = NULL) {
 # (mock_covariates <- make_mock_extra_covariates(rep_level_counts = rep_levels))
 # ## if we want a fancier one
 # # make_mock_extra_covariates(rep_level_counts = rep_levels, add_numeric = 2, add_count = 1, add_factor = 3, max_num_factor_levels = 4)
-# (mock_grna_target_data_frame <- make_mock_grna_target_data(rownames(mock_response), num_distinct_targets))
+# (mock_grna_target_data_frame <- make_mock_grna_target_data(rownames(mock_grna), num_distinct_targets))
 
