@@ -1,5 +1,6 @@
 url: https://katsevich-lab.github.io/sceptre/
 template:
+  assets: .r_examples/r_examples
   bootstrap: 5
 
 reference:
@@ -49,6 +50,7 @@ reference:
     Example data to illustrate use of the functions
   contents:
   - highmoi_example_data
+  - grna_target_data_frame_highmoi
   - lowmoi_example_data
 
 authors:
