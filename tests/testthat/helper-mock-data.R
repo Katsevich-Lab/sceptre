@@ -195,29 +195,42 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
 #' Mock grna_id to grna_target data.frame
 #'
 #' @param grna_labels : a vector of unique grna id's
-#' @param num_targets : the number of groups to form out of those
+#' @param num_targets : either a single integer or a vector of integers summing to \code{length(grna_labels)}. If a single integer, then it is the number of groups to partition \code{grna_labels} into, and the partitioning is done randomly. If instead \code{num_targets} has length greater than one, it is taken to be the sizes of each partition, and \code{grna_labels} are then deterministically partitioned into these groups.
 #'
 #' @return : a data.frame with two columns, one giving the provided \code{grna_labels},
 #' and the other giving the newly created \code{grna_target}.
 #'
 #'
 #' @examples
+#' # randomly partition these labels into 4 groups
 #' make_mock_grna_target_data(paste0("grna_", 1:12), 4)
+#' # deterministically partition these labels into 3 groups with respective sizes of 2, 3, and 7
+#' make_mock_grna_target_data(paste0("grna_", 1:12), c(2,3,7))
 make_mock_grna_target_data <- function(grna_labels, num_targets, seed = NULL) {
   if(is.null(seed)) {
     seed = 10102
   }
   set.seed(seed)
 
-  data.frame(
-    grna_id = grna_labels,
-    grna_target = make_random_factor(
+  mock_grna_to_target <- data.frame(grna_id = grna_labels, stringsAsFactors = FALSE)
+
+  # if we just get an integer, then make a random factor
+  if(length(num_targets) == 1) {
+    mock_grna_to_target$grna_target <- make_random_factor(
       num_factor_levels = num_targets, num_entries = length(grna_labels),
       level_name_base = "grna_target", return_factor = FALSE
     )
-  )
+  } else { # otherwise it is deterministic
+    if(sum(num_targets) != length(grna_labels)) {
+      stop("If `num_targets` has length > 1 then it must sum to `length(grna_labels)`.")
+    }
+    mock_grna_to_target$grna_target <- rep(
+      paste0("grna_target_", 1:length(num_targets)),
+      num_targets
+    )
+  }
+  return(mock_grna_to_target)
 }
-
 
 #############
 ## Example ##
