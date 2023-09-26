@@ -9,10 +9,10 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' #################
 #' # Low MOI example
 #' #################
-#' \dontrun{
 #' data("lowmoi_example_data")
 #'
 #' # 1. create the sceptre object

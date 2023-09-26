@@ -282,7 +282,8 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
 
   p_c <- ggplot2::ggplot(data = calibration_result |> dplyr::filter(abs(log_2_fold_change) < 0.6),
                          mapping = ggplot2::aes(x = log_2_fold_change)) +
-    ggplot2::geom_histogram(binwidth = 0.02, fill = "grey90", col = "black", boundary = 0) +
+    ggplot2::geom_histogram(binwidth = if (nrow(calibration_result) > 10000) 0.02 else 0.05,
+                            fill = "grey90", col = "black", boundary = 0) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
     ggplot2::xlab("Estimated log fold change") + ggplot2::ylab("Density") +
