@@ -32,7 +32,7 @@ library(Matrix)
 
 ## The whole game
 
-Using `sceptre` is simple. Below, we provide a minimal working example of applying `sceptre` to analyze the example data. First, we load the example data into R via the function `import_data_from_cellranger()`, thereby creating a `sceptre_object`, which is an object-based representation of the single-cell CRISPR screen data. Next, we specify the gRNA-gene pairs that we seek to test for association. Then, we call the pipeline functions on the `sceptre_object` in order. Finally, we write the outputs to the directory `~/sceptre_outputs`.
+Using `sceptre` is simple; carrying out an entire analysis requires only a few lines of code. Below, we provide a minimal working example of applying `sceptre` to analyze the example data. First, we load the example data into R via the function `import_data_from_cellranger()`, thereby creating a `sceptre_object`, which is an object-based representation of the single-cell CRISPR screen data. Next, we specify the gRNA-gene pairs that we seek to test for association. Then, we call the pipeline functions on the `sceptre_object` in order. Finally, we write the outputs to the directory `~/sceptre_outputs`.
 
 ```{r, eval=FALSE}
 # load the data, creating a sceptre_object
@@ -160,7 +160,7 @@ print(sceptre_object)
 
 ## III. Assign gRNAs to cells (optional)
 
-The third step is to assign gRNAs to cells. This step can be skipped, in which case gRNAs are assigned to cells automatically using default options. We begin by plotting the UMI count distribution of several randomly selected gRNAs, which we do by calling the function `plot_grna_count_distributions()`.
+The third step is to assign gRNAs to cells. This step can be skipped, in which case gRNAs are assigned to cells automatically using default options. The gRNA assignment step involves operating on the gRNA count matrix; thus, we begin by plotting the UMI count distribution of several randomly selected gRNAs via a call to the function `plot_grna_count_distributions()`.
 
 ```{r, eval=FALSE}
 plot_grna_count_distributions(sceptre_object)
@@ -173,29 +173,70 @@ ggplot2::ggsave(filename = "grna_count_distribution.png", plot = p, device = "pn
 knitr::include_graphics("grna_count_distribution.png")
 ```
 
-The gRNAs in this dataset display fairly bimodal count distributions. Consider, for example, `gRNA_ATTAGCA` (bottom left corner). Many cells exhibits a UMI count of $\leq 1$ or $\geq 5$ for this gRNA, while only a handful of cells exhibits a UMI count of 2, 3, or 4. The vast majority of cells with a UMI count of 1 likely do not actually contain `gRNA_ATTAGCA`. This is an example of "background contamination," the phenomenon by which gRNA transcripts sometimes map to cells that do not contain the corresponding gRNA.
+The gRNAs display fairly bimodal count distributions (and in fact this is often the case). Consider, for example, `gRNA_CCTGACA` (top left corner). This gRNA exhibits a UMI count of $\leq 1$ or $\geq 5$ in most cells and a UMI count of 2, 3, or 4 in only a handful of cells. The vast majority of cells with a UMI count of 1 likely do not actually contain `gRNA_CCTGACA`. This is an example of "background contamination," the phenomenon by which gRNA transcripts sometimes map to cells that do not contain the corresponding gRNA.
 
-`sceptre` provides three methods for assigning gRNAs to cells, all of which account for the background contamination issue. The default method for high-MOI data is a mixture-model based approach. The gRNA counts are regressed onto the (unobserved) gRNA presence/absence indicator and the cell-specific covariates (e.g., `grna_n_umis`, `batch`) via a latent variable Poisson GLM. The fitted model yields the probability that each cell contains the gRNA, and these probabilities are thresholded to assign the gRNA to cells. The default method in low-MOI is the simpler "maximum" approach: the gRNA that produced the greatest number of UMIs in a given cell is assigned to that cell. A backup option in both low- and high-MOI is the "thresholding" approach: a given gRNA is assigned to a given cell if the UMI count of that gRNA within that cell exceeds some integer threshold.
+`sceptre` provides three methods for assigning gRNAs to cells, all of which account for the background contamination issue. The default method for high-MOI data is a mixture-model based approach. The gRNA counts are regressed onto the (unobserved) gRNA presence/absence indicator and the cell-specific covariates (e.g., `grna_n_umis`, `batch`) via a latent variable Poisson GLM. The fitted model yields the probability that each cell contains the gRNA, and these probabilities are thresholded to assign the gRNA to cells. The default method in low-MOI is the simpler "maximum" approach: the gRNA that accounts for the greatest number of UMIs in a given cell is assigned to that cell. A backup option in both low- and high-MOI is the "thresholding" approach: a given gRNA is assigned to a given cell if the UMI count of that gRNA within that cell exceeds some integer threshold.
 
-We carry out the gRNA-to-cell assignments by calling the function `assign_grnas()`. `assign_grnas()` takes two main arguments: `sceptre_object` (required) and `method` (optional); the latter can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. In this example we use the default high-MOI assignment method of `"mixture"`. We also parallelize execution of the function by setting `parallel` to `TRUE`. (Windows users should set `parallel` to `FALSE`, as parallel execution is not yet configured for Windows.)
+We assign gRNAs to cells by calling the function `assign_grnas()`. `assign_grnas()` takes arguments `sceptre_object` (required) and `method` (optional); the latter argument can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. (In this example we use the default method of `"mixture"` in high-MOI.) We parallelize execution of the function by setting `parallel` to `TRUE`. (Windows users should set `parallel` to `FALSE`, as parallel execution is not yet configured for Windows.)
 
 ```{r,results='hide'}
 sceptre_object <- assign_grnas(sceptre_object = sceptre_object,
                                parallel = TRUE)
 ```
 
-We can call `plot()` on the resulting
+We call `plot()` on the resulting `sceptre_object`, which renders a plot summarizing the gRNA-to-cell assignments.
 
 ```{r,eval=FALSE}
 plot(sceptre_object)
 ```
 
 ```{r, out.width = "550px", fig.align="center", echo = FALSE, fig.cap=c("gRNA-to-cell assignments")}
+set.seed(3)
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "grna_count_assignments.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
 knitr::include_graphics("grna_count_assignments.png")
 ```
 
+The top panel displays plots representing the gRNA-to-cell assignments of three randomly selected gRNAs. Each point in a given plot is a cell; the y-axis indicates the UMI count of the gRNA in that cell, and the x-axis indicates whether that cell has been classified as "perturbed" (i.e., it *contains* the gRNA) or unperturbed (i.e., it does *not contain* the gRNA). Perturbed (resp., unperturbed) cells are shown in the left (resp., right) column. The bottom left panel is a barplot of the number of cells that each gRNA has infected. Finally, the bottom right panel is a histogram of the number of gRNAs contained in each cell. The mean number of gRNAs per cell --- i.e., the MOI --- is displayed in the purple text.
+
+We call `print()` on the `sceptre_object`, which prints some helpful information about the gRNA-to-cell assignments and the status of the analysis (output repressed in vignette).
+
+```{r, eval=FALSE}
+print(sceptre_object)
+```
+
 ## IV. Run quality control (optional)
 
-The fourth step is to run quality control. This step likewise can be skipped, in which case quality control automatically is run with default arguments.
+The fourth step is to run quality control (QC). This step likewise can be skipped, in which case QC is applied automatically using default options. `sceptre` implements two kinds of QC: cellwise QC and pairwise QC. Cellwise QC aims to remove low-quality cells, while pairwise QC aims to remove low-quality target-response pairs.
+
+`sceptre` implements standard single-cell cellwise QC. Cells with an extremely high or an extremely low `response_n_nonzero` (i.e., number of expressed responses) value or `response_n_umis` (i.e., number of response UMIs) value are removed. Likewise, cells with an excessively large `response_p_mito` (i.e., fraction of reads mapping to mitochondrial genes) value are removed. Additionally, on low-MOI data, cells that contain multiple gRNAs (as determined by the RNA-to-cell assignment step) are removed. Finally, users optionally can provide a list of additional cells to remove.
+
+`sceptre` also implements QC at the level of the target-response pair. For a given pair we define the "treatment cells" as those that contain a targeting gRNA. Next, we define the "control cells" as the cells against which the treatment cells are compared to carry out the differential expression test. We define the "number of nonzero treatment cells" (`n_nonzero_trt`) as the number of *treatment* cells with nonzero expression of the response; likewise, we define the "number of nonzero control cells" (`n_nonzero_cntrl`) as the number of *control* cells with nonzero expression of the response. `sceptre` filters out pairs for which `n_nonzero_trt` or `n_nonzero_cntrl` falls below some threshold (by default 7).
+
+We carry out QC by calling the function `run_qc`. The arguments to this function control the stringency of the various QC thresholds and are set to reasonable defaults.
+
+```{r}
+sceptre_object <- run_qc(sceptre_object)
+```
+
+We can visualize the output of the QC step by calling `plot()` on the updated `sceptre_object`.
+
+```{r,eval=FALSE}
+plot(sceptre_object)
+```
+
+```{r, out.width = "400px", fig.align="center", echo = FALSE, fig.cap=c("Cellwise and pairwise quality control")}
+p <- plot(sceptre_object)
+ggplot2::ggsave(filename = "qc.png", plot = p, device = "png", scale = 1.1, width = 3.5, height = 4, dpi = 330)
+knitr::include_graphics("qc.png")
+```
+
+The top panel displays the output of the cellwise QC step. The various cellwise QC filters (e.g., "Any filter," "N nonzero responses," "N response UMIs," etc.) are shown on the x-axis, and the percentage of cells removed due application of a given QC filter is shown on the y-axis. Note that a cell could be flagged by multiple QC filters; for example, a cell might have an extremely high `response_n_umi` value *and* an extremely high `response_n_nonzero` value. Thus, the height of the "any filter" bar need not be equal to the sum of the heights of the other bars. The bottom panel displays the output of the pairwise QC step. Each point corresponds to a target-response pair; the y-axis (resp., x-axis) indicates the `n_nonzero_trt` (resp., `n_nonzero_cntrl`) value for that pair. Pairs for which `n_nonzero_trt` or `n_nonzero_cntrl` fall below the threshold are removed.
+
+Finally, we call `print()` on the updated `sceptre_object`, which prints to the console information about the QC step.
+
+```{r,eval=FALSE}
+print(sceptre_object)
+```
+
+## V. Run calibration check
