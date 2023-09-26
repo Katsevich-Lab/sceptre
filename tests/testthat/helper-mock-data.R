@@ -45,10 +45,10 @@ make_mock_count_matrix <- function(num_genes, num_cells, rowname_base, patterns_
   }
   set.seed(seed)
   dims <- if(patterns_at_col_level) c(num_genes, num_cells) else c(num_cells, num_genes)
-  if(dims[2] < 14) {
-    stop("There are 14 required patterns and the provided dimensions are too small.")
+  if(dims[2] < 13) {
+    stop("There are 13 required patterns and the provided dimensions are too small.")
   }
-  data_systematic <- cbind(
+  mock_response_matrix <- cbind(
     0, 1, big, # constant columns
     rep(c(0,1), c(dims[1]-1, 1)),  rep(c(0, 1), c(1, dims[1]-1)), # all but one element constant
     rep(c(big, 0), c(dims[1]-1, 1)) ,rep(c(big, 1), c(dims[1]-1, 1)),
@@ -57,12 +57,16 @@ make_mock_count_matrix <- function(num_genes, num_cells, rowname_base, patterns_
     (0:(dims[1] - 1)) * big, (dims[1]:1) * big
   ) |>
     `colnames<-`(NULL) # the use of `big` adds a single column name
-  data_random <- matrix(
-    rpois(dims[1] * (dims[2] - ncol(data_systematic)), 1),
-    nrow = dims[1]
-  )
-  mock_response_matrix <- cbind(data_systematic, data_random)
-
+  # if we have more columns than the deterministic patterns, then add in random features
+  if(dims[2] >= 14) {
+    mock_response_matrix <- cbind(
+      mock_response_matrix,
+      matrix(
+        rpois(dims[1] * (dims[2] - ncol(mock_response_matrix)), 1),
+        nrow = dims[1]
+      )
+    )
+  }
   if(!patterns_at_col_level) {
     mock_response_matrix <- t(mock_response_matrix)
   }
