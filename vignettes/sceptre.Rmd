@@ -220,7 +220,7 @@ plot(sceptre_object)
 
 ```{r, out.width = "450px", fig.align="center", echo = FALSE, fig.cap=c("Cellwise and pairwise quality control")}
 p <- plot(sceptre_object)
-ggplot2::ggsave(filename = "qc.png", plot = p, device = "png", scale = 1.1, width = 3, height = 3.5, dpi = 330)
+ggplot2::ggsave(filename = "qc.png", plot = p, device = "png", scale = 1.1, width = 4, height = 4.5, dpi = 330)
 knitr::include_graphics("qc.png")
 ```
 
@@ -338,7 +338,7 @@ We also can obtain the calibration check, power check, and discovery analysis re
 result <- get_result(sceptre_object, analysis = "run_discovery_analysis")
 ```
 
-`result` is a data frame, the rows of which correspond to a target-response pairs, and the columns of which are as follows: `response_id`, `grna_target`, `n_nonzero_trt`, `n_nonzero_cntrl`, `pass_qc` (a `TRUE`/`FALSE` value indicating whether the pair passes pairwise QC), `p_value`, `log_2_fold_change`, and `significant` (a `TRUE`/`FALSE` value indicating whether the pair is called as significant).
+`result` is a data frame, the rows of which correspond to target-response pairs, and the columns of which are as follows: `response_id`, `grna_target`, `n_nonzero_trt`, `n_nonzero_cntrl`, `pass_qc` (a `TRUE`/`FALSE` value indicating whether the pair passes pairwise QC), `p_value`, `log_2_fold_change`, and `significant` (a `TRUE`/`FALSE` value indicating whether the pair is called as significant).
 
 ```{r}
 head(result)
