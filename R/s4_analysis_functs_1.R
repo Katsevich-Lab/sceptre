@@ -118,7 +118,7 @@
 #' # 8. obtain results; write outputs to directory
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
 #' }
-import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
+import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
 

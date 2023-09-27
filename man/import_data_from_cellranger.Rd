@@ -4,7 +4,12 @@
 \alias{import_data_from_cellranger}
 \title{Import data from cellranger}
 \usage{
-import_data_from_cellranger(directories, moi, grna_target_data_frame)
+import_data_from_cellranger(
+  directories,
+  moi,
+  grna_target_data_frame,
+  extra_covariates = NULL
+)
 }
 \arguments{
 \item{directories}{TBD}
@@ -20,13 +25,22 @@ a sceptre_object initialized
 Import data from cellranger
 }
 \examples{
-
 \dontrun{
-base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"
-# load the grna group df
-grna_target_data_frame <- readRDS(paste0(base_dir, "grna_group_df.rds"))
-# set paths to the directories containing the cellranger count outputs
-directories <- paste0(base_dir, "gemgroup", 1:3)
-sceptre_object <- import_data_from_cellranger(directories, "low", grna_target_data_frame)
+# 1. create the sceptre object from CellRanger output
+directories <- paste0(system.file("extdata", package = "sceptre"),
+                     "/highmoi_example/gem_group_", 1:2)
+data(grna_target_data_frame_highmoi)
+
+# 2. simulate an additional covariate
+cell_type <- sample(x = paste0("type_", 1:3),
+size = 45919,
+replace = TRUE) |> factor()
+extra_covariates <- data.frame(cell_type = cell_type)
+
+# 3. initialize the sceptre_object
+sceptre_object <- import_data_from_cellranger(directories = directories,
+                                              moi = "high",
+                                              grna_target_data_frame = grna_target_data_frame_highmoi,
+                                              extra_covariates = extra_covariates)
 }
 }

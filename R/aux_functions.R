@@ -55,7 +55,7 @@ auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_cov
   covariate_df <- cbind(covariate_df, grna_covariate_df)
 
   # if extra covariates have been provided, add those as well
-  if (!is.null(extra_covariates)) {
+  if (nrow(extra_covariates) >= 1L) {
     covariate_df <- cbind(covariate_df, extra_covariates)
   }
   return(covariate_df)
