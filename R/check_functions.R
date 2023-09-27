@@ -37,7 +37,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 8. check for agreement in number of cells
   check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
-  if (!is.null(extra_covariates)) {
+  if (nrow(extra_covariates) >= 1L) {
     check_ncells <- check_ncells && (ncol(response_matrix) == nrow(extra_covariates))
   }
   if (!check_ncells) {
