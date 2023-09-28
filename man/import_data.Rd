@@ -9,7 +9,7 @@ import_data(
   grna_matrix,
   grna_target_data_frame,
   moi,
-  extra_covariates = NULL,
+  extra_covariates = data.frame(),
   response_names = NA_character_
 )
 }

@@ -348,4 +348,5 @@ head(result)
 
 Each step of the pipeline has its own dedicated vignette. We encourage advanced users to read through these additional vignettes to learn more about the various options available at each step of the pipeline.
 
--   Data import: `vignette("import-data")`
+-   Import data: `vignette("import-data")`
+-   Set analysis parameters: `vignette("set-analysis-parameters")`

@@ -204,15 +204,3 @@ write_sceptre_object_to_cellranger_format <- function(sceptre_object, directory)
   }
   return(NULL)
 }
-
-
-#' Add extra covariates to a sceptre object
-#'
-#' @param sceptre_object TBD
-#' @param extra_covariates TBD
-#'
-#' @return TBD
-#' @export
-add_extra_covariates <- function(sceptre_object, extra_covariates) {
-  sceptre_object
-}

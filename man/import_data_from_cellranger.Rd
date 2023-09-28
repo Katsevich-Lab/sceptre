@@ -8,7 +8,7 @@ import_data_from_cellranger(
   directories,
   moi,
   grna_target_data_frame,
-  extra_covariates = NULL
+  extra_covariates = data.frame()
 )
 }
 \arguments{
@@ -17,9 +17,11 @@ import_data_from_cellranger(
 \item{moi}{TBD}
 
 \item{grna_target_data_frame}{TBD}
+
+\item{extra_covariates}{TBD}
 }
 \value{
-a sceptre_object initialized
+TBD
 }
 \description{
 Import data from cellranger
@@ -33,8 +35,8 @@ data(grna_target_data_frame_highmoi)
 
 # 2. simulate an additional covariate
 cell_type <- sample(x = paste0("type_", 1:3),
-size = 45919,
-replace = TRUE) |> factor()
+                    size = 45919,
+                    replace = TRUE) |> factor()
 extra_covariates <- data.frame(cell_type = cell_type)
 
 # 3. initialize the sceptre_object

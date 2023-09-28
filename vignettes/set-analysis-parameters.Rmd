@@ -1,0 +1,113 @@
+---
+title: "Set analysis parameters"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Set analysis parameters}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette explicatess the "set analysis parameters" step of the `sceptre` pipeline, which involves selecting the parameters that govern how the statistical analysis is to be carried out.
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE}
+knitr::include_graphics("pipeline_schematic_step_2.png")
+```
+
+We begin by loading the `sceptre` package.
+
+```{r}
+library(sceptre)
+```
+
+Throughout, we examine two example datasets. First, we examine the example high-MOI CRISPRi screen of candidate enhancers in K562 cells. This is the example dataset that we used in the Get Started (`vignette("sceptre")`) and Import Data (`vignette("import-data")`) vignettes. We initialize a `sceptre_object` called `sceptre_object_highmoi` to represent these data.
+
+```{r}
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+sceptre_object_highmoi <- import_data(response_matrix = highmoi_example_data$response_matrix,
+                                      grna_matrix = highmoi_example_data$grna_matrix,
+                                      grna_target_data_frame = grna_target_data_frame_highmoi,
+                                      moi = "high",
+                                      extra_covariates = highmoi_example_data$extra_covariates,
+                                      response_names = highmoi_example_data$gene_names)
+```
+
+Next, we examine an example low-MOI CRISPRko screen of gene transcription start sites in immune cells. We initialize a `sceptre_object` called `sceptre_object_lowmoi` to store this latter dataset.
+
+```{r}
+sceptre_object_lowmoi <- import_data(response_matrix = lowmoi_example_data$response_matrix,
+                                     grna_matrix = lowmoi_example_data$grna_matrix,
+                                     extra_covariates = lowmoi_example_data$extra_covariates,
+                                     grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+                                     moi = "low")
+```
+
+We print the details of the CRISPRko dataset below.
+
+```{r}
+sceptre_object_lowmoi
+```
+
+The CRISPR targets are gene transcription start sites, and the measured molecular phenotype is the set of gene expressions. Each gene is targeted by three or four gRNAs; additionally, nine gRNAs in the dataset are non-targeting. We print a few rows of the gRNA target data frame corresponding to this dataset below.
+
+```{r}
+lowmoi_example_data$grna_target_data_frame[1:8,]
+```
+
+Our goal in analyzing this dataset is to dissect gene regulatory networks by linking perturbations of genes to changes in the expression of other genes.
+
+We set the analysis parameters by calling the function `set_analysis_parameters()` on the `sceptre_object`. `set_analysis_parameters()` takes several arguments: `positive_control_pairs`, `discovery_pairs`, `side`, `grna_grouping_strategy`, `formula_object`, `control_group`, `resampling_mechanism`, `fit_parametric_curve`, `multiple_testing_method`, and `multiple_testing_alpha`. The only required argument among these is `discovery_pairs`. We describe these arguments below.
+
+## Positive control pairs
+
+Positive control pairs are target-response pairs for which we know (or have strong reason to believe) that there is a regulatory relationship between the target and the response. We can use positive control pairs to verify that `sceptre` (or any association testing method for that matter) is sensitive (i.e., capable of detecting true associations) on the dataset under analysis. We use the function `construct_positive_control_pairs()` to construct the positive control pairs. `construct_positive_control_pairs()` takes as an argument a `sceptre_object` and returns a data frame with columns `target` and `response_id`, where gRNA targets that coincide with response IDs are paired. We call `construct_positive_control_pairs()` on both the high-MOI CRISPRi dataset the low-MOI CRISPRko dataset. In both cases transcription start sites are paired to genes regulated by those transcription start sites.
+
+```{r}
+positive_control_pairs_highmoi <- construct_positive_control_pairs(sceptre_object_highmoi)
+head(positive_control_pairs_highmoi) # high MOI CRISPRi dataset
+```
+
+```{r}
+positive_control_pairs_lowmoi <- construct_positive_control_pairs(sceptre_object_lowmoi)
+head(positive_control_pairs_lowmoi) # low MOI CRISPRko dataset
+```
+
+Positive control pairs need not consist exclusively of gene transcription start sites paired to target genes. For example, enhancer-gene links that have been validated previously (through, e.g., an arrayed CRISPR screen) also can serve as positive control pairs. Users manually can append additional positive control pairs to the positive control pair data frame via a call to `rbind()`. For example, suppose we know on the high-MOI CRISPRi data that `candidate_enh_1` regulates gene `ENSG00000069482` and that `candidate_enh_10` regulates gene `ENSG00000135821`. We could add these enhancer-gene links to the positive control pair data frame as follows.
+
+```{r}
+# construct data frame of additional positive control pairs
+additional_positive_control_pairs <-
+  data.frame(grna_target = c("candidate_enh_1", "candidate_enh_10"),
+             response_id = c("ENSG00000069482", "ENSG00000135821"))
+
+# append additional pairs to positive control data frame
+positive_control_pairs_updated <- rbind(positive_control_pairs_highmoi,
+                                        additional_positive_control_pairs)
+positive_control_pairs_updated
+```
+
+We then could supply `positive_control_pairs_updated` instead of `positive_control_pairs_highmoi` to `set_analysis_parameters()`.
+
+## Discovery pairs
+
+Discovery pairs are target-response pairs whose association status we do not know but seek to learn. Unlike positive control and negative control pairs, which serve a mainly technical purpose, discovery pairs are of primary scientific interest. `sceptre` provides two helper functions for constructing discovery pairs: `construct_cis_pairs()` and `construct_trans_pairs()`.
+
+`construct_cis_pairs()` returns the set of target-response pairs in close physical proximity.
+
+## Side
+
+`sceptre` can run left-tailed, right-tailed, and two-tailed tests of association. Left-tailed tests test for a *decrease* in expression, right-tailed tests test for an *increase* in expression, and two-tailed tests test for an increase *or* decrease in expression. The parameter `side` controls the sidedness of the test and can take values `"left"`, `"right"`, or `"both"`. (`"both"` indicates a two-tailed test.) Two-tailed tests typically are the best choice for *trans* analyses, as the direction of *trans* relationships generally is uncertain. For *cis* analyses, on the other hand, the sidedness of the test should be chosen on the basis of the genomic element targeted and the CRISPR perturbation modality. The following table summarizes whether a left- or right-tailed test is appropriate for a *cis* analysis as a function of these variables.
+
+| **Target element** | **CRISPR modality** | **Testing for**        | **Sidedness** |
+|-------------------|------------------|------------------|------------------|
+| Enhancer           | CRISPRi or CRISPRko | Decrease in expression | Left          |
+| Enhancer           | CRISPRa             | Increase in expression | Right         |
+| Silencer           | CRISPRi or CRISPRko | Increase in expression | Right         |
+| Silencer           | CRISPRa             | Decrease in expression | Left          |

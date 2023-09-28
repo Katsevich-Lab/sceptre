@@ -177,7 +177,6 @@ set_analysis_parameters <- function(sceptre_object,
                                     fit_parametric_curve = TRUE,
                                     control_group = "default",
                                     resampling_mechanism = "default",
-                                    B1 = 499L, B2 = 4999L, B3 = 24999L,
                                     multiple_testing_method = "BH",
                                     multiple_testing_alpha = 0.1) {
   # 0. verify that function called in correct order
@@ -196,6 +195,7 @@ set_analysis_parameters <- function(sceptre_object,
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
+  B1 <- 499L; B2 = 4999L; B3 <- 24999L
 
   # 2. check inputs
   check_set_analysis_parameters(sceptre_object = sceptre_object, formula_object = formula_object,
