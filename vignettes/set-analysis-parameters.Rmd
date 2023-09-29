@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette explicatess the "set analysis parameters" step of the `sceptre` pipeline, which involves selecting the parameters that govern how the statistical analysis is to be carried out.
+This vignette explicates the "set analysis parameters" step of the `sceptre` pipeline. This step of the pipeline involves selecting the parameters that govern how the statistical analysis is to be carried out.
 
 ```{r, out.width = "650px", fig.align="center", echo = FALSE}
 knitr::include_graphics("pipeline_schematic_step_2.png")
@@ -63,7 +63,7 @@ lowmoi_example_data$grna_target_data_frame[1:8,]
 
 Our goal in analyzing this dataset is to dissect gene regulatory networks by linking perturbations of genes to changes in the expression of other genes.
 
-We set the analysis parameters by calling the function `set_analysis_parameters()` on the `sceptre_object`. `set_analysis_parameters()` takes several arguments: `positive_control_pairs`, `discovery_pairs`, `side`, `grna_grouping_strategy`, `formula_object`, `control_group`, `resampling_mechanism`, `fit_parametric_curve`, `multiple_testing_method`, and `multiple_testing_alpha`. The only required argument among these is `discovery_pairs`. We describe these arguments below.
+We set the analysis parameters by calling the function `set_analysis_parameters()` on the `sceptre_object`. `set_analysis_parameters()` takes several arguments: `positive_control_pairs`, `discovery_pairs`, `side`, `grna_grouping_strategy`, `control_group`, `resampling_mechanism`, `formula_object`, `fit_parametric_curve`, `multiple_testing_method`, and `multiple_testing_alpha`. The only required argument among these is `discovery_pairs`. We describe these arguments below.
 
 ## Positive control pairs
 
@@ -95,11 +95,27 @@ positive_control_pairs_updated
 
 We then could supply `positive_control_pairs_updated` instead of `positive_control_pairs_highmoi` to `set_analysis_parameters()`.
 
-## Discovery pairs
+## Discovery pairs (required)
 
 Discovery pairs are target-response pairs whose association status we do not know but seek to learn. Unlike positive control and negative control pairs, which serve a mainly technical purpose, discovery pairs are of primary scientific interest. `sceptre` provides two helper functions for constructing discovery pairs: `construct_cis_pairs()` and `construct_trans_pairs()`.
 
-`construct_cis_pairs()` returns the set of target-response pairs in close physical proximity.
+`construct_cis_pairs()` returns the set of target-response pairs for which the target and response are located on the same chromosome and in close physical proximity to one another. (It is assumed that the responses are genes as opposed to, say, proteins. It is also assumed that the columns `chr`, `start`, and `stop` are present within the `grna_target_data_frame`.) `construct_cis_pairs()` is a useful pair constructor function for screens that aim to map noncoding regulatory elements (e.g., enhancers, silencers, or noncoding GWAS variants) to target genes in *cis*. `construct_cis_pairs()` takes several arguments: `sceptre_object` (required) `distance_threshold` (optional), `positive_control_pairs` (optional), and `ref_genome` (optional). Each target is paired to the set of genes within `distance_threshold` bases of that target. (The default value of `distance_threshold` is 500,000 bases, or half a megabase.) The `positive_control_pairs` data frame optionally can be passed to `construct_cis_pairs()`, in which case the positive control targets (i.e., the entries within the `target` column of `positive_control_pairs`) are excluded from the construction of the *cis* pairs. Finally, `ref_genome` is a string indicating the reference genome that `chr`, `start`, and `stop` are defined with respect to. (The only reference genome currently available is "10X_GRCh38_2020," which is the GRCh38 reference genome that has shipped with CellRanger since 2020.)
+
+We use `construct_cis_pairs()` to construct the discovery pairs for the high-MOI CRISPRi dataset. We set `distance_threshold` to `5e6` (i.e., 5 megabases) so as to increase the number of pairs in the discovery set for illustration purposes.
+
+```{r}
+discovery_pairs_highmoi <- construct_cis_pairs(sceptre_object = sceptre_object_highmoi,
+                                               positive_control_pairs = positive_control_pairs_highmoi,
+                                               distance_threshold = 5e6)
+```
+
+The discovery pairs consist of candidate enhancers mapped to nearby genes.
+
+```{r}
+discovery_pairs_highmoi[c(1, 20, 30, 40),]
+```
+
+Next, `construct_trans_pairs()` ...
 
 ## Side
 
@@ -111,3 +127,9 @@ Discovery pairs are target-response pairs whose association status we do not kno
 | Enhancer           | CRISPRa             | Increase in expression | Right         |
 | Silencer           | CRISPRi or CRISPRko | Increase in expression | Right         |
 | Silencer           | CRISPRa             | Decrease in expression | Left          |
+
+## gRNA grouping strategy
+
+Typically, multiple gRNAs are designed to target a given genomic element. The parameter `grna_grouping_strategy` controls if and how gRNAs that target the same element are "combined" or "grouped."
+
+Thus, if `grna_1` is present in cells 2, 5, 10, 11, and 19, and if `grna_2` is present in cells 1, 5, 10, and 13, then the combined gRNA is defined to be present in cells 1, 2, 5, 10, 11, 13, and 19.
