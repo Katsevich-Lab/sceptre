@@ -8,15 +8,15 @@
 #'
 #' @return TBD
 #' @export
-construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
-                                exclude_positive_control_grna_targets = TRUE, ref_genome = "10X_GRCh38_2020") {
+construct_cis_pairs <- function(sceptre_object, positive_control_pairs = NULL,
+                                distance_threshold = 500000L, ref_genome = "10X_GRCh38_2020") {
   if (ref_genome != "10X_GRCh38_2020") {
     stop("The only reference genome currently available is the GRCh38 (2020) reference genome provided by 10X.")
   }
   grna_target_data_frame <- data.table::as.data.table(sceptre_object@grna_target_data_frame)
   gene_ids <- rownames(sceptre_object@response_matrix)
   distance_threshold <- as.integer(distance_threshold)
-  grna_targets_to_exclude <- c("non-targeting", if (exclude_positive_control_grna_targets) as.character(positive_control_pairs$grna_target) else NULL)
+  grna_targets_to_exclude <- c("non-targeting", if (!is.null(positive_control_pairs)) as.character(positive_control_pairs$grna_target) else NULL)
 
   # 1. subset grna group data frame so as to exclude non-targeting gRNAs and gRNA groups in grna_targets_to_exclude
   grna_target_data_frame <- grna_target_data_frame |> dplyr::filter(!(grna_target %in% grna_targets_to_exclude))
