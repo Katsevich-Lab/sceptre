@@ -274,8 +274,8 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
     stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
   }
 
-  # 2. check that negative control gRNAs are present (if the control group is the complement set)
-  if (! control_group_complement) {
+  # 2. check that negative control gRNAs are present (if the control group is the nt cells)
+  if (!control_group_complement) {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
       stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the NT set."))
