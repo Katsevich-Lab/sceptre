@@ -275,10 +275,10 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
   }
 
   # 2. check that negative control gRNAs are present (if the control group is the complement set)
-  if (control_group_complement) {
+  if (! control_group_complement) {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
-      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the complement set."))
+      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the NT set."))
     }
   }
 
