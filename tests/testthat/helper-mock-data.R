@@ -73,16 +73,16 @@
 #'   return(as(mock_response_matrix, "TsparseMatrix"))
 #' }
 
-# `sample` has unwanted behavior here where e.g. `sample(2:2, 1)` can return 1
-# even though only returning 2 is desired.
-# sample_as_vec <- function(x) {
-#   if(length(x) == 1)
-#     return(x)
-#   else {
-#     return(sample(x, 1))
-#   }
-# }
-
+#' # `sample` has unwanted behavior here where e.g. `sample(2:2, 1)` can return 1
+#' # even though only returning 2 is desired.
+#' sample_as_vec <- function(x) {
+#'   if(length(x) == 1)
+#'     return(x)
+#'   else {
+#'     return(sample(x, 1))
+#'   }
+#' }
+#'
 #' #' Helper function to make a factor with random numbers of entries per level.
 #' #'
 #' #' There are guaranteed to be at least two entries per level.
@@ -118,7 +118,7 @@
 #'   }
 #'   return(values)
 #' }
-
+#'
 #' #' Mock cell-level covariates
 #' #'
 #' #' @param rep_level_counts : this is for mocking a replicate or batch feature. \code{length(rep_level_counts)}
@@ -353,10 +353,9 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
 # out[,1:13] is identical to out[,14:26] since the column patterns are repeated, and the final column out[,27] is
 # Pois(1) noise.
 .make_mock_patterned_matrix <- function(num_rows, num_cols, patterns_at_col_level = TRUE, big = 1000, seed = NULL) {
-  if(is.null(seed)) {
-    seed = 101000
+  if(!is.null(seed)) {
+    set.seed(seed)
   }
-  set.seed(seed)
 
   dims <- if(patterns_at_col_level) c(num_rows, num_cols) else c(num_cols, num_rows)
   num_patterns <- 13 # `patterned_matrix` will have 13 columns, one per pattern
@@ -364,7 +363,7 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
   patterned_matrix <- cbind(
     0, 1, big, # constant
     rep(c(0,1), c(dims[1]-1, 1)),  rep(c(0, 1), c(1, dims[1]-1)), # all but one element constant
-    rep(c(big, 0), c(dims[1]-1, 1)) ,rep(c(big, 1), c(dims[1]-1, 1)),
+    rep(c(big, 0), c(dims[1]-1, 1)), rep(c(big, 1), c(dims[1]-1, 1)),
     rep(c(0, big), c(dims[1]-1, 1)), rep(c(1, big), c(dims[1]-1, 1)),
     0:(dims[1] - 1), dims[1]:1, # sequence columns
     seq(0, big, length = dims[1]) |> round(), seq(big, 1, length = dims[1]) |> round()
@@ -414,13 +413,9 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
 #'
 #' @return a list of matrices (sparse or not, as determined by \code{return_as_sparse}).
 #'
-make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, seed = NULL, big = 10000, return_as_sparse = TRUE) {
-
-  if(is.null(seed)) {
-    seed = sample(1e3, 1)
-  }
-  if(nrow(grna_target_data_frame) < 5) {
-    # do something?
+make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, big = 10000, seed = NULL, return_as_sparse = TRUE) {
+  if(!is.null(seed)) {
+    set.seed(seed)
   }
   cell_names <- paste0("cell_", 1:num_cells)
 
@@ -442,9 +437,7 @@ make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, seed =
   # we will do NT and non-NT separately and bind those together
   num_nt <- sum(grna_target_data_frame$grna_target == "non-targeting")
   if(num_nt > 0) {
-
     nt_names <- with(grna_target_data_frame, grna_id[grna_target == "non-targeting"])
-
     nt_patterns <- list(
       all_zero = matrix(0, num_nt, num_cells),
       all_one  = matrix(1, num_nt, num_cells),
@@ -460,9 +453,10 @@ make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, seed =
     # combine by taking all combos
     new_patterns <- vector("list", length(patterns) * length(nt_patterns))
     k <- 1
-    for(non_nt_pattern in patterns) {
-      for(nt_pattern in nt_patterns) {
-        new_patterns[[k]] <- rbind(non_nt_pattern, nt_pattern)
+    for(i in seq_along(patterns)) {
+      for(j in seq_along(nt_patterns)) {
+        new_patterns[[k]] <- rbind(patterns[[i]], nt_patterns[[j]])
+        names(new_patterns)[k] <- paste0("non_nt_", names(patterns)[i], "_and_nt_", names(nt_patterns)[j])
         k <- k + 1
       }
     }
@@ -475,14 +469,48 @@ make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, seed =
   }
 }
 
+#' Make a list of mock response expression matrices
+#'
+#' This function returns a list of 5 matrices of response expressions based on the provided dimensions.
+#'
+#' The matrices are: (1) all zero; (2) all 1; (3) all `big`;
+#' (4) row patterns, as determined by \code{.make_mock_patterned_matrix}; and (5) column patterns, also as
+#' determined by \code{.make_mock_patterned_matrix}.
+#'
+#' @param num_responses : int, the number of responses to make data for
+#' @param num_cells : int, the number of cells to make data for
+#' @param seed : used for \code{.make_mock_patterned_matrix}. If \code{NULL} the seed is randomized.
+#' @param big : a large value to use in the expression matrices
+#' @param return_as_sparse : return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#'
+#' @return a list of matrices (sparse or not, as determined by \code{return_as_sparse}).
+#'
+make_mock_response_matrix_list <- function(num_responses, num_cells, big = 10000, seed = NULL, return_as_sparse = TRUE) {
+  if(is.null(seed)) {
+    seed = sample(1e3, 1)
+  }
+  cell_names <- paste0("cell_", 1:num_cells)  # hard-coded to match `make_mock_grna_matrix_list`
+  response_names <- paste0("response_", 1:num_responses)
+  patterns <- list(
+    all_zero = matrix(0, num_responses, num_cells),
+    all_one = matrix(1, num_responses, num_cells),
+    all_big = matrix(big, num_responses, num_cells),
+    row_patterns = .make_mock_patterned_matrix(
+      num_responses, num_cells, patterns_at_col_level = FALSE, big = big, seed = seed),
+    col_patterns = .make_mock_patterned_matrix(
+      num_responses, num_cells, patterns_at_col_level = TRUE, big = big, seed = seed)
+  ) |>
+    lapply(`dimnames<-`, list(response_names, cell_names))
 
-# ok cool. So: what about the response matrix?
-# will this be the same as grna but without the NT part?
+  if(return_as_sparse) {
+    return(lapply(patterns, as, "TsparseMatrix"))
+  } else {
+    return(patterns)
+  }
+}
 
 
-# make_mock_response_matrix <- function(num_responses, num_cells) {
-#
-# }
+# extra covariates... the last piece.
 
 
 ######################################################################################################
@@ -658,7 +686,8 @@ test_that(".make_mock_patterned_matrix", {
       }
       if(num_cols > 13 && num_cols < 26) {
         # Prob(Pois(1) >= 20) < 2 * 10^{-19} so this won't be happening in these samples
-        # even though >= 20 is a positive probability event (and with these seeds)
+        # even though >= 20 is a positive probability event (and with these seeds).
+        # This is checking that `big` didn't sneak in there
         expect_true(all(out_cols[,14:num_cols] < 20))
       }
       if(num_cols >= 26) {
@@ -752,12 +781,11 @@ test_that("make_mock_grna_matrix_list", {
                                         seed = nrow(grna_target_data_frame) + num_cells, return_as_sparse = FALSE)
 
       expect_true(all(sapply(out, nrow) == nrow(grna_target_data_frame)))
-      expect_true(sapply(out, function(df) rownames(df) == grna_target_data_frame$grna_id) |> all())
       expect_true(all(sapply(out, ncol) == num_cells))
+      expect_true(all(sapply(out, function(df) all(rownames(df) == grna_target_data_frame$grna_id))))
 
       num_nt <- sum(grna_target_data_frame$grna_target == "non-targeting")
-      # more_than_one_target <- length(unique(grna_target_data_frame$grna_target)) >= 2
-      expect_equal(length(out), ifelse(num_nt > 0, 25, 5))# + more_than_one_target)
+      expect_length(out, ifelse(num_nt > 0, 25, 5))
 
       expect_true(all(out[[1]] == 0))
 
@@ -765,8 +793,10 @@ test_that("make_mock_grna_matrix_list", {
         # then out 2:5 are the predicted patterns and that's all there is
         expect_true(all(out[[2]] == 1))
         expect_true(all(out[[3]] == big_test))
-        expect_true(all(out[[4]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, FALSE, big = big_test)))
-        expect_true(all(out[[5]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, TRUE, big = big_test)))
+        expect_true(all(out[[4]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, FALSE, big = big_test,
+                                                                seed = nrow(grna_target_data_frame) + num_cells)))
+        expect_true(all(out[[5]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, TRUE, big = big_test,
+                                                                seed = nrow(grna_target_data_frame) + num_cells)))
       } else {
         # the non-NT patterns are tested above so this section will just test the NT patterns
         # NT patterns are looped thru first so we just need out[2:5] again
@@ -774,8 +804,36 @@ test_that("make_mock_grna_matrix_list", {
         expect_true(all(nt_submatrices[[1]] == 1))
         expect_true(all(nt_submatrices[[2]] == big_test))
         expect_true(all(nt_submatrices[[3]][1,] == seq(big_test, 1, length = num_cells) |> round()))
-        expect_true(all(nt_submatrices[[4]] == .make_mock_patterned_matrix(num_nt, num_cells, TRUE, big = big_test)))
+        expect_true(all(nt_submatrices[[4]] == .make_mock_patterned_matrix(num_nt, num_cells, TRUE, big = big_test,
+                                                                           seed = nrow(grna_target_data_frame) + num_cells)))
       }
+    }
+  }
+})
+
+test_that("make_mock_response_matrix_list ", {
+
+  num_response_values <- c(1, 4, 13, 14, 25, 26, 27)
+  num_cell_values <- c(1, 5, 13, 14, 25, 26, 27)
+  big_test <- 345
+
+  for(num_responses in num_response_values) {
+    for(num_cells in num_cell_values) {
+      out <- make_mock_response_matrix_list(num_responses, num_cells, big = big_test,
+                                        seed = num_response_values + num_cells, return_as_sparse = FALSE)
+
+      expect_true(all(sapply(out, nrow) == num_responses))
+      expect_true(all(sapply(out, ncol) == num_cells))
+      expect_true(all(sapply(out, function(df) rownames(df) == paste0("response_", 1:num_responses))))
+      expect_true(all(sapply(out, function(df) colnames(df) == paste0("cell_", 1:num_cells))))
+
+      expect_true(all(out[[1]] == 0))
+      expect_true(all(out[[2]] == 1))
+      expect_true(all(out[[3]] == big_test))
+      expect_true(all(out[[4]] == .make_mock_patterned_matrix(num_responses, num_cells, FALSE, big = big_test,
+                                                              seed = num_response_values + num_cells)))
+      expect_true(all(out[[5]] == .make_mock_patterned_matrix(num_responses, num_cells, TRUE, big = big_test,
+                                                              seed = num_response_values + num_cells)))
     }
   }
 })
