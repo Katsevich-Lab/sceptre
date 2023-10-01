@@ -2,7 +2,6 @@
 ##                          Functions for making mock data for unit testing                         ##
 ######################################################################################################
 
-
 # This function takes in a vector like c(1,5,3) and returns a data.frame with
 # columns "grna_target" and "chr" with rows representing different genomic targets
 # and what chromosome they are on.
@@ -352,10 +351,41 @@ make_mock_extra_covariates_list <- function(num_cells) {
   return(patterns)
 }
 
-
-
-
-
+######################
+##   example usage  ##
+######################
+# num_cells <- 50
+# mock_grna_target_data_frame <- make_mock_grna_target_data(
+#   num_guides_per_target = c(1, 5, 7, 2, 3), chr_distances = c(1, 3, 10),
+#   chr_starts = 1, num_nt_guides = 5
+# )
+# with(mock_grna_target_data_frame,
+#      cat("There are ", length(unique(grna_target)), " unique targets, ",
+#          length(unique(chr)), " unique chromosomes, and ", length(grna_id),
+#          " unique grna ids overall.", sep="")
+# )
+# mock_grna_matrix_list <- make_mock_grna_matrix_list(
+#   grna_target_data_frame = mock_grna_target_data_frame,
+#   num_cells = num_cells, seed = 12321
+# )
+#
+# # looking at one particular example
+# mock_grna_matrix_list$non_nt_col_patterns_and_nt_row_patterns |> dim()
+# mock_grna_matrix_list$non_nt_col_patterns_and_nt_row_patterns[1:5,1:15]
+#
+# mock_response_matrix_list <- make_mock_response_matrix_list(
+#   num_responses = 30, num_cells = num_cells, seed = 11111
+# )
+#
+# # looking at one particular example
+# mock_response_matrix_list$row_patterns |> dim()
+# mock_response_matrix_list$row_patterns[1:5,1:20]
+#
+#
+# mock_extra_covariates <- make_mock_extra_covariates_list(num_cells)
+# mock_extra_covariates$almost_constant_many_levels_two_vals |> dim()
+# mock_extra_covariates$almost_constant_many_levels_two_vals |> head()
+# mock_extra_covariates$almost_constant_many_levels_two_vals$batch |> table()
 
 ######################################################################################################
 ##                                          Unit tests                                              ##
