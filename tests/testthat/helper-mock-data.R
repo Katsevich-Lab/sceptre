@@ -75,121 +75,120 @@
 
 # `sample` has unwanted behavior here where e.g. `sample(2:2, 1)` can return 1
 # even though only returning 2 is desired.
-sample_as_vec <- function(x) {
-  if(length(x) == 1)
-    return(x)
-  else {
-    return(sample(x, 1))
-  }
-}
+# sample_as_vec <- function(x) {
+#   if(length(x) == 1)
+#     return(x)
+#   else {
+#     return(sample(x, 1))
+#   }
+# }
 
-#' Helper function to make a factor with random numbers of entries per level.
-#'
-#' There are guaranteed to be at least two entries per level.
-#'
-#' @param num_factor_levels : int, the number of distinct values for this factor to have
-#' @param num_entries : int, the length of the resulting vector
-#' @param level_name_base : string, all values start with this + "_".
-#' @param return_factor : bool, if \code{FALSE} the result is a character vector while if \code{TRUE}
-#' it is actually a factor.
-#' @param shuffle : if TRUE then the values of the vector are shuffled
-#'
-#' @return
-#'
-#'
-#' @examples
-make_random_factor <- function(num_factor_levels, num_entries, level_name_base = "lev", return_factor = TRUE, shuffle = FALSE) {
-  lev_counts <- numeric(num_factor_levels)
-  lev_counts[1] <- sample_as_vec(2:(num_entries - 2 * (num_factor_levels - 1)))
-  if(num_factor_levels > 2) { # middle levels get random counts
-    for(j in 2:(num_factor_levels-1)) {
-      # we need to save 2 * (# levels remaining) entries for the future levels, and
-      # we've allocated `sum(lev_counts)` so far
-      lev_counts[j] <- sample_as_vec(2:(num_entries - 2 * (num_factor_levels - j) - sum(lev_counts)))
-    }
-  }
-  lev_counts[num_factor_levels] <- num_entries - sum(lev_counts) # needs to sum to `num_entries`
-  lev_names <- paste0(level_name_base, "_", 1:num_factor_levels)
-  values <- rep(lev_names, lev_counts)
-  if(shuffle) {
-    values <- sample(values, num_entries, FALSE)
-  }
-  if(return_factor) {
-    values <- factor(values, levels = lev_names)
-  }
-  return(values)
-}
+#' #' Helper function to make a factor with random numbers of entries per level.
+#' #'
+#' #' There are guaranteed to be at least two entries per level.
+#' #'
+#' #' @param num_factor_levels : int, the number of distinct values for this factor to have
+#' #' @param num_entries : int, the length of the resulting vector
+#' #' @param level_name_base : string, all values start with this + "_".
+#' #' @param return_factor : bool, if \code{FALSE} the result is a character vector while if \code{TRUE}
+#' #' it is actually a factor.
+#' #' @param shuffle : if TRUE then the values of the vector are shuffled
+#' #'
+#' #' @return
+#' #'
+#' #' @examples
+#' make_random_factor <- function(num_factor_levels, num_entries, level_name_base = "lev", return_factor = TRUE, shuffle = FALSE) {
+#'   lev_counts <- numeric(num_factor_levels)
+#'   lev_counts[1] <- sample_as_vec(2:(num_entries - 2 * (num_factor_levels - 1)))
+#'   if(num_factor_levels > 2) { # middle levels get random counts
+#'     for(j in 2:(num_factor_levels-1)) {
+#'       # we need to save 2 * (# levels remaining) entries for the future levels, and
+#'       # we've allocated `sum(lev_counts)` so far
+#'       lev_counts[j] <- sample_as_vec(2:(num_entries - 2 * (num_factor_levels - j) - sum(lev_counts)))
+#'     }
+#'   }
+#'   lev_counts[num_factor_levels] <- num_entries - sum(lev_counts) # needs to sum to `num_entries`
+#'   lev_names <- paste0(level_name_base, "_", 1:num_factor_levels)
+#'   values <- rep(lev_names, lev_counts)
+#'   if(shuffle) {
+#'     values <- sample(values, num_entries, FALSE)
+#'   }
+#'   if(return_factor) {
+#'     values <- factor(values, levels = lev_names)
+#'   }
+#'   return(values)
+#' }
 
-#' Mock cell-level covariates
+#' #' Mock cell-level covariates
+#' #'
+#' #' @param rep_level_counts : this is for mocking a replicate or batch feature. \code{length(rep_level_counts)}
+#' #' gives the number of replicates, and each entry is the number of cells within that replicate.
+#' #' \code{sum(rep_level_counts)} is the total number of cells. For example,
+#' #' \code{rep_level_counts = c(2,4,6)} will result in data for 12 cells total, with
+#' #' replicate sizes of 2, 4, and 6 respectively.
+#' #' @param add_numeric : integter, if positive then that many columns of
+#' #' iid N(0,1) data are added, mocking continuous features.
+#' #' @param add_count integer, if positive then that many columns of
+#' #' iid Pois(1) data are added, mocking count features.
+#' #' @param add_factor integer, if positive then that many random factor features
+#' #' are added. For each random factor, the number of levels is sampled uniformly from
+#' #' \code{2:max_num_factor_levels}, and then the number of cells per level are filled
+#' #' in randomly, with the constraint that no level has fewer than 2 cells.
+#' #'
+#' #' @param max_num_factor_levels : integer, the maximum number of levels for each random
+#' #' factor. Ignored if \code{add_factor = 0}.
+#' #' @param seed
+#' #'
+#' #' @return a data.frame with the specified covariates, with each row corresponding to a cell.
+#' #'
+#' #'
+#' #' @examples
+#' #' # just doing replicate for 20 cells
+#' #' make_mock_extra_covariates(rep_level_counts = c(4, 13, 3))
+#' #' # simulating features of all types. With this seed, two of the factors ended up with
+#' #' # just 2 levels, while the third ended up with 4 levels.
+#' #' make_mock_extra_covariates(rep_level_counts = c(4, 13, 3), add_numeric = 2, add_count = 1,
+#' #' add_factor = 3, max_num_factor_levels = 4, seed = 111)
+#' make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_count = 0, add_factor = 0,
+#'                                        max_num_factor_levels = 6, seed = NULL) {
+#'   if(is.null(seed)) {
+#'     seed = 101001
+#'   }
+#'   set.seed(seed)
 #'
-#' @param rep_level_counts : this is for mocking a replicate or batch feature. \code{length(rep_level_counts)}
-#' gives the number of replicates, and each entry is the number of cells within that replicate.
-#' \code{sum(rep_level_counts)} is the total number of cells. For example,
-#' \code{rep_level_counts = c(2,4,6)} will result in data for 12 cells total, with
-#' replicate sizes of 2, 4, and 6 respectively.
-#' @param add_numeric : integter, if positive then that many columns of
-#' iid N(0,1) data are added, mocking continuous features.
-#' @param add_count integer, if positive then that many columns of
-#' iid Pois(1) data are added, mocking count features.
-#' @param add_factor integer, if positive then that many random factor features
-#' are added. For each random factor, the number of levels is sampled uniformly from
-#' \code{2:max_num_factor_levels}, and then the number of cells per level are filled
-#' in randomly, with the constraint that no level has fewer than 2 cells.
-#'
-#' @param max_num_factor_levels : integer, the maximum number of levels for each random
-#' factor. Ignored if \code{add_factor = 0}.
-#' @param seed
-#'
-#' @return a data.frame with the specified covariates, with each row corresponding to a cell.
-#'
-#'
-#' @examples
-#' # just doing replicate for 20 cells
-#' make_mock_extra_covariates(rep_level_counts = c(4, 13, 3))
-#' # simulating features of all types. With this seed, two of the factors ended up with
-#' # just 2 levels, while the third ended up with 4 levels.
-#' make_mock_extra_covariates(rep_level_counts = c(4, 13, 3), add_numeric = 2, add_count = 1,
-#' add_factor = 3, max_num_factor_levels = 4, seed = 111)
-make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_count = 0, add_factor = 0,
-                                       max_num_factor_levels = 6, seed = NULL) {
-  if(is.null(seed)) {
-    seed = 101001
-  }
-  set.seed(seed)
-
-  num_cells <- sum(rep_level_counts)
-  if(add_factor > 0 && max_num_factor_levels * 2 > num_cells) {
-    stop("`max_num_factor_levels` must be decreased so that at least 2 cells per level are possible.")
-  }
-  if(max_num_factor_levels < 2) {
-    stop("`max_num_factor_levels` must be at least 2.")
-  }
-  covariates <- data.frame(
-    replicate = rep(paste0("rep_", 1:length(rep_level_counts)), rep_level_counts) |>
-      factor(levels = paste0("rep_", 1:length(rep_level_counts)))
-  )
-  if(add_numeric > 0) {
-    for(i in 1:add_numeric) {
-      covariates[[paste0("numeric_", i)]] <- rnorm(num_cells)
-    }
-  }
-  if(add_count > 0) {
-    for(i in 1:add_count) {
-      covariates[[paste0("count_", i)]] <- rpois(num_cells, 1)
-    }
-  }
-  if(add_factor > 0) {
-    for(i in 1:add_factor) {
-      num_levs <- sample(2:max_num_factor_levels, 1)
-      covariates[[paste0("factor_", i)]] <- make_random_factor(
-        num_factor_levels = num_levs, num_entries = num_cells,
-        level_name_base = paste0("factor_", i),
-        return_factor = TRUE, shuffle = TRUE
-      )
-    }
-  }
-  return(covariates)
-}
+#'   num_cells <- sum(rep_level_counts)
+#'   if(add_factor > 0 && max_num_factor_levels * 2 > num_cells) {
+#'     stop("`max_num_factor_levels` must be decreased so that at least 2 cells per level are possible.")
+#'   }
+#'   if(max_num_factor_levels < 2) {
+#'     stop("`max_num_factor_levels` must be at least 2.")
+#'   }
+#'   covariates <- data.frame(
+#'     replicate = rep(paste0("rep_", 1:length(rep_level_counts)), rep_level_counts) |>
+#'       factor(levels = paste0("rep_", 1:length(rep_level_counts)))
+#'   )
+#'   if(add_numeric > 0) {
+#'     for(i in 1:add_numeric) {
+#'       covariates[[paste0("numeric_", i)]] <- rnorm(num_cells)
+#'     }
+#'   }
+#'   if(add_count > 0) {
+#'     for(i in 1:add_count) {
+#'       covariates[[paste0("count_", i)]] <- rpois(num_cells, 1)
+#'     }
+#'   }
+#'   if(add_factor > 0) {
+#'     for(i in 1:add_factor) {
+#'       num_levs <- sample(2:max_num_factor_levels, 1)
+#'       covariates[[paste0("factor_", i)]] <- make_random_factor(
+#'         num_factor_levels = num_levs, num_entries = num_cells,
+#'         level_name_base = paste0("factor_", i),
+#'         return_factor = TRUE, shuffle = TRUE
+#'       )
+#'     }
+#'   }
+#'   return(covariates)
+#' }
 
 #############
 ## Example ## [UNDER CONSTRUCTION]
@@ -239,7 +238,7 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
   return(grna_target_data_simple)
 }
 
-# This function takes the output of .make_mock_target_and_chr_only and adds in columns "start" and "end"
+# This function takes the output of `.make_mock_target_and_chr_only` and adds in columns "start" and "end"
 # representing where the target starts and stops on the given chromosome.
 # This function is not meant to be directly called. It is assumed `length(chr_distances) == length(chr_starts)`.
 # The result is a data.frame with columns "grna_target", "chr", "start", and "end", consisting of
@@ -261,7 +260,7 @@ make_mock_extra_covariates <- function(rep_level_counts, add_numeric = 0, add_co
   return(target_chr_and_dist_data)
 }
 
-#' Make mock grna_target_data_frame's
+#' Make mock \code{grna_target_data_frame}s
 #'
 #' This function makes a mock grna_target_data_frame in the spirit of
 #' \code{data(grna_target_data_frame_highmoi)} and \code{data(grna_target_data_frame_lowmoi)}.
@@ -322,7 +321,6 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
   # adding in unique names for each grna
   # this gets the unique target names, ensuring they stay in the order that they appear in the data
   target_labels <- with(grna_target_data, grna_target[!duplicated(grna_target)])
-  # target_labels <- grna_target_data$grna_target[!duplicated(grna_target_data$grna_target)]
   # This vector enumerates each unique target: we get a sequence 1:(# times that target appears)
   grna_id_number <- table(grna_target_data$grna_target)[target_labels] |> sapply(function(i) 1:i) |> unlist()
   grna_target_data <- cbind(
@@ -334,13 +332,158 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
       rbind(
         data.frame(
           grna_id = paste0("nt", 1:num_nt_guides),
-          grna_target = "nt",
+          grna_target = "non-targeting",
           chr = NA_character_, start = NA, end = NA
         )
       )
   }
-  grna_target_data
+  return(grna_target_data)
 }
+
+# This function returns a matrix with the given dimension with patterns either across the rows or across the columns.
+# The "patterns" are structured values that cover a wide range of cases. There are 13 patterns in all:
+# constant: all 0, all 1, all `big`
+# constant but for one element: 6 variations using values from c(0, 1, big)
+# sequences: 4 variations, either increasing or decreasing
+#
+# To fill the specified number of dimensions, the patterns are repeated as many times as the whole set of 13 fits,
+# and then if more dimensions needed the rest are filled in with iid Pois(1) noise.
+# So for example, if we run `out <- .make_mock_patterned_matrix(12, 27, TRUE)`
+# then we get a 12 x 27 matrix with the 1st column all 0, the second column all 1, and etc., and
+# out[,1:13] is identical to out[,14:26] since the column patterns are repeated, and the final column out[,27] is
+# Pois(1) noise.
+.make_mock_patterned_matrix <- function(num_rows, num_cols, patterns_at_col_level = TRUE, big = 1000, seed = NULL) {
+  if(is.null(seed)) {
+    seed = 101000
+  }
+  set.seed(seed)
+
+  dims <- if(patterns_at_col_level) c(num_rows, num_cols) else c(num_cols, num_rows)
+  num_patterns <- 13 # `patterned_matrix` will have 13 columns, one per pattern
+
+  patterned_matrix <- cbind(
+    0, 1, big, # constant
+    rep(c(0,1), c(dims[1]-1, 1)),  rep(c(0, 1), c(1, dims[1]-1)), # all but one element constant
+    rep(c(big, 0), c(dims[1]-1, 1)) ,rep(c(big, 1), c(dims[1]-1, 1)),
+    rep(c(0, big), c(dims[1]-1, 1)), rep(c(1, big), c(dims[1]-1, 1)),
+    0:(dims[1] - 1), dims[1]:1, # sequence columns
+    seq(0, big, length = dims[1]) |> round(), seq(big, 1, length = dims[1]) |> round()
+  ) |>
+    magrittr::set_colnames(NULL) # the use of `big` adds a single column name
+
+  # if we have more columns than the deterministic patterns, then
+  # duplicate the patterned matrix as many times as we can and
+  # fill the rest in with iid Pois(1) noice
+  if(dims[2] > num_patterns) {
+    num_copies <- dims[2] %/% num_patterns
+    num_extra_cols <- dims[2] %% num_patterns
+    patterned_matrix <- replicate(num_copies, patterned_matrix, simplify = FALSE) |>
+      do.call(what = cbind)
+    if(num_extra_cols > 0) {
+      patterned_matrix <- cbind(
+        patterned_matrix,
+        matrix(rpois(num_extra_cols * dims[1], 1), ncol = num_extra_cols) # appending noise
+      )
+    }
+  } else if(dims[2] < 13) {  # trim down to however many columns were asked for
+    patterned_matrix <- patterned_matrix[,1:dims[2], drop = FALSE]
+  }
+  if(!patterns_at_col_level) {
+    patterned_matrix <- t(patterned_matrix)
+  }
+  return(patterned_matrix)
+}
+
+#' Make a list of mock grna x cell expression matrices
+#'
+#' This function returns a list of matrices of grna expressions based on the provided \code{grna_target_data_frame}.
+#'
+#' These matrices are constructed by creating 5 response patterns for the targeting grnas, and separately
+#' 5 response patterns for the non-targeting guides if any are present in \code{grna_target_data_frame}. The returned
+#' list is all combinations of these: if there are no NT grnas provided, then the return is just a list of 5 with one
+#' entry per response pattern; if instead there are NT grnas present in \code{grna_target_data_frame}, then the returned
+#' list has all 25 combinations of each targeting grna response matrix on top of each NT grna response matrix. Note that
+#' \code{grna_target_data_frame} will always have the non-NT on top of the NT since that is how
+#' \code{make_mock_grna_target_data} structures it.
+#'
+#' @param grna_target_data_frame : the output of \code{make_mock_grna_target_data}
+#' @param num_cells : int, the number of cells desired for the output
+#' @param seed : used for \code{.make_mock_patterned_matrix}. If \code{NULL} the seed is randomized.
+#' @param big : a large value to use in the expression matrices
+#' @param return_as_sparse : return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#'
+#' @return a list of matrices (sparse or not, as determined by \code{return_as_sparse}).
+#'
+make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, seed = NULL, big = 10000, return_as_sparse = TRUE) {
+
+  if(is.null(seed)) {
+    seed = sample(1e3, 1)
+  }
+  if(nrow(grna_target_data_frame) < 5) {
+    # do something?
+  }
+  cell_names <- paste0("cell_", 1:num_cells)
+
+  # first we make various data sets just for the targeting grnas
+  non_nt_data <- dplyr::filter(grna_target_data_frame, grna_target != "non-targeting")
+  num_targeting_guides <- nrow(non_nt_data)
+
+  patterns <- list(
+    all_zero = matrix(0, num_targeting_guides, num_cells),
+    all_one = matrix(1, num_targeting_guides, num_cells),
+    all_big = matrix(big, num_targeting_guides, num_cells),
+    row_patterns = .make_mock_patterned_matrix(
+      num_targeting_guides, num_cells, patterns_at_col_level = FALSE, big = big, seed = seed),
+    col_patterns = .make_mock_patterned_matrix(
+      num_targeting_guides, num_cells, patterns_at_col_level = TRUE, big = big, seed = seed)
+  ) |>
+    lapply(`dimnames<-`, list(non_nt_data$grna_id, cell_names))
+
+  # we will do NT and non-NT separately and bind those together
+  num_nt <- sum(grna_target_data_frame$grna_target == "non-targeting")
+  if(num_nt > 0) {
+
+    nt_names <- with(grna_target_data_frame, grna_id[grna_target == "non-targeting"])
+
+    nt_patterns <- list(
+      all_zero = matrix(0, num_nt, num_cells),
+      all_one  = matrix(1, num_nt, num_cells),
+      all_big  = matrix(big, num_nt, num_cells),
+      # num_nt can realistically be 1, so just doing a pattern across the first row
+      row_patterns = matrix(c(seq(big, 1, length = num_cells) |> round(), rep(1, num_nt * num_cells - num_cells)),
+                        num_nt, num_cells, byrow = TRUE),
+      col_patterns = .make_mock_patterned_matrix(num_nt, num_cells,
+                                                 patterns_at_col_level = TRUE, big = big, seed = seed)
+    ) |>
+      lapply(`dimnames<-`, list(nt_names, cell_names))
+
+    # combine by taking all combos
+    new_patterns <- vector("list", length(patterns) * length(nt_patterns))
+    k <- 1
+    for(non_nt_pattern in patterns) {
+      for(nt_pattern in nt_patterns) {
+        new_patterns[[k]] <- rbind(non_nt_pattern, nt_pattern)
+        k <- k + 1
+      }
+    }
+    patterns <- new_patterns
+  }
+  if(return_as_sparse) {
+    return(lapply(patterns, as, "TsparseMatrix"))
+  } else {
+    return(patterns)
+  }
+}
+
+
+# ok cool. So: what about the response matrix?
+# will this be the same as grna but without the NT part?
+
+
+# make_mock_response_matrix <- function(num_responses, num_cells) {
+#
+# }
+
 
 ######################################################################################################
 ##                                          Unit tests                                              ##
@@ -437,10 +580,11 @@ test_that("make_mock_grna_target_data", {
           chr_starts = chr_distance_and_start_input$start,
           num_nt_guides = num_nt
         )
+        expect_equal(length(unique(out$grna_id)), nrow(out))
 
         # `grna_target`, `chr`, `start` and `end` aren't modified
         # so this just tests `grna_id` and the appended NT guides
-        out_pieces <- split(out, ifelse(out$grna_target == "nt", "nt", "non_nt"))
+        out_pieces <- split(out, ifelse(out$grna_target == "non-targeting", "nt", "non_nt"))
 
         if(num_nt > 0) {
           expect_equal(nrow(out_pieces$nt), num_nt)
@@ -454,7 +598,6 @@ test_that("make_mock_grna_target_data", {
               strsplit("_") |> sapply(`[`, 1) |> sub(pattern = "g", replacement = "") |>
               as.numeric()
             expect_equal(id_start_nums, 1:sum(grna_target == target))
-
           }
         })
       }
@@ -462,26 +605,177 @@ test_that("make_mock_grna_target_data", {
   }
 })
 
-## example
-# num_g_1 <- c(1,2,5)
-# chr_dist_1 <- c(0, 1, 2, 100)
-# num_nt_1 <- 2
-#
-# out1 <- make_mock_grna_target_data(
-#   num_guides_per_target = num_g_1, chr_distances = chr_dist_1,
-#   chr_starts = 1, num_nt_guides = num_nt_1
-# )
+test_that(".make_mock_patterned_matrix", {
 
+  big_test <- 123
 
+  for(num_rows in c(1, 5, 12, 13, 14, 25, 26, 27)) {
+    for(num_cols in c(1, 5, 12, 13, 14, 25, 26, 27)) {
+      out_cols <- .make_mock_patterned_matrix(num_rows, num_cols, patterns_at_col_level = TRUE, big = big_test, seed = num_rows + num_cols)
+      out_rows <- .make_mock_patterned_matrix(num_rows, num_cols, patterns_at_col_level = FALSE, big = big_test, seed = num_rows + num_cols)
 
+      expect_equal(dim(out_cols), c(num_rows, num_cols))
+      expect_equal(dim(out_rows), c(num_rows, num_cols))
+      expect_equal(out_cols[,1], rep(0, num_rows))
+      expect_equal(out_rows[1,], rep(0, num_cols))
 
+      ## col tests
+      if(num_cols >= 2) {
+        expect_equal(out_cols[,2], rep(1, num_rows))
+      }
+      if(num_cols >= 3) {
+        expect_equal(out_cols[,3], rep(big_test, num_rows))
+      }
+      if(num_cols >= 4) {
+        expect_equal(out_cols[,4], rep(c(0, 1), c(num_rows- 1, 1)))
+      }
+      if(num_cols >= 5) {
+        expect_equal(out_cols[,5], rep(c(0, 1), c(1, num_rows - 1)))
+      }
+      if(num_cols >= 6) {
+        expect_equal(out_cols[,6], rep(c(big_test, 0), c(num_rows - 1, 1)))
+      }
+      if(num_cols >= 7) {
+        expect_equal(out_cols[,7], rep(c(big_test, 1), c(num_rows - 1, 1)))
+      }
+      if(num_cols >= 8) {
+        expect_equal(out_cols[,8], rep(c(0, big_test), c(num_rows - 1, 1)))
+      }
+      if(num_cols >= 9) {
+        expect_equal(out_cols[,9], rep(c(1, big_test), c(num_rows - 1, 1)))
+      }
+      if(num_cols >= 10) {
+        expect_equal(out_cols[,10], 0:(num_rows-1))
+      }
+      if(num_cols >= 11) {
+        expect_equal(out_cols[,11], num_rows:1)
+      }
+      if(num_cols >= 12) {
+        expect_equal(out_cols[,12], seq(0, big_test, length = num_rows) |> round())
+      }
+      if(num_cols >= 13) {
+        expect_equal(out_cols[,13], seq(big_test, 1, length = num_rows) |> round())
+      }
+      if(num_cols > 13 && num_cols < 26) {
+        # Prob(Pois(1) >= 20) < 2 * 10^{-19} so this won't be happening in these samples
+        # even though >= 20 is a positive probability event (and with these seeds)
+        expect_true(all(out_cols[,14:num_cols] < 20))
+      }
+      if(num_cols >= 26) {
+        expect_equal(out_cols[,1:13], out_cols[,14:26])
+      }
 
+      ## row tests
+      if(num_rows >= 2) {
+        expect_equal(out_rows[2,], rep(1, num_cols))
+      }
+      if(num_rows >= 3) {
+        expect_equal(out_rows[3,], rep(big_test, num_cols))
+      }
+      if(num_rows >= 4) {
+        expect_equal(out_rows[4,], rep(c(0, 1), c(num_cols- 1, 1)))
+      }
+      if(num_rows >= 5) {
+        expect_equal(out_rows[5,], rep(c(0, 1), c(1, num_cols - 1)))
+      }
+      if(num_rows >= 6) {
+        expect_equal(out_rows[6,], rep(c(big_test, 0), c(num_cols - 1, 1)))
+      }
+      if(num_rows >= 7) {
+        expect_equal(out_rows[7,], rep(c(big_test, 1), c(num_cols - 1, 1)))
+      }
+      if(num_rows >= 8) {
+        expect_equal(out_rows[8,], rep(c(0, big_test), c(num_cols - 1, 1)))
+      }
+      if(num_rows >= 9) {
+        expect_equal(out_rows[9,], rep(c(1, big_test), c(num_cols - 1, 1)))
+      }
+      if(num_rows >= 10) {
+        expect_equal(out_rows[10,], 0:(num_cols-1))
+      }
+      if(num_rows >= 11) {
+        expect_equal(out_rows[11,], num_cols:1)
+      }
+      if(num_rows >= 12) {
+        expect_equal(out_rows[12,], seq(0, big_test, length = num_cols) |> round())
+      }
+      if(num_rows >= 13) {
+        expect_equal(out_rows[13,], seq(big_test, 1, length = num_cols) |> round())
+      }
+      if(num_rows > 13 && num_rows < 26) {
+        # Prob(Pois(1) >= 20) < 2 * 10^{-19} so this won't be happening in these samples
+        # even though >= 20 is a positive probability event (and with these seeds)
+        expect_true(all(out_rows[14:num_rows,] < 20))
+      }
+      if(num_rows >= 26) {
+        expect_equal(out_rows[1:13,], out_rows[14:26,])
+      }
+    }
+  }
+})
 
+test_that("make_mock_grna_matrix_list", {
+  grna_target_data_frame_list <- list(
+    make_mock_grna_target_data(
+      num_guides_per_target = 10, chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 0
+    ),
+    make_mock_grna_target_data(
+      num_guides_per_target = 10, chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 0
+    ) |>
+      dplyr::filter(grna_target == "t1_c1_d1"),  # taking just 1 target and chr
+    make_mock_grna_target_data(
+      num_guides_per_target = 10, chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 5
+    ),
+    make_mock_grna_target_data(
+      num_guides_per_target = c(1,5,10), chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 0
+    ),
+    make_mock_grna_target_data(
+      num_guides_per_target = c(5, 5, 5), chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 4
+    ) |> dplyr::filter(chr == "c4_d1"), # taking one bigger chr
+    make_mock_grna_target_data(
+      num_guides_per_target = c(1,5,10), chr_distances = 2,
+      chr_starts = 1, num_nt_guides = 4
+    )
+  )
 
+  num_cell_values <- c(1, 5, 18)
+  big_test <- 321
 
+  for(grna_target_data_frame in grna_target_data_frame_list) {
+    for(num_cells in num_cell_values) {
+      out <- make_mock_grna_matrix_list(grna_target_data_frame, num_cells, big = big_test,
+                                        seed = nrow(grna_target_data_frame) + num_cells, return_as_sparse = FALSE)
 
+      expect_true(all(sapply(out, nrow) == nrow(grna_target_data_frame)))
+      expect_true(sapply(out, function(df) rownames(df) == grna_target_data_frame$grna_id) |> all())
+      expect_true(all(sapply(out, ncol) == num_cells))
 
+      num_nt <- sum(grna_target_data_frame$grna_target == "non-targeting")
+      # more_than_one_target <- length(unique(grna_target_data_frame$grna_target)) >= 2
+      expect_equal(length(out), ifelse(num_nt > 0, 25, 5))# + more_than_one_target)
 
+      expect_true(all(out[[1]] == 0))
 
-
-
+      if(num_nt == 0) {
+        # then out 2:5 are the predicted patterns and that's all there is
+        expect_true(all(out[[2]] == 1))
+        expect_true(all(out[[3]] == big_test))
+        expect_true(all(out[[4]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, FALSE, big = big_test)))
+        expect_true(all(out[[5]] == .make_mock_patterned_matrix(nrow(grna_target_data_frame), num_cells, TRUE, big = big_test)))
+      } else {
+        # the non-NT patterns are tested above so this section will just test the NT patterns
+        # NT patterns are looped thru first so we just need out[2:5] again
+        nt_submatrices <- lapply(out[2:5], function(m) m[grna_target_data_frame$grna_target == "non-targeting", ,drop = FALSE])
+        expect_true(all(nt_submatrices[[1]] == 1))
+        expect_true(all(nt_submatrices[[2]] == big_test))
+        expect_true(all(nt_submatrices[[3]][1,] == seq(big_test, 1, length = num_cells) |> round()))
+        expect_true(all(nt_submatrices[[4]] == .make_mock_patterned_matrix(num_nt, num_cells, TRUE, big = big_test)))
+      }
+    }
+  }
+})
