@@ -150,12 +150,17 @@ Some users may wish to run both *cis* and *trans* analyses on their data. We rec
 
 `sceptre` can run left-tailed, right-tailed, and two-tailed tests of association. Left-tailed tests test for a *decrease* in expression, right-tailed tests test for an *increase* in expression, and two-tailed tests test for an increase *or* decrease in expression. The parameter `side` controls the sidedness of the test and can take values `"left"`, `"right"`, or `"both"`. (`"both"` indicates a two-tailed test.) Two-tailed tests typically are the best choice for *trans* analyses, as the direction of *trans* relationships generally is uncertain. For *cis* analyses, on the other hand, the sidedness of the test should be chosen on the basis of the type of genomic element targeted and the CRISPR perturbation modality. The following table summarizes whether a left- or right-tailed test is appropriate for a *cis* analysis as a function of these variables.
 
-| Target element | CRISPR modality     | Testing for            | Sidedness |
-|----------------|---------------------|------------------------|-----------|
-| Enhancer       | CRISPRi or CRISPRko | Decrease in expression | Left      |
-| Enhancer       | CRISPRa             | Increase in expression | Right     |
-| Silencer       | CRISPRi or CRISPRko | Increase in expression | Right     |
-| Silencer       | CRISPRa             | Decrease in expression | Left      |
++----------------+---------------------+------------------------+---------------+
+| Target element | CRISPR modality     | Testing for            | Sidedness     |
++================+=====================+========================+===============+
+| Enhancer       | CRISPRi or CRISPRko | Decrease in expression | Left          |
++----------------+---------------------+------------------------+---------------+
+| Enhancer       | CRISPRa             | Increase in expression | Right         |
++----------------+---------------------+------------------------+---------------+
+| Silencer       | CRISPRi or CRISPRko | Increase in expression | Right         |
++----------------+---------------------+------------------------+---------------+
+| Silencer       | CRISPRa             | Decrease in expression | Left          |
++----------------+---------------------+------------------------+---------------+
 
 : Recommended sidedness of the test as a function of target element and CRISPR modality for *cis* analyses.
 
@@ -183,11 +188,9 @@ The choice of the control group should be made on the basis of the MOI of the da
 knitr::include_graphics("control_group_dec_tree.png")
 ```
 
-## Resampling mechanism
-
 ## Formula
 
-The parameter `formula_object` specifies how `sceptre` is to adjust for the cell-specific covariates. `formula_object` is optional; if not provided, `set_analysis_parameters()` constructs a default `formula_object`. The default `formula_object` is formed by summing over all covariates and log-transforming the count-based covariates. For example, the high-MOI CRISPRi data contain the cell-specific covariates `response_n_nonzero`, `response_n_umis`, `grna_n_nonzero`, `grna_n_umis`, `response_p_mito`, and `batch`. The first four of these covariates are count-based. The default formula object for this dataset is as follows:
+The parameter `formula_object` specifies how `sceptre` is to adjust for the cell-specific covariates. `formula_object` is optional; if not provided, `set_analysis_parameters()` constructs a default `formula_object`. The default `formula_object` is formed by summing over all covariates and log-transforming the count-based covariates. For example, the high-MOI CRISPRi data contain the cell-specific covariates `response_n_nonzero`, `response_n_umis`, `grna_n_nonzero`, `grna_n_umis`, `response_p_mito`, and `batch`. The first four of these covariates are count-based. Thus, the default formula object for this dataset is as follows:
 
 ```{r, results='hide'}
 formula(~ log(response_n_nonzero) + log(response_n_umis) +
@@ -205,6 +208,67 @@ formula(~ log(response_n_nonzero) + log(response_n_umis) +
 
 Users can specify a custom formula by passing a formula object to the argument `formula_object` in `set_analysis_parameters()`. User-specified formulas should be defined in terms of the cell-specific covariates, which can be viewed by evaluating the `sceptre_object` in the console.
 
-## Multiple testing method and multiple testing $\alpha$
+## Resampling mechanism
+
+The parameter `resampling_mechanism` controls the inferential procedure that `sceptre` uses to compute a p-value for a target-response pair. Suppose for simplicity that we are carrying out a singleton gRNA analysis. There are three pieces of information relevant to testing for association between a given gRNA and response: (1) the vector of UMI counts of the response; (2) the "gRNA indicator vector," where a given entry of the gRNA indicator vector is set to "1" if the corresponding cell is part of the treatment group (i.e., it contains the gRNA) and "0" if it is part of the control group; and (3) the matrix of cell-specific covariates. First, `sceptre` regresses the response vector onto the gRNA indicator vector and covariate matrix via a negative binomial (NB) GLM. `sceptre` computes the z-score $z_\textrm{obs}$ corresponding to a test of the null hypothesis that the coefficient corresponding to the gRNA indicator vector in the fitted GLM is zero. Next, `sceptre` *resamples* the gRNA indicator vector *B* times, where *B* is some large integer (e.g., *B* = 5000). (We discuss exactly how the gRNA indicator vector is resampled below.) Finally, for each of the resampled gRNA indicator vectors, `sceptre` recomputes the z-score, producing *B* "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$. The observed z-score $z_\textrm{obs}$ is compared to the null z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ to compute a p-value.
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap="."}
+knitr::include_graphics("sceptre_pt_1.png")
+```
+
+`sceptre` provides two procedures for resampling the gRNA indicator vector: permutations (coded as `"permutations"`) and conditional resampling (also known as the conditional randomization test; coded as `"crt"`). The permutation procedure involves randomly permuting the gRNA indicator vector *B* times. The conditional resampling procedure is slightly more complex. Briefly, the gRNA indicator vector is regressed onto the covariate matrix via logistic regression, yielding an estimate for the probability that each cell contains the gRNA as a function of the covariates. *B* synthetic gRNA indicator vectors are then sampled according to these estimated probabilities. The resampling mechanism can be specified by passing either `permutations` or `crt` to the argument `resampling_mechanism` in `set_analysis_parameters()`.
+
+Permutations and conditional resampling offer distinct advantages and disadvantages, although the differences are subtle. The permutation approach is faster and slightly better at handling sparsity, while the conditional resampling approach is slightly better at handling confounding due to cell-specific covariates (see table below). In practice the two approaches often produce similar results; we recommend that users try both, provided that they have the bandwidth and compute to do so. The permutation (resp., conditional resampling) procedure is the default option in low-MOI (resp., high-MOI). (Note that both options are available in both MOI settings.)
+
++------------------------+------------------------------------+-----------------------------------+
+| Resampling procedure   | Advantages                         | Disadvantages                     |
++========================+====================================+===================================+
+| Permutations           | -   Faster                         | -   Worse at handling confounding |
+|                        |                                    |                                   |
+|                        | -   Better at handling sparsity    |                                   |
++------------------------+------------------------------------+-----------------------------------+
+| Conditional resampling | -   Better at handling confounding | -   Slower                        |
+|                        |                                    |                                   |
+|                        |                                    | -   Worse at handling sparsity    |
++------------------------+------------------------------------+-----------------------------------+
+
+Resampling is the foundation of statistical inference within the `sceptre` framework. In fact, "sceptre" is a loose acronym for "**s**ingle **c**ell **p**er**t**urbation analysis via **re**sampling."
 
 ## Fit parametric curve
+
+As described above, for a given gRNA-response pair, `sceptre` computes an "observed" z-score $z_\textrm{obs}$ and a set of "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ (regardless of whether `resampling_mechanism` is set to `permutations` or `crt`). By default, `sceptre` fits a parametric density (specifically, a skew-normal density) to the distribution of null z-scores and then computes a p-value by evaluating the tail probability of the fitted density at the observed z-score $z_\textrm{obs}$ (see figure below). The parametric density module can be deactivated by setting `fit_parametric_curve` to `FALSE` in `set_analysis_parameters()`, in which case a p-value is computed by directly comparing the observed z-score to the null z-scores.
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE}
+knitr::include_graphics("fit_parametric_curve.png")
+```
+
+Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate the miscalibration diagnosis process in the event that the negative control p-values are miscalibrated.
+
+## Multiple testing method and multiple testing $\alpha$
+
+After `sceptre` is deployed to analyze the discovery pairs and negative control pairs, the resulting p-values are subjected to a multiplicity adjustment. The adjusted p-values are thresholded to call each pair as "significant" or "not significant." The parameter `multiple_testing_method` controls the multiple testing method that is used to adjust the p-values. The default option is Benjamini-Hochberg (`"BH"`); other available methods can be viewed via a call to `p.adjust.methods`.
+
+The parameter `multiple_testing_alpha` (default value `0.1`) controls the level of the multiple testing procedure. If `multiple_testing_method` is set to a method that controls that false discovery rate (e.g., `"BH"` or `"BY"`), then `multiple_testing_alpha` is the nominal false discovery rate. If, on the other hand, `multiple_testing_method` is set to a method that controls the family-wise error rate (e.g., `"bonferroni"` or `"holm"`), then `multiple_testing_alpha` is the nominal family-wise error rate.
+
+## Setting the analysis parameters
+
+We set the analysis parameters by calling `set_analysis_parameters()` on the `sceptre_object`, passing as arguments `discovery_pairs` and `positive_control_pairs` (and, on the high-MOI CRISPRi data, `side`). We allow all other arguments to take default values.
+
+```{r}
+# high-MOI CRISPRi data
+sceptre_object_highmoi <- set_analysis_parameters(sceptre_object = sceptre_object_highmoi, 
+                                                  discovery_pairs = discovery_pairs_highmoi, 
+                                                  positive_control_pairs = positive_control_pairs_highmoi,
+                                                  side = "left")
+
+# low-MOI CRISPRko data
+sceptre_object_lowmoi <- set_analysis_parameters(sceptre_object = sceptre_object_lowmoi,
+                                                 discovery_pairs = discovery_pairs_lowmoi,
+                                                 positive_control_pairs = positive_control_pairs_lowmoi)
+```
+
+We can call `print()` on the resulting `sceptre_object`, which prints to the console a message that helps us track the status of the analysis. Notice that the "Analysis parameters" field of the output contains information about the analysis parameters that we have selected (or that have been set by default).
+
+```{r}
+print(sceptre_object_highmoi)
+```
