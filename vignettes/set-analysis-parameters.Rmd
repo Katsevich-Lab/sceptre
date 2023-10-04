@@ -232,7 +232,7 @@ Permutations and conditional resampling offer distinct advantages and disadvanta
 |                        |                                    | -   Worse at handling sparsity    |
 +------------------------+------------------------------------+-----------------------------------+
 
-Resampling is the foundation of statistical inference within the `sceptre` framework. In fact, "sceptre" is a loose acronym for "**s**ingle **c**ell **p**er**t**urbation analysis via **re**sampling."
+Resampling forms the foundation of statistical inference within the `sceptre` framework. In fact, "sceptre" is a loose acronym for "**s**ingle **c**ell **p**er**t**urbation analysis via **re**sampling." `sceptre` exploits several novel strategies to make its resampling machinery fast, including the technique of resampling GLM score statistics, sparsity-exploiting algorithms for computing GLM score tests, and algorithms for recyling compute across permutation tests.
 
 ## Fit parametric curve
 
