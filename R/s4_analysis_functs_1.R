@@ -170,7 +170,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @export
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
-                                    positive_control_pairs = data.frame(),
+                                    positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
                                     grna_grouping_strategy = "union",
                                     formula_object = "default",
