@@ -25,6 +25,8 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   if(!is.null(threshold)) threshold <- round(threshold)
   if (is.null(grnas_to_plot)) {
     grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+  } else {
+    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
@@ -130,8 +132,11 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   grna_ids <- rownames(grna_matrix)
   lowmoi <- sceptre_object@low_moi
   # sample grnas to plot
-  if (is.null(grnas_to_plot)) grnas_to_plot <- sample(grna_ids, size = min(n_grnas_to_plot, length(grna_ids)), replace = FALSE)
-
+  if (is.null(grnas_to_plot)) {
+    grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+  } else {
+    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
+  }
   to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
