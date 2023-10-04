@@ -245,12 +245,11 @@ set_analysis_parameters <- function(sceptre_object,
 #'
 #' @param sceptre_object TBD
 #' @param method TBD
-#' @param hyperparameters TBD
 #' @param print_progress TBD
 #' @param parallel TBD
 #'
 #' @export
-assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
+assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, ...) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
@@ -268,15 +267,11 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
       backup_threshold = 5, probability_threshold = 0.8,
       formula_object = auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                      include_grna_covariates = TRUE))
-  } else if (method == "user_supplied") {
-    list()
   }
-  if (identical(hyperparameters, "default")) hyperparameters <- hyperparameters_default
-  if (methods::is(hyperparameters, "list")) {
-    hyperparam_names <- names(hyperparameters)
-    for (hyperparam_name in hyperparam_names) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
-    hyperparameters <- hyperparameters_default
-  }
+  hyperparameters <- list(...)
+  if (length(hyperparameters) == 0L) hyperparameters <- hyperparameters_default
+  for (hyperparam_name in names(hyperparameters)) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
+  hyperparameters <- hyperparameters_default
 
   # 2. check inputs
   check_assign_grna_inputs(sceptre_object, method, hyperparameters) |> invisible()

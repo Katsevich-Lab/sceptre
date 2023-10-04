@@ -55,7 +55,7 @@ We print the details of the CRISPRko dataset below.
 sceptre_object_lowmoi
 ```
 
-The CRISPR perturbations target gene transcription start sites. Each gene is targeted by three or four gRNAs, and nine gRNAs in the dataset are non-targeting. The "response" are genes. We print a few rows of the gRNA target data frame corresponding to this dataset below.
+The CRISPR perturbations target gene transcription start sites. Each gene is targeted by three or four gRNAs, and nine gRNAs in the dataset are non-targeting. The "responses" are genes. We print a few rows of the gRNA target data frame corresponding to this dataset below.
 
 ```{r}
 lowmoi_example_data$grna_target_data_frame[1:8,]
@@ -67,7 +67,7 @@ We set the analysis parameters by calling the function `set_analysis_parameters(
 
 ## Positive control pairs
 
-Positive control pairs are target-response pairs for which we know (or have strong reason to believe) that there is a regulatory relationship between the target and the response. We can use positive control pairs to verify that `sceptre` (or any association testing method for that matter) is sensitive (i.e., capable of detecting true associations) on the dataset under analysis. We use the function `construct_positive_control_pairs()` to construct the positive control pairs. `construct_positive_control_pairs()` takes as an argument a `sceptre_object` and returns a data frame with columns `target` and `response_id`, where gRNA targets and response IDs with matching names are paired. We call `construct_positive_control_pairs()` on the high-MOI CRISPRi dataset and the low-MOI CRISPRko dataset. In both cases the positive control set consists of transcription start sites paired to the gene regulated by those transcription start sites.
+Positive control pairs are target-response pairs for which we know (or have strong reason to believe) that there is a regulatory relationship between the target and the response. We can use positive control pairs to verify that `sceptre` (or any association testing method for that matter) is sensitive (i.e., capable of detecting true associations) on the dataset under analysis. We use the function `construct_positive_control_pairs()` to construct the positive control pairs. `construct_positive_control_pairs()` takes as an argument a `sceptre_object` and returns a data frame with columns `grna_target` and `response_id`, where gRNA targets and response IDs with matching names are paired. We call `construct_positive_control_pairs()` on the high-MOI CRISPRi dataset and the low-MOI CRISPRko dataset. In both cases the positive control set consists of transcription start sites paired to the gene regulated by those transcription start sites.
 
 ```{r}
 positive_control_pairs_highmoi <- construct_positive_control_pairs(sceptre_object_highmoi)
@@ -210,13 +210,13 @@ Users can specify a custom formula by passing a formula object to the argument `
 
 ## Resampling mechanism
 
-The parameter `resampling_mechanism` controls the inferential procedure that `sceptre` uses to compute a p-value for a target-response pair. Suppose for simplicity that we are carrying out a singleton gRNA analysis. There are three pieces of information relevant to testing for association between a given gRNA and response: (1) the vector of UMI counts of the response; (2) the "gRNA indicator vector," where a given entry of the gRNA indicator vector is set to "1" if the corresponding cell is part of the treatment group (i.e., it contains the gRNA) and "0" if it is part of the control group; and (3) the matrix of cell-specific covariates. First, `sceptre` regresses the response vector onto the gRNA indicator vector and covariate matrix via a negative binomial (NB) GLM. `sceptre` computes the z-score $z_\textrm{obs}$ corresponding to a test of the null hypothesis that the coefficient corresponding to the gRNA indicator vector in the fitted GLM is zero. Next, `sceptre` *resamples* the gRNA indicator vector *B* times, where *B* is some large integer (e.g., *B* = 5000). (We discuss exactly how the gRNA indicator vector is resampled below.) Finally, for each of the resampled gRNA indicator vectors, `sceptre` recomputes the z-score, producing *B* "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$. The observed z-score $z_\textrm{obs}$ is compared to the null z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ to compute a p-value.
+The parameter `resampling_mechanism` controls the inferential procedure that `sceptre` uses to compute a p-value for a target-response pair. Suppose for simplicity that we are carrying out a singleton gRNA analysis. There are three pieces of information relevant to testing for association between a given gRNA and response: (1) the vector of UMI counts of the response; (2) the "gRNA indicator vector," where a given entry of the vector is set to "1" if the corresponding cell is part of the treatment group (i.e., it contains the gRNA) and "0" if it is part of the control group; and (3) the matrix of cell-specific covariates. First, `sceptre` regresses the response vector onto the gRNA indicator vector and covariate matrix via a negative binomial (NB) GLM. `sceptre` computes the z-score $z_\textrm{obs}$ corresponding to a test of the null hypothesis that the coefficient corresponding to the gRNA indicator vector in the fitted GLM is zero. Next, `sceptre` *resamples* the gRNA indicator vector *B* times, where *B* is some large integer (e.g., *B* = 5000). (We discuss exactly how the gRNA indicator vector is resampled below.) Finally, for each of the resampled gRNA indicator vectors, `sceptre` recomputes the z-score, producing *B* "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$. The observed z-score $z_\textrm{obs}$ is compared to the null z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ to compute a p-value.
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap="."}
+```{r, out.width = "650px", fig.align="center", echo = FALSE}
 knitr::include_graphics("sceptre_pt_1.png")
 ```
 
-`sceptre` provides two procedures for resampling the gRNA indicator vector: permutations (coded as `"permutations"`) and conditional resampling (also known as the conditional randomization test; coded as `"crt"`). The permutation procedure involves randomly permuting the gRNA indicator vector *B* times. The conditional resampling procedure is slightly more complex. Briefly, the gRNA indicator vector is regressed onto the covariate matrix via logistic regression, yielding an estimate for the probability that each cell contains the gRNA as a function of the covariates. *B* synthetic gRNA indicator vectors are then sampled according to these estimated probabilities. The resampling mechanism can be specified by passing either `permutations` or `crt` to the argument `resampling_mechanism` in `set_analysis_parameters()`.
+`sceptre` provides two procedures for resampling the gRNA indicator vector: permutations and conditional resampling (also known as the conditional randomization test). The permutation procedure involves randomly permuting the gRNA indicator vector *B* times. The conditional resampling procedure is slightly more complex. Briefly, the gRNA indicator vector is regressed onto the covariate matrix via logistic regression, yielding an estimate for the probability that each cell contains the gRNA as a function of the covariates. *B* synthetic gRNA indicator vectors are then sampled according to these estimated probabilities. The resampling mechanism can be specified by passing either `permutations` or `crt` (for conditional resampling) to the argument `resampling_mechanism` in `set_analysis_parameters()`.
 
 Permutations and conditional resampling offer distinct advantages and disadvantages, although the differences are subtle. The permutation approach is faster and slightly better at handling sparsity, while the conditional resampling approach is slightly better at handling confounding due to cell-specific covariates (see table below). In practice the two approaches often produce similar results; we recommend that users try both, provided that they have the bandwidth and compute to do so. The permutation (resp., conditional resampling) procedure is the default option in low-MOI (resp., high-MOI). (Note that both options are available in both MOI settings.)
 
@@ -236,13 +236,13 @@ Resampling is the foundation of statistical inference within the `sceptre` frame
 
 ## Fit parametric curve
 
-As described above, for a given gRNA-response pair, `sceptre` computes an "observed" z-score $z_\textrm{obs}$ and a set of "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ (regardless of whether `resampling_mechanism` is set to `permutations` or `crt`). By default, `sceptre` fits a parametric density (specifically, a skew-normal density) to the distribution of null z-scores and then computes a p-value by evaluating the tail probability of the fitted density at the observed z-score $z_\textrm{obs}$ (see figure below). The parametric density module can be deactivated by setting `fit_parametric_curve` to `FALSE` in `set_analysis_parameters()`, in which case a p-value is computed by directly comparing the observed z-score to the null z-scores.
+As described above, for a given gRNA-response pair, `sceptre` computes an "observed" z-score $z_\textrm{obs}$ and a set of "null" z-scores $\tilde{z_1}, \dots, \tilde{z_B}$ (regardless of whether `resampling_mechanism` is set to `permutations` or `crt`). By default, `sceptre` fits a parametric density (specifically, a skew-normal density) to the distribution of null z-scores and then computes a p-value by evaluating the tail probability of the fitted density at the observed z-score $z_\textrm{obs}$ (see figure below). The parametric density functionality can be deactivated by setting `fit_parametric_curve` to `FALSE` in `set_analysis_parameters()`, in which case a p-value is computed by directly comparing the observed z-score to the null z-scores.
 
 ```{r, out.width = "650px", fig.align="center", echo = FALSE}
 knitr::include_graphics("fit_parametric_curve.png")
 ```
 
-Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate the miscalibration diagnosis process in the event that the negative control p-values are miscalibrated.
+Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate diagnosis of a miscalibrated result on the negative control data.
 
 ## Multiple testing method and multiple testing $\alpha$
 
@@ -252,7 +252,7 @@ The parameter `multiple_testing_alpha` (default value `0.1`) controls the level 
 
 ## Setting the analysis parameters
 
-We set the analysis parameters by calling `set_analysis_parameters()` on the `sceptre_object`, passing as arguments `discovery_pairs` and `positive_control_pairs` (and, on the high-MOI CRISPRi data, `side`). We allow all other arguments to take default values.
+We set the analysis parameters by calling `set_analysis_parameters()` on the `sceptre_object`s, passing `discovery_pairs` and `positive_control_pairs` (and, on the high-MOI CRISPRi data, `side`). We allow all other arguments to take default values.
 
 ```{r}
 # high-MOI CRISPRi data
@@ -267,7 +267,7 @@ sceptre_object_lowmoi <- set_analysis_parameters(sceptre_object = sceptre_object
                                                  positive_control_pairs = positive_control_pairs_lowmoi)
 ```
 
-We can call `print()` on the resulting `sceptre_object`, which prints to the console a message that helps us track the status of the analysis. Notice that the "Analysis parameters" field of the output contains information about the analysis parameters that we have selected (or that have been set by default).
+We can call `print()` on the resulting `sceptre_object`, which prints to the console a message that tracks the status of the analysis. Notice that the "Analysis parameters" field of the output contains information about the analysis parameters that we have selected (or that have been set by default).
 
 ```{r}
 print(sceptre_object_highmoi)
