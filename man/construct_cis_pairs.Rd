@@ -6,22 +6,21 @@
 \usage{
 construct_cis_pairs(
   sceptre_object,
-  positive_control_pairs = data.frame(),
   distance_threshold = 500000L,
-  exclude_positive_control_grna_targets = TRUE,
+  positive_control_pairs = data.frame(),
   ref_genome = "10X_GRCh38_2020"
 )
 }
 \arguments{
 \item{sceptre_object}{TBD}
 
-\item{positive_control_pairs}{TBD}
-
 \item{distance_threshold}{TBD}
 
-\item{exclude_positive_control_grna_targets}{TBD}
+\item{positive_control_pairs}{TBD}
 
 \item{ref_genome}{TBD}
+
+\item{exclude_positive_control_grna_targets}{TBD}
 }
 \value{
 TBD

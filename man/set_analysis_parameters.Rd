@@ -7,16 +7,14 @@
 set_analysis_parameters(
   sceptre_object,
   discovery_pairs,
-  positive_control_pairs = data.frame(),
+  positive_control_pairs = data.frame(grna_target = character(0), response_id =
+    character(0)),
   side = "both",
   grna_grouping_strategy = "union",
   formula_object = "default",
   fit_parametric_curve = TRUE,
   control_group = "default",
   resampling_mechanism = "default",
-  B1 = 499L,
-  B2 = 4999L,
-  B3 = 24999L,
   multiple_testing_method = "BH",
   multiple_testing_alpha = 0.1
 )
@@ -40,15 +38,15 @@ set_analysis_parameters(
 
 \item{resampling_mechanism}{TBD}
 
+\item{multiple_testing_method}{TBD}
+
+\item{multiple_testing_alpha}{TBD}
+
 \item{B1}{TBD}
 
 \item{B2}{TBD}
 
 \item{B3}{TBD}
-
-\item{multiple_testing_method}{TBD}
-
-\item{multiple_testing_alpha}{TBD}
 }
 \description{
 Set analysis parameters

@@ -7,7 +7,8 @@
 construct_trans_pairs(
   sceptre_object,
   positive_control_pairs = data.frame(),
-  exclude_positive_control_pairs = TRUE
+  exclude_positive_control_pairs = TRUE,
+  exclude_positive_control_targets = FALSE
 )
 }
 \arguments{
