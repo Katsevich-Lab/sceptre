@@ -7,17 +7,15 @@
 assign_grnas(
   sceptre_object,
   method = "default",
-  hyperparameters = "default",
   print_progress = TRUE,
-  parallel = FALSE
+  parallel = FALSE,
+  ...
 )
 }
 \arguments{
 \item{sceptre_object}{TBD}
 
 \item{method}{TBD}
-
-\item{hyperparameters}{TBD}
 
 \item{print_progress}{TBD}
 

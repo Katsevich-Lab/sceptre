@@ -7,13 +7,91 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+The fourth step of the pipeline is to run quality control (QC).
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE}
+knitr::include_graphics("pipeline_schematic_step_4.png")
 ```
 
-```{r setup}
+We begin by loading the `sceptre` package.
+
+```{r,results='hide'}
 library(sceptre)
 ```
+
+We initialize `sceptre_object`s corresponding to the high-MOI CRISPRi and low-MOI CRISPRko data. We call the first three pipeline functions on both datasets: `import_data()`, `set_analysis_parameters()`, and `assign_grnas()`.
+
+```{r}
+# low-MOI CRISPRko data
+# 1. import data
+sceptre_object_lowmoi <- import_data(response_matrix = lowmoi_example_data$response_matrix,
+                                     grna_matrix = lowmoi_example_data$grna_matrix,
+                                     extra_covariates = lowmoi_example_data$extra_covariates,
+                                     grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+                                     moi = "low")
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object_lowmoi)
+discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object_lowmoi,
+                                         positive_control_pairs = positive_control_pairs)
+
+# 2-3. set analysis parameters, assign gRNAs
+sceptre_object_lowmoi <- sceptre_object_lowmoi |>
+  set_analysis_parameters(discovery_pairs = discovery_pairs,
+                          positive_control_pairs = positive_control_pairs) |>
+  assign_grnas()
+```
+
+```{r, results='hide'}
+# high-MOI CRISPRi data
+# 1. import data
+sceptre_object_highmoi <- import_data(response_matrix = highmoi_example_data$response_matrix,
+                                      grna_matrix = highmoi_example_data$grna_matrix,
+                                      grna_target_data_frame = grna_target_data_frame_highmoi,
+                                      moi = "high",
+                                      extra_covariates = highmoi_example_data$extra_covariates,
+                                      response_names = highmoi_example_data$gene_names)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object_highmoi)
+discovery_pairs <- construct_cis_pairs(sceptre_object_highmoi,
+                                       positive_control_pairs = positive_control_pairs,
+                                       distance_threshold = 5e6)
+
+# 2-3. set analysis parameters, assign gRNAs
+sceptre_object_highmoi <- sceptre_object_highmoi |>
+  set_analysis_parameters(discovery_pairs = discovery_pairs,
+                          positive_control_pairs = positive_control_pairs,
+                          side = "left") |>
+  assign_grnas(parallel = TRUE)
+```
+
+We are now ready to run QC. We apply QC both at the level of the cell and at the level of the target-response pair. Cellwise QC involves filtering on the covariates `response_n_nonzero`, `response_n_umis`, and `response_p_mito` and, in low-MOI, removing cells that contain multiple gRNAs. Pairwise QC involves removing pairs for which there are insufficiently many cells or there is insufficiently high expression of the response.
+
+## Plot the cell-specific covariates
+
+A helpful initial step in applying QC is visualizing the distribution of the cell-specific covariates. To this end we call the function `plot_covariates()`, which creates a histogram of the distribution of `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`. `plot_covariates()` takes the arguments `sceptre_object` (required), `response_n_nonzero_range` (optional), `response_n_umis_range` (optional), and `p_mito_threshold` (optional). `response_n_nonzero_range` is a length-two vector of quantiles (default: `c(0.01, 0.99)`); vertical lines are drawn at these quantiles on the `response_n_nonzero` histogram. `response_n_umis_range` likewise is a length-two vector of quantiles (default: `c(0.01, 0.99)`) indicating the location at which to draw vertical lines on the `response_n_umis` histogram. Finally, `p_mito_threshold` is a single numeric value in the interval [0,1] specifying the position at which to draw a vertical line on the `response_p_mito` plot. The vertical lines are meant to represent QC thresholds, as the cellwise QC step involves clipping the right tail of `response_p_mito` and clipping the left and right tails of `response_n_nonzero` and `response_n_umis`. We call `plot_covariates()` on the high-MOI CRISPRi `sceptre_object` (i.e., `sceptre_object_highmoi`), setting `p_mito_threshold` to 0.075.
+
+```{r, eval=FALSE}
+plot_covariates(sceptre_object_highmoi, p_mito_threshold = 0.075)
+```
+
+```{r, out.width = "600px", fig.align="center", echo = FALSE, fig.cap=c("Plot of covariates for high-MOI CRISPRi data.")}
+p <- plot_covariates(sceptre_object_highmoi, p_mito_threshold = 0.075)
+ggplot2::ggsave(filename = "plot_covariates_highmoi.png", plot = p, device = "png", scale = 1.0, width = 5, height = 4, dpi = 330)
+knitr::include_graphics("plot_covariates_highmoi.png")
+```
+
+We can inspect these plots (tinkering with `response_n_nonzero_range`, `response_n_umis_range`, and `p_mito_threshold` as necessary) to guide the selection of the QC threholds. In general it is a good idea to clip long, asymmetric tails so as to remove outlier cells. The QC thresholds appear to be drawn at reasonable locations on the CRISPRi data.
+
+For completeness we create the corresponding plot for the low-MOI CRISPRko data, again setting `p_mito_threshold` to 0.075.
+
+```{r,eval=FALSE}
+plot_covariates(sceptre_object_lowmoi, p_mito_threshold = 0.075)
+```
+
+```{r, out.width = "600px", fig.align="center", echo = FALSE, fig.cap=c("Plot of covariates for low-MOI CRISPRko data.")}
+p <- plot_covariates(sceptre_object_lowmoi, p_mito_threshold = 0.075)
+ggplot2::ggsave(filename = "plot_covariates_lowmoi.png", plot = p, device = "png", scale = 1.0, width = 5, height = 4, dpi = 330)
+knitr::include_graphics("plot_covariates_lowmoi.png")
+```
+
+The low-MOI plot is broadly similar to its high-MOI counterpart. In particular, the QC thresholds appear to be drawn at sensible locations.
+
+## Cellwise QC
