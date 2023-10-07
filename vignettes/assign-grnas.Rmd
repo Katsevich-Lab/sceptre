@@ -22,7 +22,7 @@ knitr::include_graphics("pipeline_schematic_step_3.png")
 
 We begin by loading `sceptre`.
 
-```{r}
+```{r,results='hide'}
 library(sceptre)
 ```
 

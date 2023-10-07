@@ -22,7 +22,7 @@ knitr::include_graphics("pipeline_schematic_step_2.png")
 
 We begin by loading the `sceptre` package.
 
-```{r}
+```{r,results='hide'}
 library(sceptre)
 ```
 
@@ -146,9 +146,13 @@ head(discovery_pairs_highmoi_trans)
 
 Some users may wish to run both *cis* and *trans* analyses on their data. We recommend that such users carry out the `sceptre` pipeline twice: once using a *cis* discovery set and once using a *trans* discovery set.
 
+### Reducing the multiplicity burden 
+
+`sceptre` computes a p-value for each target-response pair in the discovery set. These p-values are subjected to a multiple testing correction procedure (by default, the Benjamini-Hochberg method) to produce a discovery set that controls some notion of aggregate type-I error (by default, the false discovery rate). 
+
 ## Side
 
-`sceptre` can run left-tailed, right-tailed, and two-tailed tests of association. Left-tailed tests test for a *decrease* in expression, right-tailed tests test for an *increase* in expression, and two-tailed tests test for an increase *or* decrease in expression. The parameter `side` controls the sidedness of the test and can take values `"left"`, `"right"`, or `"both"`. (`"both"` indicates a two-tailed test.) Two-tailed tests typically are the best choice for *trans* analyses, as the direction of *trans* relationships generally is uncertain. For *cis* analyses, on the other hand, the sidedness of the test should be chosen on the basis of the type of genomic element targeted and the CRISPR perturbation modality. The following table summarizes whether a left- or right-tailed test is appropriate for a *cis* analysis as a function of these variables.
+`sceptre` can run left-tailed, right-tailed, and two-tailed tests of association. Left-tailed tests assess a *decrease* in expression, right-tailed tests assess an *increase* in expression, and two-tailed tests assess an increase *or* decrease in expression. The parameter `side` controls the sidedness of the test and can take values `"left"`, `"right"`, or `"both"`. (`"both"` indicates a two-tailed test.) Two-tailed tests typically are the best choice for *trans* analyses, as the direction of *trans* relationships generally is uncertain. For *cis* analyses, on the other hand, the sidedness of the test should be chosen on the basis of the type of genomic element targeted and the CRISPR perturbation modality. The following table summarizes whether a left- or right-tailed test is appropriate for a *cis* analysis as a function of these variables.
 
 +----------------+---------------------+------------------------+---------------+
 | Target element | CRISPR modality     | Testing for            | Sidedness     |
@@ -176,7 +180,7 @@ The other available gRNA grouping strategy is `"singleton"`. The `"singleton"` s
 
 ## Control group
 
-The primary goal of `sceptre` is to test for association between a given gRNA target and response. `control_group` is a parameter that governs the set of cells used to carry out the test of association. Suppose for simplicity that we are carrying out a singleton analysis, i.e. suppose that we are testing for association between an individual targeting gRNA and a response. We define the "treatment group" as the set of cells that contain the given targeting gRNA, and we define the "control group" as the set of cells against which the treatment group is compared to conduct the association test. There are two choices for the control group: the "complement set" and the "non-targeting (NT) cells." The complement set consists of the cells that *do not* contain the given targeting gRNA; the NT cells, by contrast, consist of the cells that contain a non-targeting gRNA. (See schematic below.) `sceptre` tests for association between the given targeting gRNA and the response by testing for differential expression of the response across the treatment group and the control group. Users can select the control group to use by passing either `"complement"` or `"nt_cells"` to `control_group`.
+The primary goal of `sceptre` is to test for association between a given gRNA target and response. `control_group` is a parameter that controls the set of cells used to carry out the test of association. Suppose for simplicity that we are carrying out a singleton analysis, i.e. suppose that we are testing for association between an individual targeting gRNA and a response. We define the "treatment group" as the set of cells that contain the given targeting gRNA, and we define the "control group" as the set of cells against which the treatment group is compared to conduct the association test. There are two choices for the control group: the "complement set" and the "non-targeting (NT) cells." The complement set consists of the cells that *do not* contain the given targeting gRNA; the NT cells, by contrast, consist of the cells that contain a non-targeting gRNA. (See schematic below.) `sceptre` tests for association between the given targeting gRNA and the response by testing for differential expression of the response across the treatment group and the control group. Users can select the control group to use by passing either `"complement"` or `"nt_cells"` to `control_group`.
 
 ```{r, out.width = "760px", fig.align = "center", echo = FALSE, fig.cap = "A schematic illustrating the difference between the \"complement set\" and \"NT cells\" control groups. The single-cell CRISPR screen experiment produces a pool of cells containing both targeting and non-targeting gRNAs (top). Suppose that we seek to test for association between a given targeting gRNA (e.g., gRNA $T_2$) and a given response. We first divide the cells into two groups: the treatment group (i.e., the cells containing gRNA $T_2$) and the control group. The control group either can consist of the cells not containing gRNA $T_2$ (the \"complement set\") or the cells containing a non-targeting gRNA (the \"NT cells\"). `sceptre` tests for differential expression of the given response across the treatment and control groups, yielding a p-value for the test of association between the given targeting gRNA and the given response."}
 knitr::include_graphics("control_vs_complement.png")

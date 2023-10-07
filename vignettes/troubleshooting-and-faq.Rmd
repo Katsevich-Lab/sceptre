@@ -25,5 +25,7 @@ rm -rf sceptre
 
 Now, try to install `sceptre` again.
 
+If this does not work, try to delete and reinstall the dependencies of `sceptre`. `sceptre` has the following dependencies: `BH`, `cowplot`, `crayon`, `data.table`, `dplyr`, `ggplot2`, `Matrix`, `Rcpp`. Using the method described above, delete and reinstall each of these dependencies one-by-one.
+
 2. My negative control p-values are miscalibrated. What should I do?
 
