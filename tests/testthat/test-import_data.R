@@ -5,8 +5,8 @@
 # TODO modify helper functions so i can get specific individual matrix returns rather
 # than always generating the whole list and then subsetting
 
-rm(list=ls())
-source("~/academics/katsevich-lab/sceptre/tests/testthat/helper-mock-data.R")
+# rm(list=ls())
+# source("~/academics/katsevich-lab/sceptre/tests/testthat/helper-mock-data.R")
 
 ## pretty comprehensive set of grna_target_data_frames aside from varying `start` and `end`
 
@@ -342,7 +342,161 @@ test_that("import_data-invalid-inputs", {
     regex = "`grna_matrix` must be an object of class matrix, dgTMatrix, dgCMatrix, dgRMatrix, lgTMatrix, lgCMatrix, lgRMatrix"
   )
 
+  ##### 8. agreement in number of cells
+  FAIL_ncol_resonse_matrix <- valid_response_matrix[,-1]
+  FAIL_ncol_grna_matrix <- valid_grna_matrix[,2:num_cells]
+  FAIL_nrow_extra_covariates <- valid_extra_covariates[-1,, drop = FALSE]
 
+  expect_error(
+    import_data(
+      response_matrix = FAIL_ncol_resonse_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    ),
+    regex = "The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` \\(if supplied\\) must coincide"
+  )
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = FAIL_ncol_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    ),
+    regex = "The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` \\(if supplied\\) must coincide"
+  )
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = FAIL_nrow_extra_covariates
+    ),
+    regex = "The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` \\(if supplied\\) must coincide"
+  )
+
+  ##### 9. barcodes are valid and agree
+  # TODO add regex thru here once the errors are settled
+  FAIL_bad_barcodes_response_matrix <- valid_response_matrix |>
+    `colnames<-`(c("123", paste0("a", 2:num_cells)))
+  FAIL_bad_barcodes_grna_matrix <- valid_response_matrix |>
+    `colnames<-`(c("123", paste0("a", 2:num_cells)))
+  valid_response_matrix_mismatches_colnames <- valid_response_matrix |>
+    `colnames<-`(paste0("b", 1:num_cells))
+  valid_grna_matrix_mismatched_colnames <- valid_grna_matrix |>
+    `colnames<-`(paste0("a", 1:num_cells))
+
+  # if just one of response_matrix and grna_matrix have colnames it should be ok
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = NULL
+    )
+  )
+
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = NULL
+    )
+  )
+
+  # but if both response and grna matrices have colnames they should agree
+  # TODO currently does not throw an error but i think it should
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = NULL
+    )
+  )
+
+  # TODO also no error if extra_covariates without rownames are passed
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    )
+  )
+
+  # now as it stands we get an error from these next two
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates |>
+        `rownames<-`(colnames(valid_response_matrix_mismatches_colnames))
+    )
+  )
+
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates |>
+        `rownames<-`(colnames(valid_grna_matrix_mismatched_colnames))
+    )
+  )
+
+  # now for bad barcodes, again we only check these if the non-NULL conditions are met
+  # but maybe better to check if non-null?
+  expect_error(
+    import_data(
+      response_matrix = FAIL_bad_barcodes_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    )
+  )
+
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = FAIL_bad_barcodes_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    )
+  )
+
+  # TODO also test for row.names of extra_covariates
+
+
+  ##### 10.
+
+
+  ##### 11.
+
+
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates |>
+        dplyr::mutate(newcol = c(list(1:5), as.list(2:num_cells)))
+    )
+  )
 
 
 
@@ -363,16 +517,6 @@ test_that("import_data-invalid-inputs", {
   )
 
 })
-# function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) {
-#
-#   # 8. check for agreement in number of cells
-#   check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
-#   if (!is.null(extra_covariates)) {
-#     check_ncells <- check_ncells && (ncol(response_matrix) == nrow(extra_covariates))
-#   }
-#   if (!check_ncells) {
-#     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide.")
-#   }
 #
 #   # 9. if applicable, check that the cell barcodes match across the grna, gene, and covariate matrices
 #   check_barcodes_provided <- function(barcodes) {
