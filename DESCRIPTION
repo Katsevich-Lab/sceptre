@@ -47,11 +47,8 @@ Suggests:
     VGAM,
     rmarkdown,
     parallel,
-<<<<<<< HEAD
     testthat (>= 3.0.0)
-=======
     readr
->>>>>>> dev
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/Katsevich-Lab/sceptre
