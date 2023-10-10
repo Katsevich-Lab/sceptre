@@ -37,7 +37,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 8. check for agreement in number of cells
   check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
-  if (!is.null(extra_covariates)) {
+  if (nrow(extra_covariates) >= 1L) {
     check_ncells <- check_ncells && (ncol(response_matrix) == nrow(extra_covariates))
   }
   if (!check_ncells) {
@@ -274,11 +274,11 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
     stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
   }
 
-  # 2. check that negative control gRNAs are present (if the control group is the complement set)
-  if (control_group_complement) {
+  # 2. check that negative control gRNAs are present (if the control group is the nt cells)
+  if (!control_group_complement) {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
-      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the complement set."))
+      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the NT set."))
     }
   }
 

@@ -3,21 +3,31 @@
 #' @param directories TBD
 #' @param moi TBD
 #' @param grna_target_data_frame TBD
+#' @param extra_covariates TBD
 #'
-#' @return a sceptre_object initialized
+#' @return TBD
 #' @export
 #'
 #' @examples
-#'
 #' \dontrun{
-#' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/test_data/"
-#' # load the grna group df
-#' grna_target_data_frame <- readRDS(paste0(base_dir, "grna_group_df.rds"))
-#' # set paths to the directories containing the cellranger count outputs
-#' directories <- paste0(base_dir, "gemgroup", 1:3)
-#' sceptre_object <- import_data_from_cellranger(directories, "low", grna_target_data_frame)
-#' }
-import_data_from_cellranger <- function(directories, moi, grna_target_data_frame) {
+#' # 1. create the sceptre object from CellRanger output
+#' directories <- paste0(system.file("extdata", package = "sceptre"),
+#'                      "/highmoi_example/gem_group_", 1:2)
+#' data(grna_target_data_frame_highmoi)
+#'
+#' # 2. simulate an additional covariate
+#' cell_type <- sample(x = paste0("type_", 1:3),
+#'                     size = 45919,
+#'                     replace = TRUE) |> factor()
+#' extra_covariates <- data.frame(cell_type = cell_type)
+#'
+#' # 3. initialize the sceptre_object
+#' sceptre_object <- import_data_from_cellranger(directories = directories,
+#'                                               moi = "high",
+#'                                               grna_target_data_frame = grna_target_data_frame_highmoi,
+#'                                               extra_covariates = extra_covariates)
+#'}
+import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame()) {
   # 1. check that directories exist
   for (curr_directory in directories) {
     if (!dir.exists(curr_directory)) stop(paste0("The directory ", curr_directory, " does not exist."))
@@ -116,18 +126,29 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
     rownames(out_mats[[modality]]) <- feature_df$feature_id[modality_idxs[[modality]]]
   }
   gene_names <- feature_df$feature_name[modality_idxs[["Gene Expression"]]]
-  batch <- rep(paste0("b", seq_along(n_cells_per_matrix)), n_cells_per_matrix) |> factor()
 
-  # 8. initialize the sceptre object
+  # 8. set up the extra covariates
+  batch <- if (length(directories) >= 2L) {
+    rep(paste0("b", seq_along(n_cells_per_matrix)), n_cells_per_matrix) |> factor()
+  } else {
+    NULL
+  }
+  if (nrow(extra_covariates) == 0L) {
+    extra_covariates <- data.frame(batch = batch)
+  } else {
+    extra_covariates$batch <- batch
+  }
+
+  # 9. initialize the sceptre object
   cat("Creating the sceptre object.")
   sceptre_object <- import_data(response_matrix = out_mats[["Gene Expression"]],
                                 grna_matrix = out_mats[["CRISPR Guide Capture"]],
                                 grna_target_data_frame = grna_target_data_frame,
                                 moi = moi,
-                                extra_covariates = if (length(directories) >= 2L) data.frame(batch = batch) else NULL,
+                                extra_covariates = extra_covariates,
                                 response_names = gene_names)
   gc() |> invisible()
-  cat(crayon::green(' \u2713\n'))
+  cat(crayon::green(' \u2713'))
   return(sceptre_object)
 }
 

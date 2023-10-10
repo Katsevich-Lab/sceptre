@@ -1,0 +1,31 @@
+---
+title: "Troubleshooting and frequently asked questions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Troubleshooting and frequently asked questions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+1. I am trying to install `sceptre` but am getting an error. What should I do?
+
+The first thing to do is to remove any previous installations of `sceptre` and then try again. First, determine the directory on your computer in which R packages are stored by executing `.libPaths()` in the R console.
+
+```{r}
+.libPaths()
+```
+
+Next, within your terminal, `cd` to this directory and then execute `rm -rf sceptre`.
+
+```
+# in terminal
+cd /Library/Frameworks/R.framework/Versions/4.2/Resources/library # change me!
+rm -rf sceptre
+```
+
+Now, try to install `sceptre` again.
+
+If this does not work, try to delete and reinstall the dependencies of `sceptre`. `sceptre` has the following dependencies: `BH`, `cowplot`, `crayon`, `data.table`, `dplyr`, `ggplot2`, `Matrix`, `Rcpp`. Using the method described above, delete and reinstall each of these dependencies one-by-one.
+
+2. My negative control p-values are miscalibrated. What should I do?
+

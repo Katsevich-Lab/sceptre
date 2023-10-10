@@ -1,0 +1,132 @@
+---
+title: "Import data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Import data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette describes how to import single-cell CRISPR screen data into `sceptre`, which is the first step of the `sceptre` pipeline.
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE}
+knitr::include_graphics("pipeline_schematic_step_1.png")
+```
+
+Users either can import data directly from the output of an existing software package (e.g., 10X CellRanger or the Parse Biosciences count matrix generation program) or from a specified set of R objects. We recommend that users import data from the output of an existing software package, as doing so decreases the probability of error. We begin by loading the `sceptre` package.
+
+```{r,results='hide'}
+library(sceptre)
+```
+
+## Import data from an existing software package
+
+`sceptre` links up with two programs for upstream processing of single-cell CRISPR screen data: 10X Cellranger and the analogous software tool developed by Parse Biosciences. (We refer to the latter program as the "Parse program.") We describe how to import data from each of these tools below.
+
+### Import from 10X CellRanger
+
+The Get Started vignette (`vignette("sceptre")`) describes how to import data from 10X CellRanger. We include a minimal working example here.
+
+```{r,results='hide'}
+directories <- paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_", 1:2)
+data(grna_target_data_frame_highmoi)
+sceptre_object <- import_data_from_cellranger(directories = directories,
+                                              moi = "high",
+                                              grna_target_data_frame = grna_target_data_frame_highmoi)
+```
+
+### Import from the Parse program
+
+A function to import data from the Parse program is coming soon.
+
+### Add extra covariates
+
+`import_data_from_cellranger()` and `input_data_from_parse()` compute the covariates `grna_n_nonzero`, `grna_n_umis`, `response_n_nonzero`, `response_n_umis`, `response_p_mito`, and `batch`. Users may wish to supply additional covariates (e.g., cell cycle or cell type) to `sceptre`. To do so, users can pass a data frame `extra_covariates` containing additional covariates to `import_data_from_cellranger()` or `input_data_from_parse()`. Below, we simulate an additional covariate `cell_type` and pass this covariate as an argument to the data import function.
+
+```{r,results='hide'}
+# simulate an extra covariate, namely cell type
+cell_type <- sample(x = paste0("type_", 1:3), size = 45919, replace = TRUE) |> factor()
+extra_covariates <- data.frame(cell_type = cell_type)
+
+# import data, passing the the extra covariates as an argument
+sceptre_object <- import_data_from_cellranger(directories = directories,
+                                              moi = "high",
+                                              grna_target_data_frame = grna_target_data_frame_highmoi,
+                                              extra_covariates = extra_covariates)
+```
+
+The additional covariate of `cell_type` is printed in the "covariates" field when we evaluate `sceptre_object` in the console.
+
+```{r}
+sceptre_object
+```
+
+## Import data from a collection of R objects
+
+Users also can import data into `sceptre` from a specified set of R objects. This data import strategy is most appropriate for users employing less standard data preprocessing pipelines to generate the response and gRNA count matrices. We use the high MOI-CRISPRi data as a working example. We can obtain these data in R matrix / data frame format as follows.
+
+```{r}
+data(highmoi_example_data)
+response_matrix <- highmoi_example_data$response_matrix # response matrix
+grna_matrix <- highmoi_example_data$grna_matrix # grna matrix
+extra_covariates <- highmoi_example_data$extra_covariates # batch information
+response_names <- highmoi_example_data$gene_names # response names
+grna_target_data_frame <- grna_target_data_frame_highmoi # gRNA target data frame
+```
+
+We call the function `import_data()` to import the data from a collection of R objects. `import_data()` takes several arguments: `response_matrix`, `grna_matrix`, `grna_target_data_frame`, `moi`, `extra_covariates`, and `response_names`. The following figure summarizes the main inputs to this function.
+
+```{r, out.width = "750px", fig.align="center",echo=FALSE,fig.cap="Data inputs to pass to `sceptre`: a response matrix, a gRNA matrix, a data frame of extra covariates (optional), and a gRNA target data frame."}
+knitr::include_graphics("input_pieces.png")
+```
+
+We describe the inputs below.
+
+-   `response_matrix` is the matrix of response UMI counts. The responses should be in the rows and the cells in the columns. The row names of the `response_matrix` should be the response IDs. The first ten rows and columns of the example `response_matrix` are as follows.
+
+    ```{r}
+    response_matrix[1:10,1:10]
+    ```
+
+-   `grna_matrix` is the matrix of gRNA UMI counts. The gRNAs should be in the rows and the cells in the columns. The row names of `grna_matrix` should be the gRNA IDs. The first ten rows and columns of the example `grna_matrix` are as follows.
+
+    ```{r}
+    grna_matrix[1:10,1:10]
+    ```
+
+`response_matrix` and `grna_matrix` should be stored in one of the following formats: `matrix`, `dgTMatrix`, `dgCMatrix`, or `dgRMatrix`.
+
+-   `grna_target_data_frame` is the data frame mapping each gRNA to its target. The `grna_target_data_frame` that we pass to `import_data()` is exactly the same as the one that we pass to `import_data_from_cellranger()`. See `vignette("sceptre")` for more information about this argument.
+
+    ```{r}
+    grna_target_data_frame[c(1:4, 21:24, 80:83),]
+    ```
+
+-   `moi` is a string specifying the MOI of the dataset, either "high" or "low". This argument serves the same function as it does in `import_data_from_cellranger()`. See `vignette("sceptre")` for more information.
+
+    ```{r}
+    moi <- "high"
+    ```
+
+-   `extra_covariates` (optional) is a data frame specifying cell-specific covariates beyond those that `sceptre` can compute. `import_data()` computes the covariates `grna_n_nonzero`, `grna_n_umis`, `response_n_nonzero`, `response_n_umis`, and `response_p_mito`. `import_data()` does *not* compute `batch`, as `import_data()` does not have access to batch information. Thus, `batch` --- alongside any other relevant covariates, such as cell type --- should be included in the `extra_covariates` data frame.
+
+    ```{r}
+    extra_covariates[c(1:3, 30001:30003),,drop = FALSE]
+    ```
+
+-   `response_names` (optional) is a vector of human-readable response names. `response_names` is used to determine which of the responses (if any) are mitochondrial genes for the purpose of computing the `response_p_mito` covariate.
+
+    ```{r}
+    head(response_names)
+    ```
+
+We pass the arguments `response_matrix`, `grna_matrix`, `grna_target_data_frame`, `moi`, `extra_covariates`, and `response_names` to `import_data()`, which initializes a `sceptre_object`.
+
+```{r}
+sceptre_object <- import_data(response_matrix = response_matrix,
+                              grna_matrix = grna_matrix,
+                              grna_target_data_frame = grna_target_data_frame,
+                              moi = moi,
+                              extra_covariates = extra_covariates,
+                              response_names = response_names)
+```

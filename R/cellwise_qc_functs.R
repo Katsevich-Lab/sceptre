@@ -1,5 +1,9 @@
 determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, response_n_nonzero_range, p_mito_threshold, additional_cells_to_remove) {
-  # 1. compute the cells to retain based on n_umis and n_nonzero
+  # 1. remove additional cells specified by the user
+  cells_to_exclude_user_specified <- additional_cells_to_remove
+  n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
+
+  # 2. compute the cells to retain based on n_umis and n_nonzero
   exclude_cells_by_clipping_counts <- function(v, percentile_range) {
     cutoffs <- stats::quantile(x = v, probs = percentile_range)
     which(v < cutoffs[1] | v > cutoffs[2])
@@ -9,7 +13,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   cells_to_exclude_n_responses <- exclude_cells_by_clipping_counts(sceptre_object@covariate_data_frame$response_n_nonzero, response_n_nonzero_range)
   n_cells_rm_n_responses <- length(cells_to_exclude_n_responses)
 
-  # 2. compute cells to retain based on p_mito
+  # 3. compute cells to retain based on p_mito
   if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
     cells_to_exclude_p_mito <- which(sceptre_object@covariate_data_frame$response_p_mito > p_mito_threshold)
     n_cells_rm_p_mito <- length(cells_to_exclude_p_mito)
@@ -18,13 +22,9 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
     n_cells_rm_p_mito <- 0L
   }
 
-  # 3. compute cells to retain based on cells containing multiple grnas (if in low MOI)
+  # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
   cells_to_exclude_multiple_grnas <- sceptre_object@cells_w_multiple_grnas
   n_cells_rm_multiple_grnas <- length(sceptre_object@cells_w_multiple_grnas)
-
-  # 4. remove additional cells specified by the user
-  cells_to_exclude_user_specified <- additional_cells_to_remove
-  n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   cells_to_exclude <- c(cells_to_exclude_n_umis, cells_to_exclude_n_responses,

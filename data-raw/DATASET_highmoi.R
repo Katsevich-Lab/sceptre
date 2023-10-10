@@ -133,5 +133,9 @@ gene_names_highmoi <- gene_table$gene_name[match(rownames(response_matrix_highmo
 grna_target_data_frame_highmoi <- grna_group_data_frame_highmoi |> dplyr::rename("grna_target" = "grna_group") |> as.data.frame()
 
 # save
-usethis::use_data(response_matrix_highmoi, gene_names_highmoi, grna_matrix_highmoi,
-                  extra_covariates_highmoi, grna_target_data_frame_highmoi, overwrite = TRUE)
+highmoi_example_data <- list(response_matrix = response_matrix_highmoi,
+                             gene_names = gene_names_highmoi,
+                             grna_matrix = grna_matrix_highmoi,
+                             extra_covariates = extra_covariates_highmoi)
+
+usethis::use_data(highmoi_example_data, grna_target_data_frame_highmoi, overwrite = TRUE)
