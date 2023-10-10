@@ -9,3 +9,6 @@ src/*.o
 src/*.o-*
 src/*.d
 src/*.so
+docs
+/doc/
+/Meta/

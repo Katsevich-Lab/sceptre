@@ -25,6 +25,8 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   if(!is.null(threshold)) threshold <- round(threshold)
   if (is.null(grnas_to_plot)) {
     grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+  } else {
+    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
@@ -130,8 +132,11 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   grna_ids <- rownames(grna_matrix)
   lowmoi <- sceptre_object@low_moi
   # sample grnas to plot
-  if (is.null(grnas_to_plot)) grnas_to_plot <- sample(grna_ids, size = min(n_grnas_to_plot, length(grna_ids)), replace = FALSE)
-
+  if (is.null(grnas_to_plot)) {
+    grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+  } else {
+    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
+  }
   to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
@@ -282,7 +287,8 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
 
   p_c <- ggplot2::ggplot(data = calibration_result |> dplyr::filter(abs(log_2_fold_change) < 0.6),
                          mapping = ggplot2::aes(x = log_2_fold_change)) +
-    ggplot2::geom_histogram(binwidth = 0.02, fill = "grey90", col = "black", boundary = 0) +
+    ggplot2::geom_histogram(binwidth = if (nrow(calibration_result) > 10000) 0.02 else 0.05,
+                            fill = "grey90", col = "black", boundary = 0) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
     ggplot2::xlab("Estimated log fold change") + ggplot2::ylab("Density") +
@@ -439,10 +445,56 @@ plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FAL
 ############
 # 5. PLOT QC
 ############
+
+#' Plot covariates
+#'
+#' @param sceptre_object TBD
+#' @param response_n_umis_range TBD
+#' @param response_n_nonzero_range TBD
+#' @param p_mito_threshold TBD
+#'
+#' @return TBD
+#' @export
+plot_covariates <- function(sceptre_object,
+                            response_n_umis_range = c(0.01, 0.99),
+                            response_n_nonzero_range = c(0.01, 0.99),
+                            p_mito_threshold = 0.2) {
+  covariate_data_frame <- sceptre_object@covariate_data_frame
+  make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
+    cutoffs <- if (use_quantile) stats::quantile(v, probs = curr_range) else curr_range
+    p1 <- ggplot2::ggplot(data = data.frame(x = v),
+                          mapping = ggplot2::aes(x = x)) +
+      ggplot2::geom_histogram(col = "darkblue", fill = "grey90", bins = 50) +
+      get_my_theme() +
+      ggplot2::scale_y_continuous(expand = c(0, NA)) +
+      ggplot2::geom_vline(xintercept = cutoffs[1], col = "darkorchid1", lwd = 1.0) +
+      (if (length(cutoffs) == 2) {
+        ggplot2::geom_vline(xintercept = cutoffs[2], col = "darkorchid1", lwd = 1.0)
+      } else NULL) +
+      ggplot2::ggtitle(plot_tit) +
+      ggplot2::theme(axis.title.x = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank())
+  }
+  p1 <- make_histogram(covariate_data_frame$response_n_nonzero, response_n_nonzero_range,
+                       "Response N nonzero", use_quantile = TRUE)
+  p2 <- make_histogram(covariate_data_frame$response_n_umis, response_n_umis_range,
+                       "Response N UMIs", use_quantile = TRUE)
+  p_mito_present <- "response_p_mito" %in% colnames(covariate_data_frame)
+  if (p_mito_present) {
+    p3 <- make_histogram(covariate_data_frame$response_p_mito, p_mito_threshold,
+                         plot_tit = "Percent mito", use_quantile = FALSE)
+    p_out <- cowplot::plot_grid(p1, p2, p3, NULL, ncol = 2)
+  } else {
+    p_out <- cowplot::plot_grid(p1, p2, ncol = 2)
+  }
+  return(p_out)
+}
+
+
 #' Plot run QC
 #'
 #' @param sceptre_object TBD
 #' @param return_indiv_plots TBD
+#' @param downsample_pairs TBD
 #' @param transparency TBD
 #' @param point_size TBD
 #'

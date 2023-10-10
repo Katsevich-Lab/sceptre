@@ -1,4 +1,4 @@
-#' Carry out an analysis using `sceptre`
+#' Import data
 #'
 #' @param response_matrix TBD
 #' @param grna_matrix TBD
@@ -9,21 +9,18 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' #################
 #' # Low MOI example
 #' #################
-#' # 0. obtain the data required for a single-cell screen analysis
-#' data(response_matrix_lowmoi) # response-by-cell expression matrix
-#' data(grna_matrix_lowmoi) # gRNA-by-cell expression matrix
-#' data(extra_covariates_lowmoi) # cell-by-covariate data frame
-#' data(grna_target_data_frame_lowmoi) # gRNA group information
+#' data("lowmoi_example_data")
 #'
 #' # 1. create the sceptre object
 #' sceptre_object <- import_data(
-#' response_matrix = response_matrix_lowmoi,
-#' grna_matrix = grna_matrix_lowmoi,
-#' extra_covariates = extra_covariates_lowmoi,
-#' grna_target_data_frame = grna_target_data_frame_lowmoi,
+#' response_matrix = lowmoi_example_data$response_matrix,
+#' grna_matrix = lowmoi_example_data$grna_matrix,
+#' extra_covariates = lowmoi_example_data$extra_covariates,
+#' grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
 #' moi = "low")
 #' print(sceptre_object)
 #'
@@ -71,7 +68,8 @@
 #' # High MOI example
 #' ##################
 #' # 1. create the sceptre object from CellRanger output
-#' directories <- paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_", 1:2)
+#' directories <- paste0(system.file("extdata", package = "sceptre"),
+#' "/highmoi_example/gem_group_", 1:2)
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(directories = directories,
 #' moi = "high",
@@ -119,7 +117,8 @@
 #'
 #' # 8. obtain results; write outputs to directory
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = NULL, response_names = NA_character_) {
+#' }
+import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
@@ -158,6 +157,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @param positive_control_pairs TBD
 #' @param formula_object TBD
 #' @param side TBD
+#' @param grna_grouping_strategy TBD
 #' @param fit_parametric_curve TBD
 #' @param control_group TBD
 #' @param resampling_mechanism TBD
@@ -170,14 +170,13 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @export
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
-                                    positive_control_pairs = data.frame(),
+                                    positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
                                     grna_grouping_strategy = "union",
                                     formula_object = "default",
                                     fit_parametric_curve = TRUE,
                                     control_group = "default",
                                     resampling_mechanism = "default",
-                                    B1 = 499L, B2 = 4999L, B3 = 24999L,
                                     multiple_testing_method = "BH",
                                     multiple_testing_alpha = 0.1) {
   # 0. verify that function called in correct order
@@ -196,6 +195,7 @@ set_analysis_parameters <- function(sceptre_object,
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
+  B1 <- 499L; B2 = 4999L; B3 <- 24999L
 
   # 2. check inputs
   check_set_analysis_parameters(sceptre_object = sceptre_object, formula_object = formula_object,
@@ -245,12 +245,11 @@ set_analysis_parameters <- function(sceptre_object,
 #'
 #' @param sceptre_object TBD
 #' @param method TBD
-#' @param hyperparameters TBD
 #' @param print_progress TBD
 #' @param parallel TBD
 #'
 #' @export
-assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "default", print_progress = TRUE, parallel = FALSE) {
+assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, ...) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
@@ -268,15 +267,11 @@ assign_grnas <- function(sceptre_object, method = "default", hyperparameters = "
       backup_threshold = 5, probability_threshold = 0.8,
       formula_object = auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                      include_grna_covariates = TRUE))
-  } else if (method == "user_supplied") {
-    list()
   }
-  if (identical(hyperparameters, "default")) hyperparameters <- hyperparameters_default
-  if (methods::is(hyperparameters, "list")) {
-    hyperparam_names <- names(hyperparameters)
-    for (hyperparam_name in hyperparam_names) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
-    hyperparameters <- hyperparameters_default
-  }
+  hyperparameters <- list(...)
+  if (length(hyperparameters) == 0L) hyperparameters <- hyperparameters_default
+  for (hyperparam_name in names(hyperparameters)) hyperparameters_default[[hyperparam_name]] <- hyperparameters[[hyperparam_name]]
+  hyperparameters <- hyperparameters_default
 
   # 2. check inputs
   check_assign_grna_inputs(sceptre_object, method, hyperparameters) |> invisible()
