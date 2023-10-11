@@ -42,22 +42,22 @@
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
+#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object)
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 6. run power check
-#' sceptre_object <- run_power_check(sceptre_object)
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object)
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -92,26 +92,26 @@
 #'
 #' # 4 (optional) manually assign grnas, run QC
 #' plot_grna_count_distributions(sceptre_object)
-#' sceptre_object <- sceptre_object |> assign_grnas()
+#' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
+#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object)
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 6. (optional) run the power check
-#' sceptre_object <- run_power_check(sceptre_object)
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object)
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
