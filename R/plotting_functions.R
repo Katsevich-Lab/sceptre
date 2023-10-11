@@ -370,7 +370,7 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
                                                                   log_2_fold_change = ifelse(log_2_fold_change < x_limits[1], x_limits[1], log_2_fold_change)),
                          mapping = ggplot2::aes(x = log_2_fold_change, y = p_value, col = reject)) +
     ggplot2::geom_point(alpha = transparency, size = point_size) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(10), limits = c(1, 1e-12), expand = c(0.02, 0)) +
+    ggplot2::scale_y_continuous(trans = revlog_trans(10), expand = c(0.02, 0)) +
     get_my_theme() + ggplot2::xlab("Log fold change") + ggplot2::ylab("P-value") +
     (if (!is.na(p_thresh)) ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") else NULL) +
     ggplot2::theme(legend.position = "none") + ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
