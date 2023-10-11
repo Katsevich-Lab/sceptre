@@ -44,8 +44,9 @@ moi = "high",
 grna_target_data_frame = grna_target_data_frame_highmoi)
 
 # construct the grna-gene pairs to analyze
-positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_cis_pairs(sceptre_object, positive_control_pairs)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object = sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object = sceptre_object, 
+                                       positive_control_pairs = positive_control_pairs)
 
 # apply the pipeline functions to the sceptre_object in order
 sceptre_object <- sceptre_object |>

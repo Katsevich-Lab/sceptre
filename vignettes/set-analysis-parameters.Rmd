@@ -246,7 +246,7 @@ As described above, for a given gRNA-response pair, `sceptre` computes an "obser
 knitr::include_graphics("fit_parametric_curve.png")
 ```
 
-Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate diagnosis of miscalibrated results on the negative control data.
+When `fit_parametric_curve` is set to `FALSE`, `sceptre` must compute a greater number of "null" test statistics to maintain p-value precision. Thus, setting `fit_parametric_curve` to `FALSE` increases compute (in some cases substantially). We recommend setting `fit_parametric_curve` to `FALSE` only when the negative control p-values exhibit miscalibration.
 
 ## Multiple testing method and multiple testing $\alpha$
 
