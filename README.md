@@ -3,7 +3,7 @@
 
 <img src="man/figures/hex.jpg" align="right" width="180"/>
 
-## `sceptre`: Single-Cell CRISPR Screen Data Analysis
+## `sceptre`: Single-Cell CRISPR Screen<br>Data Analysis
 
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
 
