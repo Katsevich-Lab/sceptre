@@ -28,6 +28,7 @@ reference:
   - plot_run_calibration_check
   - plot_run_discovery_analysis
   - plot_run_power_check
+  - plot_covariates
 
 - title: "Pair constructor functions"
   desc: >

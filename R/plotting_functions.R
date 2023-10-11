@@ -258,7 +258,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
   # compute n rejections
   n_rejections <- sum(calibration_result$significant)
   str1 <- paste0("Number of\nfalse discoveries\n(at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "): ", n_rejections)
-  str2 <- paste0("\n\nMean log-fold\nchange: ", signif(mean(calibration_result$log_2_fold_change), 2))
+  str2 <- paste0("\n\nMean log-2-fold\nchange: ", signif(mean(calibration_result$log_2_fold_change), 2))
   str <- paste0(str1, str2)
 
   p_a <- ggplot2::ggplot(data = calibration_result,
@@ -291,7 +291,7 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
                             fill = "grey90", col = "black", boundary = 0) +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
     ggplot2::ggtitle("Log fold changes") +
-    ggplot2::xlab("Estimated log fold change") + ggplot2::ylab("Density") +
+    ggplot2::xlab("Estimated log-2 fold change") + ggplot2::ylab("Density") +
     ggplot2::geom_vline(xintercept = 0, col = "firebrick2", linewidth = 1) +
     my_theme
 
@@ -597,11 +597,8 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
 
   p <- ggplot2::ggplot(
     data = df,
-    mapping = ggplot2::aes(x = lab, y = p_values, color=lab)
+    mapping = ggplot2::aes(x = lab, y = p_values, color = lab)
   )
-  if (clip_to > 0) {
-    p <- p + ggplot2::geom_hline(yintercept = clip_to, linetype = "dashed", color = "grey90")
-  }
   p <- p +
     ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
     ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0)) +

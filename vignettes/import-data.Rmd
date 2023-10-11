@@ -63,7 +63,7 @@ sceptre_object
 
 ## Import data from a collection of R objects
 
-Users also can import data into `sceptre` from a specified set of R objects. This data import strategy is most appropriate for users employing less standard data preprocessing pipelines to generate the response and gRNA count matrices. We use the high MOI-CRISPRi data as a working example. We can obtain these data in R matrix / data frame format as follows.
+Users also can import data into `sceptre` from a specified set of R objects. This data import strategy is most appropriate for users employing less standard data preprocessing pipelines to generate the response and gRNA count matrices. We use the high MOI-CRISPRi data as a working example. We can obtain these data in R matrix and data frame format as follows.
 
 ```{r}
 data(highmoi_example_data)
@@ -76,7 +76,7 @@ grna_target_data_frame <- grna_target_data_frame_highmoi # gRNA target data fram
 
 We call the function `import_data()` to import the data from a collection of R objects. `import_data()` takes several arguments: `response_matrix`, `grna_matrix`, `grna_target_data_frame`, `moi`, `extra_covariates`, and `response_names`. The following figure summarizes the main inputs to this function.
 
-```{r, out.width = "750px", fig.align="center",echo=FALSE,fig.cap="Data inputs to pass to `sceptre`: a response matrix, a gRNA matrix, a data frame of extra covariates (optional), and a gRNA target data frame."}
+```{r, out.width = "750px", fig.align="center",echo=FALSE,fig.cap="The main data objects involved in a single-cell CRISPR screen analysis: a response matrix, a gRNA matrix, a data frame of extra covariates (optional), and a gRNA target data frame."}
 knitr::include_graphics("input_pieces.png")
 ```
 

@@ -70,9 +70,9 @@ We begin by describing the methodology underlying the calibration check.
 
 ### Differential expression paradigm
 
-The goal of the calibration check is to test for association between subsets of negative control gRNAs and responses. Suppose for simplicity that we are conducting a singleton analysis, i.e. suppose that we seek to test for association between an individual negative control gRNA and a response. The "treatment group" is the set of cells containing the given non-targeting gRNA, and the "control group" is the set of cells against which the treatment group is compared to carry out the test of association. The control group can be either the complement set or the NT cells. Within the context of the calibration check analysis, the complement set consists of the cells that do not contain the given non-targeting gRNA; the NT cells, on the other hand, consist of the cells that contain any non-targeting gRNA *excluding* the given non-targeting gRNA that we are testing for association against the response (see schematic below). `sceptre` carries out the test of association by testing for differential expression of the response across the treatment and control groups, yielding a p-value.
+The goal of the calibration check is to test for association between subsets of negative control gRNAs and responses. Suppose for simplicity that we are conducting a singleton analysis, i.e. suppose that we seek to test for association between an individual negative control gRNA and a response. The "treatment group" is the set of cells containing the given non-targeting gRNA, and the "control group" is the set of cells against which the treatment group is compared to carry out the test of association. The control group can be either the complement set or the NT cells. Within the context of the calibration check analysis, the complement set consists of the cells that do not contain the given non-targeting gRNA; the NT cells, on the other hand, consist of the cells that contain any non-targeting gRNA *excluding* the given non-targeting gRNA that we are testing for association against the response (see schematic below.) `sceptre` carries out the test of association by testing for differential expression of the response across the treatment and control groups, yielding a p-value.
 
-```{r, out.width = "750px", fig.align="center", echo=FALSE, fig.cap="A schematic illustrating the differential expression paradigm of the calibration check analysis. The single-cell CRISPR screen experiment produces a pool of cells; in this example the cells contain targeting gRNAs and three different non-targeting gRNAs (labeled NT$_1$, NT$_2$, and NT$_3$). Suppose that we seek to test for association between a given non-targeting gRNA (e.g., NT$_2$) and a response. First, we divide the cells into treatment and control groups, where the treatment group consists of the cells that contain NT$_2$, and the control group can be either the complement set or the NT cells. Within the context of the calibration check analysis, the complement set consists of all cells that do not contain NT$_2$; the NT cells, on the other hand, consist of cells that contain a non-targeting gRNA excluding NT$_2$. (Thus, in this example, the NT cells consist of cells that contain NT$_1$ or NT$_3$.) `sceptre` tests for differential expression of the given response across the treatment and control groups, yielding a p-value for the test of association bewteen the given non-targeting gRNA and the response."}
+```{r, out.width = "750px", fig.align="center", echo=FALSE, fig.cap="**Figure 1**: A schematic illustrating the differential expression paradigm of the calibration check analysis. The single-cell CRISPR screen experiment produces a pool of cells; in this example the cells contain targeting gRNAs and three different non-targeting gRNAs (labeled NT$_1$, NT$_2$, and NT$_3$). Suppose that we seek to test for association between a given non-targeting gRNA (e.g., NT$_2$) and a response. First, we divide the cells into treatment and control groups, where the treatment group consists of the cells that contain NT$_2$, and the control group can be either the complement set or the NT cells. Within the context of the calibration check analysis, the complement set consists of all cells that do not contain NT$_2$; the NT cells, on the other hand, consist of cells that contain a non-targeting gRNA excluding NT$_2$. (Thus, in this example, the NT cells consist of cells that contain NT$_1$ or NT$_3$.) `sceptre` tests for differential expression of the given response across the treatment and control groups, yielding a p-value for the test of association bewteen the given non-targeting gRNA and the response."}
 knitr::include_graphics("control_vs_complement_undercover.png")
 ```
 
@@ -89,3 +89,65 @@ In a singleton analysis (i.e., an analysis in which we seek to test for associat
 After forming the negative control targets, `sceptre` constructs the set of negative control pairs by randomly pairing the negative control targets to the responses. The number of negative control pairs that `sceptre` constructs is set equal to the number of pairs in the discovery set (after QC is applied to the discovery pairs). Moreover, the negative control pairs are subjected to the same pairwise QC as the discovery pairs. In this sense the negative control pairs are "matched" to the discovery pairs in three respects: (1) the number of gRNAs contained within each target is the same across the negative control and discovery pairs; (2) the negative control pairs are subjected to the same pairwise QC as the discovery pairs; (3) the number of negative control pairs is equal to the number of discovery pairs.
 
 ### Analyzing the negative control pairs
+
+Finally, `sceptre` tests for association between the negative control targets and the responses to which the negative control targets have been paired. If `grna_grouping_strategy` is set to `"singleton"`, then the analysis proceeds as described in the section "Differential expression paradigm." If, on the other hand, `grna_grouping_strategy` is set to `"union"` (the default), then negative control gRNAs contained within a given negative control target are combined via the union operation, and this combined gRNA is tested for association against the responses as if it were a singleton gRNA. Consider again Figure 1 (section "Differential expression paradigm"). Suppose that NT~1~ and NT~2~ constitute a given negative control target, and suppose we seek to test for association between this negative control target and a given response. In this case the "treatment cells" are those containing either NT~1~ or NT~2~. Meanwhile, the "complement set" control group consists of cells that do *not* contain NT~1~ or NT~2~. Finally, the "NT cells" control gorup consists of cells containing NT~3~.
+
+## Carrying out the calibration check and obtaining the results
+
+We carry out the calibration check by calling the function `run_calibration_check()` on the `sceptre_object`. `run_calibration_check()` takes the arguments `sceptre_object` (required), `output_amount` (optional), `n_calibration_pairs` (optional), `calibration_group_size` (optional), `print_progress` (optional), and `parallel` (optional). `output_amount` is an integer (taking values 1, 2, or 3; default: `output_amount = 1`) specifying the amount of output to return from `run_calibration_check()`. We describe `output_amount` in greater detail later. Next, `n_calibration_pairs` is the number of negative control target-response pairs to test for association. By default `n_calibration_pairs` is set to the number of discovery target-response pairs that passes pairwise QC. `calibration_group_size` is the number of negative control gRNAs to put together to construct each negative control target. By default `calibration_group_size` is set to the median number of gRNAs per discovery target. Finally, `print_progress` and `parallel` control whether to print updates to the console and run the computation in parallel, respectively.
+
+We run the calibration check on the high-MOI CRISPRi and low-MOI CRISPRko data, setting `parallel` to `TRUE` but otherwise falling back on the default arguments.
+
+```{r, results='hide'}
+sceptre_object_highmoi <- run_calibration_check(sceptre_object_highmoi,
+                                                parallel = TRUE)
+sceptre_object_lowmoi <- run_calibration_check(sceptre_object_lowmoi,
+                                               parallel = TRUE)
+```
+
+We can plot the outcome of the calibration check by calling `plot()` on the resulting `sceptre_object`. Below, we plot the outcome of the calibration check on the low-MOI CRISPRko data.
+
+```{r, eval=FALSE}
+plot(sceptre_object_lowmoi)
+```
+
+```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap="Outcome of the calibration check on the low-MOI CRISPRko data."}
+p <- plot(sceptre_object_lowmoi)
+ggplot2::ggsave(filename = "plot_calibration_lowmoi.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
+knitr::include_graphics("plot_calibration_lowmoi.png")
+```
+
+We described in the Get Started vignette (`vignette("sceptre")`) how to interpret this figure. Briefly, the upper left (resp., right) plot is a QQ plot of the negative control p-values on an untransformed (resp., transformed) scale; the p-values should lie predominantly along the diagonal line. The lower left plot is a histogram of the estimated (log-2) fold changes; the histogram should be symmetric and centered about zero. Finally, the lower right panel is a text box displaying the number of false discoveries made on the negative control pairs (after applying the multiple testing adjustment) and the mean estimated (log-2) fold change. Both of these numbers ideally are close to zero. (We emphasize that it is OK if the number of false discoveries is nonzero; see subsequent section.)
+
+We can obtain a data frame containing the results by calling `get_result` on the resulting `sceptre_object`, setting `analysis` to `"run_calibration_check"`. We obtain the data frame and print its first few rows below.
+
+```{r}
+calibration_result <- get_result(sceptre_object = sceptre_object_lowmoi,
+                                 analysis = "run_calibration_check")
+head(calibration_result)
+```
+
+Each row of this data frame corresponds to a negative control target-response pair. (There are 6,205 rows in total, corresponding to the 6,205 negative control target-response pairs that `sceptre` constructed and tested for association.) The columns `response_id` and `grna_target` indicate the response and gRNA target that constitute a given pair. The individual non-targeting gRNAs that make up a negative control target are listed, concatenated into a string via the ampersand ("&") separator. (For example, the negative control gRNA target "NTg4&NTg7&NTg8&NTg9" was formed by combining the negative control gRNAs NTg4, NTg7, NTg8, and NTg9.) The remaining columns of the data frame are `n_nonzero_trt` (i.e., the number of nonzero treatment cells), `n_nonzero_cntrl` (i.e., the number of nonzero control cells), `pass_qc` (i.e., whether the given pair passes pairwise QC), `p_value` (i.e., the p-value of the given pair), `log_2_fold_change` (i.e., the estimated log-2 fold change of the given pair), and `significant` (i.e., whether the pair is called as significant after applying the multiple testing correction procedure).
+
+## Improving calibration
+
+## Changing the `output_amount` argument
+
+The argument `output_amount` in `run_calibration_check()` controls the amount of information contained within the output data frame. `output_amount` can take values 1, 2, or 3 (default value 1). We again run the calibration check on the high-MOI CRISPRi data, this time setting `output_amount` to `2`.
+
+```{r,results='hide'}
+calibration_result_output_2 <- run_calibration_check(sceptre_object_highmoi,
+                                                     parallel = TRUE,
+                                                     output_amount = 2) |>
+  get_result(analysis = "run_calibration_check")
+```
+
+The resulting data frame contains the additional columns `z_orig`, `stage`, `xi`, `omega`, and `alpha`.
+
+```{r}
+calibration_result_output_2 |>
+  dplyr::select(z_orig, stage, xi, omega, alpha) |>
+  head()
+```
+
+`z_orig` is the "original" z-score obtained by regressing the response UMI count vector onto the raw (i.e., non-resampled) gRNA indicator vector and covariate matrix. Next, `stage` indicates the "stage" in which

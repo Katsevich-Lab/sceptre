@@ -13,7 +13,6 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
-
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. handle the default arguments

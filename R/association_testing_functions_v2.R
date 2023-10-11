@@ -98,7 +98,7 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametr
 
 
 # workhorse function 3: crt, glm factored out
-crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
+crt_glm_factored_out <- function(B1, B2, B3, fit_parametric_curve, output_amount,
                                  response_ids, response_precomputations, covariate_matrix,
                                  get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
                                  response_matrix, side_code, cells_in_use) {
@@ -110,7 +110,7 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
   fitted_probabilities <- perform_grna_precomputation(trt_idxs = trt_idxs,
                                                       covariate_matrix = covariate_matrix,
                                                       return_fitted_values = TRUE)
-  synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities, B = B1 + B2)
+  synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities, B = B1 + B2 + B3)
   # loop over genes
   for (i in seq_along(response_ids)) {
     curr_response_id <- response_ids[i]
@@ -137,7 +137,7 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
                                          n_trt = n_trt,
                                          use_all_cells = TRUE,
                                          synthetic_idxs = synthetic_idxs,
-                                         B1 = B1, B2 = B2, B3 = 0L,
+                                         B1 = B1, B2 = B2, B3 = B3,
                                          fit_parametric_curve = fit_parametric_curve,
                                          return_resampling_dist = (output_amount == 3L),
                                          side_code = side_code)
@@ -147,7 +147,7 @@ crt_glm_factored_out <- function(B1, B2, fit_parametric_curve, output_amount,
 }
 
 # workhorse function 4: crt, glm run inside
-discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, get_idx_f, response_ids,
+discovery_ntcells_crt <- function(B1, B2, B3, fit_parametric_curve, output_amount, get_idx_f, response_ids,
                                   covariate_matrix, curr_grna_group, all_nt_idxs, response_matrix,
                                   side_code, cells_in_use) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
@@ -162,7 +162,7 @@ discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, g
   fitted_probabilities <- perform_grna_precomputation(trt_idxs = trt_idxs,
                                                       covariate_matrix = curr_covariate_matrix,
                                                       return_fitted_values = TRUE)
-  synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities, B = B1 + B2)
+  synthetic_idxs <- crt_index_sampler_fast(fitted_probabilities = fitted_probabilities, B = B1 + B2 + B3)
   # loop over the response ids
   for (i in seq_along(response_ids)) {
     curr_response_id <- response_ids[i]
@@ -193,7 +193,7 @@ discovery_ntcells_crt <- function(B1, B2, fit_parametric_curve, output_amount, g
                                          n_trt = n_trt,
                                          use_all_cells = TRUE,
                                          synthetic_idxs = synthetic_idxs,
-                                         B1 = B1, B2 = B2, B3 = 0L,
+                                         B1 = B1, B2 = B2, B3 = B3,
                                          fit_parametric_curve = fit_parametric_curve,
                                          return_resampling_dist = (output_amount == 3L),
                                          side_code = side_code)
