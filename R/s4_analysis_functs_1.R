@@ -195,7 +195,14 @@ set_analysis_parameters <- function(sceptre_object,
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
-  B1 <- 499L; B2 = 4999L; B3 <- 24999L
+  B1 <- 499L
+  if (fit_parametric_curve) {
+    B2 <- 4999L
+    B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
+  } else {
+    B2 <- 0L # no curve fitting; thus, B2 = 0L
+    B3 <- 0L # to be updated in the run_qc step
+  }
 
   # 2. check inputs
   check_set_analysis_parameters(sceptre_object = sceptre_object, formula_object = formula_object,
@@ -345,6 +352,14 @@ run_qc <- function(sceptre_object,
 
   # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
   sceptre_object <- compute_qc_metrics(sceptre_object)
+
+  # update B3, the number of resamples to draw, if fit_parametric_curve is false
+  if (!sceptre_object@fit_parametric_curve) {
+    side <- sceptre_object@side_code
+    mult_fact <- if (side == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * sceptre_object@n_ok_discovery_pairs/sceptre_object@multiple_testing_alpha) |>
+      as.integer()
+  }
 
   # return
   return(sceptre_object)

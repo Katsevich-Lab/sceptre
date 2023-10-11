@@ -19,6 +19,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/run-calibration-check.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/articles/run-qc.html</loc>
   </url>
   <url>
@@ -26,6 +29,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/articles/set-analysis-parameters.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/troubleshooting-and-faq.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/authors.html</loc>
@@ -197,6 +203,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot_calibration_result.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_covariates.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot_grna_count_distributions.html</loc>

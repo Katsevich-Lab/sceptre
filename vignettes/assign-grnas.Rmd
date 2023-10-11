@@ -98,12 +98,12 @@ We assign gRNAs to cells to cells by calling the function `assign_grnas()`. `ass
 
 The first gRNA assignment strategy is the `"mixture"` method, which involves assigning gRNAs to cells using a mixture model. The mixture method is the default method for high-MOI screens and is an optional method for low-MOI screens. The method works as follows. First, we fit a latent variable Poisson GLM to the data, regressing the gRNA UMI count vector onto the (latent) gRNA indicator vector and cell-specific covariate matrix. (A given entry of the gRNA indicator vector is defined to be "1" if the gRNA is present in the corresponding cell and "0" otherwise.) We fit the latent variable Poisson GLM using a novel variant of the EM algorithm. The fitted model yields the probability that each cell contains the gRNA; we threshold these probabilities to assign the gRNA to cells. An advantage of the GLM-based mixture modeling approach is that it accounts for cell-specific covariates, such as sequencing depth and batch. For example, cells that are sequenced deeply (and have a large value for `grna_n_umis` or `response_n_umis`) generally exhibit higher levels of ambient background contamination; `sceptre` controls for heterogeneity across cells due to sequencing depth and other factors.
 
-We use the mixture assignment method to assign gRNAs to cells on both the high-MOI CRISPRi data and low-MOI CRISPRko data, saving the resulting outputs as `sceptre_object_lowmoi_mixture` and `sceptre_object_highmoi_mixture`, respectively. We do not need to pass the `method` argument to `assign_grnas()` on the high-MOI data, as the default value for `method` in the high-MOI setting is `"mixture"`.
+We use the mixture assignment method to assign gRNAs to cells on both the high-MOI CRISPRi data and low-MOI CRISPRko data, saving the resulting outputs as `sceptre_object_lowmoi_mixture` and `sceptre_object_highmoi_mixture`, respectively.
 
 ```{r,results='hide'}
 # high-MOI CRISPRi data
 sceptre_object_highmoi_mixture <- assign_grnas(sceptre_object = sceptre_object_highmoi,
-                                               parallel = TRUE)
+                                               method = "mixture", parallel = TRUE)
 ```
 
 ```{r,results='hide'}
@@ -130,10 +130,10 @@ sceptre_object_highmoi_mixture <- assign_grnas(sceptre_object = sceptre_object_h
 
 ### Maximum method
 
-The second gRNA assignment strategy is the `"maximum"` method. The maximum method is the default assignment method for low-MOI screens and is not available as an option for high-MOI screens. The maximum method assigns the gRNA that accounts for the greatest number of UMIs in a given cell to that cell. We apply the maximum method to the low-MOI CRISPRko data below. We need not specify the `method` argument, as the default is `"maximum"`.
+The second gRNA assignment strategy is the `"maximum"` method. The maximum method is the default assignment method for low-MOI screens and is not available as an option for high-MOI screens. The maximum method assigns the gRNA that accounts for the greatest number of UMIs in a given cell to that cell. We apply the maximum method to the low-MOI CRISPRko data below.
 
 ```{r}
-sceptre_object_lowmoi_maximum <- assign_grnas(sceptre_object_lowmoi)
+sceptre_object_lowmoi_maximum <- assign_grnas(sceptre_object_lowmoi, method = "maximum")
 ```
 
 The maximum method allows for one optional argument: `umi_fraction_threshold` (default: `umi_fraction_threshold = 0.8`). Cells for which the maximally expressed gRNA constitutes fewer than `umi_fraction_threshold` of the UMIs in that cell are flagged as containing multiple gRNAs. (Cells containing multiple gRNAs are removed as part of low-MOI quality control step, as discussed later). For example, if the maximally expressed gRNA in a given cell makes up 0.64 (or 64$\%$) of the UMIs in that cell, then that cell is flagged as containing multiple gRNAs and is removed during quality control (assuming that `umi_fraction_threshold = 0.8`).
@@ -151,7 +151,7 @@ sceptre_object_lowmoi_thresholding <- assign_grnas(sceptre_object = sceptre_obje
                                                    method = "thresholding")
 ```
 
-The thresholding method allows for one optional argument, namely the integer threshold `threshold`. An important special case involves setting `threshold` to `1`, which assigns any gRNA expressed in a given cell to that cell. We assign gRNAs to cells on the CRISPRi data using a threshold of 1 below.
+The thresholding method allows for one optional argument, namely the integer threshold `threshold`. An important special case is to set `threshold` to `1`, which causes any gRNA expressed in a given cell to be assigned to that cell. We assign gRNAs to cells on the CRISPRi data using a threshold of 1 below.
 
 ```{r}
 sceptre_object_highmoi_thresholding <- assign_grnas(sceptre_object = sceptre_object_highmoi,
@@ -159,7 +159,7 @@ sceptre_object_highmoi_thresholding <- assign_grnas(sceptre_object = sceptre_obj
                                                     threshold = 1)
 ```
 
-Note that setting `threshold` to `1` ignores background contamination.
+Note that setting `threshold` to `1` causes background contamination to be ignored.
 
 ## Plotting and printing the outcome of the gRNA-to-cell assignment step
 

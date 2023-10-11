@@ -148,7 +148,7 @@ Some users may wish to run both *cis* and *trans* analyses on their data. We rec
 
 ### Reducing the multiplicity burden 
 
-`sceptre` computes a p-value for each target-response pair in the discovery set. These p-values are subjected to a multiple testing correction procedure (by default, the Benjamini-Hochberg method) to produce a discovery set that controls some notion of aggregate type-I error (by default, the false discovery rate). 
+`sceptre` computes a p-value for each target-response pair in the discovery set. These p-values are subjected to a multiple testing correction procedure (by default, the Benjamini-Hochberg method) to produce a discovery set that controls some notion of aggregate type-I error (by default, the false discovery rate). In general it is good to restrict one's attention to pairs that are promising or scientifically interesting. Including a large number of uninteresting or "null" pairs (i.e., pairs for which there is no relationship between the target and response) in the discovery set causes the power of the multiple testing correction procedure to decrease, resulting in fewer discoveries.
 
 ## Side
 
@@ -222,7 +222,7 @@ knitr::include_graphics("sceptre_pt_1.png")
 
 `sceptre` provides two procedures for resampling the gRNA indicator vector: permutations and conditional resampling (also known as the conditional randomization test). The permutation procedure involves randomly permuting the gRNA indicator vector *B* times. The conditional resampling procedure is slightly more complex. Briefly, the gRNA indicator vector is regressed onto the covariate matrix via logistic regression, yielding an estimate for the probability that each cell contains the gRNA as a function of the covariates. *B* synthetic gRNA indicator vectors are then sampled according to these estimated probabilities. The resampling mechanism can be specified by passing either `permutations` or `crt` (for conditional resampling) to the argument `resampling_mechanism` in `set_analysis_parameters()`.
 
-Permutations and conditional resampling offer distinct advantages and disadvantages, although the differences are subtle. The permutation approach is faster and slightly better at handling sparsity, while the conditional resampling approach is slightly better at handling confounding due to cell-specific covariates (see table below). In practice the two approaches often produce similar results; we recommend that users try both, provided that they have the bandwidth and compute to do so. The permutation (resp., conditional resampling) procedure is the default option in low-MOI (resp., high-MOI). (Note that both options are available in both MOI settings.)
+Permutations and conditional resampling offer distinct advantages and disadvantages, although the differences can be subtle. The permutation approach is faster and slightly better at handling sparsity, while the conditional resampling approach is slightly better at handling confounding due to cell-specific covariates (see table below). In practice the two approaches often produce similar results; we recommend that users try both, provided that they have the bandwidth and compute to do so. The permutation (resp., conditional resampling) procedure is the default option in low-MOI (resp., high-MOI). (Note that both options are available in both MOI settings.)
 
 +------------------------+------------------------------------+-----------------------------------+
 | Resampling procedure   | Advantages                         | Disadvantages                     |
@@ -236,7 +236,7 @@ Permutations and conditional resampling offer distinct advantages and disadvanta
 |                        |                                    | -   Worse at handling sparsity    |
 +------------------------+------------------------------------+-----------------------------------+
 
-Resampling forms the foundation of statistical inference within the `sceptre` framework. In fact, "sceptre" is a loose acronym for "**s**ingle **c**ell **p**er**t**urbation analysis via **re**sampling." `sceptre` exploits several novel strategies to make its resampling machinery fast, including the technique of resampling GLM score statistics, sparsity-exploiting algorithms for computing GLM score tests, and algorithms for recyling compute across permutation tests.
+Resampling forms the foundation of statistical inference within the `sceptre` framework. In fact, "sceptre" is a loose acronym for "**s**ingle **c**ell **p**er**t**urbation analysis via **re**sampling." The resampling machinery of `sceptre` is reasonably fast due to several algorithmic advances, including the technique of resampling score statistics and a novel sparsity-exploiting algorithm for computing GLM score tests.
 
 ## Fit parametric curve
 
@@ -246,7 +246,7 @@ As described above, for a given gRNA-response pair, `sceptre` computes an "obser
 knitr::include_graphics("fit_parametric_curve.png")
 ```
 
-Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate diagnosis of a miscalibrated result on the negative control data.
+Most users need not to worry about the `fit_parametric_curve` argument. `sceptre` provides `fit_parametric_curve` as an option to facilitate diagnosis of miscalibrated results on the negative control data.
 
 ## Multiple testing method and multiple testing $\alpha$
 
@@ -271,7 +271,7 @@ sceptre_object_lowmoi <- set_analysis_parameters(sceptre_object = sceptre_object
                                                  positive_control_pairs = positive_control_pairs_lowmoi)
 ```
 
-We can call `print()` on the resulting `sceptre_object`, which prints to the console a message that tracks the status of the analysis. Notice that the "Analysis parameters" field of the output contains information about the analysis parameters that we have selected (or that have been set by default).
+We can call `print()` on the resulting `sceptre_object`, which prints to the console a summary tracking the status of the analysis. Notice that the "Analysis parameters" field of the output contains information about the analysis parameters that we have selected (or that have been set by default).
 
 ```{r}
 print(sceptre_object_highmoi)
