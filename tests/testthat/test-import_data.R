@@ -2,123 +2,17 @@
 ## unit test `import_data` ##
 #############################
 
-# TODO modify helper functions so i can get specific individual matrix returns rather
-# than always generating the whole list and then subsetting
+# The tests in here are broken up by which subfunction of `import_data`
+# they are really testing. In order, they are:
+# 1. import_data-check_import_data_inputs
+# 2. import_data-auto_compute_cell_covariates
+# 3. import_data-set_matrix_accessibility
+# 4. import_data-slots (this is just testing the final slots/attributes rather than a subfunction)
 
-# rm(list=ls())
-# source("~/academics/katsevich-lab/sceptre/tests/testthat/helper-mock-data.R")
-
-## pretty comprehensive set of grna_target_data_frames aside from varying `start` and `end`
-
-## these do not explore different values for `start` and `end`
-# and `chr` is also not the focus.
-grna_target_data_frame_list <- list(
-  ## single target datasets, with and without NT ~~~~~~~~~~
-  # just one grna total, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ) |> dplyr::filter(grna_target == grna_target[1]),
-  # 10 grnas all still for just one target, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 10, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ) |> dplyr::filter(grna_target == grna_target[1]),
-  # one target, one NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  ) |> dplyr::filter(grna_target %in% c(grna_target[1], "non-targeting")),
-  # one target, several NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 5
-  ) |> dplyr::filter(grna_target %in% c(grna_target[1], "non-targeting")),
-
-  ## two targets, with and without NT ~~~~~
-  # one guide per target, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ),
-  # one guide per target, one NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  ),
-  # one guide per target, several NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 1, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 6
-  ),
-  # 5 guides per target, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 5, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ),
-  # 5 guides per target, one NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 5, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  ),
-  # 5 guides per target, several NT
-  make_mock_grna_target_data(
-    num_guides_per_target = 5, chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 7
-  ),
-  # one target has 1 guide, the other has several, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 10), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ) |> dplyr::filter(chr != tail(chr)[1]),
-  # one target has 1 guide, the other has several, 1 NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 10), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  )[-c(12:22),],
-  # one target has 1 guide, the other has several, several NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 10), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 8
-  )[-c(12:22),],
-
-  ## many targets, with and without NT ~~~~~
-  # many targets, one has just one guide, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 2, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ),
-  # many targets, one has just one guide, 1 NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 2, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  ),
-  # many targets, one has just one guide, many NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(1, 2, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 10
-  ),
-  # many targets, all have at least two guides, no NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(3, 4, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 0
-  ),
-  # many targets, all have at least two guides, 1 NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(3, 4, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 1
-  ),
-  # many targets, all have at least two guides, many NT
-  make_mock_grna_target_data(
-    num_guides_per_target = c(3, 4, 3), chr_distances = 2,
-    chr_starts = 1, num_nt_guides = 11
-  )
-)
-
-
-
-# really this is just testing `check_import_data_inputs`
-test_that("import_data-invalid-inputs", {
+# this is testing `check_import_data_inputs` as called by `import_data`
+# the section numberings in this test correspond to the numberings
+# as they appear in that function
+test_that("import_data-check_import_data_inputs", {
 
   ##### setting up data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   valid_grna_target_data_frame <- make_mock_grna_target_data(
@@ -140,13 +34,14 @@ test_that("import_data-invalid-inputs", {
   ##### running tests ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   ##### 0. confirming no problems with all valid data
-  expect_no_error(import_data(
-    response_matrix = valid_response_matrix,
-    grna_matrix = valid_grna_matrix,
-    grna_target_data_frame = valid_grna_target_data_frame,
-    moi = "low",
-    extra_covariates = valid_extra_covariates
-  ))
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates
+    ))
 
   # it should also work if `valid_response_matrix` has no row names
   expect_no_error(
@@ -280,7 +175,7 @@ test_that("import_data-invalid-inputs", {
   ##### 7. response and grna matrices must have an allowed class
 
   allowed_classes <- c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix")
-  # TODO what about "lgTMatrix", "lgCMatrix", "lgRMatrix" for grna_matrix?
+  # not currently testing for"lgTMatrix", "lgCMatrix", "lgRMatrix" for grna_matrix
 
   # currently both response_matrix and grna_matrix are dgTMatrix
   expect_no_error(
@@ -380,23 +275,52 @@ test_that("import_data-invalid-inputs", {
 
   ##### 9. barcodes are valid and agree
   # TODO add regex thru here once the errors are settled
-  FAIL_bad_barcodes_response_matrix <- valid_response_matrix |>
-    `colnames<-`(c("123", paste0("a", 2:num_cells)))
-  FAIL_bad_barcodes_grna_matrix <- valid_response_matrix |>
-    `colnames<-`(c("123", paste0("a", 2:num_cells)))
+
   valid_response_matrix_mismatches_colnames <- valid_response_matrix |>
     `colnames<-`(paste0("b", 1:num_cells))
   valid_grna_matrix_mismatched_colnames <- valid_grna_matrix |>
     `colnames<-`(paste0("a", 1:num_cells))
+  valid_extra_covariates_mismatched_rownames <- valid_extra_covariates |>
+    `rownames<-`(paste0("c", 1:num_cells))
 
-  # if just one of response_matrix and grna_matrix have colnames it should be ok
+  # if just one of response_matrix, grna_matrix, and extra_covariates have cell names,
+  # there will be no error
   expect_no_error(
     import_data(
       response_matrix = valid_response_matrix_mismatches_colnames,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low"
+    )
+  )
+
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low"
+    )
+  )
+
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
-      extra_covariates = NULL
+      extra_covariates = valid_extra_covariates_mismatched_rownames
+    )
+  )
+
+  # and there should be no error if they agree in names
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames |>
+        `colnames<-`(colnames(valid_grna_matrix_mismatched_colnames)),
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low"
     )
   )
 
@@ -406,58 +330,64 @@ test_that("import_data-invalid-inputs", {
       grna_matrix = valid_grna_matrix_mismatched_colnames,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
-      extra_covariates = NULL
-    )
-  )
-
-  # but if both response and grna matrices have colnames they should agree
-  # TODO currently does not throw an error but i think it should
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
-      grna_matrix = valid_grna_matrix_mismatched_colnames,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = NULL
-    )
-  )
-
-  # TODO also no error if extra_covariates without rownames are passed
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
-      grna_matrix = valid_grna_matrix_mismatched_colnames,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = valid_extra_covariates
-    )
-  )
-
-  # now as it stands we get an error from these next two
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
-      grna_matrix = valid_grna_matrix_mismatched_colnames,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = valid_extra_covariates |>
-        `rownames<-`(colnames(valid_response_matrix_mismatches_colnames))
-    )
-  )
-
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
-      grna_matrix = valid_grna_matrix_mismatched_colnames,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = valid_extra_covariates |>
+      extra_covariates = valid_extra_covariates_mismatched_rownames |>
         `rownames<-`(colnames(valid_grna_matrix_mismatched_colnames))
     )
   )
 
-  # now for bad barcodes, again we only check these if the non-NULL conditions are met
-  # but maybe better to check if non-null?
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates_mismatched_rownames |>
+        `rownames<-`(colnames(valid_response_matrix_mismatches_colnames))
+    )
+  )
+
+  # but if at least two have names, then they should agree
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low"
+    ),
+    regex = "You have provided cell barcodes in the `response_matrix` and `grna_matrix`"
+  )
+
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix_mismatches_colnames,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates_mismatched_rownames
+    ),
+    regex = "You have provided cell barcodes in the `response_matrix` and `extra_covariates`"
+  )
+
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix_mismatched_colnames,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = valid_extra_covariates_mismatched_rownames
+    ),
+    regex = "You have provided cell barcodes in the `grna_matrix` and `extra_covariates`"
+  )
+
+  # now for bad barcodes
+  FAIL_bad_barcodes_response_matrix <- valid_response_matrix |>
+    `colnames<-`(c("123", paste0("a", 2:num_cells)))
+  FAIL_bad_barcodes_grna_matrix <- valid_response_matrix |>
+    `colnames<-`(c("123", paste0("a", 2:num_cells)))
+  FAIL_bad_barcodes_extra_covariates <- valid_extra_covariates |>
+    `rownames<-`(c("123", paste0("a", 2:num_cells)))
+
+
   expect_error(
     import_data(
       response_matrix = FAIL_bad_barcodes_response_matrix,
@@ -465,7 +395,8 @@ test_that("import_data-invalid-inputs", {
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
-    )
+    ),
+    regex = "Some barcodes in `response_matrix` are all numeric"
   )
 
   expect_error(
@@ -475,17 +406,9 @@ test_that("import_data-invalid-inputs", {
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
-    )
+    ),
+    regex = "Some barcodes in `grna_matrix` are all numeric"
   )
-
-  # TODO also test for row.names of extra_covariates
-
-
-  ##### 10.
-
-
-  ##### 11.
-
 
   expect_error(
     import_data(
@@ -493,209 +416,260 @@ test_that("import_data-invalid-inputs", {
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
-      extra_covariates = valid_extra_covariates |>
-        dplyr::mutate(newcol = c(list(1:5), as.list(2:num_cells)))
-    )
+      extra_covariates = FAIL_bad_barcodes_extra_covariates
+    ),
+    regex = "Some barcodes in `extra_covariates` are all numeric"
   )
 
 
+  ##### 10. reserved extra_covariate names
 
+  # just checking a single reserved col name to confirm any check is being run
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = make_mock_extra_covariates_list(num_cells)$many_columns |>
+        dplyr::mutate(response_n_nonzero = "a")
+    ),
+    regex = "The covariate names"
+  )
 
-
-
-
+  ##### 11. extra_covariates column types
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = make_mock_extra_covariates_list(num_cells)$many_columns |>
+        dplyr::mutate(char_col = "a", logical_col = FALSE)
+    )
+  )
 
   expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "low",
+      extra_covariates = make_mock_extra_covariates_list(num_cells)$many_columns |>
+        dplyr::mutate(list_col = c(list(c(1,1,1)), as.list(2:num_cells)))
+    ),
+    regex = "of the `extra_covariates` data frame should be of type numeric"
+  )
+
+  ##### 12. moi values
+  expect_no_error(
     import_data(
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
+    )
+  )
+  expect_no_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "high",
+      extra_covariates = valid_extra_covariates
+    )
+  )
+  expect_error(
+    import_data(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "aaa",
+      extra_covariates = valid_extra_covariates
     ),
-    regex = "The ampersand character (&) cannot be present in the gRNA IDs"
+    regex = "`moi` should be either `low` or `high`"
+  )
+})
+
+# in `import_data`, the automatically computed covariates come from
+# `auto_compute_cell_covariates`. This function first computes covariates from
+# `response_matrix` and then computes covariates from `grna_matrix` before
+# cbind'ing these together along with `extra_covariates`.
+# This test first fixes `grna_matrix` and checks the calculations for a variety of
+# `response_matrix` values, then fixes the latter and varies the former.
+test_that("import_data-auto_compute_cell_covariates", {
+  set.seed(11123)
+  num_cells <- 43
+  num_responses <- 21
+
+  # having NT or not doesn't matter for this so it will be included
+  fixed_grna_target_data_frame <- make_mock_grna_target_data(c(1,2,4), 1, 1, 5)
+
+  fixed_response_matrix <- matrix(1, num_responses, num_cells)
+  fixed_grna_matrix <- matrix(1, nrow(fixed_grna_target_data_frame), num_cells) |>
+    `rownames<-`(fixed_grna_target_data_frame$grna_id)
+  fixed_extra_covariates <- data.frame(x = rpois(num_cells, 5))
+
+  ##### 1. testing the appending of `extra_covariates`
+  # no extra_covariates so we should just have the default 4 columns in
+  # @covariate_data_frame
+  sceptre_object <- import_data(
+    response_matrix = fixed_response_matrix,
+    grna_matrix = fixed_grna_matrix,
+    grna_target_data_frame = fixed_grna_target_data_frame,
+    moi = "low"  # moi doesn't matter for this test
+  )
+  expect_equal(
+    names(sceptre_object@covariate_data_frame),
+    c("response_n_nonzero", "response_n_umis", "grna_n_nonzero", "grna_n_umis")
   )
 
+  # with extra_covariates those column names and values should appear now too
+  sceptre_object <- import_data(
+    response_matrix = fixed_response_matrix,
+    grna_matrix = fixed_grna_matrix,
+    grna_target_data_frame = fixed_grna_target_data_frame,
+    moi = "low",  # moi doesn't matter for this test
+    extra_covariates = fixed_extra_covariates
+  )
+  expect_equal(
+    names(sceptre_object@covariate_data_frame),
+    c("response_n_nonzero", "response_n_umis", "grna_n_nonzero", "grna_n_umis", "x")
+  )
+  expect_equal(
+    sceptre_object@covariate_data_frame$x,
+    fixed_extra_covariates$x
+  )
+
+  ##### 2. testing computations for `response_matrix`
+  for(response_matrix in make_mock_response_matrix_list(num_responses, num_cells)) {
+    sceptre_object <- import_data(
+      response_matrix = response_matrix,
+      grna_matrix = fixed_grna_matrix,
+      grna_target_data_frame = fixed_grna_target_data_frame,
+      moi = "low"  # moi doesn't matter for this test
+    )
+    expect_equal(
+      sceptre_object@covariate_data_frame$response_n_nonzero,
+      response_matrix |> apply(2, function(cell) sum(cell > 0))
+    )
+    expect_equal(
+      sceptre_object@covariate_data_frame$response_n_umis,
+      response_matrix |> colSums()
+    )
+  }
+
+  ##### 3. testing computations for `grna_matrix`
+  for(grna_matrix in make_mock_grna_matrix_list(fixed_grna_target_data_frame, num_cells)) {
+    sceptre_object <- import_data(
+      response_matrix = fixed_response_matrix,
+      grna_matrix = grna_matrix,
+      grna_target_data_frame = fixed_grna_target_data_frame,
+      moi = "low"  # moi doesn't matter for this test
+    )
+    expect_equal(
+      sceptre_object@covariate_data_frame$grna_n_nonzero,
+      grna_matrix |> apply(2, function(cell) sum(cell > 0))
+    )
+    expect_equal(
+      sceptre_object@covariate_data_frame$grna_n_umis,
+      grna_matrix |> colSums()
+    )
+  }
 })
-#
-#   # 9. if applicable, check that the cell barcodes match across the grna, gene, and covariate matrices
-#   check_barcodes_provided <- function(barcodes) {
-#     !is.null(barcodes) && !all(grepl(pattern = "^[0-9]+$", x = barcodes))
-#   }
-#   response_cell_barcodes <- colnames(response_matrix)
-#   grna_cell_barcodes <- colnames(grna_matrix)
-#   covariate_cell_barcodes <- rownames(extra_covariates)
-#   if (check_barcodes_provided(response_cell_barcodes) &&
-#       check_barcodes_provided(grna_cell_barcodes) &&
-#       check_barcodes_provided(covariate_cell_barcodes)) {
-#     if (!(identical(response_cell_barcodes, grna_cell_barcodes) &&
-#           identical(response_cell_barcodes, covariate_cell_barcodes))) {
-#       stop("You have provided cell barcodes in the `response_matrix`, `grna_matrix`, and `extra_covariates`. These cell barcodes must have the same ordering across objects.")
-#     }
-#   }
-#
-#   # 10. check that column names of extra_covariates are not already taken
-#   reserved_covariate_names <- c("response_n_nonzero", "response_n_umis", "response_p_mito", "grna_n_nonzero", "grna_n_umis")
-#   extra_covariate_names <- colnames(extra_covariates)
-#   if (any(extra_covariate_names %in% reserved_covariate_names)) {
-#     stop("The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame.")
-#   }
-#
-#   # 11. verify that the types of the extra covariates are acceptable
-#   for (extra_covariate_name in extra_covariate_names) {
-#     v <- extra_covariates[,extra_covariate_name]
-#     accept_type <- methods::is(v, "numeric") || methods::is(v, "character") || methods::is(v, "factor")
-#     if (!accept_type) {
-#       stop(paste0("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor."))
-#     }
-#   }
-#
-#   # 12. verify that moi is specified
-#   if (!(moi %in% c("low", "high"))) {
-#     stop("`moi` should be either `low` or `high`.")
-#   }
-#
-#   return(NULL)
-# }
 
-
-# for testing computation, only grna_matrix and response_matrix change here
-# for testing inputs, we need more variation
-test_that("import_data-valid-inputs", {
-
-
-
-
-
-
-
-
-  num_cells <- 50
+# just confirming that sceptre_object@response_matrix has the right values, class, and attributes
+# after `set_matrix_accessibility`
+test_that("import_data-set_matrix_accessibility", {
+  set.seed(132)
+  num_cells <- 27
   num_responses <- 12
-
-  set.seed(112)
-  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
+  grna_target_data_frame <- make_mock_grna_target_data(c(1,2,3), 1, 1, 5)
+  grna_matrix <- matrix(rpois(nrow(grna_target_data_frame) * num_cells, 1), ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), ncol = num_cells) |>
     as("TsparseMatrix")
 
-  # makes a matrix of iid Popis(1) in the right size
-  random_grna_matrix_from_target_data_frame <- function(grna_target_data_frame, num_cells) {
-    matrix(rpois(nrow(grna_target_data_frame) * num_cells, 1), nrow(grna_target_data_frame), num_cells) |>
-      `dimnames<-`(list(grna_target_data_frame$grna_id)) |>
-      as("TsparseMatrix")
-  }
+  sceptre_object <- import_data(
+    response_matrix = response_matrix,
+    grna_matrix = grna_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"  # moi doesn't matter for this test
+  )
 
-  extra_covariates <- make_mock_extra_covariates_list(num_cells)$many_columns
-
-  for(i in seq_along(grna_target_data_frame_list)) {
-    set.seed(i)
-    grna_target_data_frame <- grna_target_data_frame_list[[i]]
-    grna_matrix <- random_grna_matrix_from_target_data_frame(grna_target_data_frame, num_cells)
-
-    sceptre_object_low <- import_data(
-      response_matrix = response_matrix,
-      grna_matrix = grna_matrix,
-      grna_target_data_frame = grna_target_data_frame,
-      moi = "low",
-      extra_covariates = extra_covariates
-    )
-    sceptre_object_high <- import_data(
-      response_matrix = response_matrix,
-      grna_matrix = grna_matrix,
-      grna_target_data_frame = grna_target_data_frame,
-      moi = "high",
-      extra_covariates = extra_covariates
-    )
-
-    # 1. inputs
-    # - for now, all these are valid inputs so all should pass
-
-    # 2. covariates
-    # the focus of this test block is grna_target_data_frame so not super relevant but I'll get them started here
-
-    # test for low MOI
-    expect_equal(
-      sceptre_object_low@covariate_data_frame$response_n_nonzero,
-      response_matrix |> apply(2, function(cell) sum(cell > 0))
-    )
-    expect_equal(
-      sceptre_object_low@covariate_data_frame$response_n_umis,
-      response_matrix |> colSums()
-    )
-    expect_equal(
-      sceptre_object_low@covariate_data_frame$grna_n_nonzero,
-      grna_matrix |> apply(2, function(cell) sum(cell > 0))
-    )
-    expect_equal(
-      sceptre_object_low@covariate_data_frame$grna_n_umis,
-      grna_matrix |> colSums()
-    )
-    expect_equal(
-      sceptre_object_low@covariate_data_frame[,names(extra_covariates)],
-      extra_covariates
-    )
-
-    # test for high MOI
-    expect_equal(
-      sceptre_object_high@covariate_data_frame$response_n_nonzero,
-      response_matrix |> apply(2, function(cell) sum(cell > 0))
-    )
-    expect_equal(
-      sceptre_object_high@covariate_data_frame$response_n_umis,
-      response_matrix |> colSums()
-    )
-    expect_equal(
-      sceptre_object_high@covariate_data_frame$grna_n_nonzero,
-      grna_matrix |> apply(2, function(cell) sum(cell > 0))
-    )
-    expect_equal(
-      sceptre_object_high@covariate_data_frame$grna_n_umis,
-      grna_matrix |> colSums()
-    )
-    expect_equal(
-      sceptre_object_high@covariate_data_frame[,names(extra_covariates)],
-      extra_covariates
-    )
+  expect_equal(sceptre_object@response_matrix@x, response_matrix@x) # values ok?
+  expect_equal(class(sceptre_object@response_matrix) |> as.character(), "dgRMatrix") # class ok?
+  expect_true(all(c("p", "j") %in% names(attributes(sceptre_object@response_matrix)))) # attr ok?
+  expect_false("i" %in% names(attributes(sceptre_object@response_matrix)))
+})
 
 
-    # 3. response matrix
-    expect_equal(sceptre_object_low@response_matrix@x, response_matrix@x)
-    expect_equal(class(sceptre_object_low@response_matrix) |> as.character(), "dgRMatrix")
+# testing that the various attributes of the returned sceptre object all came out ok
+test_that("import_data-slots", {
+  set.seed(12321)
+  num_cells <- 29
+  num_responses <- 17
+  grna_target_data_frame <- make_mock_grna_target_data(c(1,3,1), 1, 1, 6)
+  grna_matrix <- matrix(rpois(nrow(grna_target_data_frame) * num_cells, 1), ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), ncol = num_cells) |>
+    as("TsparseMatrix")
+  extra_covariates <- data.frame(x = rep("aaa", num_cells))
 
-    expect_equal(sceptre_object_high@response_matrix@x, response_matrix@x)
-    expect_equal(class(sceptre_object_high@response_matrix) |> as.character(), "dgRMatrix")
+  sceptre_object_low_no_ec_with_response_names <- import_data(
+    response_matrix = response_matrix,
+    grna_matrix = grna_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low",
+    response_names = paste0("rrr", 1:num_responses)
+  )
+  sceptre_object_high_with_ec <- import_data(
+    response_matrix = response_matrix,
+    grna_matrix = grna_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "high",
+    extra_covariates = extra_covariates
+  )
 
-    # 4. attributes (that haven't already been tested)
-    expect_equal(sceptre_object_low@grna_matrix, grna_matrix)
-    expect_equal(sceptre_object_high@grna_matrix, grna_matrix)
+  # most of the slots are so simple that only cursory tests are done, mostly to confirm
+  # that future changes do not change the API
 
-    grna_target_data_frame_with_chars <- dplyr::mutate(
-      grna_target_data_frame,
-      grna_id = as.character(grna_id), grna_target = as.character(grna_target)
-    )
-    expect_equal(sceptre_object_low@grna_target_data_frame, grna_target_data_frame_with_chars)
-    expect_equal(sceptre_object_high@grna_target_data_frame, grna_target_data_frame_with_chars)
+  all_slots <- c("response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
+                 "grna_target_data_frame", "low_moi", "user_specified_covariates",
+                 "response_names", "discovery_pairs", "positive_control_pairs", "formula_object",
+                 "side_code", "fit_parametric_curve", "control_group_complement",
+                 "run_permutations", "n_nonzero_trt_thresh", "n_nonzero_cntrl_thresh",
+                 "B1", "B2", "B3", "grna_grouping_strategy", "grna_assignment_method",
+                 "grna_assignment_hyperparameters", "multiple_testing_alpha", "multiple_testing_method",
+                 "cell_removal_metrics", "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector",
+                 "discovery_pairs_with_info", "positive_control_pairs_with_info",
+                 "negative_control_pairs", "initial_grna_assignment_list", "grna_assignments_raw",
+                 "grna_assignments", "grnas_per_cell", "cells_w_multiple_grnas",
+                 "cells_in_use", "n_ok_discovery_pairs", "n_ok_positive_control_pairs",
+                 "calibration_group_size", "n_calibration_pairs", "response_precomputations",
+                 "last_function_called", "functs_called", "calibration_result", "power_result",
+                 "discovery_result")
+  expect_equal(slotNames(sceptre_object_low_no_ec_with_response_names), all_slots)
+  expect_equal(slotNames(sceptre_object_high_with_ec), all_slots)
 
-    expect_true(is.na(sceptre_object_low@response_names))
-    expect_true(is.na(sceptre_object_high@response_names))
+  ##### slots set in section 4 of `import_data`
 
-    expect_true(sceptre_object_low@low_moi)
-    expect_true(!sceptre_object_high@low_moi)
+  expect_equal(sceptre_object_high_with_ec@response_matrix, set_matrix_accessibility(response_matrix))
+  expect_equal(sceptre_object_high_with_ec@grna_matrix, grna_matrix)
+  expect_equal(sceptre_object_low_no_ec_with_response_names@response_names, paste0("rrr", 1:num_responses))
 
-    expect_equal(sceptre_object_low@user_specified_covariates, colnames(extra_covariates))
-    expect_equal(sceptre_object_high@user_specified_covariates, colnames(extra_covariates))
+  expect_true(sceptre_object_low_no_ec_with_response_names@low_moi)
+  expect_false(sceptre_object_high_with_ec@low_moi)
 
-    # 5. flags
-    expect_equal(sceptre_object_low@last_function_called, "import_data")
-    expect_equal(sceptre_object_high@last_function_called, "import_data")
+  expect_equal(sceptre_object_low_no_ec_with_response_names@user_specified_covariates, character(0))
+  expect_equal(sceptre_object_high_with_ec@user_specified_covariates, "x")
 
-    expect_equal(names(sceptre_object_low@functs_called), c("import_data", "set_analysis_parameters",
-                                                            "assign_grnas", "run_qc", "run_calibration_check",
-                                                            "run_power_check", "run_discovery_analysis"))
-    expect_equal(names(sceptre_object_high@functs_called), c("import_data", "set_analysis_parameters",
-                                                            "assign_grnas", "run_qc", "run_calibration_check",
-                                                            "run_power_check", "run_discovery_analysis"))
+  ##### slots set in section 5 of `import_data`
 
-    expect_equal(sceptre_object_low@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(1, 6)))
-    expect_equal(sceptre_object_high@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(1, 6)))
-  }
+  expect_equal(sceptre_object_high_with_ec@last_function_called, "import_data")
+  expect_equal(names(sceptre_object_high_with_ec@functs_called), c("import_data", "set_analysis_parameters",
+                                                          "assign_grnas", "run_qc", "run_calibration_check",
+                                                          "run_power_check", "run_discovery_analysis"))
+  expect_equal(sceptre_object_high_with_ec@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(1, 6)))
 })
