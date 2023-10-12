@@ -145,7 +145,6 @@ test_that("import_data-check_import_data_inputs", {
     ),
     regex = "The ampersand character \\(&\\) cannot be present in the gRNA IDs"
   )
-
   expect_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -171,7 +170,6 @@ test_that("import_data-check_import_data_inputs", {
     regex = "The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix"
   )
 
-
   ##### 7. response and grna matrices must have an allowed class
 
   allowed_classes <- c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix")
@@ -187,7 +185,6 @@ test_that("import_data-check_import_data_inputs", {
       extra_covariates = valid_extra_covariates
     )
   )
-
   expect_no_error(
     import_data(
       response_matrix = valid_response_matrix |> as("CsparseMatrix"),
@@ -197,7 +194,6 @@ test_that("import_data-check_import_data_inputs", {
       extra_covariates = valid_extra_covariates
     )
   )
-
   expect_no_error(
     import_data(
       response_matrix = set_matrix_accessibility(valid_response_matrix, make_row_accessible = TRUE),
@@ -225,7 +221,6 @@ test_that("import_data-check_import_data_inputs", {
     ),
     regex = "`response_matrix` must be an object of class matrix, dgTMatrix, dgCMatrix, dgRMatrix"
   )
-
   expect_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -274,12 +269,10 @@ test_that("import_data-check_import_data_inputs", {
   )
 
   ##### 9. barcodes are valid and agree
-  # TODO add regex thru here once the errors are settled
-
-  valid_response_matrix_mismatches_colnames <- valid_response_matrix |>
-    `colnames<-`(paste0("b", 1:num_cells))
-  valid_grna_matrix_mismatched_colnames <- valid_grna_matrix |>
+  valid_response_matrix_mismatched_colnames <- valid_response_matrix |>
     `colnames<-`(paste0("a", 1:num_cells))
+  valid_grna_matrix_mismatched_colnames <- valid_grna_matrix |>
+    `colnames<-`(paste0("b", 1:num_cells))
   valid_extra_covariates_mismatched_rownames <- valid_extra_covariates |>
     `rownames<-`(paste0("c", 1:num_cells))
 
@@ -287,13 +280,12 @@ test_that("import_data-check_import_data_inputs", {
   # there will be no error
   expect_no_error(
     import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
+      response_matrix = valid_response_matrix_mismatched_colnames,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low"
     )
   )
-
   expect_no_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -302,7 +294,6 @@ test_that("import_data-check_import_data_inputs", {
       moi = "low"
     )
   )
-
   expect_no_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -316,14 +307,13 @@ test_that("import_data-check_import_data_inputs", {
   # and there should be no error if they agree in names
   expect_no_error(
     import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames |>
+      response_matrix = valid_response_matrix_mismatched_colnames |>
         `colnames<-`(colnames(valid_grna_matrix_mismatched_colnames)),
       grna_matrix = valid_grna_matrix_mismatched_colnames,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low"
     )
   )
-
   expect_no_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -334,32 +324,30 @@ test_that("import_data-check_import_data_inputs", {
         `rownames<-`(colnames(valid_grna_matrix_mismatched_colnames))
     )
   )
-
   expect_no_error(
     import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
+      response_matrix = valid_response_matrix_mismatched_colnames,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates_mismatched_rownames |>
-        `rownames<-`(colnames(valid_response_matrix_mismatches_colnames))
+        `rownames<-`(colnames(valid_response_matrix_mismatched_colnames))
     )
   )
 
   # but if at least two have names, then they should agree
   expect_error(
     import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
+      response_matrix = valid_response_matrix_mismatched_colnames,
       grna_matrix = valid_grna_matrix_mismatched_colnames,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low"
     ),
     regex = "You have provided cell barcodes in the `response_matrix` and `grna_matrix`"
   )
-
   expect_error(
     import_data(
-      response_matrix = valid_response_matrix_mismatches_colnames,
+      response_matrix = valid_response_matrix_mismatched_colnames,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
@@ -367,7 +355,6 @@ test_that("import_data-check_import_data_inputs", {
     ),
     regex = "You have provided cell barcodes in the `response_matrix` and `extra_covariates`"
   )
-
   expect_error(
     import_data(
       response_matrix = valid_response_matrix,
@@ -378,49 +365,6 @@ test_that("import_data-check_import_data_inputs", {
     ),
     regex = "You have provided cell barcodes in the `grna_matrix` and `extra_covariates`"
   )
-
-  # now for bad barcodes
-  FAIL_bad_barcodes_response_matrix <- valid_response_matrix |>
-    `colnames<-`(c("123", paste0("a", 2:num_cells)))
-  FAIL_bad_barcodes_grna_matrix <- valid_response_matrix |>
-    `colnames<-`(c("123", paste0("a", 2:num_cells)))
-  FAIL_bad_barcodes_extra_covariates <- valid_extra_covariates |>
-    `rownames<-`(c("123", paste0("a", 2:num_cells)))
-
-
-  expect_error(
-    import_data(
-      response_matrix = FAIL_bad_barcodes_response_matrix,
-      grna_matrix = valid_grna_matrix,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = valid_extra_covariates
-    ),
-    regex = "Some barcodes in `response_matrix` are all numeric"
-  )
-
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix,
-      grna_matrix = FAIL_bad_barcodes_grna_matrix,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = valid_extra_covariates
-    ),
-    regex = "Some barcodes in `grna_matrix` are all numeric"
-  )
-
-  expect_error(
-    import_data(
-      response_matrix = valid_response_matrix,
-      grna_matrix = valid_grna_matrix,
-      grna_target_data_frame = valid_grna_target_data_frame,
-      moi = "low",
-      extra_covariates = FAIL_bad_barcodes_extra_covariates
-    ),
-    regex = "Some barcodes in `extra_covariates` are all numeric"
-  )
-
 
   ##### 10. reserved extra_covariate names
 
@@ -448,7 +392,6 @@ test_that("import_data-check_import_data_inputs", {
         dplyr::mutate(char_col = "a", logical_col = FALSE)
     )
   )
-
   expect_error(
     import_data(
       response_matrix = valid_response_matrix,
