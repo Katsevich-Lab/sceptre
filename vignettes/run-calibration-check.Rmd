@@ -187,12 +187,9 @@ There are several concrete steps that users can take to improve the calibration 
                               resampling_mechanism = "permutations") # speeds up the code
     ```
 
-```{=html}
-<!-- -->
-```
 2.  **Add additional covariates**. `sceptre` might be miscalibrated because there are missing covariates. Users should consider whether any additional covariates are relevant and, if so, add these covariates to the `sceptre_object` via `import_data()` or `import_data_from_cellranger()`. For example, if the data contain multiple cell types, then cell type should be included as a covariate. Batch, biological replicate, and cell cycle also may be relevant covariates. (`sceptre` does not currently provide functionality for imputing cell type or cycle.)
 
-3.  **Tighten the QC thresholds**. Users can tighten the cellwise and pairwise QC thresholds to remove outlier cells and pairs with a low effective sample size, respectively, thereby ameliorating challenges to calibration due to sparsity and model misspecification. Below, we increase `n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` to 15; the default value for these parameters is 10. We additionally set `response_n_umis_range` to `c(0.05, 0.95)`, which clips the `response_n_umis` distribution at the fifth and ninety-fifth percentiles (as opposed the the first and ninety-ninth percentiles, which is the default).
+3.  **Tighten the QC thresholds**. Users can tighten the cellwise and pairwise QC thresholds to remove outlier cells and target-response pairs with a low effective sample size, respectively, thereby ameliorating challenges to calibration due to sparsity and model misspecification. Below, we increase `n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` to 15; the default value for these parameters is 10. We additionally set `response_n_umis_range` to `c(0.05, 0.95)`, which clips the `response_n_umis` distribution at the fifth and ninety-fifth percentiles (as opposed the the first and ninety-ninth percentiles, which is the default).
 
     ```{r, eval=FALSE}
     sceptre_object_highmoi <- sceptre_object_highmoi |>
