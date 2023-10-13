@@ -608,6 +608,9 @@ test_that("import_data-slots", {
   expect_equal(sceptre_object_low_no_ec_with_response_names@user_specified_covariates, character(0))
   expect_equal(sceptre_object_high_with_ec@user_specified_covariates, "x")
 
+  expect_equal(sceptre_object_low_no_ec_with_response_names@covariate_data_frame |> rownames(),
+               as.character(seq_len(num_cells)))
+
   ##### slots set in section 5 of `import_data`
 
   expect_equal(sceptre_object_high_with_ec@last_function_called, "import_data")

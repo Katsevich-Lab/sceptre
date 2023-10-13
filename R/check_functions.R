@@ -59,10 +59,10 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
   # If at least 2 non-default barcode names were provided, they must all be identical.
   # This is done by looping over all pairs of non-default names
   barcodes_with_names <- barcode_list[were_names_provided]
-  if(length(barcodes_with_names) >= 2) {
-    for(i in 1:(length(barcodes_with_names) - 1)) {
-      for(j in (i+1):length(barcodes_with_names)) {
-        if(!identical(barcodes_with_names[[i]], barcodes_with_names[[j]])) {
+  if (length(barcodes_with_names) >= 2) {
+    for (i in seq_len(length(barcodes_with_names) - 1)) {
+      for (j in seq(i+1, length(barcodes_with_names))) {
+        if (!identical(barcodes_with_names[[i]], barcodes_with_names[[j]])) {
           stop(paste0("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
                       "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects."))
         }
