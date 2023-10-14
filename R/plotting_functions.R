@@ -178,6 +178,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 
   # plot b
   n_cells_per_grna <- sapply(init_assignments, length)
+  mean_c_cells_per_grna <- mean(n_cells_per_grna)
   to_plot_b <- data.frame(x = n_cells_per_grna,
                           y = names(n_cells_per_grna)) |>
     dplyr::arrange(n_cells_per_grna) |>
@@ -189,7 +190,10 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                    axis.ticks.y = ggplot2::element_blank()) +
     ggplot2::xlab("N cells") + ggplot2::ylab("gRNA") +
-    ggplot2::ggtitle("N cells per gRNA")
+    ggplot2::ggtitle("N cells per gRNA") +
+    ggplot2::geom_vline(xintercept = mean_c_cells_per_grna, col = "darkorchid1", lwd = 1.0) +
+    ggplot2::annotate(geom = "text", label = paste0("Mean cells per\ngRNA = ", round(mean_c_cells_per_grna, 2)),
+                      x = Inf, y = -Inf, vjust = -0.5, hjust = 1, col = "darkorchid1", size = 3.0)
 
   # plot c
   if (sceptre_object@grna_assignment_method == "maximum") {
@@ -217,7 +221,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     bottom <- cowplot::plot_grid(p_b, p_c, nrow = 1)
     out <- cowplot::plot_grid(p_a, bottom, ncol = 1)
   }
-  out
   return(out)
 }
 
