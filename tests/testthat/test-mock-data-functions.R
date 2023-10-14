@@ -489,8 +489,6 @@ test_that("make_mock_response_matrices", {
   )
 })
 
-
-
 test_that("make_mock_extra_covariates_data_frames", {
 
   # this sequence is chosen so that we have values on either side of the various
