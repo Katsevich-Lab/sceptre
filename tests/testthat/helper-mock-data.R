@@ -172,78 +172,158 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
   if (!patterns_at_col_level) {
     patterned_matrix <- t(patterned_matrix)
   }
+  attr(patterned_matrix, "dimnames") <- NULL
   return(patterned_matrix)
 }
 
-#' Make a list of mock grna x cell expression matrices
+# this function takes a character vector `patterns_to_make`, which is a subset of
+# `c("zero", "one", "big", "row", "column")` (note that the calling function enforces this),
+# and returns a list of matrices with the indicated patterns and with `pattern_nrow` and
+# `pattern_ncol` rows and columns, respectively. `big` is passed to `.make_mock_patterned_matrix`
+# and the final rownames of each matrix are set to be `pattern_rownames`.
+.make_mock_matrix_pattern_list <- function(patterns_to_make, pattern_nrow, pattern_ncol, big, pattern_rownames) {
+  # ensuring they appear in this order if `patterns_to_make` doesn't list them in this order
+  patterns_to_make <- intersect(c("zero", "one", "big", "row", "column"), patterns_to_make)
+  pattern_list <- list()
+  if ("zero" %in% patterns_to_make) { # matrix with all 0
+    pattern_list <- c(pattern_list, matrix(0, pattern_nrow, pattern_ncol) |> list())
+  }
+  if ("one" %in% patterns_to_make ) { # matrix with all 1
+    pattern_list <- c(pattern_list, matrix(1, pattern_nrow, pattern_ncol) |> list())
+  }
+  if ("big" %in% patterns_to_make ) { # matrix with all `big`
+    pattern_list <- c(pattern_list, matrix(big, pattern_nrow, pattern_ncol) |> list())
+  }
+  if ("row" %in% patterns_to_make ) { # matrix with patterns in the rows
+    pattern_list <- c(
+      pattern_list,
+      .make_mock_patterned_matrix(
+        pattern_nrow, pattern_ncol, patterns_at_col_level = FALSE, big = big
+      ) |> list()
+    )
+  }
+  if ("column" %in% patterns_to_make ) { # matrix with patterns in the columns
+    pattern_list <- c(
+      pattern_list,
+      .make_mock_patterned_matrix(
+        pattern_nrow, pattern_ncol, patterns_at_col_level = TRUE, big = big
+      ) |> list()
+    )
+  }
+
+  pattern_list <- pattern_list |> lapply(`dimnames<-`, list(pattern_rownames))
+  names(pattern_list) <- patterns_to_make
+  return(pattern_list)
+}
+
+#' Makes either a single mock grna x cell expression matrix or a list of them,
+#' based on the provided \code{grna_target_data_frame}
 #'
-#' This function returns a list of matrices of grna expressions based on the provided \code{grna_target_data_frame}.
+#' These matrices are constructed using 5 possible response patterns for the targeting grnas, and separately
+#' 5 possible response patterns for the non-targeting guides if any are present in \code{grna_target_data_frame}.
+#' The returned matrices are all combinations of these: if there are no NT grnas provided, then the return is
+#' just the chosen patterns for the non-NT guide RNAs; if instead there are NT grnas present in
+#' \code{grna_target_data_frame}, then there are up to 25 matrices that can be returned, corresponding to
+#' all possible combinations of the 5 non-NT patterns and the 5 NT patterns.
 #'
-#' These matrices are constructed by creating 5 response patterns for the targeting grnas, and separately
-#' 5 response patterns for the non-targeting guides if any are present in \code{grna_target_data_frame}. The returned
-#' list is all combinations of these: if there are no NT grnas provided, then the return is just a list of 5 with one
-#' entry per response pattern; if instead there are NT grnas present in \code{grna_target_data_frame}, then the returned
-#' list has all 25 combinations of each targeting grna response matrix on top of each NT grna response matrix. Note that
-#' \code{grna_target_data_frame} will always have the non-NT on top of the NT since that is how
-#' \code{make_mock_grna_target_data} structures it.
+#' Note that \code{grna_target_data_frame} will always have the non-NT on top of the NT since that is how
+#' \code{make_mock_grna_target_data} structures it, so if both non-NT and NT guides are present, the
+#' returned matrices will always have the non-NT rows on top.
 #'
 #' @param grna_target_data_frame : the output of \code{make_mock_grna_target_data}
 #' @param num_cells : int, the number of cells desired for the output
-#' @param big : a large value to use in the expression matrices
-#' @param return_as_sparse : return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#' @param non_nt_patterns : a character vector that is a subset of c("zero", "one", "big", "row", "column")
+#' or is equal to "all". This determines which non-NT patterns are made. If "all" then all 5 patterns are made.
+#' @param nt_patterns : a character vector that is a subset of c("zero", "one", "big", "row", "column")
+#' or is equal to "all". This determines which NT patterns are made. If "all" then all 5 patterns are made.
+#' Ignored if there are no NT guides present in \code{grna_target_data_frame}.
+#' @param big : int, a large value to use in the expression matrices
+#' @param return_as_sparse : logical, return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#' @param unlist_if_single_pattern : logical, if TRUE, then if only a single pattern is made (which will happen precisely
+#' when \code{non_nt_patterns} has a single non-"all" value, and either no NTs are present or \code{nt_patterns}
+#' also specifies just a single non-"all" value) then the actual matrix is returned rather than a list of
+#' length 1 containing that pattern.
 #'
-#' @return a list of matrices (sparse or not, as determined by \code{return_as_sparse}).
+#' @return either a matrix or a list of matrices (sparse or not, as determined by \code{return_as_sparse}),
+#' depending on \code{unlist_if_single_pattern} and the number of patterns specified.
 #'
 #' @examples
 #' # See `?make_mock_response_matrix_list` for a full example using all of these functions.
-make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, big = 10000, return_as_sparse = TRUE) {
-  # first we make various data sets just for the targeting grnas
-  non_nt_data <- dplyr::filter(grna_target_data_frame, grna_target != "non-targeting")
-  num_targeting_guides <- nrow(non_nt_data)
+make_mock_grna_matrices <- function(grna_target_data_frame, num_cells, non_nt_patterns, nt_patterns = NULL,
+                                    big = 10000, return_as_sparse = TRUE, unlist_if_single_pattern = TRUE) {
+  allowed_patterns <- c("all", "zero", "one", "big", "row", "column")
+  if (!all(non_nt_patterns %in% allowed_patterns) || length(non_nt_patterns) == 0) {
+    stop(paste0('`non_nt_patterns` must be a non-empty subset of c("',
+                paste0(allowed_patterns[-1], collapse = '", "'), '") or be equal to "',
+                allowed_patterns[1], '".'))
+  }
+  if ("all" %in% non_nt_patterns) {
+    non_nt_patterns <- allowed_patterns[-1] # taking every actual pattern
+  }
 
-  patterns <- list(
-    all_zero = matrix(0, num_targeting_guides, num_cells),
-    all_one = matrix(1, num_targeting_guides, num_cells),
-    all_big = matrix(big, num_targeting_guides, num_cells),
-    row_patterns = .make_mock_patterned_matrix(
-      num_targeting_guides, num_cells, patterns_at_col_level = FALSE, big = big),
-    col_patterns = .make_mock_patterned_matrix(
-      num_targeting_guides, num_cells, patterns_at_col_level = TRUE, big = big)
-  ) |>
-    lapply(`dimnames<-`, list(non_nt_data$grna_id)) # , cell_names)) # not currently using cell names
-
-  # we will do NT and non-NT separately and bind those together
+  # non-NT and NT are handled separately, and combined at the end if any NT are present.
   num_nt <- sum(grna_target_data_frame$grna_target == "non-targeting")
-  if (num_nt > 0) {
-    nt_names <- with(grna_target_data_frame, grna_id[grna_target == "non-targeting"])
-    nt_patterns <- list(
-      all_zero = matrix(0, num_nt, num_cells),
-      all_one  = matrix(1, num_nt, num_cells),
-      all_big  = matrix(big, num_nt, num_cells),
-      # num_nt can realistically be 1, so just doing a pattern across the first row
-      row_patterns = matrix(c(seq(big, 1, length = num_cells) |> round(), rep(1, num_nt * num_cells - num_cells)),
-                            num_nt, num_cells, byrow = TRUE),
-      col_patterns = .make_mock_patterned_matrix(num_nt, num_cells,
-                                                 patterns_at_col_level = TRUE, big = big)
-    ) |>
-      lapply(`dimnames<-`, list(nt_names)) # , cell_names))  # not currently using cell names
+  num_non_nt <- nrow(grna_target_data_frame) - num_nt
+  non_nt_ids <- with(grna_target_data_frame, grna_id[grna_target != "non-targeting"])
 
-    # combine by taking all combos
-    new_patterns <- vector("list", length(patterns) * length(nt_patterns))
+  if (num_nt > 0) {
+    if (is.null(nt_patterns)) {
+      stop("`grna_target_data_frame` contains non-targeting gRNA but `nt_patterns` has not been set.")
+    }
+    if (!all(nt_patterns %in% allowed_patterns) || length(non_nt_patterns) == 0) {
+      stop(paste0('`nt_patterns` must be a non-empty subset of c("',
+                  paste0(allowed_patterns[-1], collapse = '", "'), '") or be equal to "',
+                  allowed_patterns[1], '".'))
+    }
+    if ("all" %in% nt_patterns) {
+      nt_patterns <- allowed_patterns[-1] # taking every actual pattern
+    }
+  }
+
+  non_nt_pattern_list <- .make_mock_matrix_pattern_list(
+    patterns_to_make = non_nt_patterns,
+    pattern_nrow = num_non_nt,
+    pattern_ncol = num_cells,
+    big = big,
+    pattern_rownames = non_nt_ids
+  )
+  names(non_nt_pattern_list) <- paste0("non_nt_", names(non_nt_pattern_list))
+
+
+  if (num_nt == 0) {
+    final_pattern_list <- non_nt_pattern_list  # no NTs means these are all the patterns there are
+  } else {
+    # if there are NTs, we need to take each combination of non-NT pattern with each
+    # combination of NT pattern
+    nt_ids <- with(grna_target_data_frame, grna_id[grna_target == "non-targeting"])
+    nt_pattern_list <- .make_mock_matrix_pattern_list(
+      patterns_to_make = nt_patterns,
+      pattern_nrow = num_nt,
+      pattern_ncol = num_cells,
+      big = big,
+      pattern_rownames = nt_ids
+    )
+    names(nt_pattern_list) <- paste0("nt_", names(nt_pattern_list))
+
+    # loop through this list filling in each element with one element of
+    # `non_nt_pattern_list` stacked on top of another element of `nt_pattern_list`
+    final_pattern_list <- vector("list", length(non_nt_pattern_list) * length(nt_pattern_list))
     k <- 1
-    for (i in seq_along(patterns)) {
-      for (j in seq_along(nt_patterns)) {
-        new_patterns[[k]] <- rbind(patterns[[i]], nt_patterns[[j]])
-        names(new_patterns)[k] <- paste0("non_nt_", names(patterns)[i], "_and_nt_", names(nt_patterns)[j])
+    for (i in seq_along(non_nt_pattern_list)) {
+      for (j in seq_along(nt_pattern_list)) {
+        final_pattern_list[[k]] <- rbind(non_nt_pattern_list[[i]], nt_pattern_list[[j]])
+        names(final_pattern_list)[k] <- paste0(names(non_nt_pattern_list)[i], "_", names(nt_pattern_list)[j])
         k <- k + 1
       }
     }
-    patterns <- new_patterns
   }
   if (return_as_sparse) {
-    return(lapply(patterns, as, "TsparseMatrix"))
+    final_pattern_list <- lapply(final_pattern_list, as, "TsparseMatrix")
+  }
+  if (unlist_if_single_pattern && length(final_pattern_list) == 1) {
+    return(final_pattern_list[[1]])
   } else {
-    return(patterns)
+    return(final_pattern_list)
   }
 }
 
@@ -257,14 +337,22 @@ make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, big = 
 #'
 #' @param num_responses : int, the number of responses to make data for
 #' @param num_cells : int, the number of cells to make data for
-#' @param big : a large value to use in the expression matrices
-#' @param return_as_sparse : return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#' @param patterns : a character vector that is a subset of c("zero", "one", "big", "row", "column")
+#' or is equal to "all". This determines which patterns are made. If "all" then all 5 patterns are made.
+#' @param big : int, a large value to use in the expression matrices
+#' @param return_as_sparse : logical, return as a standard \code{matrix} or (if \code{TRUE}) as a \code{TsparseMatrix}.
+#' @param unlist_if_single_pattern logical, if TRUE, then if only a single pattern is made (which will happen precisely
+#' when \code{patterns} has a single non-"all" value) then the actual matrix is returned rather than a list of
+#' length 1 containing that pattern.
 #'
-#' @return a list of matrices (sparse or not, as determined by \code{return_as_sparse}).
+#' @return either a single matrix or a list of matrices: whether or not it is a list is determined by the
+#' length of \code{patterns} and the value of \code{unlist_if_single_pattern}; whether or not it is sparse is
+#' determined by \code{return_as_sparse}.
 #'
 #' @examples
 #' set.seed(12321)
-#' num_cells <- 50
+#' num_cells <- 27
+#' num_responses <- 21
 #' mock_grna_target_data_frame <- make_mock_grna_target_data(
 #'   num_guides_per_target = c(1, 5, 7, 2, 3), chr_distances = c(1, 3, 10),
 #'   chr_starts = 1, num_nt_guides = 5
@@ -274,110 +362,256 @@ make_mock_grna_matrix_list <- function(grna_target_data_frame, num_cells, big = 
 #'          length(unique(chr)), " unique chromosomes, and ", length(grna_id),
 #'          " unique grna ids overall.", sep="")
 #' )
-#' mock_grna_matrix_list <- make_mock_grna_matrix_list(
+#' mock_grna_matrix_list <- make_mock_grna_matrices(
 #'   grna_target_data_frame = mock_grna_target_data_frame,
-#'   num_cells = num_cells
+#'   num_cells = num_cells,
+#'   non_nt_patterns = "all",
+#'   nt_patterns = "all"
 #' )
 #'
 #' # looking at one particular example
-#' mock_grna_matrix_list$non_nt_col_patterns_and_nt_row_patterns |> dim()
-#' mock_grna_matrix_list$non_nt_col_patterns_and_nt_row_patterns[1:5,1:15]
+#' mock_grna_matrix_list$non_nt_column_nt_row |> dim()
+#' mock_grna_matrix_list$non_nt_column_nt_row[1:5,1:15]
+#' # if we just wanted this one matrix, we could have gotten it this way
+#' # (note that due to RNG some of the values in the full matrix aren't the
+#' # same, but the pattern is the same and this subset is the same):
+#' make_mock_grna_matrices(
+#'   grna_target_data_frame = mock_grna_target_data_frame,
+#'   num_cells = num_cells,
+#'   non_nt_patterns = "column",
+#'   nt_patterns = "row"
+#' )[1:5, 1:15]
 #'
-#' mock_response_matrix_list <- make_mock_response_matrix_list(
-#'   num_responses = 30, num_cells = num_cells
+#' mock_response_matrix_list <- make_mock_response_matrices(
+#'   num_responses = num_responses,
+#'   num_cells = num_cells,
+#'   patterns = "all"
 #' )
 #'
 #' # looking at one particular example
-#' mock_response_matrix_list$row_patterns |> dim()
-#' mock_response_matrix_list$row_patterns[1:5,1:20]
+#' mock_response_matrix_list$row |> dim()
+#' mock_response_matrix_list$row[1:5,1:20]
+#'
+#' # if we only wanted that one matrix, we could have gotten it this way:
+#' make_mock_response_matrices(
+#'   num_responses = num_responses,
+#'   num_cells = num_cells,
+#'   patterns = "row"
+#' )[1:5, 1:15]
+#'
 #'
 #' mock_extra_covariates  <- make_mock_extra_covariates_list(num_cells)
 #' mock_extra_covariates$almost_constant_many_levels_two_vals |> dim()
 #' mock_extra_covariates$almost_constant_many_levels_two_vals |> head()
 #' mock_extra_covariates$almost_constant_many_levels_two_vals$batch |> table()
-#'
-make_mock_response_matrix_list <- function(num_responses, num_cells, big = 10000, return_as_sparse = TRUE) {
-  response_names <- paste0("response_", 1:num_responses)
-  patterns <- list(
-    all_zero = matrix(0, num_responses, num_cells),
-    all_one = matrix(1, num_responses, num_cells),
-    all_big = matrix(big, num_responses, num_cells),
-    row_patterns = .make_mock_patterned_matrix(
-      num_responses, num_cells, patterns_at_col_level = FALSE, big = big),
-    col_patterns = .make_mock_patterned_matrix(
-      num_responses, num_cells, patterns_at_col_level = TRUE, big = big)
-  ) |>
-    lapply(`dimnames<-`, list(response_names)) #, cell_names))  # not currently using cell names
+make_mock_response_matrices <- function(num_responses, num_cells, patterns,
+                                        big = 10000, return_as_sparse = TRUE,
+                                        unlist_if_single_pattern = TRUE) {
+
+  allowed_patterns <- c("all", "zero", "one", "big", "row", "column")
+  if (!all(patterns %in% allowed_patterns) || length(patterns) == 0) {
+    stop(paste0('`patterns` must be a non-empty subset of c("',
+                paste0(allowed_patterns[-1], collapse = '", "'), '") or be equal to "',
+                allowed_patterns[1], '".'))
+  }
+  if ("all" %in% patterns) {
+    patterns <- allowed_patterns[-1] # taking every actual pattern
+  }
+
+  pattern_list <- .make_mock_matrix_pattern_list(
+    patterns_to_make = patterns,
+    pattern_nrow = num_responses,
+    pattern_ncol = num_cells,
+    big = big,
+    pattern_rownames = paste0("response_", 1:num_responses)
+  )
 
   if (return_as_sparse) {
-    return(lapply(patterns, as, "TsparseMatrix"))
+    pattern_list <- lapply(pattern_list, as, "TsparseMatrix")
+  }
+  if (unlist_if_single_pattern && length(pattern_list) == 1) {
+    return(pattern_list[[1]])
   } else {
-    return(patterns)
+    return(pattern_list)
   }
 }
 
-#' Make a list of mock extra covariates data.frames
+#' Makes either a single data.frame or a list of data.frames, mocking extra_covariates
 #'
-#' @param num_cells : the number of rows each data.frame will have.
+#' @param num_cells : int, the number of rows per data.frame. Must be >= 20.
+#' @param patterns : a character vector indicating which of the 12 patterns to include. See below for
+#' details. If \code{patterns = "all"} then all 12 patterns are returned.
+#' @param unlist_if_single_pattern : boolean, if TRUE then if only a single pattern is selected
+#' then just that data.frame is returned, rather than a list containing that data.frame. Ignored if
+#' \code{length(patterns) >= 2}.
 #'
-#' @return a list of 12 data.frames, each with \code{num_cells} rows. The
-#' first 7 only have a single column, \code{batch}, and test constant, nearly constant,
-#' many levels, and one missing factor level. The next 5 test adding additional
-#' columns, which are either numeric, count, factor (two different options are considered),
-#' or all of the above together.
+#' There are 12 different patterns possible.
+#'
+#' The first 7 patterns are all a data.frame with exactly one column, a factor named "batch".
+#' (1) "constant" : "batch" is constant
+#' (2) "almost_constant_two_levels_one_val" : "batch" has two levels. The first level appears
+#' exactly one time and the rest of the values are the second level.
+#' (3) "almost_constant_two_levels_two_vals" : "batch" has two levels. The first level appears
+#' exactly two times and the rest of the values are the second level.
+#' (4) "almost_constant_many_levels_one_val" : "batch" has 10 levels. The first 9 levels appears
+#' exactly one time and the rest of the values are the 10th level.
+#' (5) "almost_constant_many_levels_two_vals" :"batch" has 10 levels. The first 9 levels appears
+#' exactly two times and the rest of the values are the 10th level.
+#' (6) "many_levels" : "batch" has 10 levels, with each appearing an equal number of times
+#' (or as close to equal as possible).
+#' (7) "missing_level" :  "batch" has 3 levels, but only values for the first two levels
+#' appear in the data
+#'
+#' The remaining 5 patterns all have at least two columns. In every case the first column is a factor named "batch"
+#' with 3 levels which is as close to balanced as possible.
+#'
+#' (8) "numeric" : a data.frame with two columns: "batch" and "numeric", where the latter is \code{rnorm(num_cells)}
+#' (9) "count" : a data.frame with two columns: "batch" and "count", where the latter is \code{rpois(num_cells, 2)}
+#' (10) "factor_one_value_level" : a data.frame with two columns: "batch" and "factor", where "factor" has two levels,
+#' with the first level appearing just once and the remaining values all being the second level
+#' (11) "factor_many_levels" : a data.frame with two columns: "batch" and "factor", where "factor" has 5 levels and
+#' is as close to balanced as possible.
+#' (12) "many_columns" : a data.frame with 4 columns: "batch", "numeric" (same as in pattern 8),
+#' "count" (same as in pattern 9), and "factor" (same as in pattern 11).
+#'
+#' @return either a data.frame or a list of data.frames (depending on \code{length(patterns)} and
+#' \code{unlist_if_single_pattern}), each with \code{num_cells} many rows.
 #'
 #' @examples
-#' # See `?make_mock_response_matrix_list` for a full example using all of these functions.
-#'
-make_mock_extra_covariates_list <- function(num_cells) {
-  # what replicate patterns do we want to have?
+#' See \code{make_mock_response_matrices} for a full example with all functions.
+make_mock_extra_covariates_data_frames <- function(num_cells, patterns, unlist_if_single_pattern = TRUE) {
+  # we need at least 20 obs to be able to do all the desired factor patterns.
   if (num_cells < 20) {
     stop("`num_cells` must be >= 20 for this function.")
   }
-  # this is mainly used for testing features other than batch
+  allowed_patterns <- c(
+    "all", "constant", "almost_constant_two_levels_one_val",
+    "almost_constant_two_levels_two_vals", "almost_constant_many_levels_one_val",
+    "almost_constant_many_levels_two_vals", "many_levels", "missing_level",
+    "numeric", "count", "factor_one_value_level", "factor_many_levels", "many_columns"
+  )
+
+  if (!all(patterns %in% allowed_patterns) || length(patterns) == 0) {
+    stop(paste0('`patterns` must be a non-empty subset of c("',
+                paste0(allowed_patterns[-1], collapse = '", "'), '") or be equal to "',
+                allowed_patterns[1], '".'))
+  }
+  if ("all" %in% patterns) {
+    patterns <- allowed_patterns[-1] # taking every actual pattern
+  }
+  patterns <- intersect(allowed_patterns[-1], patterns)  # ensuring ordering is as expected
+
+  # the idea of this is to have a well-behaved "batch" column to which other more
+  # weird columns are added.
   three_level_batch <- data.frame(
     batch = rep(c("b1", "b2", "b3"), times = num_cells %/% 3 + c(0, 0, num_cells %% 3)) |>
       factor(levels = c("b1", "b2", "b3"))
   )
-  patterns <- list(
-    constant = data.frame(batch = rep("b1", num_cells) |> factor(levels = "b1")),
-    almost_constant_two_levels_one_val = data.frame(batch = rep(c("b1", "b2"), c(1, num_cells - 1)) |>
-                                                      factor(levels = c("b1", "b2"))),
-    almost_constant_two_levels_two_vals = data.frame(batch = rep(c("b1", "b2"), c(2, num_cells - 2)) |>
-                                                       factor(levels = c("b1", "b2"))),
-    almost_constant_many_levels_one_val = data.frame(
-      batch = rep(paste0("b", 1:10), c(rep(1, 9), num_cells - 9)) |>
-        factor(levels = paste0("b", 1:10))
-    ),
-    almost_constant_many_levels_two_vals = data.frame(
-      batch = rep(paste0("b", 1:10), c(rep(2, 9), num_cells - 18)) |>
-        factor(levels = paste0("b", 1:10))
-    ),
-    # repeat b1:b10 as many times as they fit, padding the last few with b1
-    many_levels = data.frame(
-      batch = c(rep(paste0("b", 1:10), times = num_cells %/% 10 + (num_cells %% 10) * rep(0:1, c(9, 1)))) |>
-        factor(levels = paste0("b", 1:10))
-    ),
-    # two levels appear but three are in the factor
-    missing_level = data.frame(
-      batch = rep(c("b1", "b2"), c(num_cells %/% 2, num_cells %/% 2 + num_cells %% 2)) |>
-        factor(levels = c("b1", "b2", "b3"))
-    ),
-    numeric = three_level_batch |> dplyr::mutate(numeric = rnorm(num_cells)),
-    count = three_level_batch |> dplyr::mutate(count = rpois(num_cells, 2)),
-    factor_one_value_level = three_level_batch |> dplyr::mutate(
-      factor = rep(c("fac1", "fac2"), c(1, num_cells - 1)) |>
-        factor(levels = c("fac1", "fac2"))
-    ),
-    factor_many_levels = three_level_batch |> dplyr::mutate(
-      factor = rep(paste0("fac", 1:5), num_cells %/% 5 + c(0, 0, 0, 0, num_cells %% 5)) |>
-        factor(levels = paste0("fac", 1:5))
-    ),
-    many_columns = three_level_batch |> dplyr::mutate(
-      numeric = rnorm(num_cells), count = rpois(num_cells, 2),
-      factor = rep(paste0("fac", 1:5), num_cells %/% 5 + c(0, 0, 0, 0, num_cells %% 5)) |>
-        factor(levels = paste0("fac", 1:5))
+
+  pattern_list <- list()
+  if ("constant" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      data.frame(batch = rep("b1", num_cells) |> factor(levels = "b1")) |> list()
     )
-  )
-  return(patterns)
+  }
+  if ("almost_constant_two_levels_one_val" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      data.frame(batch = rep(c("b1", "b2"), c(1, num_cells - 1)) |>
+                   factor(levels = c("b1", "b2"))) |> list()
+    )
+  }
+  if ("almost_constant_two_levels_two_vals" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      data.frame(batch = rep(c("b1", "b2"), c(2, num_cells - 2)) |>
+                   factor(levels = c("b1", "b2"))) |> list()
+    )
+  }
+  if ("almost_constant_many_levels_one_val" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      data.frame(
+        batch = rep(paste0("b", 1:10), c(rep(1, 9), num_cells - 9)) |>
+          factor(levels = paste0("b", 1:10))
+      ) |> list()
+    )
+  }
+  if ("almost_constant_many_levels_two_vals" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      data.frame(
+        batch = rep(paste0("b", 1:10), c(rep(2, 9), num_cells - 18)) |>
+          factor(levels = paste0("b", 1:10))
+      ) |> list()
+    )
+  }
+  if ("many_levels" %in% patterns) {
+    # repeat b1:b10 as many times as they fit
+    pattern_list <- c(
+      pattern_list,
+      data.frame(
+        batch = c(rep(paste0("b", 1:10), times = num_cells %/% 10 + (num_cells %% 10) * rep(0:1, c(9, 1)))) |>
+          factor(levels = paste0("b", 1:10))
+      ) |> list()
+    )
+  }
+  if ("missing_level" %in% patterns) {
+    # two levels appear but three are in the factor
+    pattern_list <- c(
+      pattern_list,
+      data.frame(
+        batch = rep(c("b1", "b2"), c(num_cells %/% 2, num_cells %/% 2 + num_cells %% 2)) |>
+          factor(levels = c("b1", "b2", "b3"))
+      ) |> list()
+    )
+  }
+  if ("numeric" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      three_level_batch |> dplyr::mutate(numeric = rnorm(num_cells)) |> list()
+    )
+  }
+  if ("count" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      three_level_batch |> dplyr::mutate(count = rpois(num_cells, 2)) |> list()
+    )
+  }
+  if ("factor_one_value_level" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      three_level_batch |> dplyr::mutate(
+        factor = rep(c("fac1", "fac2"), c(1, num_cells - 1)) |>
+          factor(levels = c("fac1", "fac2"))
+      ) |> list()
+    )
+  }
+  if ("factor_many_levels" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      three_level_batch |> dplyr::mutate(
+        factor = rep(paste0("fac", 1:5), num_cells %/% 5 + c(0, 0, 0, 0, num_cells %% 5)) |>
+          factor(levels = paste0("fac", 1:5))
+      ) |> list()
+    )
+  }
+  if ("many_columns" %in% patterns) {
+    pattern_list <- c(
+      pattern_list,
+      three_level_batch |> dplyr::mutate(
+        numeric = rnorm(num_cells), count = rpois(num_cells, 2),
+        factor = rep(paste0("fac", 1:5), num_cells %/% 5 + c(0, 0, 0, 0, num_cells %% 5)) |>
+          factor(levels = paste0("fac", 1:5))
+      ) |> list()
+    )
+  }
+  names(pattern_list) <- patterns
+
+  if (unlist_if_single_pattern && length(pattern_list) == 1) {
+    return(pattern_list[[1]])
+  } else {
+    return(pattern_list)
+  }
 }
