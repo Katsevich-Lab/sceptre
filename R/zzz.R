@@ -1,3 +1,6 @@
 .onLoad <- function(libname, pkgname) {
-  cat(crayon::blue("Welcome to sceptre. Please see the sceptre e-book: . Please submit issues on the sceptre website: ."))
+  cat(paste0(crayon::blue("Welcome to sceptre.\nSubmit issues on the sceptre website: "),
+             crayon::red("github.com/Katsevich-Lab/sceptre"),
+             crayon::blue("\nRead the sceptre e-book: "),
+             crayon::red("timothy-barry.github.io/sceptre-book/")))
 }

@@ -362,4 +362,4 @@ head(result)
 
 ## Further reading
 
-Each step of the pipeline has its own dedicated vignette. We encourage advanced users to read these additional vignettes to learn more about the various options available at each step of the pipeline. We recommend that users begin with the Import Data vignette (`vignette("import-data")`) and then move through the remaining vignettes in order.
+Each step of the pipeline has its own dedicated vignette. We encourage interested users to read these additional vignettes to learn more about the various options available at each step of the pipeline. We recommend that users begin with the Import Data vignette (`vignette("import-data")`) and then move through the remaining vignettes in order.
