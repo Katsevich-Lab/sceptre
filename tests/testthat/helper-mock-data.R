@@ -399,11 +399,10 @@ make_mock_grna_matrices <- function(grna_target_data_frame, num_cells, non_nt_pa
 #'   patterns = "row"
 #' )[1:5, 1:15]
 #'
-#'
-#' mock_extra_covariates  <- make_mock_extra_covariates_list(num_cells)
-#' mock_extra_covariates$almost_constant_many_levels_two_vals |> dim()
-#' mock_extra_covariates$almost_constant_many_levels_two_vals |> head()
-#' mock_extra_covariates$almost_constant_many_levels_two_vals$batch |> table()
+#' mock_extra_covariates  <- make_mock_extra_covariates_data_frames(num_cells, patterns = "all")
+#' mock_extra_covariates$many_columns |> dim()
+#' mock_extra_covariates$many_columns |> head()
+#' mock_extra_covariates$many_columns$batch |> table()
 make_mock_response_matrices <- function(num_responses, num_cells, patterns,
                                         big = 10000, return_as_sparse = TRUE,
                                         unlist_if_single_pattern = TRUE) {
