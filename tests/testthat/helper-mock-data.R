@@ -456,7 +456,7 @@ make_mock_response_matrices <- function(num_responses, num_cells, patterns,
 #' exactly one time and the rest of the values are the 10th level.
 #' (5) "almost_constant_many_levels_two_vals" :"batch" has 10 levels. The first 9 levels appears
 #' exactly two times and the rest of the values are the 10th level.
-#' (6) "many_levels" : "batch" has 10 levels, with each appearing an equal number of times
+#' (6) "many_levels" : "batch" has 5 levels, with each appearing an equal number of times
 #' (or as close to equal as possible).
 #' (7) "missing_level" :  "batch" has 3 levels, but only values for the first two levels
 #' appear in the data
@@ -547,12 +547,12 @@ make_mock_extra_covariates_data_frames <- function(num_cells, patterns, unlist_i
     )
   }
   if ("many_levels" %in% patterns) {
-    # repeat b1:b10 as many times as they fit
+    # repeat b1:b5 as many times as they fit
     pattern_list <- c(
       pattern_list,
       data.frame(
-        batch = c(rep(paste0("b", 1:10), times = num_cells %/% 10 + (num_cells %% 10) * rep(0:1, c(9, 1)))) |>
-          factor(levels = paste0("b", 1:10))
+        batch = c(rep(paste0("b", 1:5), times = num_cells %/% 5 + (num_cells %% 5) * rep(0:1, c(4, 1)))) |>
+          factor(levels = paste0("b", 1:5))
       ) |> list()
     )
   }

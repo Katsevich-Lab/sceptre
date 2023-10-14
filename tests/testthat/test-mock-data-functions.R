@@ -519,7 +519,7 @@ test_that("make_mock_extra_covariates_data_frames", {
     expect_equal(table(results_all$almost_constant_two_levels_two_vals$batch) |> as.numeric(), c(2, num_cells - 2))
     expect_equal(table(results_all$almost_constant_many_levels_one_val$batch) |> as.numeric(), rep(c(1, num_cells - 9), c(9, 1)))
     expect_equal(table(results_all$almost_constant_many_levels_two_vals$batch) |> as.numeric(), rep(c(2, num_cells - 18), c(9, 1)))
-    expect_equal(table(results_all$many_levels$batch) |> as.numeric(), rep(c(num_cells %/% 10, num_cells %/% 10 + num_cells %% 10), c(9, 1)))
+    expect_equal(table(results_all$many_levels$batch) |> as.numeric(), rep(c(num_cells %/% 5, num_cells %/% 5 + num_cells %% 5), c(4, 1)))
     expect_equal(table(results_all$missing_level$batch) |> as.numeric(), c(num_cells %/% 2, num_cells %/% 2 + num_cells %% 2, 0))
 
     expect_equal(table(results_all$factor_one_value_level$batch) |> as.numeric(), c(num_cells %/% 3, num_cells %/% 3, num_cells %/% 3 + num_cells %% 3))
