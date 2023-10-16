@@ -1,5 +1,7 @@
-
-
+# This function is the first thing in `import_data`
+# and confirms that the basic arguments of
+# `response_matrix`, `grna_matrix`, `grna_target_data_frame`,
+# and `extra_covariates` all are ok.
 test_that("check_import_data_inputs", {
 
   ##### setting up data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -452,26 +454,3 @@ test_that("check_import_data_inputs", {
     regex = "`extra_covariates` has infinite values which need to be removed"
   )
 })
-
-
-bad_covs <- valid_extra_covariates
-bad_covs[1,1] <- NA
-
-check_import_data_inputs(
-  response_matrix = valid_response_matrix,
-  grna_matrix = valid_grna_matrix,
-  grna_target_data_frame = valid_grna_target_data_frame,
-  moi = "high",
-  extra_covariates = bad_covs
-)
-
-sceptre_object <- import_data(
-  response_matrix = valid_response_matrix,
-  grna_matrix = valid_grna_matrix,
-  grna_target_data_frame = valid_grna_target_data_frame,
-  moi = "high",
-  extra_covariates = bad_covs
-)
-set_analysis_parameters(sceptre_object, discovery_pairs = matrix("", 0, 2) |>
-                          as.data.frame() |>
-                          setNames(c("grna_target", "response_id")))
