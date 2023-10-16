@@ -92,6 +92,14 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     stop("`moi` should be either `low` or `high`.")
   }
 
+  # 13. fail if extra_covariates has NA or inifinite values
+  if (any(is.na(extra_covariates))) {
+    stop("`extra_covariates` has NA values which need to be removed.")
+  }
+  if (any(sapply(extra_covariates, function(vect) any(is.infinite(vect))))) {
+    stop("`extra_covariates` has infinite values which need to be removed.")
+  }
+
   return(NULL)
 }
 

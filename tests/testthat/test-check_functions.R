@@ -33,7 +33,7 @@ test_that("check_import_data_inputs", {
 
   # it should also work if `valid_response_matrix` has no row names
   expect_no_error(
-    import_data(
+    check_import_data_inputs(
       response_matrix = valid_response_matrix |>
         magrittr::set_rownames(NULL),
       grna_matrix = valid_grna_matrix,
@@ -425,4 +425,53 @@ test_that("check_import_data_inputs", {
     ),
     regex = "`moi` should be either `low` or `high`"
   )
+
+  ##### 13. NAs or Infs in extra_covariates
+  FAIL_extra_covariates_with_na <- valid_extra_covariates
+  FAIL_extra_covariates_with_na[1,1] <- NA
+  expect_error(
+    check_import_data_inputs(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "high",
+      extra_covariates = FAIL_extra_covariates_with_na
+    ),
+    regex = "`extra_covariates` has NA values which need to be removed"
+  )
+  FAIL_extra_covariates_with_inf <- valid_extra_covariates |>
+    dplyr::mutate(x = c(-Inf, rnorm(num_cells - 1)))
+  expect_error(
+    check_import_data_inputs(
+      response_matrix = valid_response_matrix,
+      grna_matrix = valid_grna_matrix,
+      grna_target_data_frame = valid_grna_target_data_frame,
+      moi = "high",
+      extra_covariates = FAIL_extra_covariates_with_inf
+    ),
+    regex = "`extra_covariates` has infinite values which need to be removed"
+  )
 })
+
+
+bad_covs <- valid_extra_covariates
+bad_covs[1,1] <- NA
+
+check_import_data_inputs(
+  response_matrix = valid_response_matrix,
+  grna_matrix = valid_grna_matrix,
+  grna_target_data_frame = valid_grna_target_data_frame,
+  moi = "high",
+  extra_covariates = bad_covs
+)
+
+sceptre_object <- import_data(
+  response_matrix = valid_response_matrix,
+  grna_matrix = valid_grna_matrix,
+  grna_target_data_frame = valid_grna_target_data_frame,
+  moi = "high",
+  extra_covariates = bad_covs
+)
+set_analysis_parameters(sceptre_object, discovery_pairs = matrix("", 0, 2) |>
+                          as.data.frame() |>
+                          setNames(c("grna_target", "response_id")))
