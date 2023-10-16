@@ -184,11 +184,11 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
 
 
 apply_grouping_to_result <- function(result, sceptre_object) {
-  grna_grouping_strategy <- sceptre_object@grna_grouping_strategy
-  if (grna_grouping_strategy == "union") {
+  grna_integration_strategy <- sceptre_object@grna_integration_strategy
+  if (grna_integration_strategy == "union") {
     result <- result |> dplyr::rename("grna_target" = "grna_group")
   }
-  if (grna_grouping_strategy == "singleton") {
+  if (grna_integration_strategy == "singleton") {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
       dplyr::select(grna_id, grna_target)
     result <- result |> dplyr::rename("grna_id" = "grna_group") |>
