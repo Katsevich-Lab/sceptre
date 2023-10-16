@@ -1,4 +1,3 @@
-
 # most of the content of `import_data` is subfunctions
 # which are tested elsewhere
 test_that("import_data", {

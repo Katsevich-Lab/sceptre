@@ -1,3 +1,5 @@
+# `set_matrix_accessibility` is used by `import_data` to prepare `response_matrix`
+# to be row-accessible, as well as in several other places.
 test_that("set_matrix_accessibility", {
   set.seed(115)
   n_row <- 23
@@ -41,6 +43,9 @@ test_that("set_matrix_accessibility", {
   expect_false("j" %in% names(attributes(m_c)))
 })
 
+# `convert_covariate_df_to_design_matrix` is used in `set_analysis_parameters`
+# to take `sceptre_object@covariate_data_frame` and `sceptre_object@formula_object`
+# and make the corresponding model matrix.
 test_that("convert_covariate_df_to_design_matrix", {
   set.seed(187)
   n <- 12

@@ -1,5 +1,6 @@
-
-test_that("set_analysis_parameters-perform_status_check_and_update", {
+# `perform_status_check_and_update` is used in each of the main sceptre_object
+# functions aside from `import_data`
+test_that("perform_status_check_and_update", {
   # `import_data` initializes @functs_called with the "import_data" value
   # at TRUE so we'll never see an all-FALSE @functs_called
   initial_functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
