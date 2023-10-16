@@ -60,7 +60,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
-             "\n\t\U2022 gRNA grouping strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
+             "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
              if (!print_full_output) NULL else {
                paste0(
                  "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
