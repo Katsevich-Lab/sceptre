@@ -157,7 +157,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @param positive_control_pairs TBD
 #' @param formula_object TBD
 #' @param side TBD
-#' @param grna_grouping_strategy TBD
+#' @param grna_integration_strategy TBD
 #' @param fit_parametric_curve TBD
 #' @param control_group TBD
 #' @param resampling_mechanism TBD
@@ -172,7 +172,7 @@ set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
-                                    grna_grouping_strategy = "union",
+                                    grna_integration_strategy = "union",
                                     formula_object = "default",
                                     fit_parametric_curve = TRUE,
                                     control_group = "default",
@@ -211,7 +211,7 @@ set_analysis_parameters <- function(sceptre_object,
                                 control_group = control_group,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi,
-                                grna_grouping_strategy = grna_grouping_strategy) |> invisible()
+                                grna_integration_strategy = grna_integration_strategy) |> invisible()
 
   # 3. determine whether to reset response precomputations
   reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
@@ -233,7 +233,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@B3 <- B3
   sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
   sceptre_object@multiple_testing_method <- multiple_testing_method
-  sceptre_object@grna_grouping_strategy <- grna_grouping_strategy
+  sceptre_object@grna_integration_strategy <- grna_integration_strategy
   sceptre_object@covariate_matrix  <- convert_covariate_df_to_design_matrix(covariate_data_frame = sceptre_object@covariate_data_frame,
                                                                             formula_object = formula_object)
 

@@ -151,7 +151,7 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
 
 
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
-  grouping_strategy <- sceptre_object@grna_grouping_strategy
+  grouping_strategy <- sceptre_object@grna_integration_strategy
   if (grouping_strategy == "union") {
     sceptre_object@grna_target_data_frame$grna_group <- sceptre_object@grna_target_data_frame$grna_target
     sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target

@@ -63,7 +63,7 @@ sceptre_object <- sceptre_object |> assign_grnas()
 plot(sceptre_object)
 print(sceptre_object)
 
-sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
+sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 plot(sceptre_object)
 print(sceptre_object)
 
@@ -117,7 +117,7 @@ sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
 plot(sceptre_object)
 print(sceptre_object)
 
-sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.1)
+sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 plot(sceptre_object)
 print(sceptre_object)
 
