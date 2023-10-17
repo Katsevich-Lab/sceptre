@@ -6,11 +6,11 @@
 \usage{
 set_analysis_parameters(
   sceptre_object,
-  discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
+  discovery_pairs,
   positive_control_pairs = data.frame(grna_target = character(0), response_id =
     character(0)),
   side = "both",
-  grna_grouping_strategy = "union",
+  grna_integration_strategy = "union",
   formula_object = "default",
   fit_parametric_curve = TRUE,
   control_group = "default",
@@ -28,7 +28,7 @@ set_analysis_parameters(
 
 \item{side}{TBD}
 
-\item{grna_grouping_strategy}{TBD}
+\item{grna_integration_strategy}{TBD}
 
 \item{formula_object}{TBD}
 

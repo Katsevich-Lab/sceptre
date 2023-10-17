@@ -27,7 +27,7 @@ import_data(
 \item{response_names}{TBD}
 }
 \description{
-Import data
+This function imports data from a collection of R objects. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
 }
 \examples{
 \dontrun{
