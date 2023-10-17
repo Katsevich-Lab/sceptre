@@ -129,8 +129,8 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 
 
 perform_status_check_and_update <- function(sceptre_object, curr_funct) {
-  rank_vector <- c(import_data = 1L, set_analysis_parameters = 2L, assign_grnas = 2L,
-                   run_qc = 3L, run_power_check = 4L, run_discovery_analysis = 4L, run_calibration_check = 4L)
+  rank_vector <- c(import_data = 1L, set_analysis_parameters = 2L, assign_grnas = 3L,
+                   run_qc = 4L, run_power_check = 5L, run_discovery_analysis = 5L, run_calibration_check = 5L)
   functs_called <- sceptre_object@functs_called
   curr_rank <- rank_vector[[curr_funct]]
   direct_upstream_functs <- names(rank_vector)[rank_vector == curr_rank - 1L]
