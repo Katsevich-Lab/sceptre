@@ -7,9 +7,10 @@
 
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
 
-Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) pose enormous
-potential for advancing understanding of human disease biology. However,
-the analysis of these screens presents considerable statistical and
+Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR
+genome engineering and single-cell sequencing to survey the effects of
+genetic perturbations on individual cells. Despite their promise,
+single-cell CRISPR screens present considerable statistical and
 computational challenges. `sceptre` is an R package for single-cell
 CRISPR screen data analysis, emphasizing statistical rigor,
 computational efficiency, and ease of use.
@@ -39,7 +40,9 @@ experimental designs:
 ## Get started
 
 The fastest way to get started with `sceptre` is to work through the Get
-Started vignette (10 minutes): `vignette("sceptre")`.
+Started vignette (30 minutes): `vignette("sceptre")`. Users also can
+read the `sceptre`
+[manual](https://timothy-barry.github.io/sceptre-book/).
 
 ## Installation instructions
 

@@ -62,7 +62,7 @@ navbar:
   left:
   - icon: fa-play
     text: Get started
-    href: https://timothy-barry.github.io/sceptre-book/sceptre.html
+    href: articles/sceptre.html
   - icon: fa-book
     text: Manual
     href: https://timothy-barry.github.io/sceptre-book/
