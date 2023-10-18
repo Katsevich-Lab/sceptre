@@ -13,14 +13,19 @@ assign_grnas(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{method}{TBD}
+\item{method}{a string indicating the method to use to assign the gRNAs to cells, one of "mixture", "thresholding", or "maximum"}
 
-\item{print_progress}{TBD}
+\item{print_progress}{a logical indicating whether to print progress updates}
 
-\item{parallel}{TBD}
+\item{parallel}{a logical indicating whether to run the function in parallel}
+
+\item{...}{optional method-specific additional arguments}
 }
 \description{
-Assign gRNAs to cells
+\code{assign_grnas()} performs the gRNA-to-cell assignments. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for detailed information about this function.
+}
+\examples{
+# see example via ?sceptre
 }

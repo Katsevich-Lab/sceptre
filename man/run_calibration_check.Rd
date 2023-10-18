@@ -14,18 +14,21 @@ run_calibration_check(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{TBD}
+\item{output_amount}{(optional) an integer taking values 1, 2, or 3 specifying the amount of information to return}
 
-\item{n_calibration_pairs}{TBD}
+\item{n_calibration_pairs}{(optional) the number of negative control pairs to construct and analyze}
 
-\item{calibration_group_size}{TBD}
+\item{calibration_group_size}{(optional) the number of negative control gRNAs to put into each negative control target}
 
-\item{print_progress}{TBD}
+\item{print_progress}{(optional) a logical indicating whether to print progress updates}
 
-\item{parallel}{TBD}
+\item{parallel}{(optional) a logical indicating whether to run the function in parallel}
 }
 \description{
-Run calibration check
+\code{run_calibration_check()} runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
+}
+\examples{
+# see example via ?sceptre
 }

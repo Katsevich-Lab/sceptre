@@ -15,20 +15,23 @@ run_qc(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{n_nonzero_trt_thresh}{TBD}
+\item{n_nonzero_trt_thresh}{(optional) an integer specifying the number of nonzero treatment cells a pair must contain in order to be retained}
 
-\item{n_nonzero_cntrl_thresh}{TBD}
+\item{n_nonzero_cntrl_thresh}{(optional) an integer specifying the number of nonzero control cells a pair must contain in order to be retained}
 
-\item{response_n_umis_range}{TBD}
+\item{response_n_umis_range}{(optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_umis} distribution}
 
-\item{response_n_nonzero_range}{TBD}
+\item{response_n_nonzero_range}{(optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_nonzero} distribution}
 
-\item{p_mito_threshold}{TBD}
+\item{p_mito_threshold}{(optional) a numeric value specifying the location at which to clip the right tail of the \code{response_p_mito} distribution}
 
-\item{additional_cells_to_remove}{TBD}
+\item{additional_cells_to_remove}{(optional) a vector of integer indices specifying additional cells to remove}
 }
 \description{
-Run QC
+\code{run_qc()} runs cellwise and pairwise QC. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
+}
+\examples{
+# see example via ?sceptre
 }
