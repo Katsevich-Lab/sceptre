@@ -61,7 +61,7 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
+write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
 
 ##################
 # High MOI example
@@ -115,6 +115,6 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
+write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
 }
 }

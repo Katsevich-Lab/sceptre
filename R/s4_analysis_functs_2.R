@@ -1,13 +1,17 @@
 #' Run calibration check
 #'
-#' @param sceptre_object TBD
-#' @param output_amount TBD
-#' @param n_calibration_pairs TBD
-#' @param calibration_group_size TBD
-#' @param print_progress TBD
-#' @param parallel TBD
+#' `run_calibration_check()` runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param n_calibration_pairs (optional) the number of negative control pairs to construct and analyze
+#' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
+#' @param print_progress (optional) a logical indicating whether to print progress updates
+#' @param parallel (optional) a logical indicating whether to run the function in parallel
 #'
 #' @export
+#' @examples
+#' # see example via ?sceptre
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
   # 0. advance function (if necessary), and check function call
@@ -53,12 +57,15 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 
 #' Run power check
 #'
-#' @param sceptre_object TBD
-#' @param output_amount TBD
-#' @param print_progress TBD
-#' @param parallel TBD
+#' `run_power_check()` runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 #'
-#' @export
+#' @param sceptre_object a `sceptre_object`
+#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param print_progress (optional) a logical indicating whether to print progress updates
+#' @param parallel (optional) a logical indicating whether to run the function in parallel
+#'
+#' @examples
+#' # see example via ?sceptre
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
@@ -94,12 +101,15 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 #' Run discovery analysis
 #'
-#' @param sceptre_object TBD
-#' @param output_amount TBD
-#' @param print_progress TBD
-#' @param parallel TBD
+#' `run_discovery_analysis()` runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 #'
-#' @export
+#' @param sceptre_object a `sceptre_object`
+#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param print_progress (optional) a logical indicating whether to print progress updates
+#' @param parallel (optional) a logical indicating whether to run the function in parallel
+#'
+#' @examples
+#' # see example via ?sceptre
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)

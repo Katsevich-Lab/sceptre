@@ -12,14 +12,17 @@ run_power_check(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{TBD}
+\item{output_amount}{(optional) an integer taking values 1, 2, or 3 specifying the amount of information to return}
 
-\item{print_progress}{TBD}
+\item{print_progress}{(optional) a logical indicating whether to print progress updates}
 
-\item{parallel}{TBD}
+\item{parallel}{(optional) a logical indicating whether to run the function in parallel}
 }
 \description{
-Run power check
+\code{run_power_check()} runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+}
+\examples{
+# see example via ?sceptre
 }

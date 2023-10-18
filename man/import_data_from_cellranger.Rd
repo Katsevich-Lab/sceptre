@@ -24,7 +24,7 @@ import_data_from_cellranger(
 TBD
 }
 \description{
-Import data from cellranger
+\code{import_data_from_cellranger()} imports data from the output of one or more calls to cellranger count. \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{manual}
 }
 \examples{
 \dontrun{

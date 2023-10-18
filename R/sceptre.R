@@ -66,7 +66,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 8. write results
-#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
+#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
 #'
 #' ##################
 #' # High MOI example
@@ -120,6 +120,6 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 8. write results
-#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
+#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
 #' }
 NULL

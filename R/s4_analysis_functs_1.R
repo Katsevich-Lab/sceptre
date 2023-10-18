@@ -145,12 +145,17 @@ set_analysis_parameters <- function(sceptre_object,
 
 #' Assign gRNAs to cells
 #'
-#' @param sceptre_object TBD
-#' @param method TBD
-#' @param print_progress TBD
-#' @param parallel TBD
+#' `assign_grnas()` performs the gRNA-to-cell assignments. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for detailed information about this function.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param method a string indicating the method to use to assign the gRNAs to cells, one of "mixture", "thresholding", or "maximum"
+#' @param print_progress a logical indicating whether to print progress updates
+#' @param parallel a logical indicating whether to run the function in parallel
+#' @param ... optional method-specific additional arguments
 #'
 #' @export
+#' @examples
+#' # see example via ?sceptre
 assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, ...) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
@@ -198,15 +203,19 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 
 #' Run QC
 #'
-#' @param sceptre_object TBD
-#' @param n_nonzero_trt_thresh TBD
-#' @param n_nonzero_cntrl_thresh TBD
-#' @param response_n_umis_range TBD
-#' @param response_n_nonzero_range TBD
-#' @param p_mito_threshold TBD
-#' @param additional_cells_to_remove TBD
+#' `run_qc()` runs cellwise and pairwise QC. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param n_nonzero_trt_thresh (optional) an integer specifying the number of nonzero treatment cells a pair must contain in order to be retained
+#' @param n_nonzero_cntrl_thresh (optional) an integer specifying the number of nonzero control cells a pair must contain in order to be retained
+#' @param response_n_umis_range (optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
+#' @param response_n_nonzero_range (optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
+#' @param p_mito_threshold (optional) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
+#' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
 #' @export
+#' @examples
+#' # see example via ?sceptre
 run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
