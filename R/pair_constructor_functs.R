@@ -1,5 +1,7 @@
 #' Construct cis pairs
 #'
+#' `construct_cis_pairs()` is a helper function to construct the *cis* pairs.
+#'
 #' @param sceptre_object TBD
 #' @param positive_control_pairs TBD
 #' @param distance_threshold TBD
@@ -53,34 +55,38 @@ construct_cis_pairs <- function(sceptre_object, distance_threshold = 500000L,
 
 #' Construct trans pairs
 #'
-#' A helper function to construct the trans pairs
+#' `construct_trans_pairs()` is a helper function to construct the set of *trans* pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 #'
-#' @param sceptre_object TBD
-#' @param positive_control_pairs TBD
-#' @param exclude_positive_control_pairs TBD
+#' Typically, in screens of genes (resp., noncoding regulatory elements), we set `pairs_to_exclude` to "pc_pairs" (resp., "pairs_containing_pc_targets").
 #'
-#' @return TBD
+#' @param sceptre_object a `sceptre_object`
+#' @param positive_control_pairs (optional) the set of positive control pairs
+#' @param pairs_to_exclude (optional) a string specifying pairs to exclude from the trans pairs, one of "none", "pc_pairs", or "pairs_containing_pc_targets"
+#'
+#' @return a data frame with columns `grna_target` and `response_id` containing the trans discovery set
 #' @export
-construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(),
-                                  exclude_positive_control_pairs = TRUE, exclude_positive_control_targets = FALSE) {
+construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), pairs_to_exclude = "none") {
+  if (!(pairs_to_exclude %in% c("none", "pc_pairs", "pairs_containing_pc_targets"))) {
+    stop("`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'.")
+  }
   response_ids <- rownames(sceptre_object@response_matrix)
-  grna_targets_to_exclude <- c("non-targeting", if (exclude_positive_control_targets) as.character(positive_control_pairs$grna_target) else NULL)
+  grna_targets_to_exclude <- c("non-targeting", if (pairs_to_exclude == "pairs_containing_pc_targets") as.character(positive_control_pairs$grna_target) else NULL)
   grna_targets <- sceptre_object@grna_target_data_frame |>
     dplyr::filter(!(grna_target %in% grna_targets_to_exclude)) |>
     dplyr::pull(grna_target) |> unique()
   out_pairs <- expand.grid( grna_target = grna_targets, response_id = response_ids)
-  if (exclude_positive_control_pairs) out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
+  if (pairs_to_exclude == "pc_pairs") out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
   return(out_pairs)
 }
 
 
 #' Construct positive control pairs
 #'
-#' Helper function to construct the positive control pairs.
+#' `construct_positive_control_pairs()` is a helper function to facilitate construction of the positive control pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#positive-control-pairs}{Section 2.2 in the manual} for more detailed information about this function.
 #'
-#' @param sceptre_object TBD
+#' @param sceptre_object a `sceptre_object`
 #'
-#' @return TBD
+#' @return a data frame with columns `grna_target` and `response_id` containing the positive control pairs
 #' @export
 construct_positive_control_pairs <- function(sceptre_object) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame

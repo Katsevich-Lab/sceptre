@@ -26,5 +26,5 @@ construct_cis_pairs(
 TBD
 }
 \description{
-Construct cis pairs
+\code{construct_cis_pairs()} is a helper function to construct the \emph{cis} pairs.
 }

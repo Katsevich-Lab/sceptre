@@ -32,7 +32,7 @@ set_analysis_parameters(
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{fit_parametric_curve}{(optional) a boolean indicating whether to fit a parametric curve to the null distribution of test statistics}
+\item{fit_parametric_curve}{(optional) a logical indicating whether to fit a parametric curve to the null distribution of test statistics}
 
 \item{control_group}{(optional) a string specifying the control group to use, either "complement" or "nt_cells"}
 
@@ -41,6 +41,9 @@ set_analysis_parameters(
 \item{multiple_testing_method}{(optional) a string specifying the multiple testing correction method to use; see p.adjust.methods for options}
 
 \item{multiple_testing_alpha}{(optional) a numeric specifying the nominal level of the multiple testing correction method}
+}
+\value{
+an updated \code{sceptre_object} in which the analysis parameters have been set
 }
 \description{
 \code{set_analysis_parameters()} sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.

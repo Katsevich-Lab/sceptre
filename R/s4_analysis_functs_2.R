@@ -4,10 +4,11 @@
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param n_calibration_pairs (optional) the number of negative control pairs to construct and analyze
+#' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
 #' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
 #' @param print_progress (optional) a logical indicating whether to print progress updates
 #' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
 #' @export
 #' @examples
@@ -63,6 +64,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 #' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
 #' @param print_progress (optional) a logical indicating whether to print progress updates
 #' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @return an updated `sceptre_object` in which the power check has been carried out
 #'
 #' @examples
 #' # see example via ?sceptre
@@ -107,6 +109,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
 #' @param print_progress (optional) a logical indicating whether to print progress updates
 #' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
 #' @examples
 #' # see example via ?sceptre

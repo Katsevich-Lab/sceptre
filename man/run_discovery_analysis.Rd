@@ -20,6 +20,9 @@ run_discovery_analysis(
 
 \item{parallel}{(optional) a logical indicating whether to run the function in parallel}
 }
+\value{
+an updated \code{sceptre_object} in which the discovery analysis has been carried out
+}
 \description{
 \code{run_discovery_analysis()} runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 }

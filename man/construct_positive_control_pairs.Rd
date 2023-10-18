@@ -7,11 +7,11 @@
 construct_positive_control_pairs(sceptre_object)
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 }
 \value{
-TBD
+a data frame with columns \code{grna_target} and \code{response_id} containing the positive control pairs
 }
 \description{
-Helper function to construct the positive control pairs.
+\code{construct_positive_control_pairs()} is a helper function to facilitate construction of the positive control pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#positive-control-pairs}{Section 2.2 in the manual} for more detailed information about this function.
 }
