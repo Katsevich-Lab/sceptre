@@ -7,20 +7,22 @@
 construct_trans_pairs(
   sceptre_object,
   positive_control_pairs = data.frame(),
-  exclude_positive_control_pairs = TRUE,
-  exclude_positive_control_targets = FALSE
+  pairs_to_exclude = "none"
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{positive_control_pairs}{TBD}
+\item{positive_control_pairs}{(optional) the set of positive control pairs}
 
-\item{exclude_positive_control_pairs}{TBD}
+\item{pairs_to_exclude}{(optional) a string specifying pairs to exclude from the trans pairs, one of "none", "pc_pairs", or "pairs_containing_pc_targets"}
 }
 \value{
-TBD
+a data frame with columns \code{grna_target} and \code{response_id} containing the trans discovery set
 }
 \description{
-A helper function to construct the trans pairs
+\code{construct_trans_pairs()} is a helper function to construct the set of \emph{trans} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
+}
+\details{
+Typically, in screens of genes (resp., noncoding regulatory elements), we set \code{pairs_to_exclude} to "pc_pairs" (resp., "pairs_containing_pc_targets").
 }

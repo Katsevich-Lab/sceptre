@@ -17,9 +17,9 @@ run_qc(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{n_nonzero_trt_thresh}{(optional) an integer specifying the number of nonzero treatment cells a pair must contain in order to be retained}
+\item{n_nonzero_trt_thresh}{(optional) an integer specifying the number of nonzero treatment cells a pair must contain for it to be retained}
 
-\item{n_nonzero_cntrl_thresh}{(optional) an integer specifying the number of nonzero control cells a pair must contain in order to be retained}
+\item{n_nonzero_cntrl_thresh}{(optional) an integer specifying the number of nonzero control cells a pair must contain for it to be retained}
 
 \item{response_n_umis_range}{(optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_umis} distribution}
 
@@ -29,8 +29,11 @@ run_qc(
 
 \item{additional_cells_to_remove}{(optional) a vector of integer indices specifying additional cells to remove}
 }
+\value{
+an updated \code{sceptre_object} in which QC has been carried out
+}
 \description{
-\code{run_qc()} runs cellwise and pairwise QC. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
+\code{run_qc()} runs cellwise and pairwise QC on the data. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
 }
 \examples{
 # see example via ?sceptre

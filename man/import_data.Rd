@@ -26,6 +26,9 @@ import_data(
 
 \item{response_names}{(optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate \code{response_p_mito}}
 }
+\value{
+an initialized \code{sceptre_object}
+}
 \description{
 \code{import_data()} imports data from a collection of R objects to create a \code{sceptre_object}. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
 }

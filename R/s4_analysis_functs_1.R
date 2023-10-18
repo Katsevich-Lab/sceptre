@@ -9,6 +9,7 @@
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
 #' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`
 #'
+#' @return an initialized `sceptre_object`
 #' @export
 #' @examples
 #' # see example via ?sceptre
@@ -54,11 +55,13 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
 #' @param side (optional) the sidedness of the test, one of "left", "right", or "both"
 #' @param grna_integration_strategy (optional) a string specifying the gRNA integration strategy, either "singleton" or "union"
-#' @param fit_parametric_curve (optional) a boolean indicating whether to fit a parametric curve to the null distribution of test statistics
+#' @param fit_parametric_curve (optional) a logical indicating whether to fit a parametric curve to the null distribution of test statistics
 #' @param control_group (optional) a string specifying the control group to use, either "complement" or "nt_cells"
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either "permutations" or "crt"
 #' @param multiple_testing_method (optional) a string specifying the multiple testing correction method to use; see p.adjust.methods for options
 #' @param multiple_testing_alpha (optional) a numeric specifying the nominal level of the multiple testing correction method
+#'
+#' @return an updated `sceptre_object` in which the analysis parameters have been set
 #'
 #' @export
 #' @examples
@@ -148,11 +151,12 @@ set_analysis_parameters <- function(sceptre_object,
 #' `assign_grnas()` performs the gRNA-to-cell assignments. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param method a string indicating the method to use to assign the gRNAs to cells, one of "mixture", "thresholding", or "maximum"
-#' @param print_progress a logical indicating whether to print progress updates
-#' @param parallel a logical indicating whether to run the function in parallel
+#' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of "mixture", "thresholding", or "maximum"
+#' @param print_progress (optional) a logical indicating whether to print progress updates
+#' @param parallel (optional) a logical indicating whether to run the function in parallel
 #' @param ... optional method-specific additional arguments
 #'
+#' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
 #' @export
 #' @examples
 #' # see example via ?sceptre
@@ -203,16 +207,17 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 
 #' Run QC
 #'
-#' `run_qc()` runs cellwise and pairwise QC. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
+#' `run_qc()` runs cellwise and pairwise QC on the data. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param n_nonzero_trt_thresh (optional) an integer specifying the number of nonzero treatment cells a pair must contain in order to be retained
-#' @param n_nonzero_cntrl_thresh (optional) an integer specifying the number of nonzero control cells a pair must contain in order to be retained
+#' @param n_nonzero_trt_thresh (optional) an integer specifying the number of nonzero treatment cells a pair must contain for it to be retained
+#' @param n_nonzero_cntrl_thresh (optional) an integer specifying the number of nonzero control cells a pair must contain for it to be retained
 #' @param response_n_umis_range (optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
+#' @return an updated `sceptre_object` in which QC has been carried out
 #' @export
 #' @examples
 #' # see example via ?sceptre

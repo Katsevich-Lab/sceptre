@@ -5,7 +5,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
                          "log_2_fold_change", "reject", "y", "grna_target"))
 #' sceptre
 #'
-#' `sceptre` is an R package for single-cell CRISPR screen data analysis. `sceptre` emphasizes statistical rigor, computational efficiency, and ease of use.
+#' `sceptre` is an R package for single-cell CRISPR screen data analysis that emphasizes statistical rigor, computational efficiency, and ease of use.
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
@@ -14,10 +14,9 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' @name sceptre
 #' @examples
 #' \dontrun{
-#' #################
-#' # Low MOI example
-#' #################
-#'
+#' ##########################
+#' # Low-MOI CRISPRko example
+#' ##########################
 #' # 1. create the sceptre object
 #' data("lowmoi_example_data")
 #' sceptre_object <- import_data(
@@ -31,7 +30,8 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' # 2. set the analysis parameters
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 #' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-#' positive_control_pairs = positive_control_pairs)
+#' positive_control_pairs = positive_control_pairs,
+#' pairs_to_exclude = "pc_pairs")
 #'
 #' sceptre_object <- set_analysis_parameters(
 #' sceptre_object = sceptre_object,
@@ -68,9 +68,9 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' # 8. write results
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
 #'
-#' ##################
-#' # High MOI example
-#' ##################
+#' ##########################
+#' # High-MOI CRISPRi example
+#' ##########################
 #' # 1. create the sceptre object from cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptre"),
 #' "/highmoi_example/gem_group_", 1:2)
