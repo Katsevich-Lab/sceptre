@@ -66,6 +66,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 #' @param parallel (optional) a logical indicating whether to run the function in parallel
 #' @return an updated `sceptre_object` in which the power check has been carried out
 #'
+#' @export
 #' @examples
 #' # see example via ?sceptre
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
@@ -111,6 +112,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #' @param parallel (optional) a logical indicating whether to run the function in parallel
 #' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
+#' @export
 #' @examples
 #' # see example via ?sceptre
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
