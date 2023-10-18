@@ -4,6 +4,10 @@ template:
   bootstrap: 5
 
 reference:
+- title: "Package documentation"
+  contents:
+  - sceptre
+
 - title: "Pipeline functions"
   desc: >
     The functions that form the basis of the `sceptre` pipeline

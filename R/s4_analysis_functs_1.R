@@ -1,125 +1,17 @@
 #' Import data
 #'
-#' This function imports data from a collection of R objects. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
+#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
 #'
-#' @param response_matrix TBD
-#' @param grna_matrix TBD
-#' @param grna_target_data_frame TBD
-#' @param moi TBD
-#' @param extra_covariates TBD
-#' @param response_names TBD
+#' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns
+#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
+#' @param moi a string indicating the MOI of the dataset, either "low" or "high"
+#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
+#' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#' #################
-#' # Low MOI example
-#' #################
-#' data("lowmoi_example_data")
-#'
-#' # 1. create the sceptre object
-#' sceptre_object <- import_data(
-#' response_matrix = lowmoi_example_data$response_matrix,
-#' grna_matrix = lowmoi_example_data$grna_matrix,
-#' extra_covariates = lowmoi_example_data$extra_covariates,
-#' grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-#' moi = "low")
-#' print(sceptre_object)
-#'
-#' # 2. obtain the discovery and positive control pairs
-#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-#' positive_control_pairs = positive_control_pairs)
-#'
-#' # 3. set the analysis parameters
-#' sceptre_object <- set_analysis_parameters(
-#' sceptre_object = sceptre_object,
-#' discovery_pairs = discovery_pairs,
-#' positive_control_pairs = positive_control_pairs)
-#' print(sceptre_object)
-#'
-#' # 4. optional: explicitly assign grnas, run QC
-#' plot_grna_count_distributions(sceptre_object)
-#' sceptre_object <- sceptre_object |> assign_grnas()
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 6. run power check
-#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 8. obtain the results for downstream analysis
-#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-#'
-#' ##################
-#' # High MOI example
-#' ##################
-#' # 1. create the sceptre object from CellRanger output
-#' directories <- paste0(system.file("extdata", package = "sceptre"),
-#' "/highmoi_example/gem_group_", 1:2)
-#' data(grna_target_data_frame_highmoi)
-#' sceptre_object <- import_data_from_cellranger(directories = directories,
-#' moi = "high",
-#' grna_target_data_frame = grna_target_data_frame_highmoi)
-#' print(sceptre_object)
-#'
-#' # 2. obtain the response-gRNA group pairs to analyze
-#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-#' discovery_pairs <- construct_cis_pairs(sceptre_object,
-#' positive_control_pairs = positive_control_pairs,
-#' distance_threshold = 5e6)
-#'
-#' # 3. set the analysis parameters
-#' sceptre_object <- set_analysis_parameters(
-#' sceptre_object = sceptre_object,
-#' discovery_pairs = discovery_pairs,
-#' positive_control_pairs = positive_control_pairs,
-#' side = "left")
-#' print(sceptre_object)
-#'
-#' # 4 (optional) manually assign grnas, run QC
-#' plot_grna_count_distributions(sceptre_object)
-#' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 6. (optional) run the power check
-#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
-#' plot(sceptre_object)
-#' print(sceptre_object)
-#'
-#' # 8. obtain results; write outputs to directory
-#' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-#' }
+#' # see example via ?sceptre
 import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
@@ -154,22 +46,23 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 
 #' Set analysis parameters
 #'
-#' @param sceptre_object TBD
-#' @param discovery_pairs TBD
-#' @param positive_control_pairs TBD
-#' @param formula_object TBD
-#' @param side TBD
-#' @param grna_integration_strategy TBD
-#' @param fit_parametric_curve TBD
-#' @param control_group TBD
-#' @param resampling_mechanism TBD
-#' @param B1 TBD
-#' @param B2 TBD
-#' @param B3 TBD
-#' @param multiple_testing_method TBD
-#' @param multiple_testing_alpha TBD
+#' `set_analysis_parameters()` sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param discovery_pairs a data frame with columns `grna_target` and `response_id` specifying the discovery pairs to analyze
+#' @param positive_control_pairs (optional) a data frame with columns `grna_target` and `response_id` specifying the positive control pairs to analyze
+#' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
+#' @param side (optional) the sidedness of the test, one of "left", "right", or "both"
+#' @param grna_integration_strategy (optional) a string specifying the gRNA integration strategy, either "singleton" or "union"
+#' @param fit_parametric_curve (optional) a boolean indicating whether to fit a parametric curve to the null distribution of test statistics
+#' @param control_group (optional) a string specifying the control group to use, either "complement" or "nt_cells"
+#' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either "permutations" or "crt"
+#' @param multiple_testing_method (optional) a string specifying the multiple testing correction method to use; see p.adjust.methods for options
+#' @param multiple_testing_alpha (optional) a numeric specifying the nominal level of the multiple testing correction method
 #'
 #' @export
+#' @examples
+#' # see example via ?sceptre
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs,
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
