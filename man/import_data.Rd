@@ -14,129 +14,21 @@ import_data(
 )
 }
 \arguments{
-\item{response_matrix}{TBD}
+\item{response_matrix}{a matrix of response UMI counts, with responses in rows and cells in columns}
 
-\item{grna_matrix}{TBD}
+\item{grna_matrix}{a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns}
 
-\item{grna_target_data_frame}{TBD}
+\item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target}
 
-\item{moi}{TBD}
+\item{moi}{a string indicating the MOI of the dataset, either "low" or "high"}
 
-\item{extra_covariates}{TBD}
+\item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute}
 
-\item{response_names}{TBD}
+\item{response_names}{(optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate \code{response_p_mito}}
 }
 \description{
-This function imports data from a collection of R objects. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
+\code{import_data()} imports data from a collection of R objects to create a \code{sceptre_object}. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
 }
 \examples{
-\dontrun{
-#################
-# Low MOI example
-#################
-data("lowmoi_example_data")
-
-# 1. create the sceptre object
-sceptre_object <- import_data(
-response_matrix = lowmoi_example_data$response_matrix,
-grna_matrix = lowmoi_example_data$grna_matrix,
-extra_covariates = lowmoi_example_data$extra_covariates,
-grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-moi = "low")
-print(sceptre_object)
-
-# 2. obtain the discovery and positive control pairs
-positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-positive_control_pairs = positive_control_pairs)
-
-# 3. set the analysis parameters
-sceptre_object <- set_analysis_parameters(
-sceptre_object = sceptre_object,
-discovery_pairs = discovery_pairs,
-positive_control_pairs = positive_control_pairs)
-print(sceptre_object)
-
-# 4. optional: explicitly assign grnas, run QC
-plot_grna_count_distributions(sceptre_object)
-sceptre_object <- sceptre_object |> assign_grnas()
-plot(sceptre_object)
-print(sceptre_object)
-
-sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 5. run the calibration check
-sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 6. run power check
-sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 7. run discovery analysis
-sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 8. obtain the results for downstream analysis
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-
-##################
-# High MOI example
-##################
-# 1. create the sceptre object from CellRanger output
-directories <- paste0(system.file("extdata", package = "sceptre"),
-"/highmoi_example/gem_group_", 1:2)
-data(grna_target_data_frame_highmoi)
-sceptre_object <- import_data_from_cellranger(directories = directories,
-moi = "high",
-grna_target_data_frame = grna_target_data_frame_highmoi)
-print(sceptre_object)
-
-# 2. obtain the response-gRNA group pairs to analyze
-positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_cis_pairs(sceptre_object,
-positive_control_pairs = positive_control_pairs,
-distance_threshold = 5e6)
-
-# 3. set the analysis parameters
-sceptre_object <- set_analysis_parameters(
-sceptre_object = sceptre_object,
-discovery_pairs = discovery_pairs,
-positive_control_pairs = positive_control_pairs,
-side = "left")
-print(sceptre_object)
-
-# 4 (optional) manually assign grnas, run QC
-plot_grna_count_distributions(sceptre_object)
-sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 5. run the calibration check
-sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 6. (optional) run the power check
-sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 7. run discovery analysis
-sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
-plot(sceptre_object)
-print(sceptre_object)
-
-# 8. obtain results; write outputs to directory
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs/")
-}
+# see example via ?sceptre
 }

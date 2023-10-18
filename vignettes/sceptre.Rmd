@@ -239,7 +239,7 @@ The gRNAs display fairly bimodal count distributions. Consider, for example, `gR
 
 We carry out the gRNA assignment step via a call to the function `assign_grnas()`. `assign_grnas()` takes arguments `sceptre_object` (required) and `method` (optional); the latter argument can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. We parallelize execution of `assign_grnas()` by setting `parallel` to `TRUE`. (Windows users should remove the `parallel = TRUE` argument, as parallel execution is not yet configured for Windows.)
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,results='hide'}
 sceptre_object <- assign_grnas(sceptre_object = sceptre_object)
 ```
 
@@ -302,7 +302,7 @@ The fifth step is to run the calibration check. **The calibration check is an an
 
 We run the calibration check by calling the function `run_calibration_check()` on the `sceptre_object`.
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,results='hide'}
 sceptre_object <- run_calibration_check(sceptre_object)
 ```
 
@@ -340,7 +340,7 @@ The visualization consists of four panels, which we describe below.
 
 The sixth step --- which is optional --- is to run the power check. The power check involves applying `sceptre` to analyze the positive control pairs. Given that the positive control pairs are known to contain signal, `sceptre` should produce significant (i.e., small) p-values on the positive control pairs. **The power check enables us to assess `sceptre`'s power (i.e., its ability to detect true associations) on the dataset under analysis.** We run the power check by calling the function `run_power_check()` on the `sceptre_object`.
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,results='hide'}
 sceptre_object <- run_power_check(sceptre_object)
 ```
 
@@ -368,7 +368,7 @@ Each point in the plot corresponds to a target-response pair, with positive cont
 
 The seventh and penultimate step is to run the discovery analysis. The discovery analysis entails applying `sceptre` to analyze the discovery pairs. We run the discovery analysis by calling the function `run_discovery_analysis()`.
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,results='hide'}
 sceptre_object <- run_discovery_analysis(sceptre_object)
 ```
 
@@ -434,3 +434,5 @@ head(result)
 ## Further reading
 
 Each step of the pipeline has its own dedicated chapter in the manual. We encourage interested users to read these additional chapters one-by-one to learn more about the various options available at each step of the pipeline, starting with [Chapter 1 of the manual](https://timothy-barry.github.io/sceptre-book/import-data.html).
+
+Also see complete worked examples for the low-MOI CRISPRko and high-MOI CRISPRi data via `?sceptre`.
