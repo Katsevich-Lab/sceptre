@@ -6,19 +6,19 @@
 \usage{
 plot_run_calibration_check(
   sceptre_object,
-  return_indiv_plots = FALSE,
   point_size = 0.55,
-  transparency = 0.8
+  transparency = 0.8,
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_calibration_check} called on it}
 
-\item{return_indiv_plots}{TBD}
+\item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot.}
 
-\item{point_size}{TBD}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot.}
 
-\item{transparency}{TBD}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
@@ -41,4 +41,7 @@ The plot contains four panels.
 \item{The number of false discoveries depends both on \code{alpha} and \code{multiple_testing_correction}. The default value of these arguments is 0.1 and "BH". This corresponds to a BH correction at nominal false discovery rate (FDR) 0.1.}
 \item{Technical point: when applying BH at level 0.1 to a collection of strictly null p-values, BH controls family-wise error rate (FWER) at level 0.1 as well as FDR at level 0.1. FWER is the probability of making one or more false discoveries. Thus, with probability 0.9, the number of rejections that BH makes on (well-calibrated) null p-values at level 0.1 is 0. This implies that \code{sceptre} (or any method for that matter) should make about zero false discoveries on negative control p-values data after applying a BH correction at level 0.1.}
 }
+}
+\examples{
+# A full example can be found at \code{?sceptre}
 }

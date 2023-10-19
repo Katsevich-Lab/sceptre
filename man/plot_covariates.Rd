@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_covariates}
 \alias{plot_covariates}
-\title{Plot covariates}
+\title{Visualize the distribution of the cell-specific covariates}
 \usage{
 plot_covariates(
   sceptre_object,
@@ -12,7 +12,7 @@ plot_covariates(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.}
 
 \item{response_n_umis_range}{TBD}
 
@@ -24,5 +24,8 @@ plot_covariates(
 TBD
 }
 \description{
-Plot covariates
+Visualize the distribution of the cell-specific covariates
+}
+\examples{
+# A full example can be found at \code{?sceptre}
 }
