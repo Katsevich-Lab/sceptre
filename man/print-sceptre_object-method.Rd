@@ -4,13 +4,11 @@
 \alias{print,sceptre_object-method}
 \title{Print}
 \usage{
-\S4method{print}{sceptre_object}(x, ...)
+\S4method{print}{sceptre_object}(x)
 }
 \arguments{
-\item{x}{a sceptre_object}
-
-\item{...}{TDB}
+\item{x}{a \code{sceptre_object}}
 }
 \description{
-Print
+\code{print()} prints information about the dataset and the status of the analysis to the console.
 }

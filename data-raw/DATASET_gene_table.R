@@ -24,7 +24,7 @@ gene_table <- cbind(dt_gene_chr[,c("chr", "start", "end", "strand")], gene_ids_a
   dplyr::mutate(chr = factor(chr)) |> dplyr::mutate(tss_position = ifelse(strand == "+", start, end)) |>
   dplyr::select(-start, -end, -strand)
 data.table::setorderv(gene_table, c("chr", "tss_position"))
-gene_table <- gene_table
+gene_position_data_frame_grch38 <- gene_table |> dplyr::select(response_id = gene_id, chr, position = tss_position)
 
 # save internally
-usethis::use_data(gene_table, internal = TRUE, overwrite = TRUE)
+usethis::use_data(gene_position_data_frame_grch38, overwrite = TRUE)

@@ -216,9 +216,12 @@ apply_grouping_to_result <- function(result, sceptre_object) {
 
 #' Get result
 #'
-#' @param sceptre_object TBD
-#' @param analysis TBD
+#' `get_result()` returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
+#' @param sceptre_object a `sceptre_object`
+#' @param analysis a string indicating the name of the analysis whose results we are querying, one of "run_calibration_check", "run_power_check", or "run_discovery_analysis".
+#'
+#' @returns a data frame containing the results of the analysis
 #' @export
 get_result <- function(sceptre_object, analysis) {
   if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
@@ -236,9 +239,12 @@ get_result <- function(sceptre_object, analysis) {
 
 #' Write outputs to directory
 #'
-#' @param sceptre_object TBD
-#' @param directory TBD
+#' `write_outputs_to_directory()` writes the outputs of a `sceptre` analysis to a directory on disk. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
+#' @param sceptre_object a `sceptre_object`
+#' @param directory a string giving the file path to a directory on disk in which to write the results
+#'
+#' @return NULL
 #' @export
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory
