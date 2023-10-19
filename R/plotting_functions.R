@@ -12,13 +12,18 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 #' Plot the number of cells per gRNA count
 #'
-#' @param sceptre_object TBD
+#' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
 #' @param n_grnas_to_plot  (optional; default \code{4}) the number of different gRNAs to plot
 #' @param grnas_to_plot (optional; default NULL) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.
 #' @param threshold (optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
 #'
-#' @return a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bins grow exponentially fast in size.
+#' @details
+#' The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially fast in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
+#'
+#' @return a single \code{ggplot2} plot.
 #' @export
+#' @examples
+#' # A full example can be found at \code{?sceptre}
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   # rounding just in case the user provides a non-integer one
@@ -115,18 +120,23 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 
 #' Plot the number of gRNAs per cell
 #'
-#' @param sceptre_object TBD
+#' @param sceptre_object a \code{sceptre_object} that has had \code{assign_gras} called on it.
 #' @param n_grnas_to_plot (optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
 #' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.
-#' @param transparency TBD
-#' @param point_size TBD
+#' @param point_size (optional; default \code{0.9}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
 #' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
 #' @param n_max_0_grna_unprtb_plot (optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.
-#' @param return_indiv_plots TBD
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
-plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, transparency = 0.8, point_size = 0.9, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
+#' @examples
+#' # A full example can be found at \code{?sceptre}
+plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, point_size = 0.9, transparency = 0.8, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
+  if(!sceptre_object@functs_called["assign_grnas"]) {
+    stop("This `sceptre_object` has not yet had `assign_grnas` called on it.")
+  }
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- rownames(grna_matrix)
@@ -239,10 +249,10 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #' \item{bottom right:} a text box displaying (i) the number of false discoveries made on the negative control pairs and (ii) the mean estimated log-fold change. The number of false discoveries ideally should be zero, although a small, positive integer (such as 1, 2, or 3) also is OK. The mean estimated log-fold change should be a numeric value close to zero.
 #' }
 #'
-#' @param sceptre_object  TBD
-#' @param return_indiv_plots TBD
-#' @param point_size TBD
-#' @param transparency TBD
+#' @param sceptre_object a \code{sceptre_object} that has had \code{run_calibration_check} called on it
+#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
@@ -253,9 +263,13 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #' \item{The number of false discoveries depends both on \code{alpha} and \code{multiple_testing_correction}. The default value of these arguments is 0.1 and "BH". This corresponds to a BH correction at nominal false discovery rate (FDR) 0.1.}
 #' \item{Technical point: when applying BH at level 0.1 to a collection of strictly null p-values, BH controls family-wise error rate (FWER) at level 0.1 as well as FDR at level 0.1. FWER is the probability of making one or more false discoveries. Thus, with probability 0.9, the number of rejections that BH makes on (well-calibrated) null p-values at level 0.1 is 0. This implies that \code{sceptre} (or any method for that matter) should make about zero false discoveries on negative control p-values data after applying a BH correction at level 0.1.}
 #' }
-plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALSE, point_size = 0.55, transparency = 0.8) {
+#' @examples
+#' # A full example can be found at \code{?sceptre}
+plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
+  if(!sceptre_object@functs_called["run_calibration_check"]) {
+    stop("This `sceptre_object` has not yet had `run_calibration_check` called on it.")
+  }
   calibration_result <- sceptre_object@calibration_result
-  if (nrow(calibration_result) == 0L) stop("Calibration check not yet called.")
   my_theme <- get_my_theme()
 
   # compute n rejections
@@ -316,6 +330,22 @@ plot_run_calibration_check <- function(sceptre_object, return_indiv_plots = FALS
 ############################
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
+
+#' Title
+#'
+#' @param calibration_result
+#' @param discovery_result
+#' @param p_thresh
+#' @param transform_scale
+#' @param include_legend
+#' @param include_y_axis_text
+#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compare_calibration_and_discovery_results <- function(calibration_result, discovery_result, p_thresh,
                                                       transform_scale = TRUE, include_legend = FALSE,
                                                       include_y_axis_text = TRUE, point_size = 0.55,
@@ -384,16 +414,20 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 
 #' Plot run discovery analysis
 #'
-#' @param sceptre_object TBD
-#' @param return_indiv_plots TBD
+#' @param sceptre_object a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it
 #' @param x_limits TBD
-#' @param transparency TBD
-#' @param point_size TBD
+#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @export
-plot_run_discovery_analysis <- function(sceptre_object, return_indiv_plots = FALSE, x_limits = c(-1.5, 1.5), transparency = 0.8, point_size = 0.55) {
+#' @examples
+#' # A full example can be found at \code{?sceptre}
+plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5), point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
+  if(!sceptre_object@functs_called["run_discovery_analysis"]) {
+    stop("This `sceptre_object` has not yet had `run_discovery_analysis` called on it.")
+  }
   # first, compute the rejection set
-  if (nrow(sceptre_object@discovery_result) == 0L) stop("Discovery analysis not run.")
   discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
   calibration_result <- sceptre_object@calibration_result
   discovery_set <- discovery_result |> dplyr::filter(significant)
@@ -495,14 +529,19 @@ plot_covariates <- function(sceptre_object,
 
 #' Plot run QC
 #'
-#' @param sceptre_object TBD
-#' @param return_indiv_plots TBD
+#' @param sceptre_object a \code{sceptre_object} that has had \code{run_qc} called on it
 #' @param downsample_pairs TBD
-#' @param transparency TBD
-#' @param point_size TBD
+#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @export
-plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, downsample_pairs = 10000L, transparency = 0.8, point_size = 0.55) {
+#' @examples
+#' # A full example can be found at \code{?sceptre}
+plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
+  if(!sceptre_object@functs_called["run_qc"]) {
+    stop("This `sceptre_object` has not yet had `run_qc` called on it.")
+  }
   my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
   discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
@@ -569,17 +608,20 @@ plot_run_qc <- function(sceptre_object, return_indiv_plots = FALSE, downsample_p
 #'
 #' The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
 #'
-#' @param sceptre_object TBD
-#' @param point_size TBD
-#' @param transparency TBD
+#' @param sceptre_object a \code{sceptre_object} that has had \code{run_power_check} called on it
+#' @param point_size (optional; default \code{1}) the size of the individual points in the plot.
+#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
 #' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.
-#' @param return_indiv_plots (optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.
 #'
 #' @return a single \code{ggplot2} plot.
 #' @export
-plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20, return_indiv_plots = FALSE) {
+#' @examples
+#' # A full example can be found at \code{?sceptre}
+plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
+  if(!sceptre_object@functs_called["run_power_check"]) {
+    stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
+  }
   calibration_result <- sceptre_object@power_result
-  if (nrow(calibration_result) == 0L) stop("Power check not yet called.")
   my_theme <- get_my_theme()
   set.seed(3)
   my_cols <- c("mediumseagreen", "firebrick1")
