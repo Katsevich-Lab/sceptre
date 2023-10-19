@@ -21,6 +21,8 @@ knitr::opts_chunk$set(
 
 Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR genome engineering and single-cell sequencing to survey the effects of genetic perturbations on individual cells. Despite their promise, single-cell CRISPR screens present considerable statistical and computational challenges. `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
 
+**Update October 2023**: We have released `sceptre` version 0.4.0, which is a substantial rework of the package. `sceptre` is now easier to use, faster, more memory efficient, and more fully featured than before. Also, we have written an [e-book](https://timothy-barry.github.io/sceptre-book/) to guide users through the entire process of analyzing their data using `sceptre`.
+
 ## Key features
 
 `sceptre` offers the following key features:
@@ -39,7 +41,6 @@ Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR genome en
 -   Gene-targeting and noncoding-regulatory-element-targeting
 -   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
 -   Gene and protein expression readout
--   Direct gRNA capture and barcoded gRNA capture
 
 ## Get started
 
@@ -63,8 +64,6 @@ devtools::install_github("katsevich-lab/sceptre")
 
 -   [Morris et al., 2023](https://www.science.org/doi/10.1126/science.adh7699). "Discovery of target genes and pathways...". *Science*.
 -   [Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
-
-See publication list for a full list of publications.
 
 ## Bugs and feature requests
 
