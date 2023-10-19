@@ -395,6 +395,18 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
 }
 
 
+#' Title
+#'
+#' @param discovery_result
+#' @param p_thresh
+#' @param x_limits
+#' @param transparency
+#' @param point_size
+#'
+#' @return
+#' @export
+#'
+#' @examples
 make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5), transparency = 0.5, point_size = 0.55) {
   p_lower_lim <- 1e-12
   out <- ggplot2::ggplot(data = discovery_result |> dplyr::mutate(reject = p_value < p_thresh,
