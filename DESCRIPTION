@@ -27,6 +27,7 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
+    magrittr,
     Matrix,
     methods,
     Rcpp (>= 1.0.9),
