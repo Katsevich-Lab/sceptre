@@ -18,13 +18,13 @@ test_that("perform_status_check_and_update", {
   ## try to use a function before calling the downstream ones
   expect_error(
     perform_status_check_and_update(blank_object, "run_qc"),
-    regex = "The functions `set_analysis_parameters\\(\\)`, `assign_grnas\\(\\)` must be called before `run_qc\\(\\)` is called"
+    regex = "The function `assign_grnas\\(\\)` must be called before `run_qc\\(\\)` is called"
   )
 
   ## chaining some together
   results <- blank_object |>
-    perform_status_check_and_update("assign_grnas") |>
     perform_status_check_and_update("set_analysis_parameters") |>
+    perform_status_check_and_update("assign_grnas") |>
     perform_status_check_and_update("run_qc")
   expect_equal(results@last_function_called, "run_qc")
   expect_equal(results@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(4, 3)))
