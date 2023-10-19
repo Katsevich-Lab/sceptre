@@ -76,12 +76,19 @@ convert_pointer_to_index_vector_v2 <- function(p) {
 }
 
 
+df = data.frame(x = c(NA, 2, 3))
+stats::model.matrix(object = formula("~ x"), data = df)
+
+
 convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_object) {
   global_cell_covariates_new <- stats::model.matrix(object = formula_object, data = covariate_data_frame)
   # verify that the global cell covariates are OK after transformation
+  if(nrow(global_cell_covariates_new) != nrow(covariate_data_frame)) {
+    stop("Some rows of `covariate_data_frame` were lost after applying the `formula object`. This is likely due to NAs, which should be removed first.")
+  }
   for (col_name in colnames(global_cell_covariates_new)) {
     vect <- global_cell_covariates_new[,col_name]
-    if (any(vect == -Inf) || any(vect == Inf) || any(is.na(vect))) {
+    if (any(is.infinite(vect)) || any(is.na(vect))) {
       stop(paste0("The column `", col_name, "` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries."))
     }
   }
