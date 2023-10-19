@@ -47,7 +47,7 @@ Suggests:
     VGAM,
     rmarkdown,
     parallel,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
     readr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
