@@ -8,20 +8,17 @@ plot_run_power_check(
   sceptre_object,
   point_size = 1,
   transparency = 0.8,
-  clip_to = 1e-20,
-  return_indiv_plots = FALSE
+  clip_to = 1e-20
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_power_check} called on it}
 
-\item{point_size}{TBD}
+\item{point_size}{(optional; default \code{1}) the size of the individual points in the plot.}
 
-\item{transparency}{TBD}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot.}
 
 \item{clip_to}{(optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.}
-
-\item{return_indiv_plots}{(optional; default \code{FALSE}) ignored; kept for compatibility with other plotting functions.}
 }
 \value{
 a single \code{ggplot2} plot.
@@ -31,4 +28,7 @@ The \code{plot_run_power_check} function helps to visualize the results of a pow
 }
 \details{
 The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
+}
+\examples{
+# A full example can be found at \code{?sceptre}
 }

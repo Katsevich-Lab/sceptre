@@ -10,20 +10,22 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 # 1. PLOT ASSIGN GRNAS
 ######################
-#' Plot  the empirical UMI count distribution of one or more gRNAs
+#' Plot gRNA count distributions
 #'
-#' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
-#' @param n_grnas_to_plot  (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
-#' @param grnas_to_plot (optional; default NULL) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL} then random ones are picked.
-#' @param threshold (optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
+#' `plot_grna_count_distributions()` plots the empirical UMI count distribution of one or more gRNAs.
+#'
+#' @param sceptre_object any initialized `sceptre_object`. `plot_grna_count_distributions()` can be called at any point in the pipeline after `import_data()`.
+#' @param n_grnas_to_plot (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
+#' @param grnas_to_plot (optional; default `NULL`) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then `n_grnas_to_plot` random gRNAs are plotted.
+#' @param threshold (optional; default `NULL`) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
 #'
 #' @details
-#' The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially fast in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
+#' The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
 #'
-#' @return a single \code{ggplot2} plot.
+#' @return a single \code{ggplot2} plot
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   # rounding just in case the user provides a non-integer one

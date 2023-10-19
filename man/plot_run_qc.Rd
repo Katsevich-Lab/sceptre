@@ -6,23 +6,26 @@
 \usage{
 plot_run_qc(
   sceptre_object,
-  return_indiv_plots = FALSE,
   downsample_pairs = 10000L,
+  point_size = 0.55,
   transparency = 0.8,
-  point_size = 0.55
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
-
-\item{return_indiv_plots}{TBD}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_qc} called on it}
 
 \item{downsample_pairs}{TBD}
 
-\item{transparency}{TBD}
+\item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot.}
 
-\item{point_size}{TBD}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot.}
+
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \description{
 Plot run QC
+}
+\examples{
+# A full example can be found at \code{?sceptre}
 }

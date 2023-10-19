@@ -6,23 +6,26 @@
 \usage{
 plot_run_discovery_analysis(
   sceptre_object,
-  return_indiv_plots = FALSE,
   x_limits = c(-1.5, 1.5),
+  point_size = 0.55,
   transparency = 0.8,
-  point_size = 0.55
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
-
-\item{return_indiv_plots}{TBD}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it}
 
 \item{x_limits}{TBD}
 
-\item{transparency}{TBD}
+\item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot.}
 
-\item{point_size}{TBD}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot.}
+
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \description{
 Plot run discovery analysis
+}
+\examples{
+# A full example can be found at \code{?sceptre}
 }
