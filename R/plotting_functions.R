@@ -10,11 +10,11 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 # 1. PLOT ASSIGN GRNAS
 ######################
-#' Plot the number of cells per gRNA count
+#' Plot  the empirical UMI count distribution of one or more gRNAs
 #'
 #' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
-#' @param n_grnas_to_plot  (optional; default \code{4}) the number of different gRNAs to plot
-#' @param grnas_to_plot (optional; default NULL) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.
+#' @param n_grnas_to_plot  (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
+#' @param grnas_to_plot (optional; default NULL) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL} then random ones are picked.
 #' @param threshold (optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
 #'
 #' @details
@@ -118,11 +118,11 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   return(p)
 }
 
-#' Plot the number of gRNAs per cell
+#' Plot the outcome of the gRNA-to-cell assignment step
 #'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{assign_gras} called on it.
-#' @param n_grnas_to_plot (optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
-#' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.
+#' @param n_grnas_to_plot (optional; default \code{3}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
+#' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then the gRNAs are chosen at random.
 #' @param point_size (optional; default \code{0.9}) the size of the individual points in the plot.
 #' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
 #' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
@@ -483,15 +483,17 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 # 5. PLOT QC
 ############
 
-#' Plot covariates
+#' Visualize the distribution of the cell-specific covariates
 #'
-#' @param sceptre_object TBD
+#' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
 #' @param response_n_umis_range TBD
 #' @param response_n_nonzero_range TBD
 #' @param p_mito_threshold TBD
 #'
 #' @return TBD
 #' @export
+#' @examples
+#' # A full example can be found at \code{?sceptre}
 plot_covariates <- function(sceptre_object,
                             response_n_umis_range = c(0.01, 0.99),
                             response_n_nonzero_range = c(0.01, 0.99),
