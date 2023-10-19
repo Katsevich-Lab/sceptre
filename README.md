@@ -15,6 +15,13 @@ computational challenges. `sceptre` is an R package for single-cell
 CRISPR screen data analysis, emphasizing statistical rigor,
 computational efficiency, and ease of use.
 
+**Update October 2023**: We have released `sceptre` version 0.4.0, which
+is a substantial rework of the package. `sceptre` is now easier to use,
+faster, more memory efficient, and more fully featured than before.
+Also, we have written an
+[e-book](https://timothy-barry.github.io/sceptre-book/) to guide users
+through the entire process of analyzing their data using `sceptre`.
+
 ## Key features
 
 `sceptre` offers the following key features:
@@ -35,7 +42,6 @@ experimental designs:
 - CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime
   editing
 - Gene and protein expression readout
-- Direct gRNA capture and barcoded gRNA capture
 
 ## Get started
 
@@ -64,8 +70,6 @@ Users can install `sceptre` with the following command:
 - [Barry et al.,
   2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
   “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
-
-See publication list for a full list of publications.
 
 ## Bugs and feature requests
 

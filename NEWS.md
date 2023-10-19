@@ -1,3 +1,18 @@
+# sceptre 0.4.0 (2023-10-19)
+
+Version 0.4.0 is a total rework of the `sceptre` package. The new version of the package has a fresh user interface and is faster, more memory-efficient, and more fully featured than previous versions. We summarize key updates here.
+
+-   We have added a `sceptre_object` class to represent the single-cell CRISPR screen data.
+-   We have unified low-MOI and high-MOI analysis into a single interface.
+-   We have written a [manual](https://timothy-barry.github.io/sceptre-book/) to guide users through the entire process of analyzing their single-cell CRISPR screen data.
+-   We have added a new mixture model method for assigning gRNAs to cells in a principled way.
+-   We have made the experimental high-MOI functionality (from version 0.3.0) the default functionality for high-MOI analysis.
+-   We have added functionality to carry out cell-wise QC.
+-   Mac and Linux users now can run `sceptre` in parallel.
+-   We have added a suite of plotting functions to help users visualize the output of the different steps of the `sceptre` pipeline.
+-   We have added helper functions to facilitate the construction of *cis* and *trans* discovery sets.
+-   We have added a function to import data into `sceptre` from the output of one or more calls to CellRanger count.
+
 # sceptre 0.3.0 (2023-07-13)
 
 Version 0.3.0 introduces a new, experimental high MOI function. We expect the experimental high MOI function to be faster, more memory efficient, and more powerful than the current high MOI function on most datasets. The current high MOI function likely will be deprecated in the next version of the package in favor of the experimental function. Please let us know about your experience using the experimental high MOI function, in particular whether you run into any bugs.

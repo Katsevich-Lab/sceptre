@@ -74,6 +74,20 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="sceptre-040-2023-10-19">sceptre 0.4.0 (2023-10-19)<a class="anchor" aria-label="anchor" href="#sceptre-040-2023-10-19"></a></h2>
+<p>Version 0.4.0 is a total rework of the <code>sceptre</code> package. The new version of the package has a fresh user interface and is faster, more memory-efficient, and more fully featured than previous versions. We summarize key updates here.</p>
+<ul><li>We have added a <code>sceptre_object</code> class to represent the single-cell CRISPR screen data.</li>
+<li>We have unified low-MOI and high-MOI analysis into a single interface.</li>
+<li>We have written a <a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">manual</a> to guide users through the entire process of analyzing their single-cell CRISPR screen data.</li>
+<li>We have added a new mixture model method for assigning gRNAs to cells in a principled way.</li>
+<li>We have made the experimental high-MOI functionality (from version 0.3.0) the default functionality for high-MOI analysis.</li>
+<li>We have added functionality to carry out cell-wise QC.</li>
+<li>Mac and Linux users now can run <code>sceptre</code> in parallel.</li>
+<li>We have added a suite of plotting functions to help users visualize the output of the different steps of the <code>sceptre</code> pipeline.</li>
+<li>We have added helper functions to facilitate the construction of <em>cis</em> and <em>trans</em> discovery sets.</li>
+<li>We have added a function to import data into <code>sceptre</code> from the output of one or more calls to CellRanger count.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="sceptre-030-2023-07-13">sceptre 0.3.0 (2023-07-13)<a class="anchor" aria-label="anchor" href="#sceptre-030-2023-07-13"></a></h2>
 <p>Version 0.3.0 introduces a new, experimental high MOI function. We expect the experimental high MOI function to be faster, more memory efficient, and more powerful than the current high MOI function on most datasets. The current high MOI function likely will be deprecated in the next version of the package in favor of the experimental function. Please let us know about your experience using the experimental high MOI function, in particular whether you run into any bugs.</p>
 <p>We also have added a new plotting function, namely <code>plot_resampling_distribution</code>. Small changes to the API of the <code>run_sceptre_lowmoi</code> function are detailed in the function documentation.</p>
