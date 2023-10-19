@@ -7,12 +7,18 @@
 \S4method{plot}{sceptre_object}(x, y, ...)
 }
 \arguments{
-\item{x}{a sceptre_object}
+\item{x}{a \code{sceptre_object}}
 
-\item{y}{discarded}
+\item{y}{ignored argument}
 
-\item{...}{TBD}
+\item{...}{arguments passed to the plotting function dispatched by \code{plot()}}
 }
 \description{
-Plot
+\code{plot()} creates a plot representing a \code{sceptre_object}.
+}
+\details{
+\code{plot()} is "generic" in the sense that it dispatches a specific plotting function based on the pipeline function that was most recently called on the \code{sceptre_object}. For example, if \code{run_assign_grnas()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_assign_grnas()}. Similarly, if \code{run_power_check()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_power_check()}, and so on. Users can pass arguments to the function dispatched by \code{plot()} as named arguments to \code{plot()}.
+}
+\examples{
+# A full example can be found at ?sceptre
 }

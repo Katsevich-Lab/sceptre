@@ -336,22 +336,6 @@ plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transp
 ############################
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
-
-#' Title
-#'
-#' @param calibration_result
-#' @param discovery_result
-#' @param p_thresh
-#' @param transform_scale
-#' @param include_legend
-#' @param include_y_axis_text
-#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
-#'
-#' @return
-#' @export
-#'
-#' @examples
 compare_calibration_and_discovery_results <- function(calibration_result, discovery_result, p_thresh,
                                                       transform_scale = TRUE, include_legend = FALSE,
                                                       include_y_axis_text = TRUE, point_size = 0.55,
@@ -401,18 +385,6 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
 }
 
 
-#' Title
-#'
-#' @param discovery_result
-#' @param p_thresh
-#' @param x_limits
-#' @param transparency
-#' @param point_size
-#'
-#' @return
-#' @export
-#'
-#' @examples
 make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5), transparency = 0.5, point_size = 0.55) {
   p_lower_lim <- 1e-12
   out <- ggplot2::ggplot(data = discovery_result |> dplyr::mutate(reject = p_value < p_thresh,
