@@ -115,6 +115,12 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/gene_names_highmoi.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/gene_position_data_frame_grch38.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/gene_position_table_grch38.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/generate_all_pairs.html</loc>
   </url>
   <url>
