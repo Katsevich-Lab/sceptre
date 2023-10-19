@@ -1,5 +1,4 @@
 library(testthat)
-library(pkg)
+library(sceptre)
 
-test_check("pkg")
-
+test_check("sceptre")
