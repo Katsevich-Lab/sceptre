@@ -150,7 +150,7 @@ make_mock_grna_target_data <- function(num_guides_per_target, chr_distances, chr
     0:(dims[1] - 1), dims[1]:1, # sequence columns
     seq(0, big, length = dims[1]) |> round(), seq(big, 1, length = dims[1]) |> round()
   ) |>
-    magrittr::set_colnames(NULL) # the use of `big` adds a single column name
+    set_colnames(NULL) # the use of `big` adds a single column name
 
   # if we have more columns than the deterministic patterns, then
   # duplicate the patterned matrix as many times as we can and

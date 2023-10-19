@@ -27,29 +27,23 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
-    magrittr,
     Matrix,
     methods,
+    purrr,
+    readr,
     Rcpp (>= 1.0.9),
-    stats
+    stats,
+    scales,
+    R.utils
 Depends: 
     R (>= 4.1)
 Suggests:
-    MASS,
     knitr,
-    doParallel,
-    foreach,
-    fst,
-    purrr,
-    R.utils,
-    scales,
-    sn,
-    tidyr,
-    VGAM,
     rmarkdown,
     parallel,
     testthat (>= 3.0.0),
-    readr
+    magrittr,
+    MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/Katsevich-Lab/sceptre
