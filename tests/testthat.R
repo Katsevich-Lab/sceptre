@@ -1,3 +1,4 @@
+library(magrittr)
 library(testthat)
 library(sceptre)
 
