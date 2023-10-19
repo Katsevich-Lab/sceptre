@@ -35,8 +35,6 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' @return NULL
 #' @export
 setMethod("print", signature = signature("sceptre_object"), function(x) {
-  args <- list(...)
-  print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
 
   # 1. print analysis status
