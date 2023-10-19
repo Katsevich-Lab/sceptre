@@ -50,13 +50,14 @@ reference:
   - write_outputs_to_directory
   - get_result
 
-- title: "Example data"
+- title: "Data"
   desc: >
     Example data to illustrate use of the functions
   contents:
   - highmoi_example_data
   - grna_target_data_frame_highmoi
   - lowmoi_example_data
+  - gene_position_data_frame_grch38
 
 authors:
   sidebar:

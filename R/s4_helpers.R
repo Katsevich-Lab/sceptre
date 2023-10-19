@@ -29,10 +29,12 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 
 #' Print
 #'
-#' @param x a sceptre_object
-#' @param ... TDB
+#' `print()` prints information about the dataset and the status of the analysis to the console.
+#'
+#' @param x a `sceptre_object`
+#' @return NULL
 #' @export
-setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
+setMethod("print", signature = signature("sceptre_object"), function(x) {
   args <- list(...)
   print_full_output <- !is.null(args[["full_output"]]) && args[["full_output"]]
   show(x)
@@ -61,13 +63,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x, ...) {
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
              "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
-             if (!print_full_output) NULL else {
-               paste0(
-                 "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
-                 "\n\t\U2022 B1: ", if (length(x@B1) == 0L) "not specified" else crayon::blue(x@B1), ", ",
-                 "B2: ", if (length(x@B2) == 0L) "not specified" else crayon::blue(x@B2), ", ",
-                 "B3: ", if (length(x@B3) == 0L) "not specified" else crayon::blue(x@B3))
-             },
              "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
   ))
 

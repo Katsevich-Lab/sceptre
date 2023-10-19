@@ -7,10 +7,13 @@
 get_result(sceptre_object, analysis)
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object}}
 
-\item{analysis}{TBD}
+\item{analysis}{a string indicating the name of the analysis whose results we are querying, one of "run_calibration_check", "run_power_check", or "run_discovery_analysis".}
+}
+\value{
+a data frame containing the results of the analysis
 }
 \description{
-Get result
+\code{get_result()} returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 }
