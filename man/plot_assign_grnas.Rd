@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_assign_grnas}
 \alias{plot_assign_grnas}
-\title{Plot the outcome of the gRNA-to-cell assignment step}
+\title{Plot assign gRNAs}
 \usage{
 plot_assign_grnas(
   sceptre_object,
@@ -15,11 +15,11 @@ plot_assign_grnas(
 )
 }
 \arguments{
-\item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_gras} called on it.}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_gras()} called on it.}
 
-\item{n_grnas_to_plot}{(optional; default \code{3}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.}
+\item{n_grnas_to_plot}{(optional; default \code{3}) the number of different gRNAs to display in the plots of gRNA count versus cell assigment.}
 
-\item{grnas_to_plot}{(optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then the gRNAs are chosen at random.}
+\item{grnas_to_plot}{(optional; default \code{NULL}) a character vector giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs are chosen at random.}
 
 \item{point_size}{(optional; default \code{0.9}) the size of the individual points in the plot.}
 
@@ -27,14 +27,17 @@ plot_assign_grnas(
 
 \item{n_max_0_grna_unprtb_plot}{(optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 }
 \description{
-Plot the outcome of the gRNA-to-cell assignment step
+\code{plot_assign_grnas()} plots the outcome of the gRNA-to-cell assignment step.
 }
 \examples{
-# A full example can be found at \code{?sceptre}
+# A full example can be found at ?sceptre;
+# `plot_assign_grnas()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 4 (the gRNA assignment step).
 }

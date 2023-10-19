@@ -120,21 +120,26 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   return(p)
 }
 
-#' Plot the outcome of the gRNA-to-cell assignment step
+#' Plot assign gRNAs
 #'
-#' @param sceptre_object a \code{sceptre_object} that has had \code{assign_gras} called on it.
-#' @param n_grnas_to_plot (optional; default \code{3}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.
-#' @param grnas_to_plot (optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then the gRNAs are chosen at random.
+#' `plot_assign_grnas()` plots the outcome of the gRNA-to-cell assignment step.
+#'
+#' @param sceptre_object a \code{sceptre_object} that has had `assign_gras()` called on it.
+#' @param n_grnas_to_plot (optional; default \code{3}) the number of different gRNAs to display in the plots of gRNA count versus cell assigment.
+#' @param grnas_to_plot (optional; default \code{NULL}) a character vector giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs are chosen at random.
 #' @param point_size (optional; default \code{0.9}) the size of the individual points in the plot.
 #' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
-#' @param return_indiv_plots (optional; default \code{FALSE}) return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE})?
+#' @param return_indiv_plots (optional; default \code{FALSE}) a logical specifying whether  return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE}).
 #' @param n_max_0_grna_unprtb_plot (optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre;
+#' # `plot_assign_grnas()` is dispatched when
+#' # `plot()` is called on the `sceptre_object`
+#' # in step 4 (the gRNA assignment step).
 plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, point_size = 0.9, transparency = 0.8, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
   if(!sceptre_object@functs_called["assign_grnas"]) {
     stop("This `sceptre_object` has not yet had `assign_grnas` called on it.")
