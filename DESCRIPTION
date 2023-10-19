@@ -47,7 +47,9 @@ Suggests:
     VGAM,
     rmarkdown,
     parallel,
+    testthat (>= 3.0.0)
     readr
 VignetteBuilder: knitr
+Config/testthat/edition: 3
 URL: https://github.com/Katsevich-Lab/sceptre
 LazyData: true

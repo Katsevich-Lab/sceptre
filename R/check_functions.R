@@ -44,19 +44,29 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     stop("The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide.")
   }
 
-  # 9. if applicable, check that the cell barcodes match across the grna, gene, and covariate matrices
-  check_barcodes_provided <- function(barcodes) {
-    !is.null(barcodes) && !all(grepl(pattern = "^[0-9]+$", x = barcodes))
-  }
-  response_cell_barcodes <- colnames(response_matrix)
-  grna_cell_barcodes <- colnames(grna_matrix)
-  covariate_cell_barcodes <- rownames(extra_covariates)
-  if (check_barcodes_provided(response_cell_barcodes) &&
-      check_barcodes_provided(grna_cell_barcodes) &&
-      check_barcodes_provided(covariate_cell_barcodes)) {
-    if (!(identical(response_cell_barcodes, grna_cell_barcodes) &&
-          identical(response_cell_barcodes, covariate_cell_barcodes))) {
-        stop("You have provided cell barcodes in the `response_matrix`, `grna_matrix`, and `extra_covariates`. These cell barcodes must have the same ordering across objects.")
+  # 9. if cell barcodes are provided for at least two of `response_matrix`, `grna_matrix`, and `extra_covariates`,
+  # then they must be identical
+  barcode_list <- list(response_matrix = colnames(response_matrix), grna_matrix = colnames(grna_matrix),
+                       extra_covariates = rownames(extra_covariates))
+  # for matrices we can just check if the names are not NULL, but `extra_covariates` is a data.frame so
+  # non-default names were provided if (1) it is not just `data.frame()` and (2) the names are not
+  # just "1", "2", ...
+  were_names_provided <- c(
+    !is.null(barcode_list$response_matrix),
+    !is.null(barcode_list$grna_matrix),
+    nrow(extra_covariates) > 0 && !identical(barcode_list$extra_covariates, as.character(1:nrow(extra_covariates)))
+  )
+  # If at least 2 non-default barcode names were provided, they must all be identical.
+  # This is done by looping over all pairs of non-default names
+  barcodes_with_names <- barcode_list[were_names_provided]
+  if (length(barcodes_with_names) >= 2) {
+    for (i in seq_len(length(barcodes_with_names) - 1)) {
+      for (j in seq(i+1, length(barcodes_with_names))) {
+        if (!identical(barcodes_with_names[[i]], barcodes_with_names[[j]])) {
+          stop(paste0("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
+                      "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects."))
+        }
+      }
     }
   }
 
@@ -70,7 +80,8 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
   # 11. verify that the types of the extra covariates are acceptable
   for (extra_covariate_name in extra_covariate_names) {
     v <- extra_covariates[,extra_covariate_name]
-    accept_type <- methods::is(v, "numeric") || methods::is(v, "character") || methods::is(v, "factor")
+    accept_type <- methods::is(v, "numeric") || methods::is(v, "character") ||
+      methods::is(v, "factor") || methods::is(v, "logical")
     if (!accept_type) {
       stop(paste0("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor."))
     }
@@ -79,6 +90,14 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
   # 12. verify that moi is specified
   if (!(moi %in% c("low", "high"))) {
     stop("`moi` should be either `low` or `high`.")
+  }
+
+  # 13. fail if extra_covariates has NA or inifinite values
+  if (any(is.na(extra_covariates))) {
+    stop("`extra_covariates` has NA values which need to be removed.")
+  }
+  if (any(sapply(extra_covariates, function(vect) any(is.infinite(vect))))) {
+    stop("`extra_covariates` has infinite values which need to be removed.")
   }
 
   return(NULL)
