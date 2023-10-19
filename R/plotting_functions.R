@@ -129,7 +129,6 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #' @param grnas_to_plot (optional; default \code{NULL}) a character vector giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs are chosen at random.
 #' @param point_size (optional; default \code{0.9}) the size of the individual points in the plot.
 #' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
-#' @param return_indiv_plots (optional; default \code{FALSE}) a logical specifying whether  return a single combined plot (\code{TRUE}) or the individual plots in a list (\code{FALSE}).
 #' @param n_max_0_grna_unprtb_plot (optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.
 #' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
