@@ -75,11 +75,6 @@ convert_pointer_to_index_vector_v2 <- function(p) {
   rep(x = seq(0, length(l) - 1L), times = l)
 }
 
-
-df = data.frame(x = c(NA, 2, 3))
-stats::model.matrix(object = formula("~ x"), data = df)
-
-
 convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_object) {
   global_cell_covariates_new <- stats::model.matrix(object = formula_object, data = covariate_data_frame)
   # verify that the global cell covariates are OK after transformation
