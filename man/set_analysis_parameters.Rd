@@ -26,21 +26,21 @@ set_analysis_parameters(
 
 \item{positive_control_pairs}{(optional) a data frame with columns \code{grna_target} and \code{response_id} specifying the positive control pairs to analyze}
 
-\item{side}{(optional) the sidedness of the test, one of "left", "right", or "both"}
+\item{side}{(optional; default \code{"both"}) the sidedness of the test, one of \code{"left"}, \code{"right"}, or \code{"both"}}
 
-\item{grna_integration_strategy}{(optional) a string specifying the gRNA integration strategy, either "singleton" or "union"}
+\item{grna_integration_strategy}{(optional; default \code{"union"}) a string specifying the gRNA integration strategy, either \code{"singleton"} or \code{"union"}}
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{fit_parametric_curve}{(optional) a logical indicating whether to fit a parametric curve to the null distribution of test statistics}
+\item{fit_parametric_curve}{(optional; default \code{TRUE}) a logical indicating whether to fit a parametric curve to the null distribution of test statistics}
 
-\item{control_group}{(optional) a string specifying the control group to use, either "complement" or "nt_cells"}
+\item{control_group}{(optional) a string specifying the control group to use, either \code{"complement"} or \code{"nt_cells"}}
 
-\item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either "permutations" or "crt"}
+\item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either \code{"permutations"} or \code{"crt"}}
 
-\item{multiple_testing_method}{(optional) a string specifying the multiple testing correction method to use; see p.adjust.methods for options}
+\item{multiple_testing_method}{(optional; default \code{"BH"}) a string specifying the multiple testing correction method to use; see \code{p.adjust.methods} for options}
 
-\item{multiple_testing_alpha}{(optional) a numeric specifying the nominal level of the multiple testing correction method}
+\item{multiple_testing_alpha}{(optional; default \code{0.1}) a numeric specifying the nominal level of the multiple testing correction method}
 }
 \value{
 an updated \code{sceptre_object} in which the analysis parameters have been set

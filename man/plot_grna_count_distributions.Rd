@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_grna_count_distributions}
 \alias{plot_grna_count_distributions}
-\title{Plot the number of cells per gRNA count}
+\title{Plot gRNA count distributions}
 \usage{
 plot_grna_count_distributions(
   sceptre_object,
@@ -12,17 +12,23 @@ plot_grna_count_distributions(
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{any initialized \code{sceptre_object}. \code{plot_grna_count_distributions()} can be called at any point in the pipeline after \code{import_data()}.}
 
-\item{n_grnas_to_plot}{(optional; default \code{4}) the number of different gRNAs to plot}
+\item{n_grnas_to_plot}{(optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot}
 
-\item{grnas_to_plot}{(optional; default NULL) the names of specific gRNAs to plot. If \code{NULL} then random ones are picked.}
+\item{grnas_to_plot}{(optional; default \code{NULL}) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then \code{n_grnas_to_plot} random gRNAs are plotted.}
 
-\item{threshold}{(optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL} then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.}
+\item{threshold}{(optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.}
 }
 \value{
-a single \code{ggplot2} plot. The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bins grow exponentially fast in size.
+a single \code{ggplot2} plot
 }
 \description{
-Plot the number of cells per gRNA count
+\code{plot_grna_count_distributions()} plots the empirical UMI count distribution of one or more gRNAs.
+}
+\details{
+The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
+}
+\examples{
+# A full example can be found at ?sceptre
 }
