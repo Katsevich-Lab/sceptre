@@ -16,15 +16,15 @@ run_calibration_check(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{(optional) an integer taking values 1, 2, or 3 specifying the amount of information to return}
+\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return}
 
 \item{n_calibration_pairs}{(optional) the number of negative control pairs to construct and test for association}
 
 \item{calibration_group_size}{(optional) the number of negative control gRNAs to put into each negative control target}
 
-\item{print_progress}{(optional) a logical indicating whether to print progress updates}
+\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
-\item{parallel}{(optional) a logical indicating whether to run the function in parallel}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 }
 \value{
 an updated \code{sceptre_object} in which the calibration check has been carried out

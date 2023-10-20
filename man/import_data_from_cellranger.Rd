@@ -39,9 +39,11 @@ extra_covariates <- data.frame(cell_type = cell_type)
 
 # 3. initialize the sceptre_object
 data(grna_target_data_frame_highmoi)
-sceptre_object <- import_data_from_cellranger(directories = directories,
-                                              moi = "high",
-                                              grna_target_data_frame = grna_target_data_frame_highmoi,
-                                              extra_covariates = extra_covariates)
+sceptre_object <- import_data_from_cellranger(
+  directories = directories,
+  moi = "high",
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  extra_covariates = extra_covariates
+ )
 }
 }

@@ -20,12 +20,14 @@ plot_covariates(
 \item{response_n_nonzero_range}{(optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the \code{response_n_nonzero} histogram}
 
 \item{p_mito_threshold}{(optional; default \code{0.2}) a single numeric value in the interval [0,1] specifying the location at which to draw a vertical line on the \code{response_p_mito} histogram. Note that \code{p_mito_threshold} is an absolute number rather than a percentile.}
+
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_covariates()} plots a histogram of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}. To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms.
+\code{plot_covariates()} creates histograms of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}. To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms.
 }
 \examples{
 # A full example can be found at ?sceptre

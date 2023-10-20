@@ -37,6 +37,7 @@ Suggests:
     MASS,
     knitr,
     doParallel,
+    magrittr,
     foreach,
     fst,
     purrr,

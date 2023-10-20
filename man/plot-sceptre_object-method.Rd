@@ -13,8 +13,11 @@
 
 \item{...}{arguments passed to the plotting function dispatched by \code{plot()}}
 }
+\value{
+a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+}
 \description{
-\code{plot()} creates a plot representing a \code{sceptre_object}.
+\code{plot()} creates a plot depicting the current state of a \code{sceptre_object}.
 }
 \details{
 \code{plot()} is "generic" in the sense that it dispatches a specific plotting function based on the pipeline function that was most recently called on the \code{sceptre_object}. For example, if \code{run_assign_grnas()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_assign_grnas()}. Similarly, if \code{run_power_check()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_power_check()}, and so on. Users can pass arguments to the function dispatched by \code{plot()} as named arguments to \code{plot()}.

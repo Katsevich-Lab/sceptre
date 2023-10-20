@@ -23,10 +23,12 @@
 #'
 #' # 3. initialize the sceptre_object
 #' data(grna_target_data_frame_highmoi)
-#' sceptre_object <- import_data_from_cellranger(directories = directories,
-#'                                               moi = "high",
-#'                                               grna_target_data_frame = grna_target_data_frame_highmoi,
-#'                                               extra_covariates = extra_covariates)
+#' sceptre_object <- import_data_from_cellranger(
+#'   directories = directories,
+#'   moi = "high",
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   extra_covariates = extra_covariates
+#'  )
 #' }
 import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame()) {
   # 1. check that directories exist
