@@ -24,7 +24,7 @@ import_data(
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute}
 
-\item{response_names}{(optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate \code{response_p_mito}}
+\item{response_names}{(optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate \code{response_p_mito}.}
 }
 \value{
 an initialized \code{sceptre_object}

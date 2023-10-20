@@ -3,11 +3,11 @@
 #' `run_calibration_check()` runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
 #' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
 #' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
-#' @param print_progress (optional) a logical indicating whether to print progress updates
-#' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
 #' @export
@@ -61,9 +61,9 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 #' `run_power_check()` runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional) a logical indicating whether to print progress updates
-#' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
 #' @return an updated `sceptre_object` in which the power check has been carried out
 #'
 #' @export
@@ -107,9 +107,9 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #' `run_discovery_analysis()` runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional) a logical indicating whether to print progress updates
-#' @param parallel (optional) a logical indicating whether to run the function in parallel
+#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
 #' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
 #' @export
@@ -219,7 +219,7 @@ apply_grouping_to_result <- function(result, sceptre_object) {
 #' `get_result()` returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param analysis a string indicating the name of the analysis whose results we are querying, one of "run_calibration_check", "run_power_check", or "run_discovery_analysis".
+#' @param analysis a string indicating the name of the analysis whose results we are querying, one of `"run_calibration_check"`, `"run_power_check"`, or `"run_discovery_analysis"`.
 #'
 #' @returns a data frame containing the results of the analysis
 #' @export
