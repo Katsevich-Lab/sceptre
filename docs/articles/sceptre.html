@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,6 +70,13 @@
     Changelog
   </a>
 </li>
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions">
+    <span class="fa fa-users"></span>
+     
+    Community
+  </a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -110,10 +117,15 @@ the following command.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span></span></code></pre></div>
-<p>Users can load <code>sceptre</code> via a call to
-<code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>.</p>
+<p>(Please see <a href="install.html">this page</a> for instructions to
+install older versions of <code>sceptre</code>, though we recommend
+users switch to the latest version as soon as they can.) Users can load
+<code>sceptre</code> via a call to <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Katsevich-Lab/sceptre" class="external-link">sceptre</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Katsevich-Lab/sceptre" class="external-link">sceptre</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">Welcome to sceptre.</span></span></span>
+<span><span class="co"><span style="color: #0000BB;">#&gt; Submit issues on the sceptre website: </span><span style="color: #BB0000;">github.com/Katsevich-Lab/sceptre</span></span></span>
+<span><span class="co"><span style="color: #0000BB;">#&gt; Read the sceptre manual: </span><span style="color: #BB0000;">timothy-barry.github.io/sceptre-book/</span></span></span></code></pre></div>
 <p>The standard pipeline involved in applying <code>sceptre</code> to
 analyze a dataset consists of several steps, which we summarize in the
 following schematic.</p>

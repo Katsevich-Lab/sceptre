@@ -8,7 +8,7 @@ output: html_document
 To install the latest version of `sceptre` from GitHub (currently v0.99.x, i.e. the beta version of `sceptre` 1.0.0), please run the following code from your R console:
 
 ```{r eval = FALSE}
-install.packages("devtools")
+install.packages("devtools") # if necessary
 devtools::install_github("katsevich-lab/sceptre")
 ```
 
@@ -17,5 +17,8 @@ devtools::install_github("katsevich-lab/sceptre")
 To install the previous stable version of the package (v0.3.0), please run the following code from your R console:
 
 ```{r eval = FALSE}
+install.packages("devtools") # if necessary
+devtools::install_github("katsevich-lab/sceptre", ref = "v0.3.0")
 ```
 
+We recommend that users switch to `sceptre` v0.99.x as soon as they can.

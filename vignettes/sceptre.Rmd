@@ -21,7 +21,7 @@ install.packages("devtools")
 devtools::install_github("katsevich-lab/sceptre")
 ```
 
-Users can load `sceptre` via a call to `library()`.
+(Please see [this page](install.html) for instructions to install older versions of `sceptre`, though we recommend users switch to the latest version as soon as they can.) Users can load `sceptre` via a call to `library()`.
 
 ```{r,results='hide'}
 library(sceptre)
