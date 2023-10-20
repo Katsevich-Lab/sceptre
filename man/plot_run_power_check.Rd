@@ -30,5 +30,8 @@ The \code{plot_run_power_check} function helps to visualize the results of a pow
 The plot shows positive and negative control p-values, plotted with jitter so each p-value is visible, on a reversed log10 scale.
 }
 \examples{
-# A full example can be found at \code{?sceptre}
+# A full example can be found at ?sceptre;
+# `plot_run_power_check()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 6 (the run power check step).
 }

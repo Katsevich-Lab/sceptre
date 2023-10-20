@@ -29,7 +29,7 @@ get_my_theme <- function(element_text_size = 11) {
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
   grna_matrix <- sceptre_object@grna_matrix
   # rounding just in case the user provides a non-integer one
-  if(!is.null(threshold)) threshold <- round(threshold)
+  if (!is.null(threshold)) threshold <- round(threshold)
   if (is.null(grnas_to_plot)) {
     grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
   } else {
@@ -53,7 +53,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
     bin_upper_bounds <- 0:max_single_bin
     bin_labels <-  as.character(bin_upper_bounds)
-    if(max_expression_count > 10) { # now we need to add exp growing bins, w/ more complex labels
+    if (max_expression_count > 10) { # now we need to add exp growing bins, w/ more complex labels
       # this next section relies on the fact that the upper bounds are going to be at locations
       # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 + 2^2 + 2^3, ...
       # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
@@ -91,7 +91,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
       ) +
       ggplot2::ggtitle(curr_grna_id) +
       ggplot2::scale_x_discrete(drop = FALSE)
-    if(!is.null(threshold)) {
+    if (!is.null(threshold)) {
       # adding +.5 so it is after the bin rather than through the middle
       p <- p + ggplot2::geom_vline(xintercept = threshold + .5, color = "mediumseagreen", linetype = "dashed")
     }
@@ -138,9 +138,9 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #' # A full example can be found at ?sceptre;
 #' # `plot_assign_grnas()` is dispatched when
 #' # `plot()` is called on the `sceptre_object`
-#' # in step 4 (the gRNA assignment step).
+#' # in step 3 (the gRNA assignment step).
 plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, point_size = 0.9, transparency = 0.8, n_max_0_grna_unprtb_plot = 1000, return_indiv_plots = FALSE) {
-  if(!sceptre_object@functs_called["assign_grnas"]) {
+  if (!sceptre_object@functs_called["assign_grnas"]) {
     stop("This `sceptre_object` has not yet had `assign_grnas` called on it.")
   }
   init_assignments <- sceptre_object@initial_grna_assignment_list
@@ -270,9 +270,12 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #' \item{Technical point: when applying BH at level 0.1 to a collection of strictly null p-values, BH controls family-wise error rate (FWER) at level 0.1 as well as FDR at level 0.1. FWER is the probability of making one or more false discoveries. Thus, with probability 0.9, the number of rejections that BH makes on (well-calibrated) null p-values at level 0.1 is 0. This implies that \code{sceptre} (or any method for that matter) should make about zero false discoveries on negative control p-values data after applying a BH correction at level 0.1.}
 #' }
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre;
+#' # `plot_run_calibration_check()` is dispatched when
+#' # `plot()` is called on the `sceptre_object`
+#' # in step 5 (the run calibration check step).
 plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if(!sceptre_object@functs_called["run_calibration_check"]) {
+  if (!sceptre_object@functs_called["run_calibration_check"]) {
     stop("This `sceptre_object` has not yet had `run_calibration_check` called on it.")
   }
   calibration_result <- sceptre_object@calibration_result
@@ -404,17 +407,22 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 
 #' Plot run discovery analysis
 #'
+#' `plot_run_discovery_analysis()` visualizes the results of the discovery analysis.
+#'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it
-#' @param x_limits TBD
+#' @param x_limits (optional; default \code{c(-1.5, 1.5)}) a numeric vector of length 2 giving the lower and upper limits of the x-axis (corresponding to log fold change) for the "Discovery volcano plot" panel.
 #' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
 #' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
 #' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
 #'
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre;
+#' # `plot_run_discovery_analysis()` is dispatched when
+#' # `plot()` is called on the `sceptre_object`
+#' # in step 7 (the run discovery analysis step).
 plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5), point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if(!sceptre_object@functs_called["run_discovery_analysis"]) {
+  if (!sceptre_object@functs_called["run_discovery_analysis"]) {
     stop("This `sceptre_object` has not yet had `run_discovery_analysis` called on it.")
   }
   # first, compute the rejection set
@@ -472,24 +480,24 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 ############
 # 5. PLOT QC
 ############
-
 #' Plot covariates
 #'
-#' `plot_covariates()` creates a plot to visualize the distribution of the cell-specific covariates.
+#' `plot_covariates()` plots a histogram of several cell-specific covariates: `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`. To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms.
 #'
-#' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
-#' @param response_n_umis_range TBD
-#' @param response_n_nonzero_range TBD
-#' @param p_mito_threshold TBD
+#' @param sceptre_object any initialized `sceptre_object`. `plot_covariates()` can be called at any point in the pipeline after \code{import_data()}.
+#' @param response_n_umis_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_umis` histogram
+#' @param response_n_nonzero_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_nonzero` histogram
+#' @param p_mito_threshold (optional; default \code{0.2}) a single numeric value in the interval \[0,1\] specifying the location at which to draw a vertical line on the `response_p_mito` histogram. Note that `p_mito_threshold` is an absolute number rather than a percentile.
 #'
-#' @return TBD
+#' @return  a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre
 plot_covariates <- function(sceptre_object,
                             response_n_umis_range = c(0.01, 0.99),
                             response_n_nonzero_range = c(0.01, 0.99),
-                            p_mito_threshold = 0.2) {
+                            p_mito_threshold = 0.2,
+                            return_indiv_plots = FALSE) {
   covariate_data_frame <- sceptre_object@covariate_data_frame
   make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
     cutoffs <- if (use_quantile) stats::quantile(v, probs = curr_range) else curr_range
@@ -513,9 +521,9 @@ plot_covariates <- function(sceptre_object,
   if (p_mito_present) {
     p3 <- make_histogram(covariate_data_frame$response_p_mito, p_mito_threshold,
                          plot_tit = "Percent mito", use_quantile = FALSE)
-    p_out <- cowplot::plot_grid(p1, p2, p3, NULL, ncol = 2)
+    p_out <- if (return_indiv_plots) list(p1, p2, p3) else cowplot::plot_grid(p1, p2, p3, NULL, ncol = 2)
   } else {
-    p_out <- cowplot::plot_grid(p1, p2, ncol = 2)
+    p_out <- if (return_indiv_plots) list(p1, p2) else cowplot::plot_grid(p1, p2, ncol = 2)
   }
   return(p_out)
 }
@@ -531,9 +539,12 @@ plot_covariates <- function(sceptre_object,
 #'
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre;
+#' # `plot_run_qc()` is dispatched when
+#' # `plot()` is called on the `sceptre_object`
+#' # in step 4 (the run qc step).
 plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if(!sceptre_object@functs_called["run_qc"]) {
+  if (!sceptre_object@functs_called["run_qc"]) {
     stop("This `sceptre_object` has not yet had `run_qc` called on it.")
   }
   my_cols <- c("mediumseagreen", "indianred2")
@@ -610,9 +621,12 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
 #' @return a single \code{ggplot2} plot.
 #' @export
 #' @examples
-#' # A full example can be found at \code{?sceptre}
+#' # A full example can be found at ?sceptre;
+#' # `plot_run_power_check()` is dispatched when
+#' # `plot()` is called on the `sceptre_object`
+#' # in step 6 (the run power check step).
 plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
-  if(!sceptre_object@functs_called["run_power_check"]) {
+  if (!sceptre_object@functs_called["run_power_check"]) {
     stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
   }
   calibration_result <- sceptre_object@power_result

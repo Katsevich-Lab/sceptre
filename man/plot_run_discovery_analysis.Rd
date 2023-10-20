@@ -15,7 +15,7 @@ plot_run_discovery_analysis(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it}
 
-\item{x_limits}{TBD}
+\item{x_limits}{(optional; default \code{c(-1.5, 1.5)}) a numeric vector of length 2 giving the lower and upper limits of the x-axis (corresponding to log fold change) for the "Discovery volcano plot" panel.}
 
 \item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot.}
 
@@ -24,8 +24,11 @@ plot_run_discovery_analysis(
 \item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \description{
-Plot run discovery analysis
+\code{plot_run_discovery_analysis()} visualizes the results of the discovery analysis.
 }
 \examples{
-# A full example can be found at \code{?sceptre}
+# A full example can be found at ?sceptre;
+# `plot_run_discovery_analysis()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 7 (the run discovery analysis step).
 }
