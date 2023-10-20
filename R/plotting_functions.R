@@ -533,8 +533,10 @@ plot_covariates <- function(sceptre_object,
 
 #' Plot run QC
 #'
+#' `plot_run_qc()` visualizes the outcome of the QC step.
+#'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_qc} called on it
-#' @param downsample_pairs TBD
+#' @param downsample_pairs (optional; default \code{10000}) integer; the discovery pairs in `sceptre_object` are downsampled to just `downsample_pairs` pairs, speeding up the "PairWise QC" plot in the lower panel
 #' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot.
 #' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot.
 #' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
