@@ -56,17 +56,18 @@ CRISPR screens, starting from UMI count data obtained from tools like
 -   Gene-targeting and noncoding-regulatory-element-targeting
 -   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
 -   Gene and protein expression readout
-&#10;### Featured publications
-&#10;-   [Morris et al., 2023](https://www.science.org/doi/10.1126/science.adh7699). "Discovery of target genes and pathways...". *Science*.
--   [Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
-&#10;-->
+&#10;## Get started
+&#10;The fastest way to get started with `sceptre` is to work through the [Get Started vignette](articles/sceptre.html) (30 minutes). Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
+-->
 
-## Get started
+## Featured publications
 
-The fastest way to get started with `sceptre` is to work through the
-[Get Started vignette](articles/sceptre.html) (30 minutes). Users also
-can read the `sceptre`
-[manual](https://timothy-barry.github.io/sceptre-book/).
+- [Morris et al.,
+  2023](https://www.science.org/doi/10.1126/science.adh7699). “Discovery
+  of target genes and pathways…”. *Science*.
+- [Barry et al.,
+  2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+  “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
 
 ## Bug reports, feature requests, and software questions
 

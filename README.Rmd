@@ -62,16 +62,15 @@ Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR and singl
 -   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
 -   Gene and protein expression readout
 
-### Featured publications
-
--   [Morris et al., 2023](https://www.science.org/doi/10.1126/science.adh7699). "Discovery of target genes and pathways...". *Science*.
--   [Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
-
--->
-
 ## Get started
 
 The fastest way to get started with `sceptre` is to work through the [Get Started vignette](articles/sceptre.html) (30 minutes). Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
+-->
+
+## Featured publications
+
+-   [Morris et al., 2023](https://www.science.org/doi/10.1126/science.adh7699). "Discovery of target genes and pathways...". *Science*.
+-   [Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
 
 ## Bug reports, feature requests, and software questions
 
