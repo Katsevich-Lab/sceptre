@@ -39,5 +39,5 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 # A full example can be found at ?sceptre;
 # `plot_assign_grnas()` is dispatched when
 # `plot()` is called on the `sceptre_object`
-# in step 4 (the gRNA assignment step).
+# in step 3 (the gRNA assignment step).
 }

@@ -43,5 +43,8 @@ The plot contains four panels.
 }
 }
 \examples{
-# A full example can be found at \code{?sceptre}
+# A full example can be found at ?sceptre;
+# `plot_run_calibration_check()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 5 (the run calibration check step).
 }

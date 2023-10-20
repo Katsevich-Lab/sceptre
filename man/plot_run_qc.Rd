@@ -27,5 +27,8 @@ plot_run_qc(
 Plot run QC
 }
 \examples{
-# A full example can be found at \code{?sceptre}
+# A full example can be found at ?sceptre;
+# `plot_run_qc()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 4 (the run qc step).
 }
