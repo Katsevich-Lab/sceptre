@@ -622,7 +622,7 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
   set.seed(3)
   my_cols <- c("mediumseagreen", "firebrick1")
 
-  pos_ctrl_pvals <- sceptre_object@power_result$p_value |> na.omit()
+  pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
   neg_ctrl_pvals <- sceptre_object@calibration_result$p_value
 
   group_names <- c("Positive Control", "Negative Control")
