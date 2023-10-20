@@ -15,7 +15,7 @@ plot_run_qc(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object} that has had \code{run_qc} called on it}
 
-\item{downsample_pairs}{TBD}
+\item{downsample_pairs}{(optional; default \code{10000}) integer; the discovery pairs in \code{sceptre_object} are downsampled to just \code{downsample_pairs} pairs, speeding up the "PairWise QC" plot in the lower panel}
 
 \item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot.}
 
@@ -24,7 +24,7 @@ plot_run_qc(
 \item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \description{
-Plot run QC
+\code{plot_run_qc()} visualizes the outcome of the QC step.
 }
 \examples{
 # A full example can be found at ?sceptre;
