@@ -101,11 +101,18 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 
 #' Plot
 #'
-#' @param x a sceptre_object
-#' @param y discarded
-#' @param ... TBD
+#' `plot()` creates a plot depicting the current state of a `sceptre_object`.
+#'
+#' `plot()` is "generic" in the sense that it dispatches a specific plotting function based on the pipeline function that was most recently called on the `sceptre_object`. For example, if `run_assign_grnas()` is the most recently called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`. Similarly, if `run_power_check()` is the most recently called pipeline function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users can pass arguments to the function dispatched by `plot()` as named arguments to `plot()`.
+#'
+#' @param x a `sceptre_object`
+#' @param y ignored argument
+#' @param ... arguments passed to the plotting function dispatched by `plot()`
+#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
 #' @export
+#' @examples
+#' # A full example can be found at ?sceptre
 setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
   args <- list(...)
   args[["sceptre_object"]] <- x

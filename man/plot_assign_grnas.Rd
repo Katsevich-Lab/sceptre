@@ -2,36 +2,42 @@
 % Please edit documentation in R/plotting_functions.R
 \name{plot_assign_grnas}
 \alias{plot_assign_grnas}
-\title{Plot the number of gRNAs per cell}
+\title{Plot assign gRNAs}
 \usage{
 plot_assign_grnas(
   sceptre_object,
   n_grnas_to_plot = 3L,
   grnas_to_plot = NULL,
-  transparency = 0.8,
   point_size = 0.9,
+  transparency = 0.8,
   n_max_0_grna_unprtb_plot = 1000,
   return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_grnas()} called on it}
 
-\item{n_grnas_to_plot}{(optional; default \code{2}) the number of different gRNAs shown in the plots of gRNA count versus cell assigment.}
+\item{n_grnas_to_plot}{(optional; default \code{3}) the number of gRNAs to display in the plots of gRNA count versus cell assignment}
 
-\item{grnas_to_plot}{(optional; default \code{NULL}) the names of specific gRNAs to plot; if \code{NULL} then gRNAs are chosen at random.}
+\item{grnas_to_plot}{(optional; default \code{NULL}) a character vector giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs are chosen at random.}
 
-\item{transparency}{TBD}
+\item{point_size}{(optional; default \code{0.9}) the size of the individual points in the plot}
 
-\item{point_size}{TBD}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot}
 
 \item{n_max_0_grna_unprtb_plot}{(optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.}
 
-\item{return_indiv_plots}{TBD}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \value{
-a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE}).
+a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-Plot the number of gRNAs per cell
+\code{plot_assign_grnas()} plots the outcome of the gRNA-to-cell assignment step. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_assign_grnas}{Section 3 of the introductory chapter in the manual} for guidance on interpreting this visual.
+}
+\examples{
+# A full example can be found at ?sceptre;
+# `plot_assign_grnas()` is dispatched when
+# `plot()` is called on the `sceptre_object`
+# in step 3 (the gRNA assignment step).
 }

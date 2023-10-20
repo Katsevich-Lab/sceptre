@@ -2,7 +2,7 @@
 % Please edit documentation in R/pair_constructor_functs.R
 \name{construct_trans_pairs}
 \alias{construct_trans_pairs}
-\title{Construct trans pairs}
+\title{Construct \emph{trans} pairs}
 \usage{
 construct_trans_pairs(
   sceptre_object,
@@ -15,7 +15,7 @@ construct_trans_pairs(
 
 \item{positive_control_pairs}{(optional) the set of positive control pairs}
 
-\item{pairs_to_exclude}{(optional) a string specifying pairs to exclude from the \emph{trans} pairs, one of "none", "pc_pairs", or "pairs_containing_pc_targets"}
+\item{pairs_to_exclude}{(optional; default \code{"none"}) a string specifying pairs to exclude from the \emph{trans} pairs, one of \code{"none"}, \code{"pc_pairs"}, or \code{"pairs_containing_pc_targets"}}
 }
 \value{
 a data frame with columns \code{grna_target} and \code{response_id} containing the \emph{trans} discovery set
@@ -24,5 +24,5 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 \code{construct_trans_pairs()} is a helper function to facilitate construction the set of \emph{trans} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 }
 \details{
-Typically, in screens of genes (resp., noncoding regulatory elements), we set \code{pairs_to_exclude} to "pc_pairs" (resp., "pairs_containing_pc_targets").
+Typically, in screens of genes (resp., noncoding regulatory elements), we set \code{pairs_to_exclude} to \code{"pc_pairs"} (resp., \code{"pairs_containing_pc_targets"}).
 }

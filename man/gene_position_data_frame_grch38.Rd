@@ -3,7 +3,7 @@
 \docType{data}
 \name{gene_position_data_frame_grch38}
 \alias{gene_position_data_frame_grch38}
-\title{Gene position table}
+\title{Gene position data frame}
 \format{
 An object of class \code{data.table} (inherits from \code{data.frame}) with 36572 rows and 3 columns.
 }

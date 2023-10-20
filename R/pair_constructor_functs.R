@@ -1,11 +1,11 @@
-#' Construct cis pairs
+#' Construct *cis* pairs
 #'
 #' `construct_cis_pairs()` is a helper function to facilitate construction the *cis* pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param distance_threshold (optional) target-response pairs located within `distance_threshold` bases of one another and on the same chromosome are included in the *cis* discovery set
-#' @param positive_control_pairs (optional) a data frame with columns `grna_target` and `response_id` containing the positive control pairs; if supplied, the positive control targets are excluded from the *cis* pairs
-#' @param response_position_data_frame (optional) a data frame with columns `response_id`, `chr`, and `position` giving the genomic coordinate of each response; by default `response_position_data_frame` is set to a data frame containing the genomic coordinate of each gene in the human genome relative to reference genome GRCh38
+#' @param distance_threshold (optional) target-response pairs located within `distance_threshold` bases of one another and on the same chromosome are included in the *cis* discovery set.
+#' @param positive_control_pairs (optional) a data frame with columns `grna_target` and `response_id` containing the positive control pairs; if supplied, the positive control targets are excluded from the *cis* pairs.
+#' @param response_position_data_frame (optional) a data frame with columns `response_id`, `chr`, and `position` giving the genomic coordinate of each response; by default `response_position_data_frame` is set to a data frame containing the genomic coordinate of each gene in the human genome relative to reference genome GRCh38.
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the *cis* discovery set
 #' @export
@@ -52,15 +52,15 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 }
 
 
-#' Construct trans pairs
+#' Construct *trans* pairs
 #'
 #' `construct_trans_pairs()` is a helper function to facilitate construction the set of *trans* pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 #'
-#' Typically, in screens of genes (resp., noncoding regulatory elements), we set `pairs_to_exclude` to "pc_pairs" (resp., "pairs_containing_pc_targets").
+#' Typically, in screens of genes (resp., noncoding regulatory elements), we set `pairs_to_exclude` to `"pc_pairs"` (resp., `"pairs_containing_pc_targets"`).
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param positive_control_pairs (optional) the set of positive control pairs
-#' @param pairs_to_exclude (optional) a string specifying pairs to exclude from the *trans* pairs, one of "none", "pc_pairs", or "pairs_containing_pc_targets"
+#' @param pairs_to_exclude (optional; default `"none"`) a string specifying pairs to exclude from the *trans* pairs, one of `"none"`, `"pc_pairs"`, or `"pairs_containing_pc_targets"`
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the *trans* discovery set
 #' @export

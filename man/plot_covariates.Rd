@@ -8,21 +8,27 @@ plot_covariates(
   sceptre_object,
   response_n_umis_range = c(0.01, 0.99),
   response_n_nonzero_range = c(0.01, 0.99),
-  p_mito_threshold = 0.2
+  p_mito_threshold = 0.2,
+  return_indiv_plots = FALSE
 )
 }
 \arguments{
-\item{sceptre_object}{TBD}
+\item{sceptre_object}{any initialized \code{sceptre_object}. \code{plot_covariates()} can be called at any point in the pipeline after \code{import_data()}.}
 
-\item{response_n_umis_range}{TBD}
+\item{response_n_umis_range}{(optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the \code{response_n_umis} histogram}
 
-\item{response_n_nonzero_range}{TBD}
+\item{response_n_nonzero_range}{(optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the \code{response_n_nonzero} histogram}
 
-\item{p_mito_threshold}{TBD}
+\item{p_mito_threshold}{(optional; default \code{0.2}) a single numeric value in the interval [0,1] specifying the location at which to draw a vertical line on the \code{response_p_mito} histogram. Note that \code{p_mito_threshold} is an absolute number rather than a percentile.}
+
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
 \value{
-TBD
+a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-Plot covariates
+\code{plot_covariates()} creates histograms of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}. To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms.
+}
+\examples{
+# A full example can be found at ?sceptre
 }
