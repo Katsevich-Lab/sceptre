@@ -13,19 +13,39 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src="man/figures/hex.jpg" align="right" width="180"/>
+<div style="margin-top: 5px;">
+<img src="man/figures/hex.jpg" align="right" width="150"/>
+</div>
 
-## `sceptre`: Single-Cell CRISPR Screen<br>Data Analysis
+## <span style="font-size:60px;">`sceptre`</span>
 
+An R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+
+<!-- badges: start -->
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
+<!-- badges: end -->
 
-Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR genome engineering and single-cell sequencing to survey the effects of genetic perturbations on individual cells. Despite their promise, single-cell CRISPR screens present considerable statistical and computational challenges. `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+## Beta release of `sceptre` v1
+ 
+We are excited to announce the release of `sceptre` v0.99.0, which functions as a beta release for `sceptre` v1. This milestone includes the following developments:
 
-**Update October 2023**: We have released `sceptre` version 0.4.0, which is a substantial rework of the package. `sceptre` is now easier to use, faster, more memory efficient, and more fully featured than before. Also, we have written an [e-book](https://timothy-barry.github.io/sceptre-book/) to guide users through the entire process of analyzing their data using `sceptre`.
+- A reimagined user experience based on a modular, object-oriented workflow.
+- Further improvements in computational and memory efficiency.
+- A unified interface for low- and high-MOI analyses.
+- A suite of plotting functions facilitating visualization of each step in the pipeline.
+- Expanded support for gRNA assignment and quality control.
+- Interoperability with output from 10X Cell Ranger (available now) and Parse Biosciences (coming soon).
+- An [e-book](https://timothy-barry.github.io/sceptre-book/) guiding users through the entire process of analyzing their data using `sceptre`.
 
-## Key features
+`sceptre` v1 facilitates the entire analysis pipeline for single-cell CRISPR screens, starting from UMI count data obtained from tools like 10X Cell Ranger.
 
-`sceptre` offers the following key features:
+<!--
+
+## About `sceptre`
+
+Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR and single-cell sequencing to survey the effects of genetic perturbations on individual cells. Despite their promise, single-cell CRISPR screens present considerable statistical and computational challenges. `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+
+### Key features
 
 -   Import data from 10X CellRanger or a set of R matrices
 -   Assign gRNAs to cells using one of three principled methods
@@ -35,42 +55,24 @@ Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR genome en
 -   Verify adequate power using positive control gRNAs
 -   Visualize each step in the pipeline by rendering an informative plot
 
-`sceptre` is compatible with a broad range of single-cell CRISPR screen experimental designs:
+### Compatible experimental designs
 
 -   low multiplicity-of-infection and high multiplicity-of-infection
 -   Gene-targeting and noncoding-regulatory-element-targeting
 -   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
 -   Gene and protein expression readout
 
-## Get started
-
-The fastest way to get started with `sceptre` is to work through the Get Started vignette (30 minutes): `vignette("sceptre")`. Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
-
-## Installation instructions
-
-Users can install `sceptre` with the following command:
-
-```         
-# R version >= 4.1
-install.packages("devtools")
-devtools::install_github("katsevich-lab/sceptre")
-```
-
-`sceptre` will be uploaded to Bioconductor in the near future.
-
-## Featured publications
-
-`sceptre` has been featured in the following publications:
+### Featured publications
 
 -   [Morris et al., 2023](https://www.science.org/doi/10.1126/science.adh7699). "Discovery of target genes and pathways...". *Science*.
 -   [Barry et al., 2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
 
-## Bugs and feature requests
+-->
 
-We ask that users submit bugs and feature requests as issues to the [Github repository](https://github.com/Katsevich-Lab/sceptre/issues).
+## Get started
 
-## Funding
+The fastest way to get started with `sceptre` is to work through the [Get Started vignette](articles/sceptre.html) (30 minutes). Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
 
-[Analytics at Wharton](https://analytics.wharton.upenn.edu/) and the [National Science Foundation](https://www.nsf.gov/) (DMS-2113072) support the development of this software.
+## Bug reports, feature requests, and software questions
 
-<img src="man/figures/wharton_analytics.png" align="center" width="200"/>     <img src="man/figures/nsf.jpeg" align="center" width="109"/>
+For bug reports, please open a [GitHub issue](https://github.com/Katsevich-Lab/sceptre/issues). For feature requests, please start a discussion under [feature requests](https://github.com/Katsevich-Lab/sceptre/discussions/categories/feature-requests). For questions about `sceptre` functionality, documentation, or how to apply it to your data, please start a discussion under [Q&A](https://github.com/Katsevich-Lab/sceptre/discussions/categories/q-a). 

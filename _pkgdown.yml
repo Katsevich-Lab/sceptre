@@ -3,6 +3,20 @@ template:
   assets: .r_examples/r_examples
   bootstrap: 5
 
+home:
+  links:
+    - text: Report a bug
+      href: https://github.com/Katsevich-Lab/sceptre/issues
+  sidebar:
+    structure: [links, license, citation, authors, custom, dev]
+    components:
+      custom:
+        title: Funders
+        text: |
+          [Analytics at Wharton](https://analytics.wharton.upenn.edu/)
+
+          [National Science Foundation](https://www.nsf.gov/)
+
 reference:
 - title: "Package documentation"
   contents:
@@ -80,3 +94,6 @@ navbar:
   - icon: fa-history
     text: Changelog
     href: news/index.html
+  - icon: fa-users
+    text: Community
+    href: https://github.com/Katsevich-Lab/sceptre/discussions
