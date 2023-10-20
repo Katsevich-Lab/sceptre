@@ -46,6 +46,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 4. run qc
+#' plot_covariates(sceptre_object)
 #' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 #' plot(sceptre_object)
 #' print(sceptre_object)
@@ -100,6 +101,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 4. run qc
+#' plot_covariates(sceptre_object)
 #' sceptre_object <- sceptre_object |> run_qc(p_mito_threshold = 0.075)
 #' plot(sceptre_object)
 #' print(sceptre_object)
