@@ -1,6 +1,6 @@
-# sceptre 0.4.0 (2023-10-19)
+# sceptre 0.99.0 (2023-10-20)
 
-Version 0.4.0 is a total rework of the `sceptre` package. The new version of the package has a fresh user interface and is faster, more memory-efficient, and more fully featured than previous versions. We summarize key updates here.
+Version 0.99.0 is a total rework of the `sceptre` package, and serves as the beta version for `sceptre` v1.0.0. The new version of the package has a fresh user interface and is faster, more memory-efficient, and more fully featured than previous versions. We summarize key updates here.
 
 -   We have added a `sceptre_object` class to represent the single-cell CRISPR screen data.
 -   We have unified low-MOI and high-MOI analysis into a single interface.
