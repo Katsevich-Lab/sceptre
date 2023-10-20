@@ -473,7 +473,9 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 # 5. PLOT QC
 ############
 
-#' Visualize the distribution of the cell-specific covariates
+#' Plot covariates
+#'
+#' `plot_covariates()` creates a plot to visualize the distribution of the cell-specific covariates.
 #'
 #' @param sceptre_object any initialized \code{sceptre} object. This plot can be created at any time in the pipeline after \code{import_data}.
 #' @param response_n_umis_range TBD
