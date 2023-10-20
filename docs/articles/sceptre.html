@@ -192,11 +192,11 @@ significant gRNA-gene pairs:</p>
 <h2 id="import-data">1. Import data<a class="anchor" aria-label="anchor" href="#import-data"></a>
 </h2>
 <p>The first step is to import the data. <strong>Data can be imported
-into <code>sceptre</code> from 10X Cell Ranger or Parse outputs, as well
-as from R matrices.</strong> The simplest way to import the data is to
-read the output of one or more calls to <code>cellranger_count()</code>
-into <code>sceptre</code> via the function
-<code><a href="../reference/import_data_from_cellranger.html">import_data_from_cellranger()</a></code>.
+into <code>sceptre</code> from 10X Cell Ranger outputs or R matrices;
+support for Parse Biosciences outputs is coming soon.</strong> The
+simplest way to import the data is to read the output of one or more
+calls to <code>cellranger_count()</code> into <code>sceptre</code> via
+the function <code><a href="../reference/import_data_from_cellranger.html">import_data_from_cellranger()</a></code>.
 <code><a href="../reference/import_data_from_cellranger.html">import_data_from_cellranger()</a></code> requires three arguments:
 <code>directories</code>, <code>grna_target_data_frame</code>, and
 <code>moi</code>.</p>

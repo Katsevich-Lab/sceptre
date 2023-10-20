@@ -23,7 +23,7 @@ devtools::install_github("katsevich-lab/sceptre")
 
 (Please see [this page](install.html) for instructions to install older versions of `sceptre`, though we recommend users switch to the latest version as soon as they can.) Users can load `sceptre` via a call to `library()`.
 
-```{r,results='hide'}
+```{r, message = FALSE}
 library(sceptre)
 ```
 
@@ -114,7 +114,7 @@ We describe each step of the pipeline in greater detail below.
 
 ## 1. Import data
 
-The first step is to import the data. **Data can be imported into `sceptre` from 10X Cell Ranger or Parse outputs, as well as from R matrices.** The simplest way to import the data is to read the output of one or more calls to `cellranger_count()` into `sceptre` via the function `import_data_from_cellranger()`. `import_data_from_cellranger()` requires three arguments: `directories`, `grna_target_data_frame`, and `moi`.
+The first step is to import the data. **Data can be imported into `sceptre` from 10X Cell Ranger outputs or R matrices; support for Parse Biosciences outputs is coming soon.** The simplest way to import the data is to read the output of one or more calls to `cellranger_count()` into `sceptre` via the function `import_data_from_cellranger()`. `import_data_from_cellranger()` requires three arguments: `directories`, `grna_target_data_frame`, and `moi`.
 
 1.  `directories` is a character vector specifying the locations of the directories outputted by one or more calls to `cellranger_count()`. Below, we set the variable `directories` to the (machine-dependent) location of the example CRISPRi data on disk.
 
