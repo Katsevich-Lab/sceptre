@@ -10,10 +10,31 @@
     <loc>https://katsevich-lab.github.io/sceptre/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/assign-grnas.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/import-data.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/install.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/run-calibration-check.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/run-qc.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/articles/sceptre.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/set-analysis-parameters.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/articles/troubleshooting-and-faq.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/authors.html</loc>
