@@ -15,11 +15,11 @@ assign_grnas(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{method}{(optional) a string indicating the method to use to assign the gRNAs to cells, one of "mixture", "thresholding", or "maximum"}
+\item{method}{(optional) a string indicating the method to use to assign the gRNAs to cells, one of \code{"mixture"}, \code{"thresholding"}, or \code{"maximum"}}
 
-\item{print_progress}{(optional) a logical indicating whether to print progress updates}
+\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
-\item{parallel}{(optional) a logical indicating whether to run the function in parallel}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 
 \item{...}{optional method-specific additional arguments}
 }

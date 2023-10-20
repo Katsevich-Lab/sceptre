@@ -17,15 +17,15 @@ run_qc(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{n_nonzero_trt_thresh}{(optional) an integer specifying the number of nonzero treatment cells a pair must contain for it to be retained}
+\item{n_nonzero_trt_thresh}{(optional; default \code{7L}) an integer specifying the number of nonzero treatment cells a pair must contain for it to be retained}
 
-\item{n_nonzero_cntrl_thresh}{(optional) an integer specifying the number of nonzero control cells a pair must contain for it to be retained}
+\item{n_nonzero_cntrl_thresh}{(optional; default \code{7L}) an integer specifying the number of nonzero control cells a pair must contain for it to be retained}
 
-\item{response_n_umis_range}{(optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_umis} distribution}
+\item{response_n_umis_range}{(optional; default \code{c(0.01, 0.99)}) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_umis} distribution}
 
-\item{response_n_nonzero_range}{(optional) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_nonzero} distribution}
+\item{response_n_nonzero_range}{(optional; default \code{c(0.01, 0.99)}) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_nonzero} distribution}
 
-\item{p_mito_threshold}{(optional) a numeric value specifying the location at which to clip the right tail of the \code{response_p_mito} distribution}
+\item{p_mito_threshold}{(optional; default \code{0.2}) a numeric value specifying the location at which to clip the right tail of the \code{response_p_mito} distribution}
 
 \item{additional_cells_to_remove}{(optional) a vector of integer indices specifying additional cells to remove}
 }

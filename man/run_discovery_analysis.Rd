@@ -14,11 +14,11 @@ run_discovery_analysis(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{(optional) an integer taking values 1, 2, or 3 specifying the amount of information to return}
+\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return}
 
-\item{print_progress}{(optional) a logical indicating whether to print progress updates}
+\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
-\item{parallel}{(optional) a logical indicating whether to run the function in parallel}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 }
 \value{
 an updated \code{sceptre_object} in which the discovery analysis has been carried out

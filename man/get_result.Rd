@@ -9,7 +9,7 @@ get_result(sceptre_object, analysis)
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{analysis}{a string indicating the name of the analysis whose results we are querying, one of "run_calibration_check", "run_power_check", or "run_discovery_analysis".}
+\item{analysis}{a string indicating the name of the analysis whose results we are querying, one of \code{"run_calibration_check"}, \code{"run_power_check"}, or \code{"run_discovery_analysis"}.}
 }
 \value{
 a data frame containing the results of the analysis
