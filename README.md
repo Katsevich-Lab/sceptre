@@ -25,7 +25,7 @@ the following developments:
 
 - A reimagined user experience based on a modular, object-oriented
   workflow.
-- Further improvements in computational and memory efficiency.
+- Further improvements in speed and memory efficiency.
 - A unified interface for low- and high-MOI analyses.
 - A suite of plotting functions facilitating visualization of each step
   in the pipeline.
@@ -36,7 +36,7 @@ the following developments:
   users through the entire process of analyzing their data using
   `sceptre`.
 
-`sceptre` v1 facilitates the entire analysis pipeline for single-cell
+`sceptre` v1 facilitates an entire analysis pipeline for single-cell
 CRISPR screens, starting from UMI count data obtained from tools like
 10X Cell Ranger.
 
