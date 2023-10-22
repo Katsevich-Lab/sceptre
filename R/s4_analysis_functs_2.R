@@ -46,10 +46,9 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
                                          parallel = parallel)
 
   # 6. update fields of sceptre object with results
-  sceptre_object@calibration_result <- out$result |>
+  sceptre_object@calibration_result <- out$result |> apply_grouping_to_result(sceptre_object, TRUE) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha) |>
-    apply_grouping_to_result(sceptre_object)
+                    sceptre_object@multiple_testing_alpha)
   sceptre_object@negative_control_pairs <- response_grna_group_pairs
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
@@ -197,7 +196,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
 }
 
 
-apply_grouping_to_result <- function(result, sceptre_object) {
+apply_grouping_to_result <- function(result, sceptre_object, is_calibration_check = FALSE) {
   grna_integration_strategy <- sceptre_object@grna_integration_strategy
   if (grna_integration_strategy == "union") {
     new_result <- result |> dplyr::rename("grna_target" = "grna_group")
@@ -208,7 +207,7 @@ apply_grouping_to_result <- function(result, sceptre_object) {
     new_result <- result |> dplyr::rename("grna_id" = "grna_group") |>
       dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
       dplyr::relocate(response_id, grna_id, grna_target)
-    if (grna_integration_strategy == "bonferroni") {
+    if (grna_integration_strategy == "bonferroni" && !is_calibration_check) {
       new_result <- new_result |> dplyr::group_by(grna_target, response_id) |>
         dplyr::group_modify(.f = function(tbl, key) {
           if (!any(tbl$pass_qc)) {
@@ -231,6 +230,7 @@ apply_grouping_to_result <- function(result, sceptre_object) {
                      pass_qc = pass_qc_out)
         }) |> dplyr::ungroup()
     }
+    data.table::setorderv(new_result, c("p_value", "response_id"), na.last = TRUE)
   }
   return (new_result)
 }

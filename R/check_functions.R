@@ -178,8 +178,8 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   }
 
   # 9. verify that "grna_integration_strategy" is union or singleton
-  if (!(grna_integration_strategy %in% c("union", "singleton"))) {
-    stop("`grna_integration_strategy` must be either 'union' or 'singleton'.")
+  if (!(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))) {
+    stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
   return(NULL)

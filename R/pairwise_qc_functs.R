@@ -58,7 +58,19 @@ compute_qc_metrics <- function(sceptre_object) {
     if (nrow(methods::slot(sceptre_object, data_frame_name)) >= 1L) {
       methods::slot(sceptre_object, data_frame_name) <- methods::slot(sceptre_object, data_frame_name) |>
         dplyr::mutate(pass_qc = (n_nonzero_trt >= n_nonzero_trt_thresh & n_nonzero_cntrl >= n_nonzero_cntrl_thresh))
-      methods::slot(sceptre_object, n_ok_pairs_name) <- sum(methods::slot(sceptre_object, data_frame_name)$pass_qc)
+      if (sceptre_object@grna_integration_strategy == "bonferroni") {
+        grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
+          dplyr::select(grna_id, grna_target)
+        n_ok_pairs <- methods::slot(sceptre_object, data_frame_name) |>
+          dplyr::select("grna_id" = "grna_group", pass_qc, response_id) |>
+          dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
+          dplyr::group_by(response_id, grna_target) |>
+          dplyr::summarize(any_pass_qc = any(pass_qc), .groups = "drop") |>
+          dplyr::pull(any_pass_qc) |> sum()
+      } else {
+        n_ok_pairs <- sum(methods::slot(sceptre_object, data_frame_name)$pass_qc)
+      }
+      methods::slot(sceptre_object, n_ok_pairs_name) <- n_ok_pairs
     }
   }
   return(sceptre_object)
