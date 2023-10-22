@@ -15,6 +15,7 @@ statistical rigor, computational efficiency, and ease of use.
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
+
 <!-- badges: end -->
 
 ## Beta release of `sceptre` v1
