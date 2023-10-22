@@ -159,7 +159,7 @@ update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
     sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target
     sceptre_object@positive_control_pairs$grna_group <- sceptre_object@positive_control_pairs$grna_target
   }
-  if (grouping_strategy == "singleton") {
+  if (grouping_strategy %in% c("singleton", "bonferroni")) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
     discovery_pairs <- sceptre_object@discovery_pairs
     positive_control_pairs <- sceptre_object@positive_control_pairs

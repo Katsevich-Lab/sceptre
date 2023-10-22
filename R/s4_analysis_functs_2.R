@@ -142,10 +142,9 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                          parallel = parallel)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@discovery_result <- out$result |>
+  sceptre_object@discovery_result <- out$result |> apply_grouping_to_result(sceptre_object) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha) |>
-    apply_grouping_to_result(sceptre_object)
+                    sceptre_object@multiple_testing_alpha)
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
@@ -201,16 +200,39 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
 apply_grouping_to_result <- function(result, sceptre_object) {
   grna_integration_strategy <- sceptre_object@grna_integration_strategy
   if (grna_integration_strategy == "union") {
-    result <- result |> dplyr::rename("grna_target" = "grna_group")
+    new_result <- result |> dplyr::rename("grna_target" = "grna_group")
   }
-  if (grna_integration_strategy == "singleton") {
+  if (grna_integration_strategy %in% c("singleton", "bonferroni")) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
       dplyr::select(grna_id, grna_target)
-    result <- result |> dplyr::rename("grna_id" = "grna_group") |>
+    new_result <- result |> dplyr::rename("grna_id" = "grna_group") |>
       dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
       dplyr::relocate(response_id, grna_id, grna_target)
+    if (grna_integration_strategy == "bonferroni") {
+      new_result <- new_result |> dplyr::group_by(grna_target, response_id) |>
+        dplyr::group_modify(.f = function(tbl, key) {
+          if (!any(tbl$pass_qc)) {
+            n_nonzero_trt_out <- max(tbl$n_nonzero_trt)
+            n_nonzero_cntrl_out <- max(tbl$n_nonzero_cntrl)
+            log_2_fold_change_out <- p_value_out <- NA
+            pass_qc_out <- FALSE
+          } else {
+            min_p_idx <- which.min(tbl$p_value)
+            n_nonzero_trt_out <- tbl$n_nonzero_trt[min_p_idx]
+            n_nonzero_cntrl_out <- tbl$n_nonzero_cntrl[min_p_idx]
+            log_2_fold_change_out <- tbl$log_2_fold_change[min_p_idx]
+            p_value_out <- min(sum(tbl$pass_qc) * tbl$p_value[min_p_idx], 1)
+            pass_qc_out <- TRUE
+          }
+          data.frame(p_value = p_value_out,
+                     n_nonzero_trt = n_nonzero_trt_out,
+                     n_nonzero_cntrl = n_nonzero_cntrl_out,
+                     log_2_fold_change = log_2_fold_change_out,
+                     pass_qc = pass_qc_out)
+        }) |> dplyr::ungroup()
+    }
   }
-  return (result)
+  return (new_result)
 }
 
 
