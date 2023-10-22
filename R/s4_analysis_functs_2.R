@@ -208,7 +208,7 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
       dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
       dplyr::relocate(response_id, grna_id, grna_target)
     if (grna_integration_strategy == "bonferroni" && !is_calibration_check) {
-      new_result <- new_result |> dplyr::group_by(grna_target, response_id) |>
+      new_result <- new_result |> dplyr::group_by(response_id, grna_target) |>
         dplyr::group_modify(.f = function(tbl, key) {
           if (!any(tbl$pass_qc)) {
             n_nonzero_trt_out <- max(tbl$n_nonzero_trt)
