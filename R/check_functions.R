@@ -168,7 +168,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
-      stop(paste0("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame`."))
+      stop(paste0("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'."))
     }
   }
 

@@ -101,12 +101,8 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
       increment_vector(dt_sub$feature_idx, increment_feature_vector_value)
       increment_vector(dt_sub$cell_idx, -1L)
       # create a sparse matrix in csc format
-      p <- obtain_pointer_vector(i = dt_sub$cell_idx, dim = matrix_metadata$n_cells)
-      out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-      out@i <- dt_sub$feature_idx
-      out@p <- p
-      out@x <- dt_sub$x
-      out@Dim <- c(length(curr_feature_idxs), matrix_metadata$n_cells)
+      out <- create_csc_matrix(dt = dt_sub, n_cells = matrix_metadata$n_cells,
+                               n_features = length(curr_feature_idxs))
       return(out)
     })
     rm(dt); gc() |> invisible()
@@ -156,7 +152,18 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
 }
 
 
-get_mtx_metadata <- function(mtx_file) {
+create_csc_matrix <- function(dt, n_cells, n_features) {
+  p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
+  out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
+  out@i <- dt$feature_idx
+  out@p <- p
+  out@x <- dt$x
+  out@Dim <- c(n_features, n_cells)
+  return(out)
+}
+
+
+get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_nonzero")) {
   con <- file(mtx_file, "r")
   n_to_skip <- 0L
   while (TRUE) {
@@ -166,7 +173,9 @@ get_mtx_metadata <- function(mtx_file) {
   }
   close(con)
   metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
-  list(n_features = metrics[1], n_cells = metrics[2], n_nonzero = metrics[3], n_to_skip = n_to_skip)
+  out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
+  names(out) <- c(col_id, "n_to_skip")
+  return(out)
 }
 
 
@@ -206,4 +215,73 @@ write_sceptre_object_to_cellranger_format <- function(sceptre_object, directory)
     }
   }
   return(NULL)
+}
+
+
+#' Import data from Parse (experimental)
+#'
+#' `import_data_from_parse()` imports data from the output of the Parse count matrix generation program. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{Section 1 of the introductory chapter in the manual} for more information about this function. It is assumed that the data are stored in a single set of files (as opposed to multiple sets of files corresponding to, e.g., different samples).
+#'
+#' `import_data_from_parse()` is experimental, and the API of this function is subject to change. We expect the API to solidify as we learn more about the Parse platform and the structure of the Parse count matrix generation program output.
+#'
+#' @param gene_mat_fp file path to the gene count_matrix.mtx file
+#' @param grna_mat_fp file path to the gRNA count_matrix.mtx file
+#' @param all_genes_fp file path to the all_genes.csv file containing the gene IDs
+#' @param all_grnas_fp file path to the all_guides.csv file containing the gRNA IDs
+#' @param moi a string indicating the MOI of the dataset, either "low" or "high"
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
+#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
+#'
+#' @return an initialized `sceptre_object`
+#' @export
+import_data_from_parse <- function(gene_mat_fp, grna_mat_fp, all_genes_fp, all_grnas_fp,
+                                   moi, grna_target_data_frame, extra_covariates = data.frame()) {
+  # 1. check that files exist
+  fps <- c(gene_mat_fp = gene_mat_fp, grna_mat_fp = grna_mat_fp,
+           all_genes_fp = all_genes_fp, all_grnas_fp = all_grnas_fp)
+  for (fp_name in names(fps)) {
+    fp <- fps[[fp_name]]
+    if (!file.exists(fp)) stop(paste0("File ", fp, " does not exist. Set `", fp_name, "` to a different value."))
+  }
+
+  # 2. load the gene.mtx and grna.mtx data
+  load_matrix <- function(mat_fp) {
+    matrix_metadata <- get_mtx_metadata(mat_fp, c("n_cells", "n_features", "n_nonzero"))
+    dt <- data.table::fread(file = mat_fp, skip = matrix_metadata$n_to_skip,
+                            col.names = c("cell_idx", "feature_idx", "x"),
+                            colClasses = c("integer", "integer", "double"),
+                            showProgress = FALSE, nThread = 2L)
+    # make the cell and feature idxs zero-based
+    increment_vector(dt$cell_idx, value = -1L)
+    increment_vector(dt$feature_idx, value = -1L)
+
+    # create a sparse matrix in csc format
+    out <- create_csc_matrix(dt = dt, n_cells = matrix_metadata$n_cells,
+                             n_features = matrix_metadata$n_features)
+    return(out)
+  }
+  gene_mat <- load_matrix(gene_mat_fp)
+  grna_mat <- load_matrix(grna_mat_fp)
+
+  # 3. load the gene ids; update rownames of gene mat
+  gene_feature_df <- data.table::fread(file = all_genes_fp,
+                                       colClasses = c("character", "character", "character"),
+                                       col.names = c("feature_id", "feature_name", "genome"), header = TRUE)
+  rownames(gene_mat) <- gene_feature_df$feature_id[seq(1L, nrow(gene_mat))]
+  gene_names <- gene_feature_df$feature_name[seq(1L, nrow(gene_mat))]
+
+  # 4. load the grna ids; update rownames of grna mat
+  grna_feature_df <- data.table::fread(file = all_grnas_fp,
+                                       colClasses = c("character", "character", "character"),
+                                       col.names = c("feature_id", "feature_name", "genome"), header = TRUE)
+  rownames(grna_mat) <- grna_feature_df$feature_name
+
+  # 5. create the sceptre_object
+  sceptre_object <- import_data(response_matrix = gene_mat,
+                                grna_matrix = grna_mat,
+                                grna_target_data_frame = grna_target_data_frame,
+                                moi = moi,
+                                extra_covariates = extra_covariates,
+                                response_names = gene_names)
+  return(sceptre_object)
 }
