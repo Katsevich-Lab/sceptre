@@ -28,6 +28,7 @@ reference:
   contents:
   - import_data
   - import_data_from_cellranger
+  - import_data_from_parse
   - set_analysis_parameters
   - assign_grnas
   - run_qc

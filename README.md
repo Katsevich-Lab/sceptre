@@ -18,9 +18,9 @@ statistical rigor, computational efficiency, and ease of use.
 
 <!-- badges: end -->
 
-## Release of `sceptre` v0.9.0
+## Release of `sceptre` v0.9.1
 
-We are excited to announce the release of `sceptre` v0.9.0, a
+We are excited to announce the release of `sceptre` v0.9.1, a
 substantial update to the package. This milestone includes the following
 developments:
 
@@ -31,13 +31,13 @@ developments:
 - A suite of plotting functions facilitating visualization of each step
   in the pipeline.
 - Expanded support for gRNA assignment and quality control.
-- Interoperability with output from 10X Cell Ranger (available now) and
-  Parse Biosciences (coming soon).
+- Interoperability with output from 10X Cell Ranger and Parse
+  Biosciences CRISPR Detect.
 - An [e-book](https://timothy-barry.github.io/sceptre-book/) guiding
   users through the entire process of analyzing their data using
   `sceptre`.
 
-`sceptre` v0.9.0 facilitates an entire analysis pipeline for single-cell
+`sceptre` v0.9.1 facilitates an entire analysis pipeline for single-cell
 CRISPR screens, starting from UMI count data obtained from tools like
 10X Cell Ranger.
 

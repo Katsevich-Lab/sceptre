@@ -1,3 +1,11 @@
+# sceptre 0.9.1 (2023-10-24)
+
+Version 0.9.1 is a minor update to version 0.9.0.
+
+-   We have added an experimental `import_data_from_parse()` function to import data from the output of Parse Biosciences CRISPR Detect.
+
+-   We have added support for the `"bonferroni"` gRNA integration strategy.
+
 # sceptre 0.9.0 (2023-10-20)
 
 Version 0.9.0 is a total rework of the `sceptre` package. The new version of the package has a fresh user interface and is faster, more memory-efficient, and more fully featured than previous versions. We summarize key updates here.
