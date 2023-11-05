@@ -62,14 +62,14 @@ auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_cov
 }
 
 
-partition_response_ids <- function(response_ids, parallel) {
+partition_response_ids <- function(response_ids, parallel, n_processors) {
   groups_set <- FALSE
   if (parallel) {
-    n_cores <- parallel::detectCores(logical = FALSE)
-    if (length(response_ids) >= n_cores) {
+    if (identical(n_processors, "auto")) n_processors <- parallel::detectCores(logical = FALSE)
+    if (length(response_ids) >= 2 * n_processors) {
       set.seed(4)
       s <- sample(response_ids)
-      out <- split(s, cut(seq_along(s), n_cores, labels = paste0("group_", seq(1, n_cores))))
+      out <- split(s, cut(seq_along(s), n_processors, labels = paste0("group_", seq(1, n_processors))))
       groups_set <- TRUE
     }
   }
