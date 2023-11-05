@@ -154,13 +154,14 @@ set_analysis_parameters <- function(sceptre_object,
 #' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of `"mixture"`, `"thresholding"`, or `"maximum"`
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
 #' @param ... optional method-specific additional arguments
 #'
 #' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
 #' @export
 #' @examples
 #' # see example via ?sceptre
-assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, ...) {
+assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, n_processors = "auto", ...) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
@@ -185,7 +186,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
   hyperparameters <- hyperparameters_default
 
   # 2. check inputs
-  check_assign_grna_inputs(sceptre_object, method, hyperparameters) |> invisible()
+  check_assign_grna_inputs(sceptre_object, method, hyperparameters, n_processors) |> invisible()
 
   # 3. determine whether to reset response precomputations
   reset_response_precomps <- sceptre_object@low_moi &&
@@ -198,7 +199,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
   sceptre_object@grna_assignment_hyperparameters <- hyperparameters
 
   # 5. assign the grnas
-  sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel)
+  sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel, n_processors)
 
   # return
   return(sceptre_object)

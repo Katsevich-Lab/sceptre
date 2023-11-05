@@ -186,7 +186,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
 }
 
 
-check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters) {
+check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters, n_processors) {
   if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
     stop("`assignment_method` must be `mixture`, `maximum`, or `thresholding`.")
   }
@@ -243,6 +243,11 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
     if (hyperparameters[["probability_threshold"]] <= 0 || hyperparameters[["probability_threshold"]] >= 1) {
       stop("`probability_threshold` should be a numeric in the interval (0,1).")
     }
+  }
+
+  # 3. check n_processors argument
+  if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
+    stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
   return(NULL)
 }
