@@ -269,19 +269,24 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
 }
 
 
-check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs) {
+check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs, n_processors) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   control_group_complement <- sceptre_object@control_group_complement
   n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |> nrow()
+  # 1. check number of gRNAS
   if (!control_group_complement) {
     if (n_nt_grnas < 2) stop("Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.")
   } else {
     if (n_nt_grnas < 1) stop("At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.")
   }
-
+  # 2. check number of calibration pairs
   if (n_calibration_pairs == 0L) {
     stop("Cannot run a calibration check on zero negative control pairs.")
+  }
+  # 3. check n_processors
+  if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
+    stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
   return(NULL)
 }
@@ -291,8 +296,8 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             control_group_complement,
                                             grna_target_data_frame,
                                             calibration_check_run,
-                                            pc_analysis,
-                                            calibration_result, n_ok_pairs) {
+                                            pc_analysis, calibration_result,
+                                            n_ok_pairs, n_processors) {
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
     stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
@@ -314,6 +319,11 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
   # 4. check that at least one pair passes qc
   if (n_ok_pairs == 0L) {
     stop("Zero pairs pass pairwise QC. Cannot run analysis.")
+  }
+
+  # 5. check n_processors
+  if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
+    stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
 
   return(NULL)

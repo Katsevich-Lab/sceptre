@@ -8,13 +8,15 @@
 #' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
 #' @export
 #' @examples
 #' # see example via ?sceptre
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
-                                  calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE) {
+                                  calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
+                                  n_processors = "auto") {
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
@@ -25,7 +27,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
 
   # 2. check inputs
-  check_calibration_check_inputs(sceptre_object, n_calibration_pairs) |> invisible()
+  check_calibration_check_inputs(sceptre_object, n_calibration_pairs, n_processors) |> invisible()
 
   # 3. construct the negative control pairs
   response_grna_group_pairs <- construct_negative_control_pairs_v2(sceptre_object = sceptre_object,
@@ -43,7 +45,8 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
                                          analysis_type = "calibration_check",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
-                                         parallel = parallel)
+                                         parallel = parallel,
+                                         n_processors = n_processors)
 
   # 6. update fields of sceptre object with results
   sceptre_object@calibration_result <- out$result |> apply_grouping_to_result(sceptre_object, TRUE) |>
@@ -63,12 +66,13 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 #' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
 #' @return an updated `sceptre_object` in which the power check has been carried out
 #'
 #' @export
 #' @examples
 #' # see example via ?sceptre
-run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
+run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE, n_processors = "auto") {
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
@@ -83,7 +87,8 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                   grna_target_data_frame = sceptre_object@grna_target_data_frame,
                                   pc_analysis = TRUE,
                                   calibration_result = sceptre_object@calibration_result,
-                                  n_ok_pairs = sceptre_object@n_ok_positive_control_pairs) |> invisible()
+                                  n_ok_pairs = sceptre_object@n_ok_positive_control_pairs,
+                                  n_processors = n_processors) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -92,7 +97,8 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                          analysis_type = "power_check",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
-                                         parallel = parallel)
+                                         parallel = parallel,
+                                         n_processors = n_processors)
 
   # 4. update fields of sceptre object with results
   sceptre_object@power_result <- out$result |> apply_grouping_to_result(sceptre_object)
@@ -109,12 +115,13 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
 #' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
 #' @export
 #' @examples
 #' # see example via ?sceptre
-run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE) {
+run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE, n_processors = "auto") {
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
@@ -129,7 +136,8 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                   grna_target_data_frame = sceptre_object@grna_target_data_frame,
                                   pc_analysis = FALSE,
                                   calibration_result = sceptre_object@calibration_result,
-                                  n_ok_pairs = sceptre_object@n_ok_discovery_pairs) |> invisible()
+                                  n_ok_pairs = sceptre_object@n_ok_discovery_pairs,
+                                  n_processors = n_processors) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
@@ -138,7 +146,8 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                          analysis_type = "discovery_analysis",
                                          output_amount = output_amount,
                                          print_progress = print_progress,
-                                         parallel = parallel)
+                                         parallel = parallel,
+                                         n_processors = n_processors)
 
   # 4. update fields of sceptre object with results
   sceptre_object@discovery_result <- out$result |> apply_grouping_to_result(sceptre_object) |>
@@ -149,7 +158,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 }
 
 
-run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type, output_amount, print_progress, parallel) {
+run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type, output_amount, print_progress, parallel, n_processors) {
   # if running permutations, generate the permutation idxs
   if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
@@ -177,8 +186,8 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
                        n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
                        side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
                        response_precomputations = sceptre_object@response_precomputations,
-                       cells_in_use = sceptre_object@cells_in_use,
-                       print_progress = print_progress, parallel = parallel, analysis_type = analysis_type)
+                       cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
+                       parallel = parallel, n_processors = n_processors, analysis_type = analysis_type)
 
   # run the method
   out <- if (sceptre_object@run_permutations) {
