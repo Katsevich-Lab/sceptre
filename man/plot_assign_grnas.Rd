@@ -10,7 +10,6 @@ plot_assign_grnas(
   grnas_to_plot = NULL,
   point_size = 0.9,
   transparency = 0.8,
-  n_max_0_grna_unprtb_plot = 1000,
   return_indiv_plots = FALSE
 )
 }
@@ -24,8 +23,6 @@ plot_assign_grnas(
 \item{point_size}{(optional; default \code{0.9}) the size of the individual points in the plot}
 
 \item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot}
-
-\item{n_max_0_grna_unprtb_plot}{(optional; default \code{1000}) there may be many cells with a gRNA count of 0 in the unperturbed group. This can slow down the plotting without adding useful information, so at most \code{n_max_0_grna_unprtb_plot} points from this group are plotted. Setting this to \code{Inf} will guarantee no downsampling occurs.}
 
 \item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
 }
