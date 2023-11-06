@@ -23,8 +23,9 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
                                                        extra_covariates = extra_covariates,
                                                        response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names)
 
-  # 3. make the response matrix row accessible
+  # 3. make the response and grna matrices row accessible
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
 
   # 4. update fields in output object and return
   sceptre_object <- methods::new("sceptre_object")
