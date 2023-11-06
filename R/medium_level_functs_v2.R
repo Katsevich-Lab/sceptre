@@ -16,7 +16,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                     side_code, low_moi, response_precomputations, cells_in_use, print_progress,
-                                    parallel, analysis_type) {
+                                    parallel, n_processors, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -96,7 +96,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   }
 
   # 3. partition the response IDs
-  partitioned_response_ids <- partition_response_ids(response_ids = response_ids, parallel = parallel)
+  partitioned_response_ids <- partition_response_ids(response_ids = response_ids,
+                                                     parallel = parallel, n_processors = n_processors)
 
   # 4. run the analysis
   if (!parallel) {
@@ -121,9 +122,9 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 # core function 2: run crt in memory
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
-                                 control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                 side_code, low_moi, response_precomputations, cells_in_use, print_progress, parallel, analysis_type) {
+                                 output_amount, fit_parametric_curve, B1, B2, B3, calibration_check, control_group_complement,
+                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, response_precomputations,
+                                 cells_in_use, print_progress, parallel, n_processors, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -177,7 +178,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
 
   # 5. update the response precomputations (if applicable)
   if (run_outer_regression) {
-    partitioned_response_ids <- partition_response_ids(response_ids = response_ids, parallel = parallel)
+    partitioned_response_ids <- partition_response_ids(response_ids = response_ids, parallel = parallel, n_processors = n_processors)
     if (!parallel) {
       res <- lapply(partitioned_response_ids, run_precomp_on_given_responses)
     } else {
@@ -224,7 +225,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
 
   # 10. perform the association analyses
   grna_groups <- unique(response_grna_group_pairs$grna_group)
-  partitioned_grna_group_ids <- partition_response_ids(response_ids = grna_groups, parallel = parallel)
+  partitioned_grna_group_ids <- partition_response_ids(response_ids = grna_groups, parallel = parallel, n_processors = n_processors)
   if (!parallel) {
     res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
   } else {
