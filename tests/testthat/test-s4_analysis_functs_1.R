@@ -6,7 +6,7 @@ test_that("import_data", {
   num_responses <- 17
   grna_target_data_frame <- make_mock_grna_target_data(c(1,3,1), 1, 1, 6)
   grna_matrix <- matrix(rpois(nrow(grna_target_data_frame) * num_cells, 1), ncol = num_cells) |>
-    `rownames<-`(grna_target_data_frame$grna_id)
+    `rownames<-`(grna_target_data_frame$grna_id) |> set_matrix_accessibility()
   response_matrix <- matrix(rpois(num_responses * num_cells, 1), ncol = num_cells) |>
     as("TsparseMatrix")
   extra_covariates <- data.frame(x = rep("aaa", num_cells))
@@ -50,7 +50,7 @@ test_that("import_data", {
   ##### slots set in section 4 of `import_data`
 
   expect_equal(sceptre_object_high_with_ec@response_matrix, set_matrix_accessibility(response_matrix))
-  expect_equal(sceptre_object_high_with_ec@grna_matrix, grna_matrix)
+  expect_equal(sceptre_object_high_with_ec@grna_matrix, set_matrix_accessibility(grna_matrix))
   expect_equal(sceptre_object_low_no_ec_with_response_names@response_names, paste0("rrr", 1:num_responses))
 
   expect_true(sceptre_object_low_no_ec_with_response_names@low_moi)
