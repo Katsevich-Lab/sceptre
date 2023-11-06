@@ -280,8 +280,10 @@ get_result <- function(sceptre_object, analysis) {
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory
   if (!dir.exists(directory)) dir.create(path = directory, recursive = TRUE)
-  fs <- list.files(path = directory, full.names = TRUE)
-  for (f in fs) file.remove(f)
+  fs <- paste0(directory, "/", c("analysis_summary.txt", "plot_assign_grnas.png", "plot_run_qc.png",
+        "plot_run_calibration_check.png", "plot_run_power_check.png", "plot_run_discovery_analysis.png",
+        "results_run_calibration_check.rds", "results_run_power_check.rds", "results_run_discovery_analysis.rds"))
+  for (f in fs) if (file.exists(f)) file.remove(f)
 
   # 1. create analysis_summary.txt file
   summary_file_fp <- paste0(directory, "/analysis_summary.txt")
