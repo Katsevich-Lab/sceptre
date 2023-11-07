@@ -1,4 +1,4 @@
-assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors) {
+assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors, log_dir) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. get random starting guesses for pi and g_pert
   starting_guesses <- get_random_starting_guesses(n_em_rep = grna_assignment_hyperparameters$n_em_rep,
@@ -16,7 +16,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   # 3. define the function to perform assignments for a set of grnas
   analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
     if (parallel && print_progress) {
-      f_name <- paste0(get_log_dir(), "assign_grnas_", proc_id, ".out")
+      f_name <- paste0(get_log_dir(log_dir), "assign_grnas_", proc_id, ".out")
       file.create(f_name) |> invisible()
     } else {
       f_name <- NULL
@@ -42,7 +42,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   } else {
     cat("Running gRNA assignments in parallel. ")
     if (print_progress) {
-      cat(paste0("Change directories to ", crayon::blue(get_log_dir()), " and view the files ",
+      cat(paste0("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ",
                  crayon::blue("assign_grnas_*.out"), " for progress updates.\n"))
     }
     grna_ids_partitioned <- partition_response_ids(grna_ids, parallel, n_processors)
