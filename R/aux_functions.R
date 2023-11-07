@@ -78,8 +78,8 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
 }
 
 
-get_log_dir <- function() {
-  log_dir <- paste0(tempdir(), "/sceptre_logs/")
+get_log_dir <- function(log_dir) {
+  log_dir <- paste0(log_dir, "/sceptre_logs/")
   if (!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE)
   return(log_dir)
 }

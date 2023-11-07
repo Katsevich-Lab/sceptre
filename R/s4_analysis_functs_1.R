@@ -162,7 +162,8 @@ set_analysis_parameters <- function(sceptre_object,
 #' @export
 #' @examples
 #' # see example via ?sceptre
-assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE, n_processors = "auto", ...) {
+assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE,
+                         n_processors = "auto", log_dir = tempdir(), ...) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
@@ -200,7 +201,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
   sceptre_object@grna_assignment_hyperparameters <- hyperparameters
 
   # 5. assign the grnas
-  sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel, n_processors)
+  sceptre_object <- assign_grnas_to_cells(sceptre_object, print_progress, parallel, n_processors, log_dir)
 
   # return
   return(sceptre_object)
