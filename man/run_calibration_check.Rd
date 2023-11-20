@@ -11,7 +11,8 @@ run_calibration_check(
   calibration_group_size = NULL,
   print_progress = TRUE,
   parallel = FALSE,
-  n_processors = "auto"
+  n_processors = "auto",
+  log_dir = tempdir()
 )
 }
 \arguments{

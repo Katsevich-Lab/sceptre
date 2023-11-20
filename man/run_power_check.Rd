@@ -9,7 +9,8 @@ run_power_check(
   output_amount = 1,
   print_progress = TRUE,
   parallel = FALSE,
-  n_processors = "auto"
+  n_processors = "auto",
+  log_dir = tempdir()
 )
 }
 \arguments{

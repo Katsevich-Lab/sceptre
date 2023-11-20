@@ -10,6 +10,7 @@ assign_grnas(
   print_progress = TRUE,
   parallel = FALSE,
   n_processors = "auto",
+  log_dir = tempdir(),
   ...
 )
 }
