@@ -12,6 +12,9 @@
 #'
 #' @examples
 #' \dontrun{
+#' ###################
+#' # in-memory example
+#' ###################
 #' # 1. point to directories containing cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptre"),
 #'                      "/highmoi_example/gem_group_", 1:2)
@@ -29,8 +32,17 @@
 #'   grna_target_data_frame = grna_target_data_frame_highmoi,
 #'   extra_covariates = extra_covariates
 #' )
+#'
+#' ################
+#' # ondisc example
+#' ################
+#' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/rpe1_other"
+#' directories_to_load <- list.files(base_dir, full.names = TRUE)[1:3]
+#' directory_to_write <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/odm_files_small"
+#' moi <- "low"
+#' grna_target_data_frame <-
 #' }
-import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame()) {
+import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame(), use_ondisc = FALSE, directory_to_write = NULL) {
   # 1. check that directories exist
   for (curr_directory in directories) {
     if (!dir.exists(curr_directory)) stop(paste0("The directory ", curr_directory, " does not exist."))
