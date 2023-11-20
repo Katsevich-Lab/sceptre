@@ -8,7 +8,8 @@ import_data_from_cellranger(
   directories,
   moi,
   grna_target_data_frame,
-  extra_covariates = data.frame()
+  extra_covariates = data.frame(),
+  use_ondisc = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ an initialized \code{sceptre_object}
 }
 \examples{
 \dontrun{
+###################
+# in-memory example
+###################
 # 1. point to directories containing cellranger output
 directories <- paste0(system.file("extdata", package = "sceptre"),
                      "/highmoi_example/gem_group_", 1:2)
@@ -45,5 +49,10 @@ sceptre_object <- import_data_from_cellranger(
   grna_target_data_frame = grna_target_data_frame_highmoi,
   extra_covariates = extra_covariates
 )
+
+################
+# ondisc example
+################
+
 }
 }
