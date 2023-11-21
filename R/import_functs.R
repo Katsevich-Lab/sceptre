@@ -37,12 +37,27 @@
 #' # ondisc example
 #' ################
 #' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/rpe1_other"
-#' directories_to_load <- list.files(base_dir, full.names = TRUE)[1:3]
-#' directory_to_write <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/odm_files_small"
+#' directories <- list.files(base_dir, full.names = TRUE)[1:3]
+#' directory_to_write <- "/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7_small"
 #' moi <- "low"
-#' grna_target_data_frame <-
+#' grna_target_data_frame <- readRDS("/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7/grna_target_data_frame.rds")
+#' sceptre_object <- import_data_from_cellranger(directories = directories,
+#'                                               directory_to_write = directory_to_write,
+#'                                               moi = moi,
+#'                                               grna_target_data_frame = grna_target_data_frame,
+#'                                               use_ondisc = TRUE)
 #' }
 import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame(), use_ondisc = FALSE, directory_to_write = NULL) {
+  # take cases on use_ondisc
+  if (!use_ondisc) {
+    import_data_from_cellranger_memory(directories, moi, grna_target_data_frame, extra_covariates)
+  } else {
+    import_data_from_cellranger_disk(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write)
+  }
+}
+
+
+import_data_from_cellranger_memory <- function(directories, moi, grna_target_data_frame, extra_covariates) {
   # 1. check that directories exist
   for (curr_directory in directories) {
     if (!dir.exists(curr_directory)) stop(paste0("The directory ", curr_directory, " does not exist."))
@@ -91,7 +106,7 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
                                          col.names = c("feature_id", "feature_name", "modality"), header = FALSE)
     for (col in colnames(feature_df)) {
       if (any(dplyr::pull(feature_df, dplyr::all_of(col)) !=
-            dplyr::pull(curr_feature_df, dplyr::all_of(col)))) {
+              dplyr::pull(curr_feature_df, dplyr::all_of(col)))) {
         stop("The features.tsv files must match across directories.")
       }
     }

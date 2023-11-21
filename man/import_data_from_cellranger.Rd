@@ -9,7 +9,8 @@ import_data_from_cellranger(
   moi,
   grna_target_data_frame,
   extra_covariates = data.frame(),
-  use_ondisc = FALSE
+  use_ondisc = FALSE,
+  directory_to_write = NULL
 )
 }
 \arguments{
@@ -53,6 +54,15 @@ sceptre_object <- import_data_from_cellranger(
 ################
 # ondisc example
 ################
-
+base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/rpe1_other"
+directories <- list.files(base_dir, full.names = TRUE)[1:3]
+directory_to_write <- "/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7_small"
+moi <- "low"
+grna_target_data_frame <- readRDS("/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7/grna_target_data_frame.rds")
+sceptre_object <- import_data_from_cellranger(directories = directories,
+                                              directory_to_write = directory_to_write,
+                                              moi = moi,
+                                              grna_target_data_frame = grna_target_data_frame,
+                                              use_ondisc = TRUE)
 }
 }

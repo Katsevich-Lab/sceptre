@@ -27,7 +27,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
 
-  # 4. update fields in output object and return
+  # 4. update fields in output object
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- response_matrix
   sceptre_object@grna_matrix <- grna_matrix
@@ -35,7 +35,6 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
   sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
-  if (!is.null(extra_covariates)) sceptre_object@user_specified_covariates <- colnames(extra_covariates)
 
   # 5. initialize flags
   sceptre_object@last_function_called <- "import_data"
