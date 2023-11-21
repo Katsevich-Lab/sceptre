@@ -1,7 +1,9 @@
 # import from cellranger disk
 import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
   # 1. call the corresponding ondisc function
-  output <- ondisc::create_odm_from_cellranger(directories_to_load = directories, directory_to_write = directory_to_write)
+  output <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
+                                               directory_to_write = directory_to_write,
+                                               write_cellwise_covariates = FALSE)
   # 2. update fields on the sceptre_object
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- output$gene
@@ -25,8 +27,20 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 }
 
 
-initialize_sceptre_object_from_odm_files <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
+initialize_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
+  # read in objects
   sceptre_object <- readRDS(sceptre_object_fp)
-  response_odm <- initialize_odm_from_backing_file(response_odm_file_fp)
-  grna_odm <- initialize_odm_from_backing_file(grna_odm_file_fp)
+  response_odm <- ondisc::initialize_odm_from_backing_file(response_odm_file_fp)
+  grna_odm <- ondisc::initialize_odm_from_backing_file(grna_odm_file_fp)
+  # check for concordance of integer ids
+  if (sceptre_object@integer_id != response_odm@integer_id) {
+    stop("The `sceptre_object` and `response_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file.")
+  }
+  if (sceptre_object@integer_id != grna_odm@integer_id) {
+    stop("The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file.")
+  }
+  # update response_odm and grna_odm and return
+  sceptre_object@response_matrix <- response_odm
+  sceptre_object@grna_matrix <- grna_odm
+  return(sceptre_object)
 }

@@ -154,6 +154,10 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' saveRDS(sceptre_object, paste0(directory_to_write, "/sceptre_object.rds"))
 #'
 #' # 4. read sceptre_object from disk
-#' sceptre_object <- read_sceptre_object
+#' sceptre_object <- initialize_ondisc_backed_sceptre_object(
+#'   paste0(directory_to_write, "/sceptre_object.rds"),
+#'   paste0(directory_to_write, "/gene.odm"),
+#'   paste0(directory_to_write, "/grna.odm")
+#' )
 #' }
 NULL
