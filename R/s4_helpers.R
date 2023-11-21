@@ -150,3 +150,12 @@ perform_status_check_and_update <- function(sceptre_object, curr_funct) {
   sceptre_object@last_function_called <- curr_funct
   return(sceptre_object)
 }
+
+
+load_row <- function(mat, id) {
+  if (methods::is(mat, "odm")) {
+    mat[id,]
+  } else if (methods::is(mat, "dgRMatrix")) {
+    load_csr_row(j = mat@j, p = mat@p, x = mat@x, row_idx = which(grna_id == rownames(mat)), n_cells = ncol(mat))
+  }
+}

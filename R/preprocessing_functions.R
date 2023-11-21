@@ -17,6 +17,8 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
     out <- matrix_in
   } else if (methods::is(matrix_in, "dgCMatrix") && !make_row_accessible) {
     out <- matrix_in
+  } else if (methods::is(matrix_in, "odm")) {
+    out <- matrix_in
   } else {
     # basic info: get matrix_in, n_responses, response_ids, and n_cells
     n_responses <- nrow(matrix_in)

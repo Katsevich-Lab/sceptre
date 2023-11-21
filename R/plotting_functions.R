@@ -36,10 +36,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
-    load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                 row_idx = which(grna_id == rownames(grna_matrix)), n_cells = ncol(grna_matrix))
-  }) |> unlist()
+  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) load_row(grna_matrix, grna_id)) |> unlist()
   grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
   to_plot <- data.frame(grna_id = grna_ids_rep, grna_expressions = grna_expressions) |>
     dplyr::filter(grna_expressions < 10000)

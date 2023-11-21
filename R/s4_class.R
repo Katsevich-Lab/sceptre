@@ -1,8 +1,8 @@
 # response matrix class union
 #' @import Matrix
-setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "list"))
-setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix", "list"))
-
+#' @importClassesFrom ondisc odm
+setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "odm"))
+setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix", "odm"))
 
 # sceptre object class
 setClass("sceptre_object",
@@ -14,7 +14,6 @@ setClass("sceptre_object",
            covariate_matrix = "matrix",
            grna_target_data_frame = "data.frame",
            low_moi = "logical",
-           user_specified_covariates = "character",
            response_names = "character",
 
            # analysis parameters
@@ -52,6 +51,7 @@ setClass("sceptre_object",
            n_ok_positive_control_pairs = "integer",
            calibration_group_size = "integer",
            n_calibration_pairs = "integer",
+           ondisc_grna_assignment_info = "list",
 
            # cached objects
            response_precomputations = "list",
@@ -64,3 +64,4 @@ setClass("sceptre_object",
            calibration_result = "data.frame",
            power_result = "data.frame",
            discovery_result = "data.frame"))
+
