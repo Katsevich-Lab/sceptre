@@ -4,6 +4,9 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   output <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
                                                directory_to_write = directory_to_write,
                                                write_cellwise_covariates = FALSE)
+  # 1.5 check the inputs
+  check_import_data_inputs(output$gene, output$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
+
   # 2. update fields on the sceptre_object
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- output$gene
