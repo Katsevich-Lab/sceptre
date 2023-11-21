@@ -1,3 +1,4 @@
+# import from cellranger disk
 import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
   # 1. call the corresponding ondisc function
   output <- ondisc::create_odm_from_cellranger(directories_to_load = directories, directory_to_write = directory_to_write)
@@ -7,6 +8,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   sceptre_object@grna_matrix <- output$grna
   sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
   sceptre_object@low_moi <- (moi == "low")
+  sceptre_object@integer_id <- output$gene@integer_id
   # 3. devise the initial gRNA assignment list and process cellwise covariates
   cellwise_covariates <- output$cellwise_covariates
   sceptre_object@ondisc_grna_assignment_info <- list(max_grna = cellwise_covariates$grna_feature_w_max_expression,
@@ -20,4 +22,11 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
                                     assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
                                     run_power_check = FALSE, run_discovery_analysis = FALSE)
   return(sceptre_object)
+}
+
+
+initialize_sceptre_object_from_odm_files <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
+  sceptre_object <- readRDS(sceptre_object_fp)
+  response_odm <- initialize_odm_from_backing_file(response_odm_file_fp)
+  grna_odm <- initialize_odm_from_backing_file(grna_odm_file_fp)
 }
