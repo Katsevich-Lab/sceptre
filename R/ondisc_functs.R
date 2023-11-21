@@ -27,7 +27,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 }
 
 
-initialize_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
+read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
   # read in objects
   sceptre_object <- readRDS(sceptre_object_fp)
   response_odm <- ondisc::initialize_odm_from_backing_file(response_odm_file_fp)
@@ -43,4 +43,11 @@ initialize_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_
   sceptre_object@response_matrix <- response_odm
   sceptre_object@grna_matrix <- grna_odm
   return(sceptre_object)
+}
+
+
+write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp) {
+  sceptre_object@grna_matrix <- matrix()
+  sceptre_object@response_matrix <- matrix()
+  saveRDS(sceptre_object, sceptre_object_fp)
 }

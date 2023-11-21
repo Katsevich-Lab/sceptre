@@ -145,10 +145,13 @@ sceptre_object <- set_analysis_parameters(
   discovery_pairs = discovery_pairs)
 
 # 3. write sceptre_object to disk
-saveRDS(sceptre_object, paste0(directory_to_write, "/sceptre_object.rds"))
+write_ondisc_backed_sceptre_object(
+  sceptre_object,
+  paste0(directory_to_write, "/sceptre_object.rds")
+)
 
 # 4. read sceptre_object from disk
-sceptre_object <- initialize_ondisc_backed_sceptre_object(
+sceptre_object <- read_ondisc_backed_sceptre_object(
   paste0(directory_to_write, "/sceptre_object.rds"),
   paste0(directory_to_write, "/gene.odm"),
   paste0(directory_to_write, "/grna.odm")
