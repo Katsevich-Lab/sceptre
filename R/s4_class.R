@@ -15,6 +15,7 @@ setClass("sceptre_object",
            grna_target_data_frame = "data.frame",
            low_moi = "logical",
            response_names = "character",
+           integer_id = "integer",
 
            # analysis parameters
            discovery_pairs = "data.frame",
@@ -64,4 +65,3 @@ setClass("sceptre_object",
            calibration_result = "data.frame",
            power_result = "data.frame",
            discovery_result = "data.frame"))
-

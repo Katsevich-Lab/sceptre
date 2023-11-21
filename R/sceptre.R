@@ -124,5 +124,36 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #'
 #' # 8. write results
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
+#'
+#' #####################
+#' # out-of-core example
+#' #####################
+#' # 0. set file paths
+#' base_dir <- "/Users/timbarry/research_offsite/external/replogle-2022/raw/rd7/rpe1_other"
+#' directories <- list.files(base_dir, full.names = TRUE)[1:3]
+#' directory_to_write <- "/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7_small"
+#' moi <- "low"
+#' grna_target_data_frame <- readRDS("/Users/timbarry/research_offsite/external/replogle-2022/processed/rd7/grna_target_data_frame.rds")
+#'
+#' # 1. import data
+#' sceptre_object <- import_data_from_cellranger(
+#'    directories = directories,
+#'    directory_to_write = directory_to_write,
+#'    moi = moi,
+#'    grna_target_data_frame = grna_target_data_frame,
+#'    use_ondisc = TRUE)
+#'
+#' # 2. set analysis parameters
+#' discovery_pairs <- construct_trans_pairs(
+#'   sceptre_object = sceptre_object) |> dplyr::sample_n(1000000)
+#' sceptre_object <- set_analysis_parameters(
+#'   sceptre_object = sceptre_object,
+#'   discovery_pairs = discovery_pairs)
+#'
+#' # 3. write sceptre_object to disk
+#' saveRDS(sceptre_object, paste0(directory_to_write, "/sceptre_object.rds"))
+#'
+#' # 4. read sceptre_object from disk
+#' sceptre_object <- read_sceptre_object
 #' }
 NULL
