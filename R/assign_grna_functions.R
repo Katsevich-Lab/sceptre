@@ -8,13 +8,15 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
   n_cells <- ncol(grna_matrix)
   maximum_assignment <- grna_assignment_method == "maximum"
+  grnas_in_use <- determine_grnas_in_use(sceptre_object)
+  if (!identical(sceptre_object@elements_to_analyze, NA_character_)) grnas_in_use <- sceptre_object@elements_to_analyze
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "mixture") {
     initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix, cell_covariate_data_frame = cell_covariate_data_frame,
                                                              grna_assignment_hyperparameters = grna_assignment_hyperparameters,
                                                              print_progress = print_progress, parallel = parallel, n_processors = n_processors,
-                                                             log_dir = log_dir)
+                                                             log_dir = log_dir, grna_ids = grnas_in_use)
   }
   if (grna_assignment_method == "thresholding") {
     initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
@@ -114,4 +116,13 @@ process_initial_assignment_list <- function(initial_assignment_list, grna_target
               grnas_per_cell = grnas_per_cell,
               cells_w_multiple_grnas = cells_w_multiple_grnas)
   return(out)
+}
+
+
+determine_grnas_in_use <- function(sceptre_object) {
+  all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
+                               sceptre_object@discovery_pairs$grna_target, "non-targeting"))
+  grnas_in_use <- dplyr::filter(sceptre_object@grna_target_data_frame, grna_target %in% all_grna_targets) |>
+    dplyr::pull(grna_id)
+  return(grnas_in_use)
 }
