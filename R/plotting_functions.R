@@ -143,23 +143,19 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   }
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
-  grna_ids <- rownames(grna_matrix)
+  grna_ids <- names(init_assignments)
   lowmoi <- sceptre_object@low_moi
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+    grnas_to_plot <- sample(x = grna_ids, size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
   } else {
-    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
+    if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
     multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- load_csr_row(j = grna_matrix@j,
-                      p = grna_matrix@p,
-                      x = grna_matrix@x,
-                      row_idx = which(grna_id == rownames(grna_matrix)),
-                      n_cells = ncol(grna_matrix)) |> as.integer()
+    g <- load_row(grna_matrix, grna_id)
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = grna_id |> factor(),

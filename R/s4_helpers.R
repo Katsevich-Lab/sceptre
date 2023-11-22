@@ -156,6 +156,6 @@ load_row <- function(mat, id) {
   if (methods::is(mat, "odm")) {
     mat[id,]
   } else if (methods::is(mat, "dgRMatrix")) {
-    load_csr_row(j = mat@j, p = mat@p, x = mat@x, row_idx = which(grna_id == rownames(mat)), n_cells = ncol(mat))
+    load_csr_row(j = mat@j, p = mat@p, x = mat@x, row_idx = which(id == rownames(mat)), n_cells = ncol(mat))
   }
 }

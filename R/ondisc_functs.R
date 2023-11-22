@@ -4,24 +4,25 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   output <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
                                                directory_to_write = directory_to_write,
                                                write_cellwise_covariates = FALSE)
-  # 1.5 check the inputs
+  # 2 check the inputs
   check_import_data_inputs(output$gene, output$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
-  # 2. update fields on the sceptre_object
+  # 3. update fields on the sceptre_object
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- output$gene
   sceptre_object@grna_matrix <- output$grna
   sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@integer_id <- output$gene@integer_id
-  # 3. devise the initial gRNA assignment list and process cellwise covariates
+  sceptre_object@out_of_core <- TRUE
+  # 4. devise the initial gRNA assignment list and process cellwise covariates
   cellwise_covariates <- output$cellwise_covariates
   sceptre_object@ondisc_grna_assignment_info <- list(max_grna = cellwise_covariates$grna_feature_w_max_expression,
                                                      max_grna_frac_umis = cellwise_covariates$grna_frac_umis_max_feature)
   cellwise_covariates$grna_feature_w_max_expression <- cellwise_covariates$grna_frac_umis_max_feature <- NULL
   colnames(cellwise_covariates) <- gsub(pattern = "gene", replacement = "response", fixed = TRUE, x = colnames(cellwise_covariates))
   sceptre_object@covariate_data_frame <- cellwise_covariates
-  # 4. initialize flags
+  # 5. initialize flags
   sceptre_object@last_function_called <- "import_data"
   sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
                                     assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,

@@ -1,4 +1,4 @@
-assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors, log_dir) {
+assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors, log_dir, grna_ids) {
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
   # 0. get random starting guesses for pi and g_pert
   starting_guesses <- get_random_starting_guesses(n_em_rep = grna_assignment_hyperparameters$n_em_rep,
@@ -11,7 +11,6 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
 
   # 2. make the grna expression matrix row-accessible
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_ids <- rownames(grna_matrix)
 
   # 3. define the function to perform assignments for a set of grnas
   analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
@@ -24,8 +23,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
     initial_assignment_list <- sapply(seq_along(curr_grna_ids), function(i) {
       grna_id <- get_id_from_idx(response_idx = i, print_progress = print_progress, response_ids = curr_grna_ids,
                                  feature = "gRNA", str = "Performing gRNA-to-cell assignments for ", parallel = parallel, f_name = f_name)
-      g <- load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                        row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix))
+      g <- load_row(grna_matrix, grna_id)
       assignments <- obtain_em_assignments(pi_guesses = starting_guesses$pi_guesses,
                                            g_pert_guesses = starting_guesses$g_pert_guesses,
                                            g = g, covariate_matrix = covariate_matrix, use_glm = TRUE,
@@ -55,6 +53,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   # return
   return (initial_assignment_list)
 }
+
 
 obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matrix, use_glm,
                                   n_nonzero_cells_cutoff, backup_threshold, probability_threshold) {
