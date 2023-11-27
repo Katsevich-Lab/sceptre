@@ -8,8 +8,11 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
   n_cells <- ncol(grna_matrix)
   maximum_assignment <- grna_assignment_method == "maximum"
-  grnas_in_use <- determine_grnas_in_use(sceptre_object)
-  if (!identical(sceptre_object@elements_to_analyze, NA_character_)) grnas_in_use <- sceptre_object@elements_to_analyze
+  if (sceptre_object@out_of_core) {
+    grnas_in_use <- sceptre_object@elements_to_analyze
+  } else {
+    grnas_in_use <- determine_grnas_in_use(sceptre_object)
+  }
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
   if (grna_assignment_method == "mixture") {
