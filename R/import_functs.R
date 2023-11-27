@@ -12,9 +12,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' ###################
-#' # in-memory example
-#' ###################
 #' # 1. point to directories containing cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptre"),
 #'                      "/highmoi_example/gem_group_", 1:2)
