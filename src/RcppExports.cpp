@@ -402,8 +402,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // threshold_count_matrix
-IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells, double threshold);
-RcppExport SEXP _sceptre_threshold_count_matrix(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP, SEXP thresholdSEXP) {
+IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold);
+RcppExport SEXP _sceptre_threshold_count_matrix(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -411,9 +411,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type row_idx(row_idxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
     Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(threshold_count_matrix(j, p, x, row_idx, n_cells, threshold));
+    rcpp_result_gen = Rcpp::wrap(threshold_count_matrix(j, p, x, row_idx, threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -447,7 +446,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_increment_vector", (DL_FUNC) &_sceptre_increment_vector, 2},
-    {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 6},
+    {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
     {NULL, NULL, 0}
 };
 

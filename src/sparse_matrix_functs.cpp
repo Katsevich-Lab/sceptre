@@ -118,7 +118,7 @@ void increment_vector(IntegerVector x, int value) {
 
 
 // [[Rcpp::export]]
-IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells, double threshold) {
+IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold) {
   IntegerVector out;
   int n_gte_threshold = 0, counter = 0, start = p[row_idx - 1], end = p[row_idx];
   for (int k = start; k < end; k ++) if (x[k] >= threshold) n_gte_threshold ++;
