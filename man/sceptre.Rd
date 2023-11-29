@@ -150,6 +150,11 @@ write_ondisc_backed_sceptre_object(
   paste0(directory_to_write, "/sceptre_object.rds")
 )
 
+# 5. set analysis parameters
+sceptre_object <- sceptre_object |> set_analysis_parameters(
+  discovery_pairs = discovery_pairs
+)
+
 # 4. read sceptre_object from disk
 sceptre_object <- read_ondisc_backed_sceptre_object(
   paste0(directory_to_write, "/sceptre_object.rds"),

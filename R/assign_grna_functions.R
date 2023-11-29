@@ -23,7 +23,8 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   }
   if (grna_assignment_method == "thresholding") {
     initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
-                                                                  grna_assign_threshold = grna_assignment_hyperparameters$threshold)
+                                                                  grna_assign_threshold = grna_assignment_hyperparameters$threshold,
+                                                                  grna_ids = grnas_in_use)
   }
   if (grna_assignment_method == "maximum") {
     max_result <- assign_grnas_to_cells_maximum(grna_matrix = grna_matrix,
@@ -33,30 +34,41 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   }
 
   # process the initial assignment list
-  processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
-                                                              grna_target_data_frame = grna_target_data_frame,
-                                                              n_cells = n_cells, low_moi = low_moi,
-                                                              maximum_assignment = maximum_assignment)
-  sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
-  sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
-  sceptre_object@cells_w_multiple_grnas <- if (!maximum_assignment) processed_assignment_out$cells_w_multiple_grnas else max_result$cells_w_multiple_grnas
+  if (!sceptre_object@out_of_core) {
+    processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
+                                                                grna_target_data_frame = grna_target_data_frame,
+                                                                n_cells = n_cells, low_moi = low_moi,
+                                                                maximum_assignment = maximum_assignment)
+    sceptre_object@grna_assignments_raw <- processed_assignment_out$grna_assignments_raw
+    sceptre_object@grnas_per_cell <- processed_assignment_out$grnas_per_cell
+    sceptre_object@cells_w_multiple_grnas <- if (!maximum_assignment) processed_assignment_out$cells_w_multiple_grnas else max_result$cells_w_multiple_grnas
+  }
   sceptre_object@initial_grna_assignment_list <- initial_assignment_list
   return(sceptre_object)
 }
 
 
-assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold) {
-  # 1. make the grna expression matrix row-accessible; ensure threshold is numeric
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_ids <- rownames(grna_matrix)
-  grna_assign_threshold <- as.numeric(grna_assign_threshold)
+assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_ids) {
+  # take cases on the class of grna_matrix
+  if (is(grna_matrix, "odm")) {
+    initial_assignment_list <- sapply(grna_ids, function(grna_id) {
+      ondisc:::threshold_count_matrix_cpp(file_name_in = grna_matrix@h5_file,
+                                          f_row_ptr = grna_matrix@ptr,
+                                          row_idx = which(grna_id == rownames(grna_matrix)),
+                                          threshold = grna_assign_threshold)
+    })
+  } else {
+    # 1. make the grna expression matrix row-accessible; ensure threshold is numeric
+    grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+    grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
-  # 2. perform the assignments
-  initial_assignment_list <- sapply(grna_ids, function(grna_id) {
-    threshold_count_matrix(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
-                           row_idx = which(grna_id == grna_ids), n_cells = ncol(grna_matrix),
-                           threshold = grna_assign_threshold)
-  })
+    # 2. perform the assignments
+    initial_assignment_list <- sapply(grna_ids, function(grna_id) {
+      threshold_count_matrix(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                             row_idx = which(grna_id == rownames(grna_matrix)),
+                             threshold = grna_assign_threshold)
+    })
+  }
 
   return(initial_assignment_list)
 }
