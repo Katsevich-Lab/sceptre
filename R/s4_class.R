@@ -66,7 +66,7 @@ setClass("sceptre_object",
            discovery_result = "data.frame",
 
            # odm-related entries
-           out_of_core = "logical",
+           nf_pipeline = "logical",
            integer_id = "integer",
            elements_to_analyze = "character"
            ))

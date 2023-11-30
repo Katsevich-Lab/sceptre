@@ -8,7 +8,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
   n_cells <- ncol(grna_matrix)
   maximum_assignment <- grna_assignment_method == "maximum"
-  if (sceptre_object@out_of_core) {
+  if (sceptre_object@nf_pipeline) {
     grnas_in_use <- sceptre_object@elements_to_analyze
   } else {
     grnas_in_use <- determine_grnas_in_use(sceptre_object)
@@ -34,7 +34,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   }
 
   # process the initial assignment list
-  if (!sceptre_object@out_of_core) {
+  if (!sceptre_object@nf_pipeline) {
     processed_assignment_out <- process_initial_assignment_list(initial_assignment_list = initial_assignment_list,
                                                                 grna_target_data_frame = grna_target_data_frame,
                                                                 n_cells = n_cells, low_moi = low_moi,
