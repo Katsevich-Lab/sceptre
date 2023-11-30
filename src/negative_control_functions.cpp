@@ -13,7 +13,7 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
   std::vector<int> x(n);
   for (int i = 0; i < n; i ++) x[i] = i;
   std::vector<int> out(k);
-  double n_doub = (double) n, u;
+  double u;
   int r;
   for (int i = 0; i < k; i ++) {
     u = distribution(generator);
