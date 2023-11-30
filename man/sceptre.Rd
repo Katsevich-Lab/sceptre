@@ -169,5 +169,8 @@ sceptre_object <- sceptre_object |>
     parallel = TRUE
   )
 
+# 7. run qc
+sceptre_object <- run_qc(sceptre_object)
+
 }
 }
