@@ -144,7 +144,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- names(init_assignments)
-  lowmoi <- sceptre_object@low_moi
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
     grnas_to_plot <- sample(x = grna_ids, size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
@@ -160,8 +159,8 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = grna_id |> factor(),
                      multiple_grnas = multiple_grnas)
-    # if in low MOI, remove cells containing multiple gRNAs
-    if (sceptre_object@low_moi) df <- df |> dplyr::filter(!multiple_grnas)
+    # if assignment method maximum, remove cells containing multiple gRNAs
+    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!multiple_grnas)
     return(df)
   }) |> data.table::rbindlist()
 
