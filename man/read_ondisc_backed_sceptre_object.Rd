@@ -2,7 +2,7 @@
 % Please edit documentation in R/ondisc_functs.R
 \name{read_ondisc_backed_sceptre_object}
 \alias{read_ondisc_backed_sceptre_object}
-\title{Read a sceptre object backed by an odm}
+\title{Read ondisc-backed sceptre object}
 \usage{
 read_ondisc_backed_sceptre_object(
   sceptre_object_fp,
@@ -16,6 +16,9 @@ read_ondisc_backed_sceptre_object(
 \item{response_odm_file_fp}{file path to a backing \code{.odm} file for the response modality}
 
 \item{grna_odm_file_fp}{file path to a backing \code{.odm} file for the gRNA modality}
+}
+\value{
+an odm-backed \code{sceptre_object}
 }
 \description{
 Reads and initializes a \code{sceptre_object} from backing .odm files.

@@ -144,22 +144,30 @@ sceptre_object <- set_analysis_parameters(
   sceptre_object = sceptre_object,
   discovery_pairs = discovery_pairs)
 
-# 3. write sceptre_object to disk
+# 3. set analysis parameters
+sceptre_object <- sceptre_object |> set_analysis_parameters(
+  discovery_pairs = discovery_pairs
+)
+
+# 4. write sceptre_object to disk
 write_ondisc_backed_sceptre_object(
   sceptre_object,
   paste0(directory_to_write, "/sceptre_object.rds")
 )
 
-# 5. set analysis parameters
-sceptre_object <- sceptre_object |> set_analysis_parameters(
-  discovery_pairs = discovery_pairs
-)
-
-# 4. read sceptre_object from disk
+# 5. read sceptre_object from disk
 sceptre_object <- read_ondisc_backed_sceptre_object(
   paste0(directory_to_write, "/sceptre_object.rds"),
   paste0(directory_to_write, "/gene.odm"),
   paste0(directory_to_write, "/grna.odm")
 )
+
+# 6. assign gRNAs
+sceptre_object <- sceptre_object |>
+  assign_grnas(
+    method = "mixture",
+    parallel = TRUE
+  )
+
 }
 }

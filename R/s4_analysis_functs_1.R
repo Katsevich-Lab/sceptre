@@ -36,7 +36,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@elements_to_analyze <- NA_character_
-  sceptre_object@out_of_core <- FALSE
+  sceptre_object@nf_pipeline <- FALSE
 
   # 5. initialize flags
   sceptre_object@last_function_called <- "import_data"

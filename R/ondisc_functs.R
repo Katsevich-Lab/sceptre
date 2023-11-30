@@ -14,7 +14,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@integer_id <- output$gene@integer_id
-  sceptre_object@out_of_core <- TRUE
+  sceptre_object@nf_pipeline <- FALSE
   # 4. devise the initial gRNA assignment list and process cellwise covariates
   cellwise_covariates <- output$cellwise_covariates
   sceptre_object@ondisc_grna_assignment_info <- list(max_grna = cellwise_covariates$grna_feature_w_max_expression,
@@ -31,7 +31,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 }
 
 
-#' Read a sceptre object backed by an odm
+#' Read ondisc-backed sceptre object
 #'
 #' Reads and initializes a `sceptre_object` from backing .odm files.
 #'
@@ -39,7 +39,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 #' @param response_odm_file_fp file path to a backing `.odm` file for the response modality
 #' @param grna_odm_file_fp file path to a backing `.odm` file for the gRNA modality
 #'
-#' @return
+#' @return an odm-backed `sceptre_object`
 #' @export
 read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
   # read in objects
@@ -60,6 +60,15 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
 }
 
 
+#' Write ondisc-backed sceptre object
+#'
+#' Write an ondisc-backed sceptre object to disk.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param sceptre_object_fp the file in which to store the `sceptre_object`
+#'
+#' @return NULL
+#' @export
 write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp) {
   sceptre_object@grna_matrix <- matrix()
   sceptre_object@response_matrix <- matrix()
