@@ -176,5 +176,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #'   )
 #'
 #' # 7. run qc
+#' sceptre_object <- run_qc(sceptre_object)
+#'
 #' }
 NULL
