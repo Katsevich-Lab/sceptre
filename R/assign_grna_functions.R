@@ -75,22 +75,31 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 
 
 assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fraction_threshold) {
- # 1. make grna matrix column accessible
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
+  # take cases on the class of grna_matrix
+  if (is(grna_matrix, "odm")) {
+    grna_ids <- unique(sceptre_object@ondisc_grna_assignment_info$max_grna)
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
+      which(sceptre_object@ondisc_grna_assignment_info$max_grna == grna_id)
+    }) |> stats::setNames(grna_ids)
+    cells_w_multiple_grnas <- which(sceptre_object@ondisc_grna_assignment_info$max_grna_frac_umis > umi_fraction_threshold)
+  } else {
+    # 1. make grna matrix column accessible
+    grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
 
-  # 2. compute the column-wise max and fraction of reads coming from the assigned grna
-  l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p, x = grna_matrix@x,
-                           n_cells = ncol(grna_matrix), grna_lib_size = grna_lib_size)
+    # 2. compute the column-wise max and fraction of reads coming from the assigned grna
+    l <- compute_colwise_max(i = grna_matrix@i, p = grna_matrix@p, x = grna_matrix@x,
+                             n_cells = ncol(grna_matrix), grna_lib_size = grna_lib_size)
 
-  # 3. construct a list in which each individual grna is mapped to the set of cells containing it
-  indiv_grna_id_assignments <- l$assignment_vect
-  grna_rownames <- rownames(grna_matrix)
-  initial_assignment_list <- lapply(X = seq_along(grna_rownames), FUN = function(i) {
-    which(i == indiv_grna_id_assignments)
-  }) |> stats::setNames(grna_rownames)
+    # 3. construct a list in which each individual grna is mapped to the set of cells containing it
+    indiv_grna_id_assignments <- l$assignment_vect
+    grna_rownames <- rownames(grna_matrix)
+    initial_assignment_list <- lapply(X = seq_along(grna_rownames), FUN = function(i) {
+      which(i == indiv_grna_id_assignments)
+    }) |> stats::setNames(grna_rownames)
 
-  # 4. obtain the cells containing multiple grnas
-  cells_w_multiple_grnas <- which(l$frac_umis <= umi_fraction_threshold)
+    # 4. obtain the cells containing multiple grnas
+    cells_w_multiple_grnas <- which(l$frac_umis <= umi_fraction_threshold)
+  }
 
   return(list(initial_assignment_list = initial_assignment_list,
               cells_w_multiple_grnas = cells_w_multiple_grnas))
