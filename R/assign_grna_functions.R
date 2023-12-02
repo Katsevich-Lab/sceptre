@@ -1,3 +1,6 @@
+###########################################
+# TOP-LEVEL FUNCTION: ASSIGN GRNAS TO CELLS
+###########################################
 assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_processors, log_dir) {
   # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
@@ -48,6 +51,9 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
 }
 
 
+#######################
+# THRESHOLDING FUNCTION
+#######################
 assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_ids) {
   # take cases on the class of grna_matrix
   if (is(grna_matrix, "odm")) {
@@ -74,6 +80,10 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 }
 
 
+
+#########
+# MAXIMUM
+#########
 assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fraction_threshold) {
   # take cases on the class of grna_matrix
   if (is(grna_matrix, "odm")) {
@@ -81,7 +91,7 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
       which(sceptre_object@ondisc_grna_assignment_info$max_grna == grna_id)
     }) |> stats::setNames(grna_ids)
-    cells_w_multiple_grnas <- which(sceptre_object@ondisc_grna_assignment_info$max_grna_frac_umis > umi_fraction_threshold)
+    cells_w_multiple_grnas <- which(sceptre_object@ondisc_grna_assignment_info$max_grna_frac_umis <= umi_fraction_threshold)
   } else {
     # 1. make grna matrix column accessible
     grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)
@@ -106,6 +116,9 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
 }
 
 
+######################
+# AUXILLIARY FUNCTIONS
+######################
 process_initial_assignment_list <- function(initial_assignment_list, grna_target_data_frame, n_cells, low_moi, maximum_assignment) {
   # 1. compute the vector of grnas per cell
   grnas_per_cell <- if (!maximum_assignment) {
