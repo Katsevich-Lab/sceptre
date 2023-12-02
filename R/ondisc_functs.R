@@ -74,3 +74,23 @@ write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp
   sceptre_object@response_matrix <- matrix()
   saveRDS(sceptre_object, sceptre_object_fp)
 }
+
+
+###########################
+# PIPELINE HELPER FUNCTIONS
+###########################
+get_id_vect <- function(v, pod_size) {
+  n_elements <- length(v)
+  breaks <- round(n_elements/pod_size)
+  if (breaks >= 2) {
+    as.integer(cut(seq(1, n_elements), breaks))
+  } else {
+    rep(1L, n_elements)
+  }
+}
+
+write_vector <- function(vector, file_name) {
+  file_con <- file(file_name)
+  writeLines(as.character(vector), file_con)
+  close(file_con)
+}
