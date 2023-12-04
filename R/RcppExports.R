@@ -74,8 +74,8 @@ increment_matrix <- function(m) {
     invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
-sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use) {
-    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use)
+sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
+    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 }
 
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {

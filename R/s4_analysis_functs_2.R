@@ -325,10 +325,15 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 
 skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel) {
   functs_run <- sceptre_object@functs_called
-  if (functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]] &&
-      !functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) { # advance by two
-    cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.\n\n"))
-    sceptre_object <- assign_grnas(sceptre_object, parallel = parallel) |> run_qc()
+  if (functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]) {
+    if (!functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
+      cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.\n\n"))
+      sceptre_object <- assign_grnas(sceptre_object, parallel = parallel) |> run_qc() # advance by two
+    }
+    if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
+      cat(crayon::red("Note: Automatically running `run_qc()` with default arguments.\n\n"))
+      sceptre_object <- sceptre_object |> run_qc() # advance by one
+    }
   }
   return(sceptre_object)
 }

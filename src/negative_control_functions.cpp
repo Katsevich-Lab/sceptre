@@ -96,19 +96,12 @@ void increment_matrix(IntegerMatrix m) {
 
 
 // [[Rcpp::export]]
-List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes,
-                                int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, bool calculate_ess_using_m_matrix,
-                                IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, List indiv_nt_grna_idxs, IntegerVector cells_in_use) {
+List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
+                                int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
   // 0.1 define a few variables
   int n_grna_groups = possible_groups_m.nrow(), undercover_grp_size = possible_groups_m.ncol(), n_nonzero_trt, n_nonzero_cntrl;
   int n_possible_pairs = n_grna_groups * n_genes;
   double n_possible_pairs_doub = (double) n_possible_pairs;
-
-  // 0.2 define variables related to the expression matrix
-  std::vector<bool> y_sub(n_cells_sub), y_orig(n_cells_orig);
-  std::vector<int> cells_in_use_zero_idx(n_cells_sub);
-  IntegerVector curr_idxs;
-  for (int i = 0; i < cells_in_use_zero_idx.size(); i ++) cells_in_use_zero_idx[i] = cells_in_use[i] - 1;
 
   // 0.3 initialize the vector of sampled elements and elements that could be sampld
   std::vector<int> gene_idxs, grna_group_idxs, n_nonzero_trt_v, n_nonzero_cntrl_v;
@@ -135,25 +128,8 @@ List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonze
 
     // check if the grna group-gene pair passes pairwise QC
     n_nonzero_trt = 0;
-
-    if (calculate_ess_using_m_matrix) {
-      // sum over elements of n nonzero mat
-      for (int k = 0; k < undercover_grp_size; k++) {
-        n_nonzero_trt += n_nonzero_m(possible_groups_m(grna_group_idx, k), gene_idx);
-      }
-    } else {
-      // load vector of positions of nonzero entries into y
-      load_nonzero_posits(j, p, gene_idx, y_orig, y_sub, cells_in_use_zero_idx);
-      // loop over the grnas in the group
-      for (int k = 0; k < undercover_grp_size; k ++) {
-        curr_idxs = indiv_nt_grna_idxs[possible_groups_m(grna_group_idx, k)];
-        for (int l = 0; l < curr_idxs.size(); l++) {
-          if (y_sub[curr_idxs[l] - 1]) {
-            n_nonzero_trt ++;
-            y_sub[curr_idxs[l] - 1] = false;
-          }
-        }
-      }
+    for (int k = 0; k < undercover_grp_size; k++) {
+      n_nonzero_trt += n_nonzero_m(possible_groups_m(grna_group_idx, k), gene_idx);
     }
     n_nonzero_cntrl = n_nonzero_tot[gene_idx] - n_nonzero_trt;
 
