@@ -39,7 +39,20 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
                                        n_nonzero_trt_thresh = n_nonzero_trt_thresh,
                                        n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh)
   } else {
-    # high MOI groped code here
+    nt_grna_group_idxs <- lapply(X = seq(1L, nrow(possible_groups_m)), function(i) {
+      nt_grna_idxs <- possible_groups_m[i,] + 1L
+      grna_assignments$indiv_nt_grna_idxs[nt_grna_idxs] |> unlist() |> unique()
+    })
+    n_nonzero_m <- compute_n_trt_cells_matrix(j = response_matrix@j, p = response_matrix@p,
+                                              n_cells_orig = ncol(response_matrix), n_cells_sub = length(cells_in_use),
+                                              n_genes = n_genes, nt_grna_group_idxs = nt_grna_group_idxs,
+                                              cells_in_use = cells_in_use)
+    dummy_possibly_groups_m <- matrix(seq_along(nt_grna_group_idxs) - 1L, ncol = 1L)
+    samp <- sample_undercover_pairs_v2(n_nonzero_m = n_nonzero_m, n_nonzero_tot = n_nonzero_tot,
+                                       possible_groups_m = dummy_possibly_groups_m, n_genes = n_genes,
+                                       n_calibration_pairs = n_calibration_pairs,
+                                       n_nonzero_trt_thresh = n_nonzero_trt_thresh,
+                                       n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh)
   }
 
   # 4. construct the data frame of negative control pairs

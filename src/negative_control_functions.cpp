@@ -150,3 +150,36 @@ List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonze
                       Named("n_nonzero_trt_v") = n_nonzero_trt_v,
                       Named("n_nonzero_cntrl_v") = n_nonzero_cntrl_v));
 }
+
+
+// [[Rcpp::export]]
+IntegerMatrix compute_n_trt_cells_matrix(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub,
+                                         int n_genes, List nt_grna_group_idxs, IntegerVector cells_in_use) {
+  // define objects
+  int n_nonzero;
+  IntegerVector curr_idxs;
+  IntegerMatrix M(nt_grna_group_idxs.size(), n_genes);
+  std::vector<bool> y_sub(n_cells_sub), y_orig(n_cells_orig);
+  std::vector<int> cells_in_use_zero_idx(n_cells_sub);
+  for (int i = 0; i < cells_in_use_zero_idx.size(); i ++) cells_in_use_zero_idx[i] = cells_in_use[i] - 1;
+
+  // decrement nt_grna_group_idxs
+  for (int i = 0; i < nt_grna_group_idxs.size(); i ++) {
+    curr_idxs = nt_grna_group_idxs[i];
+    for (int k = 0; k < curr_idxs.size(); k ++) curr_idxs[k] --;
+  }
+
+  // iterate over genes
+  for (int row_idx = 0; row_idx < n_genes; row_idx ++) {
+    // load nonzero positions into the boolean vector y_sub
+    load_nonzero_posits(j, p, row_idx, y_orig, y_sub, cells_in_use_zero_idx);
+    // iterate over nt grna groups
+    for (int grna_idx = 0; grna_idx < nt_grna_group_idxs.size(); grna_idx ++) {
+      n_nonzero = 0;
+      curr_idxs = nt_grna_group_idxs[grna_idx];
+      for (int k = 0; k < curr_idxs.size(); k ++) if (y_sub[curr_idxs[k]]) n_nonzero ++;
+      M(grna_idx, row_idx) = n_nonzero;
+    }
+  }
+  return M;
+}
