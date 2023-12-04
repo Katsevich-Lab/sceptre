@@ -78,6 +78,10 @@ sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_grou
     .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 }
 
+compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
+    .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
+}
+
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
     .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }

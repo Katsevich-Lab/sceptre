@@ -32,7 +32,7 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
       for (int k = 0; k < curr_idxs.size(); k ++) {
         if (!control_group_complement) { // NT cells control group
           if (y_sub[all_nt_idxs[curr_idxs[k] - 1] - 1]) n_nonzero ++; // redirection
-        } else { // discovery cells control group
+        } else { // complement set cells control group
           if (y_sub[curr_idxs[k] - 1]) n_nonzero ++; // no redirection
         }
       }

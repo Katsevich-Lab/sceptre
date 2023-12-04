@@ -227,6 +227,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_n_trt_cells_matrix
+IntegerMatrix compute_n_trt_cells_matrix(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, int n_genes, List nt_grna_group_idxs, IntegerVector cells_in_use);
+RcppExport SEXP _sceptre_compute_n_trt_cells_matrix(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP n_genesSEXP, SEXP nt_grna_group_idxsSEXP, SEXP cells_in_useSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells_sub(n_cells_subSEXP);
+    Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
+    Rcpp::traits::input_parameter< List >::type nt_grna_group_idxs(nt_grna_group_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_n_trt_cells_matrix(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_genes_within_distance
 std::vector<int> compute_genes_within_distance(int midpoint, IntegerVector gene_tss_posits, int distance_threshold);
 RcppExport SEXP _sceptre_compute_genes_within_distance(SEXP midpointSEXP, SEXP gene_tss_positsSEXP, SEXP distance_thresholdSEXP) {
@@ -427,6 +444,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
     {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 7},
+    {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
