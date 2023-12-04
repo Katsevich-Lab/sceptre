@@ -68,6 +68,9 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
   }
 
   # 4. construct the data frame of negative control pairs
+  if (length(samp$response_idxs) == 0L) {
+    stop("No negative control pair passes pairwise QC.")
+  }
   response_ids <- rownames(response_matrix)
   increment_matrix(possible_groups_m)
   undercover_groups <- get_undercover_group_names(possible_groups_m, nt_grna_names)

@@ -91,6 +91,7 @@ set_analysis_parameters <- function(sceptre_object,
     if (control_group == "default") control_group <- "nt_cells"
     if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
   }
+  if (is(sceptre_object@response_matrix, "odm")) resampling_mechanism <- "permutations"
   if (identical(formula_object, "default")) {
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)
@@ -245,8 +246,8 @@ run_qc <- function(sceptre_object,
   current_cells_in_use <- sceptre_object@cells_in_use
 
   # 4. update uncached fields of the sceptre object
-  sceptre_object@n_nonzero_trt_thresh <- n_nonzero_trt_thresh
-  sceptre_object@n_nonzero_cntrl_thresh <- n_nonzero_cntrl_thresh
+  sceptre_object@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
+  sceptre_object@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
 
   # 5. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(sceptre_object, response_n_umis_range, response_n_nonzero_range,

@@ -47,11 +47,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                      parallel = parallel, f_name = f_name)
 
       # 3. load the expressions of the current response
-      expression_vector <- load_csr_row(j = response_matrix@j,
-                                        p = response_matrix@p,
-                                        x = response_matrix@x,
-                                        row_idx = which(rownames(response_matrix) == response_id),
-                                        n_cells = n_cells_orig)[cells_in_use]
+      expression_vector <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
       if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
       # 4. obtain the gRNA groups to analyze
