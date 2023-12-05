@@ -17,6 +17,22 @@
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
                                   n_processors = "auto", log_dir = tempdir()) {
+  sceptre_object <- sceptre_object |>
+    run_calibration_check_pt_1(n_calibration_pairs = n_calibration_pairs,
+                               calibration_group_size = calibration_group_size,
+                               parallel = parallel,
+                               n_processors = n_processors) |>
+    run_calibration_check_pt_2(output_amount = output_amount,
+                               print_progress = print_progress,
+                               parallel = parallel,
+                               n_processors = n_processors,
+                               log_dir = log_dir)
+  return(sceptre_object)
+}
+
+
+run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NULL, calibration_group_size = NULL,
+                                       parallel = FALSE, n_processors = "auto") {
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
@@ -30,15 +46,22 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   check_calibration_check_inputs(sceptre_object, n_calibration_pairs, n_processors) |> invisible()
 
   # 3. construct the negative control pairs
-  response_grna_group_pairs <- construct_negative_control_pairs_v2(sceptre_object = sceptre_object,
-                                                                   n_calibration_pairs = n_calibration_pairs,
-                                                                   calibration_group_size = calibration_group_size)
+  negative_control_pairs <- construct_negative_control_pairs_v2(sceptre_object = sceptre_object,
+                                                                n_calibration_pairs = n_calibration_pairs,
+                                                                calibration_group_size = calibration_group_size)
 
   # 4. update uncached objects
   sceptre_object@calibration_group_size <- as.integer(calibration_group_size)
   sceptre_object@n_calibration_pairs <- as.integer(n_calibration_pairs)
+  sceptre_object@negative_control_pairs <- negative_control_pairs
+  return(sceptre_object)
+}
 
+
+run_calibration_check_pt_2 <- function(sceptre_object, output_amount = 1, print_progress = TRUE,
+                                       parallel = FALSE, n_processors = "auto", log_dir = tempdir()) {
   # 5. run the sceptre analysis (high-level function call)
+  response_grna_group_pairs <- sceptre_object@negative_control_pairs
   out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
                                          response_grna_group_pairs = response_grna_group_pairs,
                                          calibration_check = TRUE,
@@ -50,12 +73,20 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
                                          log_dir = log_dir)
 
   # 6. update fields of sceptre object with results
-  sceptre_object@calibration_result <- out$result |> apply_grouping_to_result(sceptre_object, TRUE) |>
-    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha)
-  sceptre_object@negative_control_pairs <- response_grna_group_pairs
+  sceptre_object@calibration_result <- if (!sceptre_object@nf_pipeline) {
+    process_calibration_result(out$result, sceptre_object)
+  } else {
+    out$result
+  }
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
+}
+
+
+process_calibration_result <- function(result, sceptre_object) {
+  result |> apply_grouping_to_result(sceptre_object, TRUE) |>
+    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
+                    sceptre_object@multiple_testing_alpha)
 }
 
 
@@ -104,7 +135,11 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
                                          log_dir = log_dir)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@power_result <- out$result |> apply_grouping_to_result(sceptre_object)
+  sceptre_object@power_result <- if (!sceptre_object@nf_pipeline) {
+    out$result |> apply_grouping_to_result(sceptre_object)
+  } else {
+    out$result
+  }
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
 }
@@ -155,11 +190,20 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
                                          log_dir = log_dir)
 
   # 4. update fields of sceptre object with results
-  sceptre_object@discovery_result <- out$result |> apply_grouping_to_result(sceptre_object) |>
-    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha)
+  sceptre_object@discovery_result <- if (!sceptre_object@nf_pipeline) {
+    process_discovery_result(out$result, sceptre_object)
+  } else {
+    out$result
+  }
   sceptre_object@response_precomputations <- out$response_precomputations
   return(sceptre_object)
+}
+
+
+process_discovery_result <- function(result, sceptre_object) {
+  result |> apply_grouping_to_result(sceptre_object) |>
+    dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
+                    sceptre_object@multiple_testing_alpha)
 }
 
 
