@@ -10,7 +10,9 @@ run_calibration_check(
   n_calibration_pairs = NULL,
   calibration_group_size = NULL,
   print_progress = TRUE,
-  parallel = FALSE
+  parallel = FALSE,
+  n_processors = "auto",
+  log_dir = tempdir()
 )
 }
 \arguments{
@@ -25,6 +27,8 @@ run_calibration_check(
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
 \item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
+
+\item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, "auto," automatically detects the number of processors available on the machine.}
 }
 \value{
 an updated \code{sceptre_object} in which the calibration check has been carried out

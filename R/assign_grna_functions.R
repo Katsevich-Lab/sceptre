@@ -1,4 +1,4 @@
-assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
+assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_processors, log_dir) {
   # extract pieces from sceptre_object
   grna_matrix <- sceptre_object@grna_matrix
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
@@ -13,7 +13,8 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel) {
   if (grna_assignment_method == "mixture") {
     initial_assignment_list <- assign_grnas_to_cells_mixture(grna_matrix = grna_matrix, cell_covariate_data_frame = cell_covariate_data_frame,
                                                              grna_assignment_hyperparameters = grna_assignment_hyperparameters,
-                                                             print_progress = print_progress, parallel = parallel)
+                                                             print_progress = print_progress, parallel = parallel, n_processors = n_processors,
+                                                             log_dir = log_dir)
   }
   if (grna_assignment_method == "thresholding") {
     initial_assignment_list <- assign_grnas_to_cells_thresholding(grna_matrix = grna_matrix,
