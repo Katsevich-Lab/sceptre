@@ -101,7 +101,7 @@ compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
   matrix_in <- set_matrix_accessibility(matrix_in, make_row_accessible = FALSE)
   # get MT gene idxs
   if (compute_p_mito) {
-    mt_gene_idxs <- grep(pattern = "^MT-", x = feature_names)
+    mt_gene_idxs <- grep(pattern = "^MT-", x = feature_names, ignore.case = TRUE)
     compute_p_mito <- length(mt_gene_idxs) >= 1
   } else {
     mt_gene_idxs <- integer()
