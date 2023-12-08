@@ -1,3 +1,12 @@
+# sceptre 0.9.2 (2023-12-08)
+
+Version 0.9.2 is a minor update.
+
+1. Add an `n_processors` argument to the functions that enable parallelization to allow users to select the number of processors to use. (The default, `n_processors = "auto"`, selects the number of processors to use based on the number of processors available on the machine.)
+2. Add a `log_dir` argument enabling users to specify the directory in which to write the log files.
+3. Accelerate the `plot_assign_grnas()` function.
+4. Fix the functionality for identifying mitochondrial genes; now, genes prefixed by "MT-" or "mt-" are considered mitochondrial.
+
 # sceptre 0.9.1 (2023-10-24)
 
 Version 0.9.1 is a minor update to version 0.9.0.
