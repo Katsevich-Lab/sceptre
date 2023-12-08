@@ -72,7 +72,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     cat(paste0("\n\ngRNA-to-cell assignment information:",
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(mean_cells_per_grna |> round(2)),
-               "\n\t\U2022 Mean N gRNAs per cell (MOI): ", if (x@grna_assignment_method == "maximum") "not computed when using \"maximum\" assignment method" else crayon::blue(x@grnas_per_cell |> mean() |> round(2))))
+               "\n\t\U2022 Mean N gRNAs per cell (MOI): ", if (x@grna_assignment_method == "maximum") "not computed when using \"maximum\" assignment method" else crayon::blue(x@grnas_per_cell |> mean() |> round(2))),
+               if (x@grna_assignment_method == "mixture") paste0("\n\t\U2022 gRNA assignment formula object: ", crayon::blue(as.character(x@grna_assignment_hyperparameters$formula_object)[2])) else NULL)
   }
 
   # 4. print the results summary
