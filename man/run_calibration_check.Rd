@@ -29,6 +29,8 @@ run_calibration_check(
 \item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 
 \item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, "auto," automatically detects the number of processors available on the machine.}
+
+\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
 }
 \value{
 an updated \code{sceptre_object} in which the calibration check has been carried out
