@@ -11,7 +11,14 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object@response_matrix <- output$gene
   sceptre_object@grna_matrix <- output$grna
-  sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id), grna_target = as.character(grna_target))
+  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
+    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
+                                                                                     grna_target = as.character(grna_target))
+  } else {
+    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
+                                                                                                 grna_target = as.character(grna_target),
+                                                                                                 vector_id = as.character(vector_id))
+  }
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@integer_id <- output$gene@integer_id
   sceptre_object@nf_pipeline <- FALSE
