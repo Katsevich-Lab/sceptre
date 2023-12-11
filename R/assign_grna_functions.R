@@ -75,8 +75,6 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
   return(initial_assignment_list)
 }
 
-
-
 #########
 # MAXIMUM
 #########
@@ -115,9 +113,36 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
 ######################
 # AUXILLIARY FUNCTIONS
 ######################
+preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
+  # update the initial grna assignment list
+  initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
+  grna_target_data_table <- sceptre_object@grna_target_data_frame |> data.table::as.data.table()
+  vector_ids <- unique(grna_target_data_table$vector_id)
+  vector_groups <- lapply(vector_ids, function(curr_vector_id) {
+    grna_target_data_table[grna_target_data_table$vector_id == curr_vector_id,]$grna_id
+  }) |> stats::setNames(vector_ids)
+  initial_grna_assignment_list <- lapply(vector_groups, function(elem) {
+    l <- initial_grna_assignment_list[elem]
+    unique(unlist(l))
+  })
+  # update the grna target data table
+  grna_target_data_table <- grna_target_data_table |>
+    dplyr::mutate(grna_id = vector_id, vector_id = NULL) |>
+    dplyr::distinct()
+  # update the fields of the sceptre_object and return
+  sceptre_object@grna_target_data_frame <- grna_target_data_table
+  sceptre_object@initial_grna_assignment_list <- initial_grna_assignment_list
+  return(sceptre_object)
+}
+
+
 # add three fields to sceptre_object:
 # 1. grnas_per_cell, 2. cells_w_multiple_grnas, 3. grna_assignments_raw
 process_initial_assignment_list <- function(sceptre_object) {
+  # -1. preprocessing step: if vector_id has been supplied, combine grnas within the same vector, and treat vectors as if they are individual grnas
+  if ("vector_id" %in% colnames(sceptre_object@grna_target_data_frame)) {
+    sceptre_object <- preprocess_initial_assignment_list_vector_supplied(sceptre_object)
+  }
   # 0. set variables
   initial_assignment_list <- sceptre_object@initial_grna_assignment_list
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
