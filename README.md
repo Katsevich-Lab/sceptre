@@ -18,9 +18,9 @@ statistical rigor, computational efficiency, and ease of use.
 
 <!-- badges: end -->
 
-## Release of `sceptre` v0.9.1
+## Release of `sceptre` v0.9.2
 
-We are excited to announce the release of `sceptre` v0.9.1, a
+We are excited to announce the release of `sceptre` v0.9.2, a
 substantial update to the package. This milestone includes the following
 developments:
 
@@ -37,7 +37,7 @@ developments:
   users through the entire process of analyzing their data using
   `sceptre`.
 
-`sceptre` v0.9.1 facilitates an entire analysis pipeline for single-cell
+`sceptre` v0.9.2 facilitates an entire analysis pipeline for single-cell
 CRISPR screens, starting from UMI count data obtained from tools like
 10X Cell Ranger.
 
