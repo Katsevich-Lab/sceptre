@@ -156,6 +156,7 @@ set_analysis_parameters <- function(sceptre_object,
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
 #' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
+#' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @param ... optional method-specific additional arguments
 #'
 #' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
