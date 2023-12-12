@@ -116,22 +116,23 @@ assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fracti
 preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
   # update the initial grna assignment list
   initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
-  grna_target_data_table <- sceptre_object@grna_target_data_frame |> data.table::as.data.table()
+  grna_target_data_table <- sceptre_object@grna_target_data_frame_with_vector |> data.table::as.data.table()
   vector_ids <- unique(grna_target_data_table$vector_id)
   vector_groups <- lapply(vector_ids, function(curr_vector_id) {
     grna_target_data_table[grna_target_data_table$vector_id == curr_vector_id,]$grna_id
   }) |> stats::setNames(vector_ids)
-  initial_grna_assignment_list <- lapply(vector_groups, function(elem) {
+  initial_grna_assignment_list_modified <- lapply(vector_groups, function(elem) {
     l <- initial_grna_assignment_list[elem]
     unique(unlist(l))
   })
   # update the grna target data table
-  grna_target_data_table <- grna_target_data_table |>
-    dplyr::mutate(grna_id = vector_id, vector_id = NULL) |>
+  grna_target_data_table_modified <- grna_target_data_table |>
+    dplyr::select(grna_id = vector_id, grna_target) |>
+    dplyr::mutate(grna_group = grna_target) |>
     dplyr::distinct()
   # update the fields of the sceptre_object and return
-  sceptre_object@grna_target_data_frame <- grna_target_data_table
-  sceptre_object@initial_grna_assignment_list <- initial_grna_assignment_list
+  sceptre_object@grna_target_data_frame <- grna_target_data_table_modified
+  sceptre_object@initial_grna_assignment_list <- initial_grna_assignment_list_modified
   return(sceptre_object)
 }
 
@@ -140,7 +141,7 @@ preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
 # 1. grnas_per_cell, 2. cells_w_multiple_grnas, 3. grna_assignments_raw
 process_initial_assignment_list <- function(sceptre_object) {
   # -1. preprocessing step: if vector_id has been supplied, combine grnas within the same vector, and treat vectors as if they are individual grnas
-  if ("vector_id" %in% colnames(sceptre_object@grna_target_data_frame)) {
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
     sceptre_object <- preprocess_initial_assignment_list_vector_supplied(sceptre_object)
   }
   # 0. set variables
@@ -181,7 +182,12 @@ process_initial_assignment_list <- function(sceptre_object) {
 determine_grnas_in_use <- function(sceptre_object) {
   all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
                                sceptre_object@discovery_pairs$grna_target, "non-targeting"))
-  grnas_in_use <- dplyr::filter(sceptre_object@grna_target_data_frame, grna_target %in% all_grna_targets) |>
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
+  grnas_in_use <- dplyr::filter(grna_target_data_frame, grna_target %in% all_grna_targets) |>
     dplyr::pull(grna_id)
   return(grnas_in_use)
 }

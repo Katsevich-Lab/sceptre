@@ -36,7 +36,10 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
     if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) load_row(grna_matrix, grna_id)) |> unlist()
+  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
+    load_csr_row(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
+                 row_idx = which(grna_id == rownames(grna_matrix)), n_cells = ncol(grna_matrix))
+  }) |> unlist()
   grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
   to_plot <- data.frame(grna_id = grna_ids_rep, grna_expressions = grna_expressions) |>
     dplyr::filter(grna_expressions < 10000)
@@ -150,14 +153,22 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   } else {
     if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
-  to_plot_a <- lapply(X = grnas_to_plot, function(grna_id) {
+  to_plot_a <- lapply(X = grnas_to_plot, function(curr_grna_id) {
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
-    assignment[init_assignments[[grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
+    assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
     multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- load_row(grna_matrix, grna_id)
+    g <- if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+      sceptre_object@grna_target_data_frame_with_vector |>
+        dplyr::filter(vector_id == curr_grna_id) |>
+        dplyr::pull(grna_id) |>
+        sapply(function(i) load_row(grna_matrix, i)) |>
+        rowSums()
+    } else {
+      load_row(grna_matrix, curr_grna_id)
+    }
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
-                     grna_id = grna_id |> factor(),
+                     grna_id = curr_grna_id |> factor(),
                      multiple_grnas = multiple_grnas)
     # if assignment method maximum, remove cells containing multiple gRNAs
     if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!multiple_grnas)

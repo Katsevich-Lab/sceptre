@@ -14,7 +14,12 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
   if (!all(colnames(response_position_data_frame) %in% c("response_id", "chr", "position"))) {
     stop("`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'.")
   }
-  grna_target_data_frame <- data.table::as.data.table(sceptre_object@grna_target_data_frame)
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
+  grna_target_data_frame <- data.table::as.data.table(grna_target_data_frame)
   response_ids <- rownames(sceptre_object@response_matrix)
   distance_threshold <- as.integer(distance_threshold)
   grna_targets_to_exclude <- c("non-targeting", as.character(positive_control_pairs$grna_target))
@@ -70,10 +75,15 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
   }
   response_ids <- rownames(sceptre_object@response_matrix)
   grna_targets_to_exclude <- c("non-targeting", if (pairs_to_exclude == "pairs_containing_pc_targets") as.character(positive_control_pairs$grna_target) else NULL)
-  grna_targets <- sceptre_object@grna_target_data_frame |>
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
+  grna_targets <- grna_target_data_frame |>
     dplyr::filter(!(grna_target %in% grna_targets_to_exclude)) |>
     dplyr::pull(grna_target) |> unique()
-  out_pairs <- expand.grid( grna_target = grna_targets, response_id = response_ids)
+  out_pairs <- expand.grid(grna_target = grna_targets, response_id = response_ids)
   if (pairs_to_exclude == "pc_pairs") out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
   return(out_pairs)
 }
@@ -88,7 +98,11 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #' @return a data frame with columns `grna_target` and `response_id` containing the positive control pairs
 #' @export
 construct_positive_control_pairs <- function(sceptre_object) {
-  grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
   response_ids <- rownames(sceptre_object@response_matrix)
   pc_grna_targets <- grna_target_data_frame$grna_target[
     grna_target_data_frame$grna_target %in% response_ids] |> unique()

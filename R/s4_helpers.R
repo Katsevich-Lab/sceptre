@@ -6,9 +6,14 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 1. obtain the basic information
   n_cells <- ncol(object@response_matrix)
   n_responses <- nrow(object@response_matrix)
-  n_nt_grnas <- object@grna_target_data_frame |>
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
+  n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_target == "non-targeting") |> nrow()
-  targeting_grnas_df <- object@grna_target_data_frame |>
+  targeting_grnas_df <- grna_target_data_frame |>
     dplyr::filter(grna_target != "non-targeting")
   n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
   n_targeting_grnas <- nrow(targeting_grnas_df)
