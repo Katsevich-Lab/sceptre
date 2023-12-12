@@ -52,7 +52,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
 #######################
 assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_ids) {
   # take cases on the class of grna_matrix
-  if (is(grna_matrix, "odm")) {
+  if (methods::is(grna_matrix, "odm")) {
     initial_assignment_list <- sapply(grna_ids, function(grna_id) {
       ondisc:::threshold_count_matrix_cpp(file_name_in = grna_matrix@h5_file,
                                           f_row_ptr = grna_matrix@ptr,
@@ -80,7 +80,7 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 #########
 assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fraction_threshold) {
   # take cases on the class of grna_matrix
-  if (is(grna_matrix, "odm")) {
+  if (methods::is(grna_matrix, "odm")) {
     grna_ids <- unique(sceptre_object@ondisc_grna_assignment_info$max_grna)
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
       which(sceptre_object@ondisc_grna_assignment_info$max_grna == grna_id)

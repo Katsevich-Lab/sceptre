@@ -21,6 +21,10 @@ import_data_from_cellranger(
 \item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute}
+
+\item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to store the expression data in a disk-backed \code{ondisc} matrix (TRUE) or an in-memory sparse matrix (FALSE)}
+
+\item{directory_to_write}{(optional) a string indicating the directory in which to write the backing \code{.odm} files (must be specified if \code{use_ondisc} is set to \code{TRUE})}
 }
 \value{
 an initialized \code{sceptre_object}
