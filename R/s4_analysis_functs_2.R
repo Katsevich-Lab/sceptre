@@ -21,7 +21,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. handle the default arguments
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
@@ -80,7 +80,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
@@ -132,7 +132,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
