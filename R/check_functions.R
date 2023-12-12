@@ -109,7 +109,11 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   response_matrix <- sceptre_object@response_matrix
   grna_matrix <- sceptre_object@grna_matrix
   covariate_data_frame <- sceptre_object@covariate_data_frame
-  grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
+  } else {
+    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+  }
 
   # 1. if response_grna_target_pairs has been supplied, check its characteristics
   for (idx in seq_along(response_grna_target_pairs_list)) {
@@ -125,7 +129,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
         stop(paste0("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix."))
       }
       # iii. check that the `grna_target` column of the `response_grna_target_pairs` data frame is a subset of the `grna_target` column of the `grna_target_data_frame`
-      if (!all(response_grna_target_pairs$grna_target %in% sceptre_object@grna_target_data_frame$grna_target)) {
+      if (!all(response_grna_target_pairs$grna_target %in% grna_target_data_frame$grna_target)) {
         stop(paste0("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."))
       }
       # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
