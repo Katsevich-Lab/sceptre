@@ -6,6 +6,8 @@
 #' @param moi a string indicating the MOI of the dataset, either "low" or "high"
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
+#' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to store the expression data in a disk-backed `ondisc` matrix (TRUE) or an in-memory sparse matrix (FALSE)
+#' @param directory_to_write (optional) a string indicating the directory in which to write the backing `.odm` files (must be specified if `use_ondisc` is set to `TRUE`)
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -186,45 +188,6 @@ get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_no
   out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
   names(out) <- c(col_id, "n_to_skip")
   return(out)
-}
-
-
-write_sceptre_object_to_cellranger_format <- function(sceptre_object, directory) {
-  # 0. create directory
-  if (dir.exists(directory)) unlink(directory, recursive = TRUE)
-  dir.create(directory)
-
-  # 1. combine matrices across modalities
-  response_matrix <- sceptre_object@response_matrix |> set_matrix_accessibility(make_row_accessible = FALSE)
-  grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = FALSE)
-  combined_mat <- rbind(response_matrix, grna_matrix)
-
-  # 2. construct the features df
-  response_ids <- rownames(response_matrix)
-  response_names <- sceptre_object@response_names
-  grna_ids <- rownames(grna_matrix)
-  feature_df <- data.frame(response_id = c(response_ids, grna_ids),
-                           response_name = c(response_names, grna_ids),
-                           modality = c(rep("Gene Expression", length(response_ids)),
-                                        rep("CRISPR Guide Capture", length(grna_ids))))
-
-  # 3. split the matrices according to batch; loop over the batches and save the matrix and features file
-  batch_v <- sceptre_object@covariate_data_frame$batch
-  batch_levels_v <- as.character(unique(batch_v))
-  for (i in seq_along(batch_levels_v)) {
-    batch_level <- batch_levels_v[i]
-    mat_sub <- combined_mat[feature_df$response_id, batch_level == batch_v]
-    dir_name <- paste0(directory, "/gem_group_", i)
-    dir.create(dir_name)
-    Matrix::writeMM(obj = mat_sub, file = paste0(dir_name, "/matrix.mtx"))
-    readr::write_tsv(x = feature_df, file = paste0(dir_name, "/features.tsv"), col_names = FALSE)
-    readr::write_tsv(x = data.frame(), file = paste0(dir_name, "/barcodes.tsv"))
-    curr_files <- list.files(dir_name, full.names = TRUE)
-    for (curr_file in curr_files) {
-      R.utils::gzip(filename = curr_file, destname = paste0(curr_file, ".gz"))
-    }
-  }
-  return(NULL)
 }
 
 

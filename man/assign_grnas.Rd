@@ -25,6 +25,8 @@ assign_grnas(
 
 \item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, "auto," automatically detects the number of processors available on the machine.}
 
+\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
+
 \item{...}{optional method-specific additional arguments}
 }
 \value{

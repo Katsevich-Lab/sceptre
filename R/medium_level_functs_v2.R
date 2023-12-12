@@ -109,7 +109,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
   # 5. combine and sort result
   result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |> data.table::rbindlist(fill = TRUE)
-  precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> purrr::flatten()
+  precomp_out_list <- lapply(res, function(chunk) chunk[["precomp_out_list"]]) |> unlist(recursive = FALSE)
   response_precomputations <- c(response_precomputations, precomp_out_list)
 
   return(list(result = result, response_precomputations = response_precomputations))
@@ -184,7 +184,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
                                 function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),
                                 mc.cores = length(partitioned_response_ids))
     }
-    precomp_out_list <- purrr::flatten(res)
+    precomp_out_list <- unlist(recursive = FALSE)
     response_precomputations <- c(response_precomputations, precomp_out_list)
   }
 
