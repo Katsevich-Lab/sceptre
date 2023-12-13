@@ -21,6 +21,7 @@ construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount
 
 
 auto_construct_formula_object <- function(cell_covariates, include_grna_covariates) {
+  MAX_N_LEVELS_ALLOWED <- 15L
   cell_covariate_names <- colnames(cell_covariates)
   cell_covariate_names <- cell_covariate_names[cell_covariate_names != "response_p_mito"]
   if (!include_grna_covariates) { # by default, do not use grna count-based covariates in low moi
@@ -35,10 +36,14 @@ auto_construct_formula_object <- function(cell_covariates, include_grna_covariat
         out <- paste0("log(", curr_name, ")")
       }
     } else {
-      out <- curr_name
+      if (length(unique(cell_covariates[[curr_name]])) >= MAX_N_LEVELS_ALLOWED) {
+        out <- NA_character_
+      } else {
+        out <- curr_name
+      }
     }
     return(out)
-  }) |> paste0(collapse = " + ")
+  }) |> stats::na.omit() |> paste0(collapse = " + ")
   form <- paste0("~ ", form_str) |> stats::as.formula()
   return(form)
 }
