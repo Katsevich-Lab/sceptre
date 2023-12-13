@@ -186,6 +186,16 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
+  # 10. if using a backing .odm file, verify that resampling mechanism is permutations
+  if (methods::is(sceptre_object@response_matrix, "odm") && (resampling_mechanism != "permutations")) {
+    stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
+  }
+
+  # 11. if a vector_id has been supplied, ensure that the grna integration strategy is union
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && grna_integration_strategy != "union") {
+    stop("When a `vector_id` column is supplied within the `grna_target_data_frame`, the `grna_integration_strategy` should be set to 'union'.")
+  }
+
   return(NULL)
 }
 
