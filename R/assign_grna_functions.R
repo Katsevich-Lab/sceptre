@@ -33,6 +33,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   }
   if (grna_assignment_method == "maximum") {
     max_result <- assign_grnas_to_cells_maximum(
+      sceptre_object = sceptre_object,
       grna_matrix = grna_matrix,
       grna_lib_size = cell_covariate_data_frame$grna_n_umis,
       umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold
@@ -78,7 +79,7 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 #########
 # MAXIMUM
 #########
-assign_grnas_to_cells_maximum <- function(grna_matrix, grna_lib_size, umi_fraction_threshold) {
+assign_grnas_to_cells_maximum <- function(sceptre_object, grna_matrix, grna_lib_size, umi_fraction_threshold) {
   # take cases on the class of grna_matrix
   if (methods::is(grna_matrix, "odm")) {
     grna_ids <- unique(sceptre_object@ondisc_grna_assignment_info$max_grna)

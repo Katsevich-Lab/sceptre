@@ -98,7 +98,7 @@ set_analysis_parameters <- function(sceptre_object,
     if (control_group == "default") control_group <- "nt_cells"
     if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
   }
-  if (is(sceptre_object@response_matrix, "odm")) resampling_mechanism <- "permutations"
+  if (methods::is(sceptre_object@response_matrix, "odm")) resampling_mechanism <- "permutations"
   if (identical(formula_object, "default")) {
     formula_object <- auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                     include_grna_covariates = !sceptre_object@low_moi)

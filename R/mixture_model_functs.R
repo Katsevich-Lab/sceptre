@@ -47,7 +47,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
     res <- parallel::mclapply(seq_along(grna_ids_partitioned),
                               function(proc_id) analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id),
                               mc.cores = length(grna_ids_partitioned))
-    initial_assignment_list <- res |> unlist(recursive = FALSE)
+    initial_assignment_list <- res |> purrr::flatten()
   }
 
   # return

@@ -25,7 +25,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
   to_analyze_grna_idxs <- dt$grna_idx
 
   # take cases on odm
-  if (is(response_matrix, "odm")) {
+  if (methods::is(response_matrix, "odm")) {
     out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc(file_name_in = response_matrix@h5_file,
                                                                     f_row_ptr = response_matrix@ptr,
                                                                     n_genes = nrow(response_matrix),
