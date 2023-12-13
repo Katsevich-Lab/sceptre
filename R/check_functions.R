@@ -263,6 +263,12 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
   if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
     stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
+
+  # 4. check that method is not maximum when vector_id is supplied
+  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && assignment_method == "maximum") {
+    stop("The maximum assignment method is not currently compatible with data in which `vector_id` has been specified as part of the `grna_target_data_frame`.")
+  }
+
   return(NULL)
 }
 
