@@ -43,7 +43,7 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
       nt_grna_idxs <- possible_groups_m[i,] + 1L
       grna_assignments$indiv_nt_grna_idxs[nt_grna_idxs] |> unlist() |> unique()
     })
-    if (is(response_matrix, "odm")) {
+    if (methods::is(response_matrix, "odm")) {
       n_nonzero_m <- ondisc:::compute_n_trt_cells_matrix_ondisc(file_name_in = response_matrix@h5_file,
                                                                 f_row_ptr = response_matrix@ptr,
                                                                 n_cells_orig = ncol(response_matrix),
