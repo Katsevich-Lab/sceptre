@@ -83,8 +83,14 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
   grna_targets <- grna_target_data_frame |>
     dplyr::filter(!(grna_target %in% grna_targets_to_exclude)) |>
     dplyr::pull(grna_target) |> unique()
-  out_pairs <- expand.grid(grna_target = grna_targets, response_id = response_ids)
-  if (pairs_to_exclude == "pc_pairs") out_pairs <- exclude_pairs(out_pairs, positive_control_pairs)
+  out_pairs <- expand.grid(grna_target = grna_targets, response_id = response_ids, stringsAsFactors = FALSE)
+  data.table::setDT(out_pairs)
+  if (pairs_to_exclude == "pc_pairs") {
+    data.table::setDT(positive_control_pairs)
+    if (nrow(positive_control_pairs) >= 1) {
+      out_pairs <- data.table::fsetdiff(out_pairs, positive_control_pairs)
+    }
+  }
   return(out_pairs)
 }
 
@@ -108,18 +114,4 @@ construct_positive_control_pairs <- function(sceptre_object) {
     grna_target_data_frame$grna_target %in% response_ids] |> unique()
   df <- data.frame(grna_target = pc_grna_targets, response_id = pc_grna_targets)
   return(df)
-}
-
-
-exclude_pairs <- function(pairs_df, pairs_to_exclude_df) {
-  if (nrow(pairs_to_exclude_df) >= 1) {
-    pairs_to_exclude_str <- paste0(pairs_to_exclude_df$response_id,
-                                   pairs_to_exclude_df$grna_target)
-    out <- pairs_df |> dplyr::mutate(pair_str = paste0(response_id, grna_target)) |>
-      dplyr::filter(!(pair_str %in% pairs_to_exclude_str)) |>
-      dplyr::select(-pair_str)
-  } else {
-    out <- pairs_df
-  }
-  return(out)
 }
