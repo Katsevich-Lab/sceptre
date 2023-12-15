@@ -417,7 +417,7 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
   calibration_result <- sceptre_object@calibration_result
   discovery_set <- discovery_result |> dplyr::filter(significant)
   p_thresh <- if (nrow(discovery_set) >= 1L) max(discovery_set$p_value) else NA
-  if (nrow(calibration_result) != nrow(discovery_result)) {
+  if (nrow(calibration_result) != nrow(discovery_result)) { # if the two sets of pairs do not coincide in number, set calibration_result to data.frame()
     calibration_result <- data.frame()
   }
   # create the bulk QQ plot
@@ -439,7 +439,8 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
                                                   include_legend = FALSE,
                                                   include_y_axis_text = FALSE)
   # make the volcano plot
-  p3 <- make_volcano_plot(discovery_result = discovery_result,
+  discovery_result_downsample <- downsample_result_data_frame(result_df = discovery_result)
+  p3 <- make_volcano_plot(discovery_result = discovery_result_downsample,
                           p_thresh = p_thresh,
                           transparency = transparency,
                           point_size = point_size,
@@ -623,16 +624,18 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
   my_cols <- c("mediumseagreen", "firebrick1")
 
   pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
-  neg_ctrl_pvals <- sceptre_object@calibration_result$p_value
-
+  neg_ctrl_pvals <- downsample_result_data_frame(
+      result_df = sceptre_object@calibration_result
+    ) |>
+    dplyr::pull(p_value)
   group_names <- c("Positive Control", "Negative Control")
   df <- data.frame(
     lab = rep(
       group_names,
-      c(length(pos_ctrl_pvals), length(neg_ctrl_pvals))
+      c(length(pos_ctrl_pvals), length(neg_ctrl_pval_sub))
     ) |>
       factor(levels = group_names),
-    p_values = c(pos_ctrl_pvals, neg_ctrl_pvals) |>
+    p_values = c(pos_ctrl_pvals, neg_ctrl_pval_sub) |>
       pmax(clip_to)
   )
 
@@ -651,4 +654,12 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
     my_theme
 
   return(p)
+}
+
+
+downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
+  result_df |>
+    dplyr::mutate(bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))) |>
+    dplyr::group_by(bin) |>
+    dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
 }
