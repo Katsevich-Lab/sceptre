@@ -5,7 +5,7 @@ using namespace Rcpp;
 
 double compute_observed_full_statistic_v2(NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs) {
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
-  int D_nrow = D.nrow(), D_ncol = D.ncol();
+  int D_nrow = D.nrow();
 
   // iterate over the rows of D
   for (int i = 0; i < D_nrow; i ++) {
