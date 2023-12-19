@@ -54,6 +54,10 @@ run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_
     .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
 }
 
+run_low_level_test_resid <- function(y, mu, resids, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
+    .Call(`_sceptre_run_low_level_test_resid`, y, mu, resids, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
+}
+
 compute_tolerance_cpp <- function(curr_log_lik, prev_log_lik) {
     .Call(`_sceptre_compute_tolerance_cpp`, curr_log_lik, prev_log_lik)
 }

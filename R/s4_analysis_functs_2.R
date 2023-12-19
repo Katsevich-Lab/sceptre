@@ -197,7 +197,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
                        response_precomputations = sceptre_object@response_precomputations,
                        cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
                        parallel = parallel, n_processors = n_processors, log_dir = log_dir,
-                       analysis_type = analysis_type)
+                       analysis_type = analysis_type, full_test_stat = sceptre_object@full_test_stat)
 
   # run the method
   out <- if (sceptre_object@run_permutations) {

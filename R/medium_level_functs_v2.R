@@ -16,7 +16,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                     synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                     side_code, low_moi, response_precomputations, cells_in_use, print_progress,
-                                    parallel, n_processors, log_dir, analysis_type) {
+                                    parallel, n_processors, log_dir, analysis_type, full_test_stat) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
   run_outer_regression <- calibration_check || control_group_complement
@@ -76,14 +76,15 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
                                                         covariate_matrix,
                                                         response_precomp$fitted_coefs,
                                                         response_precomp$theta,
-                                                        full_test_stat = TRUE)
+                                                        full_test_stat = full_test_stat)
         curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
                                                            output_amount, grna_groups, expression_vector,
-                                                           pieces_precomp, get_idx_f, side_code)
+                                                           pieces_precomp, get_idx_f, side_code, full_test_stat)
       } else {
         curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
                                                             output_amount, covariate_matrix, all_nt_idxs,
-                                                            grna_group_idxs, grna_groups, expression_vector, side_code)
+                                                            grna_group_idxs, grna_groups, expression_vector, side_code,
+                                                            full_test_stat)
       }
 
       # 9. combine the response-wise results into a data table; insert into list

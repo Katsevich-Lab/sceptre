@@ -143,6 +143,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// run_low_level_test_resid
+SEXP run_low_level_test_resid(NumericVector y, NumericVector mu, NumericVector resids, IntegerVector trt_idxs, int n_trt, SEXP synthetic_idxs, int B1, int B2, int B3, bool fit_parametric_curve, bool return_resampling_dist, int side_code);
+RcppExport SEXP _sceptre_run_low_level_test_resid(SEXP ySEXP, SEXP muSEXP, SEXP residsSEXP, SEXP trt_idxsSEXP, SEXP n_trtSEXP, SEXP synthetic_idxsSEXP, SEXP B1SEXP, SEXP B2SEXP, SEXP B3SEXP, SEXP fit_parametric_curveSEXP, SEXP return_resampling_distSEXP, SEXP side_codeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type resids(residsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type trt_idxs(trt_idxsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_trt(n_trtSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type synthetic_idxs(synthetic_idxsSEXP);
+    Rcpp::traits::input_parameter< int >::type B1(B1SEXP);
+    Rcpp::traits::input_parameter< int >::type B2(B2SEXP);
+    Rcpp::traits::input_parameter< int >::type B3(B3SEXP);
+    Rcpp::traits::input_parameter< bool >::type fit_parametric_curve(fit_parametric_curveSEXP);
+    Rcpp::traits::input_parameter< bool >::type return_resampling_dist(return_resampling_distSEXP);
+    Rcpp::traits::input_parameter< int >::type side_code(side_codeSEXP);
+    rcpp_result_gen = Rcpp::wrap(run_low_level_test_resid(y, mu, resids, trt_idxs, n_trt, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_tolerance_cpp
 double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik);
 RcppExport SEXP _sceptre_compute_tolerance_cpp(SEXP curr_log_likSEXP, SEXP prev_log_likSEXP) {
@@ -429,6 +451,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 15},
+    {"_sceptre_run_low_level_test_resid", (DL_FUNC) &_sceptre_run_low_level_test_resid, 12},
     {"_sceptre_compute_tolerance_cpp", (DL_FUNC) &_sceptre_compute_tolerance_cpp, 2},
     {"_sceptre_run_reduced_em_algo_cpp", (DL_FUNC) &_sceptre_run_reduced_em_algo_cpp, 5},
     {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},

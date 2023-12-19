@@ -87,9 +87,8 @@ compute_precomputation_pieces <- function(expression_vector, covariate_matrix, f
     D <- compute_D_matrix(Zt_wZ, wZ)
     out <- list(mu = mu, w = w, a = a, D = D)
   } else {
-    a <- expression_vector - (expression_vector * mu + theta * mu)/(theta + mu)
-    b <- (theta * mu)/(theta + mu)
-    out <- list(mu = mu, a = a, b = b)
+    out <- list(resid = expression_vector - mu,
+                mu = mu)
   }
   return(out)
 }

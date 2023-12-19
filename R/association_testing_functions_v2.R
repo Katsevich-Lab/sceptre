@@ -28,24 +28,37 @@ get_idx_vector_discovery_analysis <- function(curr_grna_group, grna_group_idxs) 
 
 # workhorse function 1: permutations, glm factored out
 perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_parametric_curve, output_amount, grna_groups,
-                                       expression_vector, pieces_precomp, get_idx_f, side_code) {
+                                       expression_vector, pieces_precomp, get_idx_f, side_code, full_test_stat) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
     idxs <- get_idx_f(curr_grna_group)
-    result <- run_low_level_test_full_v4(y = expression_vector,
+    if (full_test_stat) {
+      result <- run_low_level_test_full_v4(y = expression_vector,
+                                           mu = pieces_precomp$mu,
+                                           a = pieces_precomp$a,
+                                           w = pieces_precomp$w,
+                                           D = pieces_precomp$D,
+                                           trt_idxs = idxs$trt_idxs,
+                                           use_all_cells = FALSE,
+                                           n_trt = idxs$n_trt,
+                                           synthetic_idxs = synthetic_idxs,
+                                           B1 = B1, B2 = B2, B3 = B3,
+                                           fit_parametric_curve = fit_parametric_curve,
+                                           return_resampling_dist = (output_amount == 3L),
+                                           side_code = side_code)
+    } else {
+      result <- run_low_level_test_resid(y = expression_vector,
                                          mu = pieces_precomp$mu,
-                                         a = pieces_precomp$a,
-                                         w = pieces_precomp$w,
-                                         D = pieces_precomp$D,
+                                         resids = pieces_precomp$resid,
                                          trt_idxs = idxs$trt_idxs,
-                                         use_all_cells = FALSE,
                                          n_trt = idxs$n_trt,
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
                                          fit_parametric_curve = fit_parametric_curve,
                                          return_resampling_dist = (output_amount == 3L),
                                          side_code = side_code)
+    }
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)
@@ -54,7 +67,7 @@ perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_parametri
 
 # workhorse function 2: permutations, glm run inside
 discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametric_curve, output_amount, covariate_matrix,
-                                        all_nt_idxs, grna_group_idxs, grna_groups, expression_vector, side_code) {
+                                        all_nt_idxs, grna_group_idxs, grna_groups, expression_vector, side_code, full_test_stat) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
@@ -76,21 +89,34 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametr
                                                     covariate_matrix = curr_covariate_matrix,
                                                     fitted_coefs = response_precomp$fitted_coefs,
                                                     theta = response_precomp$theta,
-                                                    full_test_stat = TRUE)
+                                                    full_test_stat = full_test_stat)
     # 4. run the association test
-    result <- run_low_level_test_full_v4(y = curr_expression_vector,
+    if (full_test_stat) {
+      result <- run_low_level_test_full_v4(y = curr_expression_vector,
+                                           mu = precomp_pieces$mu,
+                                           a = precomp_pieces$a,
+                                           w = precomp_pieces$w,
+                                           D = precomp_pieces$D,
+                                           n_trt = n_trt,
+                                           use_all_cells = FALSE,
+                                           trt_idxs = trt_idxs,
+                                           synthetic_idxs = synthetic_idxs,
+                                           B1 = B1, B2 = B2, B3 = B3,
+                                           fit_parametric_curve = fit_parametric_curve,
+                                           return_resampling_dist = (output_amount == 3L),
+                                           side_code = side_code)
+    } else {
+      result <- run_low_level_test_resid(y = curr_expression_vector,
                                          mu = precomp_pieces$mu,
-                                         a = precomp_pieces$a,
-                                         w = precomp_pieces$w,
-                                         D = precomp_pieces$D,
-                                         n_trt = n_trt,
-                                         use_all_cells = FALSE,
+                                         resids = precomp_pieces$resid,
                                          trt_idxs = trt_idxs,
+                                         n_trt = n_trt,
                                          synthetic_idxs = synthetic_idxs,
                                          B1 = B1, B2 = B2, B3 = B3,
                                          fit_parametric_curve = fit_parametric_curve,
                                          return_resampling_dist = (output_amount == 3L),
                                          side_code = side_code)
+    }
     result_list_inner[[i]] <- result
   }
   return(result_list_inner)
