@@ -77,7 +77,8 @@ set_analysis_parameters <- function(sceptre_object,
                                     control_group = "default",
                                     resampling_mechanism = "default",
                                     multiple_testing_method = "BH",
-                                    multiple_testing_alpha = 0.1) {
+                                    multiple_testing_alpha = 0.1,
+                                    full_test_stat = TRUE) {
   # 0. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "set_analysis_parameters")
 
@@ -135,6 +136,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@grna_integration_strategy <- grna_integration_strategy
   sceptre_object@covariate_matrix  <- convert_covariate_df_to_design_matrix(covariate_data_frame = sceptre_object@covariate_data_frame,
                                                                             formula_object = formula_object)
+  sceptre_object@full_test_stat <- full_test_stat
 
   # 5. modify the grna target df and response grna target dfs
   sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
