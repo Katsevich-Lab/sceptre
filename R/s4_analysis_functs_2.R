@@ -226,7 +226,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   gc() |> invisible()
 
   # initialize the args to pass
-  args_to_pass <- list(response_matrix = sceptre_object@response_matrix,
+  args_to_pass <- list(response_matrix = get_response_matrix(sceptre_object),
                        grna_assignments = sceptre_object@grna_assignments,
                        covariate_matrix = sceptre_object@covariate_matrix,
                        response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),

@@ -9,7 +9,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 
   # 3. update fields on the sceptre_object
   sceptre_object <- methods::new("sceptre_object")
-  sceptre_object@response_matrix <- output$gene
+  set_response_matrix(sceptre_object) <- output$gene
   sceptre_object@grna_matrix <- output$grna
   if (!("vector_id" %in% colnames(grna_target_data_frame))) {
     sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
@@ -61,7 +61,7 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
     stop("The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file.")
   }
   # update response_odm and grna_odm and return
-  sceptre_object@response_matrix <- response_odm
+  set_response_matrix(sceptre_object) <- response_odm
   sceptre_object@grna_matrix <- grna_odm
   return(sceptre_object)
 }
@@ -78,7 +78,6 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
 #' @export
 write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp) {
   sceptre_object@grna_matrix <- matrix()
-  sceptre_object@response_matrix <- matrix()
   saveRDS(sceptre_object, sceptre_object_fp)
 }
 

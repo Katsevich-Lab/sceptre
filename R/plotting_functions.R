@@ -572,7 +572,7 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
 
   # cellwise QC
   cell_removal_metrics <- sceptre_object@cell_removal_metrics
-  n_orig_cells <- ncol(sceptre_object@response_matrix)
+  n_orig_cells <- ncol(get_response_matrix(sceptre_object))
   cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
   df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
                    Filter = c("N response UMIs", "N nonzero responses", "Percent mito", "multiple gRNAs", "User-specified", "Any filter"))
@@ -624,7 +624,7 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
   my_cols <- c("mediumseagreen", "firebrick1")
 
   pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
-  neg_ctrl_pvals <- downsample_result_data_frame(
+  neg_ctrl_pval_sub <- downsample_result_data_frame(
       result_df = sceptre_object@calibration_result
     ) |>
     dplyr::pull(p_value)
@@ -643,9 +643,10 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
     data = df,
     mapping = ggplot2::aes(x = lab, y = p_values, color = lab)
   )
+  my_breaks <- 10^(seq(-2, -40, by = -4))
   p <- p +
     ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0)) +
+    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0), breaks = my_breaks) +
     ggplot2::scale_color_manual(values = my_cols, guide = "none") +
     ggplot2::labs(
       x = "Pair type",

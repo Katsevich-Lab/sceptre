@@ -2,7 +2,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
   # extract basic information from sceptre_object
   cells_in_use <- sceptre_object@cells_in_use
   grna_assignments <- sceptre_object@grna_assignments
-  response_matrix <- sceptre_object@response_matrix
+  response_matrix <- get_response_matrix(sceptre_object)
   discovery_pairs <- sceptre_object@discovery_pairs
   positive_control_pairs <- sceptre_object@positive_control_pairs
   control_group_complement <- sceptre_object@control_group_complement
