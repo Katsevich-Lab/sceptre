@@ -107,7 +107,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
                                           control_group, resampling_mechanism, side, low_moi, grna_integration_strategy) {
   response_matrix <- get_response_matrix(sceptre_object)
-  grna_matrix <- sceptre_object@grna_matrix
+  grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
   if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector

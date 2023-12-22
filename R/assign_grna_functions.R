@@ -3,7 +3,7 @@
 ###########################################
 assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_processors, log_dir) {
   # extract pieces from sceptre_object
-  grna_matrix <- sceptre_object@grna_matrix
+  grna_matrix <- get_grna_matrix(sceptre_object)
   grna_assignment_method <- sceptre_object@grna_assignment_method
   cell_covariate_data_frame <- sceptre_object@covariate_data_frame
   grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
@@ -149,7 +149,7 @@ process_initial_assignment_list <- function(sceptre_object) {
   initial_assignment_list <- sceptre_object@initial_grna_assignment_list
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   low_moi <- sceptre_object@low_moi
-  n_cells <- ncol(sceptre_object@grna_matrix)
+  n_cells <- ncol(get_grna_matrix(sceptre_object))
   maximum_assignment <- sceptre_object@grna_assignment_method == "maximum"
   # 1. if not using maximum assignment, compute n grnas per cell and cells with multiple grnas
   if (!maximum_assignment) {

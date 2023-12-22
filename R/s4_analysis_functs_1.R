@@ -30,7 +30,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   # 4. update fields in output object
   sceptre_object <- methods::new("sceptre_object")
   sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
-  sceptre_object@grna_matrix <- grna_matrix
+  sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
   sceptre_object@covariate_data_frame <- covariate_data_frame
   if (!("vector_id" %in% colnames(grna_target_data_frame))) {
     sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
