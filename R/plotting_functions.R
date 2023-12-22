@@ -27,7 +27,7 @@ get_my_theme <- function(element_text_size = 11) {
 #' @examples
 #' # A full example can be found at ?sceptre
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
-  grna_matrix <- sceptre_object@grna_matrix
+  grna_matrix <- get_grna_matrix(sceptre_object)
   # rounding just in case the user provides a non-integer one
   if (!is.null(threshold)) threshold <- round(threshold)
   if (is.null(grnas_to_plot)) {
@@ -144,7 +144,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     stop("This `sceptre_object` has not yet had `assign_grnas` called on it.")
   }
   init_assignments <- sceptre_object@initial_grna_assignment_list
-  grna_matrix <- sceptre_object@grna_matrix |> set_matrix_accessibility(make_row_accessible = TRUE)
+  grna_matrix <- get_grna_matrix(sceptre_object) |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- names(init_assignments)
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {

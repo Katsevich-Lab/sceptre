@@ -1,7 +1,8 @@
-# # class union
-# #' @import Matrix
-# setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix"))
+# class union
+#' @import Matrix
 # setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix"))
+# setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix"))
+
 
 # sceptre object class
 setClass("sceptre_object",
