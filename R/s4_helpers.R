@@ -4,8 +4,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   funct_run_vect <- object@functs_called
 
   # 1. obtain the basic information
-  n_cells <- ncol(object@response_matrix)
-  n_responses <- nrow(object@response_matrix)
+  n_cells <- ncol(get_response_matrix(object))
+  n_responses <- nrow(get_response_matrix(object))
   if (nrow(object@grna_target_data_frame_with_vector) >= 1L) {
     grna_target_data_frame <- object@grna_target_data_frame_with_vector
   } else {

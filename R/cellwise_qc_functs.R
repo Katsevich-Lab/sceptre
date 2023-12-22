@@ -30,7 +30,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   cells_to_exclude <- c(cells_to_exclude_n_umis, cells_to_exclude_n_responses,
                         cells_to_exclude_p_mito, cells_to_exclude_multiple_grnas,
                         cells_to_exclude_user_specified) |> unique()
-  n_cells <- ncol(sceptre_object@response_matrix)
+  n_cells <- ncol(get_response_matrix(sceptre_object))
   cells_to_retain <- if (length(cells_to_exclude) == 0L) seq(1L, n_cells) else seq(1L, n_cells)[-cells_to_exclude]
   sceptre_object@cells_in_use <- cells_to_retain
   n_cells_rm_total <- n_cells - length(cells_to_retain)
@@ -49,7 +49,7 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   # 0. define several varaibles
   cells_in_use <- sceptre_object@cells_in_use
   grna_assignments_raw <- sceptre_object@grna_assignments_raw
-  n_cells <- ncol(sceptre_object@response_matrix)
+  n_cells <- ncol(get_response_matrix(sceptre_object))
 
   # 1. define update idxs funct
   update_idxs <- function(v, cells_in_use, n_cells) {

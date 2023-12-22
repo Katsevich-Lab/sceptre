@@ -1,7 +1,7 @@
 construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pairs, calibration_group_size) {
   cat("Constructing negative control pairs.")
   grna_assignments <- sceptre_object@grna_assignments
-  response_matrix <- sceptre_object@response_matrix
+  response_matrix <- get_response_matrix(sceptre_object)
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   low_moi <- sceptre_object@low_moi
   n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
