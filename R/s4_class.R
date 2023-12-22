@@ -1,15 +1,15 @@
-# response matrix class union
-#' @import Matrix
-#' @importClassesFrom ondisc odm
-setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "odm"))
-setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix", "odm"))
+# # response matrix class union
+# #' @import Matrix
+# #' @importClassesFrom ondisc odm
+# setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "odm"))
+# setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix", "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix", "odm"))
 
 # sceptre object class
 setClass("sceptre_object",
          slots = list(
            # raw data
-           response_matrix = "response_matrix_class",
-           grna_matrix = "grna_matrix_class",
+           response_matrix = "list",
+           grna_matrix = "list",
            covariate_data_frame = "data.frame",
            covariate_matrix = "matrix",
            grna_target_data_frame = "data.frame",
