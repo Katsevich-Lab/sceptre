@@ -141,5 +141,19 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' directory_to_write = tempdir())
 #'
 #' # 2. repeat steps 2-8 above.
+#'
+#' # 3. reading and writing
+#' # write_ondisc_backed_sceptre_object
+#' write_ondisc_backed_sceptre_object(
+#'   sceptre_object,
+#'   paste0(tempdir(), "/sceptre_object.rds")
+#'  )
+#'
+#' # read ondisc-backed sceptre_object
+#' sceptre_object <- read_ondisc_backed_sceptre_object(
+#'  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
+#'  response_odm_file_fp = paste0(empdir(), "/gene.odm"),
+#'  grna_odm_file_fp = paste0(empdir(), "/grna.odm")
+#' )
 #' }
 NULL
