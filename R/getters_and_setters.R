@@ -4,7 +4,7 @@ set_response_matrix <- function(sceptre_object, response_matrix) {
 }
 
 get_response_matrix <- function(sceptre_object) {
-  return(sceptre_object@response_matrix[[1]] )
+  return(sceptre_object@response_matrix[[1]])
 }
 
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
@@ -13,5 +13,5 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
 }
 
 get_grna_matrix <- function(sceptre_object) {
-  return(sceptre_object@grna_matrix)
+  return(sceptre_object@grna_matrix[[1]])
 }
