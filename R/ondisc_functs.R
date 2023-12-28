@@ -46,7 +46,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
 #' @param response_odm_file_fp file path to a backing `.odm` file for the response modality
 #' @param grna_odm_file_fp file path to a backing `.odm` file for the gRNA modality
 #'
-#' @return an odm-backed `sceptre_object`
+#' @return an ondisc-backed `sceptre_object`
 #' @export
 read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
   # read in objects
@@ -75,6 +75,7 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
 #' @param sceptre_object_fp the file in which to store the `sceptre_object`
 #'
 #' @return NULL
+#' @rdname read_ondisc_backed_sceptre_object
 #' @export
 write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp) {
   sceptre_object <- set_grna_matrix(sceptre_object, list())

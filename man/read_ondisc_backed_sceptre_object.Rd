@@ -2,6 +2,7 @@
 % Please edit documentation in R/ondisc_functs.R
 \name{read_ondisc_backed_sceptre_object}
 \alias{read_ondisc_backed_sceptre_object}
+\alias{write_ondisc_backed_sceptre_object}
 \title{Read ondisc-backed sceptre object}
 \usage{
 read_ondisc_backed_sceptre_object(
@@ -9,17 +10,23 @@ read_ondisc_backed_sceptre_object(
   response_odm_file_fp,
   grna_odm_file_fp
 )
+
+write_ondisc_backed_sceptre_object(sceptre_object, sceptre_object_fp)
 }
 \arguments{
-\item{sceptre_object_fp}{file path to a \code{sceptre_object.rds} file}
+\item{sceptre_object_fp}{the file in which to store the \code{sceptre_object}}
 
 \item{response_odm_file_fp}{file path to a backing \code{.odm} file for the response modality}
 
 \item{grna_odm_file_fp}{file path to a backing \code{.odm} file for the gRNA modality}
+
+\item{sceptre_object}{a \code{sceptre_object}}
 }
 \value{
-an odm-backed \code{sceptre_object}
+an ondisc-backed \code{sceptre_object}
 }
 \description{
 Reads and initializes a \code{sceptre_object} from backing .odm files.
+
+Write an ondisc-backed sceptre object to disk.
 }
