@@ -5,7 +5,7 @@
 \alias{sceptre}
 \title{sceptre}
 \description{
-\code{sceptre} is an R package for single-cell CRISPR screen data analysis that emphasizes statistical rigor, computational efficiency, and ease of use.
+\code{sceptre} is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
 }
 \examples{
 \dontrun{
@@ -146,8 +146,8 @@ write_ondisc_backed_sceptre_object(
 # read ondisc-backed sceptre_object
 sceptre_object <- read_ondisc_backed_sceptre_object(
  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
- response_odm_file_fp = paste0(empdir(), "/gene.odm"),
- grna_odm_file_fp = paste0(empdir(), "/grna.odm")
+ response_odm_file_fp = paste0(tempdir(), "/gene.odm"),
+ grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
 )
 }
 }

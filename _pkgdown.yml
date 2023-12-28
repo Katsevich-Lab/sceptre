@@ -65,6 +65,17 @@ reference:
   - write_outputs_to_directory
   - get_result
 
+- title: "`ondisc` intput/output functions"
+  contents:
+  - read_ondisc_backed_sceptre_object
+  - write_ondisc_backed_sceptre_object
+
+- title: "Getter functions"
+  contents:
+  - get_response_matrix
+  - get_grna_matrix
+  - get_cell_covariates
+
 - title: "Data"
   desc: >
     Example data to illustrate use of the functions
