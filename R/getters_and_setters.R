@@ -44,6 +44,25 @@ get_cell_covariates <- function(sceptre_object) {
   return(sceptre_object@covariate_data_frame)
 }
 
+
+
+#' Get gRNA assignments
+#'
+#' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a named list, with each entry corresponding to a different gRNA. The entry for a given gRNA is an integer vector indicating the cells to which that gRNA has been assigned.
+#'
+#' The assignments correspond to the original (i.e., non-QC'ed) gRNA expression matrix.
+#'
+#' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called on it
+#'
+#' @return a list containing the gRNA-to-cell assignments
+#' @export
+get_grna_assignments <- function(sceptre_object) {
+  if (!sceptre_object@functs_called[["assign_grnas"]]) {
+    stop("`assign_grnas()` has not yet been called on the `sceptre_object`.")
+  }
+  return(sceptre_object@initial_grna_assignment_list)
+}
+
 set_response_matrix <- function(sceptre_object, response_matrix) {
   sceptre_object@response_matrix[[1]] <- response_matrix
   return(sceptre_object)
@@ -53,3 +72,4 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
   sceptre_object@grna_matrix[[1]] <- grna_matrix
   return(sceptre_object)
 }
+
