@@ -17,6 +17,8 @@ home:
 
           [National Science Foundation](https://www.nsf.gov/)
 
+          [National Institutes of Health](https://www.nih.gov)
+
 reference:
 - title: "Package documentation"
   contents:
@@ -75,6 +77,7 @@ reference:
   - get_response_matrix
   - get_grna_matrix
   - get_cell_covariates
+  - get_grna_assignments
 
 - title: "Data"
   desc: >

@@ -16,5 +16,5 @@ a list containing the gRNA-to-cell assignments
 Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is a named list, with each entry corresponding to a different gRNA. The entry for a given gRNA is an integer vector indicating the cells to which that gRNA has been assigned.
 }
 \details{
-The assignments correspond to the original (i.e., non-QC'ed) gRNA expression data.
+The assignments correspond to the original (i.e., non-QC'ed) gRNA expression matrix.
 }
