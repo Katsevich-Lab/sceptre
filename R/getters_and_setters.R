@@ -1,4 +1,4 @@
-#' Getter functions
+#' Basic getter functions
 #'
 #' The getter functions (i.e., `get_*`) return of a specified field from a `sceptre_object`.
 #'
@@ -44,8 +44,6 @@ get_cell_covariates <- function(sceptre_object) {
   return(sceptre_object@covariate_data_frame)
 }
 
-
-
 #' Get gRNA assignments
 #'
 #' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a named list, with each entry corresponding to a different gRNA. The entry for a given gRNA is an integer vector indicating the cells to which that gRNA has been assigned.
@@ -72,4 +70,3 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
   sceptre_object@grna_matrix[[1]] <- grna_matrix
   return(sceptre_object)
 }
-
