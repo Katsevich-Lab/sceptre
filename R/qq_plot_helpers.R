@@ -154,10 +154,10 @@ revlog_trans <- function(base = exp(1)) {
   inv <- function(x) {
     base^(-x)
   }
-  scales::trans_new(paste("revlog-", base, sep = ""),
-                    trans,
-                    inv,
-                    scales::log_breaks(base = base),
+  scales::trans_new(name = paste("revlog-", base, sep = ""),
+                    transform = trans,
+                    inverse = inv,
+                    breaks = scales::log_breaks(base = base),
                     domain = c(1e-100, Inf)
   )
 }
