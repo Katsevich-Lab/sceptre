@@ -33,6 +33,7 @@ get_response_matrix <- function(sceptre_object) {
 #' Get gRNA matrix
 #'
 #' @rdname get_response_matrix
+#' @export
 get_grna_matrix <- function(sceptre_object) {
   return(sceptre_object@grna_matrix[[1]])
 }
@@ -40,6 +41,7 @@ get_grna_matrix <- function(sceptre_object) {
 #' Get cell covariates
 #'
 #' @rdname get_response_matrix
+#' @export
 get_cell_covariates <- function(sceptre_object) {
   return(sceptre_object@covariate_data_frame)
 }

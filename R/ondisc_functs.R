@@ -72,15 +72,17 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
 #' Write an ondisc-backed sceptre object to disk.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param sceptre_object_fp the file in which to store the `sceptre_object`
+#' @param directory_to_write directory in which to write `sceptre_object.rds`
 #'
 #' @return NULL
 #' @rdname read_ondisc_backed_sceptre_object
 #' @export
-write_ondisc_backed_sceptre_object <- function(sceptre_object, sceptre_object_fp) {
+write_ondisc_backed_sceptre_object <- function(sceptre_object, directory_to_write) {
   sceptre_object <- set_grna_matrix(sceptre_object, list())
   sceptre_object <- set_response_matrix(sceptre_object, list())
-  saveRDS(sceptre_object, sceptre_object_fp)
+  # check that dir exists
+  if (!dir.exists(directory_to_write)) dir.create(directory_to_write, recursive = TRUE)
+  saveRDS(sceptre_object, paste0(directory_to_write, "/sceptre_object.rds"))
 }
 
 

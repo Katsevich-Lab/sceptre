@@ -4,7 +4,7 @@
 \alias{get_response_matrix}
 \alias{get_grna_matrix}
 \alias{get_cell_covariates}
-\title{Getter functions}
+\title{Basic getter functions}
 \usage{
 get_response_matrix(sceptre_object)
 
