@@ -470,7 +470,9 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 ############
 #' Plot covariates
 #'
-#' `plot_covariates()` creates histograms of several cell-specific covariates: `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`. To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms.
+#' `plot_covariates()` creates histograms of several cell-specific covariates: `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`.
+#'
+#' To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms. If `run_qc()` has been called on the `sceptre_object`, then the QC thresholds plotted on the histograms are those contained within the `sceptre_object`.
 #'
 #' @param sceptre_object any initialized `sceptre_object`. `plot_covariates()` can be called at any point in the pipeline after \code{import_data()}.
 #' @param response_n_umis_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_umis` histogram
@@ -487,6 +489,11 @@ plot_covariates <- function(sceptre_object,
                             response_n_nonzero_range = c(0.01, 0.99),
                             p_mito_threshold = 0.2,
                             return_indiv_plots = FALSE) {
+  if (sceptre_object@functs_called[["run_qc"]]) {
+    response_n_umis_range <- sceptre_object@cellwise_qc_thresholds$response_n_umis_range
+    response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
+    p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
+  }
   covariate_data_frame <- sceptre_object@covariate_data_frame
   make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
     cutoffs <- if (use_quantile) stats::quantile(v, probs = curr_range) else curr_range

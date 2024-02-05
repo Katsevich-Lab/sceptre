@@ -250,6 +250,11 @@ run_qc <- function(sceptre_object,
                       response_n_umis_range,
                       response_n_nonzero_range) |> invisible()
 
+  # 2.5 update fields of sceptre_object
+  sceptre_object@cellwise_qc_thresholds <- list(response_n_umis_range = response_n_umis_range,
+                                                response_n_nonzero_range = response_n_nonzero_range,
+                                                p_mito_threshold = p_mito_threshold)
+
   # 3. obtain previous cells_in_use for caching purposes
   current_cells_in_use <- sceptre_object@cells_in_use
 
