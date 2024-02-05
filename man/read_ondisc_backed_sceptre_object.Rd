@@ -11,16 +11,18 @@ read_ondisc_backed_sceptre_object(
   grna_odm_file_fp
 )
 
-write_ondisc_backed_sceptre_object(sceptre_object, sceptre_object_fp)
+write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 }
 \arguments{
-\item{sceptre_object_fp}{the file in which to store the \code{sceptre_object}}
+\item{sceptre_object_fp}{file path to a \code{sceptre_object.rds} file}
 
 \item{response_odm_file_fp}{file path to a backing \code{.odm} file for the response modality}
 
 \item{grna_odm_file_fp}{file path to a backing \code{.odm} file for the gRNA modality}
 
 \item{sceptre_object}{a \code{sceptre_object}}
+
+\item{directory_to_write}{directory in which to write \code{sceptre_object.rds}}
 }
 \value{
 an ondisc-backed \code{sceptre_object}

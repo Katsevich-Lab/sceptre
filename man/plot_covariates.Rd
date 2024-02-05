@@ -27,7 +27,10 @@ plot_covariates(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_covariates()} creates histograms of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}. To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms.
+\code{plot_covariates()} creates histograms of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}.
+}
+\details{
+To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms. If \code{run_qc()} has been called on the \code{sceptre_object}, then the QC thresholds plotted on the histograms are those contained within the \code{sceptre_object}.
 }
 \examples{
 # A full example can be found at ?sceptre
