@@ -1,11 +1,12 @@
 
 # NOTES
 # - anywhere with the tag <--discuss--> is something i want to discuss when presenting this
-
-# TODO
 # - Is `@grnas_per_cell` used for method="maximum"?
 # - for method="thresholding" there is some inconsistency with the slots. Is that fine?
-# -
+
+
+
+# - what happens to  a cell with 0 expression for every response? Deleted in qc? (yeah should be)
 
 
 # this function hard-codes a particular dataset that will be the base
@@ -13,7 +14,7 @@
 # It is called in every test, so a little repetitive, but it only takes
 # ~2 milliseconds per call on my laptop
 make_mock_base_data_for_testing_assign_grnas <- function() {
-  num_cells <- 23  # must be even for my choice of extra_covariates
+  num_cells <- 24  # must be even for my choice of extra_covariates
   num_responses <- 7
   grna_target_data_frame <- make_mock_grna_target_data(c(2,2), 1, 1, 3)
   on_targets <- unique(grna_target_data_frame$grna_target)[1:2]
@@ -30,7 +31,7 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
   ) |>
     `rownames<-`(c(on_targets, paste0("response_", (length(on_targets) + 1):num_responses)))
 
-  extra_covariates <- data.frame(x = rep(c("b1", "b2"), each = num_cells / 2))
+  # extra_covariates <- data.frame(x = rep(c("b1", "b2"), each = num_cells / 2))
 
   positive_control_pairs <- data.frame(
     grna_target = on_targets,
@@ -46,7 +47,7 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
     grna_target_data_frame = grna_target_data_frame,
     response_matrix = response_matrix,
     grna_matrix_all_0 = grna_matrix,
-    extra_covariates = extra_covariates,
+    # extra_covariates = extra_covariates,
     positive_control_pairs = positive_control_pairs,
     discovery_pairs = discovery_pairs
   )
