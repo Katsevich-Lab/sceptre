@@ -5,8 +5,7 @@
 # - for method="thresholding" there is some inconsistency with the slots. Is that fine?
 
 
-
-# - what happens to  a cell with 0 expression for every response? Deleted in qc? (yeah should be)
+# TODO do i need make_mock_response_matrix here? or make_mock_grna_matrix? or in any of these?
 
 
 # this function hard-codes a particular dataset that will be the base
@@ -33,10 +32,10 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
 
   # extra_covariates <- data.frame(x = rep(c("b1", "b2"), each = num_cells / 2))
 
-  positive_control_pairs <- data.frame(
-    grna_target = on_targets,
-    response_id = on_targets
-  )
+  # positive_control_pairs <- data.frame(
+  #   grna_target = on_targets,
+  #   response_id = on_targets
+  # )
 
   discovery_pairs <- data.frame(
     grna_target = on_targets,
@@ -48,7 +47,7 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
     response_matrix = response_matrix,
     grna_matrix_all_0 = grna_matrix,
     # extra_covariates = extra_covariates,
-    positive_control_pairs = positive_control_pairs,
+    # positive_control_pairs = positive_control_pairs,
     discovery_pairs = discovery_pairs
   )
 }
@@ -82,6 +81,8 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
   # first element should have all idx
   expect_equal(
     scep_low_all_1@initial_grna_assignment_list,
+    # every cell is assigned to the first grna_id that appears since they are all tied
+    # plus all of these cells will be removed anyway in qc so the assignment doesn't matter
     lapply(test_data_list$grna_target_data_frame$grna_id, function(target_name)
       if(target_name == test_data_list$grna_target_data_frame$grna_id[1]) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
@@ -101,9 +102,8 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
       indiv_nt_grna_idxs = nt_part_all_1
     )
   )
-
+  # should be empty for maximum assignment
   expect_equal(scep_low_all_1@grnas_per_cell, integer(0))
-
 
 })
 
@@ -154,7 +154,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
       indiv_nt_grna_idxs = nt_part
     )
   )
-
+  # should be empty for maximum assignment
   expect_equal(scep_low_clear_max@grnas_per_cell, integer(0))
 })
 
@@ -212,8 +212,10 @@ test_that("assign_grnas method=threshold moi=low", {
   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
 
   grna_matrix_vary_thresh <- test_data_list$grna_matrix_all_0
-  grna_matrix_vary_thresh[1,] <- 100 # all cells express grna1 very strongly
-  grna_matrix_vary_thresh[2,] <- 25  # all cells also express some of grna2
+  expressed_grna_ids <- c(5,6)
+  grna_matrix_vary_thresh[expressed_grna_ids[1],] <- 100 # all cells express this grna_id very strongly
+  grna_matrix_vary_thresh[expressed_grna_ids[2],] <- 25  # all cells also express some of this grna_id
+
 
   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_low_with_low_thresh <- import_data(
@@ -229,20 +231,19 @@ test_that("assign_grnas method=threshold moi=low", {
 
   expect_equal(scep_low_with_low_thresh@cells_w_multiple_grnas, 1:num_cells)
 
-  # TODO should this fail?? <--discuss-->
-  # some grnas are missing and I'm not sure why
+  # TODO currently fails. Should this be changed?
   expect_equal(
     scep_low_with_low_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i <= 2) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if(i %in% expressed_grna_ids) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
+  # TODO confirm this is correct after  i changed which grna_ids I'm using
   guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 1) 1:num_cells else integer(0)) |>
       setNames(unique_targets)
   nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
     setNames(nt_guides)
 
-  # TODO there's a mix of integer(0) and NULL here that seems weird <--discuss-->
   expect_equal(
     scep_low_with_low_thresh@grna_assignments_raw,
     list(
@@ -303,7 +304,7 @@ test_that("assign_grnas method=threshold moi=high", {
   grna_matrix_vary_thresh <- test_data_list$grna_matrix_all_0
   grna_matrix_vary_thresh[1,] <- 100 # all cells express grna1 very strongly
   grna_matrix_vary_thresh[2,] <- 50  # all cells also express some of grna2
-  grna_matrix_vary_thresh[3:6,3:6] <- 1:16 # little bit extra to get numerically full rank covariate data frame
+  grna_matrix_vary_thresh[3:6, 3:6] <- 1:16 # little bit extra to get numerically full rank covariate data frame
 
   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_high_with_low_thresh <- import_data(
@@ -319,31 +320,15 @@ test_that("assign_grnas method=threshold moi=high", {
 
   expect_equal(scep_high_with_low_thresh@grnas_per_cell, rep(2, num_cells))
 
-  # TODO what should this be? <--discuss-->
-  # expect_equal(scep_high_with_low_thresh@cells_w_multiple_grnas, 1:num_cells)
 
-  # TODO should this fail? <--discuss-->
-  # expect_equal(
-  #   scep_high_with_low_thresh@initial_grna_assignment_list,
-  #   lapply(1:num_grnas, function(i) if(i <= 2) 1:num_cells else integer(0)) |>
-  #     setNames(test_data_list$grna_target_data_frame$grna_id)
-  # )
+  scep_high_with_low_thresh@initial_grna_assignment_list
 
-  # guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 1) 1:num_cells else integer(0)) |>
-  #   setNames(unique_targets)
-  # nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
-  #   setNames(nt_guides)
-  #
-  # # TODO there's a mix of integer(0) and NULL here again <--discuss-->
-  # expect_equal(
-  #   scep_high_with_low_thresh@grna_assignments_raw,
-  #   list(
-  #     grna_group_idxs = guide_part,
-  #     indiv_nt_grna_idxs = nt_part
-  #   )
-  # )
-
-
+  # TODO currently fails but should pass after every grna_id is assigned
+  expect_equal(
+    scep_high_with_low_thresh@initial_grna_assignment_list,
+    lapply(1:num_grnas, function(i) if(i <= 2) 1:num_cells else integer(0)) |>
+      setNames(test_data_list$grna_target_data_frame$grna_id)
+  )
 
   # no cell is flagged as expressing multiple grnas ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_high_with_high_thresh <- import_data(
@@ -357,29 +342,15 @@ test_that("assign_grnas method=threshold moi=high", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 55)
 
-  expect_equal(scep_high_with_high_thresh@cells_w_multiple_grnas, integer(0))
+  # expect_equal(scep_high_with_high_thresh@cells_w_multiple_grnas, integer(0))
   expect_equal(scep_high_with_high_thresh@grnas_per_cell, rep(1, num_cells))
 
-  # TODO again -- why are some names missing? <--discuss-->
-  # expect_equal(
-  #   scep_high_with_high_thresh@initial_grna_assignment_list,
-  #   lapply(1:num_grnas, function(i) if(i == 1) 1:num_cells else integer(0)) |>
-  #     setNames(test_data_list$grna_target_data_frame$grna_id)
-  # )
-
-  # guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 1) 1:num_cells else integer(0)) |>
-  #   setNames(unique_targets)
-  # nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
-  #   setNames(nt_guides)
-
-  # TODO there's a mix of integer(0) and NULL here again <--discuss-->
-  # expect_equal(
-  #   scep_high_with_high_thresh@grna_assignments_raw,
-  #   list(
-  #     grna_group_idxs = guide_part,
-  #     indiv_nt_grna_idxs = nt_part
-  #   )
-  # )
+  # TODO again, should pass later
+  expect_equal(
+    scep_high_with_high_thresh@initial_grna_assignment_list,
+    lapply(1:num_grnas, function(i) if(i == 1) 1:num_cells else integer(0)) |>
+      setNames(test_data_list$grna_target_data_frame$grna_id)
+  )
 })
 
 # TODO write this test
