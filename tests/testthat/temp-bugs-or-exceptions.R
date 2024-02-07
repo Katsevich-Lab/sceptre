@@ -7,7 +7,7 @@
 
 bug_threshold_assign_grnas <- function(threshold) {
 
-  test_data_list <- make_mock_base_data_for_testing_run_qc(24)
+  test_data_list <- make_mock_base_data_for_testing_run_qc(24) # from temp-test-run_qc.R in tests/testthat
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix)
   num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
@@ -33,8 +33,9 @@ bug_threshold_assign_grnas <- function(threshold) {
 
 }
 
-bug_threshold_assign_grnas(threshold=6)
-bug_threshold_assign_grnas(threshold=9)
+## run these
+# bug_threshold_assign_grnas(threshold=5) # works
+# bug_threshold_assign_grnas(threshold=6) # fails
 
 
 # 2. problem in `run_qc()` if no NTs are considered expressed
