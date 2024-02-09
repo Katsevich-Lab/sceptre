@@ -12,7 +12,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   if (sceptre_object@nf_pipeline) {
     grnas_in_use <- sceptre_object@elements_to_analyze
   } else {
-    grnas_in_use <- determine_grnas_in_use(sceptre_object)
+    grnas_in_use <- sceptre_object@grna_target_data_frame$grna_id
   }
 
   # assign grnas via the selected strategy; obtain the grna assignments and cells containing multiple grnas
