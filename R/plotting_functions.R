@@ -631,10 +631,11 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
   my_cols <- c("mediumseagreen", "firebrick1")
 
   pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
-  neg_ctrl_pval_sub <- downsample_result_data_frame(
+  neg_ctrl_pval_sub <- if (nrow(sceptre_object@calibration_result) >= 1) {
+    downsample_result_data_frame(
       result_df = sceptre_object@calibration_result
-    ) |>
-    dplyr::pull(p_value)
+    ) |> dplyr::pull(p_value)
+  } else numeric(0)
   group_names <- c("Positive Control", "Negative Control")
   df <- data.frame(
     lab = rep(
