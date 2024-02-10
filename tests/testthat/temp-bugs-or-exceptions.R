@@ -3,7 +3,7 @@
 
 # 1. problem with thresholding in `assign_grnas()`
 # 2. problem with `assign_grnas()` that I don't understand
-
+# 3. problem in `run_qc()` if no cells have assigned grnas
 
 bug_threshold_assign_grnas <- function(threshold) {
 
@@ -96,35 +96,40 @@ bug_error_in_assign_grnas_involving_matrices <- function(crash = TRUE) {
 # bug_error_in_assign_grnas_involving_matrices(crash = FALSE)  # does not throw error
 
 
+bug_no_grnas_assigned_crashes_run_qc <- function() {
+  set.seed(2)
+  num_cells <- 100
+  num_responses <- 40
 
+  grna_target_data_frame <- make_mock_grna_target_data(c(2,2,2), 1, 1, 10)
+  grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 1) |>
+    matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
 
-# 3. problem in `run_qc()` if no NTs are considered expressed
-# can't replicate
+  response_matrix <- rpois(num_cells * num_responses, 5) |>
+    matrix(nrow = num_responses, ncol = num_cells) |>
+    `rownames<-`(paste0("response_", 1:num_responses))
 
-# crash_no_NTs_in_run_qc <- function() {
-#   test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells=24)
-#   num_cells <- ncol(test_data_list$response_matrix)
-#   num_grnas <- nrow(test_data_list$grna_matrix)
-#   num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
-#   unique_targets <- unique(test_data_list$grna_target_data_frame$grna_target[1:num_targets])
-#   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
-#
-#   set.seed(123)
-#   grna_matrix <- test_data_list$grna_matrix
-#   grna_matrix[] <- rpois(prod(dim(grna_matrix)), .5)
-#   grna_matrix[1,] <- 10
-#   # grna_matrix[9:11,] <- 0 # no expression for NTs
-#
-#   scep_high <- import_data(
-#     grna_matrix = grna_matrix,
-#     response_matrix = test_data_list$response_matrix,
-#     grna_target_data_frame = test_data_list$grna_target_data_frame,
-#     moi = "high"
-#   ) |>
-#     set_analysis_parameters(
-#       positive_control_pairs = test_data_list$positive_control_pairs,
-#       discovery_pairs = test_data_list$discovery_pairs
-#     ) |>
-#     assign_grnas(method="thresholding", threshold=10) |>
-#     run_qc()
-# }
+  discovery_pairs <- data.frame(
+    grna_target = c("t1_c1_d1"),
+    response_id = c("response_1")
+  )
+
+  scep <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"
+  ) |>
+    set_analysis_parameters(
+      discovery_pairs = discovery_pairs,
+      control_group = "nt_cells"
+    ) |>
+    assign_grnas(method = "thresholding", threshold = 40) |> # nothing passes
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0) |> # so that all cells and pairs pass
+    run_calibration_check()
+}
+
+## run this
+# bug_no_grnas_assigned_crashes_run_qc() # throws error
