@@ -1,11 +1,3 @@
-# NOTES
-# - `run_qc()` fails if there are no cells with NT grnas expressed, and the error is not helpful:
-#     "Error in seq.default(start[i], stop[i]) : 'to' must be a finite number"
-# -
-
-
-# TODO
-# - confirm grna assignments updated correctly
 
 make_mock_base_data_for_testing_run_qc <- function(num_cells) {
   # num_cells <- 24  # must be even for my choice of extra_covariates
@@ -238,8 +230,6 @@ test_that("run_qc test positive control pairs", {
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  # response_matrix <- matrix(sample(0:1, num_responses * num_cells, replace=TRUE, prob = c(.9, .1)), num_responses, num_cells) |>
-  #   `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
   response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
@@ -347,8 +337,9 @@ test_that("run_qc test positive control pairs", {
 })
 
 
-
 test_that("run_qc test discovery pairs", {
+  # the test above for positive controls uses the same ideas as this one
+  # but has clearer comments
   grna_target_data_frame <- data.frame(
     grna_id = c("id1", "id2", "id3", "nt1"),
     grna_target = c("t1", "t2", "t3", "non-targeting"),
@@ -459,8 +450,6 @@ test_that("run_qc test discovery pairs", {
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
            n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)  # don't want to remove the cells I'm messing with
   expect_equal(scep_high_control_complement_t1_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
-
-
 })
 
 
