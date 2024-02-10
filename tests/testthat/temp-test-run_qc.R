@@ -135,8 +135,6 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
   set.seed(123)
   grna_matrix <- test_data_list$grna_matrix
   grna_matrix[] <- rpois(prod(dim(grna_matrix)), 4)
-  # for(i in 1:num_grnas) grna_matrix[i,i] <- 100 # for clear expression
-
 
   response_matrix <- test_data_list$response_matrix
   response_matrix[] <- rpois(prod(dim(response_matrix)), 2) + 10
@@ -176,8 +174,6 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
   scep_qc <- scep_high_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,.02))
   expect_equal(scep_qc@cells_in_use, zero_umi_count_idx)
-
-
 })
 
 test_that("run_qc remove cells with `p_mito_threshold` high moi", {
@@ -217,62 +213,142 @@ test_that("run_qc remove cells with `p_mito_threshold` high moi", {
   expect_identical(scep_qc@cells_in_use, (1:100)[-high_p_mito_idx])
 })
 
+
+
 # TODO finish controlling n_nonzero_trt and n_nonzero_cntrl for pass_qc in pos control
 test_that("run_qc test positive control pairs", {
-  test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells = 100)
-  num_cells <- ncol(test_data_list$response_matrix)
-  num_grnas <- nrow(test_data_list$grna_matrix)
-  num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
-  unique_targets <- unique(test_data_list$grna_target_data_frame$grna_target[1:num_targets])
-  nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
+  grna_target_data_frame <- data.frame(
+    grna_id = c("id1", "id2", "id3", "nt1"),
+    grna_target = c("t1", "t2", "t3", "non-targeting"),
+    chr = 0, start = 0, end = 1
+  )
+  num_grna <- nrow(grna_target_data_frame)
+  num_cells <- 40
+  num_responses <- 10
 
-  set.seed(123)
-  grna_matrix <- test_data_list$grna_matrix
-  grna_matrix[] <- rpois(prod(dim(grna_matrix)), 4)
+  set.seed(1)
+  # using sample(0:1) so no entries can accidentally cross the threshold
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  cells_expressing_t1 <- 1:10
+  cells_expressing_t2 <- 11:20
+  cells_expressing_t3 <- 21:30
+  cells_expressing_nt1 <- 31:40
+  all_cells <- 1:num_cells
 
-  response_matrix <- test_data_list$response_matrix
-  response_matrix[] <- rpois(prod(dim(response_matrix)), 2)
+  grna_matrix["id1", cells_expressing_t1] <- 50
+  grna_matrix["id2", cells_expressing_t2] <- 50
+  # grna_matrix["id3", cells_expressing_t3] <- 50
+  grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  scep_high_all_pass <- import_data(
+  # response_matrix <- matrix(sample(0:1, num_responses * num_cells, replace=TRUE, prob = c(.9, .1)), num_responses, num_cells) |>
+  #   `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
+  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+    `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
+
+  # # target t1: all control group are non-zero, all NT are non-zero
+  # # whether or not the counts reflect this will depend on if there are "control" cells
+  # # other than `cells_expressing_nt1`
+  response_matrix["t1", cells_expressing_t1] <- 100
+  response_matrix["t1", cells_expressing_nt1] <- 100
+  # these next two only matter for complement control group: this makes it so
+  # there will be 20 non-zero control cells in that situation
+  response_matrix["t1", cells_expressing_t2] <- 0
+  response_matrix["t1", cells_expressing_t3] <- 100
+
+  # target t2: all control group are non-zero, all NT are 0
+  response_matrix["t2", cells_expressing_t2] <- 100
+  response_matrix["t2", cells_expressing_nt1] <- 0
+  # these next two only matter for complement control group: this makes it so
+  # there will be 0 non-zero control cells in that situation
+  response_matrix["t2", cells_expressing_t1] <- 0
+  response_matrix["t2", cells_expressing_t3] <- 0
+
+  # target t3: all cells are non-zero
+  response_matrix["t3", all_cells] <- 100
+
+  positive_control_pairs = data.frame(
+    grna_target = c("t1", "t2", "t3"),
+    response_id = c("t1", "t2", "t3")
+  )
+  discovery_pairs <- data.frame(
+    grna_target = c("t1",        "t1",        "t2",         "t2"),
+    response_id = c("response_4", "response_5",  "response_4", "response_6")
+  )
+
+  ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  scep_low_control_nt_pre_qc <- import_data(
     grna_matrix = grna_matrix,
     response_matrix = response_matrix,
-    grna_target_data_frame = test_data_list$grna_target_data_frame,
-    moi = "high"
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"
   ) |>
     set_analysis_parameters(
-      positive_control_pairs = test_data_list$positive_control_pairs,
-      discovery_pairs = test_data_list$discovery_pairs,
+      positive_control_pairs = positive_control_pairs,
+      discovery_pairs = discovery_pairs,
       control_group = "nt_cells"
     ) |>
-    assign_grnas(method = "thresholding", threshold = 7) |>
-    run_qc()
+    assign_grnas(method = "thresholding", threshold = 40)
 
-  expect_true(all(scep_high_all_pass@positive_control_pairs_with_info$pass_qc))
+  scep_low_control_nt_all_pass <- scep_low_control_nt_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
 
-  # TODO finish
-  pos_ctrl_to_fail <- test_data_list$positive_control_pairs$grna_target[2]
-  grna_ids_to_fail <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == pos_ctrl_to_fail])
-  grna_matrix[grna_ids_to_fail,] <- 0
-  grna_matrix[grna_ids_to_fail,1:2] <- 1  # not making it entirely 0
+  # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
+  expect_equal(scep_low_control_nt_all_pass@positive_control_pairs_with_info$n_nonzero_trt, c(10, 10, 0))
+  expect_equal(scep_low_control_nt_all_pass@positive_control_pairs_with_info$n_nonzero_cntrl, c(10, 0, 10))
 
-  scep_high_one_pos_fails <- import_data(
+  # confirming all pass QC with these thresholds
+  expect_true(all(scep_low_control_nt_all_pass@positive_control_pairs_with_info$pass_qc))
+
+  # for this one only t3 fails because it has no cells expressing the response, since no gRNAs express t3
+  scep_low_control_nt_t3_fail <- scep_low_control_nt_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+  expect_equal(scep_low_control_nt_t3_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
+
+  # for this one only t2 fails, because that's the only one with 0 control group responses
+  scep_low_control_nt_t2_fail <- scep_low_control_nt_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1)  # don't want to remove the cells I'm messing with
+  expect_equal(scep_low_control_nt_t2_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, FALSE, TRUE))
+
+
+  ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  scep_high_control_complement_pre_qc <- import_data(
     grna_matrix = grna_matrix,
     response_matrix = response_matrix,
-    grna_target_data_frame = test_data_list$grna_target_data_frame,
-    moi = "high"
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "high" # forces complement control group
   ) |>
     set_analysis_parameters(
-      positive_control_pairs = test_data_list$positive_control_pairs,
-      discovery_pairs = test_data_list$discovery_pairs,
-      control_group = "nt_cells"
+      positive_control_pairs = positive_control_pairs,
+      discovery_pairs = discovery_pairs,
     ) |>
-    assign_grnas(method = "thresholding", threshold = 7) |>
-    run_qc()
+    assign_grnas(method = "thresholding", threshold = 40)
 
-  scep_high_one_pos_fails@positive_control_pairs_with_info
+  scep_high_control_complement_all_pass <- scep_high_control_complement_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
 
+  # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
+  expect_equal(scep_high_control_complement_all_pass@positive_control_pairs_with_info$n_nonzero_trt, c(10, 10, 0))
+  expect_equal(scep_high_control_complement_all_pass@positive_control_pairs_with_info$n_nonzero_cntrl, c(20, 0, 40))
 
-  setdiff(1:100, scep_high_one_pos_fails@cells_in_use)
+  # confirming all pass QC with these thresholds
+  expect_true(all(scep_high_control_complement_all_pass@positive_control_pairs_with_info$pass_qc))
+
+  # for this one only t3 fails because it has no cells expressing the response, since no gRNAs express t3
+  scep_high_control_complement_t3_fail <- scep_high_control_complement_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+  expect_equal(scep_high_control_complement_t3_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
+
+  # for this one only t2 fails, because that's the only one with 0 control group responses
+  scep_high_control_complement_t1_t2_fail <- scep_high_control_complement_pre_qc |>
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
+           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)  # don't want to remove the cells I'm messing with
+  expect_equal(scep_high_control_complement_t1_t2_fail@positive_control_pairs_with_info$pass_qc, c(FALSE, FALSE, TRUE))
 
 })
 
