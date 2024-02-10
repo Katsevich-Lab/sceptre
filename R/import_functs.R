@@ -4,7 +4,7 @@
 #'
 #' @param directories a character vector of directories containing the output of one or more calls to cellranger count. Each directory should contain the files "matrix.mtx.gz" and "features.tsv.gz" (and optionally "barcodes.tsv.gz").
 #' @param moi a string indicating the MOI of the dataset, either "low" or "high"
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target. Optionally, `grna_target_data_frame` can contain columns `chr`, `start`, and `end`, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, `grna_target_data_frame` can contain the column `vector_id` specifying the vector to which a given gRNA belongs.
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
 #' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to store the expression data in a disk-backed `ondisc` matrix (TRUE) or an in-memory sparse matrix (FALSE)
 #' @param directory_to_write (optional) a string indicating the directory in which to write the backing `.odm` files (must be specified if `use_ondisc` is set to `TRUE`)

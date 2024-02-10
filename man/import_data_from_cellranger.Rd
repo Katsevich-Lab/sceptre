@@ -18,7 +18,7 @@ import_data_from_cellranger(
 
 \item{moi}{a string indicating the MOI of the dataset, either "low" or "high"}
 
-\item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target}
+\item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target. Optionally, \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end}, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, \code{grna_target_data_frame} can contain the column \code{vector_id} specifying the vector to which a given gRNA belongs.}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute}
 

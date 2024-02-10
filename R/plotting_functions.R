@@ -146,6 +146,8 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- get_grna_matrix(sceptre_object) |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- names(init_assignments)
+  assigned <- sapply(init_assignments, length) >= 1
+  grna_ids <- grna_ids[assigned]
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
     grnas_to_plot <- sample(x = grna_ids, size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
