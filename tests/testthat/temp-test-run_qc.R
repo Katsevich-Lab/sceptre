@@ -289,16 +289,16 @@ test_that("run_qc test positive control pairs", {
   expect_true(all(scep_low_control_nt_all_pass@positive_control_pairs_with_info$pass_qc))
 
   # for this one only t3 fails because it has no cells expressing the response, since no gRNAs express t3
-  scep_low_control_nt_t3_fail <- scep_low_control_nt_pre_qc |>
+  scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
            n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)
-  expect_equal(scep_low_control_nt_t3_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
+  expect_equal(scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
 
   # for this one only t2 fails, because that's the only one with 0 control group responses
-  scep_low_control_nt_t2_fail <- scep_low_control_nt_pre_qc |>
+  scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
            n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1)
-  expect_equal(scep_low_control_nt_t2_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, FALSE, TRUE))
+  expect_equal(scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, FALSE, TRUE))
 
 
   ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,15 +325,15 @@ test_that("run_qc test positive control pairs", {
   # confirming all pass QC with these thresholds
   expect_true(all(scep_high_control_complement_all_pass@positive_control_pairs_with_info$pass_qc))
 
-  scep_high_control_complement_t3_fail <- scep_high_control_complement_pre_qc |>
+  scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),  # don't want to remove any cells here
            n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)
-  expect_equal(scep_high_control_complement_t3_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
+  expect_equal(scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
 
-  scep_high_control_complement_t1_t2_fail <- scep_high_control_complement_pre_qc |>
+  scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
            n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)
-  expect_equal(scep_high_control_complement_t1_t2_fail@positive_control_pairs_with_info$pass_qc, c(FALSE, FALSE, TRUE))
+  expect_equal(scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc, c(FALSE, FALSE, TRUE))
 })
 
 
@@ -408,15 +408,15 @@ test_that("run_qc test discovery pairs", {
   # confirming all pass QC with these thresholds
   expect_true(all(scep_low_control_nt_all_pass@discovery_pairs_with_info$pass_qc))
 
-  scep_low_control_nt_t2_t3_fail <- scep_low_control_nt_pre_qc |>
+  scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
            n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
-  expect_equal(scep_low_control_nt_t2_t3_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
+  expect_equal(scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
 
-  scep_low_control_nt_t1_fail <- scep_low_control_nt_pre_qc |>
+  scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
            n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1)  # don't want to remove the cells I'm messing with
-  expect_equal(scep_low_control_nt_t1_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
+  expect_equal(scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
 
   ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_high_control_complement_pre_qc <- import_data(
@@ -441,15 +441,15 @@ test_that("run_qc test discovery pairs", {
   # confirming all pass QC with these thresholds
   expect_true(all(scep_high_control_complement_all_pass@discovery_pairs_with_info$pass_qc))
 
-  scep_high_control_complement_t2_t3_fail <- scep_high_control_complement_pre_qc |>
+  scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
            n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
-  expect_equal(scep_high_control_complement_t2_t3_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
+  expect_equal(scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
 
-  scep_high_control_complement_t1_fail <- scep_high_control_complement_pre_qc |>
+  scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
     run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
            n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)  # don't want to remove the cells I'm messing with
-  expect_equal(scep_high_control_complement_t1_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
+  expect_equal(scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
 })
 
 
