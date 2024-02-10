@@ -39,7 +39,7 @@ bug_threshold_assign_grnas <- function(threshold) {
 
 
 
-bug_error_in_assign_grnas_involving_matrices <- function() {
+bug_error_in_assign_grnas_involving_matrices <- function(crash = TRUE) {
   grna_target_data_frame <- data.frame(
     grna_id = c("id1", "id2", "id3", "nt1"),
     grna_target = c("t1", "t2", "t3", "non-targeting"),
@@ -61,23 +61,13 @@ bug_error_in_assign_grnas_involving_matrices <- function() {
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  grna_matrix["id3", cells_expressing_t3] <- 50
+  if(crash) {
+    grna_matrix["id3", cells_expressing_t3] <- 50
+  }
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(sample(0:1, num_responses * num_cells, replace=TRUE, prob = c(.9, .1)), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
-
-  # target t1: I will have all non-zero for both the treatment and control cells
-  # whether or not the counts reflect this will depend on if there are "control" cells
-  # other than `cells_expressing_nt1`
-  response_matrix["t1", cells_expressing_t1] <- 100
-  response_matrix["t1", cells_expressing_nt1] <- 100
-
-  response_matrix["t2", cells_expressing_t2] <- 100
-  response_matrix["t2", cells_expressing_nt1] <- 0
-
-  response_matrix["t3", cells_expressing_t3] <- 0
-  response_matrix["t3", cells_expressing_nt1] <- 100
 
   positive_control_pairs = data.frame(
     grna_target = c("t1", "t2", "t3"),
@@ -102,7 +92,8 @@ bug_error_in_assign_grnas_involving_matrices <- function() {
     assign_grnas(method = "thresholding", threshold = 40)
 }
 ## run this
-# bug_weird_error()  # throws error
+# bug_error_in_assign_grnas_involving_matrices(crash = TRUE)  # throws error
+# bug_error_in_assign_grnas_involving_matrices(crash = FALSE)  # does not throw error
 
 
 
