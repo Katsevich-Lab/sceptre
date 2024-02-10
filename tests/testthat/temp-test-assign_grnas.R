@@ -1,12 +1,5 @@
-
-# NOTES
-# - anywhere with the tag <--discuss--> is something i want to discuss when presenting this
-# - Is `@grnas_per_cell` used for method="maximum"?
-# - for method="thresholding" there is some inconsistency with the slots. Is that fine?
-
-
-# TODO do i need make_mock_response_matrix here? or make_mock_grna_matrix? or in any of these?
-
+# TODO
+# - write test for method="mixture"
 
 # this function hard-codes a particular dataset that will be the base
 # of the tests for `assign_grnas()`.
@@ -201,7 +194,6 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
   expect_equal(scep_low_with_high_frac@cells_w_multiple_grnas, 1)
 })
 
-# TODO change tests?
 test_that("assign_grnas method=threshold moi=low", {
 
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
@@ -231,16 +223,15 @@ test_that("assign_grnas method=threshold moi=low", {
 
   expect_equal(scep_low_with_low_thresh@cells_w_multiple_grnas, 1:num_cells)
 
-  # TODO currently fails. Should this be changed?
   expect_equal(
     scep_low_with_low_thresh@initial_grna_assignment_list,
     lapply(1:num_grnas, function(i) if(i %in% expressed_grna_ids) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
-  # TODO confirm this is correct after  i changed which grna_ids I'm using
-  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 1) 1:num_cells else integer(0)) |>
-      setNames(unique_targets)
+  # the check is `i == 3` because the target with expressed guides is t1_c3_d1, the 3rd one
+  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 3) 1:num_cells else integer(0)) |>
+    setNames(unique_targets)
   nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
     setNames(nt_guides)
 
@@ -268,19 +259,19 @@ test_that("assign_grnas method=threshold moi=low", {
 
   expect_equal(scep_low_with_high_thresh@cells_w_multiple_grnas, integer(0))
 
-  # TODO again -- why are some names missing?? <--discuss-->
+  # `i == 5` is used because g1_t1_c3_d1 is the 5th grna_id and is what all these cells are assigned to
   expect_equal(
     scep_low_with_high_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i == 1) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if(i == 5) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
-  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 1) 1:num_cells else integer(0)) |>
+  # as above, the check is `i == 3` because the target with expressed guides is t1_c3_d1, the 3rd one
+  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 3) 1:num_cells else integer(0)) |>
     setNames(unique_targets)
   nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
     setNames(nt_guides)
 
-  # TODO there's a mix of integer(0) and NULL here that seems weird <--discuss-->
   expect_equal(
     scep_low_with_high_thresh@grna_assignments_raw,
     list(
@@ -291,7 +282,6 @@ test_that("assign_grnas method=threshold moi=low", {
   expect_equal(scep_low_with_high_thresh@grnas_per_cell, rep(1, num_cells))
 })
 
-# TODO uncomment tests?
 test_that("assign_grnas method=threshold moi=high", {
 
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
@@ -320,10 +310,6 @@ test_that("assign_grnas method=threshold moi=high", {
 
   expect_equal(scep_high_with_low_thresh@grnas_per_cell, rep(2, num_cells))
 
-
-  scep_high_with_low_thresh@initial_grna_assignment_list
-
-  # TODO currently fails but should pass after every grna_id is assigned
   expect_equal(
     scep_high_with_low_thresh@initial_grna_assignment_list,
     lapply(1:num_grnas, function(i) if(i <= 2) 1:num_cells else integer(0)) |>
@@ -342,10 +328,8 @@ test_that("assign_grnas method=threshold moi=high", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 55)
 
-  # expect_equal(scep_high_with_high_thresh@cells_w_multiple_grnas, integer(0))
   expect_equal(scep_high_with_high_thresh@grnas_per_cell, rep(1, num_cells))
 
-  # TODO again, should pass later
   expect_equal(
     scep_high_with_high_thresh@initial_grna_assignment_list,
     lapply(1:num_grnas, function(i) if(i == 1) 1:num_cells else integer(0)) |>
@@ -354,48 +338,48 @@ test_that("assign_grnas method=threshold moi=high", {
 })
 
 # TODO write this test
-test_that("assign_grnas method=mixture moi=high", {
-
-  test_data_list <- make_mock_base_data_for_testing_assign_grnas()
-  num_cells <- ncol(test_data_list$response_matrix)
-  num_grnas <- nrow(test_data_list$grna_matrix_all_0)
-  num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
-  unique_targets <- unique(test_data_list$grna_target_data_frame$grna_target[1:num_targets])
-  nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
-
-  grna_matrix_mixture <- test_data_list$grna_matrix_all_0
-  grna_matrix_mixture[1,] <- 100 # all cells express grna1 very strongly
-  grna_matrix_mixture[2,] <- 100  # all cells also express some of grna2
-  grna_matrix_mixture[3:6,3:6] <- (1:16)/10 # little bit extra to get numerically full rank covariate data frame
-
-  # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
-  scep_high_mixture <- import_data(
-    grna_matrix = grna_matrix_mixture,
-    response_matrix = test_data_list$response_matrix,
-    grna_target_data_frame = test_data_list$grna_target_data_frame,
-    moi = "high"
-  ) |>
-    set_analysis_parameters(
-      discovery_pairs = test_data_list$discovery_pairs
-    ) |>
-    assign_grnas(method = "mixture")
-
-  # expect_equal(scep_high_mixture@grnas_per_cell, ...)
-
-  # expect_equal(scep_high_mixture@cells_w_multiple_grnas, ...)
-
-  # TODO should this fail? <--discuss-->
-  # expect_equal(
-  #   scep_high_mixture@initial_grna_assignment_list,
-  #   ...
-  # )
-
-  # # TODO there's a mix of integer(0) and NULL here again <--discuss-->
-  # expect_equal(
-  #   scep_high_mixture@grna_assignments_raw,
-  #   ...
-  # )
-})
+# test_that("assign_grnas method=mixture moi=high", {
+#
+#   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
+#   num_cells <- ncol(test_data_list$response_matrix)
+#   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
+#   num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
+#   unique_targets <- unique(test_data_list$grna_target_data_frame$grna_target[1:num_targets])
+#   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
+#
+#   grna_matrix_mixture <- test_data_list$grna_matrix_all_0
+#   grna_matrix_mixture[1,] <- 100 # all cells express grna1 very strongly
+#   grna_matrix_mixture[2,] <- 100  # all cells also express some of grna2
+#   grna_matrix_mixture[3:6,3:6] <- (1:16)/10 # little bit extra to get numerically full rank covariate data frame
+#
+#   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
+#   scep_high_mixture <- import_data(
+#     grna_matrix = grna_matrix_mixture,
+#     response_matrix = test_data_list$response_matrix,
+#     grna_target_data_frame = test_data_list$grna_target_data_frame,
+#     moi = "high"
+#   ) |>
+#     set_analysis_parameters(
+#       discovery_pairs = test_data_list$discovery_pairs
+#     ) |>
+#     assign_grnas(method = "mixture")
+#
+#   # expect_equal(scep_high_mixture@grnas_per_cell, ...)
+#
+#   # expect_equal(scep_high_mixture@cells_w_multiple_grnas, ...)
+#
+#   # TODO should this fail? <--discuss-->
+#   # expect_equal(
+#   #   scep_high_mixture@initial_grna_assignment_list,
+#   #   ...
+#   # )
+#
+#   # # TODO there's a mix of integer(0) and NULL here again <--discuss-->
+#   # expect_equal(
+#   #   scep_high_mixture@grna_assignments_raw,
+#   #   ...
+#   # )
+# })
 
 
 
