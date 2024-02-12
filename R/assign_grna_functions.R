@@ -123,9 +123,13 @@ preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
     grna_target_data_table[grna_target_data_table$vector_id == curr_vector_id,]$grna_id
   }) |> stats::setNames(vector_ids)
   initial_grna_assignment_list_modified <- lapply(vector_groups, function(elem) {
-    l <- sort(initial_grna_assignment_list[elem], decreasing = FALSE)
+    l <- initial_grna_assignment_list[elem]
     out <- unique(unlist(l))
-    if (is.null(out)) out <- integer()
+    if (is.null(out)) {
+      out <- integer()
+    } else {
+      out <- sort(out)
+    }
     out
   })
   # update the grna target data table
