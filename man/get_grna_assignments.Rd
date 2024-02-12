@@ -10,11 +10,14 @@ get_grna_assignments(sceptre_object)
 \item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_grnas()} called on it}
 }
 \value{
-a list containing the gRNA-to-cell assignments
+a sparse logical matrix containing the gRNA-to-cell assignments
 }
 \description{
-Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is a named list, with each entry corresponding to a different gRNA. The entry for a given gRNA is an integer vector indicating the cells to which that gRNA has been assigned.
+Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is TRUE if the given gRNA is assigned to the given cell.
 }
 \details{
-The assignments correspond to the original (i.e., non-QC'ed) gRNA expression matrix.
+\itemize{
+\item The assignments correspond to the original gRNA expression matrix, i.e. the expression matrix that has not yet had cellwise QC performed on it.
+\item When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
+}
 }
