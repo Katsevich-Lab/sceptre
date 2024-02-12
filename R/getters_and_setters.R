@@ -71,7 +71,8 @@ get_grna_assignments <- function(sceptre_object) {
   mat <- Matrix::sparseMatrix(j = 1, p = c(0, 1), repr = "R")
   mat@j <- j
   mat@p <- p
-  mat@Dim <- get_grna_matrix(sceptre_object) |> dim()
+  mat@Dim <- c(length(initial_grna_assignment_list),
+               get_grna_matrix(sceptre_object) |> ncol())
   rownames(mat) <- grna_ids
   return(mat)
 }

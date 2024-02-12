@@ -123,7 +123,7 @@ preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
     grna_target_data_table[grna_target_data_table$vector_id == curr_vector_id,]$grna_id
   }) |> stats::setNames(vector_ids)
   initial_grna_assignment_list_modified <- lapply(vector_groups, function(elem) {
-    l <- initial_grna_assignment_list[elem]
+    l <- sort(initial_grna_assignment_list[elem], decreasing = FALSE)
     out <- unique(unlist(l))
     if (is.null(out)) out <- integer()
     out
