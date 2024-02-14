@@ -248,7 +248,8 @@ run_qc <- function(sceptre_object,
   check_run_qc_inputs(n_nonzero_trt_thresh,
                       n_nonzero_cntrl_thresh,
                       response_n_umis_range,
-                      response_n_nonzero_range) |> invisible()
+                      response_n_nonzero_range,
+                      sceptre_object@initial_grna_assignment_list) |> invisible()
 
   # 2.5 update fields of sceptre_object
   sceptre_object@cellwise_qc_thresholds <- list(response_n_umis_range = response_n_umis_range,

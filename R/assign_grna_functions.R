@@ -41,6 +41,10 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
     sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
     sceptre_object@cells_w_multiple_grnas <- max_result$cells_w_multiple_grnas # set cells w/ multiple gRNAs for max method
   }
+  # check that at least some gRNAs were assigned
+  if (all(sapply(sceptre_object@initial_grna_assignment_list, length) == 0L)) {
+    warning("No gRNA was assigned to any cell. Consider setting `method` to 'thresholding' and `threshold` to a small, positive number.")
+  }
 
   # process the initial assignment list
   if (!sceptre_object@nf_pipeline) sceptre_object <- process_initial_assignment_list(sceptre_object)
