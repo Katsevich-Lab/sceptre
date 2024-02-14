@@ -70,7 +70,7 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
       threshold_count_matrix(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                              row_idx = which(grna_id == rownames(grna_matrix)),
                              threshold = grna_assign_threshold)
-    })
+    }, simplify = FALSE)
   }
 
   return(initial_assignment_list)
