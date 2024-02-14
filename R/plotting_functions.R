@@ -766,7 +766,7 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
     dplyr::group_by(treatment) |>
     dplyr::sample_n(size = min(dplyr::n(), 1000))
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
-    ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.7) +
+    ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.6) +
     ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5) +
     sceptre:::get_my_theme() +
     ggplot2::theme(legend.position = "none") +
