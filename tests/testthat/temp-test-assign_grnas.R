@@ -23,13 +23,6 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
   ) |>
     `rownames<-`(c(on_targets, paste0("response_", (length(on_targets) + 1):num_responses)))
 
-  # extra_covariates <- data.frame(x = rep(c("b1", "b2"), each = num_cells / 2))
-
-  # positive_control_pairs <- data.frame(
-  #   grna_target = on_targets,
-  #   response_id = on_targets
-  # )
-
   discovery_pairs <- data.frame(
     grna_target = on_targets,
     response_id = rep(paste0("response_", length(on_targets) + 1), times=2)
@@ -39,8 +32,6 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
     grna_target_data_frame = grna_target_data_frame,
     response_matrix = response_matrix,
     grna_matrix_all_0 = grna_matrix,
-    # extra_covariates = extra_covariates,
-    # positive_control_pairs = positive_control_pairs,
     discovery_pairs = discovery_pairs
   )
 }
@@ -97,7 +88,6 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
   )
   # should be empty for maximum assignment
   expect_equal(scep_low_all_1@grnas_per_cell, integer(0))
-
 })
 
 test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
@@ -207,7 +197,6 @@ test_that("assign_grnas method=threshold moi=low", {
   expressed_grna_ids <- c(5,6)
   grna_matrix_vary_thresh[expressed_grna_ids[1],] <- 100 # all cells express this grna_id very strongly
   grna_matrix_vary_thresh[expressed_grna_ids[2],] <- 25  # all cells also express some of this grna_id
-
 
   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_low_with_low_thresh <- import_data(
