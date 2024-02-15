@@ -75,7 +75,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   grna_assignment_run <- funct_run_vect[["assign_grnas"]]
   if (grna_assignment_run) {
     mean_cells_per_grna <- sapply(x@initial_grna_assignment_list, length) |> mean()
-    mean_cells_per_grna_group <- sapply(x@grna_assignments_raw$grna_group_idxs, length) |> mean()
     cat(paste0("\n\ngRNA-to-cell assignment information:",
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(mean_cells_per_grna |> round(2)),
