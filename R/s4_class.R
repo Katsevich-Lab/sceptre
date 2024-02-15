@@ -16,6 +16,7 @@ setClass("sceptre_object",
            grna_target_data_frame_with_vector = "data.frame",
            low_moi = "logical",
            response_names = "character",
+           covariate_names = "character",
 
            # analysis parameters
            discovery_pairs = "data.frame",

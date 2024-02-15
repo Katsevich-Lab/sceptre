@@ -17,8 +17,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
     dplyr::filter(grna_target != "non-targeting")
   n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
   n_targeting_grnas <- nrow(targeting_grnas_df)
-  n_covariates <- ncol(object@covariate_data_frame)
-  covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
+  n_covariates <- length(object@covariate_names)
+  covariates <- paste0(object@covariate_names, collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
              crayon::blue(n_cells), " cells", if (funct_run_vect["run_qc"]) {
