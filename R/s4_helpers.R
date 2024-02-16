@@ -51,14 +51,14 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   }
 
   # 2. print analysis parameters
-  n_discovery_pairs <- nrow(x@discovery_pairs)
+  n_discovery_pairs <- x@n_discovery_pairs
   disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
-  n_pc_pairs <- nrow(x@positive_control_pairs)
+  n_pc_pairs <- x@n_positive_control_pairs
   pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
   cat(paste0("\nAnalysis parameters: \n",
-             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
+             "\t\U2022 Discovery pairs:", if (length(n_discovery_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
                                                                                                       if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
-             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
+             "\n\t\U2022 Positive control pairs:", if (length(n_pc_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
                                                                                                         if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
@@ -74,7 +74,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   # 3. print the gRNA-to-cell assignment information
   grna_assignment_run <- funct_run_vect[["assign_grnas"]]
   if (grna_assignment_run) {
-    mean_cells_per_grna <- sapply(x@initial_grna_assignment_list, length) |> mean()
+    mean_cells_per_grna <- x@mean_cells_per_grna
     cat(paste0("\n\ngRNA-to-cell assignment information:",
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(mean_cells_per_grna |> round(2)),
