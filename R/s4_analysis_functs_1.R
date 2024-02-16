@@ -244,6 +244,25 @@ run_qc <- function(sceptre_object,
                    response_n_nonzero_range = c(0.01, 0.99),
                    p_mito_threshold = 0.2,
                    additional_cells_to_remove = integer()) {
+  run_qc_pt_1(sceptre_object,
+              n_nonzero_trt_thresh,
+              n_nonzero_cntrl_thresh,
+              response_n_umis_range,
+              response_n_nonzero_range,
+              p_mito_threshold,
+              additional_cells_to_remove) |>
+    run_qc_pt_2()
+}
+
+
+run_qc_pt_1 <- function(sceptre_object,
+                        n_nonzero_trt_thresh = 7L,
+                        n_nonzero_cntrl_thresh = 7L,
+                        response_n_umis_range = c(0.01, 0.99),
+                        response_n_nonzero_range = c(0.01, 0.99),
+                        p_mito_threshold = 0.2,
+                        additional_cells_to_remove = integer()) {
+  # cellwise start
   # 1. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
 
@@ -277,7 +296,12 @@ run_qc <- function(sceptre_object,
 
   # 7. update the grna assignments given the cellwise qc
   sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
+  return (sceptre_object)
+}
 
+
+run_qc_pt_2 <- function(sceptre_object) {
+  # pairwise start
   # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
   sceptre_object <- compute_pairwise_qc_information(sceptre_object)
 
