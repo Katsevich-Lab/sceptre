@@ -186,6 +186,8 @@ process_initial_assignment_list <- function(sceptre_object) {
                                indiv_nt_grna_idxs = indiv_nt_grna_idxs)
   # 6. initialize output
   sceptre_object@grna_assignments_raw <- grna_assignments_raw
+  # 7. save mean cells per grna
+  sceptre_object@mean_cells_per_grna <- sapply(sceptre_object@initial_grna_assignment_list, length) |> mean()
   return(sceptre_object)
 }
 

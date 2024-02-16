@@ -132,6 +132,8 @@ set_analysis_parameters <- function(sceptre_object,
   run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
+  sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
+  sceptre_object@n_positive_control_pairs <- nrow(sceptre_object@positive_control_pairs)
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
   sceptre_object@fit_parametric_curve <- fit_parametric_curve
