@@ -65,6 +65,7 @@ setClass("sceptre_object",
            # flags
            last_function_called = "character",
            functs_called = "logical",
+           nuclear = "logical",
 
            # results
            calibration_result = "data.frame",

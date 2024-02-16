@@ -44,6 +44,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@elements_to_analyze <- NA_character_
   sceptre_object@nf_pipeline <- FALSE
+  sceptre_object@nuclear <- FALSE
   sceptre_object@covariate_names <- sort(colnames(sceptre_object@covariate_data_frame))
 
   # 5. initialize flags
