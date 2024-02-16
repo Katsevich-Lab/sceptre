@@ -31,6 +31,7 @@ import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_
   sceptre_object@covariate_data_frame <- cellwise_covariates
   sceptre_object@covariate_names <- sort(colnames(sceptre_object@covariate_data_frame))
   # 5. initialize flags
+  sceptre_object@nuclear <- FALSE
   sceptre_object@last_function_called <- "import_data"
   sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
                                     assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
