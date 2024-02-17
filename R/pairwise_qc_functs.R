@@ -38,7 +38,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
                                                 to_analyze_grna_idxs = to_analyze_grna_idxs,
                                                 control_group_complement = control_group_complement,
                                                 cells_in_use = cells_in_use,
-                                                unique_response_idxs = unique(to_analyze_response_idxs))
+                                                unique_response_idxs = sort(unique(to_analyze_response_idxs)))
     } else {
       out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc(file_name_in = response_matrix@h5_file,
                                                                       f_row_ptr = response_matrix@ptr,

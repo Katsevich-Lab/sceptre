@@ -1,5 +1,10 @@
 # import from cellranger disk
 import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
+  # 0. check that directory_to_write has been supplied
+  if (is.null(directory_to_write)) {
+    stop("`directory_to_write` must be supplied.")
+  }
+
   # 1. call the corresponding ondisc function
   output <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
                                                directory_to_write = directory_to_write,
