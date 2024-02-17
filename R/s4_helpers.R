@@ -65,7 +65,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
              "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
              "\n\t\U2022 Fit parametric curve: ", crayon::blue(x@fit_parametric_curve),
-             "\n\t\U2022 Multiple testing adjustment: ", crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha),
+             "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
