@@ -57,9 +57,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
   cat(paste0("\nAnalysis parameters: \n",
              "\t\U2022 Discovery pairs:", if (x@nuclear) " trans" else {if (length(n_discovery_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
-                                                                                                      if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)}},
+                                                                                                      if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)}},
              "\n\t\U2022 Positive control pairs:", if (length(n_pc_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
-                                                                                                        if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
+                                                                                                        if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
