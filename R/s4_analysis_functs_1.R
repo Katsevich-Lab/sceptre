@@ -78,7 +78,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @examples
 #' # see example via ?sceptre
 set_analysis_parameters <- function(sceptre_object,
-                                    discovery_pairs,
+                                    discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
                                     grna_integration_strategy = "union",

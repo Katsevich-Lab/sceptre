@@ -25,7 +25,7 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
     possible_groups_m <- iterate_over_combinations(n_nt_grnas, calibration_group_size, n_possible_groups)
   } else {
     # sample from the set of combinations
-    p_hat <- mean(discovery_pairs_with_info$pass_qc)
+    p_hat <- if (nrow(discovery_pairs_with_info) == 0L) 0.1 else mean(discovery_pairs_with_info$pass_qc)
     possible_groups_m <- sample_combinations_v2(calibration_group_size, n_calibration_pairs, n_possible_groups,
                                                 n_nt_grnas, as.numeric(n_genes), N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
   }

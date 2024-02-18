@@ -549,12 +549,16 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
     stop("This `sceptre_object` has not yet had `run_qc` called on it.")
   }
   p_a <- plot_cellwise_qc(sceptre_object)
-  p_b <- plot_pairwise_qc(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE)
-  # combine the plots
-  if (return_indiv_plots) {
-    p_out <- list(p_a, p_b)
+  if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
+    p_b <- plot_pairwise_qc(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE)
+    # combine the plots
+    if (return_indiv_plots) {
+      p_out <- list(p_a, p_b)
+    } else {
+      p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+    }
   } else {
-    p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+    p_out <- p_a
   }
   return(p_out)
 }
