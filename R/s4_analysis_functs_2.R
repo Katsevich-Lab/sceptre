@@ -40,6 +40,9 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. handle the default arguments
+  if (nrow(sceptre_object@discovery_pairs_with_info) == 0L && (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
+    stop("`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified.")
+  }
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
   if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
 
