@@ -199,8 +199,15 @@ determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
   }
   if (restricted_grnas) {
-    all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
-                                 sceptre_object@discovery_pairs$grna_target, "non-targeting"))
+    if (!sceptre_object@nuclear) {
+      all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
+                                   sceptre_object@discovery_pairs$grna_target, "non-targeting"))
+    } else {
+      set.seed(4)
+      all_grna_targets <- c(grna_target_data_frame |>
+        dplyr::filter(grna_target != "non-targeting") |>
+        dplyr::sample_n(min(dplyr::n(), 30)) |> dplyr::pull(grna_target), "non-targeting")
+    }
     grnas_in_use <- dplyr::filter(grna_target_data_frame, grna_target %in% all_grna_targets) |>
       dplyr::pull(grna_id)
   } else {
