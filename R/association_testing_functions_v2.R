@@ -201,3 +201,21 @@ discovery_ntcells_crt <- function(B1, B2, B3, fit_parametric_curve, output_amoun
   }
   return(result_list_inner)
 }
+
+# workhorse function 5: score test, glm factored out
+score_test_glm_factored_out <- function(grna_groups, expression_vector,
+                                        pieces_precomp, get_idx_f, side_code){
+  result_list_inner <- vector(mode = "list", length = length(grna_groups))
+  for (i in seq_along(grna_groups)) {
+    curr_grna_group <- grna_groups[i]
+    idxs <- get_idx_f(curr_grna_group)
+
+    z_orig = compute_observed_full_statistic_v2(a = pieces_precomp$a,
+                                                w = pieces_precomp$w,
+                                                D = pieces_precomp$D,
+                                                trt_idxs = idxs$trt_idxs)
+
+    result_list_inner[[i]] <- result
+  }
+  return(result_list_inner)
+}
