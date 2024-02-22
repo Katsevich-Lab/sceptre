@@ -14,7 +14,6 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
   // 0. initialize variables and objects
   int n_nt_grnas = indiv_nt_grna_idxs.size(), n_genes = p.size() - 1, n_pairs = to_analyze_response_idxs.size(), pair_pointer = 0, n_nonzero = 0, curr_n_nonzero_cntrl = 0, curr_n_nonzero_trt = 0;
   IntegerVector curr_idxs, n_nonzero_tot(n_genes), n_nonzero_trt(n_pairs), n_nonzero_cntrl(n_pairs);
-  bool n_cntrl_cells_ok;
   IntegerMatrix M(n_nt_grnas, n_genes);
 
   std::vector<bool> y_sub(n_cells_sub), y_orig(n_cells_orig);

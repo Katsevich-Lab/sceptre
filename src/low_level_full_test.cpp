@@ -35,7 +35,7 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a, const N
   int* curr_vect;
   std::vector<double> out(B);
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
-  int D_nrow = D.nrow(), D_ncol = D.ncol(), idx;
+  int D_nrow = D.nrow(), idx;
 
   // iterate over the B tests
   for (int k = start_pos; k < B + start_pos; k ++) {
