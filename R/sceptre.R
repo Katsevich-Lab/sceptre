@@ -124,36 +124,5 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #'
 #' # 8. write results
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
-#'
-#' #####################
-#' # out-of-core example
-#' #####################
-#' # 1. create the sceptre object, setting `ondisc = TRUE`
-#' # and specifying the `directory_to_write` in which to write
-#' # the backing `.odm` files.
-#' directories <- paste0(system.file("extdata", package = "sceptre"),
-#' "/highmoi_example/gem_group_", 1:2)
-#' data(grna_target_data_frame_highmoi)
-#' sceptre_object <- import_data_from_cellranger(directories = directories,
-#' moi = "high",
-#' grna_target_data_frame = grna_target_data_frame_highmoi,
-#' use_ondisc = TRUE,
-#' directory_to_write = tempdir())
-#'
-#' # 2. repeat steps 2-8 above.
-#'
-#' # 3. reading and writing
-#' # write_ondisc_backed_sceptre_object
-#' write_ondisc_backed_sceptre_object(
-#'   sceptre_object,
-#'   paste0(tempdir(), "/sceptre_object.rds")
-#'  )
-#'
-#' # read ondisc-backed sceptre_object
-#' sceptre_object <- read_ondisc_backed_sceptre_object(
-#'  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
-#'  response_odm_file_fp = paste0(tempdir(), "/gene.odm"),
-#'  grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
-#' )
 #' }
 NULL

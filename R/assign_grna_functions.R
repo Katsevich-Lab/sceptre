@@ -124,7 +124,13 @@ preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
   }) |> stats::setNames(vector_ids)
   initial_grna_assignment_list_modified <- lapply(vector_groups, function(elem) {
     l <- initial_grna_assignment_list[elem]
-    unique(unlist(l))
+    out <- unique(unlist(l))
+    if (is.null(out)) {
+      out <- integer()
+    } else {
+      out <- sort(out)
+    }
+    out
   })
   # update the grna target data table
   grna_target_data_table_modified <- grna_target_data_table |>
@@ -180,15 +186,19 @@ process_initial_assignment_list <- function(sceptre_object) {
 }
 
 
-determine_grnas_in_use <- function(sceptre_object) {
-  all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
-                               sceptre_object@discovery_pairs$grna_target, "non-targeting"))
+determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
   if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
   } else {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
   }
-  grnas_in_use <- dplyr::filter(grna_target_data_frame, grna_target %in% all_grna_targets) |>
-    dplyr::pull(grna_id)
+  if (restricted_grnas) {
+    all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
+                                 sceptre_object@discovery_pairs$grna_target, "non-targeting"))
+    grnas_in_use <- dplyr::filter(grna_target_data_frame, grna_target %in% all_grna_targets) |>
+      dplyr::pull(grna_id)
+  } else {
+    grnas_in_use <- grna_target_data_frame$grna_id
+  }
   return(grnas_in_use)
 }
