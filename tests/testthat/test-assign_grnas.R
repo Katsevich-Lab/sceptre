@@ -1,10 +1,7 @@
 # TODO
 # - write test for method="mixture"
 
-# this function hard-codes a particular dataset that will be the base
-# of the tests for `assign_grnas()`.
-# It is called in every test, so a little repetitive, but it only takes
-# ~2 milliseconds per call on my laptop
+# mock data function just for the tests in this file
 make_mock_base_data_for_testing_assign_grnas <- function() {
   num_cells <- 24  # must be even for my choice of extra_covariates
   num_responses <- 7

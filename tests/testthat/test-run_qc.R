@@ -1,6 +1,5 @@
-
+# mock data function just used for the tests in this file
 make_mock_base_data_for_testing_run_qc <- function(num_cells) {
-  # num_cells <- 24  # must be even for my choice of extra_covariates
   num_responses <- 7
   grna_target_data_frame <- make_mock_grna_target_data(c(2,2), 1, 1, 3)
   on_targets <- unique(grna_target_data_frame$grna_target)[1:2]
