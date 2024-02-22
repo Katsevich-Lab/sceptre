@@ -48,19 +48,33 @@ get_cell_covariates <- function(sceptre_object) {
 
 #' Get gRNA assignments
 #'
-#' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a named list, with each entry corresponding to a different gRNA. The entry for a given gRNA is an integer vector indicating the cells to which that gRNA has been assigned.
+#' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is TRUE if the given gRNA is assigned to the given cell.
 #'
-#' The assignments correspond to the original (i.e., non-QC'ed) gRNA expression matrix.
+#' - The assignments correspond to the original gRNA expression matrix, i.e. the expression matrix that has not yet had cellwise QC performed on it.
+#' - When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 #'
 #' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called on it
 #'
-#' @return a list containing the gRNA-to-cell assignments
+#' @return a sparse logical matrix containing the gRNA-to-cell assignments
 #' @export
 get_grna_assignments <- function(sceptre_object) {
   if (!sceptre_object@functs_called[["assign_grnas"]]) {
     stop("`assign_grnas()` has not yet been called on the `sceptre_object`.")
   }
-  return(sceptre_object@initial_grna_assignment_list)
+  initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
+  grna_ids <- names(initial_grna_assignment_list)
+  names(initial_grna_assignment_list) <- NULL
+  j <- unlist(initial_grna_assignment_list)
+  increment_vector(j, -1L)
+  l <- sapply(initial_grna_assignment_list, length)
+  p <- c(0L, cumsum(l))
+  mat <- Matrix::sparseMatrix(j = 1, p = c(0, 1), repr = "R")
+  mat@j <- j
+  mat@p <- p
+  mat@Dim <- c(length(initial_grna_assignment_list),
+               get_grna_matrix(sceptre_object) |> ncol())
+  rownames(mat) <- grna_ids
+  return(mat)
 }
 
 set_response_matrix <- function(sceptre_object, response_matrix) {
