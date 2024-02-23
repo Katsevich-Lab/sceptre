@@ -13,7 +13,7 @@
 #' @export
 #' @examples
 #' # see example via ?sceptre
-import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
+import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_, use_ondisc = FALSE, directory_to_write = NULL) {
   # 1. perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
@@ -27,8 +27,20 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
 
-  # 4. update fields in output object
+  # 3.5 if using ondisc, create odms for gene and grna
   sceptre_object <- methods::new("sceptre_object")
+  if (use_ondisc) {
+    integer_id <- sample(x = seq(0L, .Machine$integer.max), size = 1L)
+    out <- write_matrices_to_disk(response_matrix = response_matrix,
+                                  grna_matrix = grna_matrix,
+                                  directory_to_write = directory_to_write,
+                                  integer_id = integer_id)
+    response_matrix <- out$response_matrix; grna_matrix <- out$grna_matrix
+    sceptre_object@integer_id <- integer_id
+    sceptre_object@nf_pipeline <- FALSE
+  }
+
+  # 4. update fields in output object
   sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
   sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
   sceptre_object@covariate_data_frame <- covariate_data_frame
@@ -43,11 +55,10 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
   sceptre_object@response_names <- response_names
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@elements_to_analyze <- NA_character_
-  sceptre_object@nf_pipeline <- FALSE
-  sceptre_object@nuclear <- FALSE
   sceptre_object@covariate_names <- sort(colnames(sceptre_object@covariate_data_frame))
 
   # 5. initialize flags
+  sceptre_object@nuclear <- FALSE
   sceptre_object@last_function_called <- "import_data"
   sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
                                     assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,

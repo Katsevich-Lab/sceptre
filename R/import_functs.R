@@ -164,33 +164,6 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
 }
 
 
-create_csc_matrix <- function(dt, n_cells, n_features) {
-  p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
-  out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-  out@i <- dt$feature_idx
-  out@p <- p
-  out@x <- dt$x
-  out@Dim <- c(n_features, n_cells)
-  return(out)
-}
-
-
-get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_nonzero")) {
-  con <- file(mtx_file, "r")
-  n_to_skip <- 0L
-  while (TRUE) {
-    n_to_skip <- n_to_skip + 1L
-    line <- readLines(con, n = 1)
-    if (substr(line, 0, 1) != "%") break()
-  }
-  close(con)
-  metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
-  out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
-  names(out) <- c(col_id, "n_to_skip")
-  return(out)
-}
-
-
 #' Import data from Parse (experimental)
 #'
 #' `import_data_from_parse()` imports data from the output of the Parse count matrix generation program. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual} for more information about this function. It is assumed that the data are stored in a single set of files (as opposed to multiple sets of files corresponding to, e.g., different samples).
@@ -257,4 +230,42 @@ import_data_from_parse <- function(gene_mat_fp, grna_mat_fp, all_genes_fp, all_g
                                 extra_covariates = extra_covariates,
                                 response_names = gene_names)
   return(sceptre_object)
+}
+
+
+create_csc_matrix <- function(dt, n_cells, n_features) {
+  p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
+  out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
+  out@i <- dt$feature_idx
+  out@p <- p
+  out@x <- dt$x
+  out@Dim <- c(n_features, n_cells)
+  return(out)
+}
+
+
+get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_nonzero")) {
+  con <- file(mtx_file, "r")
+  n_to_skip <- 0L
+  while (TRUE) {
+    n_to_skip <- n_to_skip + 1L
+    line <- readLines(con, n = 1)
+    if (substr(line, 0, 1) != "%") break()
+  }
+  close(con)
+  metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
+  out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
+  names(out) <- c(col_id, "n_to_skip")
+  return(out)
+}
+
+
+write_matrices_to_disk <- function(response_matrix, grna_matrix, directory_to_write, integer_id) {
+  response_matrix <- ondisc::create_odm_from_r_matrix(mat = response_matrix,
+                                                      file_to_write = paste0(directory_to_write, "/response.odm"),
+                                                      integer_id = integer_id)
+  grna_matrix <- ondisc::create_odm_from_r_matrix(mat = grna_matrix,
+                                                  file_to_write = paste0(directory_to_write, "/grna.odm"),
+                                                  integer_id = integer_id)
+  return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
 }
