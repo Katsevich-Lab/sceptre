@@ -98,7 +98,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
+compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito, compute_max_feature) {
   # make response matrix column accessible
   matrix_in <- set_matrix_accessibility(matrix_in, make_row_accessible = FALSE)
   # get MT gene idxs
@@ -115,10 +115,14 @@ compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
                                      n_genes = nrow(matrix_in),
                                      n_cells = ncol(matrix_in),
                                      mt_gene_idxs = mt_gene_idxs,
-                                     compute_p_mito = compute_p_mito)
-  ret <- data.frame(n_nonzero = out$n_nonzero,
-                    n_umis = out$n_umi)
+                                     compute_p_mito = compute_p_mito,
+                                     compute_max_feature = compute_max_feature)
+  ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
   if (compute_p_mito) ret$p_mito <- out$p_mito
+  if (compute_max_feature) {
+    ret$frac_umis_max_feature <- out$frac_umis_max_feature
+    ret$feature_w_max_expression <- rownames(matrix_in)[out$max_feature + 1L]
+  }
   return(ret)
 }
 
