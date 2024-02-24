@@ -33,7 +33,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   }
   if (grna_assignment_method == "maximum") {
     max_result <- assign_grnas_to_cells_maximum(sceptre_object = sceptre_object,
-                                                umi_fraction_threshold = umi_fraction_threshold)
+                                                umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold)
     sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
     sceptre_object@cells_w_multiple_grnas <- max_result$cells_w_multiple_grnas # set cells w/ multiple gRNAs for max method
   }
