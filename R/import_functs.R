@@ -1,3 +1,89 @@
+############
+# R MATRICES
+############
+#' Import data
+#'
+#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
+#'
+#' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns
+#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
+#' @param moi a string indicating the MOI of the dataset, either "low" or "high"
+#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
+#' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`.
+#'
+#' @return an initialized `sceptre_object`
+#' @export
+#' @examples
+#' # see example via ?sceptre
+import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(),
+                        response_names = NA_character_, use_ondisc = FALSE, directory_to_write = NULL) {
+  if (use_ondisc) { # use ondisc
+    import_data_use_ondisc(response_matrix, grna_matrix, grna_target_data_frame, moi,
+                           extra_covariates, response_names, directory_to_write)
+  } else { # do not use ondisc
+    import_data_memory(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates, response_names)
+  }
+}
+
+# memory
+import_data_memory <- function(response_matrix, grna_matrix, grna_target_data_frame,
+                               moi, extra_covariates, response_names) {
+  #  perform initial check
+  check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
+  # process covariates and matrices
+  processed_inputs <- process_covariates_and_matrices(response_matrix = response_matrix,
+                                                      grna_matrix = grna_matrix,
+                                                      extra_covariates = extra_covariates,
+                                                      response_names = response_names)
+  # initialize the sceptre_object
+  sceptre_object <- init_sceptre_object(response_matrix = processed_inputs$response_matrix,
+                                        grna_matrix = processed_inputs$grna_matrix,
+                                        covariate_data_frame = processed_inputs$covariate_data_frame,
+                                        moi = moi,
+                                        grna_target_data_frame = grna_target_data_frame)
+}
+
+# 1. ondisc
+import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_data_frame, moi,
+                                   extra_covariates, response_names, directory_to_write) {
+  #  perform initial check
+  check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
+  # check directory_to_write
+  if (is.null(directory_to_write)) stop("`directory_to_write` cannot be `NULL`.")
+
+  # process covariates and matrices
+  processed_inputs <- process_covariates_and_matrices(response_matrix = response_matrix,
+                                                      grna_matrix = grna_matrix,
+                                                      extra_covariates = extra_covariates,
+                                                      response_names = response_names)
+  response_matrix <- processed_inputs$response_matrix
+  grna_matrix <- processed_inputs$grna_matrix
+  covariate_data_frame <- processed_inputs$covariate_data_frame
+
+  # write matrices to disk
+  integer_id <- sample(x = seq(0L, .Machine$integer.max), size = 1L)
+  out <- write_matrices_to_disk(response_matrix = response_matrix,
+                                grna_matrix = grna_matrix,
+                                directory_to_write = directory_to_write,
+                                integer_id = integer_id)
+
+  # initialize the sceptre_object
+  sceptre_object <- init_sceptre_object(response_matrix = out$response_matrix,
+                                        grna_matrix = out$grna_matrix,
+                                        covariate_data_frame = covariate_data_frame,
+                                        moi = moi,
+                                        grna_target_data_frame = grna_target_data_frame)
+
+  # add integer id
+  sceptre_object@integer_id <- integer_id
+  return(sceptre_object)
+}
+
+
+############
+# CELLRANGER
+############
 #' Import data from cellranger
 #'
 #' `import_data_from_cellranger()` imports data from the output of one or more calls to cellranger count. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{Section 1 of the introductory chapter in the manual} for more information about this function.
@@ -37,11 +123,11 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
   if (!use_ondisc) {
     import_data_from_cellranger_memory(directories, moi, grna_target_data_frame, extra_covariates)
   } else {
-    import_data_from_cellranger_disk(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write)
+    import_data_from_cellranger_use_ondisc(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write)
   }
 }
 
-
+# 1. memory
 import_data_from_cellranger_memory <- function(directories, moi, grna_target_data_frame, extra_covariates) {
   # 1. check that directories exist
   for (curr_directory in directories) {
@@ -152,18 +238,52 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
 
   # 9. initialize the sceptre object
   cat("Creating the sceptre object.")
-  sceptre_object <- import_data(response_matrix = out_mats[["Gene Expression"]],
-                                grna_matrix = out_mats[["CRISPR Guide Capture"]],
-                                grna_target_data_frame = grna_target_data_frame,
-                                moi = moi,
-                                extra_covariates = extra_covariates,
-                                response_names = gene_names)
+  sceptre_object <- import_data_memory(response_matrix = out_mats[["Gene Expression"]],
+                                       grna_matrix = out_mats[["CRISPR Guide Capture"]],
+                                       grna_target_data_frame = grna_target_data_frame,
+                                       moi = moi,
+                                       extra_covariates = extra_covariates,
+                                       response_names = gene_names)
   gc() |> invisible()
   cat(crayon::green(' \u2713'))
   return(sceptre_object)
 }
 
 
+# 2. disk
+import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
+  # 0. check that directory_to_write has been supplied
+  if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
+
+  # 1. call the corresponding ondisc function
+  out <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
+                                            directory_to_write = directory_to_write,
+                                            write_cellwise_covariates = FALSE)
+
+  # 2. check the inputs
+  check_import_data_inputs(out$gene, out$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
+
+  # 3. process the cellwise covariates
+  covariate_df <- out$cellwise_covariates
+  colnames(covariate_df) <- gsub(pattern = "gene", replacement = "response", fixed = TRUE, x = colnames(covariate_df))
+  if (nrow(extra_covariates) >= 1L) covariate_df <- cbind(extra_covariates, covariate_df)
+
+  # 4. initialize the sceptre_object
+  sceptre_object <- init_sceptre_object(response_matrix = out$gene,
+                                        grna_matrix = out$grna,
+                                        covariate_data_frame = covariate_df,
+                                        moi = moi,
+                                        grna_target_data_frame = grna_target_data_frame)
+
+  # 5. add integer id
+  sceptre_object@integer_id <- output$gene@integer_id
+  return(sceptre_object)
+}
+
+
+#######
+# PARSE
+#######
 #' Import data from Parse (experimental)
 #'
 #' `import_data_from_parse()` imports data from the output of the Parse count matrix generation program. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual} for more information about this function. It is assumed that the data are stored in a single set of files (as opposed to multiple sets of files corresponding to, e.g., different samples).
@@ -223,12 +343,53 @@ import_data_from_parse <- function(gene_mat_fp, grna_mat_fp, all_genes_fp, all_g
   rownames(grna_mat) <- grna_feature_df$feature_name
 
   # 5. create the sceptre_object
-  sceptre_object <- import_data(response_matrix = gene_mat,
-                                grna_matrix = grna_mat,
-                                grna_target_data_frame = grna_target_data_frame,
-                                moi = moi,
-                                extra_covariates = extra_covariates,
-                                response_names = gene_names)
+  sceptre_object <- import_data_memory(response_matrix = gene_mat,
+                                       grna_matrix = grna_mat,
+                                       grna_target_data_frame = grna_target_data_frame,
+                                       moi = moi,
+                                       extra_covariates = extra_covariates,
+                                       response_names = gene_names)
+  return(sceptre_object)
+}
+
+
+##################
+# HELPER FUNCTIONS
+##################
+init_sceptre_object <- function(response_matrix, grna_matrix, covariate_data_frame, moi, grna_target_data_frame) {
+  # create sceptre_object
+  sceptre_object <- methods::new("sceptre_object")
+
+  # process the covariate data frame
+  sceptre_object@ondisc_grna_assignment_info <- list(max_grna = covariate_data_frame$grna_feature_w_max_expression,
+                                                     max_grna_frac_umis = covariate_data_frame$grna_frac_umis_max_feature)
+  covariate_data_frame$grna_feature_w_max_expression <- covariate_data_frame$grna_frac_umis_max_feature <- NULL
+
+  # set data fields
+  sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
+  sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
+  sceptre_object@covariate_data_frame <- covariate_data_frame
+  sceptre_object@low_moi <- (moi == "low")
+  sceptre_object@covariate_names <- sort(colnames(covariate_data_frame))
+
+  # handle vector_id column (remove later)
+  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
+    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
+                                                                                     grna_target = as.character(grna_target))
+  } else {
+    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
+                                                                                                 grna_target = as.character(grna_target),
+                                                                                                 vector_id = as.character(vector_id))
+  }
+
+  # 5. initialize flags
+  sceptre_object@elements_to_analyze <- NA_character_
+  sceptre_object@nf_pipeline <- FALSE
+  sceptre_object@nuclear <- FALSE
+  sceptre_object@last_function_called <- "import_data"
+  sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
+                                    assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
+                                    run_power_check = FALSE, run_discovery_analysis = FALSE)
   return(sceptre_object)
 }
 
@@ -268,4 +429,15 @@ write_matrices_to_disk <- function(response_matrix, grna_matrix, directory_to_wr
                                                   file_to_write = paste0(directory_to_write, "/grna.odm"),
                                                   integer_id = integer_id)
   return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
+}
+
+
+process_covariates_and_matrices <- function(response_matrix, grna_matrix, extra_covariates, response_names) {
+  covariate_data_frame <- auto_compute_cell_covariates(response_matrix = response_matrix,
+                                                       grna_matrix = grna_matrix,
+                                                       extra_covariates = extra_covariates,
+                                                       response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names)
+  response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
+  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+  return(list(covariate_data_frame = covariate_data_frame, response_matrix = response_matrix, grna_matrix = grna_matrix))
 }
