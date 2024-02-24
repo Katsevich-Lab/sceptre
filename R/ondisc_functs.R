@@ -1,54 +1,6 @@
-# import from cellranger disk
-import_data_from_cellranger_disk <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
-  # 0. check that directory_to_write has been supplied
-  if (is.null(directory_to_write)) {
-    stop("`directory_to_write` must be supplied.")
-  }
-
-  # 1. call the corresponding ondisc function
-  output <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
-                                               directory_to_write = directory_to_write,
-                                               write_cellwise_covariates = FALSE)
-  # 2. extract the pieces to pass
-
-
-
-  # 2 check the inputs
-  check_import_data_inputs(output$gene, output$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
-
-  # 3. update fields on the sceptre_object
-  sceptre_object <- methods::new("sceptre_object")
-  sceptre_object <- set_response_matrix(sceptre_object, output$gene)
-  sceptre_object <- set_grna_matrix(sceptre_object, output$grna)
-  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                     grna_target = as.character(grna_target))
-  } else {
-    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                                 grna_target = as.character(grna_target),
-                                                                                                 vector_id = as.character(vector_id))
-  }
-  sceptre_object@low_moi <- (moi == "low")
-  sceptre_object@integer_id <- output$gene@integer_id
-  # 4. devise the initial gRNA assignment list and process cellwise covariates
-  cellwise_covariates <- output$cellwise_covariates
-  sceptre_object@ondisc_grna_assignment_info <- list(max_grna = cellwise_covariates$grna_feature_w_max_expression,
-                                                     max_grna_frac_umis = cellwise_covariates$grna_frac_umis_max_feature)
-  cellwise_covariates$grna_feature_w_max_expression <- cellwise_covariates$grna_frac_umis_max_feature <- NULL
-  colnames(cellwise_covariates) <- gsub(pattern = "gene", replacement = "response", fixed = TRUE, x = colnames(cellwise_covariates))
-  sceptre_object@covariate_data_frame <- cellwise_covariates
-  sceptre_object@covariate_names <- sort(colnames(sceptre_object@covariate_data_frame))
-  # 5. initialize flags
-  sceptre_object@nf_pipeline <- FALSE
-  sceptre_object@nuclear <- FALSE
-  sceptre_object@last_function_called <- "import_data"
-  sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
-                                    assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
-                                    run_power_check = FALSE, run_discovery_analysis = FALSE)
-  return(sceptre_object)
-}
-
-
+##########################
+# READ AND WRITE FUNCTIONS
+##########################
 #' Read ondisc-backed sceptre object
 #'
 #' Reads and initializes a `sceptre_object` from backing .odm files.
