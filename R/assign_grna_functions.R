@@ -86,11 +86,11 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 assign_grnas_to_cells_maximum <- function(sceptre_object, grna_matrix, grna_lib_size, umi_fraction_threshold) {
   # take cases on the class of grna_matrix
   if (methods::is(grna_matrix, "odm")) {
-    grna_ids <- unique(sceptre_object@ondisc_grna_assignment_info$max_grna)
+    grna_ids <- unique(sceptre_object@import_grna_assignment_info$max_grna)
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-      which(sceptre_object@ondisc_grna_assignment_info$max_grna == grna_id)
+      which(sceptre_object@import_grna_assignment_info$max_grna == grna_id)
     }) |> stats::setNames(grna_ids)
-    cells_w_multiple_grnas <- which(sceptre_object@ondisc_grna_assignment_info$max_grna_frac_umis <= umi_fraction_threshold)
+    cells_w_multiple_grnas <- which(sceptre_object@import_grna_assignment_info$max_grna_frac_umis <= umi_fraction_threshold)
   } else {
     # 1. make grna matrix column accessible
     grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = FALSE)

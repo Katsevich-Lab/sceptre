@@ -361,7 +361,7 @@ init_sceptre_object <- function(response_matrix, grna_matrix, covariate_data_fra
   sceptre_object <- methods::new("sceptre_object")
 
   # process the covariate data frame
-  sceptre_object@ondisc_grna_assignment_info <- list(max_grna = covariate_data_frame$grna_feature_w_max_expression,
+  sceptre_object@import_grna_assignment_info <- list(max_grna = covariate_data_frame$grna_feature_w_max_expression,
                                                      max_grna_frac_umis = covariate_data_frame$grna_frac_umis_max_feature)
   covariate_data_frame$grna_feature_w_max_expression <- covariate_data_frame$grna_frac_umis_max_feature <- NULL
 

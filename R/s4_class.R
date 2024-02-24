@@ -55,7 +55,7 @@ setClass("sceptre_object",
            n_ok_positive_control_pairs = "integer",
            calibration_group_size = "integer",
            n_calibration_pairs = "integer",
-           ondisc_grna_assignment_info = "list",
+           import_grna_assignment_info = "list",
            mean_cells_per_grna = "numeric",
 
            # cached objects
@@ -64,7 +64,6 @@ setClass("sceptre_object",
            # flags
            last_function_called = "character",
            functs_called = "logical",
-           nuclear = "logical",
 
            # results
            calibration_result = "data.frame",
@@ -72,6 +71,7 @@ setClass("sceptre_object",
            discovery_result = "data.frame",
 
            # odm-related entries
+           nuclear = "logical",
            nf_pipeline = "logical",
            integer_id = "integer",
            elements_to_analyze = "character"
