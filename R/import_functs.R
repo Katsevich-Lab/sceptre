@@ -276,7 +276,7 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
                                         grna_target_data_frame = grna_target_data_frame)
 
   # 5. add integer id
-  sceptre_object@integer_id <- output$gene@integer_id
+  sceptre_object@integer_id <- out$gene@integer_id
   return(sceptre_object)
 }
 
