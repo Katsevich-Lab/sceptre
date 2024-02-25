@@ -772,8 +772,8 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
   # create the plot
   set.seed(4)
   to_plot_downsample <- to_plot |>
-    dplyr::filter(normalized_count > 0) |>
-    dplyr::group_by(treatment) |>
+    dplyr::mutate(is_zero = (normalized_count == 0)) |>
+    dplyr::group_by(is_zero, treatment) |>
     dplyr::sample_n(size = min(dplyr::n(), 1000))
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
     ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.6) +
@@ -784,7 +784,7 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
     ggplot2::xlab("Treatment status") +
     ggplot2::ylab("Normalized expression") +
     ggplot2::annotate("text", x = 1.5, y = max(to_plot$normalized_count) + 0.5, label = annotation, parse = TRUE) +
-    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(0.0, max(to_plot$normalized_count) + 0.7)) +
+    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(-0.01, max(to_plot$normalized_count) + 0.7)) +
     ggplot2::ggtitle(paste0("Response: ", response_id, "\ngRNA", if (singleton_integration_strategy) "" else " target" ,": ", grna_target)) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 10))
 
