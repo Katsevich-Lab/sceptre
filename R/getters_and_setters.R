@@ -53,7 +53,7 @@ get_cell_covariates <- function(sceptre_object) {
 #' - When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 #'
 #' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called on it
-#' @param apply_cellwise_qc a logical value (i.e., `TRUE` or `FALSE`) indicating whether to return the gRNA-to-cell assignment matrix that has had cellwise QC applied to it (default `FALSE`)
+#' @param apply_cellwise_qc a logical value (i.e., `TRUE` or `FALSE`) indicating whether to return the gRNA-to-cell assignment matrix after cellwise QC has been applied (default `FALSE`)
 #'
 #' @return a sparse logical matrix containing the gRNA-to-cell assignments
 #' @export
