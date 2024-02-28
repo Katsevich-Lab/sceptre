@@ -386,17 +386,8 @@ init_sceptre_object <- function(response_matrix, grna_matrix, covariate_data_fra
   sceptre_object@covariate_data_frame <- covariate_data_frame
   sceptre_object@low_moi <- (moi == "low")
   sceptre_object@covariate_names <- sort(colnames(covariate_data_frame))
-
-  # handle vector_id column (remove later)
-  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                     grna_target = as.character(grna_target))
-  } else {
-    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                                 grna_target = as.character(grna_target),
-                                                                                                 vector_id = as.character(vector_id))
-  }
-
+  sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
+                                                                                   grna_target = as.character(grna_target))
   # 5. initialize flags
   sceptre_object@elements_to_analyze <- NA_character_
   sceptre_object@nf_pipeline <- FALSE
