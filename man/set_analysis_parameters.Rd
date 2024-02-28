@@ -6,7 +6,7 @@
 \usage{
 set_analysis_parameters(
   sceptre_object,
-  discovery_pairs,
+  discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
   positive_control_pairs = data.frame(grna_target = character(0), response_id =
     character(0)),
   side = "both",

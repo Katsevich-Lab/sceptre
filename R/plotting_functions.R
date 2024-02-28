@@ -158,15 +158,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
     multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-      sceptre_object@grna_target_data_frame_with_vector |>
-        dplyr::filter(vector_id == curr_grna_id) |>
-        dplyr::pull(grna_id) |>
-        sapply(function(i) load_row(grna_matrix, i)) |>
-        rowSums()
-    } else {
-      load_row(grna_matrix, curr_grna_id)
-    }
+    g <- load_row(grna_matrix, curr_grna_id)
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = curr_grna_id |> factor(),
@@ -548,6 +540,41 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
   if (!sceptre_object@functs_called["run_qc"]) {
     stop("This `sceptre_object` has not yet had `run_qc` called on it.")
   }
+  p_a <- plot_cellwise_qc(sceptre_object)
+  if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
+    p_b <- plot_pairwise_qc(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE)
+    # combine the plots
+    if (return_indiv_plots) {
+      p_out <- list(p_a, p_b)
+    } else {
+      p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+    }
+  } else {
+    p_out <- p_a
+  }
+  return(p_out)
+}
+
+plot_cellwise_qc <- function(sceptre_object) {
+  cell_removal_metrics <- sceptre_object@cell_removal_metrics
+  n_orig_cells <- ncol(get_response_matrix(sceptre_object))
+  cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
+  df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
+                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito", "multiple gRNAs", "User-specified", "Any filter"))
+  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "multiple gRNAs")
+  # make a barplot. remove x-axis text
+  p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
+    ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
+    ggplot2::scale_y_continuous(expand = c(0, NA)) +
+    ggplot2::ylab("Percent cells removed") +
+    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
+    get_my_theme() +
+    ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +
+    ggplot2::ggtitle("Cellwise QC")
+  return(p_a)
+}
+
+plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
   my_cols <- c("mediumseagreen", "indianred2")
   my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
   discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
@@ -555,9 +582,8 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
     dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
   if (nrow(discovery_pairs) >= downsample_pairs) discovery_pairs <- discovery_pairs |> dplyr::sample_n(downsample_pairs)
 
-  # pairwise QC
   p_b <- ggplot2::ggplot(data = discovery_pairs,
-                  mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)) +
+                         mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)) +
     ggplot2::geom_point(alpha = transparency, size = point_size) + get_my_theme() +
     ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10, sigma = 1),
                                 breaks = my_breaks) +
@@ -578,31 +604,7 @@ plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 
       keyheight = 0.15,
       default.unit = "inch",
       override.aes = list(size = 1.25)))
-
-  # cellwise QC
-  cell_removal_metrics <- sceptre_object@cell_removal_metrics
-  n_orig_cells <- ncol(get_response_matrix(sceptre_object))
-  cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
-  df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
-                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito", "multiple gRNAs", "User-specified", "Any filter"))
-  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "multiple gRNAs")
-  # make a barplot. remove x-axis text
-  p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
-    ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
-    ggplot2::scale_y_continuous(expand = c(0, NA)) +
-    ggplot2::ylab("Percent cells removed") +
-    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
-    get_my_theme() +
-    ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +
-    ggplot2::ggtitle("Cellwise QC")
-
-  # combine the plots
-  if (return_indiv_plots) {
-    p_out <- list(p_a, p_b)
-  } else {
-    p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
-  }
-  return(p_out)
+  return(p_b)
 }
 
 ###############
@@ -762,19 +764,19 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
   # create the plot
   set.seed(4)
   to_plot_downsample <- to_plot |>
-    dplyr::filter(normalized_count > 0) |>
-    dplyr::group_by(treatment) |>
+    dplyr::mutate(is_zero = (normalized_count == 0)) |>
+    dplyr::group_by(is_zero, treatment) |>
     dplyr::sample_n(size = min(dplyr::n(), 1000))
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
-    ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.7) +
+    ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.6) +
     ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5) +
-    sceptre:::get_my_theme() +
+    get_my_theme() +
     ggplot2::theme(legend.position = "none") +
     ggplot2::scale_color_manual(values = c("dodgerblue4", "firebrick4")) +
     ggplot2::xlab("Treatment status") +
     ggplot2::ylab("Normalized expression") +
     ggplot2::annotate("text", x = 1.5, y = max(to_plot$normalized_count) + 0.5, label = annotation, parse = TRUE) +
-    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(0.0, max(to_plot$normalized_count) + 0.7)) +
+    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(-0.01, max(to_plot$normalized_count) + 0.7)) +
     ggplot2::ggtitle(paste0("Response: ", response_id, "\ngRNA", if (singleton_integration_strategy) "" else " target" ,": ", grna_target)) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 10))
 

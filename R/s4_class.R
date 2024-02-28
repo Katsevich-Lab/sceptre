@@ -13,9 +13,8 @@ setClass("sceptre_object",
            covariate_data_frame = "data.frame",
            covariate_matrix = "matrix",
            grna_target_data_frame = "data.frame",
-           grna_target_data_frame_with_vector = "data.frame",
            low_moi = "logical",
-           response_names = "character",
+           covariate_names = "character",
 
            # analysis parameters
            discovery_pairs = "data.frame",
@@ -49,11 +48,14 @@ setClass("sceptre_object",
            grnas_per_cell = "integer",
            cells_w_multiple_grnas = "integer",
            cells_in_use = "integer",
+           n_discovery_pairs = "integer",
            n_ok_discovery_pairs = "integer",
+           n_positive_control_pairs = "integer",
            n_ok_positive_control_pairs = "integer",
            calibration_group_size = "integer",
            n_calibration_pairs = "integer",
-           ondisc_grna_assignment_info = "list",
+           import_grna_assignment_info = "list",
+           mean_cells_per_grna = "numeric",
 
            # cached objects
            response_precomputations = "list",
@@ -68,6 +70,7 @@ setClass("sceptre_object",
            discovery_result = "data.frame",
 
            # odm-related entries
+           nuclear = "logical",
            nf_pipeline = "logical",
            integer_id = "integer",
            elements_to_analyze = "character"

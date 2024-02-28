@@ -6,19 +6,15 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 1. obtain the basic information
   n_cells <- ncol(get_response_matrix(object))
   n_responses <- nrow(get_response_matrix(object))
-  if (nrow(object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- object@grna_target_data_frame
-  }
+  grna_target_data_frame <- object@grna_target_data_frame
   n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_target == "non-targeting") |> nrow()
   targeting_grnas_df <- grna_target_data_frame |>
     dplyr::filter(grna_target != "non-targeting")
   n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
   n_targeting_grnas <- nrow(targeting_grnas_df)
-  n_covariates <- ncol(object@covariate_data_frame)
-  covariates <- paste0(sort(colnames(object@covariate_data_frame)), collapse = ", ")
+  n_covariates <- length(object@covariate_names)
+  covariates <- paste0(object@covariate_names, collapse = ", ")
   moi <- ifelse(object@low_moi, "Low", "High")
   cat(paste0("An object of class ", crayon::blue("sceptre_object"), ".\n\nAttributes of the data:\n\t\U2022 ",
              crayon::blue(n_cells), " cells", if (funct_run_vect["run_qc"]) {
@@ -51,21 +47,21 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   }
 
   # 2. print analysis parameters
-  n_discovery_pairs <- nrow(x@discovery_pairs)
+  n_discovery_pairs <- x@n_discovery_pairs
   disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
-  n_pc_pairs <- nrow(x@positive_control_pairs)
+  n_pc_pairs <- x@n_positive_control_pairs
   pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
   cat(paste0("\nAnalysis parameters: \n",
-             "\t\U2022 Discovery pairs:", if (n_discovery_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
-                                                                                                      if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)},
-             "\n\t\U2022 Positive control pairs:", if (n_pc_pairs == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
-                                                                                                        if (funct_run_vect["run_qc"]) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
+             "\t\U2022 Discovery pairs:", if (x@nuclear) " trans" else {if (length(n_discovery_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_discovery_pairs), " pairs",
+                                                                                                      if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) paste0(" (", crayon::blue(x@n_ok_discovery_pairs), " after pairwise QC)") else NULL)}},
+             "\n\t\U2022 Positive control pairs:", if (length(n_pc_pairs) == 0) {" not specified"} else {paste0(" data frame with ", crayon::blue(n_pc_pairs), " pairs",
+                                                                                                        if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) paste0(" (", crayon::blue(x@n_ok_positive_control_pairs), " after pairwise QC)") else NULL)},
              "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
              "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
-             "\n\t\U2022 Fit parametric curve: ", crayon::blue(x@fit_parametric_curve),
-             "\n\t\U2022 Multiple testing adjustment: ", crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha),
+             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
+             "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
              "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
@@ -74,8 +70,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   # 3. print the gRNA-to-cell assignment information
   grna_assignment_run <- funct_run_vect[["assign_grnas"]]
   if (grna_assignment_run) {
-    mean_cells_per_grna <- sapply(x@initial_grna_assignment_list, length) |> mean()
-    mean_cells_per_grna_group <- sapply(x@grna_assignments_raw$grna_group_idxs, length) |> mean()
+    mean_cells_per_grna <- x@mean_cells_per_grna
     cat(paste0("\n\ngRNA-to-cell assignment information:",
                "\n\t\U2022 Assignment method: ", crayon::blue(x@grna_assignment_method),
                "\n\t\U2022 Mean N cells per gRNA: ", crayon::blue(mean_cells_per_grna |> round(2)),
