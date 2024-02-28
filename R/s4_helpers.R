@@ -6,11 +6,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
   # 1. obtain the basic information
   n_cells <- ncol(get_response_matrix(object))
   n_responses <- nrow(get_response_matrix(object))
-  if (nrow(object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- object@grna_target_data_frame
-  }
+  grna_target_data_frame <- object@grna_target_data_frame
   n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_target == "non-targeting") |> nrow()
   targeting_grnas_df <- grna_target_data_frame |>

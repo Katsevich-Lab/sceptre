@@ -158,15 +158,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
     multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-      sceptre_object@grna_target_data_frame_with_vector |>
-        dplyr::filter(vector_id == curr_grna_id) |>
-        dplyr::pull(grna_id) |>
-        sapply(function(i) load_row(grna_matrix, i)) |>
-        rowSums()
-    } else {
-      load_row(grna_matrix, curr_grna_id)
-    }
+    g <- load_row(grna_matrix, curr_grna_id)
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = curr_grna_id |> factor(),

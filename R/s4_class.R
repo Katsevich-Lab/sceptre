@@ -13,7 +13,6 @@ setClass("sceptre_object",
            covariate_data_frame = "data.frame",
            covariate_matrix = "matrix",
            grna_target_data_frame = "data.frame",
-           grna_target_data_frame_with_vector = "data.frame",
            low_moi = "logical",
            covariate_names = "character",
 
