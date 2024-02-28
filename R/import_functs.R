@@ -256,11 +256,21 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
   if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
 
   # 1. call the corresponding ondisc function
+  vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
   out <- ondisc::create_odm_from_cellranger(directories_to_load = directories,
                                             directory_to_write = directory_to_write,
-                                            write_cellwise_covariates = FALSE)
+                                            write_cellwise_covariates = FALSE,
+                                            grna_target_data_frame = if (vector_supplied) grna_target_data_frame else NULL)
 
-  # 2. check the inputs
+  # 1.5. update grna_target_data_frame, if vector supplied
+  if (vector_supplied) {
+    grna_target_data_frame <- grna_target_data_frame |>
+      dplyr::select(-grna_id) |>
+      dplyr::rename(grna_id = vector_id) |>
+      dplyr::distinct()
+  }
+
+  # 2. cehck data imports
   check_import_data_inputs(out$gene, out$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
   # 3. process the cellwise covariates
