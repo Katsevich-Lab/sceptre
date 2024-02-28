@@ -2,6 +2,7 @@
 
 
 # taken from Julius Vainora's answer at https://stackoverflow.com/questions/54051576
+# This is used to get information from a cowplot::plot_grid object
 get_elements_from_plot_grid <- function(p, what) {
   unlist(sapply(p$layers, function(x) {
     idx <- which(x$geom_params$grob$layout$name == what)
@@ -82,7 +83,6 @@ test_that("test all plots", {
   expect_equal(get_elements_from_plot_grid(plt, "xlab-b"), c("gRNA count", "gRNA count", "gRNA count"))
   expect_equal(get_elements_from_plot_grid(plt, "ylab-l"), "Cell count (log scale)")
 
-
   ## testing `plot_assign_grnas()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_assign_grnas(scep, grnas_to_plot = c("nt1", "id1"), return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 3)
@@ -115,7 +115,6 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$x, "Estimated log-2 fold change")
   expect_equal(pltlist[[3]]$labels$y, "Density")
 
-
   # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_discovery_analysis(scep, return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 4)
@@ -133,7 +132,6 @@ test_that("test all plots", {
   expect_equal(pltlist[[4]]$labels$x, "x")
   expect_equal(pltlist[[4]]$labels$y, "y")
 
-
   # testing `plot_run_qc()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_qc(scep, return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 2)
@@ -145,7 +143,6 @@ test_that("test all plots", {
   expect_equal(pltlist[[2]]$labels$title, "Pairwise QC")
   expect_equal(pltlist[[2]]$labels$x, "N nonzero trt. cells")
   expect_equal(pltlist[[2]]$labels$y, "N nonzero cntrl. cells")
-
 
   # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   plt <- plot_run_power_check(scep)
