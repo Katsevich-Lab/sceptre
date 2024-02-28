@@ -11,6 +11,8 @@
 #' @param moi a string indicating the MOI of the dataset, either "low" or "high"
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
 #' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`.
+#' @param use_ondisc (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`) indicating whether to create an `ondisc`-backed `sceptre_object` (`TRUE`) or a standard `sceptre_object` (`FALSE`)
+#' @param directory_to_write (optional) a file path to a directory in which to write the backing response and gRNA expression matrices. Must be supplied if `use_ondisc` is set to `TRUE`.
 #'
 #' @return an initialized `sceptre_object`
 #' @export

@@ -3,7 +3,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
                          "significant", "lab", "p_values", "pass_qc", "fraction_cells_removed",
                          "grna_id", "pass_qc", "grna_group", "p_value", "gene_id", "response_id",
                          "log_2_fold_change", "reject", "y", "grna_target", "gene_position_data_frame_grch38",
-                         "any_pass_qc", "vector_id"))
+                         "any_pass_qc", "vector_id", "bin", "normalized_count", "is_zero", "treatment"))
 #' sceptre
 #'
 #' `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
@@ -11,7 +11,6 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @import BH
-#' @docType package
 #' @name sceptre
 #' @examples
 #' \dontrun{
