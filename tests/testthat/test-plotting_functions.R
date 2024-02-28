@@ -1,6 +1,5 @@
 # plotting functions
 
-
 # taken from Julius Vainora's answer at https://stackoverflow.com/questions/54051576
 # This is used to get information from a cowplot::plot_grid object
 get_elements_from_plot_grid <- function(p, what) {
@@ -9,7 +8,6 @@ get_elements_from_plot_grid <- function(p, what) {
     x$geom_params$grob$grobs[[idx]]$children[[1]]$label
   }))
 }
-
 
 # this test makes a single sceptre object and runs thru each of the main plots
 # making sure their basic components are all there
