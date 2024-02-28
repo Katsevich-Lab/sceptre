@@ -100,20 +100,62 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$y, "Frequency")
 
   ## testing `plot_run_calibration_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  plt <- plot_run_calibration_check(scep)
+  pltlist <- plot_run_calibration_check(scep, return_indiv_plots = TRUE)
+  expect_equal(length(pltlist), 3)
+
+  expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
+  expect_equal(pltlist[[1]]$labels$x, "Expected null p-value")
+  expect_equal(pltlist[[1]]$labels$y, "Observed p-value")
+
+  expect_equal(pltlist[[2]]$labels$title, "QQ plot (tail)")
+  expect_equal(pltlist[[2]]$labels$x, "Expected null p-value")
+  expect_equal(pltlist[[2]]$labels$y, "Observed p-value")
+
+  expect_equal(pltlist[[3]]$labels$title, "Log fold changes")
+  expect_equal(pltlist[[3]]$labels$x, "Estimated log-2 fold change")
+  expect_equal(pltlist[[3]]$labels$y, "Density")
 
 
-  plt <- plot_run_discovery_analysis(scep)
+  # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  pltlist <- plot_run_discovery_analysis(scep, return_indiv_plots = TRUE)
+  expect_equal(length(pltlist), 4)
+
+  expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
+  expect_equal(pltlist[[1]]$labels$x, "Expected null p-value")
+  expect_equal(pltlist[[1]]$labels$y, "Observed p-value")
+
+  expect_equal(pltlist[[2]]$labels$title, "QQ plot (tail)")
+  expect_equal(pltlist[[2]]$labels$x, "Expected null p-value")
+  expect_equal(pltlist[[2]]$labels$y, "Observed p-value")
+
+  # this is the text-only pane
+  expect_true(!"title" %in% names(pltlist[[4]]))
+  expect_equal(pltlist[[4]]$labels$x, "x")
+  expect_equal(pltlist[[4]]$labels$y, "y")
 
 
+  # testing `plot_run_qc()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  pltlist <- plot_run_qc(scep, return_indiv_plots = TRUE)
+  expect_equal(length(pltlist), 2)
 
-  plt <- plot_run_qc(scep)
+  expect_equal(pltlist[[1]]$labels$title, "Cellwise QC")
+  expect_equal(pltlist[[1]]$labels$x, "Filter")
+  expect_equal(pltlist[[1]]$labels$y, "Percent cells removed")
+
+  expect_equal(pltlist[[2]]$labels$title, "Pairwise QC")
+  expect_equal(pltlist[[2]]$labels$x, "N nonzero trt. cells")
+  expect_equal(pltlist[[2]]$labels$y, "N nonzero cntrl. cells")
 
 
+  # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   plt <- plot_run_power_check(scep)
+  expect_equal(plt$labels$title, "Positive and negative control p-values")
+  expect_equal(plt$labels$x, "Pair type")
+  expect_equal(plt$labels$y, "p-value")
 
+  # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   plt <- plot_response_grna_target_pair(scep, response_id = "response_4", grna_target = "t1")
-
-
-
+  expect_equal(plt$labels$title, "Response: response_4\ngRNA target: t1")
+  expect_equal(plt$labels$x, "Treatment status")
+  expect_equal(plt$labels$y, "Normalized expression")
 })
