@@ -323,49 +323,56 @@ test_that("assign_grnas method=threshold moi=high", {
   )
 })
 
-# TODO write this test
-# test_that("assign_grnas method=mixture moi=high", {
-#
-#   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
-#   num_cells <- ncol(test_data_list$response_matrix)
-#   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
-#   num_targets <- sum(test_data_list$grna_target_data_frame$grna_target != "non-targeting")
-#   unique_targets <- unique(test_data_list$grna_target_data_frame$grna_target[1:num_targets])
-#   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
-#
-#   grna_matrix_mixture <- test_data_list$grna_matrix_all_0
-#   grna_matrix_mixture[1,] <- 100 # all cells express grna1 very strongly
-#   grna_matrix_mixture[2,] <- 100  # all cells also express some of grna2
-#   grna_matrix_mixture[3:6,3:6] <- (1:16)/10 # little bit extra to get numerically full rank covariate data frame
-#
-#   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
-#   scep_high_mixture <- import_data(
-#     grna_matrix = grna_matrix_mixture,
-#     response_matrix = test_data_list$response_matrix,
-#     grna_target_data_frame = test_data_list$grna_target_data_frame,
-#     moi = "high"
-#   ) |>
-#     set_analysis_parameters(
-#       discovery_pairs = test_data_list$discovery_pairs
-#     ) |>
-#     assign_grnas(method = "mixture")
-#
-#   # expect_equal(scep_high_mixture@grnas_per_cell, ...)
-#
-#   # expect_equal(scep_high_mixture@cells_w_multiple_grnas, ...)
-#
-#   # TODO should this fail? <--discuss-->
-#   # expect_equal(
-#   #   scep_high_mixture@initial_grna_assignment_list,
-#   #   ...
-#   # )
-#
-#   # # TODO there's a mix of integer(0) and NULL here again <--discuss-->
-#   # expect_equal(
-#   #   scep_high_mixture@grna_assignments_raw,
-#   #   ...
-#   # )
-# })
+test_that("assign_grnas method=mixture moi=high", {
+  set.seed(1312)
+  num_guides <- 3
+  num_nt <- 1
+  num_cells <- 10
+  num_responses <- 20
+
+  grna_target_data_frame <- data.frame(
+    grna_id = c(paste0("grna_", 1:num_guides), paste0("nt_", 1:num_nt)),
+    grna_target = rep(c("target_1", "non-targeting"), c(num_guides,  num_nt)),
+    chr = "", start = 0, end = 1
+  )
+
+  grna_matrix <- sample(0:2, (num_guides + num_nt) * num_cells, TRUE) |>
+    matrix(ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  cells_getting_grna_1 <- c(1,2,3)
+  cells_getting_grna_2 <- c(1, 4, 5)
+  cells_getting_grna_3 <- c(1, 6:7)
+  cells_getting_nt_1 <- c(2, 8:9)
+  # cell 10 has nothing
+
+  expressed_value <- 20
+  grna_matrix["grna_1", cells_getting_grna_1] <- expressed_value
+  grna_matrix["grna_2", cells_getting_grna_2] <- expressed_value
+  grna_matrix["grna_3", cells_getting_grna_3] <- expressed_value
+  grna_matrix["nt_1", cells_getting_nt_1] <- expressed_value
+
+  response_matrix <- sample(0:2, num_responses * num_cells, TRUE) |>
+    matrix(ncol = num_cells) |>
+    `rownames<-`(paste0("response_", 1:num_responses))
+
+  scep_high_mixture <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "high"
+  ) |>
+    set_analysis_parameters(
+      discovery_pairs = data.frame(
+        grna_target = "target_1", response_id = "response_1"
+      )
+    ) |>
+    assign_grnas(method = "mixture")
+
+  expect_equal(scep_high_mixture@initial_grna_assignment_list$grna_1, cells_getting_grna_1)
+  expect_equal(scep_high_mixture@initial_grna_assignment_list$grna_2, cells_getting_grna_2)
+  expect_equal(scep_high_mixture@initial_grna_assignment_list$grna_3, cells_getting_grna_3)
+  expect_equal(scep_high_mixture@initial_grna_assignment_list$nt_1, cells_getting_nt_1)
+})
 
 
 
