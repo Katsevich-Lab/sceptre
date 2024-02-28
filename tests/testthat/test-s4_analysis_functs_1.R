@@ -34,7 +34,7 @@ test_that("import_data", {
                  'side_code', 'fit_parametric_curve', 'control_group_complement', 'run_permutations',
                  'n_nonzero_trt_thresh', 'n_nonzero_cntrl_thresh', 'B1', 'B2', 'B3',
                  'grna_integration_strategy', 'grna_assignment_method', 'grna_assignment_hyperparameters',
-                 'multiple_testing_alpha', 'multiple_testing_method', 'cell_removal_metrics',
+                 'multiple_testing_alpha', 'multiple_testing_method', 'cell_removal_metrics', "cellwise_qc_thresholds",
                  'mitochondrial_gene', 'M_matrix', 'n_nonzero_tot_vector', 'discovery_pairs_with_info',
                  'positive_control_pairs_with_info', 'negative_control_pairs', 'initial_grna_assignment_list',
                  'grna_assignments_raw', 'grna_assignments', 'grnas_per_cell', 'cells_w_multiple_grnas',
@@ -47,8 +47,8 @@ test_that("import_data", {
 
   ##### slots set in section 4 of `import_data`
 
-  expect_equal(sceptre_object_high_with_ec@response_matrix, set_matrix_accessibility(response_matrix))
-  expect_equal(sceptre_object_high_with_ec@grna_matrix, set_matrix_accessibility(grna_matrix))
+  expect_equal(sceptre_object_high_with_ec@response_matrix, list(set_matrix_accessibility(response_matrix)))
+  expect_equal(sceptre_object_high_with_ec@grna_matrix, list(set_matrix_accessibility(grna_matrix)))
   expect_equal(sceptre_object_low_no_ec_with_response_names@response_names, paste0("rrr", 1:num_responses))
 
   expect_true(sceptre_object_low_no_ec_with_response_names@low_moi)
@@ -175,7 +175,7 @@ test_that("set_analysis_parameters", {
                  'side_code', 'fit_parametric_curve', 'control_group_complement', 'run_permutations',
                  'n_nonzero_trt_thresh', 'n_nonzero_cntrl_thresh', 'B1', 'B2', 'B3',
                  'grna_integration_strategy', 'grna_assignment_method', 'grna_assignment_hyperparameters',
-                 'multiple_testing_alpha', 'multiple_testing_method', 'cell_removal_metrics',
+                 'multiple_testing_alpha', 'multiple_testing_method', 'cell_removal_metrics', "cellwise_qc_thresholds",
                  'mitochondrial_gene', 'M_matrix', 'n_nonzero_tot_vector', 'discovery_pairs_with_info',
                  'positive_control_pairs_with_info', 'negative_control_pairs', 'initial_grna_assignment_list',
                  'grna_assignments_raw', 'grna_assignments', 'grnas_per_cell', 'cells_w_multiple_grnas',
