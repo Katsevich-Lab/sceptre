@@ -393,11 +393,11 @@ test_that("run_discovery_analysis", {
     get_result(analysis = "run_discovery_analysis")
 
   # confirming everything is ok with the pair failing pairwise QC
-  expect_false(disc_results[grna_target == "t1" & response_id == "response_5", "pass_qc"][[1]])
+  expect_false(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_5", "pass_qc"][[1]])
 
   # t1 should be significant
-  expect_true(disc_results[grna_target == "t1" & response_id == "response_4","significant"][[1]])
+  expect_true(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_4","significant"][[1]])
 
   # t2 tests are not significant
-  expect_false(any(disc_results[grna_target == "t2","significant"]))
+  expect_false(any(disc_results[disc_results$grna_target == "t2","significant"]))
 })
