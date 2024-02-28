@@ -274,10 +274,10 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
 
   # 1.5. update grna_target_data_frame, if vector supplied
   if (vector_supplied) {
-
+    grna_target_data_frame <- collapse_grna_target_data_frame(grna_target_data_frame)
   }
 
-  # 2. cehck data imports
+  # 2. check data imports
   check_import_data_inputs(out$gene, out$grna, grna_target_data_frame, moi, extra_covariates) |> invisible()
 
   # 3. process the cellwise covariates
