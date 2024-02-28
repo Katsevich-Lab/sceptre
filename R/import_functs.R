@@ -34,7 +34,8 @@ import_data_memory <- function(response_matrix, grna_matrix, grna_target_data_fr
 
   # collapse gRNA matrix (if vector_id supplied)
   if ("vector_id" %in% colnames(grna_target_data_frame)) {
-    grna_matrix <- collapse_grna_matrix()
+    grna_matrix <- collapse_grna_matrix(grna_matrix = grna_matrix,
+                                        grna_target_data_frame = grna_target_data_frame)
     grna_target_data_frame <- collapse_grna_target_data_frame(grna_target_data_frame)
   }
 
@@ -462,4 +463,19 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
     dplyr::select(-grna_id) |>
     dplyr::rename(grna_id = vector_id) |>
     dplyr::distinct()
+}
+
+
+collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
+  # temporary function; we may rewrite this function to improve its
+  # speed and memory efficiency if multiguide vector data become more prevalent.
+  vector_ids <- grna_target_data_frame$vector_id |> unique()
+  suppressWarnings(grna_matrix <- as.matrix(grna_matrix))
+  grna_matrix_collapsed <- sapply(vector_ids, function(curr_vector_id) {
+    curr_grna_ids <- grna_target_data_frame |>
+      dplyr::filter(vector_id == curr_vector_id) |>
+      dplyr::pull(grna_id)
+    Matrix::colSums(grna_matrix[curr_grna_ids,,drop=FALSE])
+  }) |> t()
+  return(grna_matrix_collapsed)
 }
