@@ -109,11 +109,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-  }
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
   # 1. if response_grna_target_pairs has been supplied, check its characteristics
   for (idx in seq_along(response_grna_target_pairs_list)) {
@@ -191,11 +187,6 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
   }
 
-  # 11. if a vector_id has been supplied, ensure that the grna integration strategy is union
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && grna_integration_strategy != "union") {
-    stop("When a `vector_id` column is supplied within the `grna_target_data_frame`, the `grna_integration_strategy` should be set to 'union'.")
-  }
-
   return(NULL)
 }
 
@@ -262,11 +253,6 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
   # 3. check n_processors argument
   if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
     stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
-  }
-
-  # 4. check that method is not maximum when vector_id is supplied
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && assignment_method == "maximum") {
-    stop("The maximum assignment method is not currently compatible with data in which `vector_id` has been specified as part of the `grna_target_data_frame`.")
   }
 
   return(NULL)

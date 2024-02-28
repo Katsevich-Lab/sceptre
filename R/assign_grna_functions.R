@@ -95,44 +95,10 @@ assign_grnas_to_cells_maximum <- function(sceptre_object, umi_fraction_threshold
 ######################
 # AUXILLIARY FUNCTIONS
 ######################
-preprocess_initial_assignment_list_vector_supplied <- function(sceptre_object) {
-  # update the initial grna assignment list
-  initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
-  grna_target_data_table <- sceptre_object@grna_target_data_frame_with_vector |> data.table::as.data.table()
-  vector_ids <- unique(grna_target_data_table$vector_id)
-  vector_groups <- lapply(vector_ids, function(curr_vector_id) {
-    grna_target_data_table[grna_target_data_table$vector_id == curr_vector_id,]$grna_id
-  }) |> stats::setNames(vector_ids)
-  initial_grna_assignment_list_modified <- lapply(vector_groups, function(elem) {
-    l <- initial_grna_assignment_list[elem]
-    out <- unique(unlist(l))
-    if (is.null(out)) {
-      out <- integer()
-    } else {
-      out <- sort(out)
-    }
-    out
-  })
-  # update the grna target data table
-  grna_target_data_table_modified <- grna_target_data_table |>
-    dplyr::select(grna_id = vector_id, grna_target) |>
-    dplyr::mutate(grna_group = grna_target) |>
-    dplyr::distinct()
-  # update the fields of the sceptre_object and return
-  sceptre_object@grna_target_data_frame <- grna_target_data_table_modified
-  sceptre_object@initial_grna_assignment_list <- initial_grna_assignment_list_modified
-  return(sceptre_object)
-}
-
-
 # add three fields to sceptre_object:
 # 1. grnas_per_cell, 2. cells_w_multiple_grnas, 3. grna_assignments_raw
 process_initial_assignment_list <- function(sceptre_object) {
-  # -1. preprocessing step: if vector_id has been supplied, combine grnas within the same vector, and treat vectors as if they are individual grnas
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-    sceptre_object <- preprocess_initial_assignment_list_vector_supplied(sceptre_object)
-  }
-  # 0. set variables
+ # 0. set variables
   initial_assignment_list <- sceptre_object@initial_grna_assignment_list
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   low_moi <- sceptre_object@low_moi
@@ -170,11 +136,7 @@ process_initial_assignment_list <- function(sceptre_object) {
 
 
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-  }
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
   if (restricted_grnas) {
     if (!sceptre_object@nuclear) {
       all_grna_targets <- unique(c(sceptre_object@positive_control_pairs$grna_target,
