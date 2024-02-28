@@ -321,11 +321,9 @@ test_that("run_power_check", {
   expect_true(dplyr::filter(scep_power@power_result, response_id == "t1") |> dplyr::pull(p_value) < 1e-10)
   # this test is not significant at all
   expect_true(dplyr::filter(scep_power@power_result, response_id == "t2") |> dplyr::pull(p_value) > 0.5)
-  # log fold change should be 0 here because the response_matrix values are constant
+  # log fold change should be NA here because the response_matrix values are constant
   expect_true(dplyr::filter(scep_power@power_result, response_id == "t3") |> dplyr::pull(log_2_fold_change) |> is.na())
 })
-
-
 
 test_that("run_discovery_analysis", {
   grna_target_data_frame <- data.frame(

@@ -1,6 +1,3 @@
-# TODO
-# - write test for method="mixture"
-
 # mock data function just for the tests in this file
 make_mock_base_data_for_testing_assign_grnas <- function() {
   num_cells <- 24  # must be even for my choice of extra_covariates
