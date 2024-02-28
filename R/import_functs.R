@@ -31,6 +31,13 @@ import_data_memory <- function(response_matrix, grna_matrix, grna_target_data_fr
                                moi, extra_covariates, response_names) {
   #  perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
+
+  # collapse gRNA matrix (if vector_id supplied)
+  if ("vector_id" %in% colnames(grna_target_data_frame)) {
+    grna_matrix <- collapse_grna_matrix()
+    grna_target_data_frame <- collapse_grna_target_data_frame(grna_target_data_frame)
+  }
+
   # process covariates and matrices
   processed_inputs <- process_covariates_and_matrices(response_matrix = response_matrix,
                                                       grna_matrix = grna_matrix,
@@ -264,10 +271,7 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
 
   # 1.5. update grna_target_data_frame, if vector supplied
   if (vector_supplied) {
-    grna_target_data_frame <- grna_target_data_frame |>
-      dplyr::select(-grna_id) |>
-      dplyr::rename(grna_id = vector_id) |>
-      dplyr::distinct()
+
   }
 
   # 2. cehck data imports
@@ -450,4 +454,12 @@ process_covariates_and_matrices <- function(response_matrix, grna_matrix, extra_
   response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
   grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
   return(list(covariate_data_frame = covariate_data_frame, response_matrix = response_matrix, grna_matrix = grna_matrix))
+}
+
+
+collapse_grna_target_data_frame <- function(grna_target_data_frame) {
+  grna_target_data_frame |>
+    dplyr::select(-grna_id) |>
+    dplyr::rename(grna_id = vector_id) |>
+    dplyr::distinct()
 }
