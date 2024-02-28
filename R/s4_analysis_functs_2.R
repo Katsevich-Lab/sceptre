@@ -40,8 +40,16 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
   # 1. handle the default arguments
+  if (sceptre_object@n_discovery_pairs == 0L && (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
+    stop("`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified.")
+  }
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
-  if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+  if (is.null(n_calibration_pairs)) {
+    n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+  } else {
+    mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * n_calibration_pairs /sceptre_object@multiple_testing_alpha) |> as.integer()
+  }
 
   # 2. check inputs
   check_calibration_check_inputs(sceptre_object, n_calibration_pairs, n_processors) |> invisible()
@@ -366,6 +374,9 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
     }
   }
 
+  # 4. save gRNA-to-cell assignments
+  grna_assignments <- get_grna_assignments(sceptre_object)
+  saveRDS(object = grna_assignments, file = paste0(directory, "/grna_assignment_matrix.rds"))
   return(NULL)
 }
 

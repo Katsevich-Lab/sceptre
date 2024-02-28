@@ -50,14 +50,14 @@ get_cell_covariates <- function(sceptre_object) {
 #'
 #' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is TRUE if the given gRNA is assigned to the given cell.
 #'
-#' - The assignments correspond to the original gRNA expression matrix, i.e. the expression matrix that has not yet had cellwise QC performed on it.
 #' - When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 #'
 #' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called on it
+#' @param apply_cellwise_qc a logical value (i.e., `TRUE` or `FALSE`) indicating whether to return the gRNA-to-cell assignment matrix after cellwise QC has been applied (default `FALSE`)
 #'
 #' @return a sparse logical matrix containing the gRNA-to-cell assignments
 #' @export
-get_grna_assignments <- function(sceptre_object) {
+get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
   if (!sceptre_object@functs_called[["assign_grnas"]]) {
     stop("`assign_grnas()` has not yet been called on the `sceptre_object`.")
   }
@@ -74,6 +74,12 @@ get_grna_assignments <- function(sceptre_object) {
   mat@Dim <- c(length(initial_grna_assignment_list),
                get_grna_matrix(sceptre_object) |> ncol())
   rownames(mat) <- grna_ids
+  if (apply_cellwise_qc) {
+    if (!sceptre_object@functs_called[["run_qc"]]) {
+      stop("QC has not yet been called on this sceptre_object.")
+    }
+    mat <- mat[,sceptre_object@cells_in_use]
+  }
   return(mat)
 }
 

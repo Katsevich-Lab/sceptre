@@ -109,11 +109,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-  }
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
   # 1. if response_grna_target_pairs has been supplied, check its characteristics
   for (idx in seq_along(response_grna_target_pairs_list)) {
@@ -191,11 +187,6 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
   }
 
-  # 11. if a vector_id has been supplied, ensure that the grna integration strategy is union
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && grna_integration_strategy != "union") {
-    stop("When a `vector_id` column is supplied within the `grna_target_data_frame`, the `grna_integration_strategy` should be set to 'union'.")
-  }
-
   return(NULL)
 }
 
@@ -264,16 +255,11 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
     stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
 
-  # 4. check that method is not maximum when vector_id is supplied
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && assignment_method == "maximum") {
-    stop("The maximum assignment method is not currently compatible with data in which `vector_id` has been specified as part of the `grna_target_data_frame`.")
-  }
-
   return(NULL)
 }
 
 
-check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range) {
+check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range, initial_grna_assignment_list) {
   if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
     stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
   }
@@ -284,6 +270,9 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
   if (min(response_n_nonzero_range) < 0 || max(response_n_nonzero_range) > 1 ||
       length(response_n_nonzero_range) != 2L || response_n_nonzero_range[1] > response_n_nonzero_range[2]) {
     stop("`response_n_nonzero_range` must an interval in the range [0,1].")
+  }
+  if (all(sapply(initial_grna_assignment_list, length) == 0L)) {
+    stop("At least one gRNA must be assigned to at least one cell to call `run_qc()`.")
   }
   return(NULL)
 }

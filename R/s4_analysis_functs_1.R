@@ -1,59 +1,3 @@
-#' Import data
-#'
-#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
-#'
-#' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns
-#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
-#' @param moi a string indicating the MOI of the dataset, either "low" or "high"
-#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
-#' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`.
-#'
-#' @return an initialized `sceptre_object`
-#' @export
-#' @examples
-#' # see example via ?sceptre
-import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
-  # 1. perform initial check
-  check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
-
-  # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix = response_matrix,
-                                                       grna_matrix = grna_matrix,
-                                                       extra_covariates = extra_covariates,
-                                                       response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names)
-
-  # 3. make the response and grna matrices row accessible
-  response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-
-  # 4. update fields in output object
-  sceptre_object <- methods::new("sceptre_object")
-  sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
-  sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
-  sceptre_object@covariate_data_frame <- covariate_data_frame
-  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                     grna_target = as.character(grna_target))
-  } else {
-    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                                 grna_target = as.character(grna_target),
-                                                                                                 vector_id = as.character(vector_id))
-  }
-  sceptre_object@response_names <- response_names
-  sceptre_object@low_moi <- (moi == "low")
-  sceptre_object@elements_to_analyze <- NA_character_
-  sceptre_object@nf_pipeline <- FALSE
-
-  # 5. initialize flags
-  sceptre_object@last_function_called <- "import_data"
-  sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
-                                    assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
-                                    run_power_check = FALSE, run_discovery_analysis = FALSE)
-  return(sceptre_object)
-}
-
-
 #' Set analysis parameters
 #'
 #' `set_analysis_parameters()` sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
@@ -76,7 +20,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @examples
 #' # see example via ?sceptre
 set_analysis_parameters <- function(sceptre_object,
-                                    discovery_pairs,
+                                    discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
                                     grna_integration_strategy = "union",
@@ -131,6 +75,8 @@ set_analysis_parameters <- function(sceptre_object,
   run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
+  sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
+  sceptre_object@n_positive_control_pairs <- nrow(sceptre_object@positive_control_pairs)
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
   sceptre_object@fit_parametric_curve <- fit_parametric_curve
@@ -241,6 +187,25 @@ run_qc <- function(sceptre_object,
                    response_n_nonzero_range = c(0.01, 0.99),
                    p_mito_threshold = 0.2,
                    additional_cells_to_remove = integer()) {
+  run_qc_pt_1(sceptre_object,
+              n_nonzero_trt_thresh,
+              n_nonzero_cntrl_thresh,
+              response_n_umis_range,
+              response_n_nonzero_range,
+              p_mito_threshold,
+              additional_cells_to_remove) |>
+    run_qc_pt_2()
+}
+
+
+run_qc_pt_1 <- function(sceptre_object,
+                        n_nonzero_trt_thresh = 7L,
+                        n_nonzero_cntrl_thresh = 7L,
+                        response_n_umis_range = c(0.01, 0.99),
+                        response_n_nonzero_range = c(0.01, 0.99),
+                        p_mito_threshold = 0.2,
+                        additional_cells_to_remove = integer()) {
+  # cellwise start
   # 1. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
 
@@ -248,7 +213,8 @@ run_qc <- function(sceptre_object,
   check_run_qc_inputs(n_nonzero_trt_thresh,
                       n_nonzero_cntrl_thresh,
                       response_n_umis_range,
-                      response_n_nonzero_range) |> invisible()
+                      response_n_nonzero_range,
+                      sceptre_object@initial_grna_assignment_list) |> invisible()
 
   # 2.5 update fields of sceptre_object
   sceptre_object@cellwise_qc_thresholds <- list(response_n_umis_range = response_n_umis_range,
@@ -273,7 +239,12 @@ run_qc <- function(sceptre_object,
 
   # 7. update the grna assignments given the cellwise qc
   sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
+  return (sceptre_object)
+}
 
+
+run_qc_pt_2 <- function(sceptre_object) {
+  # pairwise start
   # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii) n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
   sceptre_object <- compute_pairwise_qc_information(sceptre_object)
 
@@ -282,9 +253,9 @@ run_qc <- function(sceptre_object,
 
   # update B3, the number of resamples to draw, if fit_parametric_curve is false
   if (!sceptre_object@fit_parametric_curve) {
-    side <- sceptre_object@side_code
-    mult_fact <- if (side == 0L) 10 else 5
-    sceptre_object@B3 <- ceiling(mult_fact * sceptre_object@n_ok_discovery_pairs/sceptre_object@multiple_testing_alpha) |>
+    mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * max(sceptre_object@n_ok_discovery_pairs,
+                                                 sceptre_object@n_ok_positive_control_pairs)/sceptre_object@multiple_testing_alpha) |>
       as.integer()
   }
 
