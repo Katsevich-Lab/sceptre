@@ -47,7 +47,6 @@ test_that("import_data", {
   expect_equal(slotNames(sceptre_object_high_with_ec), all_slots)
 
   ##### slots set in section 4 of `import_data`
-
   expect_equal(get_response_matrix(sceptre_object_high_with_ec), set_matrix_accessibility(response_matrix))
   expect_equal(get_grna_matrix(sceptre_object_high_with_ec), set_matrix_accessibility(grna_matrix))
 
