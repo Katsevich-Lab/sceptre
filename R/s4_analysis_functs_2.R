@@ -218,8 +218,8 @@ process_discovery_result <- function(result, sceptre_object) {
 }
 
 
-run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type, output_amount,
-                                            print_progress, parallel, n_processors, log_dir) {
+run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type,
+                                            output_amount, print_progress, parallel, n_processors, log_dir) {
   # if running permutations, generate the permutation idxs
   if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
@@ -239,7 +239,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
                        covariate_matrix = sceptre_object@covariate_matrix,
                        response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),
                        output_amount = output_amount,
-                       fit_parametric_curve = sceptre_object@fit_parametric_curve,
+                       resampling_approximation = sceptre_object@resampling_approximation,
                        B1 = sceptre_object@B1, B2 = sceptre_object@B2,
                        B3 = sceptre_object@B3, calibration_check = calibration_check,
                        control_group_complement = sceptre_object@control_group_complement,
