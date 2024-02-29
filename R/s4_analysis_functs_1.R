@@ -253,9 +253,9 @@ run_qc_pt_2 <- function(sceptre_object) {
 
   # update B3, the number of resamples to draw, if fit_parametric_curve is false
   if (!sceptre_object@fit_parametric_curve) {
-    side <- sceptre_object@side_code
-    mult_fact <- if (side == 0L) 10 else 5
-    sceptre_object@B3 <- ceiling(mult_fact * sceptre_object@n_ok_discovery_pairs/sceptre_object@multiple_testing_alpha) |>
+    mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * max(sceptre_object@n_ok_discovery_pairs,
+                                                 sceptre_object@n_ok_positive_control_pairs)/sceptre_object@multiple_testing_alpha) |>
       as.integer()
   }
 
