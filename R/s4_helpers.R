@@ -60,7 +60,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
              if (!x@low_moi) NULL else {paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))},
              "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
              "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
-             "\n\t\U2022 Fit parametric curve: ", if (length(x@fit_parametric_curve) == 0L) "not specified" else crayon::blue(x@fit_parametric_curve),
+             "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
              "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
              "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
              "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),

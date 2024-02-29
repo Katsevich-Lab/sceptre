@@ -105,7 +105,8 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
 
 check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
-                                          control_group, resampling_mechanism, side, low_moi, grna_integration_strategy) {
+                                          control_group, resampling_mechanism, side, low_moi,
+                                          grna_integration_strategy, resampling_approximation) {
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
@@ -185,6 +186,11 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   # 10. if using a backing .odm file, verify that resampling mechanism is permutations
   if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
+  }
+
+  # 11. verify resampling_approximation acceptable
+  if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
+    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
   }
 
   return(NULL)

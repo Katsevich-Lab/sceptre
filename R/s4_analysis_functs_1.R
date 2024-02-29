@@ -8,7 +8,7 @@
 #' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"` or `"union"`
-#' @param fit_parametric_curve (optional; default `TRUE`) a logical indicating whether to fit a parametric curve to the null distribution of test statistics
+#' @param resampling_approximation (optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".
 #' @param control_group (optional) a string specifying the control group to use, either `"complement"` or `"nt_cells"`
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
@@ -25,7 +25,7 @@ set_analysis_parameters <- function(sceptre_object,
                                     side = "both",
                                     grna_integration_strategy = "union",
                                     formula_object = "default",
-                                    fit_parametric_curve = TRUE,
+                                    resampling_approximation = "skew_normal",
                                     control_group = "default",
                                     resampling_mechanism = "default",
                                     multiple_testing_method = "BH",
@@ -47,10 +47,10 @@ set_analysis_parameters <- function(sceptre_object,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
   B1 <- 499L
-  if (fit_parametric_curve) {
+  if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
     B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
-  } else {
+  } else if (resampling_approximation == "no_approximation") {
     B2 <- 0L # no curve fitting; thus, B2 = 0L
     B3 <- 0L # to be updated in the run_qc step
   }
@@ -63,7 +63,8 @@ set_analysis_parameters <- function(sceptre_object,
                                 control_group = control_group,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi,
-                                grna_integration_strategy = grna_integration_strategy) |> invisible()
+                                grna_integration_strategy = grna_integration_strategy,
+                                resampling_approximation = resampling_approximation) |> invisible()
 
   # 3. determine whether to reset response precomputations
   reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
@@ -79,7 +80,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@n_positive_control_pairs <- nrow(sceptre_object@positive_control_pairs)
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
-  sceptre_object@fit_parametric_curve <- fit_parametric_curve
+  sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
   sceptre_object@run_permutations <- run_permutations
   sceptre_object@B1 <- B1
@@ -251,8 +252,8 @@ run_qc_pt_2 <- function(sceptre_object) {
   # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
   sceptre_object <- compute_qc_metrics(sceptre_object)
 
-  # update B3, the number of resamples to draw, if fit_parametric_curve is false
-  if (!sceptre_object@fit_parametric_curve) {
+  # update B3, the number of resamples to draw, if resampling_approximation is no_approximation
+  if (sceptre_object@resampling_approximation == "no_approximation") {
     mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
     sceptre_object@B3 <- ceiling(mult_fact * max(sceptre_object@n_ok_discovery_pairs,
                                                  sceptre_object@n_ok_positive_control_pairs)/sceptre_object@multiple_testing_alpha) |>
