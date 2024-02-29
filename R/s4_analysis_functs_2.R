@@ -44,7 +44,12 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
     stop("`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified.")
   }
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
-  if (is.null(n_calibration_pairs)) n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+  if (is.null(n_calibration_pairs)) {
+    n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
+  } else {
+    mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * n_calibration_pairs /sceptre_object@multiple_testing_alpha) |> as.integer()
+  }
 
   # 2. check inputs
   check_calibration_check_inputs(sceptre_object, n_calibration_pairs, n_processors) |> invisible()
