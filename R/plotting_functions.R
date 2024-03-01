@@ -155,16 +155,16 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   to_plot_a <- lapply(X = grnas_to_plot, function(curr_grna_id) {
-    assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
+    assignment <- cells_w_zero_or_twoplus_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
-    multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
+    cells_w_zero_or_twoplus_grnas[sceptre_object@cells_w_zero_or_twoplus_grnas] <- TRUE  # indicates which cells have 0/2+ grnas
     g <- load_row(grna_matrix, curr_grna_id)
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = curr_grna_id |> factor(),
-                     multiple_grnas = multiple_grnas)
-    # if assignment method maximum, remove cells containing multiple gRNAs
-    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!multiple_grnas)
+                     cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas)
+    # if assignment method maximum, remove cells with 0/2+ grnas
+    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!cells_w_zero_or_twoplus_grnas)
     return(df)
   }) |> data.table::rbindlist()
 
@@ -561,8 +561,8 @@ plot_cellwise_qc <- function(sceptre_object) {
   cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
   df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
                    Filter = c("N response UMIs", "N nonzero responses", "Percent mito",
-                              if (sceptre_object@low_moi) "Zero or 2+ gRNAs" else "Multiple gRNAs", "User-specified", "Any filter"))
-  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "multiple gRNAs")
+                              "Zero or 2+ gRNAs", "User-specified", "Any filter"))
+  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "Zero or 2+ gRNAs")
   # make a barplot. remove x-axis text
   p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
     ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
