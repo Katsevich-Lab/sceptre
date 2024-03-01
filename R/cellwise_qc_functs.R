@@ -23,12 +23,12 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   }
 
   # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
-  cells_to_exclude_multiple_grnas <- sceptre_object@cells_w_multiple_grnas
-  n_cells_rm_multiple_grnas <- length(sceptre_object@cells_w_multiple_grnas)
+  cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+  n_cells_rm_zero_twoplus_grnas <- length(sceptre_object@cells_w_zero_or_twoplus_grnas)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   cells_to_exclude <- c(cells_to_exclude_n_umis, cells_to_exclude_n_responses,
-                        cells_to_exclude_p_mito, cells_to_exclude_multiple_grnas,
+                        cells_to_exclude_p_mito, cells_to_exclude_zero_twoplus_grnas,
                         cells_to_exclude_user_specified) |> unique()
   n_cells <- ncol(get_response_matrix(sceptre_object))
   cells_to_retain <- if (length(cells_to_exclude) == 0L) seq(1L, n_cells) else seq(1L, n_cells)[-cells_to_exclude]
@@ -37,7 +37,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   cell_removal_metrics <- c(n_cells_rm_n_umis = n_cells_rm_n_umis,
                             n_cells_rm_n_responses = n_cells_rm_n_responses,
                             n_cells_rm_p_mito = n_cells_rm_p_mito,
-                            n_cells_rm_multiple_grnas = n_cells_rm_multiple_grnas,
+                            n_cells_rm_zero_twoplus_grnas = n_cells_rm_zero_twoplus_grnas,
                             n_cells_rm_user_specified = n_cells_rm_user_specified,
                             n_cells_rm_total = n_cells_rm_total)
   sceptre_object@cell_removal_metrics <- cell_removal_metrics

@@ -38,7 +38,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
                                                 min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
                                                 grna_ids = grnas_in_use)
     sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
-    sceptre_object@cells_w_multiple_grnas <- max_result$cells_w_multiple_grnas # set cells w/ multiple gRNAs for max method
+    sceptre_object@cells_w_zero_or_twoplus_grnas <- max_result$cells_w_zero_or_twoplus_grnas # set cells w/ multiple gRNAs for max method
   }
   # check that at least some gRNAs were assigned
   if (all(sapply(sceptre_object@initial_grna_assignment_list, length) == 0L)) {
@@ -88,10 +88,9 @@ assign_grnas_to_cells_maximum <- function(sceptre_object, umi_fraction_threshold
   }) |> stats::setNames(grna_ids)
   cells_w_multiple_grnas <- which(sceptre_object@import_grna_assignment_info$max_grna_frac_umis <= umi_fraction_threshold)
   cells_w_zero_grnas <- which(grna_n_umis < min_grna_n_umis_threshold)
-  # we will assign to 'cells_w_multiple_grnas' those cells that contain zero or 2+ grnas
-  cells_w_multiple_grnas <- union(cells_w_multiple_grnas, cells_w_zero_grnas)
+  cells_w_zero_or_twoplus_grnas <- union(cells_w_multiple_grnas, cells_w_zero_grnas)
   return(list(initial_assignment_list = initial_assignment_list,
-              cells_w_multiple_grnas = cells_w_multiple_grnas))
+              cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas))
 }
 
 
@@ -99,7 +98,7 @@ assign_grnas_to_cells_maximum <- function(sceptre_object, umi_fraction_threshold
 # AUXILLIARY FUNCTIONS
 ######################
 # add three fields to sceptre_object:
-# 1. grnas_per_cell, 2. cells_w_multiple_grnas, 3. grna_assignments_raw
+# 1. grnas_per_cell, 2. cells_w_zero_or_twoplus_grnas, 3. grna_assignments_raw
 process_initial_assignment_list <- function(sceptre_object) {
  # 0. set variables
   initial_assignment_list <- sceptre_object@initial_grna_assignment_list
@@ -111,7 +110,9 @@ process_initial_assignment_list <- function(sceptre_object) {
   if (!maximum_assignment) {
     sceptre_object@grnas_per_cell <- compute_n_grnas_per_cell_vector(initial_assignment_list, n_cells)
     if (low_moi) {
-      sceptre_object@cells_w_multiple_grnas <- which(sceptre_object@grnas_per_cell >= 2L)
+      cells_w_multiple_grnas <- which(sceptre_object@grnas_per_cell >= 2L)
+      cells_w_zero_grnas <- seq(1, n_cells)[-sort(unique(unlist(initial_assignment_list)))]
+      sceptre_object@cells_w_zero_or_twoplus_grnas <- union(cells_w_multiple_grnas, cells_w_zero_grnas)
     }
   }
   # 2. pool together targeting gRNAs via the or operation
