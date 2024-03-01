@@ -560,7 +560,8 @@ plot_cellwise_qc <- function(sceptre_object) {
   n_orig_cells <- ncol(get_response_matrix(sceptre_object))
   cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
   df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
-                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito", "multiple gRNAs", "User-specified", "Any filter"))
+                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito",
+                              if (sceptre_object@low_moi) "Zero or 2+ gRNAs" else "Multiple gRNAs", "User-specified", "Any filter"))
   if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "multiple gRNAs")
   # make a barplot. remove x-axis text
   p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
