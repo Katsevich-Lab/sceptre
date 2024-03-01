@@ -34,6 +34,8 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
   if (grna_assignment_method == "maximum") {
     max_result <- assign_grnas_to_cells_maximum(sceptre_object = sceptre_object,
                                                 umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,
+                                                grna_n_umis = cell_covariate_data_frame$grna_n_umis,
+                                                min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
                                                 grna_ids = grnas_in_use)
     sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
     sceptre_object@cells_w_multiple_grnas <- max_result$cells_w_multiple_grnas # set cells w/ multiple gRNAs for max method
@@ -80,12 +82,14 @@ assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshol
 #########
 # MAXIMUM
 #########
-assign_grnas_to_cells_maximum <- function(sceptre_object, umi_fraction_threshold, grna_ids) {
+assign_grnas_to_cells_maximum <- function(sceptre_object, umi_fraction_threshold, grna_n_umis, min_grna_n_umis_threshold, grna_ids) {
   initial_assignment_list <- lapply(grna_ids, function(grna_id) {
       which(sceptre_object@import_grna_assignment_info$max_grna == grna_id)
   }) |> stats::setNames(grna_ids)
   cells_w_multiple_grnas <- which(sceptre_object@import_grna_assignment_info$max_grna_frac_umis <= umi_fraction_threshold)
-
+  cells_w_zero_grnas <- which(grna_n_umis < min_grna_n_umis_threshold)
+  # we will assign to 'cells_w_multiple_grnas' those cells that contain zero or 2+ grnas
+  cells_w_multiple_grnas <- union(cells_w_multiple_grnas, cells_w_zero_grnas)
   return(list(initial_assignment_list = initial_assignment_list,
               cells_w_multiple_grnas = cells_w_multiple_grnas))
 }

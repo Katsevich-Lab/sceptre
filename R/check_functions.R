@@ -211,11 +211,14 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
   hyperparam_names <- names(hyperparameters)
   # i. maximum option
   if (assignment_method == "maximum") {
-    if (!setequal(hyperparam_names, "umi_fraction_threshold")) {
-      stop("The hyperparameter list must contain the single entry `umi_fraction_threshold`.")
+    if (!setequal(hyperparam_names, c("umi_fraction_threshold", "min_grna_n_umis_threshold"))) {
+      stop("The hyperparameter list must contain the fields `umi_fraction_threshold` and `min_grna_n_umis_threshold`.")
     }
     if (!(hyperparameters[["umi_fraction_threshold"]] > 0.0 && hyperparameters[["umi_fraction_threshold"]] < 1.0)) {
       stop("`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0.")
+    }
+    if (hyperparameters[["min_grna_n_umis_threshold"]] < 0L) {
+      stop("`min_grna_n_umis_threshold` should be an integer greater than 0.")
     }
   }
   # ii. thresholding operation
