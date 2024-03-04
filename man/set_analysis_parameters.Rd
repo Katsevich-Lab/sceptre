@@ -12,7 +12,7 @@ set_analysis_parameters(
   side = "both",
   grna_integration_strategy = "union",
   formula_object = "default",
-  fit_parametric_curve = TRUE,
+  resampling_approximation = "skew_normal",
   control_group = "default",
   resampling_mechanism = "default",
   multiple_testing_method = "BH",
@@ -32,7 +32,7 @@ set_analysis_parameters(
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{fit_parametric_curve}{(optional; default \code{TRUE}) a logical indicating whether to fit a parametric curve to the null distribution of test statistics}
+\item{resampling_approximation}{(optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".}
 
 \item{control_group}{(optional) a string specifying the control group to use, either \code{"complement"} or \code{"nt_cells"}}
 
