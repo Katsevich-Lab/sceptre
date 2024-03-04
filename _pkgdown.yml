@@ -50,6 +50,7 @@ reference:
   - plot_run_discovery_analysis
   - plot_run_power_check
   - plot_covariates
+  - plot_response_grna_target_pair
 
 - title: "Pair constructor functions"
   desc: >
@@ -66,20 +67,12 @@ reference:
   - print,sceptre_object-method
   - write_outputs_to_directory
   - get_result
-
-- title: "`ondisc` intput/output functions"
-  contents:
-  - read_ondisc_backed_sceptre_object
-  - write_ondisc_backed_sceptre_object
-
-- title: "Getter functions"
-  contents:
   - get_response_matrix
   - get_grna_matrix
   - get_cell_covariates
   - get_grna_assignments
 
-- title: "Data"
+- title: "Example data"
   desc: >
     Example data to illustrate use of the functions
   contents:
@@ -87,6 +80,11 @@ reference:
   - grna_target_data_frame_highmoi
   - lowmoi_example_data
   - gene_position_data_frame_grch38
+
+- title: "`ondisc` intput/output functions"
+  contents:
+  - read_ondisc_backed_sceptre_object
+  - write_ondisc_backed_sceptre_object
 
 authors:
   sidebar:
