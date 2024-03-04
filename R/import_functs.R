@@ -310,13 +310,32 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
 #' @param gene_mat_fp file path to the gene count_matrix.mtx file
 #' @param grna_mat_fp file path to the gRNA count_matrix.mtx file
 #' @param all_genes_fp file path to the all_genes.csv file containing the gene IDs
-#' @param all_grnas_fp file path to the all_guides.csv file containing the gRNA IDs
+#' @param all_grnas_fp file path to the all_guides.csv file containing the gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the "gene_name" column) of this file.
 #' @param moi a string indicating the MOI of the dataset, either "low" or "high"
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
 #'
 #' @return an initialized `sceptre_object`
 #' @export
+#'
+#' @examples
+#' directory <- paste0(system.file("extdata", package = "sceptredata"), "/parse_example/")
+#' gene_mat_fp <- paste0(directory, "gene_mat.mtx")
+#' grna_mat_fp <- paste0(directory, "grna_mat.mtx")
+#' all_genes_fp <- paste0(directory, "all_genes.csv")
+#' all_grnas_fp <- paste0(directory, "all_grnas.csv")
+#' grna_target_data_frame <- data.frame(
+#'    grna_id = c("guide_A", "guide_B", "guide_C"),
+#'    grna_target = c("target-A", "target-B", "non-targeting")
+#' )
+#' sceptre_object <- import_data_from_parse(
+#'   gene_mat_fp = gene_mat_fp,
+#'   grna_mat_fp = grna_mat_fp,
+#'   all_genes_fp = all_genes_fp,
+#'   all_grnas_fp = all_grnas_fp,
+#'   moi = "low",
+#'   grna_target_data_frame = grna_target_data_frame
+#' )
 import_data_from_parse <- function(gene_mat_fp, grna_mat_fp, all_genes_fp, all_grnas_fp,
                                    moi, grna_target_data_frame, extra_covariates = data.frame()) {
   # 1. check that files exist
