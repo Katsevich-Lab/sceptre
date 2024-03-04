@@ -14,7 +14,6 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' @import BH
 #' @name sceptre
 #' @examples
-#' \dontrun{
 #' ##########################
 #' # Low-MOI CRISPRko example
 #' ##########################
@@ -53,17 +52,17 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 6. run power check
-#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -97,7 +96,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #'
 #' # 3. assign grnas
 #' plot_grna_count_distributions(sceptre_object)
-#' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE)
+#' sceptre_object <- sceptre_object |> assign_grnas(parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
@@ -108,21 +107,20 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' print(sceptre_object)
 #'
 #' # 5. run the calibration check
-#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 6. run the power check
-#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_power_check(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 7. run discovery analysis
-#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE)
+#' sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE, n_processors = 2)
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
 #' # 8. write results
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
-#' }
 NULL
