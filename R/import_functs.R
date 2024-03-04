@@ -452,6 +452,12 @@ process_covariates_and_matrices <- function(response_matrix, grna_matrix, extra_
 
 
 collapse_grna_target_data_frame <- function(grna_target_data_frame) {
+  vector_nested_within_target <- (grna_target_data_frame |>
+    dplyr::group_by(vector_id) |>
+    dplyr::summarize(n_distinct_targets = length(unique(grna_target))) |>
+    dplyr::pull(n_distinct_targets) == 1) |> all()
+  if (!vector_nested_within_target) stop("`vector_id` must be nested within `grna_target`.")
+
   grna_target_data_frame |>
     dplyr::select(-grna_id) |>
     dplyr::rename(grna_id = vector_id) |>

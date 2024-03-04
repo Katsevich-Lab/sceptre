@@ -145,6 +145,12 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/generate_all_pairs.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/get_grna_assignments.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/get_response_matrix.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/get_result.html</loc>
   </url>
   <url>
@@ -226,6 +232,9 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot_resampling_distribution.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_response_grna_target_pair.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot_result.html</loc>
   </url>
   <url>
@@ -245,6 +254,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/print-sceptre_object-method.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/read_ondisc_backed_sceptre_object.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/regularize_gene_sizes_at_scale.html</loc>
@@ -314,6 +326,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/threshold_gRNA_matrix.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/write_ondisc_backed_sceptre_object.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/write_outputs_to_directory.html</loc>
