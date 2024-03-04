@@ -59,6 +59,7 @@ reference:
   - construct_positive_control_pairs
   - construct_cis_pairs
   - construct_trans_pairs
+  - gene_position_data_frame_grch38
 
 - title: "Information extraction functions"
   desc: >
@@ -71,15 +72,6 @@ reference:
   - get_grna_matrix
   - get_cell_covariates
   - get_grna_assignments
-
-- title: "Example data"
-  desc: >
-    Example data to illustrate use of the functions
-  contents:
-  - highmoi_example_data
-  - grna_target_data_frame_highmoi
-  - lowmoi_example_data
-  - gene_position_data_frame_grch38
 
 - title: "`ondisc` intput/output functions"
   contents:

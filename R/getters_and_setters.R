@@ -13,13 +13,16 @@
 #' @export
 #' @examples
 #' # 1. create a sceptre_object
-#' directories <- paste0(system.file("extdata", package = "sceptre"),
-#' "/highmoi_example/gem_group_", 1:2)
+#' library(sceptredata)
+#' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
-#' sceptre_object <- import_data_from_cellranger(
-#'   directories = directories,
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
 #'   moi = "high",
-#'   grna_target_data_frame = grna_target_data_frame_highmoi
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
 #' )
 #'
 #' # 2. extract data fields from the sceptre_object

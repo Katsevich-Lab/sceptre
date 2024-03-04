@@ -4,12 +4,13 @@
 \alias{sceptre}
 \title{sceptre}
 \description{
-\code{sceptre} is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+\code{sceptre} is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
 }
 \examples{
 ##########################
 # Low-MOI CRISPRko example
 ##########################
+library(sceptredata)
 # 1. create the sceptre object
 data("lowmoi_example_data")
 sceptre_object <- import_data(
@@ -66,7 +67,7 @@ write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_l
 # High-MOI CRISPRi example
 ##########################
 # 1. create the sceptre object from cellranger output
-directories <- paste0(system.file("extdata", package = "sceptre"),
+directories <- paste0(system.file("extdata", package = "sceptredata"),
 "/highmoi_example/gem_group_", 1:2)
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data_from_cellranger(directories = directories,

@@ -95,7 +95,7 @@
 <span>  side <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>  grna_integration_strategy <span class="op">=</span> <span class="st">"union"</span>,</span>
 <span>  formula_object <span class="op">=</span> <span class="st">"default"</span>,</span>
-<span>  fit_parametric_curve <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  resampling_approximation <span class="op">=</span> <span class="st">"skew_normal"</span>,</span>
 <span>  control_group <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  resampling_mechanism <span class="op">=</span> <span class="st">"default"</span>,</span>
 <span>  multiple_testing_method <span class="op">=</span> <span class="st">"BH"</span>,</span>
@@ -129,8 +129,8 @@
 <dd><p>(optional) a formula object specifying how to adjust for the covariates in the model</p></dd>
 
 
-<dt>fit_parametric_curve</dt>
-<dd><p>(optional; default <code>TRUE</code>) a logical indicating whether to fit a parametric curve to the null distribution of test statistics</p></dd>
+<dt>resampling_approximation</dt>
+<dd><p>(optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".</p></dd>
 
 
 <dt>control_group</dt>

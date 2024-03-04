@@ -15,3 +15,6 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 \description{
 \code{construct_positive_control_pairs()} is a helper function to facilitate construction of the positive control pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#positive-control-pairs}{Section 2.2 in the manual} for more detailed information about this function.
 }
+\examples{
+# see example via ?sceptre
+}
