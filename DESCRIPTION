@@ -20,6 +20,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 LinkingTo: Rcpp, BH
+Remotes: github::timothy-barry/ondisc
 Imports:
     BH,
     cowplot,
@@ -42,7 +43,7 @@ Suggests:
     parallel,
     testthat (>= 3.0.0),
     magrittr,
-    MASS,
+    MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/Katsevich-Lab/sceptre
