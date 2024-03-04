@@ -107,11 +107,9 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #'
 #' @return an initialized `sceptre_object`
 #' @export
-#'
 #' @examples
-#' \dontrun{
 #' # 1. point to directories containing cellranger output
-#' directories <- paste0(system.file("extdata", package = "sceptre"),
+#' directories <- paste0(system.file("extdata", package = "sceptredata"),
 #'                      "/highmoi_example/gem_group_", 1:2)
 #'
 #' # 2. simulate an additional covariate
@@ -120,6 +118,7 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #' extra_covariates <- data.frame(cell_type = cell_type)
 #'
 #' # 3. initialize the sceptre_object
+#' #' library(sceptredata)
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(
 #'   directories = directories,
@@ -127,7 +126,6 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #'   grna_target_data_frame = grna_target_data_frame_highmoi,
 #'   extra_covariates = extra_covariates
 #' )
-#' }
 import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame(), use_ondisc = FALSE, directory_to_write = NULL) {
   # take cases on use_ondisc
   if (!use_ondisc) {

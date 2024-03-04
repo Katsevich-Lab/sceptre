@@ -31,13 +31,14 @@ Imports:
     Matrix,
     methods,
     Rcpp (>= 1.0.9),
-    stats,
     scales,
+    stats,
     purrr
 Depends: 
     R (>= 4.1)
 Suggests:
     ondisc,
+    sceptredata,
     knitr,
     rmarkdown,
     parallel,

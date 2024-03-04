@@ -33,9 +33,8 @@ an initialized \code{sceptre_object}
 \code{import_data_from_cellranger()} imports data from the output of one or more calls to cellranger count. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{Section 1 of the introductory chapter in the manual} for more information about this function.
 }
 \examples{
-\dontrun{
 # 1. point to directories containing cellranger output
-directories <- paste0(system.file("extdata", package = "sceptre"),
+directories <- paste0(system.file("extdata", package = "sceptredata"),
                      "/highmoi_example/gem_group_", 1:2)
 
 # 2. simulate an additional covariate
@@ -44,6 +43,7 @@ cell_type <- sample(x = paste0("type_", 1:3),
 extra_covariates <- data.frame(cell_type = cell_type)
 
 # 3. initialize the sceptre_object
+#' library(sceptredata)
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
@@ -51,5 +51,4 @@ sceptre_object <- import_data_from_cellranger(
   grna_target_data_frame = grna_target_data_frame_highmoi,
   extra_covariates = extra_covariates
 )
-}
 }

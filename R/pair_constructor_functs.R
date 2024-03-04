@@ -9,6 +9,8 @@
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the *cis* discovery set
 #' @export
+#' @examples
+#' # see example via ?sceptre
 construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
                                 response_position_data_frame = gene_position_data_frame_grch38) {
   if (!all(colnames(response_position_data_frame) %in% c("response_id", "chr", "position"))) {
@@ -65,6 +67,8 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the *trans* discovery set
 #' @export
+#' @examples
+#' # see example via ?sceptre
 construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), pairs_to_exclude = "none") {
   if (!(pairs_to_exclude %in% c("none", "pc_pairs", "pairs_containing_pc_targets"))) {
     stop("`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'.")
@@ -95,6 +99,8 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the positive control pairs
 #' @export
+#' @examples
+#' # see example via ?sceptre
 construct_positive_control_pairs <- function(sceptre_object) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   response_ids <- rownames(get_response_matrix(sceptre_object))

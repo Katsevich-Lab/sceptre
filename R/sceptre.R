@@ -7,7 +7,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
                          "n_distinct_targets"))
 #' sceptre
 #'
-#' `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+#' `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
@@ -17,6 +17,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' ##########################
 #' # Low-MOI CRISPRko example
 #' ##########################
+#' library(sceptredata)
 #' # 1. create the sceptre object
 #' data("lowmoi_example_data")
 #' sceptre_object <- import_data(
@@ -73,7 +74,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' # High-MOI CRISPRi example
 #' ##########################
 #' # 1. create the sceptre object from cellranger output
-#' directories <- paste0(system.file("extdata", package = "sceptre"),
+#' directories <- paste0(system.file("extdata", package = "sceptredata"),
 #' "/highmoi_example/gem_group_", 1:2)
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(directories = directories,
