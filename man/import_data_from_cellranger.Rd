@@ -33,6 +33,7 @@ an initialized \code{sceptre_object}
 \code{import_data_from_cellranger()} imports data from the output of one or more calls to cellranger count. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{Section 1 of the introductory chapter in the manual} for more information about this function.
 }
 \examples{
+library(sceptredata)
 # 1. point to directories containing cellranger output
 directories <- paste0(system.file("extdata", package = "sceptredata"),
                      "/highmoi_example/gem_group_", 1:2)

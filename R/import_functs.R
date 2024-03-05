@@ -108,6 +108,7 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #' @return an initialized `sceptre_object`
 #' @export
 #' @examples
+#' library(sceptredata)
 #' # 1. point to directories containing cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptredata"),
 #'                      "/highmoi_example/gem_group_", 1:2)
