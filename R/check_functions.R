@@ -56,7 +56,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
   were_names_provided <- c(
     !is.null(barcode_list$response_matrix),
     !is.null(barcode_list$grna_matrix),
-    nrow(extra_covariates) > 0 && !identical(barcode_list$extra_covariates, as.character(1:nrow(extra_covariates)))
+    nrow(extra_covariates) > 0 && !identical(barcode_list$extra_covariates, as.character(seq_len(nrow(extra_covariates))))
   )
   # If at least 2 non-default barcode names were provided, they must all be identical.
   # This is done by looping over all pairs of non-default names

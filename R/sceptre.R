@@ -75,7 +75,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' ##########################
 #' # 1. create the sceptre object from cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptredata"),
-#' "/highmoi_example/gem_group_", 1:2)
+#' "/highmoi_example/gem_group_", c(1, 2))
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(directories = directories,
 #' moi = "high",
