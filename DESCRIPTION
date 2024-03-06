@@ -39,8 +39,8 @@ Depends:
 Suggests:
     ondisc,
     sceptredata,
-    knitr,
     rmarkdown,
+    knitr,
     parallel,
     testthat (>= 3.0.0),
     magrittr,
