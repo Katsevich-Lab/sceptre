@@ -69,7 +69,7 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
   names(initial_grna_assignment_list) <- NULL
   j <- unlist(initial_grna_assignment_list)
   increment_vector(j, -1L)
-  l <- sapply(initial_grna_assignment_list, length)
+  l <- vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1))
   p <- c(0L, cumsum(l))
   mat <- Matrix::sparseMatrix(j = 1, p = c(0, 1), repr = "R")
   mat@j <- j

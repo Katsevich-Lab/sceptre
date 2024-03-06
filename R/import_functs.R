@@ -160,8 +160,8 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   }) |> stats::setNames(NULL)
 
   # 3. obtain the barcodes, features, and matrix fp vectors
-  feature_fps <- sapply(X = input_files, FUN = function(i) i[["features"]])
-  matrix_fps <- sapply(X = input_files, FUN = function(i) i[["matrix"]])
+  feature_fps <- vapply(X = input_files, FUN = function(i) i[["features"]], FUN.VALUE = character(1))
+  matrix_fps <- vapply(X = input_files, FUN = function(i) i[["matrix"]], FUN.VALUE = character(1))
 
   # 4. obtain the feature data frame; determine the ids of each feature
   feature_df <- data.table::fread(file = feature_fps[1],
@@ -487,12 +487,13 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
   # temporary function; we may rewrite this function to improve its
   # speed and memory efficiency if multiguide vector data become more prevalent.
   vector_ids <- grna_target_data_frame$vector_id |> unique()
-  suppressWarnings(grna_matrix <- as.matrix(grna_matrix))
-  grna_matrix_collapsed <- sapply(vector_ids, function(curr_vector_id) {
+  grna_matrix <- as.matrix(grna_matrix)
+  n_cells <- ncol(grna_matrix)
+  grna_matrix_collapsed <- vapply(vector_ids, function(curr_vector_id) {
     curr_grna_ids <- grna_target_data_frame |>
       dplyr::filter(vector_id == curr_vector_id) |>
       dplyr::pull(grna_id)
     Matrix::colSums(grna_matrix[curr_grna_ids,,drop=FALSE])
-  }) |> t()
+  }, FUN.VALUE = numeric(n_cells)) |> t()
   return(grna_matrix_collapsed)
 }
