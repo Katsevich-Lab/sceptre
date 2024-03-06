@@ -9,7 +9,7 @@ sed -i -e 's|\[`sceptre` Nextflow pipeline\](at-scale.qmd)|\[`sceptre` Nextflow 
 sed -i -e 's/[^.]*@sec-[^.]*\.//g' sceptre.Rmd
 sed -i -e 's|this book|this vignette|g' sceptre.Rmd
 sed -i -e 's|`sceptre` may not exhibit good calibration initially, which is OK.|`sceptre` may not exhibit good calibration initially, which is OK. See the \[book\](https://timothy-barry.github.io/sceptre-book/) for strategies for improving calibration.|g' sceptre.Rmd
-sed -i -e 's/\,parallel = TRUE/parallel = FALSE/g' sceptre.Rmd
+sed -i -e 's/parallel = TRUE/parallel = TRUE, n_processors = 2/g' sceptre.Rmd
 sed -i -e '/## Further reading/,$d' sceptre.Rmd
 echo "## Further reading
 We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/)." >> sceptre.Rmd
