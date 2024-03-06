@@ -1,12 +1,12 @@
 construct_data_frame_v2 <- function(curr_df, curr_response_result, output_amount) {
-    curr_df$p_value <- sapply(X = curr_response_result, FUN = function(l) l$p, simplify = TRUE)
-    curr_df$log_2_fold_change <- sapply(curr_response_result, FUN = function(l) l$lfc)
+    curr_df$p_value <- vapply(X = curr_response_result, FUN = function(l) l$p, simplify = TRUE)
+    curr_df$log_2_fold_change <- vapply(curr_response_result, FUN = function(l) l$lfc)
     if (output_amount >= 2L) {
-      curr_df$stage <- sapply(curr_response_result, FUN = function(l) l$stage)
-      curr_df$z_orig <- sapply(curr_response_result, FUN = function(l) l$z_orig)
-      curr_df$xi <- sapply(curr_response_result, FUN = function(l) l$sn_params[1L])
-      curr_df$omega <- sapply(curr_response_result, FUN = function(l) l$sn_params[2L])
-      curr_df$alpha <- sapply(curr_response_result, FUN = function(l) l$sn_params[3L])
+      curr_df$stage <- vapply(curr_response_result, FUN = function(l) l$stage)
+      curr_df$z_orig <- vapply(curr_response_result, FUN = function(l) l$z_orig)
+      curr_df$xi <- vapply(curr_response_result, FUN = function(l) l$sn_params[1L])
+      curr_df$omega <- vapply(curr_response_result, FUN = function(l) l$sn_params[2L])
+      curr_df$alpha <- vapply(curr_response_result, FUN = function(l) l$sn_params[3L])
     }
     if (output_amount >= 3L) {
       to_append <- lapply(curr_response_result, FUN = function(l) {
@@ -27,7 +27,7 @@ auto_construct_formula_object <- function(cell_covariates, include_grna_covariat
   if (!include_grna_covariates) { # by default, do not use grna count-based covariates in low moi
     cell_covariate_names <- cell_covariate_names[!(cell_covariate_names %in% c("grna_n_umis", "grna_n_nonzero"))]
   }
-  form_str <- sapply(cell_covariate_names, function(curr_name) {
+  form_str <- vapply(cell_covariate_names, function(curr_name) {
     count_based_covariate <- grepl(pattern = "n_umis|n_nonzero", x = curr_name)
     if (count_based_covariate) {
       if (any(cell_covariates[[curr_name]] == 0)) {

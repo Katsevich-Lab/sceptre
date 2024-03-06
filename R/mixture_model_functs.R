@@ -20,7 +20,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
     } else {
       f_name <- NULL
     }
-    initial_assignment_list <- sapply(seq_along(curr_grna_ids), function(i) {
+    initial_assignment_list <- lapply(seq_along(curr_grna_ids), function(i) {
       grna_id <- get_id_from_idx(response_idx = i, print_progress = print_progress, response_ids = curr_grna_ids,
                                  feature = "gRNA", str = "Performing gRNA-to-cell assignments for ", parallel = parallel, f_name = f_name)
       g <- load_row(grna_matrix, grna_id)
@@ -31,7 +31,7 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
                                            backup_threshold = grna_assignment_hyperparameters$backup_threshold,
                                            probability_threshold = grna_assignment_hyperparameters$probability_threshold)
       return(assignments)
-    }, simplify = FALSE) |> stats::setNames(curr_grna_ids)
+    }) |> stats::setNames(curr_grna_ids)
   }
 
   # 4. run the analysis
