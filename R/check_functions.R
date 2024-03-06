@@ -27,7 +27,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 7. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
-    ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
+    ok_class <- vapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
     if (!ok_class) {
       stop(paste0("`", input_matrix_name, "` must be an object of class ", paste0(allowed_matrix_classes, collapse = ", "), "."))
     }
@@ -94,10 +94,10 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 13. fail if extra_covariates has NA or inifinite values
   if (any(is.na(extra_covariates))) {
-    stop("`extra_covariates` has NA values which need to be removed.")
+    stop("`extra_covariates` has NA values that need to be removed.")
   }
-  if (any(sapply(extra_covariates, function(vect) any(is.infinite(vect))))) {
-    stop("`extra_covariates` has infinite values which need to be removed.")
+  if (any(vapply(extra_covariates, function(vect) any(is.infinite(vect))))) {
+    stop("`extra_covariates` has infinite values that need to be removed.")
   }
 
   return(NULL)
@@ -280,7 +280,7 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
       length(response_n_nonzero_range) != 2L || response_n_nonzero_range[1] > response_n_nonzero_range[2]) {
     stop("`response_n_nonzero_range` must an interval in the range [0,1].")
   }
-  if (all(sapply(initial_grna_assignment_list, length) == 0L)) {
+  if (all(vapply(initial_grna_assignment_list, length) == 0L)) {
     stop("At least one gRNA must be assigned to at least one cell to call `run_qc()`.")
   }
   return(NULL)

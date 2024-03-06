@@ -146,7 +146,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- get_grna_matrix(sceptre_object) |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- names(init_assignments)
-  assigned <- sapply(init_assignments, length) >= 1
+  assigned <- vapply(init_assignments, length) >= 1
   grna_ids <- grna_ids[assigned]
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
@@ -187,7 +187,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
 
   # plot b
-  n_cells_per_grna <- sapply(init_assignments, length)
+  n_cells_per_grna <- vapply(init_assignments, length)
   mean_c_cells_per_grna <- mean(n_cells_per_grna)
   to_plot_b <- data.frame(x = n_cells_per_grna,
                           y = names(n_cells_per_grna)) |>
