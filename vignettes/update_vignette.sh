@@ -12,7 +12,10 @@ sed -i -e 's|`sceptre` may not exhibit good calibration initially, which is OK.|
 sed -i -e 's/parallel = TRUE/parallel = TRUE, n_processors = 2/g' sceptre.Rmd
 sed -i -e '/## Further reading/,$d' sceptre.Rmd
 echo "## Further reading
-We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/)." >> sceptre.Rmd
+We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/).
+\`\`\`{r}
+sessioninfo::session_info()
+\`\`\`" >> sceptre.Rmd
 sed -i '' '1i\
 --- \
 title: "Getting started with sceptre" \
