@@ -144,10 +144,10 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   }
 
   # 2. create the vector of matrix, features, and barcode files
-  input_files <- sapply(X = directories, function(curr_directory) {
+  input_files <- lapply(X = directories, function(curr_directory) {
     fs <- list.files(curr_directory)
     grep_strs <- c("*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
-    out <- sapply(grep_strs, function(grep_str) {
+    out <- vapply(grep_strs, function(grep_str) {
       file_names <- grep(pattern = grep_str, x = fs, value = TRUE)
       if (length(file_names) >= 2L) {
         stop(paste0("There are multiple ", grep_str, " files within the directory ", curr_directory, "."))
@@ -156,8 +156,8 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
         stop(paste0("The directory ", curr_directory, " contains zero ", grep_str, " files."))
       }
       return(paste0(curr_directory, "/", file_names))
-    }) |> stats::setNames(c("features", "matrix"))
-  }, simplify = FALSE) |> stats::setNames(NULL)
+    }, FUN.VALUE = character(1)) |> stats::setNames(c("features", "matrix"))
+  }) |> stats::setNames(NULL)
 
   # 3. obtain the barcodes, features, and matrix fp vectors
   feature_fps <- sapply(X = input_files, FUN = function(i) i[["features"]])
