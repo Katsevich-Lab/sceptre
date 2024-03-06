@@ -65,8 +65,8 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     for (i in seq_len(length(barcodes_with_names) - 1)) {
       for (j in seq(i+1, length(barcodes_with_names))) {
         if (!identical(barcodes_with_names[[i]], barcodes_with_names[[j]])) {
-          stop(paste0("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
-                      "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects."))
+          stop("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
+               "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects.")
         }
       }
     }
@@ -85,7 +85,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     accept_type <- methods::is(v, "numeric") || methods::is(v, "character") ||
       methods::is(v, "factor") || methods::is(v, "logical")
     if (!accept_type) {
-      stop(paste0("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor."))
+      stop("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor.")
     }
   }
 
@@ -125,11 +125,11 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
       }
       # ii. check that the response ids in the `response_grna_target_pairs` data frame are a subset of the response ids
       if (!all(response_grna_target_pairs$response_id %in% rownames(response_matrix))) {
-        stop(paste0("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix."))
+        stop("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix.")
       }
       # iii. check that the `grna_target` column of the `response_grna_target_pairs` data frame is a subset of the `grna_target` column of the `grna_target_data_frame`
       if (!all(response_grna_target_pairs$grna_target %in% grna_target_data_frame$grna_target)) {
-        stop(paste0("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."))
+        stop("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`.")
       }
       # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
       if ("non-targeting" %in% unique(response_grna_target_pairs$grna_target)) {
@@ -171,7 +171,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
-      stop(paste0("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'."))
+      stop("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'.")
     }
   }
 
@@ -320,14 +320,18 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             n_ok_pairs, n_processors) {
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
-    stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
+    stop(if (pc_analysis) "Positive control" else "Discovery", " pairs have not been supplied. Thus, the ",
+         if (pc_analysis) "power check" else "discovery analysis", " cannot be run. You can supply ",
+         if (pc_analysis) "positive control" else "discovery", " pairs in the function set_analysis_parameters().")
   }
 
   # 2. check that negative control gRNAs are present (if the control group is the nt cells)
   if (!control_group_complement) {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
-      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the NT set."))
+      stop("At least one non-targeting gRNA must be present to run a ",
+            if (pc_analysis) "power check" else "discovery analysis",
+            " when the control group is the NT set.")
     }
   }
 

@@ -86,7 +86,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
   for (col_name in colnames(global_cell_covariates_new)) {
     vect <- global_cell_covariates_new[,col_name]
     if (any(is.infinite(vect)) || any(is.na(vect))) {
-      stop(paste0("The column `", col_name, "` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries."))
+      stop("The column `", col_name, "` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries.")
     }
   }
   # verify that matrix is not rank-deficient

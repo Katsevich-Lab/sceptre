@@ -709,13 +709,13 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
   grna_group_idxs <- sceptre_object@grna_assignments$grna_group_idxs
   grna_group_names <- names(grna_group_idxs)
   if (!grna_target %in% grna_group_names) {
-    stop(paste0(if (singleton_integration_strategy) "gRNA ID" else "gRNA target `", grna_target, "` is not present within the data."))
+    stop(if (singleton_integration_strategy) "gRNA ID" else "gRNA target `", grna_target, "` is not present within the data.")
   }
 
   # check that the response is present within the data
   response_matrix <- get_response_matrix(sceptre_object)
   if (!(response_id %in% rownames(response_matrix))) {
-    stop(paste0("Response `", response_id, "` is not present within the data."))
+    stop("Response `", response_id, "` is not present within the data.")
   }
 
   # extract the counts for this pair; filter for cells in use
