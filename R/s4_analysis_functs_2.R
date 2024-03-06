@@ -35,7 +35,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NULL, calibration_group_size = NULL,
                                        parallel = FALSE, n_processors = "auto") {
   # 0. advance function (if necessary), and check function call
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -117,7 +117,7 @@ process_calibration_result <- function(result, sceptre_object) {
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                             n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -173,7 +173,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                                    n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -381,12 +381,12 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
-skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel) {
+skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel, n_processors) {
   functs_run <- sceptre_object@functs_called
   if (functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]) {
     if (!functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
       cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.\n\n"))
-      sceptre_object <- assign_grnas(sceptre_object, parallel = parallel) |> run_qc() # advance by two
+      sceptre_object <- assign_grnas(sceptre_object, parallel = parallel, n_processors = n_processors) |> run_qc() # advance by two
     }
     if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
       cat(crayon::red("Note: Automatically running `run_qc()` with default arguments.\n\n"))
