@@ -7,6 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8} 
 --- 
 
+
+
 `sceptre` is an R package that facilitates statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. First, users should install `sceptre`. Users also should install the `sceptredata` package, which contains the example data used in this vignette.
 
 ```{r, eval=FALSE}
@@ -60,9 +62,9 @@ discovery_pairs <- construct_cis_pairs(
 # apply the pipeline functions to the sceptre_object in order
 sceptre_object <- sceptre_object |> # |> is R's base pipe, similar to %>%
   set_analysis_parameters(discovery_pairs, positive_control_pairs) |>
-  run_calibration_check(parallel = TRUE, n_processors = 2) |>
-  run_power_check(parallel = TRUE, n_processors = 2) |>
-  run_discovery_analysis(parallel = TRUE, n_processors = 2)
+  run_calibration_check() |>
+  run_power_check() |>
+  run_discovery_analysis()
 
 # write the results to disk
 write_outputs_to_directory(sceptre_object, "~/sceptre_outputs")
@@ -93,11 +95,9 @@ discovery_pairs <- construct_cis_pairs(
 # apply the pipeline functions to the sceptre_object in order
 sceptre_object <- sceptre_object |> # |> is R's base pipe, similar to %>%
   set_analysis_parameters(discovery_pairs, positive_control_pairs) |>
-  assign_grnas(method = "thresholding") |>
-  run_qc() |>
   run_calibration_check(print_progress = FALSE, parallel = TRUE, n_processors = 2) |>
-  run_power_check(print_progress = FALSE, parallel = FALSE) |>
-  run_discovery_analysis(print_progress = FALSE, parallel = FALSE)
+  run_power_check(print_progress = FALSE, parallel = TRUE, n_processors = 2) |>
+  run_discovery_analysis(print_progress = FALSE, parallel = TRUE, n_processors = 2)
 ```
 
 ```{r, echo = FALSE}
@@ -238,7 +238,7 @@ The gRNAs display bimodal count distributions. Consider, for example, `gRNA_CCTG
 We carry out the gRNA assignment step via a call to the function `assign_grnas()`. `assign_grnas()` takes arguments `sceptre_object` (required) and `method` (optional); the latter argument can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. We parallelize execution of `assign_grnas()` by setting `parallel` to `TRUE`. (Parallel execution is not yet configured for Windows. We recommend that Windows users seeking to parallelize their analysis leverage the [`sceptre` Nextflow pipeline](https://timothy-barry.github.io/sceptre-book/).)
 
 ```{r,results='hide'}
-sceptre_object <- assign_grnas(sceptre_object = sceptre_object, parallel = FALSE)
+sceptre_object <- assign_grnas(sceptre_object = sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
@@ -297,7 +297,7 @@ The fifth step is to run the calibration check. **The calibration check is an an
 We run the calibration check by calling the function `run_calibration_check()` on the `sceptre_object`.
 
 ```{r,results='hide'}
-sceptre_object <- run_calibration_check(sceptre_object, parallel = FALSE)
+sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
@@ -331,7 +331,7 @@ The visualization consists of four panels, which we describe below.
 The sixth step --- which is optional --- is to run the power check. The power check involves applying `sceptre` to analyze the positive control pairs. Given that the positive control pairs are known to contain signal, `sceptre` should produce significant (i.e., small) p-values on the positive control pairs. **The power check enables us to assess `sceptre`'s power (i.e., its ability to detect true associations) on the dataset under analysis.** We run the power check by calling the function `run_power_check()` on the `sceptre_object`.
 
 ```{r,results='hide'}
-sceptre_object <- run_power_check(sceptre_object, parallel = FALSE)
+sceptre_object <- run_power_check(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
@@ -355,7 +355,7 @@ Each point in the plot corresponds to a target-response pair, with positive cont
 The seventh and penultimate step is to run the discovery analysis. The discovery analysis entails applying `sceptre` to analyze the discovery pairs. We run the discovery analysis by calling the function `run_discovery_analysis()`.
 
 ```{r,results='hide'}
-sceptre_object <- run_discovery_analysis(sceptre_object, parallel = FALSE)
+sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
