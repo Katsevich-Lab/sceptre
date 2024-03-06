@@ -41,7 +41,7 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
     sceptre_object@cells_w_zero_or_twoplus_grnas <- max_result$cells_w_zero_or_twoplus_grnas # set cells w/ multiple gRNAs for max method
   }
   # check that at least some gRNAs were assigned
-  if (all(sapply(sceptre_object@initial_grna_assignment_list, length) == 0L)) {
+  if (all(vapply(sceptre_object@initial_grna_assignment_list, length, FUN.VALUE = integer(1)) == 0L)) {
     warning("No gRNA was assigned to any cell. Consider setting `method` to 'thresholding' and `threshold` to a small, positive number.")
   }
 
@@ -57,23 +57,23 @@ assign_grnas_to_cells <- function(sceptre_object, print_progress, parallel, n_pr
 assign_grnas_to_cells_thresholding <- function(grna_matrix, grna_assign_threshold, grna_ids) {
   # take cases on the class of grna_matrix
   if (methods::is(grna_matrix, "odm")) {
-    initial_assignment_list <- sapply(grna_ids, function(grna_id) {
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
       ondisc:::threshold_count_matrix_cpp(file_name_in = grna_matrix@h5_file,
                                           f_row_ptr = grna_matrix@ptr,
                                           row_idx = which(grna_id == rownames(grna_matrix)),
                                           threshold = grna_assign_threshold)
-    }, simplify = FALSE)
+    })
   } else {
     # 1. make the grna expression matrix row-accessible; ensure threshold is numeric
     grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
     grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
     # 2. perform the assignments
-    initial_assignment_list <- sapply(grna_ids, function(grna_id) {
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
       threshold_count_matrix(j = grna_matrix@j, p = grna_matrix@p, x = grna_matrix@x,
                              row_idx = which(grna_id == rownames(grna_matrix)),
                              threshold = grna_assign_threshold)
-    }, simplify = FALSE)
+    })
   }
 
   return(initial_assignment_list)
@@ -134,7 +134,8 @@ process_initial_assignment_list <- function(sceptre_object) {
   # 6. initialize output
   sceptre_object@grna_assignments_raw <- grna_assignments_raw
   # 7. save mean cells per grna
-  sceptre_object@mean_cells_per_grna <- sapply(sceptre_object@initial_grna_assignment_list, length) |> mean()
+  sceptre_object@mean_cells_per_grna <- vapply(sceptre_object@initial_grna_assignment_list,
+                                               length, FUN.VALUE = integer(1)) |> mean()
   return(sceptre_object)
 }
 
