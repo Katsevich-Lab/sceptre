@@ -140,7 +140,7 @@ import_data_from_cellranger <- function(directories, moi, grna_target_data_frame
 import_data_from_cellranger_memory <- function(directories, moi, grna_target_data_frame, extra_covariates) {
   # 1. check that directories exist
   for (curr_directory in directories) {
-    if (!dir.exists(curr_directory)) stop(paste0("The directory ", curr_directory, " does not exist."))
+    if (!dir.exists(curr_directory)) stop("The directory ", curr_directory, " does not exist.")
   }
 
   # 2. create the vector of matrix, features, and barcode files
@@ -150,10 +150,10 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
     out <- vapply(grep_strs, function(grep_str) {
       file_names <- grep(pattern = grep_str, x = fs, value = TRUE)
       if (length(file_names) >= 2L) {
-        stop(paste0("There are multiple ", grep_str, " files within the directory ", curr_directory, "."))
+        stop("There are multiple ", grep_str, " files within the directory ", curr_directory, ".")
       }
       if (length(file_names) == 0L) {
-        stop(paste0("The directory ", curr_directory, " contains zero ", grep_str, " files."))
+        stop("The directory ", curr_directory, " contains zero ", grep_str, " files.")
       }
       return(paste0(curr_directory, "/", file_names))
     }, FUN.VALUE = character(1)) |> stats::setNames(c("features", "matrix"))
@@ -342,7 +342,7 @@ import_data_from_parse <- function(gene_mat_fp, grna_mat_fp, all_genes_fp, all_g
            all_genes_fp = all_genes_fp, all_grnas_fp = all_grnas_fp)
   for (fp_name in names(fps)) {
     fp <- fps[[fp_name]]
-    if (!file.exists(fp)) stop(paste0("File ", fp, " does not exist. Set `", fp_name, "` to a different value."))
+    if (!file.exists(fp)) stop("File ", fp, " does not exist. Set `", fp_name, "` to a different value.")
   }
 
   # 2. load the gene.mtx and grna.mtx data

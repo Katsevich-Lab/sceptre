@@ -320,7 +320,7 @@ get_result <- function(sceptre_object, analysis) {
   if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
     stop("`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`.")
   }
-  if (!sceptre_object@functs_called[[analysis]]) stop(paste0(analysis, " has not yet been run."))
+  if (!sceptre_object@functs_called[[analysis]]) stop(analysis, " has not yet been run.")
   field_to_extract <- switch(EXPR = analysis,
                              run_calibration_check = "calibration_result",
                              run_power_check = "power_result",
