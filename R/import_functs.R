@@ -111,10 +111,10 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #' library(sceptredata)
 #' # 1. point to directories containing cellranger output
 #' directories <- paste0(system.file("extdata", package = "sceptredata"),
-#'                      "/highmoi_example/gem_group_", 1:2)
+#'                      "/highmoi_example/gem_group_", c(1,2))
 #'
 #' # 2. simulate an additional covariate
-#' cell_type <- sample(x = paste0("type_", 1:3),
+#' cell_type <- sample(x = paste0("type_", seq(1,3)),
 #'                     size = 45919, replace = TRUE) |> factor()
 #' extra_covariates <- data.frame(cell_type = cell_type)
 #'

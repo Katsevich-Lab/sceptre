@@ -58,8 +58,8 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
       # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
       # smallest n such that this biggest bin width is above `max_expression_count`
       num_exp_bins <- log2((max_expression_count - max_single_bin) / 2 + 1) |> ceiling()
-      bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2 * (2^(1:num_exp_bins) - 1))
-      bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((1:num_exp_bins) - 1) - 1)))
+      bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2 * (2^seq_len(num_exp_bins) - 1))
+      bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((seq_len(num_exp_bins)) - 1) - 1)))
     }
     return(data.frame(bin_upper_bounds = bin_upper_bounds, bin_labels = bin_labels))
   }
@@ -217,7 +217,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
                            mapping = ggplot2::aes(x = x)) +
       ggplot2::geom_histogram(binwidth = max(1, 0.02 * length(unique(n_grnas_per_cell))),
                               fill = "grey90", color = "darkblue") +
-      ggplot2::scale_y_continuous(expand = c(0, 0), trans = "log1p", breaks = 10^(1:8)) +
+      ggplot2::scale_y_continuous(expand = c(0, 0), trans = "log1p", breaks = 10^(seq(1,8))) +
       get_my_theme() + ggplot2::ylab("Frequency") +
       ggplot2::ggtitle("N gRNAs per cell") +
       ggplot2::xlab("N gRNAs") +

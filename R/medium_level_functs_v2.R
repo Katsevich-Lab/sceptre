@@ -11,7 +11,7 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
 }
 
 
-# core function 1: run permutation test in memory
+# core function 1. run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, resampling_approximation, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
