@@ -34,7 +34,10 @@ This chapter illustrates application of `sceptre` to a CRISPRi screen of candida
 
 ```{r, echo = FALSE}
 library(Matrix)
-system("rm -rf ~/sceptre_outputs")
+if (dir.exists("~/sceptre_outputs")) {
+  fs <- list.files("~/sceptre_outputs", full.names = TRUE)
+  for (f in fs) file.remove(f)
+}
 ```
 
 Using `sceptre` is simple; carrying out an entire analysis requires only a few lines of code. Below, we provide a minimal working example of applying `sceptre` to analyze the example data. First, we load the example data into R via the function `import_data_from_cellranger()`, which creates a `sceptre_object`, an object-based representation of the single-cell CRISPR screen data. Next, we specify the gRNA-gene pairs that we seek to test for association. Then, we call the pipeline functions on the `sceptre_object` in order. Finally, we write the outputs to the directory `~/sceptre_outputs`.

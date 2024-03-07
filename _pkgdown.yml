@@ -42,7 +42,7 @@ reference:
   desc: >
     Functions to visualize the analysis
   contents:
-  - plot,sceptre_object-method
+  - plot,sceptre_object,ANY-method
   - plot_grna_count_distributions
   - plot_assign_grnas
   - plot_run_qc
