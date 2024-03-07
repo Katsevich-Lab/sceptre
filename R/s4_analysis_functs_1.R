@@ -18,7 +18,30 @@
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                        positive_control_pairs = positive_control_pairs,
+#'                                        distance_threshold = 5e6
+#' )
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters(
+#'    discovery_pairs = discovery_pairs,
+#'    positive_control_pairs = positive_control_pairs,
+#'    side = "left"
+#'  )
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
@@ -118,7 +141,22 @@ set_analysis_parameters <- function(sceptre_object,
 #' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data("lowmoi_example_data")
+#' # 1. import data, set default analysis parameters
+#' sceptre_object <- import_data(
+#'  response_matrix = lowmoi_example_data$response_matrix,
+#'  grna_matrix = lowmoi_example_data$grna_matrix,
+#'  extra_covariates = lowmoi_example_data$extra_covariates,
+#'  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+#'  moi = "low") |> set_analysis_parameters()
+#'
+#'  # 2. assign gRNAs (three different methods)
+#' sceptre_object <- sceptre_object |> assign_grnas(method = "thresholding")
+#' sceptre_object <- sceptre_object |> assign_grnas(method = "maximum")
+#' sceptre_object <- sceptre_object |> assign_grnas(
+#'   method = "mixture", parallel = TRUE, n_processors = 2
+#' )
 assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE,
                          n_processors = "auto", log_dir = tempdir(), ...) {
   # 0. verify that function called in correct order
@@ -181,7 +219,32 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @return an updated `sceptre_object` in which QC has been carried out
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                        positive_control_pairs = positive_control_pairs,
+#'                                        distance_threshold = 5e6
+#' )
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters(
+#'    discovery_pairs = discovery_pairs,
+#'    positive_control_pairs = positive_control_pairs,
+#'    side = "left"
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc()
 run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
