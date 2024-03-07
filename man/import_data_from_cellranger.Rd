@@ -43,7 +43,6 @@ sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",
   grna_target_data_frame = grna_target_data_frame_highmoi,
-  extra_covariates = extra_covariates
 )
 
 # 2. create an ondisc-backed sceptre_object from cellranger output
@@ -51,7 +50,6 @@ sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",
   grna_target_data_frame = grna_target_data_frame_highmoi,
-  extra_covariates = extra_covariates,
   use_ondisc = TRUE,
   directory_to_write = tempdir()
 )
