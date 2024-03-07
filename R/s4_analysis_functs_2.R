@@ -337,7 +337,7 @@ get_result <- function(sceptre_object, analysis) {
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a string giving the file path to a directory on disk in which to write the results
 #'
-#' @return NULL
+#' @return the value NULL
 #' @export
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory

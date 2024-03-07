@@ -11,6 +11,9 @@ write_outputs_to_directory(sceptre_object, directory)
 
 \item{directory}{a string giving the file path to a directory on disk in which to write the results}
 }
+\value{
+the value NULL
+}
 \description{
 \code{write_outputs_to_directory()} writes the outputs of a \code{sceptre} analysis to a directory on disk. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 }
