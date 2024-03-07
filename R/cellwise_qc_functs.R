@@ -61,8 +61,12 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   }
 
   # 2. for each gRNA group and NT gRNA, subset the grna vector and the update the indices
-  grna_group_idxs_new <- lapply(grna_assignments_raw$grna_group_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
-  nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) update_idxs(v, cells_in_use, n_cells))
+  grna_group_idxs_new <- lapply(grna_assignments_raw$grna_group_idxs, function(v) {
+    update_idxs(v, cells_in_use, n_cells)
+  }) |> stats::setNames(names(grna_assignments_raw$grna_group_idxs))
+  nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) {
+    update_idxs(v, cells_in_use, n_cells)
+  }) |> stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
   # remove those nt grnas with 0 cells (after QC)
   nt_idxs_new <- nt_idxs_new[vapply(nt_idxs_new, length, FUN.VALUE = integer(1)) != 0L]
   grna_assignments <- list(grna_group_idxs = grna_group_idxs_new, indiv_nt_grna_idxs = nt_idxs_new)
