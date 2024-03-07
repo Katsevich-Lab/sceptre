@@ -34,22 +34,25 @@ an initialized \code{sceptre_object}
 }
 \examples{
 library(sceptredata)
-# 1. point to directories containing cellranger output
-directories <- paste0(system.file("extdata", package = "sceptredata"),
-                     "/highmoi_example/gem_group_", c(1,2))
-
-# 2. simulate an additional covariate
-cell_type <- sample(x = paste0("type_", seq(1,3)),
-                    size = 45919, replace = TRUE) |> factor()
-extra_covariates <- data.frame(cell_type = cell_type)
-
-# 3. initialize the sceptre_object
-#' library(sceptredata)
 data(grna_target_data_frame_highmoi)
+directories <- paste0(system.file("extdata", package = "sceptredata"),
+                      "/highmoi_example/gem_group_", c(1,2))
+
+# 1. create a standard sceptre_object from cellranger output
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",
   grna_target_data_frame = grna_target_data_frame_highmoi,
   extra_covariates = extra_covariates
+)
+
+# 2. create an ondisc-backed sceptre_object from cellranger output
+sceptre_object <- import_data_from_cellranger(
+  directories = directories,
+  moi = "high",
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  extra_covariates = extra_covariates,
+  use_ondisc = TRUE,
+  directory_to_write = tempdir()
 )
 }

@@ -12,7 +12,7 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @import BH
-#' @name sceptre
+#' @keywords package
 #' @examples
 #' ##########################
 #' # Low-MOI CRISPRko example
@@ -124,4 +124,4 @@ utils::globalVariables(c("n_nonzero_trt", "n_nonzero_cntrl", "pair_str", "assign
 #'
 #' # 8. write results
 #' write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
-NULL
+"_PACKAGE"

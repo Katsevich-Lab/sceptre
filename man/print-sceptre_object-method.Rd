@@ -9,6 +9,9 @@
 \arguments{
 \item{x}{a \code{sceptre_object}}
 }
+\value{
+the value NULL
+}
 \description{
 \code{print()} prints information about the dataset and the status of the analysis to the console.
 }

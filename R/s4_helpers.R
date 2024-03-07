@@ -33,7 +33,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' `print()` prints information about the dataset and the status of the analysis to the console.
 #'
 #' @param x a `sceptre_object`
-#' @return NULL
+#' @return the value NULL
 #' @export
 setMethod("print", signature = signature("sceptre_object"), function(x) {
   show(x)

@@ -144,8 +144,25 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># see example via ?sceptre</span></span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptredata</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"lowmoi_example_data"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># 1. initialize a standard sceptre_object from R objects</span></span></span>
+<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data</span><span class="op">(</span></span></span>
+<span class="r-in"><span> response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span> grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span> extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span> grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
+<span class="r-in"><span> moi <span class="op">=</span> <span class="st">"low"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. initialize an ondisc-backed sceptre_object from R objects</span></span></span>
+<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data</span><span class="op">(</span></span></span>
+<span class="r-in"><span> response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span> grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span> extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span> grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
+<span class="r-in"><span> moi <span class="op">=</span> <span class="st">"low"</span>,</span></span>
+<span class="r-in"><span> use_ondisc <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span> directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -153,7 +170,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Timothy Barry, Eugene Katsevich.</p>
+  <p></p><p>Developed by Timothy Barry, Joseph Deutsch, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown-footer-right">
