@@ -68,7 +68,7 @@ write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_l
 ##########################
 # 1. create the sceptre object from cellranger output
 directories <- paste0(system.file("extdata", package = "sceptredata"),
-"/highmoi_example/gem_group_", 1:2)
+"/highmoi_example/gem_group_", c(1, 2))
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data_from_cellranger(directories = directories,
 moi = "high",
