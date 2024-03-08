@@ -14,7 +14,32 @@
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas, run qc, run calibration check
+#' sceptre_object <- sceptre_object |>
+#' set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations"
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_calibration_check(
+#'     n_calibration_pairs = 500,
+#'     calibration_group_size = 2,
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'  )
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
                                   n_processors = "auto", log_dir = tempdir()) {
@@ -113,7 +138,30 @@ process_calibration_result <- function(result, sceptre_object) {
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#'
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas, run qc
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters(
+#'    side = "left",
+#'    resampling_mechanism = "permutations",
+#'    positive_control_pairs = positive_control_pairs
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_power_check()
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                             n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
