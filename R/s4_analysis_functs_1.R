@@ -231,12 +231,11 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #'  response_names = highmoi_example_data$gene_names
 #' )
 #'
-#' # set analysis parameters, assign grnas
+#' # set analysis parameters, assign grnas, run qc
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 #' discovery_pairs <- construct_cis_pairs(sceptre_object,
 #'                                        positive_control_pairs = positive_control_pairs,
-#'                                        distance_threshold = 5e6
-#' )
+#'                                        distance_threshold = 5e6)
 #' sceptre_object <- sceptre_object |>
 #'  set_analysis_parameters(
 #'    discovery_pairs = discovery_pairs,
