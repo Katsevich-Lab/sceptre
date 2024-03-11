@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 ## [`sceptre`]{style="font-size:60px;"}
 
-An R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
+An R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
 
 <!-- badges: start -->
 
@@ -41,35 +41,6 @@ We are excited to announce the release of `sceptre` v0.9.1, a substantial update
 
 `sceptre` v0.9.1 facilitates an entire analysis pipeline for single-cell CRISPR screens, starting from UMI count data obtained from tools like 10X Cell Ranger.
 
-```{=html}
-<!--
-
-## About `sceptre`
-
-Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR and single-cell sequencing to survey the effects of genetic perturbations on individual cells. Despite their promise, single-cell CRISPR screens present considerable statistical and computational challenges. `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
-
-### Key features
-
--   Import data from 10X CellRanger or a set of R matrices
--   Assign gRNAs to cells using one of three principled methods
--   Perform extensive quality control
--   Run gRNA-to-gene differential expression analyses
--   Verify false discovery rate control using negative control gRNAs
--   Verify adequate power using positive control gRNAs
--   Visualize each step in the pipeline by rendering an informative plot
-
-### Compatible experimental designs
-
--   low multiplicity-of-infection and high multiplicity-of-infection
--   Gene-targeting and noncoding-regulatory-element-targeting
--   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
--   Gene and protein expression readout
-
-## Get started
-
-The fastest way to get started with `sceptre` is to work through the [Get Started vignette](articles/sceptre.html) (30 minutes). Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
--->
-```
 ## Featured publications
 
 -   Barry et al., 2024. "Exponential family measurement error models...". *Biostatistics.*
