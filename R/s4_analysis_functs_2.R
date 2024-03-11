@@ -71,7 +71,8 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
   if (is.null(n_calibration_pairs)) {
     n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
-  } else {
+  }
+  if (!is.null(n_calibration_pairs) && sceptre_object@resampling_approximation == "no_approximation") {
     mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
     sceptre_object@B3 <- ceiling(mult_fact * n_calibration_pairs /sceptre_object@multiple_testing_alpha) |> as.integer()
   }
