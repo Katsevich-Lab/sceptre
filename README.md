@@ -63,9 +63,13 @@ CRISPR screens, starting from UMI count data obtained from tools like
 
 ## Featured publications
 
+- Barry et al., 2024. “Exponential family measurement error models…”.
+  *Biostatistics.*
+
 - [Morris et al.,
   2023](https://www.science.org/doi/10.1126/science.adh7699). “Discovery
   of target genes and pathways…”. *Science*.
+
 - [Barry et al.,
   2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
   “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
