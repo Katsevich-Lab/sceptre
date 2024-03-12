@@ -23,12 +23,12 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   }
 
   # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
-  cells_to_exclude_multiple_grnas <- sceptre_object@cells_w_multiple_grnas
-  n_cells_rm_multiple_grnas <- length(sceptre_object@cells_w_multiple_grnas)
+  cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+  n_cells_rm_zero_twoplus_grnas <- length(sceptre_object@cells_w_zero_or_twoplus_grnas)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   cells_to_exclude <- c(cells_to_exclude_n_umis, cells_to_exclude_n_responses,
-                        cells_to_exclude_p_mito, cells_to_exclude_multiple_grnas,
+                        cells_to_exclude_p_mito, cells_to_exclude_zero_twoplus_grnas,
                         cells_to_exclude_user_specified) |> unique()
   n_cells <- ncol(get_response_matrix(sceptre_object))
   cells_to_retain <- if (length(cells_to_exclude) == 0L) seq(1L, n_cells) else seq(1L, n_cells)[-cells_to_exclude]
@@ -37,7 +37,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   cell_removal_metrics <- c(n_cells_rm_n_umis = n_cells_rm_n_umis,
                             n_cells_rm_n_responses = n_cells_rm_n_responses,
                             n_cells_rm_p_mito = n_cells_rm_p_mito,
-                            n_cells_rm_multiple_grnas = n_cells_rm_multiple_grnas,
+                            n_cells_rm_zero_twoplus_grnas = n_cells_rm_zero_twoplus_grnas,
                             n_cells_rm_user_specified = n_cells_rm_user_specified,
                             n_cells_rm_total = n_cells_rm_total)
   sceptre_object@cell_removal_metrics <- cell_removal_metrics
@@ -61,10 +61,14 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   }
 
   # 2. for each gRNA group and NT gRNA, subset the grna vector and the update the indices
-  grna_group_idxs_new <- sapply(grna_assignments_raw$grna_group_idxs, function(v) update_idxs(v, cells_in_use, n_cells), simplify = FALSE)
-  nt_idxs_new <- sapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) update_idxs(v, cells_in_use, n_cells), simplify = FALSE)
+  grna_group_idxs_new <- lapply(grna_assignments_raw$grna_group_idxs, function(v) {
+    update_idxs(v, cells_in_use, n_cells)
+  }) |> stats::setNames(names(grna_assignments_raw$grna_group_idxs))
+  nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) {
+    update_idxs(v, cells_in_use, n_cells)
+  }) |> stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
   # remove those nt grnas with 0 cells (after QC)
-  nt_idxs_new <- nt_idxs_new[sapply(nt_idxs_new, length) != 0L]
+  nt_idxs_new <- nt_idxs_new[vapply(nt_idxs_new, length, FUN.VALUE = integer(1)) != 0L]
   grna_assignments <- list(grna_group_idxs = grna_group_idxs_new, indiv_nt_grna_idxs = nt_idxs_new)
 
   # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
@@ -84,7 +88,7 @@ update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
   out <- list()
   nt_grnas <- names(indiv_nt_grna_idxs)
   all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
-  n_cells_per_nt <- sapply(indiv_nt_grna_idxs, length)
+  n_cells_per_nt <- vapply(indiv_nt_grna_idxs, length, FUN.VALUE = integer(1))
   stop <- cumsum(n_cells_per_nt)
   start <- c(0L, stop[-length(stop)]) + 1L
   indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {

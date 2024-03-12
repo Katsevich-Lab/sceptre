@@ -35,7 +35,7 @@ test_that("auto_compute_cell_covariates", {
 
   ## testing grna_matrix
   # only `response_n_nonzero` and `response_n_umis` are tested for this part
-  for(grna_matrix in make_mock_grna_matrices(grna_target_data_frame, num_cells, non_nt_patterns = "all", nt_patterns = "column")) {
+  for (grna_matrix in make_mock_grna_matrices(grna_target_data_frame, num_cells, non_nt_patterns = "all", nt_patterns = "column")) {
     results <- auto_compute_cell_covariates(
       response_matrix = fixed_response_matrix,
       grna_matrix = grna_matrix,
@@ -73,7 +73,8 @@ test_that("auto_compute_cell_covariates", {
   )
   expect_equal(
     colnames(results_empty),
-    c("response_n_nonzero", "response_n_umis", "grna_n_nonzero", "grna_n_umis")
+    c("response_n_nonzero", "response_n_umis", "grna_n_nonzero",
+      "grna_n_umis", "grna_frac_umis_max_feature", "grna_feature_w_max_expression")
   )
 
   ## testing response_names

@@ -37,7 +37,7 @@ test_that("check_import_data_inputs", {
   expect_no_error(
     check_import_data_inputs(
       response_matrix = valid_response_matrix |>
-        set_rownames(NULL),
+        `rownames<-`(NULL),
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
@@ -78,7 +78,7 @@ test_that("check_import_data_inputs", {
   expect_error(
     check_import_data_inputs(
       response_matrix = valid_response_matrix |>
-        set_rownames(c("a", "a", paste0("b", 1:(num_responses - 2)))),
+        `rownames<-`(c("a", "a", paste0("b", 1:(num_responses - 2)))),
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
@@ -92,7 +92,7 @@ test_that("check_import_data_inputs", {
     check_import_data_inputs(
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix |>
-        set_rownames(c("a", "a", paste0("b", 1:(num_targets - 2)))),
+        `rownames<-`(c("a", "a", paste0("b", 1:(num_targets - 2)))),
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
@@ -105,7 +105,7 @@ test_that("check_import_data_inputs", {
     check_import_data_inputs(
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix |>
-        set_rownames(NULL),
+        `rownames<-`(NULL),
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
@@ -116,14 +116,14 @@ test_that("check_import_data_inputs", {
   ##### 5. checking that "&" does not appear in any grna ids and that no grna is named "non-targeting"
 
   FAIL_id_contains_ampersand_target_df <- valid_grna_target_data_frame |>
-    inset(1,1,"bad&id")
+    .Primitive("[<-")(1,1,"bad&id") # using .Primitive since I can't use `[<-` with base R pipe
   FAIL_id_contains_ampersand_grna_matrix <- valid_grna_matrix |>
-    set_rownames(FAIL_id_contains_ampersand_target_df$grna_id)
+    `rownames<-`(FAIL_id_contains_ampersand_target_df$grna_id)
 
   FAIL_id_contains_non_targeting_target_df <- valid_grna_target_data_frame |>
-    inset(2,1,"non-targeting")
+    .Primitive("[<-")(2,1,"non-targeting") # using .Primitive since I can't use `[<-` with base R pipe
   FAIL_id_contains_non_targeting_grna_matrix <- valid_grna_matrix |>
-    set_rownames(FAIL_id_contains_non_targeting_target_df$grna_id)
+    `rownames<-`(FAIL_id_contains_non_targeting_target_df$grna_id)
 
   expect_error(
     check_import_data_inputs(
@@ -153,7 +153,8 @@ test_that("check_import_data_inputs", {
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame |>
-        inset(3,1,"this grna id is not in the grna matrix"),
+        # using .Primitive since I can't use `[<-` with base R pipe
+        .Primitive("[<-")(3,1,"this grna id is not in the grna matrix"),
       moi = "low",
       extra_covariates = valid_extra_covariates
     ),
