@@ -26,3 +26,6 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 \description{
 \code{construct_cis_pairs()} is a helper function to facilitate construction the \emph{cis} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 }
+\examples{
+# see example via ?sceptre
+}

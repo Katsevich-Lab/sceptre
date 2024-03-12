@@ -13,9 +13,7 @@ setClass("sceptre_object",
            covariate_data_frame = "data.frame",
            covariate_matrix = "matrix",
            grna_target_data_frame = "data.frame",
-           grna_target_data_frame_with_vector = "data.frame",
            low_moi = "logical",
-           response_names = "character",
            covariate_names = "character",
 
            # analysis parameters
@@ -23,7 +21,7 @@ setClass("sceptre_object",
            positive_control_pairs = "data.frame",
            formula_object = "formula",
            side_code = "integer",
-           fit_parametric_curve = "logical",
+           resampling_approximation = "character",
            control_group_complement = "logical",
            run_permutations = "logical",
            n_nonzero_trt_thresh = "integer",
@@ -48,7 +46,7 @@ setClass("sceptre_object",
            grna_assignments_raw = "list",
            grna_assignments = "list",
            grnas_per_cell = "integer",
-           cells_w_multiple_grnas = "integer",
+           cells_w_zero_or_twoplus_grnas = "integer",
            cells_in_use = "integer",
            n_discovery_pairs = "integer",
            n_ok_discovery_pairs = "integer",
@@ -56,7 +54,7 @@ setClass("sceptre_object",
            n_ok_positive_control_pairs = "integer",
            calibration_group_size = "integer",
            n_calibration_pairs = "integer",
-           ondisc_grna_assignment_info = "list",
+           import_grna_assignment_info = "list",
            mean_cells_per_grna = "numeric",
 
            # cached objects
@@ -65,7 +63,6 @@ setClass("sceptre_object",
            # flags
            last_function_called = "character",
            functs_called = "logical",
-           nuclear = "logical",
 
            # results
            calibration_result = "data.frame",
@@ -73,6 +70,7 @@ setClass("sceptre_object",
            discovery_result = "data.frame",
 
            # odm-related entries
+           nuclear = "logical",
            nf_pipeline = "logical",
            integer_id = "integer",
            elements_to_analyze = "character"

@@ -86,7 +86,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
   for (col_name in colnames(global_cell_covariates_new)) {
     vect <- global_cell_covariates_new[,col_name]
     if (any(is.infinite(vect)) || any(is.na(vect))) {
-      stop(paste0("The column `", col_name, "` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries."))
+      stop("The column `", col_name, "` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries.")
     }
   }
   # verify that matrix is not rank-deficient
@@ -98,7 +98,7 @@ convert_covariate_df_to_design_matrix <- function(covariate_data_frame, formula_
 }
 
 
-compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
+compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito, compute_max_feature) {
   # make response matrix column accessible
   matrix_in <- set_matrix_accessibility(matrix_in, make_row_accessible = FALSE)
   # get MT gene idxs
@@ -115,28 +115,32 @@ compute_cell_covariates <- function(matrix_in, feature_names, compute_p_mito) {
                                      n_genes = nrow(matrix_in),
                                      n_cells = ncol(matrix_in),
                                      mt_gene_idxs = mt_gene_idxs,
-                                     compute_p_mito = compute_p_mito)
-  ret <- data.frame(n_nonzero = out$n_nonzero,
-                    n_umis = out$n_umi)
+                                     compute_p_mito = compute_p_mito,
+                                     compute_max_feature = compute_max_feature)
+  ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
   if (compute_p_mito) ret$p_mito <- out$p_mito
+  if (compute_max_feature) {
+    ret$frac_umis_max_feature <- out$frac_umis_max_feature
+    ret$feature_w_max_expression <- rownames(matrix_in)[out$max_feature + 1L]
+  }
   return(ret)
 }
 
 
 get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_check, control_group_complement, calibration_group_size, n_cells) {
   if (calibration_check && !control_group_complement) { # 1. calibration check, nt cells (low MOI only)
-    indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+    indiv_nt_sizes <- vapply(grna_assignments$indiv_nt_grna_idxs, length, FUN.VALUE = integer(1)) |> sort(decreasing = TRUE)
     M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
     n_control_cells <- length(grna_assignments$all_nt_idxs)
     out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
 
   } else if (calibration_check && control_group_complement) { # 2. calibration check, complement (low and high MOI)
-    indiv_nt_sizes <- sapply(grna_assignments$indiv_nt_grna_idxs, length) |> sort(decreasing = TRUE)
+    indiv_nt_sizes <- vapply(grna_assignments$indiv_nt_grna_idxs, length, FUN.VALUE = integer(1)) |> sort(decreasing = TRUE)
     M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
     out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
 
   } else if (!calibration_check && !control_group_complement) { # 3. discovery, nt cells (low MOI only)
-    grna_group_sizes <- sapply(grna_assignments$grna_group_idxs, length)
+    grna_group_sizes <- vapply(grna_assignments$grna_group_idxs, length, FUN.VALUE = integer(1))
     grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
     range_grna_group_sizes <- range(grna_group_sizes)
     n_control_cells <- length(grna_assignments$all_nt_idxs)
@@ -146,7 +150,7 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
                                       B = B)
 
   } else if (!calibration_check && control_group_complement) { # 4. discovery, complement (low and high MOI)
-    max_cells_per_grna_group <- sapply(grna_assignments$grna_group_idxs, length) |> max()
+    max_cells_per_grna_group <- vapply(grna_assignments$grna_group_idxs, length, FUN.VALUE = integer(1)) |> max()
     out <- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
   }
 

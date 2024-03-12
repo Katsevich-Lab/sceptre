@@ -6,13 +6,13 @@
 \usage{
 set_analysis_parameters(
   sceptre_object,
-  discovery_pairs,
+  discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
   positive_control_pairs = data.frame(grna_target = character(0), response_id =
     character(0)),
   side = "both",
   grna_integration_strategy = "union",
   formula_object = "default",
-  fit_parametric_curve = TRUE,
+  resampling_approximation = "skew_normal",
   control_group = "default",
   resampling_mechanism = "default",
   multiple_testing_method = "BH",
@@ -32,7 +32,7 @@ set_analysis_parameters(
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{fit_parametric_curve}{(optional; default \code{TRUE}) a logical indicating whether to fit a parametric curve to the null distribution of test statistics}
+\item{resampling_approximation}{(optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".}
 
 \item{control_group}{(optional) a string specifying the control group to use, either \code{"complement"} or \code{"nt_cells"}}
 
@@ -49,5 +49,28 @@ an updated \code{sceptre_object} in which the analysis parameters have been set
 \code{set_analysis_parameters()} sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
 }
 \examples{
-# see example via ?sceptre
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+ response_matrix = highmoi_example_data$response_matrix,
+ grna_matrix = highmoi_example_data$grna_matrix,
+ grna_target_data_frame = grna_target_data_frame_highmoi,
+ moi = "high",
+ extra_covariates = highmoi_example_data$extra_covariates,
+ response_names = highmoi_example_data$gene_names
+)
+
+# set analysis parameters
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object,
+                                       positive_control_pairs = positive_control_pairs,
+                                       distance_threshold = 5e6
+)
+sceptre_object <- sceptre_object |>
+ set_analysis_parameters(
+   discovery_pairs = discovery_pairs,
+   positive_control_pairs = positive_control_pairs,
+   side = "left"
+ )
 }

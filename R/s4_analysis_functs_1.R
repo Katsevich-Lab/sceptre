@@ -1,61 +1,3 @@
-#' Import data
-#'
-#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
-#'
-#' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns
-#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target
-#' @param moi a string indicating the MOI of the dataset, either "low" or "high"
-#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute
-#' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are assumed to be mitochondrial genes and are used to compute the covariate `response_p_mito`.
-#'
-#' @return an initialized `sceptre_object`
-#' @export
-#' @examples
-#' # see example via ?sceptre
-import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates = data.frame(), response_names = NA_character_) {
-  # 1. perform initial check
-  check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
-
-  # 2. compute the covariates
-  covariate_data_frame <- auto_compute_cell_covariates(response_matrix = response_matrix,
-                                                       grna_matrix = grna_matrix,
-                                                       extra_covariates = extra_covariates,
-                                                       response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names)
-
-  # 3. make the response and grna matrices row accessible
-  response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-
-  # 4. update fields in output object
-  sceptre_object <- methods::new("sceptre_object")
-  sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
-  sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
-  sceptre_object@covariate_data_frame <- covariate_data_frame
-  if (!("vector_id" %in% colnames(grna_target_data_frame))) {
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                     grna_target = as.character(grna_target))
-  } else {
-    sceptre_object@grna_target_data_frame_with_vector <- grna_target_data_frame |> dplyr::mutate(grna_id = as.character(grna_id),
-                                                                                                 grna_target = as.character(grna_target),
-                                                                                                 vector_id = as.character(vector_id))
-  }
-  sceptre_object@response_names <- response_names
-  sceptre_object@low_moi <- (moi == "low")
-  sceptre_object@elements_to_analyze <- NA_character_
-  sceptre_object@nf_pipeline <- FALSE
-  sceptre_object@nuclear <- FALSE
-  sceptre_object@covariate_names <- sort(colnames(sceptre_object@covariate_data_frame))
-
-  # 5. initialize flags
-  sceptre_object@last_function_called <- "import_data"
-  sceptre_object@functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
-                                    assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
-                                    run_power_check = FALSE, run_discovery_analysis = FALSE)
-  return(sceptre_object)
-}
-
-
 #' Set analysis parameters
 #'
 #' `set_analysis_parameters()` sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
@@ -66,7 +8,7 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"` or `"union"`
-#' @param fit_parametric_curve (optional; default `TRUE`) a logical indicating whether to fit a parametric curve to the null distribution of test statistics
+#' @param resampling_approximation (optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".
 #' @param control_group (optional) a string specifying the control group to use, either `"complement"` or `"nt_cells"`
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
@@ -76,14 +18,37 @@ import_data <- function(response_matrix, grna_matrix, grna_target_data_frame, mo
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                        positive_control_pairs = positive_control_pairs,
+#'                                        distance_threshold = 5e6
+#' )
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters(
+#'    discovery_pairs = discovery_pairs,
+#'    positive_control_pairs = positive_control_pairs,
+#'    side = "left"
+#'  )
 set_analysis_parameters <- function(sceptre_object,
                                     discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
                                     side = "both",
                                     grna_integration_strategy = "union",
                                     formula_object = "default",
-                                    fit_parametric_curve = TRUE,
+                                    resampling_approximation = "skew_normal",
                                     control_group = "default",
                                     resampling_mechanism = "default",
                                     multiple_testing_method = "BH",
@@ -105,10 +70,10 @@ set_analysis_parameters <- function(sceptre_object,
                                                     include_grna_covariates = !sceptre_object@low_moi)
   }
   B1 <- 499L
-  if (fit_parametric_curve) {
+  if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
     B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
-  } else {
+  } else if (resampling_approximation == "no_approximation") {
     B2 <- 0L # no curve fitting; thus, B2 = 0L
     B3 <- 0L # to be updated in the run_qc step
   }
@@ -121,7 +86,8 @@ set_analysis_parameters <- function(sceptre_object,
                                 control_group = control_group,
                                 resampling_mechanism = resampling_mechanism,
                                 side = side, low_moi = sceptre_object@low_moi,
-                                grna_integration_strategy = grna_integration_strategy) |> invisible()
+                                grna_integration_strategy = grna_integration_strategy,
+                                resampling_approximation = resampling_approximation) |> invisible()
 
   # 3. determine whether to reset response precomputations
   reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
@@ -137,7 +103,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@n_positive_control_pairs <- nrow(sceptre_object@positive_control_pairs)
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
-  sceptre_object@fit_parametric_curve <- fit_parametric_curve
+  sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
   sceptre_object@run_permutations <- run_permutations
   sceptre_object@B1 <- B1
@@ -175,7 +141,22 @@ set_analysis_parameters <- function(sceptre_object,
 #' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data("lowmoi_example_data")
+#' # 1. import data, set default analysis parameters
+#' sceptre_object <- import_data(
+#'  response_matrix = lowmoi_example_data$response_matrix,
+#'  grna_matrix = lowmoi_example_data$grna_matrix,
+#'  extra_covariates = lowmoi_example_data$extra_covariates,
+#'  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+#'  moi = "low") |> set_analysis_parameters()
+#'
+#'  # 2. assign gRNAs (three different methods)
+#' sceptre_object <- sceptre_object |> assign_grnas(method = "thresholding")
+#' sceptre_object <- sceptre_object |> assign_grnas(method = "maximum")
+#' sceptre_object <- sceptre_object |> assign_grnas(
+#'   method = "mixture", parallel = TRUE, n_processors = 2
+#' )
 assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE,
                          n_processors = "auto", log_dir = tempdir(), ...) {
   # 0. verify that function called in correct order
@@ -186,13 +167,14 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
     method <- if (sceptre_object@low_moi) "maximum" else "mixture"
   }
   hyperparameters_default <- if (method == "maximum") {
-    list(umi_fraction_threshold = 0.8)
+    list(umi_fraction_threshold = 0.8,
+         min_grna_n_umis_threshold = 5L)
   } else if (method == "thresholding")  {
     list(threshold = 5)
   } else if (method == "mixture") {
     list(n_em_rep = 5L, pi_guess_range = c(1e-5, 0.1),
       g_pert_guess_range = log(c(10, 5000)), n_nonzero_cells_cutoff = 10L,
-      backup_threshold = 5, probability_threshold = 0.8,
+      backup_threshold = 5L, probability_threshold = 0.8,
       formula_object = auto_construct_formula_object(cell_covariates = sceptre_object@covariate_data_frame,
                                                      include_grna_covariates = TRUE))
   }
@@ -237,7 +219,31 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @return an updated `sceptre_object` in which QC has been carried out
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas, run qc
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                        positive_control_pairs = positive_control_pairs,
+#'                                        distance_threshold = 5e6)
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters(
+#'    discovery_pairs = discovery_pairs,
+#'    positive_control_pairs = positive_control_pairs,
+#'    side = "left"
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc()
 run_qc <- function(sceptre_object,
                    n_nonzero_trt_thresh = 7L,
                    n_nonzero_cntrl_thresh = 7L,
@@ -309,11 +315,11 @@ run_qc_pt_2 <- function(sceptre_object) {
   # 9. compute the number of discovery pairs and (if applicable) pc pairs passing qc
   sceptre_object <- compute_qc_metrics(sceptre_object)
 
-  # update B3, the number of resamples to draw, if fit_parametric_curve is false
-  if (!sceptre_object@fit_parametric_curve) {
-    side <- sceptre_object@side_code
-    mult_fact <- if (side == 0L) 10 else 5
-    sceptre_object@B3 <- ceiling(mult_fact * sceptre_object@n_ok_discovery_pairs/sceptre_object@multiple_testing_alpha) |>
+  # update B3, the number of resamples to draw, if resampling_approximation is no_approximation
+  if (sceptre_object@resampling_approximation == "no_approximation") {
+    mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+    sceptre_object@B3 <- ceiling(mult_fact * max(sceptre_object@n_ok_discovery_pairs,
+                                                 sceptre_object@n_ok_positive_control_pairs)/sceptre_object@multiple_testing_alpha) |>
       as.integer()
   }
 

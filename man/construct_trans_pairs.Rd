@@ -26,3 +26,6 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 \details{
 Typically, in screens of genes (resp., noncoding regulatory elements), we set \code{pairs_to_exclude} to \code{"pc_pairs"} (resp., \code{"pairs_containing_pc_targets"}).
 }
+\examples{
+# see example via ?sceptre
+}

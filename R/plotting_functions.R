@@ -58,8 +58,8 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
       # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
       # smallest n such that this biggest bin width is above `max_expression_count`
       num_exp_bins <- log2((max_expression_count - max_single_bin) / 2 + 1) |> ceiling()
-      bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2 * (2^(1:num_exp_bins) - 1))
-      bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((1:num_exp_bins) - 1) - 1)))
+      bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2 * (2^seq_len(num_exp_bins) - 1))
+      bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((seq_len(num_exp_bins)) - 1) - 1)))
     }
     return(data.frame(bin_upper_bounds = bin_upper_bounds, bin_labels = bin_labels))
   }
@@ -146,7 +146,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   init_assignments <- sceptre_object@initial_grna_assignment_list
   grna_matrix <- get_grna_matrix(sceptre_object) |> set_matrix_accessibility(make_row_accessible = TRUE)
   grna_ids <- names(init_assignments)
-  assigned <- sapply(init_assignments, length) >= 1
+  assigned <- vapply(init_assignments, length, FUN.VALUE = integer(1)) >= 1
   grna_ids <- grna_ids[assigned]
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
@@ -155,24 +155,16 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
   to_plot_a <- lapply(X = grnas_to_plot, function(curr_grna_id) {
-    assignment <- multiple_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
+    assignment <- cells_w_zero_or_twoplus_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
     assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
-    multiple_grnas[sceptre_object@cells_w_multiple_grnas] <- TRUE  # indicates which cells have >1 grna
-    g <- if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-      sceptre_object@grna_target_data_frame_with_vector |>
-        dplyr::filter(vector_id == curr_grna_id) |>
-        dplyr::pull(grna_id) |>
-        sapply(function(i) load_row(grna_matrix, i)) |>
-        rowSums()
-    } else {
-      load_row(grna_matrix, curr_grna_id)
-    }
+    cells_w_zero_or_twoplus_grnas[sceptre_object@cells_w_zero_or_twoplus_grnas] <- TRUE  # indicates which cells have 0/2+ grnas
+    g <- load_row(grna_matrix, curr_grna_id)
     df <- data.frame(g = g,
                      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
                      grna_id = curr_grna_id |> factor(),
-                     multiple_grnas = multiple_grnas)
-    # if assignment method maximum, remove cells containing multiple gRNAs
-    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!multiple_grnas)
+                     cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas)
+    # if assignment method maximum, remove cells with 0/2+ grnas
+    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!cells_w_zero_or_twoplus_grnas)
     return(df)
   }) |> data.table::rbindlist()
 
@@ -195,7 +187,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
     ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
 
   # plot b
-  n_cells_per_grna <- sapply(init_assignments, length)
+  n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
   mean_c_cells_per_grna <- mean(n_cells_per_grna)
   to_plot_b <- data.frame(x = n_cells_per_grna,
                           y = names(n_cells_per_grna)) |>
@@ -225,7 +217,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
                            mapping = ggplot2::aes(x = x)) +
       ggplot2::geom_histogram(binwidth = max(1, 0.02 * length(unique(n_grnas_per_cell))),
                               fill = "grey90", color = "darkblue") +
-      ggplot2::scale_y_continuous(expand = c(0, 0), trans = "log1p", breaks = 10^(1:8)) +
+      ggplot2::scale_y_continuous(expand = c(0, 0), trans = "log1p", breaks = 10^(seq(1,8))) +
       get_my_theme() + ggplot2::ylab("Frequency") +
       ggplot2::ggtitle("N gRNAs per cell") +
       ggplot2::xlab("N gRNAs") +
@@ -568,8 +560,9 @@ plot_cellwise_qc <- function(sceptre_object) {
   n_orig_cells <- ncol(get_response_matrix(sceptre_object))
   cell_removal_metrics_frac <- cell_removal_metrics/n_orig_cells * 100
   df <- data.frame(fraction_cells_removed = cell_removal_metrics_frac,
-                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito", "multiple gRNAs", "User-specified", "Any filter"))
-  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "multiple gRNAs")
+                   Filter = c("N response UMIs", "N nonzero responses", "Percent mito",
+                              "Zero or 2+ gRNAs", "User-specified", "Any filter"))
+  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "Zero or 2+ gRNAs")
   # make a barplot. remove x-axis text
   p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
     ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") + get_my_theme() +
@@ -716,13 +709,13 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
   grna_group_idxs <- sceptre_object@grna_assignments$grna_group_idxs
   grna_group_names <- names(grna_group_idxs)
   if (!grna_target %in% grna_group_names) {
-    stop(paste0(if (singleton_integration_strategy) "gRNA ID" else "gRNA target `", grna_target, "` is not present within the data."))
+    stop(if (singleton_integration_strategy) "gRNA ID" else "gRNA target `", grna_target, "` is not present within the data.")
   }
 
   # check that the response is present within the data
   response_matrix <- get_response_matrix(sceptre_object)
   if (!(response_id %in% rownames(response_matrix))) {
-    stop(paste0("Response `", response_id, "` is not present within the data."))
+    stop("Response `", response_id, "` is not present within the data.")
   }
 
   # extract the counts for this pair; filter for cells in use
@@ -772,19 +765,19 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
   # create the plot
   set.seed(4)
   to_plot_downsample <- to_plot |>
-    dplyr::filter(normalized_count > 0) |>
-    dplyr::group_by(treatment) |>
+    dplyr::mutate(is_zero = (normalized_count == 0)) |>
+    dplyr::group_by(is_zero, treatment) |>
     dplyr::sample_n(size = min(dplyr::n(), 1000))
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
     ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.6) +
     ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5) +
-    sceptre:::get_my_theme() +
+    get_my_theme() +
     ggplot2::theme(legend.position = "none") +
     ggplot2::scale_color_manual(values = c("dodgerblue4", "firebrick4")) +
     ggplot2::xlab("Treatment status") +
     ggplot2::ylab("Normalized expression") +
     ggplot2::annotate("text", x = 1.5, y = max(to_plot$normalized_count) + 0.5, label = annotation, parse = TRUE) +
-    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(0.0, max(to_plot$normalized_count) + 0.7)) +
+    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(-0.01, max(to_plot$normalized_count) + 0.7)) +
     ggplot2::ggtitle(paste0("Response: ", response_id, "\ngRNA", if (singleton_integration_strategy) "" else " target" ,": ", grna_target)) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 10))
 

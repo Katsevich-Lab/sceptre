@@ -27,7 +27,9 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 7. check type of input matrices
   check_matrix_class <- function(input_matrix, input_matrix_name, allowed_matrix_classes) {
-    ok_class <- sapply(X = allowed_matrix_classes, function(mat_class) methods::is(input_matrix, mat_class)) |> any()
+    ok_class <- vapply(X = allowed_matrix_classes,
+                       function(mat_class) methods::is(input_matrix, mat_class),
+                       FUN.VALUE = logical(1)) |> any()
     if (!ok_class) {
       stop(paste0("`", input_matrix_name, "` must be an object of class ", paste0(allowed_matrix_classes, collapse = ", "), "."))
     }
@@ -54,7 +56,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
   were_names_provided <- c(
     !is.null(barcode_list$response_matrix),
     !is.null(barcode_list$grna_matrix),
-    nrow(extra_covariates) > 0 && !identical(barcode_list$extra_covariates, as.character(1:nrow(extra_covariates)))
+    nrow(extra_covariates) > 0 && !identical(barcode_list$extra_covariates, as.character(seq_len(nrow(extra_covariates))))
   )
   # If at least 2 non-default barcode names were provided, they must all be identical.
   # This is done by looping over all pairs of non-default names
@@ -63,8 +65,8 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     for (i in seq_len(length(barcodes_with_names) - 1)) {
       for (j in seq(i+1, length(barcodes_with_names))) {
         if (!identical(barcodes_with_names[[i]], barcodes_with_names[[j]])) {
-          stop(paste0("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
-                      "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects."))
+          stop("You have provided cell barcodes in the `", names(barcodes_with_names)[i],
+               "` and `", names(barcodes_with_names)[j], "`. These cell barcodes must be identical across objects.")
         }
       }
     }
@@ -83,7 +85,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     accept_type <- methods::is(v, "numeric") || methods::is(v, "character") ||
       methods::is(v, "factor") || methods::is(v, "logical")
     if (!accept_type) {
-      stop(paste0("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor."))
+      stop("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor.")
     }
   }
 
@@ -94,10 +96,10 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
   # 13. fail if extra_covariates has NA or inifinite values
   if (any(is.na(extra_covariates))) {
-    stop("`extra_covariates` has NA values which need to be removed.")
+    stop("`extra_covariates` has NA values that need to be removed.")
   }
-  if (any(sapply(extra_covariates, function(vect) any(is.infinite(vect))))) {
-    stop("`extra_covariates` has infinite values which need to be removed.")
+  if (vapply(extra_covariates, function(vect) any(is.infinite(vect)), FUN.VALUE = logical(1)) |> any()) {
+    stop("`extra_covariates` has infinite values that need to be removed.")
   }
 
   return(NULL)
@@ -105,15 +107,12 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
 
 check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
-                                          control_group, resampling_mechanism, side, low_moi, grna_integration_strategy) {
+                                          control_group, resampling_mechanism, side, low_moi,
+                                          grna_integration_strategy, resampling_approximation) {
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame_with_vector
-  } else {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-  }
+  grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
   # 1. if response_grna_target_pairs has been supplied, check its characteristics
   for (idx in seq_along(response_grna_target_pairs_list)) {
@@ -126,11 +125,11 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
       }
       # ii. check that the response ids in the `response_grna_target_pairs` data frame are a subset of the response ids
       if (!all(response_grna_target_pairs$response_id %in% rownames(response_matrix))) {
-        stop(paste0("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix."))
+        stop("The column `response_id` of the `", df_name ,"` data frame must be a subset of the row names of the response expression matrix.")
       }
       # iii. check that the `grna_target` column of the `response_grna_target_pairs` data frame is a subset of the `grna_target` column of the `grna_target_data_frame`
       if (!all(response_grna_target_pairs$grna_target %in% grna_target_data_frame$grna_target)) {
-        stop(paste0("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."))
+        stop("The column `grna_target` of the `", df_name , "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`.")
       }
       # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
       if ("non-targeting" %in% unique(response_grna_target_pairs$grna_target)) {
@@ -172,7 +171,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
-      stop(paste0("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'."))
+      stop("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'.")
     }
   }
 
@@ -191,9 +190,9 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
   }
 
-  # 11. if a vector_id has been supplied, ensure that the grna integration strategy is union
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && grna_integration_strategy != "union") {
-    stop("When a `vector_id` column is supplied within the `grna_target_data_frame`, the `grna_integration_strategy` should be set to 'union'.")
+  # 11. verify resampling_approximation acceptable
+  if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
+    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
   }
 
   return(NULL)
@@ -214,11 +213,14 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
   hyperparam_names <- names(hyperparameters)
   # i. maximum option
   if (assignment_method == "maximum") {
-    if (!setequal(hyperparam_names, "umi_fraction_threshold")) {
-      stop("The hyperparameter list must contain the single entry `umi_fraction_threshold`.")
+    if (!setequal(hyperparam_names, c("umi_fraction_threshold", "min_grna_n_umis_threshold"))) {
+      stop("The hyperparameter list must contain the fields `umi_fraction_threshold` and `min_grna_n_umis_threshold`.")
     }
     if (!(hyperparameters[["umi_fraction_threshold"]] > 0.0 && hyperparameters[["umi_fraction_threshold"]] < 1.0)) {
       stop("`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0.")
+    }
+    if (hyperparameters[["min_grna_n_umis_threshold"]] < 0L) {
+      stop("`min_grna_n_umis_threshold` should be an integer greater than 0.")
     }
   }
   # ii. thresholding operation
@@ -264,11 +266,6 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
     stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
   }
 
-  # 4. check that method is not maximum when vector_id is supplied
-  if (nrow(sceptre_object@grna_target_data_frame_with_vector) >= 1L && assignment_method == "maximum") {
-    stop("The maximum assignment method is not currently compatible with data in which `vector_id` has been specified as part of the `grna_target_data_frame`.")
-  }
-
   return(NULL)
 }
 
@@ -285,7 +282,7 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
       length(response_n_nonzero_range) != 2L || response_n_nonzero_range[1] > response_n_nonzero_range[2]) {
     stop("`response_n_nonzero_range` must an interval in the range [0,1].")
   }
-  if (all(sapply(initial_grna_assignment_list, length) == 0L)) {
+  if (all(vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1)) == 0L)) {
     stop("At least one gRNA must be assigned to at least one cell to call `run_qc()`.")
   }
   return(NULL)
@@ -323,14 +320,18 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
                                             n_ok_pairs, n_processors) {
   # 1. check that positive control pairs are available
   if (nrow(response_grna_group_pairs) == 0L) {
-    stop(paste0(ifelse(pc_analysis, "Positive control", "Discovery"), " pairs have not been supplied. Thus, the ", ifelse(pc_analysis, "power check", "discovery analysis"), " cannot be run. You can supply ", ifelse(pc_analysis, "positive control", "discovery"), " pairs in the function set_analysis_parameters()."))
+    stop(if (pc_analysis) "Positive control" else "Discovery", " pairs have not been supplied. Thus, the ",
+         if (pc_analysis) "power check" else "discovery analysis", " cannot be run. You can supply ",
+         if (pc_analysis) "positive control" else "discovery", " pairs in the function set_analysis_parameters().")
   }
 
   # 2. check that negative control gRNAs are present (if the control group is the nt cells)
   if (!control_group_complement) {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
     if (!nt_present) {
-      stop(paste0("At least one non-targeting gRNA must be present to run a ", ifelse(pc_analysis, "power check", "discovery analysis"), " when the control group is the NT set."))
+      stop("At least one non-targeting gRNA must be present to run a ",
+            if (pc_analysis) "power check" else "discovery analysis",
+            " when the control group is the NT set.")
     }
   }
 

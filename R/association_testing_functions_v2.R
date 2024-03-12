@@ -10,7 +10,7 @@ get_idx_vector_factory <- function(calibration_check, indiv_nt_grna_idxs, grna_g
     return(f)
 }
 
-# helper function 1: calibration check complement set
+# helper function 1. calibration check complement set
 get_idx_vector_calibration_check <- function(curr_grna_group, indiv_nt_grna_idxs, low_moi) {
   undercover_nts <- strsplit(x = curr_grna_group, split = "&", fixed = TRUE)[[1]]
   trt_idxs <- indiv_nt_grna_idxs[undercover_nts] |> unlist() |> stats::setNames(NULL)
@@ -26,7 +26,7 @@ get_idx_vector_discovery_analysis <- function(curr_grna_group, grna_group_idxs) 
 }
 
 
-# workhorse function 1: permutations, glm factored out
+# workhorse function 1. permutations, glm factored out
 perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_parametric_curve, output_amount, grna_groups,
                                        expression_vector, pieces_precomp, get_idx_f, side_code) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))

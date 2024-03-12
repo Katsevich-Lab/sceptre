@@ -4,10 +4,12 @@
 \alias{get_grna_assignments}
 \title{Get gRNA assignments}
 \usage{
-get_grna_assignments(sceptre_object)
+get_grna_assignments(sceptre_object, apply_cellwise_qc = FALSE)
 }
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_grnas()} called on it}
+
+\item{apply_cellwise_qc}{a logical value (i.e., \code{TRUE} or \code{FALSE}) indicating whether to return the gRNA-to-cell assignment matrix after cellwise QC has been applied (default \code{FALSE})}
 }
 \value{
 a sparse logical matrix containing the gRNA-to-cell assignments
@@ -17,7 +19,6 @@ Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is
 }
 \details{
 \itemize{
-\item The assignments correspond to the original gRNA expression matrix, i.e. the expression matrix that has not yet had cellwise QC performed on it.
 \item When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 }
 }
