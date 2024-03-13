@@ -49,6 +49,7 @@ an updated \code{sceptre_object} in which the analysis parameters have been set
 \code{set_analysis_parameters()} sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
 }
 \examples{
+library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

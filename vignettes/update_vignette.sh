@@ -14,7 +14,7 @@ sed -i -e '/## Further reading/,$d' sceptre.Rmd
 echo "## Further reading
 We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/).
 \`\`\`{r}
-sessioninfo::session_info()
+library(sessioninfo); session_info()
 \`\`\`" >> sceptre.Rmd
 sed -i '' '1i\
 --- \

@@ -36,6 +36,7 @@ an updated \code{sceptre_object} in which QC has been carried out
 \code{run_qc()} runs cellwise and pairwise QC on the data. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
 }
 \examples{
+library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
