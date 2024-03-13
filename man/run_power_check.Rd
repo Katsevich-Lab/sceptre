@@ -33,7 +33,7 @@ an updated \code{sceptre_object} in which the power check has been carried out
 \code{run_power_check()} runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
 }
 \examples{
-
+library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

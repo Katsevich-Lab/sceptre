@@ -40,6 +40,7 @@ Depends:
     R (>= 4.1)
 Suggests:
     ondisc,
+    sessioninfo,
     sceptredata,
     rmarkdown,
     knitr,
