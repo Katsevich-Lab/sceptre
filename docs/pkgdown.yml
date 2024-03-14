@@ -3,7 +3,7 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   sceptre: sceptre.html
-last_built: 2024-03-11T17:52Z
+last_built: 2024-03-14T16:13Z
 urls:
   reference: https://katsevich-lab.github.io/sceptre/reference
   article: https://katsevich-lab.github.io/sceptre/articles

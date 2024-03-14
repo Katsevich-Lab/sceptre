@@ -130,8 +130,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' # set analysis parameters, assign grnas
 #' sceptre_object <- sceptre_object |>
 #'  set_analysis_parameters() |>
-#'  assign_grnas(method = "thresholding")
-#' plot(sceptre_object)
+#'  assign_grnas(method = "thresholding") |>
+#'  plot()
 setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
   args <- list(...)
   args[["sceptre_object"]] <- x

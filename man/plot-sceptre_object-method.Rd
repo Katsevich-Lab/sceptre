@@ -38,6 +38,6 @@ sceptre_object <- import_data(
 # set analysis parameters, assign grnas
 sceptre_object <- sceptre_object |>
  set_analysis_parameters() |>
- assign_grnas(method = "thresholding")
-plot(sceptre_object)
+ assign_grnas(method = "thresholding") |>
+ plot()
 }

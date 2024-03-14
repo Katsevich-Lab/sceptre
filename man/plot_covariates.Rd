@@ -33,5 +33,15 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms. If \code{run_qc()} has been called on the \code{sceptre_object}, then the QC thresholds plotted on the histograms are those contained within the \code{sceptre_object}.
 }
 \examples{
-# A full example can be found at ?sceptre
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+import_data(
+ response_matrix = highmoi_example_data$response_matrix,
+ grna_matrix = highmoi_example_data$grna_matrix,
+ grna_target_data_frame = grna_target_data_frame_highmoi,
+ moi = "high",
+ extra_covariates = highmoi_example_data$extra_covariates,
+ response_names = highmoi_example_data$gene_names
+) |> plot_covariates(p_mito_threshold = 0.07)
 }
