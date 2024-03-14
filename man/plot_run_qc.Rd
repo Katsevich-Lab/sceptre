@@ -30,8 +30,24 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 \code{plot_run_qc()} creates a visualization of the outcome of the QC step. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_qc}{Section 4 of the introductory chapter in the manual} for guidance on interpreting this visual.
 }
 \examples{
-# A full example can be found at ?sceptre;
-# `plot_run_qc()` is dispatched when
-# `plot()` is called on the `sceptre_object`
-# in step 4 (the run qc step).
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+ response_matrix = highmoi_example_data$response_matrix,
+ grna_matrix = highmoi_example_data$grna_matrix,
+ grna_target_data_frame = grna_target_data_frame_highmoi,
+ moi = "high",
+ extra_covariates = highmoi_example_data$extra_covariates,
+ response_names = highmoi_example_data$gene_names
+)
+discovery_pairs <- construct_cis_pairs(sceptre_object)
+sceptre_object |>
+set_analysis_parameters(
+  discovery_pairs = discovery_pairs,
+  side = "left") |>
+ assign_grnas(method = "thresholding") |>
+ run_qc() |>
+ plot_run_qc()
 }

@@ -25,7 +25,17 @@ get_my_theme <- function(element_text_size = 11) {
 #' @return a single \code{ggplot2} plot
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' ) |> plot_grna_count_distributions()
 plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
   grna_matrix <- get_grna_matrix(sceptre_object)
   # rounding just in case the user provides a non-integer one
@@ -133,10 +143,20 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre;
-#' # `plot_assign_grnas()` is dispatched when
-#' # `plot()` is called on the `sceptre_object`
-#' # in step 3 (the gRNA assignment step).
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#'  ) |>
+#'  set_analysis_parameters() |>
+#'  assign_grnas(method = "thresholding") |>
+#'  plot_assign_grnas()
 plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, point_size = 0.9, transparency = 0.8, return_indiv_plots = FALSE) {
   n_points_to_plot_per_umi <- 1000
   n_grnas_to_plot_panel_b <- 1000
@@ -250,10 +270,32 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #' @export
 #'
 #' @examples
-#' # A full example can be found at ?sceptre;
-#' # `plot_run_calibration_check()` is dispatched when
-#' # `plot()` is called on the `sceptre_object`
-#' # in step 5 (the run calibration check step).
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' sceptre_object |>
+#' set_analysis_parameters(
+#'   side = "left",
+#'   resampling_mechanism = "permutations"
+#' ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_calibration_check(
+#'     parallel = TRUE,
+#'     n_processors = 2,
+#'     n_calibration_pairs = 500,
+#'     calibration_group_size = 2,
+#'  ) |>
+#'  plot_run_calibration_check()
 plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
   if (!sceptre_object@functs_called["run_calibration_check"]) {
     stop("This `sceptre_object` has not yet had `run_calibration_check` called on it.")
@@ -398,10 +440,39 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 #'
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre;
-#' # `plot_run_discovery_analysis()` is dispatched when
-#' # `plot()` is called on the `sceptre_object`
-#' # in step 7 (the run discovery analysis step).
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                       positive_control_pairs = positive_control_pairs,
+#'                                       distance_threshold = 5e6)
+#' sceptre_object |>
+#' set_analysis_parameters(
+#'    side = "left",
+#'    discovery_pairs = discovery_pairs,
+#'    resampling_mechanism = "permutations",
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_calibration_check(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'  ) |>
+#'  run_discovery_analysis(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'  ) |>
+#'  plot_run_discovery_analysis()
 plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5), point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
   if (!sceptre_object@functs_called["run_discovery_analysis"]) {
     stop("This `sceptre_object` has not yet had `run_discovery_analysis` called on it.")
@@ -477,7 +548,17 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' ) |> plot_covariates(p_mito_threshold = 0.07)
 plot_covariates <- function(sceptre_object,
                             response_n_umis_range = c(0.01, 0.99),
                             response_n_nonzero_range = c(0.01, 0.99),
@@ -532,10 +613,26 @@ plot_covariates <- function(sceptre_object,
 #'
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre;
-#' # `plot_run_qc()` is dispatched when
-#' # `plot()` is called on the `sceptre_object`
-#' # in step 4 (the run qc step).
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' discovery_pairs <- construct_cis_pairs(sceptre_object)
+#' sceptre_object |>
+#' set_analysis_parameters(
+#'   discovery_pairs = discovery_pairs,
+#'   side = "left") |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  plot_run_qc()
 plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
   if (!sceptre_object@functs_called["run_qc"]) {
     stop("This `sceptre_object` has not yet had `run_qc` called on it.")
@@ -623,10 +720,35 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
 #' @return a single \code{ggplot2} plot
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre;
-#' # `plot_run_power_check()` is dispatched when
-#' # `plot()` is called on the `sceptre_object`
-#' # in step 6 (the run power check step).
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' sceptre_object |>
+#' set_analysis_parameters(
+#'    side = "left",
+#'    positive_control_pairs = positive_control_pairs,
+#'    resampling_mechanism = "permutations",
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_calibration_check(
+#'     parallel = TRUE,
+#'     n_processors = 2,
+#'     n_calibration_pairs = 500,
+#'    calibration_group_size = 2
+#'  ) |>
+#'  run_power_check() |>
+#'  plot_run_power_check()
 plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
   if (!sceptre_object@functs_called["run_power_check"]) {
     stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
@@ -690,6 +812,36 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 #'
 #' @return a violin plot
 #' @export
+#' @examples
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' discovery_pairs <- construct_cis_pairs(sceptre_object)
+#' sceptre_object |>
+#' set_analysis_parameters(
+#'    side = "left",
+#'    discovery_pairs = discovery_pairs,
+#'    resampling_mechanism = "permutations",
+#'  ) |>
+#'  assign_grnas(method = "thresholding") |>
+#'  run_qc() |>
+#'  run_discovery_analysis(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'  ) |>
+#' plot_response_grna_target_pair(
+#'   response_id = "ENSG00000136938",
+#'   grna_target = "candidate_enh_20"
+#' )
 plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_target) {
   # check that grnas have been assigned and qc has been called
   functs_called <- sceptre_object@functs_called
