@@ -1,16 +1,45 @@
 ##########################
 # READ AND WRITE FUNCTIONS
 ##########################
-#' Read ondisc-backed sceptre object
+#' Write/read an `ondisc`-backed `sceptre_object`
 #'
-#' Reads and initializes a `sceptre_object` from backing .odm files.
+#' - `write_ondisc_backed_sceptre_object()` writes an `ondisc`-backed `sceptre_object` to disk, creating a file `sceptre_object.rds` in the specified directory
+#' - `read_ondisc_backed_sceptre_object()` reads and initializes a `sceptre_object` from a `sceptre_object.rds` file, `response.odm` file, and `grna.odm` file on disk
 #'
+#' @param sceptre_object a `sceptre_object`
+#' @param directory_to_write the directory in which to write the `sceptre_object.rds` file
 #' @param sceptre_object_fp file path to a `sceptre_object.rds` file
 #' @param response_odm_file_fp file path to a backing `.odm` file for the response modality
 #' @param grna_odm_file_fp file path to a backing `.odm` file for the gRNA modality
 #'
-#' @return an ondisc-backed `sceptre_object`
+#' @return `write_ondisc_backed_sceptre_object()` returns NULL, and `read_ondisc_backed_sceptre_object()` returns an `ondisc`-backed `sceptre_object`
 #' @export
+#' @examples
+#' library(sceptredata)
+#' data(lowmoi_example_data)
+#' # 1. create ondisc-backed sceptre_object
+#' sceptre_object <- import_data(
+#'  response_matrix = lowmoi_example_data$response_matrix,
+#'  grna_matrix = lowmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+#'  extra_covariates = lowmoi_example_data$extra_covariates,
+#'  moi = "low",
+#'  use_ondisc = TRUE,
+#'  directory_to_write = tempdir())
+#'
+#' # 2. write
+#' write_ondisc_backed_sceptre_object(
+#'   sceptre_object = sceptre_object,
+#'   directory_to_write = tempdir()
+#' )
+#'
+#' # 3. read
+#' rm(sceptre_object)
+#' sceptre_object <- read_ondisc_backed_sceptre_object(
+#'   sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
+#'   response_odm_file_fp = paste0(tempdir(), "/response.odm"),
+#'   grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
+#' )
 read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
   # read in objects
   sceptre_object <- readRDS(sceptre_object_fp)
@@ -30,14 +59,6 @@ read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_fi
 }
 
 
-#' Write ondisc-backed sceptre object
-#'
-#' Write an ondisc-backed sceptre object to disk.
-#'
-#' @param sceptre_object a `sceptre_object`
-#' @param directory_to_write directory in which to write `sceptre_object.rds`
-#'
-#' @return NULL
 #' @rdname read_ondisc_backed_sceptre_object
 #' @export
 write_ondisc_backed_sceptre_object <- function(sceptre_object, directory_to_write) {

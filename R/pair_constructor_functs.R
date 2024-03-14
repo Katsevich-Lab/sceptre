@@ -10,7 +10,22 @@
 #' @return a data frame with columns `grna_target` and `response_id` containing the *cis* discovery set
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'                                        positive_control_pairs = positive_control_pairs,
+#'                                        distance_threshold = 5e6)
 construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
                                 response_position_data_frame = gene_position_data_frame_grch38) {
   if (!all(colnames(response_position_data_frame) %in% c("response_id", "chr", "position"))) {
@@ -68,7 +83,36 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #' @return a data frame with columns `grna_target` and `response_id` containing the *trans* discovery set
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' # 1. low-moi, gene-targeting screen
+#' data("lowmoi_example_data")
+#' sceptre_object <- import_data(
+#'   response_matrix = lowmoi_example_data$response_matrix,
+#'   grna_matrix = lowmoi_example_data$grna_matrix,
+#'   extra_covariates = lowmoi_example_data$extra_covariates,
+#'   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+#'   moi = "low")
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
+#'                                          positive_control_pairs = positive_control_pairs,
+#'                                          pairs_to_exclude = "pc_pairs")
+#'
+#' # 2. high-moi, enhancer-targeting screen
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
+#'                                         positive_control_pairs = positive_control_pairs,
+#'                                         pairs_to_exclude = "pairs_containing_pc_targets")
 construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), pairs_to_exclude = "none") {
   if (!(pairs_to_exclude %in% c("none", "pc_pairs", "pairs_containing_pc_targets"))) {
     stop("`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'.")
@@ -100,7 +144,19 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #' @return a data frame with columns `grna_target` and `response_id` containing the positive control pairs
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 construct_positive_control_pairs <- function(sceptre_object) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   response_ids <- rownames(get_response_matrix(sceptre_object))

@@ -22,3 +22,31 @@ Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is
 \item When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 }
 }
+\examples{
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+ response_matrix = highmoi_example_data$response_matrix,
+ grna_matrix = highmoi_example_data$grna_matrix,
+ grna_target_data_frame = grna_target_data_frame_highmoi,
+ moi = "high",
+ extra_covariates = highmoi_example_data$extra_covariates,
+ response_names = highmoi_example_data$gene_names
+)
+discovery_pairs <- construct_cis_pairs(sceptre_object)
+sceptre_object <- sceptre_object |>
+set_analysis_parameters(
+  discovery_pairs = discovery_pairs,
+  side = "left") |>
+assign_grnas(
+  method = "mixture", parallel = TRUE, n_processors = 2
+) |> run_qc()
+
+grna_assignment_matrix <- get_grna_assignments(sceptre_object)
+grna_assignment_matrix_with_qc <- get_grna_assignments(
+  sceptre_object = sceptre_object,
+  apply_cellwise_qc = TRUE
+ )
+}
