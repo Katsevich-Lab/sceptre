@@ -23,5 +23,21 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 \code{plot()} is "generic" in the sense that it dispatches a specific plotting function based on the pipeline function that was most recently called on the \code{sceptre_object}. For example, if \code{run_assign_grnas()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_assign_grnas()}. Similarly, if \code{run_power_check()} is the most recently called pipeline function, then \code{plot()} dispatches \code{plot_run_power_check()}, and so on. Users can pass arguments to the function dispatched by \code{plot()} as named arguments to \code{plot()}.
 }
 \examples{
-# A full example can be found at ?sceptre
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+ response_matrix = highmoi_example_data$response_matrix,
+ grna_matrix = highmoi_example_data$grna_matrix,
+ grna_target_data_frame = grna_target_data_frame_highmoi,
+ moi = "high",
+ extra_covariates = highmoi_example_data$extra_covariates,
+ response_names = highmoi_example_data$gene_names
+)
+# set analysis parameters, assign grnas
+sceptre_object <- sceptre_object |>
+ set_analysis_parameters() |>
+ assign_grnas(method = "thresholding")
+plot(sceptre_object)
 }

@@ -115,7 +115,23 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' @export
 #' @examples
-#' # A full example can be found at ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'  response_matrix = highmoi_example_data$response_matrix,
+#'  grna_matrix = highmoi_example_data$grna_matrix,
+#'  grna_target_data_frame = grna_target_data_frame_highmoi,
+#'  moi = "high",
+#'  extra_covariates = highmoi_example_data$extra_covariates,
+#'  response_names = highmoi_example_data$gene_names
+#' )
+#' # set analysis parameters, assign grnas
+#' sceptre_object <- sceptre_object |>
+#'  set_analysis_parameters() |>
+#'  assign_grnas(method = "thresholding")
+#' plot(sceptre_object)
 setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
   args <- list(...)
   args[["sceptre_object"]] <- x
