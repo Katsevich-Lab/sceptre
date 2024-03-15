@@ -35,8 +35,10 @@ an initialized \code{sceptre_object}
 \examples{
 library(sceptredata)
 data(grna_target_data_frame_highmoi)
-directories <- paste0(system.file("extdata", package = "sceptredata"),
-                      "/highmoi_example/gem_group_", c(1,2))
+directories <- paste0(
+  system.file("extdata", package = "sceptredata"),
+  "/highmoi_example/gem_group_", c(1, 2)
+)
 
 # 1. create a standard sceptre_object from cellranger output
 sceptre_object <- import_data_from_cellranger(

@@ -35,19 +35,20 @@ data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
 sceptre_object <- import_data(
- response_matrix = highmoi_example_data$response_matrix,
- grna_matrix = highmoi_example_data$grna_matrix,
- grna_target_data_frame = grna_target_data_frame_highmoi,
- moi = "high",
- extra_covariates = highmoi_example_data$extra_covariates,
- response_names = highmoi_example_data$gene_names
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
 )
 discovery_pairs <- construct_cis_pairs(sceptre_object)
 sceptre_object |>
-set_analysis_parameters(
-  discovery_pairs = discovery_pairs,
-  side = "left") |>
- assign_grnas(method = "thresholding") |>
- run_qc() |>
- plot_run_qc()
+  set_analysis_parameters(
+    discovery_pairs = discovery_pairs,
+    side = "left"
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  plot_run_qc()
 }

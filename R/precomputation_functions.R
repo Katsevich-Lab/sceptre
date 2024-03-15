@@ -11,8 +11,10 @@
 #' @noRd
 perform_response_precomputation <- function(expressions, covariate_matrix) {
   pois_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
-  response_theta_list <- estimate_theta(y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual,
-                                        limit = 50, eps = (.Machine$double.eps)^(1/4))
+  response_theta_list <- estimate_theta(
+    y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual,
+    limit = 50, eps = (.Machine$double.eps)^(1 / 4)
+  )
   # theta_fit_str <- c("mle", "mm", "pilot")[response_theta_list[[2]]]
   theta <- max(min(response_theta_list[[1]], 1000), 0.01)
   result <- list(fitted_coefs = pois_fit$coefficients, theta = theta)
@@ -36,7 +38,7 @@ perform_grna_precomputation <- function(trt_idxs, covariate_matrix, return_fitte
 compute_D_matrix <- function(Zt_wZ, wZ) {
   P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
   U <- P_decomp$vectors
-  Lambda_minus_half <- 1/sqrt(P_decomp$values)
+  Lambda_minus_half <- 1 / sqrt(P_decomp$values)
   D <- (Lambda_minus_half * t(U)) %*% t(wZ)
   return(D)
 }
@@ -45,16 +47,16 @@ compute_D_matrix <- function(Zt_wZ, wZ) {
 compute_precomputation_pieces <- function(expression_vector, covariate_matrix, fitted_coefs, theta, full_test_stat) {
   mu <- exp(as.numeric(covariate_matrix %*% fitted_coefs))
   if (full_test_stat) {
-    denom <- 1 + mu/theta
-    w <- mu/denom
-    a <- (expression_vector - mu)/denom
+    denom <- 1 + mu / theta
+    w <- mu / denom
+    a <- (expression_vector - mu) / denom
     wZ <- w * covariate_matrix
     Zt_wZ <- t(covariate_matrix) %*% wZ
     D <- compute_D_matrix(Zt_wZ, wZ)
     out <- list(mu = mu, w = w, a = a, D = D)
   } else {
-    a <- expression_vector - (expression_vector * mu + theta * mu)/(theta + mu)
-    b <- (theta * mu)/(theta + mu)
+    a <- expression_vector - (expression_vector * mu + theta * mu) / (theta + mu)
+    b <- (theta * mu) / (theta + mu)
     out <- list(mu = mu, a = a, b = b)
   }
   return(out)

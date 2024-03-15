@@ -3,9 +3,11 @@
 test_that("perform_status_check_and_update", {
   # `import_data` initializes @functs_called with the "import_data" value
   # at TRUE so we'll never see an all-FALSE @functs_called
-  initial_functs_called <- c(import_data = TRUE, set_analysis_parameters = FALSE,
+  initial_functs_called <- c(
+    import_data = TRUE, set_analysis_parameters = FALSE,
     assign_grnas = FALSE, run_qc = FALSE, run_calibration_check = FALSE,
-    run_power_check = FALSE, run_discovery_analysis = FALSE)
+    run_power_check = FALSE, run_discovery_analysis = FALSE
+  )
 
   blank_object <- new("sceptre_object")
   blank_object@functs_called <- initial_functs_called
@@ -32,7 +34,6 @@ test_that("perform_status_check_and_update", {
   ## confirming if we rerun a lower level one after having run a higher level one
   results <- results |> perform_status_check_and_update("assign_grnas")
   expect_equal(results@last_function_called, "assign_grnas")
-  expect_false(results@functs_called["run_qc"])  # this was TRUE before
-  expect_true(results@functs_called["set_analysis_parameters"])  # this should still be TRUE
+  expect_false(results@functs_called["run_qc"]) # this was TRUE before
+  expect_true(results@functs_called["set_analysis_parameters"]) # this should still be TRUE
 })
-

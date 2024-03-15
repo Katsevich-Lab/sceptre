@@ -23,32 +23,36 @@ data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
 sceptre_object <- import_data(
- response_matrix = highmoi_example_data$response_matrix,
- grna_matrix = highmoi_example_data$grna_matrix,
- grna_target_data_frame = grna_target_data_frame_highmoi,
- moi = "high",
- extra_covariates = highmoi_example_data$extra_covariates,
- response_names = highmoi_example_data$gene_names
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
 )
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(sceptre_object,
-                                      positive_control_pairs = positive_control_pairs,
-                                      distance_threshold = 5e6)
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
 sceptre_object |>
-set_analysis_parameters(
-   side = "left",
-   resampling_mechanism = "permutations",
-   discovery_pairs = discovery_pairs,
-   positive_control_pairs = positive_control_pairs) |>
-assign_grnas(method = "thresholding") |>
-run_qc() |>
-run_calibration_check(
+  set_analysis_parameters(
+    side = "left",
+    resampling_mechanism = "permutations",
+    discovery_pairs = discovery_pairs,
+    positive_control_pairs = positive_control_pairs
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
     parallel = TRUE,
-    n_processors = 2) |>
-run_power_check() |>
-run_discovery_analysis(
+    n_processors = 2
+  ) |>
+  run_power_check() |>
+  run_discovery_analysis(
     parallel = TRUE,
-    n_processors = 2) |>
-write_outputs_to_directory(paste0(tempdir(), "/sceptre_outputs"))
+    n_processors = 2
+  ) |>
+  write_outputs_to_directory(paste0(tempdir(), "/sceptre_outputs"))
 # files written to "sceptre_outputs" in tempdir()
 }

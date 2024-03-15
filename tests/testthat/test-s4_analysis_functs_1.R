@@ -4,9 +4,10 @@ test_that("import_data", {
   set.seed(12321)
   num_cells <- 29
   num_responses <- 17
-  grna_target_data_frame <- make_mock_grna_target_data(c(1,3,1), 1, 1, 6)
+  grna_target_data_frame <- make_mock_grna_target_data(c(1, 3, 1), 1, 1, 6)
   grna_matrix <- matrix(rpois(nrow(grna_target_data_frame) * num_cells, 1), ncol = num_cells) |>
-    `rownames<-`(grna_target_data_frame$grna_id) |> set_matrix_accessibility()
+    `rownames<-`(grna_target_data_frame$grna_id) |>
+    set_matrix_accessibility()
   response_matrix <- matrix(rpois(num_responses * num_cells, 1), ncol = num_cells) |>
     as("TsparseMatrix")
   extra_covariates <- data.frame(x = rep("aaa", num_cells))
@@ -28,21 +29,23 @@ test_that("import_data", {
 
   # most of the slots are so simple that only cursory tests are done, mostly to confirm
   # that future changes do not change the API
-  all_slots <- c('response_matrix', 'grna_matrix', 'covariate_data_frame', 'covariate_matrix',
-                 'grna_target_data_frame', 'low_moi', 'covariate_names', 'discovery_pairs',
-                 'positive_control_pairs', 'formula_object', 'side_code', 'fit_parametric_curve',
-                 'control_group_complement', 'run_permutations', 'n_nonzero_trt_thresh',
-                 'n_nonzero_cntrl_thresh', 'B1', 'B2', 'B3', 'grna_integration_strategy',
-                 'grna_assignment_method', 'grna_assignment_hyperparameters', 'multiple_testing_alpha',
-                 'multiple_testing_method', 'cell_removal_metrics', 'cellwise_qc_thresholds',
-                 'mitochondrial_gene', 'M_matrix', 'n_nonzero_tot_vector', 'discovery_pairs_with_info',
-                 'positive_control_pairs_with_info', 'negative_control_pairs', 'initial_grna_assignment_list',
-                 'grna_assignments_raw', 'grna_assignments', 'grnas_per_cell', 'cells_w_multiple_grnas',
-                 'cells_in_use', 'n_discovery_pairs', 'n_ok_discovery_pairs', 'n_positive_control_pairs',
-                 'n_ok_positive_control_pairs', 'calibration_group_size', 'n_calibration_pairs',
-                 'import_grna_assignment_info', 'mean_cells_per_grna', 'response_precomputations',
-                 'last_function_called', 'functs_called', 'calibration_result', 'power_result',
-                 'discovery_result', 'nuclear', 'nf_pipeline', 'integer_id', 'elements_to_analyze')
+  all_slots <- c(
+    "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
+    "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
+    "positive_control_pairs", "formula_object", "side_code", "fit_parametric_curve",
+    "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
+    "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
+    "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
+    "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
+    "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector", "discovery_pairs_with_info",
+    "positive_control_pairs_with_info", "negative_control_pairs", "initial_grna_assignment_list",
+    "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_multiple_grnas",
+    "cells_in_use", "n_discovery_pairs", "n_ok_discovery_pairs", "n_positive_control_pairs",
+    "n_ok_positive_control_pairs", "calibration_group_size", "n_calibration_pairs",
+    "import_grna_assignment_info", "mean_cells_per_grna", "response_precomputations",
+    "last_function_called", "functs_called", "calibration_result", "power_result",
+    "discovery_result", "nuclear", "nf_pipeline", "integer_id", "elements_to_analyze"
+  )
   expect_equal(slotNames(sceptre_object_low_no_ec_with_response_names), all_slots)
   expect_equal(slotNames(sceptre_object_high_with_ec), all_slots)
 
@@ -53,8 +56,10 @@ test_that("import_data", {
   expect_true(sceptre_object_low_no_ec_with_response_names@low_moi)
   expect_false(sceptre_object_high_with_ec@low_moi)
 
-  expect_equal(sceptre_object_low_no_ec_with_response_names@covariate_data_frame |> rownames(),
-               as.character(seq_len(num_cells)))
+  expect_equal(
+    sceptre_object_low_no_ec_with_response_names@covariate_data_frame |> rownames(),
+    as.character(seq_len(num_cells))
+  )
 
   expect_equal(
     names(sceptre_object_low_no_ec_with_response_names@covariate_data_frame),
@@ -71,9 +76,11 @@ test_that("import_data", {
 
   ##### slots set in section 5 of `import_data`
   expect_equal(sceptre_object_high_with_ec@last_function_called, "import_data")
-  expect_equal(names(sceptre_object_high_with_ec@functs_called), c("import_data", "set_analysis_parameters",
-                                                                   "assign_grnas", "run_qc", "run_calibration_check",
-                                                                   "run_power_check", "run_discovery_analysis"))
+  expect_equal(names(sceptre_object_high_with_ec@functs_called), c(
+    "import_data", "set_analysis_parameters",
+    "assign_grnas", "run_qc", "run_calibration_check",
+    "run_power_check", "run_discovery_analysis"
+  ))
   expect_equal(sceptre_object_high_with_ec@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(1, 6)))
 })
 
@@ -151,7 +158,7 @@ test_that("set_analysis_parameters", {
     response_matrix = response_matrix,
     grna_matrix = grna_matrix,
     grna_target_data_frame = grna_target_data_frame,
-    extra_covariates = data.frame(aaa = rnorm(num_cells)),  # needed for the formula
+    extra_covariates = data.frame(aaa = rnorm(num_cells)), # needed for the formula
     moi = "low"
   ) |>
     set_analysis_parameters(
@@ -165,22 +172,23 @@ test_that("set_analysis_parameters", {
 
   ## 2. are all expected slots there, and only the expected slots?
 
-  all_slots <- c('response_matrix', 'grna_matrix', 'covariate_data_frame', 'covariate_matrix',
-                 'grna_target_data_frame', 'low_moi', 'covariate_names', 'discovery_pairs',
-                 'positive_control_pairs', 'formula_object', 'side_code', 'fit_parametric_curve',
-                 'control_group_complement', 'run_permutations', 'n_nonzero_trt_thresh',
-                 'n_nonzero_cntrl_thresh', 'B1', 'B2', 'B3', 'grna_integration_strategy',
-                 'grna_assignment_method', 'grna_assignment_hyperparameters', 'multiple_testing_alpha',
-                 'multiple_testing_method', 'cell_removal_metrics', 'cellwise_qc_thresholds',
-                 'mitochondrial_gene', 'M_matrix', 'n_nonzero_tot_vector', 'discovery_pairs_with_info',
-                 'positive_control_pairs_with_info', 'negative_control_pairs', 'initial_grna_assignment_list',
-                 'grna_assignments_raw', 'grna_assignments', 'grnas_per_cell', 'cells_w_multiple_grnas',
-                 'cells_in_use', 'n_discovery_pairs', 'n_ok_discovery_pairs', 'n_positive_control_pairs',
-                 'n_ok_positive_control_pairs', 'calibration_group_size', 'n_calibration_pairs',
-                 'import_grna_assignment_info', 'mean_cells_per_grna', 'response_precomputations',
-                 'last_function_called', 'functs_called', 'calibration_result', 'power_result',
-                 'discovery_result', 'nuclear', 'nf_pipeline', 'integer_id', 'elements_to_analyze')
+  all_slots <- c(
+    "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
+    "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
+    "positive_control_pairs", "formula_object", "side_code", "fit_parametric_curve",
+    "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
+    "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
+    "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
+    "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
+    "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector", "discovery_pairs_with_info",
+    "positive_control_pairs_with_info", "negative_control_pairs", "initial_grna_assignment_list",
+    "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_multiple_grnas",
+    "cells_in_use", "n_discovery_pairs", "n_ok_discovery_pairs", "n_positive_control_pairs",
+    "n_ok_positive_control_pairs", "calibration_group_size", "n_calibration_pairs",
+    "import_grna_assignment_info", "mean_cells_per_grna", "response_precomputations",
+    "last_function_called", "functs_called", "calibration_result", "power_result",
+    "discovery_result", "nuclear", "nf_pipeline", "integer_id", "elements_to_analyze"
+  )
   expect_equal(slotNames(sceptre_object_post_all_defaults_high_moi), all_slots)
   expect_equal(slotNames(sceptre_object_post_all_defaults_low_moi), all_slots)
 })
-

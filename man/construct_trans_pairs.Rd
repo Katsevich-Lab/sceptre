@@ -35,26 +35,31 @@ sceptre_object <- import_data(
   grna_matrix = lowmoi_example_data$grna_matrix,
   extra_covariates = lowmoi_example_data$extra_covariates,
   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-  moi = "low")
+  moi = "low"
+)
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-                                         positive_control_pairs = positive_control_pairs,
-                                         pairs_to_exclude = "pc_pairs")
+discovery_pairs <- construct_trans_pairs(
+  sceptre_object = sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  pairs_to_exclude = "pc_pairs"
+)
 
 # 2. high-moi, enhancer-targeting screen
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
 sceptre_object <- import_data(
- response_matrix = highmoi_example_data$response_matrix,
- grna_matrix = highmoi_example_data$grna_matrix,
- grna_target_data_frame = grna_target_data_frame_highmoi,
- moi = "high",
- extra_covariates = highmoi_example_data$extra_covariates,
- response_names = highmoi_example_data$gene_names
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
 )
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-                                        positive_control_pairs = positive_control_pairs,
-                                        pairs_to_exclude = "pairs_containing_pc_targets")
+discovery_pairs <- construct_trans_pairs(
+  sceptre_object = sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  pairs_to_exclude = "pairs_containing_pc_targets"
+)
 }
