@@ -44,26 +44,26 @@ data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
 sceptre_object <- import_data(
- response_matrix = highmoi_example_data$response_matrix,
- grna_matrix = highmoi_example_data$grna_matrix,
- grna_target_data_frame = grna_target_data_frame_highmoi,
- moi = "high",
- extra_covariates = highmoi_example_data$extra_covariates,
- response_names = highmoi_example_data$gene_names
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
 )
 
 # set analysis parameters, assign grnas, run qc, run calibration check
 sceptre_object <- sceptre_object |>
-set_analysis_parameters(
+  set_analysis_parameters(
     side = "left",
     resampling_mechanism = "permutations"
- ) |>
- assign_grnas(method = "thresholding") |>
- run_qc() |>
- run_calibration_check(
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
     n_calibration_pairs = 500,
     calibration_group_size = 2,
     parallel = TRUE,
     n_processors = 2
- )
+  )
 }

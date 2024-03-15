@@ -38,13 +38,14 @@ library(sceptredata)
 data(lowmoi_example_data)
 # 1. create ondisc-backed sceptre_object
 sceptre_object <- import_data(
- response_matrix = lowmoi_example_data$response_matrix,
- grna_matrix = lowmoi_example_data$grna_matrix,
- grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
- extra_covariates = lowmoi_example_data$extra_covariates,
- moi = "low",
- use_ondisc = TRUE,
- directory_to_write = tempdir())
+  response_matrix = lowmoi_example_data$response_matrix,
+  grna_matrix = lowmoi_example_data$grna_matrix,
+  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+  extra_covariates = lowmoi_example_data$extra_covariates,
+  moi = "low",
+  use_ondisc = TRUE,
+  directory_to_write = tempdir()
+)
 
 # 2. write
 write_ondisc_backed_sceptre_object(

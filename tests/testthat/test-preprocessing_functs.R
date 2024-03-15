@@ -13,7 +13,9 @@ test_that("set_matrix_accessibility", {
   expect_false("i" %in% names(attributes(m_r)))
 
   ## testing row accessible when the input is a TsparseMatrix
-  m_r <- m |> as("TsparseMatrix") |> set_matrix_accessibility(make_row_accessible = TRUE)
+  m_r <- m |>
+    as("TsparseMatrix") |>
+    set_matrix_accessibility(make_row_accessible = TRUE)
   expect_true(is(m_r, "dgRMatrix"))
   expect_true(all(m_r == m))
   expect_false("i" %in% names(attributes(m_r)))
@@ -31,7 +33,9 @@ test_that("set_matrix_accessibility", {
   expect_false("j" %in% names(attributes(m_c)))
 
   ## testing col accessible when the input is a TsparseMatrix
-  m_c <- m |> as("TsparseMatrix") |> set_matrix_accessibility(make_row_accessible = FALSE)
+  m_c <- m |>
+    as("TsparseMatrix") |>
+    set_matrix_accessibility(make_row_accessible = FALSE)
   expect_true(is(m_c, "dgCMatrix"))
   expect_true(all(m_c == m))
   expect_false("j" %in% names(attributes(m_c)))
@@ -50,24 +54,26 @@ test_that("convert_covariate_df_to_design_matrix", {
   set.seed(187)
   n <- 12
   covariate_data_frame <- data.frame(
-    x = rnorm(n), y = 1:n, z = factor(rep(0:1, each = n/2), levels = 0:1)
+    x = rnorm(n), y = 1:n, z = factor(rep(0:1, each = n / 2), levels = 0:1)
   )
   fmla <- formula("~ x*z + log(y + 1)")
 
   ## testing errors with Inf or NA values
   FAIL_bad_values_covariate_data_frame <- covariate_data_frame
-  FAIL_bad_values_covariate_data_frame[1,1] <- Inf
+  FAIL_bad_values_covariate_data_frame[1, 1] <- Inf
 
   expect_error(
     convert_covariate_df_to_design_matrix(FAIL_bad_values_covariate_data_frame,
-                                          formula_object = fmla),
+      formula_object = fmla
+    ),
     regex = "contains entries that are -Inf, Inf, or NA"
   )
 
-  FAIL_bad_values_covariate_data_frame[1,1] <- NA
+  FAIL_bad_values_covariate_data_frame[1, 1] <- NA
   expect_error(
     convert_covariate_df_to_design_matrix(FAIL_bad_values_covariate_data_frame,
-                                          formula_object = fmla),
+      formula_object = fmla
+    ),
     regex = "Some rows of `covariate_data_frame` were lost"
   )
 
@@ -75,17 +81,19 @@ test_that("convert_covariate_df_to_design_matrix", {
   FAIL_fmla <- formula("~ log(y - 1)") # should lead to an  -Inf from log(0)
   expect_error(
     convert_covariate_df_to_design_matrix(covariate_data_frame,
-                                          formula_object = FAIL_fmla),
+      formula_object = FAIL_fmla
+    ),
     regex = "has been applied contains entries that are -Inf, Inf, or NA"
   )
 
   ## testing low rank
   FAIL_low_Rank_covariate_data_frame <- covariate_data_frame |>
-    dplyr::mutate(low_rank_col = 2*x - log(y + 1))
+    dplyr::mutate(low_rank_col = 2 * x - log(y + 1))
   # the formula doesn't use the low rank column so there should be no error currently
   expect_no_error(
     convert_covariate_df_to_design_matrix(FAIL_low_Rank_covariate_data_frame,
-                                          formula_object = fmla)
+      formula_object = fmla
+    )
   )
   expect_error(
     convert_covariate_df_to_design_matrix(
@@ -97,25 +105,25 @@ test_that("convert_covariate_df_to_design_matrix", {
 
   ## testing correctness
   results <- convert_covariate_df_to_design_matrix(covariate_data_frame,
-                                                   formula_object = fmla)
+    formula_object = fmla
+  )
   expect_equal(
     ncol(results), 5 # with intercept
   )
   expect_true(
-    all(results[,1] == 1)
+    all(results[, 1] == 1)
   )
   expect_equal(
-    results[,"x"] |> as.numeric(), covariate_data_frame$x
+    results[, "x"] |> as.numeric(), covariate_data_frame$x
   )
   expect_equal(
-    results[,"z1"] |> as.numeric(), covariate_data_frame$z |> as.character() |> as.numeric()
+    results[, "z1"] |> as.numeric(), covariate_data_frame$z |> as.character() |> as.numeric()
   )
   expect_equal(
-    results[,"log(y + 1)"] |> as.numeric(), covariate_data_frame$y |> log1p()
+    results[, "log(y + 1)"] |> as.numeric(), covariate_data_frame$y |> log1p()
   )
   expect_equal(
-    results[,"x:z1"] |> as.numeric(),
+    results[, "x:z1"] |> as.numeric(),
     (covariate_data_frame$z |> as.character() |> as.numeric()) * covariate_data_frame$x
   )
 })
-

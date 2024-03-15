@@ -15,17 +15,18 @@
 #' data(grna_target_data_frame_highmoi)
 #' # import data
 #' sceptre_object <- import_data(
-#'  response_matrix = highmoi_example_data$response_matrix,
-#'  grna_matrix = highmoi_example_data$grna_matrix,
-#'  grna_target_data_frame = grna_target_data_frame_highmoi,
-#'  moi = "high",
-#'  extra_covariates = highmoi_example_data$extra_covariates,
-#'  response_names = highmoi_example_data$gene_names
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
 #' )
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 #' discovery_pairs <- construct_cis_pairs(sceptre_object,
-#'                                        positive_control_pairs = positive_control_pairs,
-#'                                        distance_threshold = 5e6)
+#'   positive_control_pairs = positive_control_pairs,
+#'   distance_threshold = 5e6
+#' )
 construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
                                 response_position_data_frame = gene_position_data_frame_grch38) {
   if (!all(colnames(response_position_data_frame) %in% c("response_id", "chr", "position"))) {
@@ -46,17 +47,18 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
   # 3. loop over chromosomes in grna group df
   unique_chrs <- unique(grna_target_data_frame$chr)
   out_pairs <- lapply(X = unique_chrs, FUN = function(unique_chr) {
-    response_position_data_frame_curr_chr <- response_position_data_frame[response_position_data_frame$chr == unique_chr,]
+    response_position_data_frame_curr_chr <- response_position_data_frame[response_position_data_frame$chr == unique_chr, ]
     response_posits <- response_position_data_frame_curr_chr$position
     response_ids <- response_position_data_frame_curr_chr$response_id
-    grna_target_data_frame_curr_chr <- grna_target_data_frame[grna_target_data_frame$chr == unique_chr,]
+    grna_target_data_frame_curr_chr <- grna_target_data_frame[grna_target_data_frame$chr == unique_chr, ]
 
     # 4. loop over unique grna groups in grna group df curr chr
     unique_grna_targets <- unique(grna_target_data_frame_curr_chr$grna_target)
     lapply(X = unique_grna_targets, FUN = function(unique_grna_target) {
-      x <- grna_target_data_frame_curr_chr[grna_target_data_frame_curr_chr$grna_target == unique_grna_target,]
-      min_posit <- min(x$start); max_posit <- max(x$end)
-      midpoint <- as.integer(floor((min_posit + max_posit)/2))
+      x <- grna_target_data_frame_curr_chr[grna_target_data_frame_curr_chr$grna_target == unique_grna_target, ]
+      min_posit <- min(x$start)
+      max_posit <- max(x$end)
+      midpoint <- as.integer(floor((min_posit + max_posit) / 2))
       paired_responses <- response_ids[compute_genes_within_distance(midpoint, response_posits, distance_threshold)]
       if (length(paired_responses) >= 1L) {
         data.table::data.table(response_id = paired_responses, grna_target = unique_grna_target)
@@ -64,7 +66,10 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
         NULL
       }
     }) |> data.table::rbindlist()
-  }) |> data.table::rbindlist() |> as.data.frame() |> dplyr::select(grna_target, response_id)
+  }) |>
+    data.table::rbindlist() |>
+    as.data.frame() |>
+    dplyr::select(grna_target, response_id)
 
   return(out_pairs)
 }
@@ -91,28 +96,33 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #'   grna_matrix = lowmoi_example_data$grna_matrix,
 #'   extra_covariates = lowmoi_example_data$extra_covariates,
 #'   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-#'   moi = "low")
+#'   moi = "low"
+#' )
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-#'                                          positive_control_pairs = positive_control_pairs,
-#'                                          pairs_to_exclude = "pc_pairs")
+#' discovery_pairs <- construct_trans_pairs(
+#'   sceptre_object = sceptre_object,
+#'   positive_control_pairs = positive_control_pairs,
+#'   pairs_to_exclude = "pc_pairs"
+#' )
 #'
 #' # 2. high-moi, enhancer-targeting screen
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
 #' sceptre_object <- import_data(
-#'  response_matrix = highmoi_example_data$response_matrix,
-#'  grna_matrix = highmoi_example_data$grna_matrix,
-#'  grna_target_data_frame = grna_target_data_frame_highmoi,
-#'  moi = "high",
-#'  extra_covariates = highmoi_example_data$extra_covariates,
-#'  response_names = highmoi_example_data$gene_names
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
 #' )
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-#' discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-#'                                         positive_control_pairs = positive_control_pairs,
-#'                                         pairs_to_exclude = "pairs_containing_pc_targets")
+#' discovery_pairs <- construct_trans_pairs(
+#'   sceptre_object = sceptre_object,
+#'   positive_control_pairs = positive_control_pairs,
+#'   pairs_to_exclude = "pairs_containing_pc_targets"
+#' )
 construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), pairs_to_exclude = "none") {
   if (!(pairs_to_exclude %in% c("none", "pc_pairs", "pairs_containing_pc_targets"))) {
     stop("`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'.")
@@ -122,7 +132,8 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   grna_targets <- grna_target_data_frame |>
     dplyr::filter(!(grna_target %in% grna_targets_to_exclude)) |>
-    dplyr::pull(grna_target) |> unique()
+    dplyr::pull(grna_target) |>
+    unique()
   out_pairs <- expand.grid(grna_target = grna_targets, response_id = response_ids, stringsAsFactors = FALSE)
   data.table::setDT(out_pairs)
   if (pairs_to_exclude == "pc_pairs") {
@@ -149,19 +160,20 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #' data(grna_target_data_frame_highmoi)
 #' # import data
 #' sceptre_object <- import_data(
-#'  response_matrix = highmoi_example_data$response_matrix,
-#'  grna_matrix = highmoi_example_data$grna_matrix,
-#'  grna_target_data_frame = grna_target_data_frame_highmoi,
-#'  moi = "high",
-#'  extra_covariates = highmoi_example_data$extra_covariates,
-#'  response_names = highmoi_example_data$gene_names
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
 #' )
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 construct_positive_control_pairs <- function(sceptre_object) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   response_ids <- rownames(get_response_matrix(sceptre_object))
   pc_grna_targets <- grna_target_data_frame$grna_target[
-    grna_target_data_frame$grna_target %in% response_ids] |> unique()
+    grna_target_data_frame$grna_target %in% response_ids
+  ] |> unique()
   df <- data.frame(grna_target = pc_grna_targets, response_id = pc_grna_targets)
   return(df)
 }

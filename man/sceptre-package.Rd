@@ -16,23 +16,27 @@ library(sceptredata)
 # 1. create the sceptre object
 data("lowmoi_example_data")
 sceptre_object <- import_data(
-response_matrix = lowmoi_example_data$response_matrix,
-grna_matrix = lowmoi_example_data$grna_matrix,
-extra_covariates = lowmoi_example_data$extra_covariates,
-grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-moi = "low")
+  response_matrix = lowmoi_example_data$response_matrix,
+  grna_matrix = lowmoi_example_data$grna_matrix,
+  extra_covariates = lowmoi_example_data$extra_covariates,
+  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+  moi = "low"
+)
 print(sceptre_object)
 
 # 2. set the analysis parameters
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-discovery_pairs <- construct_trans_pairs(sceptre_object = sceptre_object,
-positive_control_pairs = positive_control_pairs,
-pairs_to_exclude = "pc_pairs")
+discovery_pairs <- construct_trans_pairs(
+  sceptre_object = sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  pairs_to_exclude = "pc_pairs"
+)
 
 sceptre_object <- set_analysis_parameters(
-sceptre_object = sceptre_object,
-discovery_pairs = discovery_pairs,
-positive_control_pairs = positive_control_pairs)
+  sceptre_object = sceptre_object,
+  discovery_pairs = discovery_pairs,
+  positive_control_pairs = positive_control_pairs
+)
 print(sceptre_object)
 
 # 3. assign grnas
@@ -69,25 +73,31 @@ write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_l
 # High-MOI CRISPRi example
 ##########################
 # 1. create the sceptre object from cellranger output
-directories <- paste0(system.file("extdata", package = "sceptredata"),
-"/highmoi_example/gem_group_", c(1, 2))
+directories <- paste0(
+  system.file("extdata", package = "sceptredata"),
+  "/highmoi_example/gem_group_", c(1, 2)
+)
 data(grna_target_data_frame_highmoi)
-sceptre_object <- import_data_from_cellranger(directories = directories,
-moi = "high",
-grna_target_data_frame = grna_target_data_frame_highmoi)
+sceptre_object <- import_data_from_cellranger(
+  directories = directories,
+  moi = "high",
+  grna_target_data_frame = grna_target_data_frame_highmoi
+)
 print(sceptre_object)
 
 # 2. set the analysis parameters
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(sceptre_object,
-positive_control_pairs = positive_control_pairs,
-distance_threshold = 5e6)
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
 
 sceptre_object <- set_analysis_parameters(
-sceptre_object = sceptre_object,
-discovery_pairs = discovery_pairs,
-positive_control_pairs = positive_control_pairs,
-side = "left")
+  sceptre_object = sceptre_object,
+  discovery_pairs = discovery_pairs,
+  positive_control_pairs = positive_control_pairs,
+  side = "left"
+)
 print(sceptre_object)
 
 # 3. assign grnas
