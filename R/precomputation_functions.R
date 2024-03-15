@@ -7,49 +7,15 @@
 #' @param expressions the numeric vector of response expressions
 #' @param covariate_matrix the covariate matrix on which to regress the expressions (NOTE: the matrix should contain an interecept term)
 #'
-#' @return a list containing the following elements: (i) "precomp_str": a string summarizing the method used to fit the GLM and calculate the NB size parameter. The part of the string before the colon is either "nb" or "pois," indicating whether NB regression or Poisson regression was used. ("pois_{warn}" indicates that Poisson regression was used and that a warning was generated). The part of the string after the colon indicates the method used to estimate the size parameter ("mass" for the "mass" package, "resid_mle" for MLE on the residuals, and "resid_mm" for method of moments on the residuals.) (ii) "fitted_coefs": a vector of fitted coefficients; the final entry of this vector is the fitted theta.
+#' @return a list containing the following elements: (i) "fitted_coefs": a vector of fitted coefficients; (ii) "theta": the fitted theta.
 #' @noRd
-perform_response_precomputation <- function(expressions, covariate_matrix, regression_method) {
-  # backup: return fitted coefficients from Poisson regression
-  backup_2 <- function(pois_fit, pois_warn) {
-    list(fitted_coef_str = paste0("pois", if (pois_warn) "_(warn)" else NULL),
-         fitted_coefs = pois_fit$coefficients)
-  }
-
-  # fit Poisson model, tracking warning
-  pois_warn <- FALSE
-  wHandler <- function(w) {pois_warn <<- TRUE; invokeRestart("muffleWarning")}
-  withCallingHandlers(expr = {
-    pois_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
-  }, warning = wHandler)
-
-  # get theta; save theta itself (in response_theta) and theta_fit_string (i.e., procedure used to fit theta)
+perform_response_precomputation <- function(expressions, covariate_matrix) {
+  pois_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
   response_theta_list <- estimate_theta(y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual,
                                         limit = 50, eps = (.Machine$double.eps)^(1/4))
-  theta_fit_str <- c("mle", "mm", "pilot")[response_theta_list[[2]]]
+  # theta_fit_str <- c("mle", "mm", "pilot")[response_theta_list[[2]]]
   theta <- max(min(response_theta_list[[1]], 1000), 0.01)
-
-  # obtain the fitted coefficients
-  if (regression_method == "nb_glm") {
-    fitted_coefs_list <- tryCatch({
-      fit_nb <- stats::glm.fit(y = expressions,
-                               x = covariate_matrix,
-                               family = MASS::negative.binomial(theta),
-                               mustart = pois_fit$fitted.values)
-      list(fitted_coef_str = "nb",
-           fitted_coefs = fit_nb$coefficients)
-    }, error = function(e) backup_2(pois_fit, pois_warn), warning = function(w) backup_2(pois_fit, pois_warn))
-  } else {
-    fitted_coefs_list <- backup_2(pois_fit, pois_warn)
-  }
-
-  # set the precomp str
-  precomp_str <- paste0(fitted_coefs_list$fitted_coef_str, ":", theta_fit_str)
-
-  # output the result
-  result <- list(precomp_str = precomp_str,
-                 fitted_coefs = fitted_coefs_list$fitted_coefs,
-                 theta = theta)
+  result <- list(fitted_coefs = pois_fit$coefficients, theta = theta)
   return(result)
 }
 

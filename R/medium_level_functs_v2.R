@@ -64,8 +64,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
         } else {
           # perform the regression to get the coefficients
           response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                              covariate_matrix = covariate_matrix,
-                                                              regression_method = "pois_glm")
+                                                              covariate_matrix = covariate_matrix)
           # save precomputation
           precomp_out_list[[response_id]] <- response_precomp
         }
@@ -165,8 +164,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
         } else {
           # perform the regression to get the coefficients
           response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                              covariate_matrix = covariate_matrix,
-                                                              regression_method = "pois_glm")
+                                                              covariate_matrix = covariate_matrix)
           # save precomputation
           precomp_out_list[[response_id]] <- response_precomp
         }
