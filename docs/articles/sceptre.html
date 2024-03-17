@@ -163,7 +163,7 @@ the outputs to the directory <code>~/sceptre_outputs</code>.</p>
 <span><span class="co"># construct the grna-gene pairs to analyze</span></span>
 <span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
 <span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span></span>
-<span>  <span class="va">sceptre_object</span>, </span>
+<span>  <span class="va">sceptre_object</span>,</span>
 <span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -208,7 +208,7 @@ locations of the directories outputted by one or more calls to
 example CRISPRi data on disk.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>, </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>,</span>
 <span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">directories</span> <span class="co"># file paths to the example data on your computer</span></span></code></pre></div>
@@ -247,7 +247,7 @@ We load and examine the <code>grna_target_data_frame</code>
 corresponding to the example data.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
-<span><span class="va">grna_target_data_frame_highmoi</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">24</span>, <span class="fl">80</span><span class="op">:</span><span class="fl">83</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
+<span><span class="va">grna_target_data_frame_highmoi</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">24</span>, <span class="fl">80</span><span class="op">:</span><span class="fl">83</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##         grna_id      grna_target   chr     start       end</span></span>
 <span><span class="co">## 1  grna_CCGGGCG  ENSG00000069482 chr11  68451943  68451958</span></span>
 <span><span class="co">## 2  grna_TGGCGGC  ENSG00000069482 chr11  68451958  68451974</span></span>
@@ -391,7 +391,7 @@ chromatin-derived features.)</p>
 <span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
 <span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">discovery_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">101</span><span class="op">:</span><span class="fl">104</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
+<span><span class="va">discovery_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">101</span><span class="op">:</span><span class="fl">104</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##          grna_target     response_id</span></span>
 <span><span class="co">## 1    candidate_enh_1 ENSG00000174529</span></span>
 <span><span class="co">## 2    candidate_enh_1 ENSG00000117222</span></span>
@@ -737,7 +737,7 @@ directory in which to write the results contained within the
 <code>sceptre_object</code>.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span>
-<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>, </span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
 <span>  directory <span class="op">=</span> <span class="st">"~/sceptre_outputs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/write_outputs_to_directory.html">write_outputs_to_directory()</a></code> writes several files to the
@@ -866,7 +866,7 @@ manual</a>.</p>
 <span><span class="co">##  rstudioapi    0.15.0   <span style="color: #555555;">2023-07-07</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  sass          0.4.8    <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  scales        1.3.0    <span style="color: #555555;">2023-11-28</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
-<span><span class="co">##  sceptre     * 0.9.1    <span style="color: #555555;">2024-03-14</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
+<span><span class="co">##  sceptre     * 0.9.1    <span style="color: #555555;">2024-03-15</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">##  sceptredata * 0.0.1    <span style="color: #555555;">2024-03-04</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
 <span><span class="co">##  sessioninfo   1.2.2    <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  systemfonts   1.0.5    <span style="color: #555555;">2023-10-09</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
@@ -879,7 +879,7 @@ manual</a>.</p>
 <span><span class="co">##  xfun          0.42     <span style="color: #555555;">2024-02-08</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  yaml          2.3.8    <span style="color: #555555;">2023-12-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T/Rtmp2SoBeB/temp_libpathb6f83698fde0</span></span></span>
+<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T/RtmpGIcGdR/temp_libpath13b20427c646</span></span></span>
 <span><span class="co">## <span style="color: #555555;"> [2] /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/library</span></span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## <span style="color: #00BBBB; font-weight: bold;">──────────────────────────────────────────────────────────────────────────────</span></span></span></code></pre>

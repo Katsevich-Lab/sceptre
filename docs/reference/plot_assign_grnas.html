@@ -136,16 +136,16 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span> grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span> grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span> moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span> extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span> response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
-<span class="r-in"><span> <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span> <span class="fu">plot_assign_grnas</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
+<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
+<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">plot_assign_grnas</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_assign_grnas-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

@@ -114,33 +114,37 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># import data</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span> response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span> grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span> grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span> moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span> extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span> response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
+<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
+<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
+<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>                                      positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>                                      distance_threshold <span class="op">=</span> <span class="fl">5e6</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
+<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   side <span class="op">=</span> <span class="st">"left"</span>,</span></span>
-<span class="r-in"><span>   resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span></span>
-<span class="r-in"><span>   discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>   positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    side <span class="op">=</span> <span class="st">"left"</span>,</span></span>
+<span class="r-in"><span>    resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span></span>
+<span class="r-in"><span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
+<span class="r-in"><span>    positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    n_processors <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu">write_outputs_to_directory</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_outputs"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    n_processors <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">write_outputs_to_directory</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_outputs"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
 <span class="r-in"><span><span class="co"># files written to "sceptre_outputs" in tempdir()</span></span></span>
 </code></pre></div>
