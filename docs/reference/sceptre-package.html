@@ -109,11 +109,12 @@
 <span class="r-in"><span><span class="co"># 1. create the sceptre object</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"lowmoi_example_data"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
-<span class="r-in"><span>moi <span class="op">=</span> <span class="st">"low"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
+<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"low"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -149,14 +150,17 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 2. set the analysis parameters</span></span></span>
 <span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_trans_pairs.html">construct_trans_pairs</a></span><span class="op">(</span>sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>pairs_to_exclude <span class="op">=</span> <span class="st">"pc_pairs"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_trans_pairs.html">construct_trans_pairs</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
+<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
+<span class="r-in"><span>  pairs_to_exclude <span class="op">=</span> <span class="st">"pc_pairs"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
+<span class="r-in"><span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
+<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -282,7 +286,7 @@
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Constructing negative control pairs.<span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Generating permutation resamples.<span style="color: #00BB00;"> ✓</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running calibration_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">calibration_check_*.out</span> for progress updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running calibration_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">calibration_check_*.out</span> for progress updates.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
@@ -332,7 +336,7 @@
 <span class="r-in"><span><span class="co"># 6. run power check</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Generating permutation resamples.<span style="color: #00BB00;"> ✓</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running power_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">power_check_*.out</span> for progress updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running power_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">power_check_*.out</span> for progress updates.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
@@ -383,7 +387,7 @@
 <span class="r-in"><span><span class="co"># 7. run discovery analysis</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Generating permutation resamples.<span style="color: #00BB00;"> ✓</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running discovery_analysis in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">discovery_analysis_*.out</span> for progress updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running discovery_analysis in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">discovery_analysis_*.out</span> for progress updates.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
@@ -440,12 +444,16 @@
 <span class="r-in"><span><span class="co"># High-MOI CRISPRi example</span></span></span>
 <span class="r-in"><span><span class="co">##########################</span></span></span>
 <span class="r-in"><span><span class="co"># 1. create the sceptre object from cellranger output</span></span></span>
-<span class="r-in"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span><span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data_from_cellranger.html">import_data_from_cellranger</a></span><span class="op">(</span>directories <span class="op">=</span> <span class="va">directories</span>,</span></span>
-<span class="r-in"><span>moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data_from_cellranger.html">import_data_from_cellranger</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  directories <span class="op">=</span> <span class="va">directories</span>,</span></span>
+<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
+<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Processing directory 1.<span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Processing directory 2.<span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Combining matrices across directories.<span style="color: #00BB00;"> ✓</span></span>
@@ -485,14 +493,16 @@
 <span class="r-in"><span><span class="co"># 2. set the analysis parameters</span></span></span>
 <span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>distance_threshold <span class="op">=</span> <span class="fl">5e6</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
+<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>side <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
+<span class="r-in"><span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
+<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
+<span class="r-in"><span>  side <span class="op">=</span> <span class="st">"left"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -529,7 +539,7 @@
 <span class="r-in"><span><span class="fu"><a href="plot_grna_count_distributions.html">plot_grna_count_distributions</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sceptre-package-8.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running gRNA assignments in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">assign_grnas_*.out</span> for progress updates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running gRNA assignments in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">assign_grnas_*.out</span> for progress updates.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sceptre-package-9.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
@@ -617,7 +627,7 @@
 <span class="r-in"><span><span class="co"># 5. run the calibration check</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Constructing negative control pairs.<span style="color: #00BB00;"> ✓</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running calibration_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">calibration_check_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running calibration_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">calibration_check_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sceptre-package-12.png" alt="" width="700" height="433"></span>
@@ -665,7 +675,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 6. run the power check</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running power_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">power_check_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running power_check in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">power_check_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sceptre-package-13.png" alt="" width="700" height="433"></span>
@@ -714,7 +724,7 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># 7. run discovery analysis</span></span></span>
 <span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running discovery_analysis in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpdQlfVe/sceptre_logs/</span> and view the files <span style="color: #0000BB;">discovery_analysis_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running discovery_analysis in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpmHeZFL/sceptre_logs/</span> and view the files <span style="color: #0000BB;">discovery_analysis_*.out</span> for progress updates. <span style="color: #00BB00;"> ✓</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="sceptre-package-14.png" alt="" width="700" height="433"></span>
