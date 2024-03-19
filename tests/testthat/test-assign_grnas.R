@@ -68,9 +68,9 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
 
   # first element should have all idx
   guide_part_all_1 <- lapply(unique_targets, function(target_name)
-    if(target_name == test_data_list$grna_target_data_frame$grna_target[1]) 1:num_cells else integer(0)) |>
+    if(target_name == test_data_list$grna_target_data_frame$grna_target[1]) 1:num_cells else NULL) |>
     setNames(unique_targets)
-  nt_part_all_1 <- lapply(nt_guides, function(nt_guide) integer(0)) |>
+  nt_part_all_1 <- lapply(nt_guides, function(nt_guide) NULL) |>
     setNames(nt_guides)
 
   expect_equal(
@@ -108,7 +108,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
     assign_grnas(method = "maximum")
 
   # expected answer: cell i expresses grna i
-  expected_initial_assignment_list <- lapply(1:num_grnas, function(i) i)  |>
+  expected_initial_assignment_list <- as.list(1:num_grnas)  |>
     setNames(test_data_list$grna_target_data_frame$grna_id)
   expect_equal(
     scep_low_clear_max@initial_grna_assignment_list,
@@ -372,4 +372,12 @@ test_that("assign_grnas method=mixture moi=high", {
 })
 
 
+
+The two tests that currently fail are
+
+"assign_grnas method=maximum moi=low grna_matrix all 1"
+
+"assign_grnas method=maximum moi=low grna_matrix clear max"
+
+and each fails in two places.
 
