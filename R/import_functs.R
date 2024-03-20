@@ -519,12 +519,12 @@ get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_no
 
 
 write_matrices_to_disk <- function(response_matrix, grna_matrix, directory_to_write, integer_id) {
-  response_matrix <- ondisc::create_odm_from_r_matrix(
+  response_matrix <- ondisc:::create_odm_from_r_matrix(
     mat = response_matrix,
     file_to_write = paste0(directory_to_write, "/response.odm"),
     integer_id = integer_id
   )
-  grna_matrix <- ondisc::create_odm_from_r_matrix(
+  grna_matrix <- ondisc:::create_odm_from_r_matrix(
     mat = grna_matrix,
     file_to_write = paste0(directory_to_write, "/grna.odm"),
     integer_id = integer_id
