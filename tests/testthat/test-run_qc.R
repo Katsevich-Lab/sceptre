@@ -71,7 +71,9 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
     assign_grnas(method = "thresholding", threshold = 9) |>
     run_qc()
 
-  expect_equal(scep_low@cells_in_use, (1:num_cells)[-locs_of_extra_expression])
+  # the only cells in use are those with a single grna UMI count exceeding
+  # the threshold
+  expect_equal(scep_low@cells_in_use, (1:num_grnas)[-locs_of_extra_expression])
 })
 
 
@@ -489,13 +491,12 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
-  cells_expressing_t3 <- 21:30
+  cells_not_expressing_anything <- 21:30
   cells_expressing_nt1 <- 31:40
   all_cells <- 1:num_cells
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
   response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
@@ -509,7 +510,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
   # these next two only matter for complement control group: this makes it so
   # there will be 20 non-zero control cells in that situation
   response_matrix["t1", cells_expressing_t2] <- 0
-  response_matrix["t1", cells_expressing_t3] <- 100
+  response_matrix["t1", cells_not_expressing_anything] <- 100
 
   # target t2: all control group are non-zero, all NT are 0
   response_matrix["t2", cells_expressing_t2] <- 100
@@ -517,7 +518,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
   # these next two only matter for complement control group: this makes it so
   # there will be 0 non-zero control cells in that situation
   response_matrix["t2", cells_expressing_t1] <- 0
-  response_matrix["t2", cells_expressing_t3] <- 0
+  response_matrix["t2", cells_not_expressing_anything] <- 0
 
   # target t3: all cells are non-zero
   response_matrix["t3", all_cells] <- 100
@@ -558,7 +559,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
   # making sure that the only cells removed are the ones intended to be removed
   expect_setequal(
     scep_low@cells_in_use,
-    all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
+    all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi, cells_not_expressing_anything)]
   )
 
   # 6 cells were removed from on-target 1, 3 cells from on-target 2
