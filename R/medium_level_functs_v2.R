@@ -11,9 +11,9 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
 }
 
 
-# core function 1: run permutation test in memory
+# core function 1. run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                    synthetic_idxs, output_amount, fit_parametric_curve, B1, B2, B3, calibration_check,
+                                    synthetic_idxs, output_amount, resampling_approximation, B1, B2, B3, calibration_check,
                                     control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                     side_code, low_moi, response_precomputations, cells_in_use, print_progress,
                                     parallel, n_processors, log_dir, analysis_type) {
@@ -26,10 +26,11 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
+  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use,]
-  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
+  covariate_matrix <- covariate_matrix[cells_in_use, ]
+  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
 
   # 2. define function to loop subset of response IDs
   analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
@@ -44,7 +45,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
     for (response_idx in seq_along(curr_response_ids)) {
       response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids,
-                                     parallel = parallel, f_name = f_name)
+        parallel = parallel, f_name = f_name
+      )
 
       # 3. load the expressions of the current response
       expression_vector <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
@@ -52,7 +54,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
       # 4. obtain the gRNA groups to analyze
       l <- response_grna_group_pairs$response_id == response_id
-      curr_df <- response_grna_group_pairs[l,]
+      curr_df <- response_grna_group_pairs[l, ]
       grna_groups <- as.character(curr_df$grna_group)
 
       # 6. perform outer regression (if applicable)
@@ -62,24 +64,30 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
           response_precomp <- response_precomputations[[response_id]]
         } else {
           # perform the regression to get the coefficients
-          response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                              covariate_matrix = covariate_matrix,
-                                                              regression_method = "pois_glm")
+          response_precomp <- perform_response_precomputation(
+            expressions = expression_vector,
+            covariate_matrix = covariate_matrix
+          )
           # save precomputation
           precomp_out_list[[response_id]] <- response_precomp
         }
         pieces_precomp <- compute_precomputation_pieces(expression_vector,
-                                                        covariate_matrix,
-                                                        response_precomp$fitted_coefs,
-                                                        response_precomp$theta,
-                                                        full_test_stat = TRUE)
-        curr_response_result <- perm_test_glm_factored_out(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-                                                           output_amount, grna_groups, expression_vector,
-                                                           pieces_precomp, get_idx_f, side_code)
+          covariate_matrix,
+          response_precomp$fitted_coefs,
+          response_precomp$theta,
+          full_test_stat = TRUE
+        )
+        curr_response_result <- perm_test_glm_factored_out(
+          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
+          output_amount, grna_groups, expression_vector,
+          pieces_precomp, get_idx_f, side_code
+        )
       } else {
-        curr_response_result <- discovery_ntcells_perm_test(synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-                                                            output_amount, covariate_matrix, all_nt_idxs,
-                                                            grna_group_idxs, grna_groups, expression_vector, side_code)
+        curr_response_result <- discovery_ntcells_perm_test(
+          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
+          output_amount, covariate_matrix, all_nt_idxs,
+          grna_group_idxs, grna_groups, expression_vector, side_code
+        )
       }
 
       # 9. combine the response-wise results into a data table; insert into list
@@ -92,8 +100,10 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   }
 
   # 3. partition the response IDs
-  partitioned_response_ids <- partition_response_ids(response_ids = response_ids,
-                                                     parallel = parallel, n_processors = n_processors)
+  partitioned_response_ids <- partition_response_ids(
+    response_ids = response_ids,
+    parallel = parallel, n_processors = n_processors
+  )
 
   # 4. run the analysis
   if (!parallel) {
@@ -102,9 +112,10 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
     cat(paste0("Running ", analysis_type, " in parallel. "))
     if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates.\n"))
     res <- parallel::mclapply(seq_along(partitioned_response_ids),
-                              function(proc_id) analyze_given_response_ids(partitioned_response_ids[[proc_id]], proc_id),
-                              mc.cores = length(partitioned_response_ids))
-    cat(crayon::green(' \u2713\n'))
+      function(proc_id) analyze_given_response_ids(partitioned_response_ids[[proc_id]], proc_id),
+      mc.cores = length(partitioned_response_ids)
+    )
+    cat(crayon::green(" \u2713\n"))
   }
 
   # 5. combine and sort result
@@ -118,7 +129,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 # core function 2: run crt in memory
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 output_amount, fit_parametric_curve, B1, B2, B3, calibration_check, control_group_complement,
+                                 output_amount, resampling_approximation, B1, B2, B3, calibration_check, control_group_complement,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, response_precomputations,
                                  cells_in_use, print_progress, parallel, n_processors, log_dir, analysis_type) {
   # 0. define several variables
@@ -130,10 +141,11 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
+  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use,]
-  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs,]
+  covariate_matrix <- covariate_matrix[cells_in_use, ]
+  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
 
   # 2. define the run precomputation function
   run_precomp_on_given_responses <- function(curr_response_ids, proc_id = NULL) {
@@ -146,28 +158,33 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     precomp_out_list <- list()
 
     for (response_idx in seq_along(curr_response_ids)) {
-      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids, str = "Running precomputation on ",
-                                     parallel = parallel, f_name = f_name)
+      response_id <- get_id_from_idx(response_idx, print_progress, curr_response_ids,
+        str = "Running precomputation on ",
+        parallel = parallel, f_name = f_name
+      )
 
       # 3. load the expressions of the current response
-      expression_vector <- load_csr_row(j = response_matrix@j,
-                                        p = response_matrix@p,
-                                        x = response_matrix@x,
-                                        row_idx = which(rownames(response_matrix) == response_id),
-                                        n_cells = n_cells_orig)[cells_in_use]
+      expression_vector <- load_csr_row(
+        j = response_matrix@j,
+        p = response_matrix@p,
+        x = response_matrix@x,
+        row_idx = which(rownames(response_matrix) == response_id),
+        n_cells = n_cells_orig
+      )[cells_in_use]
       if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
       # 4. # if precomp is available, load
-        if (!is.null(response_precomputations[[response_id]])) {
-          response_precomp <- response_precomputations[[response_id]]
-        } else {
-          # perform the regression to get the coefficients
-          response_precomp <- perform_response_precomputation(expressions = expression_vector,
-                                                              covariate_matrix = covariate_matrix,
-                                                              regression_method = "pois_glm")
-          # save precomputation
-          precomp_out_list[[response_id]] <- response_precomp
-        }
+      if (!is.null(response_precomputations[[response_id]])) {
+        response_precomp <- response_precomputations[[response_id]]
+      } else {
+        # perform the regression to get the coefficients
+        response_precomp <- perform_response_precomputation(
+          expressions = expression_vector,
+          covariate_matrix = covariate_matrix
+        )
+        # save precomputation
+        precomp_out_list[[response_id]] <- response_precomp
+      }
     }
     return(precomp_out_list)
   }
@@ -181,8 +198,9 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
       cat(paste0("Running ", analysis_type, " in parallel. "))
       if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates. "))
       res <- parallel::mclapply(seq_along(partitioned_response_ids),
-                                function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),
-                                mc.cores = length(partitioned_response_ids))
+        function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),
+        mc.cores = length(partitioned_response_ids)
+      )
     }
     precomp_out_list <- purrr::flatten(res)
     response_precomputations <- c(response_precomputations, precomp_out_list)
@@ -195,23 +213,28 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
 
     for (grna_group_idx in seq_along(curr_grna_groups)) {
       curr_grna_group <- get_id_from_idx(grna_group_idx, print_progress, curr_grna_groups,
-                                         feature = "gRNA group", parallel = parallel, f_name = f_name)
+        feature = "gRNA group", parallel = parallel, f_name = f_name
+      )
 
       # 7. obtain the genes to analyze
       l <- response_grna_group_pairs$grna_group == curr_grna_group
-      curr_df <- response_grna_group_pairs[l,]
+      curr_df <- response_grna_group_pairs[l, ]
       response_ids <- as.character(curr_df$response_id)
 
       # 8. call the low-level analysis function
       if (run_outer_regression) {
-        curr_response_result <- crt_glm_factored_out(B1, B2, B3, fit_parametric_curve, output_amount,
-                                                     response_ids, response_precomputations, covariate_matrix,
-                                                     get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
-                                                     response_matrix, side_code, cells_in_use)
+        curr_response_result <- crt_glm_factored_out(
+          B1, B2, B3, fit_parametric_curve, output_amount,
+          response_ids, response_precomputations, covariate_matrix,
+          get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
+          response_matrix, side_code, cells_in_use
+        )
       } else {
-        curr_response_result <- discovery_ntcells_crt(B1, B2, B3, fit_parametric_curve, output_amount, get_idx_f,
-                                                      response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
-                                                      response_matrix, side_code, cells_in_use)
+        curr_response_result <- discovery_ntcells_crt(
+          B1, B2, B3, fit_parametric_curve, output_amount, get_idx_f,
+          response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
+          response_matrix, side_code, cells_in_use
+        )
       }
       result_out_list[[grna_group_idx]] <- construct_data_frame_v2(curr_df, curr_response_result, output_amount)
     }
@@ -226,9 +249,10 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
   } else {
     res <- parallel::mclapply(seq_along(partitioned_grna_group_ids),
-                              function(proc_id) perform_association_analysis(partitioned_grna_group_ids[[proc_id]], proc_id),
-                              mc.cores = length(partitioned_grna_group_ids))
-    cat(crayon::green(' \u2713\n'))
+      function(proc_id) perform_association_analysis(partitioned_grna_group_ids[[proc_id]], proc_id),
+      mc.cores = length(partitioned_grna_group_ids)
+    )
+    cat(crayon::green(" \u2713\n"))
   }
   result <- res |> data.table::rbindlist(fill = TRUE)
 

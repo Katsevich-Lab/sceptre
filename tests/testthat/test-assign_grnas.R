@@ -1,13 +1,14 @@
 # mock data function just for the tests in this file
 make_mock_base_data_for_testing_assign_grnas <- function() {
-  num_cells <- 24  # must be even for my choice of extra_covariates
+  num_cells <- 24 # must be even for my choice of extra_covariates
   num_responses <- 7
-  grna_target_data_frame <- make_mock_grna_target_data(c(2,2), 1, 1, 3)
+  grna_target_data_frame <- make_mock_grna_target_data(c(2, 2), 1, 1, 3)
   on_targets <- unique(grna_target_data_frame$grna_target)[1:2]
   num_grnas <- nrow(grna_target_data_frame)
 
   grna_matrix <- make_mock_grna_matrices(
-    grna_target_data_frame, non_nt_patterns="zero",
+    grna_target_data_frame,
+    non_nt_patterns = "zero",
     nt_patterns = "zero", num_cells = num_cells
   )
 
@@ -19,7 +20,7 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
 
   discovery_pairs <- data.frame(
     grna_target = on_targets,
-    response_id = rep(paste0("response_", length(on_targets) + 1), times=2)
+    response_id = rep(paste0("response_", length(on_targets) + 1), times = 2)
   )
 
   list(
@@ -31,7 +32,6 @@ make_mock_base_data_for_testing_assign_grnas <- function() {
 }
 
 test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
-
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
@@ -61,14 +61,17 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
     scep_low_all_1@initial_grna_assignment_list,
     # every cell is assigned to the first grna_id that appears since they are all tied
     # plus all of these cells will be removed anyway in qc so the assignment doesn't matter
-    lapply(test_data_list$grna_target_data_frame$grna_id, function(target_name)
-      if(target_name == test_data_list$grna_target_data_frame$grna_id[1]) 1:num_cells else integer(0)) |>
+    lapply(test_data_list$grna_target_data_frame$grna_id, function(target_name) {
+      if (target_name == test_data_list$grna_target_data_frame$grna_id[1]) 1:num_cells else integer(0)
+    }) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
   # first element should have all idx
-  guide_part_all_1 <- lapply(unique_targets, function(target_name)
-    if(target_name == test_data_list$grna_target_data_frame$grna_target[1]) 1:num_cells else NULL) |>
+
+  guide_part_all_1 <- lapply(unique_targets, function(target_name) {
+    if (target_name == test_data_list$grna_target_data_frame$grna_target[1]) 1:num_cells else integer(0)
+  }) |>
     setNames(unique_targets)
   nt_part_all_1 <- lapply(nt_guides, function(nt_guide) NULL) |>
     setNames(nt_guides)
@@ -85,7 +88,6 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
 })
 
 test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
-
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
@@ -94,7 +96,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
 
   grna_matrix_clear_max <- test_data_list$grna_matrix_all_0
-  for(i in 1:num_grnas) grna_matrix_clear_max[i,i] <- 100
+  for (i in 1:num_grnas) grna_matrix_clear_max[i, i] <- 100
 
   scep_low_clear_max <- import_data(
     grna_matrix = grna_matrix_clear_max,
@@ -116,7 +118,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
   )
   # all cells from idx `num_grnas+1` onward have no UMI counts at all, so they
   # all are considered to have multiple grnas
-  expect_equal(scep_low_clear_max@cells_w_multiple_grnas, (num_grnas+1):num_cells)
+  expect_equal(scep_low_clear_max@cells_w_multiple_grnas, (num_grnas + 1):num_cells)
 
   # there are two guides per target, and 3 NT guides
   # this is assembling the expected answer which is a list of lists of indicecs
@@ -136,7 +138,6 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
 })
 
 test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_threshold", {
-
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
@@ -145,8 +146,8 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
 
   grna_matrix_vary_frac <- test_data_list$grna_matrix_all_0
-  grna_matrix_vary_frac[1,] <- 100 # all cells express grna1 very strongly
-  grna_matrix_vary_frac[2,1] <- 25 # cell 1 also expresses some grna2
+  grna_matrix_vary_frac[1, ] <- 100 # all cells express grna1 very strongly
+  grna_matrix_vary_frac[2, 1] <- 25 # cell 1 also expresses some grna2
   # in total, for cell 1 we have grna1 as exactly 80% of the total UMI count
 
   # cell 1 IS NOT flagged as expressing 2 grna with low threshold
@@ -159,7 +160,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
     set_analysis_parameters(
       discovery_pairs = test_data_list$discovery_pairs
     ) |>
-    assign_grnas(method = "maximum", umi_fraction_threshold=.8 - .001)
+    assign_grnas(method = "maximum", umi_fraction_threshold = .8 - .001)
 
   expect_equal(scep_low_with_low_frac@cells_w_multiple_grnas, integer(0))
 
@@ -173,13 +174,12 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
     set_analysis_parameters(
       discovery_pairs = test_data_list$discovery_pairs
     ) |>
-    assign_grnas(method = "maximum", umi_fraction_threshold=.8 + .001)
+    assign_grnas(method = "maximum", umi_fraction_threshold = .8 + .001)
 
   expect_equal(scep_low_with_high_frac@cells_w_multiple_grnas, 1)
 })
 
 test_that("assign_grnas method=threshold moi=low", {
-
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
@@ -188,9 +188,9 @@ test_that("assign_grnas method=threshold moi=low", {
   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
 
   grna_matrix_vary_thresh <- test_data_list$grna_matrix_all_0
-  expressed_grna_ids <- c(5,6)
-  grna_matrix_vary_thresh[expressed_grna_ids[1],] <- 100 # all cells express this grna_id very strongly
-  grna_matrix_vary_thresh[expressed_grna_ids[2],] <- 25  # all cells also express some of this grna_id
+  expressed_grna_ids <- c(5, 6)
+  grna_matrix_vary_thresh[expressed_grna_ids[1], ] <- 100 # all cells express this grna_id very strongly
+  grna_matrix_vary_thresh[expressed_grna_ids[2], ] <- 25 # all cells also express some of this grna_id
 
   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
   scep_low_with_low_thresh <- import_data(
@@ -208,12 +208,12 @@ test_that("assign_grnas method=threshold moi=low", {
 
   expect_equal(
     scep_low_with_low_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i %in% expressed_grna_ids) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if (i %in% expressed_grna_ids) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
   # the check is `i == 3` because the target with expressed guides is t1_c3_d1, the 3rd one
-  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 3) 1:num_cells else integer(0)) |>
+  guide_part <- lapply(seq_along(unique_targets), function(i) if (i == 3) 1:num_cells else integer(0)) |>
     setNames(unique_targets)
   nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
     setNames(nt_guides)
@@ -245,12 +245,12 @@ test_that("assign_grnas method=threshold moi=low", {
   # `i == 5` is used because g1_t1_c3_d1 is the 5th grna_id and is what all these cells are assigned to
   expect_equal(
     scep_low_with_high_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i == 5) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if (i == 5) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
   # as above, the check is `i == 3` because the target with expressed guides is t1_c3_d1, the 3rd one
-  guide_part <- lapply(seq_along(unique_targets), function(i) if(i == 3) 1:num_cells else integer(0)) |>
+  guide_part <- lapply(seq_along(unique_targets), function(i) if (i == 3) 1:num_cells else integer(0)) |>
     setNames(unique_targets)
   nt_part <- lapply(nt_guides, function(nt_guide) integer(0)) |>
     setNames(nt_guides)
@@ -266,7 +266,6 @@ test_that("assign_grnas method=threshold moi=low", {
 })
 
 test_that("assign_grnas method=threshold moi=high", {
-
   test_data_list <- make_mock_base_data_for_testing_assign_grnas()
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix_all_0)
@@ -275,8 +274,8 @@ test_that("assign_grnas method=threshold moi=high", {
   nt_guides <- with(test_data_list$grna_target_data_frame, grna_id[grna_target == "non-targeting"])
 
   grna_matrix_vary_thresh <- test_data_list$grna_matrix_all_0
-  grna_matrix_vary_thresh[1,] <- 100 # all cells express grna1 very strongly
-  grna_matrix_vary_thresh[2,] <- 50  # all cells also express some of grna2
+  grna_matrix_vary_thresh[1, ] <- 100 # all cells express grna1 very strongly
+  grna_matrix_vary_thresh[2, ] <- 50 # all cells also express some of grna2
   grna_matrix_vary_thresh[3:6, 3:6] <- 1:16 # little bit extra to get numerically full rank covariate data frame
 
   # every cell is flagged as expressing 2 grnas ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -295,7 +294,7 @@ test_that("assign_grnas method=threshold moi=high", {
 
   expect_equal(
     scep_high_with_low_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i <= 2) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if (i <= 2) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 
@@ -315,7 +314,7 @@ test_that("assign_grnas method=threshold moi=high", {
 
   expect_equal(
     scep_high_with_high_thresh@initial_grna_assignment_list,
-    lapply(1:num_grnas, function(i) if(i == 1) 1:num_cells else integer(0)) |>
+    lapply(1:num_grnas, function(i) if (i == 1) 1:num_cells else integer(0)) |>
       setNames(test_data_list$grna_target_data_frame$grna_id)
   )
 })
@@ -329,14 +328,14 @@ test_that("assign_grnas method=mixture moi=high", {
 
   grna_target_data_frame <- data.frame(
     grna_id = c(paste0("grna_", 1:num_guides), paste0("nt_", 1:num_nt)),
-    grna_target = rep(c("target_1", "non-targeting"), c(num_guides,  num_nt)),
+    grna_target = rep(c("target_1", "non-targeting"), c(num_guides, num_nt)),
     chr = "", start = 0, end = 1
   )
 
   grna_matrix <- sample(0:2, (num_guides + num_nt) * num_cells, TRUE) |>
     matrix(ncol = num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
-  cells_getting_grna_1 <- c(1,2,3)
+  cells_getting_grna_1 <- c(1, 2, 3)
   cells_getting_grna_2 <- c(1, 4, 5)
   cells_getting_grna_3 <- c(1, 6:7)
   cells_getting_nt_1 <- c(2, 8:9)
@@ -370,14 +369,3 @@ test_that("assign_grnas method=mixture moi=high", {
   expect_equal(scep_high_mixture@initial_grna_assignment_list$grna_3, cells_getting_grna_3)
   expect_equal(scep_high_mixture@initial_grna_assignment_list$nt_1, cells_getting_nt_1)
 })
-
-
-
-The two tests that currently fail are
-
-"assign_grnas method=maximum moi=low grna_matrix all 1"
-
-"assign_grnas method=maximum moi=low grna_matrix clear max"
-
-and each fails in two places.
-

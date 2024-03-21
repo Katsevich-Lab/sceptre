@@ -27,8 +27,30 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 \code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_calibration_check}{Section 5 of the introductory chapter in the manual} for guidance on interpreting this visual.
 }
 \examples{
-# A full example can be found at ?sceptre;
-# `plot_run_calibration_check()` is dispatched when
-# `plot()` is called on the `sceptre_object`
-# in step 5 (the run calibration check step).
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+sceptre_object |>
+  set_analysis_parameters(
+    side = "left",
+    resampling_mechanism = "permutations"
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
+    parallel = TRUE,
+    n_processors = 2,
+    n_calibration_pairs = 500,
+    calibration_group_size = 2,
+  ) |>
+  plot_run_calibration_check()
 }

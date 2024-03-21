@@ -1,6 +1,5 @@
-citHeader("To cite sceptre in publications, please use the following")
-
 citEntry(entry = "article",
+  note = "Please cite if you are using the high-MOI functionality.",
   author = "Timothy Barry, and Xuran Wang, and John A Morris, Kathryn Roeder, and Eugene Katsevich",
   title = "SCEPTRE improves calibration and sensitivity in single-cell CRISPR screen analysis",
   journal = "Genome Biology",
@@ -10,13 +9,15 @@ citEntry(entry = "article",
 )
 
 citEntry(entry = "article",
+note = "Please cite if you are using the 'mixture' gRNA assignment method.",
 author = "Timothy Barry, and Kathryn Roeder, and Eugene Katsevich",
 title = "Exponential family measurement error models for single-cell CRISPR screens",
-journal = "Preprint",
-year = "2022",
-textVersion = "Barry, T., Roeder, K., & Katsevich, E. (2022). Exponential family measurement error models for single-cell CRISPR screens.")
+journal = "Biostatistics",
+year = "2024",
+textVersion = "Barry, T., Roeder, K., & Katsevich, E. (2024). Exponential family measurement error models for single-cell CRISPR screens. Biostatistics.")
 
 citEntry(entry = "article",
+note = "Please cite if you are using the low-MOI functionality.",
 author = "Timothy Barry, and Kaishu Mason, and Kathryn Roeder, and Eugene Katsevich",
 title = "Robust differential expression analysis for single-cell CRISPR screens",
 journal = "Preprint",
