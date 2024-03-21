@@ -68,14 +68,13 @@ test_that("run_calibration_check negative control pairs complement set with cell
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
-  cells_expressing_t3 <- 21:30
+  cells_expressing_no_grna <- 21:30
   cells_expressing_nt1 <- 31:40
   cells_expressing_nt2 <- 41:50
   all_cells <- 1:num_cells
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
@@ -109,13 +108,14 @@ test_that("run_calibration_check negative control pairs complement set with cell
   scep_complement_size_1 <- scep_pre |>
     run_qc(
       response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
-      # with `n_nonzero_cntrl_thresh = 20` one discovery pair fails
-      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 20
+      # with `n_nonzero_cntrl_thresh = 17` one discovery pair fails
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 17
     ) |>
     run_calibration_check(calibration_group_size = 1)
 
   # making sure the correct cells were removed
-  remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
+  remaining_cells <- all_cells[-c(cells_to_remove_low_umi,
+                                  cells_to_remove_high_umi, cells_expressing_no_grna)]
   expect_setequal(scep_complement_size_1@cells_in_use, remaining_cells)
 
   neg_df <- scep_complement_size_1@negative_control_pairs
@@ -151,7 +151,8 @@ test_that("run_calibration_check negative control pairs complement set with cell
     run_calibration_check(calibration_group_size = 2)
 
   # making sure the correct cells were removed
-  remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
+  remaining_cells <- all_cells[-c(cells_to_remove_low_umi,
+                                  cells_to_remove_high_umi, cells_expressing_no_grna)]
   expect_setequal(scep_complement_size_2@cells_in_use, remaining_cells)
 
   neg_df <- scep_complement_size_2@negative_control_pairs
@@ -193,14 +194,13 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
-  cells_expressing_t3 <- 21:30
+  cells_expressing_no_grna <- 21:30
   cells_expressing_nt1 <- 31:40
   cells_expressing_nt2 <- 41:50
   all_cells <- 1:num_cells
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
@@ -239,7 +239,8 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
     run_calibration_check(calibration_group_size = 1)
 
   # making sure the correct cells were removed
-  remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
+  remaining_cells <- all_cells[-c(cells_to_remove_low_umi,
+                                  cells_to_remove_high_umi, cells_expressing_no_grna)]
   expect_setequal(scep_nt_size_1@cells_in_use, remaining_cells)
 
   neg_df <- scep_nt_size_1@negative_control_pairs
