@@ -1,12 +1,13 @@
 # mock data function just used for the tests in this file
 make_mock_base_data_for_testing_run_qc <- function(num_cells) {
   num_responses <- 7
-  grna_target_data_frame <- make_mock_grna_target_data(c(2,2), 1, 1, 3)
+  grna_target_data_frame <- make_mock_grna_target_data(c(2, 2), 1, 1, 3)
   on_targets <- unique(grna_target_data_frame$grna_target)[1:2]
   num_grnas <- nrow(grna_target_data_frame)
 
   grna_matrix <- make_mock_grna_matrices(
-    grna_target_data_frame, non_nt_patterns="zero",
+    grna_target_data_frame,
+    non_nt_patterns = "zero",
     nt_patterns = "zero", num_cells = num_cells
   )
 
@@ -39,7 +40,6 @@ make_mock_base_data_for_testing_run_qc <- function(num_cells) {
 }
 
 test_that("run_qc remove cells with multiple grnas in low moi", {
-
   test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells = 24)
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix)
@@ -50,13 +50,13 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
   set.seed(123)
   grna_matrix <- test_data_list$grna_matrix
   grna_matrix[] <- rpois(prod(dim(grna_matrix)), 1)
-  for(i in 1:num_grnas) grna_matrix[i,i] <- 10 # for clear expression
+  for (i in 1:num_grnas) grna_matrix[i, i] <- 10 # for clear expression
   locs_of_extra_expression <- 2:4
-  grna_matrix[1, locs_of_extra_expression] <- 10  # these cells now have 2 grnas clearly expressed
+  grna_matrix[1, locs_of_extra_expression] <- 10 # these cells now have 2 grnas clearly expressed
 
   response_matrix <- test_data_list$response_matrix
-  response_matrix[] <- rep(c(0,0,1,0), times=prod(dim(response_matrix))/4)
-  for(i in 1:nrow(response_matrix)) response_matrix[i,i] <- 2 # to avoid low rank covariate data frame
+  response_matrix[] <- rep(c(0, 0, 1, 0), times = prod(dim(response_matrix)) / 4)
+  for (i in 1:nrow(response_matrix)) response_matrix[i, i] <- 2 # to avoid low rank covariate data frame
 
   scep_low <- import_data(
     grna_matrix = grna_matrix,
@@ -76,7 +76,6 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
 
 
 test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
-
   test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells = 24)
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix)
@@ -87,11 +86,11 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
   set.seed(123)
   grna_matrix <- test_data_list$grna_matrix
   grna_matrix[] <- rpois(prod(dim(grna_matrix)), 2)
-  for(i in 1:num_grnas) grna_matrix[i,i] <- 10 # for clear expression
+  for (i in 1:num_grnas) grna_matrix[i, i] <- 10 # for clear expression
 
   response_matrix <- test_data_list$response_matrix
-  response_matrix[] <- rep(c(0,0,1,0), times=prod(dim(response_matrix))/4)
-  for(i in 1:nrow(response_matrix)) response_matrix[i,i] <- 2 # to avoid low rank covariate data frame
+  response_matrix[] <- rep(c(0, 0, 1, 0), times = prod(dim(response_matrix)) / 4)
+  for (i in 1:nrow(response_matrix)) response_matrix[i, i] <- 2 # to avoid low rank covariate data frame
 
   scep_high_pre_qc <- import_data(
     grna_matrix = grna_matrix,
@@ -107,7 +106,7 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
 
   expect_equal(run_qc(scep_high_pre_qc)@cells_in_use, 1:num_cells) # all here
 
-  cells_to_remove <- c(1,3,5)
+  cells_to_remove <- c(1, 3, 5)
 
   scep_qc <- run_qc(scep_high_pre_qc, additional_cells_to_remove = cells_to_remove)
   expect_equal(scep_qc@cells_in_use, (1:num_cells)[-cells_to_remove])
@@ -115,7 +114,6 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
 
 
 test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonzero_range` high moi", {
-
   test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells = 100)
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix)
@@ -129,10 +127,10 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
 
   response_matrix <- test_data_list$response_matrix
   response_matrix[] <- rpois(prod(dim(response_matrix)), 2) + 10
-  zero_umi_count_idx <- c(1,5)
+  zero_umi_count_idx <- c(1, 5)
   high_umi_count_idx <- 2:4
-  response_matrix[,zero_umi_count_idx] <- 0
-  response_matrix[,high_umi_count_idx] <- 100
+  response_matrix[, zero_umi_count_idx] <- 0
+  response_matrix[, high_umi_count_idx] <- 100
 
   scep_high_pre_qc <- import_data(
     grna_matrix = grna_matrix,
@@ -147,28 +145,27 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
     assign_grnas(method = "thresholding", threshold = 7)
 
   scep_all <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1))
-  expect_identical(scep_all@cells_in_use, 1:100)  # all remain currently
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1))
+  expect_identical(scep_all@cells_in_use, 1:100) # all remain currently
 
   scep_qc <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0.02, 1), response_n_nonzero_range = c(0,1))
+    run_qc(response_n_umis_range = c(0.02, 1), response_n_nonzero_range = c(0, 1))
   expect_identical(scep_qc@cells_in_use, (1:100)[-zero_umi_count_idx])
 
   scep_qc <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0, .97), response_n_nonzero_range = c(0,1))
+    run_qc(response_n_umis_range = c(0, .97), response_n_nonzero_range = c(0, 1))
   expect_identical(scep_qc@cells_in_use, (1:100)[-high_umi_count_idx])
 
   scep_qc <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0.03,1))
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0.03, 1))
   expect_identical(scep_qc@cells_in_use, (1:100)[-zero_umi_count_idx])
 
   scep_qc <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,.02))
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, .02))
   expect_equal(scep_qc@cells_in_use, zero_umi_count_idx)
 })
 
 test_that("run_qc remove cells with `p_mito_threshold` high moi", {
-
   test_data_list <- make_mock_base_data_for_testing_run_qc(num_cells = 100)
   num_cells <- ncol(test_data_list$response_matrix)
   num_grnas <- nrow(test_data_list$grna_matrix)
@@ -183,8 +180,8 @@ test_that("run_qc remove cells with `p_mito_threshold` high moi", {
   response_matrix <- test_data_list$response_matrix
   rownames(response_matrix)[6:7] <- paste0("MT-", rownames(response_matrix)[6:7])
   response_matrix[] <- rpois(prod(dim(response_matrix)), 2)
-  high_p_mito_idx <- c(1,5)
-  response_matrix[6:7,high_p_mito_idx] <- 100
+  high_p_mito_idx <- c(1, 5)
+  response_matrix[6:7, high_p_mito_idx] <- 100
 
   scep_high_pre_qc <- import_data(
     grna_matrix = grna_matrix,
@@ -199,7 +196,7 @@ test_that("run_qc remove cells with `p_mito_threshold` high moi", {
     assign_grnas(method = "thresholding", threshold = 7)
 
   scep_qc <- scep_high_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), p_mito_threshold = .93)
+    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), p_mito_threshold = .93)
 
   expect_identical(scep_qc@cells_in_use, (1:100)[-high_p_mito_idx])
 })
@@ -216,7 +213,7 @@ test_that("run_qc test positive control pairs", {
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -229,7 +226,7 @@ test_that("run_qc test positive control pairs", {
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   # # target t1: all control group are non-zero, all NT are non-zero
@@ -253,13 +250,13 @@ test_that("run_qc test positive control pairs", {
   # target t3: all cells are non-zero
   response_matrix["t3", all_cells] <- 100
 
-  positive_control_pairs = data.frame(
+  positive_control_pairs <- data.frame(
     grna_target = c("t1", "t2", "t3"),
     response_id = c("t1", "t2", "t3")
   )
   discovery_pairs <- data.frame(
-    grna_target = c("t1",        "t1",        "t2",         "t2"),
-    response_id = c("response_4", "response_5",  "response_4", "response_6")
+    grna_target = c("t1", "t1", "t2", "t2"),
+    response_id = c("response_4", "response_5", "response_4", "response_6")
   )
 
   ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -277,8 +274,10 @@ test_that("run_qc test positive control pairs", {
     assign_grnas(method = "thresholding", threshold = 40)
 
   scep_low_control_nt_all_pass <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    )
 
   # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
   expect_equal(scep_low_control_nt_all_pass@positive_control_pairs_with_info$n_nonzero_trt, c(10, 10, 0))
@@ -289,14 +288,18 @@ test_that("run_qc test positive control pairs", {
 
   # for this one only t3 fails because it has no cells expressing the response, since no gRNAs express t3
   scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    )
   expect_equal(scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
 
   # for this one only t2 fails, because that's the only one with 0 control group responses
   scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1
+    )
   expect_equal(scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, FALSE, TRUE))
 
 
@@ -314,8 +317,10 @@ test_that("run_qc test positive control pairs", {
     assign_grnas(method = "thresholding", threshold = 40)
 
   scep_high_control_complement_all_pass <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    )
 
   # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
   expect_equal(scep_high_control_complement_all_pass@positive_control_pairs_with_info$n_nonzero_trt, c(10, 10, 0))
@@ -325,13 +330,17 @@ test_that("run_qc test positive control pairs", {
   expect_true(all(scep_high_control_complement_all_pass@positive_control_pairs_with_info$pass_qc))
 
   scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),  # don't want to remove any cells here
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    )
   expect_equal(scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc, c(TRUE, TRUE, FALSE))
 
   scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21
+    )
   expect_equal(scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc, c(FALSE, FALSE, TRUE))
 })
 
@@ -350,7 +359,7 @@ test_that("run_qc test discovery pairs", {
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -363,7 +372,7 @@ test_that("run_qc test discovery pairs", {
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   response_matrix["response_4", cells_expressing_t1] <- 100
@@ -378,7 +387,7 @@ test_that("run_qc test discovery pairs", {
   response_matrix["response_6", ] <- 100
 
   discovery_pairs <- data.frame(
-    grna_target = c("t1",         "t2",         "t3"),
+    grna_target = c("t1", "t2", "t3"),
     response_id = c("response_4", "response_5", "response_6")
   )
 
@@ -397,8 +406,10 @@ test_that("run_qc test discovery pairs", {
 
 
   scep_low_control_nt_all_pass <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) # don't want to remove the cells I'm messing with
 
   # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
   expect_equal(scep_low_control_nt_all_pass@discovery_pairs_with_info$n_nonzero_trt, c(10, 0, 0))
@@ -408,13 +419,17 @@ test_that("run_qc test discovery pairs", {
   expect_true(all(scep_low_control_nt_all_pass@discovery_pairs_with_info$pass_qc))
 
   scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    ) # don't want to remove the cells I'm messing with
   expect_equal(scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
 
   scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 1
+    ) # don't want to remove the cells I'm messing with
   expect_equal(scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
 
   ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -430,8 +445,10 @@ test_that("run_qc test discovery pairs", {
     assign_grnas(method = "thresholding", threshold = 40)
 
   scep_high_control_complement_all_pass <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) # don't want to remove the cells I'm messing with
 
   # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
   expect_equal(scep_high_control_complement_all_pass@discovery_pairs_with_info$n_nonzero_trt, c(10, 0, 0))
@@ -441,13 +458,17 @@ test_that("run_qc test discovery pairs", {
   expect_true(all(scep_high_control_complement_all_pass@discovery_pairs_with_info$pass_qc))
 
   scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    ) # don't want to remove the cells I'm messing with
   expect_equal(scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc, c(TRUE, FALSE, FALSE))
 
   scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21)  # don't want to remove the cells I'm messing with
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 21
+    ) # don't want to remove the cells I'm messing with
   expect_equal(scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc, c(FALSE, TRUE, TRUE))
 })
 
@@ -464,7 +485,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -477,7 +498,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   # # target t1: all control group are non-zero, all NT are non-zero
@@ -501,18 +522,18 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
   # target t3: all cells are non-zero
   response_matrix["t3", all_cells] <- 100
 
-  cells_to_remove_low_umi <- c(1,2,4,5,6,11,12,31)
-  cells_to_remove_high_umi <- c(3, 13,32,33,34)
-  response_matrix[,cells_to_remove_low_umi] <- 0
-  response_matrix[,cells_to_remove_high_umi] <- 100000
+  cells_to_remove_low_umi <- c(1, 2, 4, 5, 6, 11, 12, 31)
+  cells_to_remove_high_umi <- c(3, 13, 32, 33, 34)
+  response_matrix[, cells_to_remove_low_umi] <- 0
+  response_matrix[, cells_to_remove_high_umi] <- 100000
 
-  positive_control_pairs = data.frame(
+  positive_control_pairs <- data.frame(
     grna_target = c("t1", "t2", "t3"),
     response_id = c("t1", "t2", "t3")
   )
   discovery_pairs <- data.frame(
-    grna_target = c("t1",        "t1",        "t2",         "t2"),
-    response_id = c("response_4", "response_5",  "response_4", "response_6")
+    grna_target = c("t1", "t1", "t2", "t2"),
+    response_id = c("response_4", "response_5", "response_4", "response_6")
   )
 
   ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -529,8 +550,10 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
     ) |>
     assign_grnas(method = "thresholding", threshold = 40) |>
     # these params are chosen to remove the intended cells in cellwise-qc
-    run_qc(response_n_umis_range = c(0, .85), response_n_nonzero_range = c(0.20,1),
-           n_nonzero_trt_thresh = 5, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, .85), response_n_nonzero_range = c(0.20, 1),
+      n_nonzero_trt_thresh = 5, n_nonzero_cntrl_thresh = 0
+    )
 
   # making sure that the only cells removed are the ones intended to be removed
   expect_setequal(
@@ -571,7 +594,7 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -584,7 +607,7 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   response_matrix["response_4", cells_expressing_t1] <- 100
@@ -598,14 +621,14 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
 
   response_matrix["response_6", ] <- 100
 
-  cells_to_remove_low_umi <- c(1,2,4,5,6,11,12,31)
-  cells_to_remove_high_umi <- c(3, 13,32,33,34)
-  response_matrix[,cells_to_remove_low_umi] <- 0
-  response_matrix[,cells_to_remove_high_umi] <- 100000
+  cells_to_remove_low_umi <- c(1, 2, 4, 5, 6, 11, 12, 31)
+  cells_to_remove_high_umi <- c(3, 13, 32, 33, 34)
+  response_matrix[, cells_to_remove_low_umi] <- 0
+  response_matrix[, cells_to_remove_high_umi] <- 100000
 
 
   discovery_pairs <- data.frame(
-    grna_target = c("t1",         "t2",         "t3"),
+    grna_target = c("t1", "t2", "t3"),
     response_id = c("response_4", "response_5", "response_6")
   )
 
@@ -620,8 +643,10 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
       discovery_pairs = discovery_pairs,
     ) |>
     assign_grnas(method = "thresholding", threshold = 40) |>
-    run_qc(response_n_umis_range = c(0, .85), response_n_nonzero_range = c(.20, 1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 11)
+    run_qc(
+      response_n_umis_range = c(0, .85), response_n_nonzero_range = c(.20, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 11
+    )
 
   expect_setequal(
     scep_high@cells_in_use,
@@ -645,4 +670,3 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
     c(FALSE, TRUE, TRUE)
   )
 })
-

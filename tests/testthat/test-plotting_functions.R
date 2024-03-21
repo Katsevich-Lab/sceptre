@@ -25,7 +25,7 @@ test_that("test all plots", {
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -40,20 +40,20 @@ test_that("test all plots", {
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   response_matrix["t1", cells_expressing_t1] <- 100 # should be highly significant
 
   response_matrix["t2", ] <- 100 # should not be significant at all
 
-  positive_control_pairs = data.frame(
+  positive_control_pairs <- data.frame(
     grna_target = c("t1", "t2", "t3"),
     response_id = c("t1", "t2", "t3")
   )
   discovery_pairs <- data.frame(
-    grna_target = c("t1",        "t1",        "t2",         "t2"),
-    response_id = c("response_4", "response_5",  "response_4", "response_6")
+    grna_target = c("t1", "t1", "t2", "t2"),
+    response_id = c("response_4", "response_5", "response_4", "response_6")
   )
 
   scep <- import_data(
@@ -69,8 +69,10 @@ test_that("test all plots", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 40) |>
     # don't want to remove any cells or pairs for this one
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0) |>
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) |>
     run_calibration_check(calibration_group_size = 1) |>
     run_power_check() |>
     run_discovery_analysis()
@@ -85,7 +87,7 @@ test_that("test all plots", {
   pltlist <- plot_assign_grnas(scep, grnas_to_plot = c("nt1", "id1"), return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 3)
 
-  expect_true(! "title" %in% names(pltlist[[1]]$labels)) # no title for this plot
+  expect_true(!"title" %in% names(pltlist[[1]]$labels)) # no title for this plot
   expect_equal(pltlist[[1]]$labels$y, "gRNA count")
   expect_equal(pltlist[[1]]$labels$x, "Assignment")
 

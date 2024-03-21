@@ -36,5 +36,21 @@ an updated \code{sceptre_object} in which the gRNA assignments have been carried
 \code{assign_grnas()} performs the gRNA-to-cell assignments. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for detailed information about this function.
 }
 \examples{
-# see example via ?sceptre
+library(sceptredata)
+data("lowmoi_example_data")
+# 1. import data, set default analysis parameters
+sceptre_object <- import_data(
+  response_matrix = lowmoi_example_data$response_matrix,
+  grna_matrix = lowmoi_example_data$grna_matrix,
+  extra_covariates = lowmoi_example_data$extra_covariates,
+  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+  moi = "low"
+) |> set_analysis_parameters()
+
+# 2. assign gRNAs (three different methods)
+sceptre_object <- sceptre_object |> assign_grnas(method = "thresholding")
+sceptre_object <- sceptre_object |> assign_grnas(method = "maximum")
+sceptre_object <- sceptre_object |> assign_grnas(
+  method = "mixture", parallel = TRUE, n_processors = 2
+)
 }

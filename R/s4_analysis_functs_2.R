@@ -14,20 +14,50 @@
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas, run qc, run calibration check
+#' sceptre_object <- sceptre_object |>
+#'   set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations"
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc() |>
+#'   run_calibration_check(
+#'     n_calibration_pairs = 500,
+#'     calibration_group_size = 2,
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'   )
 run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
                                   n_processors = "auto", log_dir = tempdir()) {
   sceptre_object <- sceptre_object |>
-    run_calibration_check_pt_1(n_calibration_pairs = n_calibration_pairs,
-                               calibration_group_size = calibration_group_size,
-                               parallel = parallel,
-                               n_processors = n_processors) |>
-    run_calibration_check_pt_2(output_amount = output_amount,
-                               print_progress = print_progress,
-                               parallel = parallel,
-                               n_processors = n_processors,
-                               log_dir = log_dir)
+    run_calibration_check_pt_1(
+      n_calibration_pairs = n_calibration_pairs,
+      calibration_group_size = calibration_group_size,
+      parallel = parallel,
+      n_processors = n_processors
+    ) |>
+    run_calibration_check_pt_2(
+      output_amount = output_amount,
+      print_progress = print_progress,
+      parallel = parallel,
+      n_processors = n_processors,
+      log_dir = log_dir
+    )
   return(sceptre_object)
 }
 
@@ -35,7 +65,7 @@ run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibrati
 run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NULL, calibration_group_size = NULL,
                                        parallel = FALSE, n_processors = "auto") {
   # 0. advance function (if necessary), and check function call
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -46,18 +76,21 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   if (is.null(calibration_group_size)) calibration_group_size <- compute_calibration_group_size(sceptre_object@grna_target_data_frame)
   if (is.null(n_calibration_pairs)) {
     n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
-  } else {
+  }
+  if (!is.null(n_calibration_pairs) && sceptre_object@resampling_approximation == "no_approximation") {
     mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-    sceptre_object@B3 <- ceiling(mult_fact * n_calibration_pairs /sceptre_object@multiple_testing_alpha) |> as.integer()
+    sceptre_object@B3 <- ceiling(mult_fact * n_calibration_pairs / sceptre_object@multiple_testing_alpha) |> as.integer()
   }
 
   # 2. check inputs
   check_calibration_check_inputs(sceptre_object, n_calibration_pairs, n_processors) |> invisible()
 
   # 3. construct the negative control pairs
-  negative_control_pairs <- construct_negative_control_pairs_v2(sceptre_object = sceptre_object,
-                                                                n_calibration_pairs = n_calibration_pairs,
-                                                                calibration_group_size = calibration_group_size)
+  negative_control_pairs <- construct_negative_control_pairs_v2(
+    sceptre_object = sceptre_object,
+    n_calibration_pairs = n_calibration_pairs,
+    calibration_group_size = calibration_group_size
+  )
 
   # 4. update uncached objects
   sceptre_object@calibration_group_size <- as.integer(calibration_group_size)
@@ -71,15 +104,17 @@ run_calibration_check_pt_2 <- function(sceptre_object, output_amount = 1, print_
                                        parallel = FALSE, n_processors = "auto", log_dir = tempdir()) {
   # 5. run the sceptre analysis (high-level function call)
   response_grna_group_pairs <- sceptre_object@negative_control_pairs
-  out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
-                                         response_grna_group_pairs = response_grna_group_pairs,
-                                         calibration_check = TRUE,
-                                         analysis_type = "calibration_check",
-                                         output_amount = output_amount,
-                                         print_progress = print_progress,
-                                         parallel = parallel,
-                                         n_processors = n_processors,
-                                         log_dir = log_dir)
+  out <- run_sceptre_analysis_high_level(
+    sceptre_object = sceptre_object,
+    response_grna_group_pairs = response_grna_group_pairs,
+    calibration_check = TRUE,
+    analysis_type = "calibration_check",
+    output_amount = output_amount,
+    print_progress = print_progress,
+    parallel = parallel,
+    n_processors = n_processors,
+    log_dir = log_dir
+  )
 
   # 6. update fields of sceptre object with results
   sceptre_object@calibration_result <- if (!sceptre_object@nf_pipeline) {
@@ -93,9 +128,10 @@ run_calibration_check_pt_2 <- function(sceptre_object, output_amount = 1, print_
 
 
 process_calibration_result <- function(result, sceptre_object) {
-  result |> apply_grouping_to_result(sceptre_object, TRUE) |>
+  result |>
+    apply_grouping_to_result(sceptre_object, TRUE) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha)
+      sceptre_object@multiple_testing_alpha)
 }
 
 
@@ -113,11 +149,34 @@ process_calibration_result <- function(result, sceptre_object) {
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#'
+#' # set analysis parameters, assign grnas, run qc
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' sceptre_object <- sceptre_object |>
+#'   set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations",
+#'     positive_control_pairs = positive_control_pairs
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc() |>
+#'   run_power_check()
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                             n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -125,24 +184,28 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
 
   # 2. check inputs
-  check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
-                                  control_group_complement = sceptre_object@control_group_complement,
-                                  grna_target_data_frame = sceptre_object@grna_target_data_frame,
-                                  pc_analysis = TRUE,
-                                  calibration_result = sceptre_object@calibration_result,
-                                  n_ok_pairs = sceptre_object@n_ok_positive_control_pairs,
-                                  n_processors = n_processors) |> invisible()
+  check_discovery_analysis_inputs(
+    response_grna_group_pairs = response_grna_group_pairs,
+    control_group_complement = sceptre_object@control_group_complement,
+    grna_target_data_frame = sceptre_object@grna_target_data_frame,
+    pc_analysis = TRUE,
+    calibration_result = sceptre_object@calibration_result,
+    n_ok_pairs = sceptre_object@n_ok_positive_control_pairs,
+    n_processors = n_processors
+  ) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
-  out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
-                                         response_grna_group_pairs = response_grna_group_pairs,
-                                         calibration_check = FALSE,
-                                         analysis_type = "power_check",
-                                         output_amount = output_amount,
-                                         print_progress = print_progress,
-                                         parallel = parallel,
-                                         n_processors = n_processors,
-                                         log_dir = log_dir)
+  out <- run_sceptre_analysis_high_level(
+    sceptre_object = sceptre_object,
+    response_grna_group_pairs = response_grna_group_pairs,
+    calibration_check = FALSE,
+    analysis_type = "power_check",
+    output_amount = output_amount,
+    print_progress = print_progress,
+    parallel = parallel,
+    n_processors = n_processors,
+    log_dir = log_dir
+  )
 
   # 4. update fields of sceptre object with results
   sceptre_object@power_result <- if (!sceptre_object@nf_pipeline) {
@@ -169,11 +232,36 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #'
 #' @export
 #' @examples
-#' # see example via ?sceptre
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#' # set analysis parameters, assign grnas, run qc
+#' discovery_pairs <- construct_cis_pairs(sceptre_object)
+#' sceptre_object <- sceptre_object |>
+#'   set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations",
+#'     discovery_pairs = discovery_pairs
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc() |>
+#'   run_discovery_analysis(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'   )
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                                    n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
-  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel)
+  sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
   if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
 
@@ -181,24 +269,28 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
 
   # 2. check inputs
-  check_discovery_analysis_inputs(response_grna_group_pairs = response_grna_group_pairs,
-                                  control_group_complement = sceptre_object@control_group_complement,
-                                  grna_target_data_frame = sceptre_object@grna_target_data_frame,
-                                  pc_analysis = FALSE,
-                                  calibration_result = sceptre_object@calibration_result,
-                                  n_ok_pairs = sceptre_object@n_ok_discovery_pairs,
-                                  n_processors = n_processors) |> invisible()
+  check_discovery_analysis_inputs(
+    response_grna_group_pairs = response_grna_group_pairs,
+    control_group_complement = sceptre_object@control_group_complement,
+    grna_target_data_frame = sceptre_object@grna_target_data_frame,
+    pc_analysis = FALSE,
+    calibration_result = sceptre_object@calibration_result,
+    n_ok_pairs = sceptre_object@n_ok_discovery_pairs,
+    n_processors = n_processors
+  ) |> invisible()
 
   # 3.  run the sceptre analysis (high-level function call)
-  out <- run_sceptre_analysis_high_level(sceptre_object = sceptre_object,
-                                         response_grna_group_pairs = response_grna_group_pairs,
-                                         calibration_check = FALSE,
-                                         analysis_type = "discovery_analysis",
-                                         output_amount = output_amount,
-                                         print_progress = print_progress,
-                                         parallel = parallel,
-                                         n_processors = n_processors,
-                                         log_dir = log_dir)
+  out <- run_sceptre_analysis_high_level(
+    sceptre_object = sceptre_object,
+    response_grna_group_pairs = response_grna_group_pairs,
+    calibration_check = FALSE,
+    analysis_type = "discovery_analysis",
+    output_amount = output_amount,
+    print_progress = print_progress,
+    parallel = parallel,
+    n_processors = n_processors,
+    log_dir = log_dir
+  )
 
   # 4. update fields of sceptre object with results
   sceptre_object@discovery_result <- if (!sceptre_object@nf_pipeline) {
@@ -212,44 +304,49 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 
 
 process_discovery_result <- function(result, sceptre_object) {
-  result |> apply_grouping_to_result(sceptre_object) |>
+  result |>
+    apply_grouping_to_result(sceptre_object) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
-                    sceptre_object@multiple_testing_alpha)
+      sceptre_object@multiple_testing_alpha)
 }
 
 
-run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type, output_amount,
-                                            print_progress, parallel, n_processors, log_dir) {
+run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type,
+                                            output_amount, print_progress, parallel, n_processors, log_dir) {
   # if running permutations, generate the permutation idxs
   if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
-    synthetic_idxs <- get_synthetic_permutation_idxs(grna_assignments = sceptre_object@grna_assignments,
-                                                     B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
-                                                     calibration_check = calibration_check,
-                                                     control_group_complement = sceptre_object@control_group_complement,
-                                                     calibration_group_size = sceptre_object@calibration_group_size,
-                                                     n_cells = length(sceptre_object@cells_in_use))
-    cat(crayon::green(' \u2713\n'))
+    synthetic_idxs <- get_synthetic_permutation_idxs(
+      grna_assignments = sceptre_object@grna_assignments,
+      B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+      calibration_check = calibration_check,
+      control_group_complement = sceptre_object@control_group_complement,
+      calibration_group_size = sceptre_object@calibration_group_size,
+      n_cells = length(sceptre_object@cells_in_use)
+    )
+    cat(crayon::green(" \u2713\n"))
   }
   gc() |> invisible()
 
   # initialize the args to pass
-  args_to_pass <- list(response_matrix = get_response_matrix(sceptre_object),
-                       grna_assignments = sceptre_object@grna_assignments,
-                       covariate_matrix = sceptre_object@covariate_matrix,
-                       response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),
-                       output_amount = output_amount,
-                       fit_parametric_curve = sceptre_object@fit_parametric_curve,
-                       B1 = sceptre_object@B1, B2 = sceptre_object@B2,
-                       B3 = sceptre_object@B3, calibration_check = calibration_check,
-                       control_group_complement = sceptre_object@control_group_complement,
-                       n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-                       n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
-                       side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
-                       response_precomputations = sceptre_object@response_precomputations,
-                       cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
-                       parallel = parallel, n_processors = n_processors, log_dir = log_dir,
-                       analysis_type = analysis_type)
+  args_to_pass <- list(
+    response_matrix = get_response_matrix(sceptre_object),
+    grna_assignments = sceptre_object@grna_assignments,
+    covariate_matrix = sceptre_object@covariate_matrix,
+    response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),
+    output_amount = output_amount,
+    resampling_approximation = sceptre_object@resampling_approximation,
+    B1 = sceptre_object@B1, B2 = sceptre_object@B2,
+    B3 = sceptre_object@B3, calibration_check = calibration_check,
+    control_group_complement = sceptre_object@control_group_complement,
+    n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
+    n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+    side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
+    response_precomputations = sceptre_object@response_precomputations,
+    cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
+    parallel = parallel, n_processors = n_processors, log_dir = log_dir,
+    analysis_type = analysis_type
+  )
 
   # run the method
   out <- if (sceptre_object@run_permutations) {
@@ -275,11 +372,13 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
   if (grna_integration_strategy %in% c("singleton", "bonferroni")) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
       dplyr::select(grna_id, grna_target)
-    new_result <- result |> dplyr::rename("grna_id" = "grna_group") |>
+    new_result <- result |>
+      dplyr::rename("grna_id" = "grna_group") |>
       dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
       dplyr::relocate(response_id, grna_id, grna_target)
     if (grna_integration_strategy == "bonferroni" && !is_calibration_check) {
-      new_result <- new_result |> dplyr::group_by(response_id, grna_target) |>
+      new_result <- new_result |>
+        dplyr::group_by(response_id, grna_target) |>
         dplyr::group_modify(.f = function(tbl, key) {
           if (!any(tbl$pass_qc)) {
             n_nonzero_trt_out <- max(tbl$n_nonzero_trt)
@@ -294,16 +393,19 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
             p_value_out <- min(sum(tbl$pass_qc) * tbl$p_value[min_p_idx], 1)
             pass_qc_out <- TRUE
           }
-          data.frame(p_value = p_value_out,
-                     n_nonzero_trt = n_nonzero_trt_out,
-                     n_nonzero_cntrl = n_nonzero_cntrl_out,
-                     log_2_fold_change = log_2_fold_change_out,
-                     pass_qc = pass_qc_out)
-        }) |> dplyr::ungroup()
+          data.frame(
+            p_value = p_value_out,
+            n_nonzero_trt = n_nonzero_trt_out,
+            n_nonzero_cntrl = n_nonzero_cntrl_out,
+            log_2_fold_change = log_2_fold_change_out,
+            pass_qc = pass_qc_out
+          )
+        }) |>
+        dplyr::ungroup()
     }
     data.table::setorderv(new_result, c("p_value", "response_id"), na.last = TRUE)
   }
-  return (new_result)
+  return(new_result)
 }
 
 
@@ -316,15 +418,40 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
 #'
 #' @returns a data frame containing the results of the analysis
 #' @export
+#' @examples
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' pc_result <- sceptre_object |>
+#'   set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations",
+#'     positive_control_pairs = positive_control_pairs
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc() |>
+#'   run_power_check() |>
+#'   get_result("run_power_check")
 get_result <- function(sceptre_object, analysis) {
   if (!(analysis %in% c("run_calibration_check", "run_power_check", "run_discovery_analysis"))) {
     stop("`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`.")
   }
-  if (!sceptre_object@functs_called[[analysis]]) stop(paste0(analysis, " has not yet been run."))
+  if (!sceptre_object@functs_called[[analysis]]) stop(analysis, " has not yet been run.")
   field_to_extract <- switch(EXPR = analysis,
-                             run_calibration_check = "calibration_result",
-                             run_power_check = "power_result",
-                             run_discovery_analysis = "discovery_result")
+    run_calibration_check = "calibration_result",
+    run_power_check = "power_result",
+    run_discovery_analysis = "discovery_result"
+  )
   out <- methods::slot(sceptre_object, field_to_extract)
   return(out)
 }
@@ -337,14 +464,54 @@ get_result <- function(sceptre_object, analysis) {
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a string giving the file path to a directory on disk in which to write the results
 #'
-#' @return NULL
+#' @return the value NULL
 #' @export
+#' @examples
+#' library(sceptredata)
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' # import data
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+#' discovery_pairs <- construct_cis_pairs(sceptre_object,
+#'   positive_control_pairs = positive_control_pairs,
+#'   distance_threshold = 5e6
+#' )
+#' sceptre_object |>
+#'   set_analysis_parameters(
+#'     side = "left",
+#'     resampling_mechanism = "permutations",
+#'     discovery_pairs = discovery_pairs,
+#'     positive_control_pairs = positive_control_pairs
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc() |>
+#'   run_calibration_check(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'   ) |>
+#'   run_power_check() |>
+#'   run_discovery_analysis(
+#'     parallel = TRUE,
+#'     n_processors = 2
+#'   ) |>
+#'   write_outputs_to_directory(paste0(tempdir(), "/sceptre_outputs"))
+#' # files written to "sceptre_outputs" in tempdir()
 write_outputs_to_directory <- function(sceptre_object, directory) {
   # 0. create directory
   if (!dir.exists(directory)) dir.create(path = directory, recursive = TRUE)
-  fs <- paste0(directory, "/", c("analysis_summary.txt", "plot_assign_grnas.png", "plot_run_qc.png",
-        "plot_run_calibration_check.png", "plot_run_power_check.png", "plot_run_discovery_analysis.png",
-        "results_run_calibration_check.rds", "results_run_power_check.rds", "results_run_discovery_analysis.rds"))
+  fs <- paste0(directory, "/", c(
+    "analysis_summary.txt", "plot_assign_grnas.png", "plot_run_qc.png",
+    "plot_run_calibration_check.png", "plot_run_power_check.png", "plot_run_discovery_analysis.png",
+    "results_run_calibration_check.rds", "results_run_power_check.rds", "results_run_discovery_analysis.rds"
+  ))
   for (f in fs) if (file.exists(f)) file.remove(f)
 
   # 1. create analysis_summary.txt file
@@ -381,12 +548,12 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
-skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel) {
+skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel, n_processors) {
   functs_run <- sceptre_object@functs_called
   if (functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]) {
     if (!functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
       cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.\n\n"))
-      sceptre_object <- assign_grnas(sceptre_object, parallel = parallel) |> run_qc() # advance by two
+      sceptre_object <- assign_grnas(sceptre_object, parallel = parallel, n_processors = n_processors) |> run_qc() # advance by two
     }
     if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
       cat(crayon::red("Note: Automatically running `run_qc()` with default arguments.\n\n"))

@@ -2,23 +2,23 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 synth_idx_list_to_matrix <- function(synthetic_idx_ptr) {
-    .Call(`_sceptre_synth_idx_list_to_matrix`, synthetic_idx_ptr)
+  .Call(`_sceptre_synth_idx_list_to_matrix`, synthetic_idx_ptr)
 }
 
 synth_idx_list_to_r_list <- function(synthetic_idx_ptr) {
-    .Call(`_sceptre_synth_idx_list_to_r_list`, synthetic_idx_ptr)
+  .Call(`_sceptre_synth_idx_list_to_r_list`, synthetic_idx_ptr)
 }
 
 print_synth_idx_list_row <- function(synthetic_idx_ptr, idx) {
-    invisible(.Call(`_sceptre_print_synth_idx_list_row`, synthetic_idx_ptr, idx))
+  invisible(.Call(`_sceptre_print_synth_idx_list_row`, synthetic_idx_ptr, idx))
 }
 
 test <- function() {
-    invisible(.Call(`_sceptre_test`))
+  invisible(.Call(`_sceptre_test`))
 }
 
 estimate_theta <- function(y, mu, dfr, limit, eps) {
-    .Call(`_sceptre_estimate_theta`, y, mu, dfr, limit, eps)
+  .Call(`_sceptre_estimate_theta`, y, mu, dfr, limit, eps)
 }
 
 #' @title Fisher-Yates sampler
@@ -28,7 +28,7 @@ estimate_theta <- function(y, mu, dfr, limit, eps) {
 #' @param B the number of WOR samples to generate
 #' @noRd
 fisher_yates_samlper <- function(n_tot, M, B) {
-    .Call(`_sceptre_fisher_yates_samlper`, n_tot, M, B)
+  .Call(`_sceptre_fisher_yates_samlper`, n_tot, M, B)
 }
 
 #' @title Hybrid Fisher-Yates/IWOR sampler
@@ -39,98 +39,97 @@ fisher_yates_samlper <- function(n_tot, M, B) {
 #' @param B the number of WOR samples to generate
 #' @noRd
 hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
-    .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
+  .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
 crt_index_sampler <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B)
+  .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B)
 }
 
 crt_index_sampler_fast <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
+  .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
 }
 
 run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
-    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
+  .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
 }
 
 compute_tolerance_cpp <- function(curr_log_lik, prev_log_lik) {
-    .Call(`_sceptre_compute_tolerance_cpp`, curr_log_lik, prev_log_lik)
+  .Call(`_sceptre_compute_tolerance_cpp`, curr_log_lik, prev_log_lik)
 }
 
 run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {
-    .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
+  .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
 }
 
 sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
-    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
+  .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
-    .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
+  .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
 increment_matrix <- function(m) {
-    invisible(.Call(`_sceptre_increment_matrix`, m))
+  invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
 sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+  .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 }
 
 compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
-    .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
+  .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
 }
 
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
-    .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
+  .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }
 
 compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
-    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
+  .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
 }
 
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {
-    .Call(`_sceptre_compute_empirical_p_value`, null_statistics, z_orig, side)
+  .Call(`_sceptre_compute_empirical_p_value`, null_statistics, z_orig, side)
 }
 
 fit_skew_normal_funct <- function(y) {
-    .Call(`_sceptre_fit_skew_normal_funct`, y)
+  .Call(`_sceptre_fit_skew_normal_funct`, y)
 }
 
 check_sn_tail <- function(y, xi_hat, omega_hat, alpha_hat) {
-    .Call(`_sceptre_check_sn_tail`, y, xi_hat, omega_hat, alpha_hat)
+  .Call(`_sceptre_check_sn_tail`, y, xi_hat, omega_hat, alpha_hat)
 }
 
 fit_and_evaluate_skew_normal <- function(z_orig, null_statistics, side_code) {
-    .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
+  .Call(`_sceptre_fit_and_evaluate_skew_normal`, z_orig, null_statistics, side_code)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
-    .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
+  .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }
 
 obtain_pointer_vector <- function(i, dim) {
-    .Call(`_sceptre_obtain_pointer_vector`, i, dim)
+  .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
-    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
+  .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
 }
 
 compute_colwise_max <- function(i, p, x, n_cells, grna_lib_size) {
-    .Call(`_sceptre_compute_colwise_max`, i, p, x, n_cells, grna_lib_size)
+  .Call(`_sceptre_compute_colwise_max`, i, p, x, n_cells, grna_lib_size)
 }
 
 compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
-    .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
+  .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
 }
 
 increment_vector <- function(x, value) {
-    invisible(.Call(`_sceptre_increment_vector`, x, value))
+  invisible(.Call(`_sceptre_increment_vector`, x, value))
 }
 
 threshold_count_matrix <- function(j, p, x, row_idx, threshold) {
-    .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, threshold)
+  .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, threshold)
 }
-

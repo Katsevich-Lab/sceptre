@@ -21,7 +21,7 @@ import_data_from_parse(
 
 \item{all_genes_fp}{file path to the all_genes.csv file containing the gene IDs}
 
-\item{all_grnas_fp}{file path to the all_guides.csv file containing the gRNA IDs}
+\item{all_grnas_fp}{file path to the all_guides.csv file containing the gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the "gene_name" column) of this file.}
 
 \item{moi}{a string indicating the MOI of the dataset, either "low" or "high"}
 
@@ -37,4 +37,23 @@ an initialized \code{sceptre_object}
 }
 \details{
 \code{import_data_from_parse()} is experimental, and the API of this function is subject to change. We expect the API to solidify as we learn more about the Parse platform and the structure of the Parse count matrix generation program output.
+}
+\examples{
+directory <- paste0(system.file("extdata", package = "sceptredata"), "/parse_example/")
+gene_mat_fp <- paste0(directory, "gene_mat.mtx")
+grna_mat_fp <- paste0(directory, "grna_mat.mtx")
+all_genes_fp <- paste0(directory, "all_genes.csv")
+all_grnas_fp <- paste0(directory, "all_grnas.csv")
+grna_target_data_frame <- data.frame(
+  grna_id = c("guide_A", "guide_B", "guide_C"),
+  grna_target = c("target-A", "target-B", "non-targeting")
+)
+sceptre_object <- import_data_from_parse(
+  gene_mat_fp = gene_mat_fp,
+  grna_mat_fp = grna_mat_fp,
+  all_genes_fp = all_genes_fp,
+  all_grnas_fp = all_grnas_fp,
+  moi = "low",
+  grna_target_data_frame = grna_target_data_frame
+)
 }
