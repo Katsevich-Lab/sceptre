@@ -4,7 +4,7 @@ test_that("run_calibration_check", {
   num_cells <- 100
   num_responses <- 40
 
-  grna_target_data_frame <- make_mock_grna_target_data(c(2,2,2), 1, 1, 10)
+  grna_target_data_frame <- make_mock_grna_target_data(c(2, 2, 2), 1, 1, 10)
   grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 5) |>
     matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
@@ -29,18 +29,20 @@ test_that("run_calibration_check", {
       control_group = "nt_cells"
     ) |>
     assign_grnas(method = "thresholding", threshold = 5) |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0)
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    )
 
   scep_calib_1 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size=1)
+    run_calibration_check(calibration_group_size = 1)
   scep_calib_3 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size=3)
+    run_calibration_check(calibration_group_size = 3)
 
   expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
   expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
 
-  expect_false(any(grepl(pattern="&", x=scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
+  expect_false(any(grepl(pattern = "&", x = scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
   expect_equal(strsplit(scep_calib_3@calibration_result$grna_target, "&") |> sapply(length), rep(3, nrow(discovery_pairs)))
 
   # with this seed all nulls are false for both objects
@@ -62,7 +64,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -77,16 +79,16 @@ test_that("run_calibration_check negative control pairs complement set with cell
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
-  cells_to_remove_low_umi <- c(1,2,4,5,6,11,12,31)
-  cells_to_remove_high_umi <- c(3, 13,32,33,34)
-  response_matrix[,cells_to_remove_low_umi] <- 0
-  response_matrix[,cells_to_remove_high_umi] <- 100000
+  cells_to_remove_low_umi <- c(1, 2, 4, 5, 6, 11, 12, 31)
+  cells_to_remove_high_umi <- c(3, 13, 32, 33, 34)
+  response_matrix[, cells_to_remove_low_umi] <- 0
+  response_matrix[, cells_to_remove_high_umi] <- 100000
 
   discovery_pairs <- data.frame(
-    grna_target = c("t1",         "t2",         "t3"),
+    grna_target = c("t1", "t2", "t3"),
     response_id = c("response_4", "response_5", "response_6")
   )
 
@@ -105,10 +107,12 @@ test_that("run_calibration_check negative control pairs complement set with cell
 
   # set.seed(5)
   scep_complement_size_1 <- scep_pre |>
-    run_qc(response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
-           # with `n_nonzero_cntrl_thresh = 20` one discovery pair fails
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 20) |>
-    run_calibration_check(calibration_group_size=1)
+    run_qc(
+      response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
+      # with `n_nonzero_cntrl_thresh = 20` one discovery pair fails
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 20
+    ) |>
+    run_calibration_check(calibration_group_size = 1)
 
   # making sure the correct cells were removed
   remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
@@ -121,7 +125,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
 
   expect_true(all(neg_df$pass_qc))
 
-  for(i in 1:nrow(neg_df)) {
+  for (i in 1:nrow(neg_df)) {
     trt_cells <- remaining_cells[scep_complement_size_1@grna_assignments$indiv_nt_grna_idxs[[neg_df$grna_group[i]]]]
     expect_equal(
       neg_df$n_nonzero_trt[i],
@@ -139,10 +143,12 @@ test_that("run_calibration_check negative control pairs complement set with cell
   ## testing `control_group = "complement"` and `calibration_group_size=2` ~~~~~~~~~~~~~~~~~~~~~
   set.seed(2)
   scep_complement_size_2 <- scep_pre |>
-    run_qc(response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
-           # with `n_nonzero_trt_thresh = 1` a single discovery pair fails pairwise QC
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0) |>
-    run_calibration_check(calibration_group_size=2)
+    run_qc(
+      response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
+      # with `n_nonzero_trt_thresh = 1` a single discovery pair fails pairwise QC
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    ) |>
+    run_calibration_check(calibration_group_size = 2)
 
   # making sure the correct cells were removed
   remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
@@ -154,7 +160,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
   expect_equal(nrow(neg_df), sum(scep_complement_size_2@discovery_pairs_with_info$pass_qc))
   expect_true(all(neg_df$pass_qc))
 
-  for(i in 1:nrow(neg_df)) {
+  for (i in 1:nrow(neg_df)) {
     # all nt cells each time
     trt_cells <- remaining_cells[scep_complement_size_2@grna_assignments$indiv_nt_grna_idxs |> unlist()]
     expect_equal(
@@ -183,7 +189,7 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -198,16 +204,16 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
-  cells_to_remove_low_umi <- c(1,2,4,5,6,11,12,31)
-  cells_to_remove_high_umi <- c(3, 13,32,33,34)
-  response_matrix[,cells_to_remove_low_umi] <- 0
-  response_matrix[,cells_to_remove_high_umi] <- 100000
+  cells_to_remove_low_umi <- c(1, 2, 4, 5, 6, 11, 12, 31)
+  cells_to_remove_high_umi <- c(3, 13, 32, 33, 34)
+  response_matrix[, cells_to_remove_low_umi] <- 0
+  response_matrix[, cells_to_remove_high_umi] <- 100000
 
   discovery_pairs <- data.frame(
-    grna_target = c("t1",         "t2",         "t3"),
+    grna_target = c("t1", "t2", "t3"),
     response_id = c("response_4", "response_5", "response_6")
   )
 
@@ -225,10 +231,12 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
     assign_grnas(method = "thresholding", threshold = 40)
 
   scep_nt_size_1 <- scep_pre |>
-    run_qc(response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
-           # with `n_nonzero_cntrl_thresh = 20` one discovery pair fails
-           n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0) |>
-    run_calibration_check(calibration_group_size=1)
+    run_qc(
+      response_n_umis_range = c(0, .90), response_n_nonzero_range = c(.15, 1),
+      # with `n_nonzero_cntrl_thresh = 20` one discovery pair fails
+      n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0
+    ) |>
+    run_calibration_check(calibration_group_size = 1)
 
   # making sure the correct cells were removed
   remaining_cells <- all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
@@ -240,7 +248,7 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
   expect_equal(nrow(neg_df), sum(scep_nt_size_1@discovery_pairs_with_info$pass_qc))
   expect_true(all(neg_df$pass_qc))
 
-  for(i in 1:nrow(neg_df)) {
+  for (i in 1:nrow(neg_df)) {
     trt_cells <- remaining_cells[scep_nt_size_1@grna_assignments$all_nt_idxs[scep_nt_size_1@grna_assignments$indiv_nt_grna_idxs[[neg_df$grna_group[i]]]]]
     expect_equal(
       neg_df$n_nonzero_trt[i],
@@ -270,7 +278,7 @@ test_that("run_power_check", {
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -283,20 +291,20 @@ test_that("run_power_check", {
   # grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   response_matrix["t1", cells_expressing_t1] <- 100 # should be highly significant
 
   response_matrix["t2", ] <- 100 # should not be significant at all
 
-  positive_control_pairs = data.frame(
+  positive_control_pairs <- data.frame(
     grna_target = c("t1", "t2", "t3"),
     response_id = c("t1", "t2", "t3")
   )
   discovery_pairs <- data.frame(
-    grna_target = c("t1",        "t1",        "t2",         "t2"),
-    response_id = c("response_4", "response_5",  "response_4", "response_6")
+    grna_target = c("t1", "t1", "t2", "t2"),
+    response_id = c("response_4", "response_5", "response_4", "response_6")
   )
 
   ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -312,8 +320,10 @@ test_that("run_power_check", {
       control_group = "nt_cells"
     ) |>
     assign_grnas(method = "thresholding", threshold = 40) |>
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1), # don't want to remove any cells here
-           n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0) |>
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) |>
     run_power_check()
 
   expect_equal(nrow(scep_power@power_result), nrow(positive_control_pairs))
@@ -337,7 +347,7 @@ test_that("run_discovery_analysis", {
 
   set.seed(1)
   # using sample(0:1) so no entries can accidentally cross the threshold
-  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace=TRUE), num_grna, num_cells) |>
+  grna_matrix <- matrix(sample(0:1, num_grna * num_cells, replace = TRUE), num_grna, num_cells) |>
     `rownames<-`(grna_target_data_frame$grna_id)
   cells_expressing_t1 <- 1:10
   cells_expressing_t2 <- 11:20
@@ -352,20 +362,20 @@ test_that("run_discovery_analysis", {
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
-  response_matrix <- matrix(rpois( num_responses * num_cells, 1), num_responses, num_cells) |>
+  response_matrix <- matrix(rpois(num_responses * num_cells, 1), num_responses, num_cells) |>
     `rownames<-`(c("t1", "t2", "t3", paste0("response_", 4:num_responses)))
 
   response_matrix["t1", cells_expressing_t1] <- 100 # should be highly significant
 
   response_matrix["t2", ] <- 100 # should not be significant at all
 
-  positive_control_pairs = data.frame(
+  positive_control_pairs <- data.frame(
     grna_target = c("t1", "t2", "t3"),
     response_id = c("t1", "t2", "t3")
   )
   discovery_pairs <- data.frame(
-    grna_target = c("t1",        "t1",        "t2",         "t2"),
-    response_id = c("response_4", "response_5",  "response_4", "response_6")
+    grna_target = c("t1", "t1", "t2", "t2"),
+    response_id = c("response_4", "response_5", "response_4", "response_6")
   )
 
   ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -382,9 +392,11 @@ test_that("run_discovery_analysis", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 40) |>
     # don't want to remove any cells for this one
-    run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0,1),
-           # making the response_5, t1 pair fail pairwise QC
-           n_nonzero_trt_thresh = 7, n_nonzero_cntrl_thresh = 0) |>
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      # making the response_5, t1 pair fail pairwise QC
+      n_nonzero_trt_thresh = 7, n_nonzero_cntrl_thresh = 0
+    ) |>
     run_calibration_check(calibration_group_size = 1) |>
     run_power_check() |>
     run_discovery_analysis() |>
@@ -394,8 +406,8 @@ test_that("run_discovery_analysis", {
   expect_false(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_5", "pass_qc"][[1]])
 
   # t1 should be significant
-  expect_true(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_4","significant"][[1]])
+  expect_true(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_4", "significant"][[1]])
 
   # t2 tests are not significant
-  expect_false(any(disc_results[disc_results$grna_target == "t2","significant"]))
+  expect_false(any(disc_results[disc_results$grna_target == "t2", "significant"]))
 })

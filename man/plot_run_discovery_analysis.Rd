@@ -30,8 +30,38 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 \code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_run_discovery_analysis}{Section 7 of the introductory chapter in the manual} for guidance on interpreting this visual.
 }
 \examples{
-# A full example can be found at ?sceptre;
-# `plot_run_discovery_analysis()` is dispatched when
-# `plot()` is called on the `sceptre_object`
-# in step 7 (the run discovery analysis step).
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
+sceptre_object |>
+  set_analysis_parameters(
+    side = "left",
+    discovery_pairs = discovery_pairs,
+    resampling_mechanism = "permutations",
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
+    parallel = TRUE,
+    n_processors = 2
+  ) |>
+  run_discovery_analysis(
+    parallel = TRUE,
+    n_processors = 2
+  ) |>
+  plot_run_discovery_analysis()
 }

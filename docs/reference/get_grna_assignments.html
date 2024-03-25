@@ -19,7 +19,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
-  <a class="nav-link" href="../articles/sceptre.html">
+  <a class="nav-link" href="../doc/sceptre.html">
     <span class="fa fa-play"></span>
      
     Get started
@@ -112,6 +112,39 @@
 <ul><li><p>When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.</p></li>
 </ul></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptredata</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># import data</span></span></span>
+<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
+<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
+<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
+<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
+<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
+<span class="r-in"><span>    side <span class="op">=</span> <span class="st">"left"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"mixture"</span>, parallel <span class="op">=</span> <span class="cn">TRUE</span>, n_processors <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running gRNA assignments in parallel. Change directories to <span style="color: #0000BB;">/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T//RtmpZxIgZi/sceptre_logs/</span> and view the files <span style="color: #0000BB;">assign_grnas_*.out</span> for progress updates.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">grna_assignment_matrix</span> <span class="op">&lt;-</span> <span class="fu">get_grna_assignments</span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">grna_assignment_matrix_with_qc</span> <span class="op">&lt;-</span> <span class="fu">get_grna_assignments</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
+<span class="r-in"><span>  apply_cellwise_qc <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

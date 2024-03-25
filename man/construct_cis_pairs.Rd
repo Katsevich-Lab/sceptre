@@ -27,5 +27,21 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 \code{construct_cis_pairs()} is a helper function to facilitate construction the \emph{cis} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
 }
 \examples{
-# see example via ?sceptre
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
 }
