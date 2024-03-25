@@ -32,7 +32,7 @@ test_that("import_data", {
   all_slots <- c(
     "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
     "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
-    "positive_control_pairs", "formula_object", "side_code", "fit_parametric_curve",
+    "positive_control_pairs", "formula_object", "side_code", "resampling_approximation",
     "control_group_complement", "resampling_mechanism", "n_nonzero_trt_thresh",
     "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
     "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
