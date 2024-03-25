@@ -163,9 +163,11 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
-  if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
-    stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
+  # 5. verify that resampling_mechanism is one of "permutations", "crt",
+  #     "asymptotic_normality", or "default"
+  if (!(resampling_mechanism %in% c("permutations", "crt",
+                                    "asymptotic_normality", "default"))) {
+    stop("`resampling_mechanism` should set to `permutations`, `crt`, `asymptotic_normality` or `default`.")
   }
 
   # 6. verify that the moi is consistent with the control group

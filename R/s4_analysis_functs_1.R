@@ -103,7 +103,6 @@ set_analysis_parameters <- function(sceptre_object,
   # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
-  run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
@@ -112,7 +111,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@side_code <- side_code
   sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
-  sceptre_object@run_permutations <- run_permutations
+  sceptre_object@resampling_mechanism <- resampling_mechanism
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
   sceptre_object@B3 <- B3

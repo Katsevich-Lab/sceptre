@@ -13,8 +13,8 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
 
 # core function 1. run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                    synthetic_idxs, output_amount, resampling_approximation, B1, B2, B3, calibration_check,
-                                    control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                    synthetic_idxs, output_amount, resampling_mechanism,resampling_approximation,
+                                    B1, B2, B3, calibration_check, control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
                                     side_code, low_moi, response_precomputations, cells_in_use, print_progress,
                                     parallel, n_processors, log_dir, analysis_type) {
   # 0. define several variables
@@ -129,7 +129,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 # core function 2: run crt in memory
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 output_amount, resampling_approximation, B1, B2, B3, calibration_check, control_group_complement,
+                                 output_amount, resampling_mechanism, resampling_approximation, B1, B2, B3, calibration_check, control_group_complement,
                                  n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, response_precomputations,
                                  cells_in_use, print_progress, parallel, n_processors, log_dir, analysis_type) {
   # 0. define several variables
