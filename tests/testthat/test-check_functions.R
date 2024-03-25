@@ -440,7 +440,7 @@ test_that("check_import_data_inputs", {
       moi = "high",
       extra_covariates = FAIL_extra_covariates_with_na
     ),
-    regex = "`extra_covariates` has NA values which need to be removed"
+    regex = "`extra_covariates` has NA values that need to be removed"
   )
   FAIL_extra_covariates_with_inf <- valid_extra_covariates |>
     dplyr::mutate(x = c(-Inf, rnorm(num_cells - 1)))
@@ -452,6 +452,6 @@ test_that("check_import_data_inputs", {
       moi = "high",
       extra_covariates = FAIL_extra_covariates_with_inf
     ),
-    regex = "`extra_covariates` has infinite values which need to be removed"
+    regex = "`extra_covariates` has infinite values that need to be removed"
   )
 })
