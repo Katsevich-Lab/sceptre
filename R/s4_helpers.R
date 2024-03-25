@@ -98,7 +98,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     } else {
       paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))
     },
-    "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
+    "\n\t\U2022 Resampling mechanism: ", resampling_mechanism_to_string(x@resampling_mechanism),
     "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
     "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
     "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
@@ -226,5 +226,20 @@ load_row <- function(mat, id) {
     mat[id, ]
   } else if (methods::is(mat, "dgRMatrix")) {
     load_csr_row(j = mat@j, p = mat@p, x = mat@x, row_idx = which(id == rownames(mat)), n_cells = ncol(mat))
+  }
+}
+
+# convert sceptre_object@resampling_mechanism to a string for printing
+resampling_mechanism_to_string <- function(resampling_mechanism){
+  if(length(resampling_mechanism) == 0L){
+    return("not specified")
+  } else if(resampling_mechanism == "permutations"){
+    return("permutations")
+  } else if(resampling_mechanism == "crt"){
+    return("conditional resampling")
+  } else if(resampling_mechanism == "asymptotic_normality"){
+    return("asymptotic normality")
+  } else {
+    stop("Invalid resampling mechanism")
   }
 }
