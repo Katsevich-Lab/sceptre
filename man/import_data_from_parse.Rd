@@ -45,8 +45,8 @@ grna_mat_fp <- paste0(directory, "grna_mat.mtx")
 all_genes_fp <- paste0(directory, "all_genes.csv")
 all_grnas_fp <- paste0(directory, "all_grnas.csv")
 grna_target_data_frame <- data.frame(
-   grna_id = c("guide_A", "guide_B", "guide_C"),
-   grna_target = c("target-A", "target-B", "non-targeting")
+  grna_id = c("guide_A", "guide_B", "guide_C"),
+  grna_target = c("target-A", "target-B", "non-targeting")
 )
 sceptre_object <- import_data_from_parse(
   gene_mat_fp = gene_mat_fp,

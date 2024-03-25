@@ -3,7 +3,7 @@
 \name{read_ondisc_backed_sceptre_object}
 \alias{read_ondisc_backed_sceptre_object}
 \alias{write_ondisc_backed_sceptre_object}
-\title{Read ondisc-backed sceptre object}
+\title{Write/read an \code{ondisc}-backed \code{sceptre_object}}
 \usage{
 read_ondisc_backed_sceptre_object(
   sceptre_object_fp,
@@ -22,13 +22,42 @@ write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{directory_to_write}{directory in which to write \code{sceptre_object.rds}}
+\item{directory_to_write}{the directory in which to write the \code{sceptre_object.rds} file}
 }
 \value{
-an ondisc-backed \code{sceptre_object}
+\code{write_ondisc_backed_sceptre_object()} returns NULL, and \code{read_ondisc_backed_sceptre_object()} returns an \code{ondisc}-backed \code{sceptre_object}
 }
 \description{
-Reads and initializes a \code{sceptre_object} from backing .odm files.
+\itemize{
+\item \code{write_ondisc_backed_sceptre_object()} writes an \code{ondisc}-backed \code{sceptre_object} to disk, creating a file \code{sceptre_object.rds} in the specified directory
+\item \code{read_ondisc_backed_sceptre_object()} reads and initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file, \code{response.odm} file, and \code{grna.odm} file on disk
+}
+}
+\examples{
+library(sceptredata)
+data(lowmoi_example_data)
+# 1. create ondisc-backed sceptre_object
+sceptre_object <- import_data(
+  response_matrix = lowmoi_example_data$response_matrix,
+  grna_matrix = lowmoi_example_data$grna_matrix,
+  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+  extra_covariates = lowmoi_example_data$extra_covariates,
+  moi = "low",
+  use_ondisc = TRUE,
+  directory_to_write = tempdir()
+)
 
-Write an ondisc-backed sceptre object to disk.
+# 2. write
+write_ondisc_backed_sceptre_object(
+  sceptre_object = sceptre_object,
+  directory_to_write = tempdir()
+)
+
+# 3. read
+rm(sceptre_object)
+sceptre_object <- read_ondisc_backed_sceptre_object(
+  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
+  response_odm_file_fp = paste0(tempdir(), "/response.odm"),
+  grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
+)
 }

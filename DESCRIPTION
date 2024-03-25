@@ -21,7 +21,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 LinkingTo: Rcpp, BH
-biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport
+biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 BugReports: https://github.com/Katsevich-Lab/sceptre/issues
 Imports:
     BH,
@@ -40,6 +40,7 @@ Depends:
     R (>= 4.1)
 Suggests:
     ondisc,
+    sessioninfo,
     sceptredata,
     rmarkdown,
     knitr,
