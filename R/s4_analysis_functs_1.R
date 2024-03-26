@@ -11,7 +11,7 @@
 #' @param resampling_approximation (optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".
 #' @param response_regression_method (optional) a string specifying the regression method to use for the response, either `"approximate_nb"` or `"nb"`
 #' @param control_group (optional) a string specifying the control group to use, either `"complement"` or `"nt_cells"`
-#' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
+#' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"`, `"crt"`, or `"asymptotic_normality"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
 #' @param multiple_testing_alpha (optional; default `0.1`) a numeric specifying the nominal level of the multiple testing correction method
 #'
