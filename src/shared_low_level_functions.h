@@ -11,6 +11,11 @@ double estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVec
 double compute_empirical_p_value(const std::vector<double>& null_statistics, double z_orig, int side);
 #endif
 
+#ifndef COMPUTE_NORMAL_P_VALUE
+#define COMPUTE_NORMAL_P_VALUE
+double compute_normal_p_value(double z_orig, int side);
+#endif
+
 
 #ifndef FIT_SKEW_NORMAL_FUNCT
 #define FIT_SKEW_NORMAL_FUNCT

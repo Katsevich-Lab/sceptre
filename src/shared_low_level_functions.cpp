@@ -3,7 +3,9 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 #include <boost/math/distributions/skew_normal.hpp>
+#include <boost/math/distributions/normal.hpp>
 using boost::math::skew_normal;
+using boost::math::normal;
 #include <cmath>
 #include <math.h>
 #include <algorithm>
@@ -39,6 +41,22 @@ double compute_empirical_p_value(const std::vector<double>& null_statistics, dou
   return p;
 }
 
+// side: -1 is left, 0 is both, 1 is right
+// [[Rcpp::export]]
+double compute_normal_p_value(double z_orig, int side) {
+  double p, left_tail, right_tail;
+  normal dist(0, 1);
+  left_tail = cdf(dist, z_orig);
+  right_tail = cdf(complement(dist, z_orig));
+  if (side == -1) {
+    p = left_tail;
+  } else if (side == 1) {
+    p = right_tail;
+  } else {
+    p = 2 * std::min(left_tail, right_tail);
+  }
+  return p;
+}
 
 // [[Rcpp::export]]
 std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {

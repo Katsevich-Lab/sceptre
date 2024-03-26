@@ -5,11 +5,12 @@
 #' We (i) perform an initial Poisson regression, (ii) estimate the size parameter using the Poisson residuals, and then (iii) perform an NB regression, treating the size parameter as estimated in step (ii) as fixed and known.
 #'
 #' @param expressions the numeric vector of response expressions
-#' @param covariate_matrix the covariate matrix on which to regress the expressions (NOTE: the matrix should contain an interecept term)
+#' @param covariate_matrix the covariate matrix on which to regress the expressions (NOTE: the matrix should contain an intercept term)
+#' @param response_regression_method the method by which the response is regressed onto the covariates; must be either 'approximate_nb' or 'nb'
 #'
 #' @return a list containing the following elements: (i) "fitted_coefs": a vector of fitted coefficients; (ii) "theta": the fitted theta.
 #' @noRd
-perform_response_precomputation <- function(expressions, covariate_matrix) {
+perform_response_precomputation <- function(expressions, covariate_matrix, response_regression_method) {
   pois_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
   response_theta_list <- estimate_theta(
     y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual,
@@ -17,10 +18,20 @@ perform_response_precomputation <- function(expressions, covariate_matrix) {
   )
   # theta_fit_str <- c("mle", "mm", "pilot")[response_theta_list[[2]]]
   theta <- max(min(response_theta_list[[1]], 1000), 0.01)
-  result <- list(fitted_coefs = pois_fit$coefficients, theta = theta)
+  if(response_regression_method == "approximate_nb"){
+    fitted_coefs <- pois_fit$coefficients
+  } else if(response_regression_method == "nb"){
+    nb_fit <- stats::glm.fit(y = expressions,
+                             x = covariate_matrix,
+                             mustart = pois_fit$fitted.values,
+                             family = MASS::negative.binomial(theta = theta))
+    fitted_coefs <- nb_fit$coefficients
+  } else{
+    stop("response_regression_method must be either 'approximate_nb' or 'nb'")
+  }
+  result <- list(fitted_coefs = fitted_coefs, theta = theta)
   return(result)
 }
-
 
 perform_grna_precomputation <- function(trt_idxs, covariate_matrix, return_fitted_values) {
   indicator <- integer(length = nrow(covariate_matrix))
