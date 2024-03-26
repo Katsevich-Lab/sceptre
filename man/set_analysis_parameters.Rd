@@ -37,7 +37,7 @@ set_analysis_parameters(
 
 \item{control_group}{(optional) a string specifying the control group to use, either \code{"complement"} or \code{"nt_cells"}}
 
-\item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either \code{"permutations"} or \code{"crt"}}
+\item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either \code{"permutations"}, \code{"crt"}, or \code{"asymptotic_normality"}}
 
 \item{response_regression_method}{(optional) a string specifying the regression method to use for the response, either \code{"approximate_nb"} or \code{"nb"}}
 
