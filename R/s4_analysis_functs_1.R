@@ -82,6 +82,9 @@ set_analysis_parameters <- function(sceptre_object,
       response_regression_method <- "nb"
     }
   }
+  if(resampling_mechanism == "asymptotic_normality"){
+    resampling_approximation <- "no_approximation"
+  }
   B1 <- 499L
   if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
