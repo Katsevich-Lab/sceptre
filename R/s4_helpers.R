@@ -98,7 +98,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     } else {
       paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))
     },
-    "\n\t\U2022 Resampling mechanism: ", resampling_mechanism_to_string(x@resampling_mechanism),
+    "\n\t\U2022 Resampling mechanism: ", crayon::blue(resampling_mechanism_to_string(x@resampling_mechanism)),
     "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
     "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
     "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
