@@ -347,6 +347,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
     n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
     side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
     response_precomputations = sceptre_object@response_precomputations,
+    response_regression_method = sceptre_object@response_regression_method,
     cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
     parallel = parallel, n_processors = n_processors, log_dir = log_dir,
     analysis_type = analysis_type

@@ -3,6 +3,7 @@ using namespace Rcpp;
 #include <math.h>
 #include "shared_low_level_functions.h"
 
+// [[Rcpp::export]]
 double compute_observed_full_statistic_v2(NumericVector a, NumericVector w, NumericMatrix D, IntegerVector trt_idxs) {
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
   int D_nrow = D.nrow();
@@ -85,19 +86,28 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int B3,
                                 bool fit_parametric_curve,
                                 bool return_resampling_dist,
+                                bool asymptotic_normality,
                                 int side_code) {
-  double P_THRESH = 0.02, p;
+  // initialize the output list and p-value
+  List out;
+  double p, P_THRESH = 0.02;
   bool sn_fit_used = false;
   NumericVector sn_params = NumericVector::create(NA_REAL, NA_REAL, NA_REAL);
   std::vector<double> fit_sn_out;
   int stage = 1;
-  List out;
 
   // estimate the log fold change
   double lfc = estimate_log_fold_change_v2(y, mu, trt_idxs, n_trt);
 
   // compute the original statistic
   double z_orig = compute_observed_full_statistic_v2(a, w, D, trt_idxs);
+
+  // if p-value based on asymptotic normality is requested, compute and return it
+  if (asymptotic_normality) {
+    p = compute_normal_p_value(z_orig, side_code);
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = 0, Named("sn_params") = sn_params);
+    return(out);
+  }
 
   // compute the stage 1 vector of null statistics and p-value
   std::vector<double> null_statistics = compute_null_full_statistics(a, w, D, 0, B1, n_trt, use_all_cells, synthetic_idxs);

@@ -50,7 +50,64 @@ test_that("run_calibration_check", {
   expect_false(any(scep_calib_3@calibration_result$significant))
 })
 
-
+# test_that("run_calibration_check with score test", {
+#   set.seed(2)
+#
+#   num_cells <- 100
+#   num_responses <- 2
+#   num_nt_guides <- 10
+#
+#   grna_target_data_frame <- make_mock_grna_target_data(
+#     num_guides_per_target = c(2, 2, 2),
+#     chr_distances = 1,
+#     chr_starts = 1,
+#     num_nt_guides = num_nt_guides
+#   )
+#
+#   grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 5) |>
+#     matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
+#     `rownames<-`(grna_target_data_frame$grna_id)
+#
+#   response_matrix <- rpois(num_cells * num_responses, 5) |>
+#     matrix(nrow = num_responses, ncol = num_cells) |>
+#     `rownames<-`(paste0("response_", 1:num_responses))
+#
+#   scep <- import_data(
+#     grna_matrix = grna_matrix,
+#     response_matrix = response_matrix,
+#     grna_target_data_frame = grna_target_data_frame,
+#     moi = "high"
+#   ) |>
+#     set_analysis_parameters(
+#       resampling_mechanism = "asymptotic_normality",
+#       response_regression_method = "nb"
+#     ) |>
+#     assign_grnas(method = "thresholding", threshold = 5) |>
+#     run_qc(
+#       response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+#       n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+#     ) |>
+#     run_calibration_check(calibration_group_size = 1,
+#                           n_calibration_pairs = num_nt_guides * num_responses,
+#                           output_amount = 2)
+#
+#   theta <- scep@response_precomputations$response_1$theta
+#   response_vec <- response_matrix[1,]
+#   partial_model <- stats::glm.fit(y = response_vec, x = scep@covariate_matrix, family = stats::poisson())
+#   partial_model_2 <- stats::glm.fit(y = response_vec, x = scep@covariate_matrix, mustart = partial_model$fitted.values,
+#                                     family = MASS::negative.binomial(theta = theta))
+#
+#   partial_model_2$coefficients
+#   scep@response_precomputations$response_1$fitted_coefs
+#
+#   grna_assignment_matrix <- (get_grna_assignments(scep)[paste0("nt", 1:num_nt_guides),] * 1) |>
+#     Matrix::t() |>
+#     Matrix::as.matrix()
+#
+#   z_stats <- statmod::glm.scoretest(partial_model_2, x2 = grna_assignments)
+#   pvals_statmod <- 2*pnorm(abs(z_stats), lower.tail = FALSE)
+#   pvals_sceptre <- scep |> get_result(analysis = "run_calibration_check")
+# })
 
 test_that("run_calibration_check negative control pairs complement set with cellwise and pairwise qc", {
   grna_target_data_frame <- data.frame(
