@@ -145,6 +145,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     n_discovery_pairs <- x@n_ok_discovery_pairs
     cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "called as significant: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
   }
+  cat(paste0("\n"))
 })
 
 
