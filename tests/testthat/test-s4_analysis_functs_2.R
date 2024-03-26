@@ -102,8 +102,8 @@ test_that("run_calibration_check with score test", {
   covariate_matrix <- scep@covariate_matrix
   grna_assignment_matrix <- get_grna_assignments(scep)
 
-  # TODO: Apply statmod::score.test to calibration pairs and compare the results
-  # to the output of sceptre's run_calibration_check
+  # TODO: Apply statmod::score.test to calibration pairs and compare the resulting
+  # p-values those output by sceptre's run_calibration_check
 })
 
 test_that("run_calibration_check negative control pairs complement set with cellwise and pairwise qc", {
