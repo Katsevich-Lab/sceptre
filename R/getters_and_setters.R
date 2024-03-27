@@ -49,6 +49,7 @@ get_cell_covariates <- function(sceptre_object) {
   return(sceptre_object@covariate_data_frame)
 }
 
+
 #' Get gRNA assignments
 #'
 #' Obtains the gRNA-to-cell assignments from a `sceptre_object`. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is TRUE if the given gRNA is assigned to the given cell.

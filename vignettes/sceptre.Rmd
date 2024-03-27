@@ -9,7 +9,7 @@ vignette: >
 
 
 
-`sceptre` is an R package that facilitates statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. First, users should install `sceptre`. Users also should install the `sceptredata` package, which contains the example data used in this vignette.
+`sceptre` is an R package that facilitates statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. To get started, users should install `sceptre`. Users also should install the `sceptredata` package, which contains the example data used in this vignette.
 
 ```{r, eval=FALSE}
 install.packages("devtools")
@@ -24,6 +24,8 @@ library(sceptre)
 library(sceptredata)
 ```
 
+Note: The [frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html) contains tips for installing `sceptre` such that it runs as fast as possible on your computer.
+
 The standard pipeline involved in applying `sceptre` to analyze a dataset consists of several steps, which we summarize in the following schematic.
 
 ```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Standard `sceptre` pipeline")}
@@ -34,10 +36,7 @@ This chapter illustrates application of `sceptre` to a CRISPRi screen of candida
 
 ```{r, echo = FALSE}
 library(Matrix)
-if (dir.exists("~/sceptre_outputs")) {
-  fs <- list.files("~/sceptre_outputs", full.names = TRUE)
-  for (f in fs) file.remove(f)
-}
+system("rm -rf ~/sceptre_outputs")
 ```
 
 Using `sceptre` is simple; carrying out an entire analysis requires only a few lines of code. Below, we provide a minimal working example of applying `sceptre` to analyze the example data. First, we load the example data into R via the function `import_data_from_cellranger()`, which creates a `sceptre_object`, an object-based representation of the single-cell CRISPR screen data. Next, we specify the gRNA-gene pairs that we seek to test for association. Then, we call the pipeline functions on the `sceptre_object` in order. Finally, we write the outputs to the directory `~/sceptre_outputs`.
@@ -58,7 +57,7 @@ sceptre_object <- import_data_from_cellranger(
 # construct the grna-gene pairs to analyze
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(
-  sceptre_object,
+  sceptre_object, 
   positive_control_pairs = positive_control_pairs
 )
 
@@ -91,7 +90,7 @@ sceptre_object <- import_data_from_cellranger(
 # construct the grna-gene pairs to analyze
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(
-  sceptre_object,
+  sceptre_object, 
   positive_control_pairs = positive_control_pairs
 )
 
@@ -120,25 +119,25 @@ The first step is to import the data. **Data can be imported into `sceptre` from
 1.  `directories` is a character vector specifying the locations of the directories outputted by one or more calls to `cellranger_count`. Below, we set the variable `directories` to the (machine-dependent) location of the example CRISPRi data on disk.
 
     ```{r}
-directories <- paste0(
-  system.file("extdata", package = "sceptredata"),
-  "/highmoi_example/gem_group_", 1:2
-)
-directories # file paths to the example data on your computer
+    directories <- paste0(
+      system.file("extdata", package = "sceptredata"), 
+      "/highmoi_example/gem_group_", 1:2
+    )
+    directories # file paths to the example data on your computer
     ```
 
     `directories` points to two directories, both of which store the expression data in matrix market format and contain the files `barcodes.tsv.gz`, `features.tsv.gz`, and `matrix.mtx.gz`.
 
     ```{r}
-list.files(directories[1])
-list.files(directories[2])
+    list.files(directories[1])
+    list.files(directories[2])
     ```
 
 2.  `grna_target_data_frame` is a data frame mapping each individual gRNA to the genomic element that the gRNA targets. `grna_target_data_frame` contains two required columns: `grna_id` and `grna_target`. `grna_id` is the ID of an individual gRNA, while `grna_target` is a label specifying the genomic element that the gRNA targets. (Typically, multiple gRNAs are designed to target a given genomic element in a single-cell CRISPR screen.) Non-targeting (NT) gRNAs are assigned a gRNA target label of "non-targeting". `grna_target_data_frame` optionally contains the columns `chr`, `start`, and `end`, which give the chromosome, start coordinate, and end coordinate, respectively, of the genomic region that each gRNA targets. Finally, `grna_target_data_frame` optionally can contain the column `vector_id` specifying the vector to which a given gRNA belongs. `vector_id` should be supplied in experiments in which each viral vector contains two or more distinct gRNAs (as in, e.g., [(Replogle, 2022)](https://pubmed.ncbi.nlm.nih.gov/35688146/)). We load and examine the `grna_target_data_frame` corresponding to the example data.
 
     ```{r}
-data(grna_target_data_frame_highmoi)
-grna_target_data_frame_highmoi[c(1:4, 21:24, 80:83), ]
+    data(grna_target_data_frame_highmoi)
+    grna_target_data_frame_highmoi[c(1:4, 21:24, 80:83),]
     ```
 
     Some gRNAs (e.g., `grna_CCGGGCG` and `grna_TGGCGGC`) target gene transcription start sites and serve as positive controls; other gRNAs (e.g., `grna_TCTTGAC` and `grna_TGATCGC`) target candidate enhancers, while others still (e.g., `grna_TATTCGT` and `grna_GACCTCC`) are non-targeting. Each gene and candidate enhancer in this dataset is targeted by exactly two gRNAs.
@@ -146,7 +145,7 @@ grna_target_data_frame_highmoi[c(1:4, 21:24, 80:83), ]
 3.  `moi` is a string specifying the multiplicity-of-infection (MOI) of the data, taking values `"high"` or `"low"`. A high-MOI (respectively, low-MOI) dataset is one in which the experimenter has aimed to insert multiple gRNAs (respectively, a single gRNA) into each cell. (If a given cell is determined to contain multiple gRNAs in a low-MOI screen, that cell is removed as part of the quality control step, as discussed below.) The example dataset is a high MOI dataset, and so we set `moi` to `"high"`.
 
     ```{r}
-moi <- "high"
+    moi <- "high"
     ```
 
 Finally, we call the function `import_data_from_cellranger()`, passing `directories`, `grna_target_data_frame`, and `moi` as arguments.
@@ -180,19 +179,19 @@ The second step is to set the analysis parameters. The most important analysis p
     `sceptre` offers several helper functions to facilitate the construction of positive control and discovery pairs. The function `construct_positive_control_pairs()` takes as argument a `sceptre_object` and outputs the set of positive control pairs formed by matching gRNA targets (as contained in the `grna_target_data_frame`) to response IDs. Positive control pairs are optional and need not be computed.
 
     ```{r}
-positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
-head(positive_control_pairs)
+    positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+    head(positive_control_pairs)
     ```
 
     Next, the functions `construct_cis_pairs()` and `construct_trans_pairs()` facilitate the construction of *cis* and *trans* discovery sets, respectively. `construct_cis_pairs()` takes as arguments a `sceptre_object` and an integer `distance_threshold` and returns the set of response-target pairs located on the same chromosome within `distance_threshold` bases of one another. `positive_control_pairs` optionally can be passed to this function, in which case positive control gRNA targets are excluded from the *cis* pairs. (Note that `construct_cis_pairs()` assumes that the responses are genes rather than, say, proteins or chromatin-derived features.)
 
     ```{r}
-discovery_pairs <- construct_cis_pairs(
-  sceptre_object = sceptre_object,
-  positive_control_pairs = positive_control_pairs,
-  distance_threshold = 5e6
-)
-discovery_pairs[c(1:4, 101:104), ]
+    discovery_pairs <- construct_cis_pairs(
+      sceptre_object = sceptre_object,
+      positive_control_pairs = positive_control_pairs,
+      distance_threshold = 5e6
+    )
+    discovery_pairs[c(1:4, 101:104),]
     ```
 
     `construct_trans_pairs()` constructs the entire set of possible target-response pairs.
@@ -200,7 +199,7 @@ discovery_pairs[c(1:4, 101:104), ]
 2.  **Sidedness**. The parameter `side` controls whether to run a left-tailed (`"left"`), right-tailed (`"right"`), or two-tailed (`"both"`; default) test. A left-tailed (resp., right-tailed) test is appropriate when testing for a decrease (resp., increase) in expression; a two-tailed test, by contrast, is appropriate when testing for an increase *or* decrease in expression. A left-tailed test is the most appropriate choice for a CRISPRi screen of enhancers, and so we set `side` to `"left"`.
 
     ```{r}
-side <- "left"
+    side <- "left"
     ```
 
 3.  **gRNA integration strategy**. Typically, multiple gRNAs are designed to target a given genomic element. The parameter `grna_integration_strategy` controls if and how gRNAs that target the same genomic element are integrated. The default option, `"union"`, combines gRNAs that target the same element into a single "grouped gRNA;" this "grouped gRNA" is tested for association against the responses to which the element is paired. `grna_integration_strategy` also can be set to "singleton," in which case each gRNA targeting a given element is tested individually against the responses paired to that element. In our analysis we use the default "union" strategy.
@@ -391,7 +390,7 @@ The eighth and final step is to write the outputs of the analysis to a directory
 
 ```{r,results='hide'}
 write_outputs_to_directory(
-  sceptre_object = sceptre_object,
+  sceptre_object = sceptre_object, 
   directory = "~/sceptre_outputs"
 )
 ```
@@ -420,5 +419,5 @@ head(result)
 ## Further reading
 We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/).
 ```{r}
-sessioninfo::session_info()
+library(sessioninfo); session_info()
 ```
