@@ -17,14 +17,13 @@ devtools::install_github("katsevich-lab/sceptre")
 devtools::install_github("katsevich-lab/sceptredata")
 ```
 
-Users can load `sceptre` and `sceptredata` via a call to `library()`.
+See the [frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html) for tips on installing `sceptre` such that it runs as fast as possible. Users can load `sceptre` and `sceptredata` via a call to `library()`.
 
 ```{r,message = FALSE}
 library(sceptre)
 library(sceptredata)
 ```
 
-Note: The [frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html) contains tips for installing `sceptre` such that it runs as fast as possible on your computer.
 
 The standard pipeline involved in applying `sceptre` to analyze a dataset consists of several steps, which we summarize in the following schematic.
 
