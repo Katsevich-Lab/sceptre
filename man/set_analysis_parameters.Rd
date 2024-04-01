@@ -22,19 +22,19 @@ set_analysis_parameters(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{discovery_pairs}{a data frame with columns \code{grna_target} and \code{response_id} specifying the discovery pairs to analyze}
+\item{discovery_pairs}{(optional) a data frame with columns \code{grna_target} and \code{response_id} specifying the discovery pairs to analyze}
 
 \item{positive_control_pairs}{(optional) a data frame with columns \code{grna_target} and \code{response_id} specifying the positive control pairs to analyze}
 
 \item{side}{(optional; default \code{"both"}) the sidedness of the test, one of \code{"left"}, \code{"right"}, or \code{"both"}}
 
-\item{grna_integration_strategy}{(optional; default \code{"union"}) a string specifying the gRNA integration strategy, either \code{"singleton"} or \code{"union"}}
+\item{grna_integration_strategy}{(optional; default \code{"union"}) a string specifying the gRNA integration strategy, either \code{"singleton"}, \code{"union"}, or \code{"bonferroni"}}
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{resampling_approximation}{(optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".}
+\item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string indicating the resampling approximation to make to the null distribution of test statistics, either \code{"skew_normal"} or \code{"no_approximation"}}
 
-\item{control_group}{(optional) a string specifying the control group to use, either \code{"complement"} or \code{"nt_cells"}}
+\item{control_group}{(optional) a string specifying the control group to use in the differential expression analysis, either \code{"complement"} or \code{"nt_cells"}}
 
 \item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either \code{"permutations"} or \code{"crt"}}
 
@@ -46,7 +46,10 @@ set_analysis_parameters(
 an updated \code{sceptre_object} in which the analysis parameters have been set
 }
 \description{
-\code{set_analysis_parameters()} sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
+\code{set_analysis_parameters()} sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for more detailed information about this function.
+}
+\note{
+Every argument to this function is optional, but typically, users want to specify \code{discovery_pairs} at minimum.
 }
 \examples{
 library(sceptredata)

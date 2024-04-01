@@ -1,3 +1,29 @@
+# sceptre 0.10.0 (2024-04-02)
+
+Version 0.10.0 is a major update to the `sceptre` package. This version provides support for the analysis of large-scale single-cell CRISPR screen data. It also includes several other, minor updates.
+
+-   We have introduced the `ondisc`-backed `sceptre_object`, which is a special kind of `sceptre_object` in which the data are stored on-disk as opposed to in-memory.
+
+-    We have made the `sceptre` R package compatible with the `sceptre` Nextflow pipeline.
+
+-   We have added the function `plot_response_grna_target_pair()`, which creates a violin plot of the expression level of a specified gene across treatment and control groups of a specified target.
+
+-   We have added the function `get_grna_assignments()`, which facilitates obtaining the gRNA-to-cell assignments.
+
+-   We have updated the `sceptre` e-book, adding two new parts: a part on at-scale `sceptre` and a part on the methodology underlying `sceptre`.
+
+-   We have made the discovery pairs data frame and the positive control pairs data frame optional arguments to the `set_analysis_parameters()` function.
+
+-   We have added a comprehensive suite of unit tests to help verify correctness of the code.
+
+-   We have fleshed out the man pages, for example by adding a runable example to each.
+
+-   We have moved the example data within the `sceptre` package into the companion `sceptredata` package.
+
+-   We have issued minor bug fixes.
+
+Please note that v0.10.0 is a higher version number than v0.9.1.
+
 # sceptre 0.9.1 (2023-10-24)
 
 Version 0.9.1 is a minor update to version 0.9.0.
