@@ -1,14 +1,14 @@
 #' Run calibration check
 #'
-#' `run_calibration_check()` runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
+#' `run_calibration_check()` runs the calibration check. The calibration check involves applying sceptre to analyze negative control target-response pairs --- pairs for which we know there is no association between the target and response --- to ensure control of the false discovery rate. The calibration check enables us to verify that the discovery set that sceptre ultimately produces is not contaminated by excess false positives. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return. `1` returns the least amount of information and `3` the most.
 #' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
-#' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
+#' @param calibration_group_size (optional) the number of negative control gRNAs to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
+#' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
@@ -41,9 +41,9 @@
 #'     parallel = TRUE,
 #'     n_processors = 2
 #'   )
-run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
+run_calibration_check <- function(sceptre_object, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
-                                  n_processors = "auto", log_dir = tempdir()) {
+                                  n_processors = "auto", log_dir = tempdir(), output_amount = 1) {
   sceptre_object <- sceptre_object |>
     run_calibration_check_pt_1(
       n_calibration_pairs = n_calibration_pairs,
@@ -137,14 +137,10 @@ process_calibration_result <- function(result, sceptre_object) {
 
 #' Run power check
 #'
-#' `run_power_check()` runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+#' `run_power_check()` runs the power check. The power check entails applying `sceptre` to analyze positive control pairs --- pairs for which we know there is an association between the target and the response --- to ensure that `sceptre` is capable of detecting true associations. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
-#' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
+#' @inheritParams run_calibration_check
 #' @return an updated `sceptre_object` in which the power check has been carried out
 #'
 #' @export
@@ -220,14 +216,10 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 #' Run discovery analysis
 #'
-#' `run_discovery_analysis()` runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+#' `run_discovery_analysis()` runs the discovery analysis. The discovery analysis involves applying `sceptre` to analyze discovery pairs, or target-response pairs whose association status we do not know but seek to learn. Identifying associations among the discovery pairs is the primary objective of the single-cell CRISPR screen analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
-#' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
+#' @inheritParams run_calibration_check
 #' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
 #' @export

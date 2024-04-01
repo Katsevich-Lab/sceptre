@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,53 +103,39 @@
 <h2 id="sceptre">
 <span style="font-size:60px;"><code>sceptre</code></span><a class="anchor" aria-label="anchor" href="#sceptre"></a>
 </h2>
-<p>An R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.</p>
+<p><code>sceptre</code> is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.</p>
 <!-- badges: start -->
 
 <!-- badges: end -->
 </div>
 <div class="section level2">
-<h2 id="release-of-sceptre-v091">Release of <code>sceptre</code> v0.9.1<a class="anchor" aria-label="anchor" href="#release-of-sceptre-v091"></a>
+<h2 id="v0100-sceptre-at-massive-scale">v0.10.0: <code>sceptre</code> at massive scale<a class="anchor" aria-label="anchor" href="#v0100-sceptre-at-massive-scale"></a>
 </h2>
-<p>We are excited to announce the release of <code>sceptre</code> v0.9.1, a substantial update to the package. This milestone includes the following developments:</p>
+<p><code>sceptre</code> v0.10.0 represents another a major upgrade to the <code>sceptre</code> software. We have integrated <code>sceptre</code> with <a href="https://timothy-barry.github.io/ondisc/" class="external-link"><code>ondisc</code></a>, a companion R package that facilitates large-scale computing on single-cell data. <code>sceptre</code> now supports the analysis of single-cell CRISPR screen data out-of-core on a laptop or distributed across hundreds of processors on a computing cluster or cloud.</p>
+<p><code>sceptre</code> v0.10.0 includes the following updates:</p>
 <ul>
-<li>A reimagined user experience based on a modular, object-oriented workflow.</li>
-<li>Further improvements in speed and memory efficiency.</li>
-<li>A unified interface for low- and high-MOI analyses.</li>
-<li>A suite of plotting functions facilitating visualization of each step in the pipeline.</li>
-<li>Expanded support for gRNA assignment and quality control.</li>
-<li>Interoperability with output from 10X Cell Ranger and Parse Biosciences CRISPR Detect.</li>
-<li>An <a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">e-book</a> guiding users through the entire process of analyzing their data using <code>sceptre</code>.</li>
+<li>Support for disk-backed <code>sceptre</code> objects, enabling the analysis of data too large to fit in memory</li>
+<li>A <code>sceptre</code> <a href="https://github.com/timothy-barry/sceptre-pipeline" class="external-link">Nextflow pipeline</a>, enabling the deployment of <code>sceptre</code> across hundreds of processors on a cluster or cloud</li>
+<li>An updated <a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">e-book</a> containing new sections about at-scale <code>sceptre</code> and the statistical methodology underlying <code>sceptre</code>
+</li>
+<li>New functionality for plotting and inspecting gRNA-to-cell assignments</li>
+<li>A comprehensive suite of unit tests, which help verify the correctness of the code</li>
+<li>Fleshed out help pages and minor bug fixes</li>
 </ul>
-<p><code>sceptre</code> v0.9.1 facilitates an entire analysis pipeline for single-cell CRISPR screens, starting from UMI count data obtained from tools like 10X Cell Ranger.</p>
-<!--
-&#10;## About `sceptre`
-&#10;Single-cell CRISPR screens (e.g., Perturb-seq, TAP-seq) combine CRISPR and single-cell sequencing to survey the effects of genetic perturbations on individual cells. Despite their promise, single-cell CRISPR screens present considerable statistical and computational challenges. `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, computational efficiency, and ease of use.
-&#10;### Key features
-&#10;-   Import data from 10X CellRanger or a set of R matrices
--   Assign gRNAs to cells using one of three principled methods
--   Perform extensive quality control
--   Run gRNA-to-gene differential expression analyses
--   Verify false discovery rate control using negative control gRNAs
--   Verify adequate power using positive control gRNAs
--   Visualize each step in the pipeline by rendering an informative plot
-&#10;### Compatible experimental designs
-&#10;-   low multiplicity-of-infection and high multiplicity-of-infection
--   Gene-targeting and noncoding-regulatory-element-targeting
--   CRISPRko, CRISPRi, CRISPRa, CRISPR base editing, and CRISPR prime editing
--   Gene and protein expression readout
-&#10;## Get started
-&#10;The fastest way to get started with `sceptre` is to work through the [Get Started vignette](articles/sceptre.html) (30 minutes). Users also can read the `sceptre` [manual](https://timothy-barry.github.io/sceptre-book/).
--->
 </div>
 <div class="section level2">
 <h2 id="featured-publications">Featured publications<a class="anchor" aria-label="anchor" href="#featured-publications"></a>
 </h2>
 <ul>
-<li><p>Barry et al., 2024. “Exponential family measurement error models…”. <em>Biostatistics.</em></p></li>
-<li><p><a href="https://www.science.org/doi/10.1126/science.adh7699" class="external-link">Morris et al., 2023</a>. “Discovery of target genes and pathways…”. <em>Science</em>.</p></li>
-<li><p><a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Barry et al., 2021</a>. “SCEPTRE improves calibration and sensitivity…”. <em>Genome Biology</em>.</p></li>
+<li>
+<a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2" class="external-link">Barry et al., 2021</a>. “SCEPTRE improves calibration and sensitivity…”. <em>Genome Biology</em>.</li>
+<li>
+<a href="https://www.science.org/doi/10.1126/science.adh7699" class="external-link">Morris et al., 2023</a>. “Discovery of target genes and pathways…”. <em>Science</em>.</li>
+<li>
+<a href="https://arxiv.org/abs/2201.01879" class="external-link">Barry et al., 2024</a>. “Exponential family measurement error models…”. <em>Biostatistics.</em>
+</li>
 </ul>
+<p><code>sceptre</code> also recently was featured in a <a href="https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre" class="external-link">10x Genomics</a> analysis guide.</p>
 </div>
 <div class="section level2">
 <h2 id="bug-reports-feature-requests-and-software-questions">Bug reports, feature requests, and software questions<a class="anchor" aria-label="anchor" href="#bug-reports-feature-requests-and-software-questions"></a>
