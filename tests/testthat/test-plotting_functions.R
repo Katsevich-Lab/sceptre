@@ -101,7 +101,7 @@ test_that("test all plots", {
 
   ## testing `plot_run_calibration_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_calibration_check(scep, return_indiv_plots = TRUE)
-  expect_equal(length(pltlist), 3)
+  expect_equal(length(pltlist), 4)
 
   expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
   expect_equal(pltlist[[1]]$labels$x, "Expected null p-value")
@@ -115,6 +115,11 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$x, "Estimated log-2 fold change")
   expect_equal(pltlist[[3]]$labels$y, "Density")
 
+  # this is the text-only pane
+  expect_true(!"title" %in% names(pltlist[[4]]))
+  expect_equal(pltlist[[4]]$labels$x, "x")
+  expect_equal(pltlist[[4]]$labels$y, "y")
+
   # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_discovery_analysis(scep, return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 4)
@@ -126,6 +131,10 @@ test_that("test all plots", {
   expect_equal(pltlist[[2]]$labels$title, "QQ plot (tail)")
   expect_equal(pltlist[[2]]$labels$x, "Expected null p-value")
   expect_equal(pltlist[[2]]$labels$y, "Observed p-value")
+
+  expect_equal(pltlist[[3]]$labels$title, "Discovery volcano plot")
+  expect_equal(pltlist[[3]]$labels$x, "Log fold change")
+  expect_equal(pltlist[[3]]$labels$y, "P-value")
 
   # this is the text-only pane
   expect_true(!"title" %in% names(pltlist[[4]]))

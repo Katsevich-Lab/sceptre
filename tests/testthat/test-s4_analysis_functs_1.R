@@ -32,14 +32,14 @@ test_that("import_data", {
   all_slots <- c(
     "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
     "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
-    "positive_control_pairs", "formula_object", "side_code", "fit_parametric_curve",
+    "positive_control_pairs", "formula_object", "side_code", "resampling_approximation",
     "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
     "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
     "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
     "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
     "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector", "discovery_pairs_with_info",
     "positive_control_pairs_with_info", "negative_control_pairs", "initial_grna_assignment_list",
-    "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_multiple_grnas",
+    "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_zero_or_twoplus_grnas",
     "cells_in_use", "n_discovery_pairs", "n_ok_discovery_pairs", "n_positive_control_pairs",
     "n_ok_positive_control_pairs", "calibration_group_size", "n_calibration_pairs",
     "import_grna_assignment_info", "mean_cells_per_grna", "response_precomputations",
@@ -170,25 +170,4 @@ test_that("set_analysis_parameters", {
     "aaa"
   )
 
-  ## 2. are all expected slots there, and only the expected slots?
-
-  all_slots <- c(
-    "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
-    "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
-    "positive_control_pairs", "formula_object", "side_code", "fit_parametric_curve",
-    "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
-    "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
-    "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
-    "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
-    "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector", "discovery_pairs_with_info",
-    "positive_control_pairs_with_info", "negative_control_pairs", "initial_grna_assignment_list",
-    "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_multiple_grnas",
-    "cells_in_use", "n_discovery_pairs", "n_ok_discovery_pairs", "n_positive_control_pairs",
-    "n_ok_positive_control_pairs", "calibration_group_size", "n_calibration_pairs",
-    "import_grna_assignment_info", "mean_cells_per_grna", "response_precomputations",
-    "last_function_called", "functs_called", "calibration_result", "power_result",
-    "discovery_result", "nuclear", "nf_pipeline", "integer_id", "elements_to_analyze"
-  )
-  expect_equal(slotNames(sceptre_object_post_all_defaults_high_moi), all_slots)
-  expect_equal(slotNames(sceptre_object_post_all_defaults_low_moi), all_slots)
 })

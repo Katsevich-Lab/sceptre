@@ -54,7 +54,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
     assign_grnas(method = "maximum")
 
   # every cell here should look like it has multiple GRNAs
-  expect_equal(scep_low_all_1@cells_w_multiple_grnas, 1:num_cells)
+  expect_equal(scep_low_all_1@cells_w_zero_or_twoplus_grnas, 1:num_cells)
 
   # first element should have all idx
   expect_equal(
@@ -68,6 +68,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
   )
 
   # first element should have all idx
+
   guide_part_all_1 <- lapply(unique_targets, function(target_name) {
     if (target_name == test_data_list$grna_target_data_frame$grna_target[1]) 1:num_cells else integer(0)
   }) |>
@@ -109,7 +110,9 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
     assign_grnas(method = "maximum")
 
   # expected answer: cell i expresses grna i
-  expected_initial_assignment_list <- lapply(1:num_grnas, function(i) i) |>
+  expected_initial_assignment_list <- lapply(1:num_grnas, function(i) {
+    if(i == 1) c(1, (num_grnas + 1):num_cells) else i
+  })  |>
     setNames(test_data_list$grna_target_data_frame$grna_id)
   expect_equal(
     scep_low_clear_max@initial_grna_assignment_list,
@@ -117,19 +120,16 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
   )
   # all cells from idx `num_grnas+1` onward have no UMI counts at all, so they
   # all are considered to have multiple grnas
-  expect_equal(scep_low_clear_max@cells_w_multiple_grnas, (num_grnas + 1):num_cells)
+  expect_equal(scep_low_clear_max@cells_w_zero_or_twoplus_grnas, (num_grnas + 1):num_cells)
 
-  # there are two guides per target, and 3 NT guides
-  # this is assembling the expected answer which is a list of lists of indicecs
-  guide_part <- lapply(unique_targets, function(target_name) which(test_data_list$grna_target_data_frame$grna_target == target_name)) |>
-    setNames(unique_targets)
-  nt_part <- lapply(nt_guides, function(nt_guide) which(test_data_list$grna_target_data_frame$grna_id == nt_guide)) |>
-    setNames(nt_guides)
   expect_equal(
     scep_low_clear_max@grna_assignments_raw,
     list(
-      grna_group_idxs = guide_part,
-      indiv_nt_grna_idxs = nt_part
+      grna_group_idxs = list(
+        t1_c1_d1 = c(1L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L, 23L, 24L, 2L),
+        t1_c2_d1 = 3:4, t1_c3_d1 = 5:6, t2_c3_d1 = 7:8
+      ),
+      indiv_nt_grna_idxs = list(nt1 = 9L, nt2 = 10L, nt3 = 11L)
     )
   )
   # should be empty for maximum assignment
@@ -161,7 +161,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
     ) |>
     assign_grnas(method = "maximum", umi_fraction_threshold = .8 - .001)
 
-  expect_equal(scep_low_with_low_frac@cells_w_multiple_grnas, integer(0))
+  expect_equal(scep_low_with_low_frac@cells_w_zero_or_twoplus_grnas, integer(0))
 
   # cell 1 IS flagged as expressing 2 grna with high threshold
   scep_low_with_high_frac <- import_data(
@@ -175,7 +175,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
     ) |>
     assign_grnas(method = "maximum", umi_fraction_threshold = .8 + .001)
 
-  expect_equal(scep_low_with_high_frac@cells_w_multiple_grnas, 1)
+  expect_equal(scep_low_with_high_frac@cells_w_zero_or_twoplus_grnas, 1)
 })
 
 test_that("assign_grnas method=threshold moi=low", {
@@ -203,7 +203,7 @@ test_that("assign_grnas method=threshold moi=low", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 25)
 
-  expect_equal(scep_low_with_low_thresh@cells_w_multiple_grnas, 1:num_cells)
+  expect_equal(scep_low_with_low_thresh@cells_w_zero_or_twoplus_grnas, 1:num_cells)
 
   expect_equal(
     scep_low_with_low_thresh@initial_grna_assignment_list,
@@ -239,7 +239,7 @@ test_that("assign_grnas method=threshold moi=low", {
     ) |>
     assign_grnas(method = "thresholding", threshold = 26)
 
-  expect_equal(scep_low_with_high_thresh@cells_w_multiple_grnas, integer(0))
+  expect_equal(scep_low_with_high_thresh@cells_w_zero_or_twoplus_grnas, integer(0))
 
   # `i == 5` is used because g1_t1_c3_d1 is the 5th grna_id and is what all these cells are assigned to
   expect_equal(
