@@ -3,12 +3,14 @@ name: R-CMD-check
 on:
   push:
     branches:
-      - main
-      - dev
+      # - main
+      # - dev
+      - code-cov
   pull_request:
     branches:
-      - main
-      - dev
+      # - main
+      # - dev
+      - code-cov
 
 jobs:
   test-coverage:
@@ -20,6 +22,8 @@ jobs:
       run: |
         install.packages(c("remotes", "covr"))
         remotes::install_deps(dependencies = TRUE)
-    - name: Run test coverage
-      run: covr::codecov()
+    - name: Generate coverage report
+      run: covr::codecov(quiet = FALSE) 
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
 
