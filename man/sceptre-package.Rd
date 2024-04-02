@@ -135,7 +135,6 @@ Useful links:
 \itemize{
   \item \url{https://timothy-barry.github.io/sceptre-book/}
   \item \url{https://github.com/Katsevich-Lab/sceptre}
-  \item Report bugs at \url{https://github.com/Katsevich-Lab/sceptre/issues}
 }
 
 }

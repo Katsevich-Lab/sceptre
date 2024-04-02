@@ -59,9 +59,8 @@ a computing cluster or cloud.
   2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
   “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
 
-`sceptre` also recently was featured in a [10x
-Genomics](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre)
-analysis guide.
+`sceptre` also recently was featured in a [10x Genomics analysis
+guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre).
 
 ## Bug reports, feature requests, and software questions
 
