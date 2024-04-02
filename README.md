@@ -16,6 +16,8 @@ emphasizing statistical rigor, massive scalability, and ease of use.
 
 [![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
 
+[![codecov](https://codecov.io/gh/Katsevich-Lab/sceptre/branch/main/graph/badge.svg)](https://codecov.io/gh/Katsevich-Lab/sceptre)
+
 <!-- badges: end -->
 
 ## v0.10.0: `sceptre` at massive scale
