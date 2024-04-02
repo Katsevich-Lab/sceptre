@@ -27,6 +27,7 @@ Imports:
     cowplot,
     crayon,
     data.table,
+    R.utils
     dplyr,
     ggplot2,
     Matrix,
