@@ -47,7 +47,7 @@ Suggests:
     parallel,
     testthat (>= 3.0.0),
     magrittr,
-    MASS
+    MASS,
     covr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
