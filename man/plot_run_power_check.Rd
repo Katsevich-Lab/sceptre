@@ -24,11 +24,36 @@ plot_run_power_check(
 a single \code{ggplot2} plot
 }
 \description{
-\code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Positive (resp., negative) control p-values are plotted in the left (resp., right) column on a negative log scale.
+\code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Each point in the plot corresponds to a target-response pair, with positive control pairs in the left column and negative control pairs in the right column. The vertical axis indicates the p-value of a given pair; smaller (i.e., more significant) p-values are positioned higher along this axis (p-values truncated at \code{clip_to} for visualization). The positive control p-values should be small, and in particular, smaller than the negative control p-values.
 }
 \examples{
-# A full example can be found at ?sceptre;
-# `plot_run_power_check()` is dispatched when
-# `plot()` is called on the `sceptre_object`
-# in step 6 (the run power check step).
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+sceptre_object |>
+  set_analysis_parameters(
+    side = "left",
+    positive_control_pairs = positive_control_pairs,
+    resampling_mechanism = "permutations",
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
+    parallel = TRUE,
+    n_processors = 2,
+    n_calibration_pairs = 500,
+    calibration_group_size = 2
+  ) |>
+  run_power_check() |>
+  plot_run_power_check()
 }

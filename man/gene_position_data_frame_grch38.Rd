@@ -11,6 +11,9 @@ An object of class \code{data.table} (inherits from \code{data.frame}) with 3657
 data(gene_position_data_frame_grch38)
 }
 \description{
-\code{gene_position_data_frame_grch38} maps each gene to the chromosome on which it is located and to the position of its transcription start site on that chromosome. The data frame was constructed from the GRCh38 reference genome that has shipped with CellRanger since 2020.
+\code{gene_position_data_frame_grch38} maps each gene to the chromosome on which it is located and the position of its transcription start site on that chromosome. The data frame was constructed from the GRCh38 reference genome that has shipped with CellRanger since 2020.
+}
+\examples{
+head(gene_position_data_frame_grch38)
 }
 \keyword{datasets}

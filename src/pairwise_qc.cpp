@@ -13,14 +13,10 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
                                                  bool control_group_complement, IntegerVector cells_in_use) {
   // 0. initialize variables and objects
   int n_nt_grnas = indiv_nt_grna_idxs.size(), n_genes = p.size() - 1, n_pairs = to_analyze_response_idxs.size(), pair_pointer = 0, n_nonzero = 0, curr_n_nonzero_cntrl = 0, curr_n_nonzero_trt = 0;
-  IntegerVector curr_idxs;
-  IntegerVector n_nonzero_tot(n_genes);
-  bool n_cntrl_cells_ok;
+  IntegerVector curr_idxs, n_nonzero_tot(n_genes), n_nonzero_trt(n_pairs), n_nonzero_cntrl(n_pairs);
   IntegerMatrix M(n_nt_grnas, n_genes);
-  IntegerVector n_nonzero_trt(n_pairs), n_nonzero_cntrl(n_pairs);
 
-  std::vector<bool> y_sub(n_cells_sub);
-  std::vector<bool> y_orig(n_cells_orig);
+  std::vector<bool> y_sub(n_cells_sub), y_orig(n_cells_orig);
   std::vector<int> cells_in_use_zero_idx(n_cells_sub);
   for (int i = 0; i < cells_in_use_zero_idx.size(); i ++) cells_in_use_zero_idx[i] = cells_in_use[i] - 1;
 
@@ -28,14 +24,14 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
   for (int row_idx = 0; row_idx < n_genes; row_idx++) {
     // load nonzero positions into the boolean vector y_sub
     load_nonzero_posits(j, p, row_idx, y_orig, y_sub, cells_in_use_zero_idx);
-    // iterate over nt grnas, adding n nonzero trt to M matrix
+    // 1.2 iterate over nt grnas, adding n nonzero trt to M matrix
     for (int grna_idx = 0; grna_idx < n_nt_grnas; grna_idx ++) {
       n_nonzero = 0;
       curr_idxs = indiv_nt_grna_idxs[grna_idx];
       for (int k = 0; k < curr_idxs.size(); k ++) {
         if (!control_group_complement) { // NT cells control group
           if (y_sub[all_nt_idxs[curr_idxs[k] - 1] - 1]) n_nonzero ++; // redirection
-        } else { // complement set control group
+        } else { // complement set cells control group
           if (y_sub[curr_idxs[k] - 1]) n_nonzero ++; // no redirection
         }
       }

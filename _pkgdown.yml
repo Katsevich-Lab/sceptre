@@ -17,6 +17,8 @@ home:
 
           [National Science Foundation](https://www.nsf.gov/)
 
+          [National Institutes of Health](https://www.nih.gov)
+
 reference:
 - title: "Package documentation"
   contents:
@@ -48,6 +50,7 @@ reference:
   - plot_run_discovery_analysis
   - plot_run_power_check
   - plot_covariates
+  - plot_response_grna_target_pair
 
 - title: "Pair constructor functions"
   desc: >
@@ -56,6 +59,7 @@ reference:
   - construct_positive_control_pairs
   - construct_cis_pairs
   - construct_trans_pairs
+  - gene_position_data_frame_grch38
 
 - title: "Information extraction functions"
   desc: >
@@ -64,15 +68,15 @@ reference:
   - print,sceptre_object-method
   - write_outputs_to_directory
   - get_result
+  - get_response_matrix
+  - get_grna_matrix
+  - get_cell_covariates
+  - get_grna_assignments
 
-- title: "Data"
-  desc: >
-    Example data to illustrate use of the functions
+- title: "`ondisc` intput/output functions"
   contents:
-  - highmoi_example_data
-  - grna_target_data_frame_highmoi
-  - lowmoi_example_data
-  - gene_position_data_frame_grch38
+  - read_ondisc_backed_sceptre_object
+  - write_ondisc_backed_sceptre_object
 
 authors:
   sidebar:

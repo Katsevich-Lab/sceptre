@@ -6,38 +6,64 @@
 \usage{
 run_calibration_check(
   sceptre_object,
-  output_amount = 1,
   n_calibration_pairs = NULL,
   calibration_group_size = NULL,
   print_progress = TRUE,
   parallel = FALSE,
   n_processors = "auto",
-  log_dir = tempdir()
+  log_dir = tempdir(),
+  output_amount = 1
 )
 }
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return}
-
 \item{n_calibration_pairs}{(optional) the number of negative control pairs to construct and test for association}
 
-\item{calibration_group_size}{(optional) the number of negative control gRNAs to put into each negative control target}
+\item{calibration_group_size}{(optional) the number of negative control gRNAs to randomly assemble to form each negative control target}
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
 \item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 
-\item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, "auto," automatically detects the number of processors available on the machine.}
+\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, automatically detects the number of processors available on the machine.}
 
 \item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
+
+\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return. \code{1} returns the least amount of information and \code{3} the most.}
 }
 \value{
 an updated \code{sceptre_object} in which the calibration check has been carried out
 }
 \description{
-\code{run_calibration_check()} runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
+\code{run_calibration_check()} runs the calibration check. The calibration check involves applying sceptre to analyze negative control target-response pairs --- pairs for which we know there is no association between the target and response --- to ensure control of the false discovery rate. The calibration check enables us to verify that the discovery set that sceptre ultimately produces is not contaminated by excess false positives. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for more detailed information about this function.
 }
 \examples{
-# see example via ?sceptre
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+
+# set analysis parameters, assign grnas, run qc, run calibration check
+sceptre_object <- sceptre_object |>
+  set_analysis_parameters(
+    side = "left",
+    resampling_mechanism = "permutations"
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
+    n_calibration_pairs = 500,
+    calibration_group_size = 2,
+    parallel = TRUE,
+    n_processors = 2
+  )
 }
