@@ -3,7 +3,7 @@
 \name{read_ondisc_backed_sceptre_object}
 \alias{read_ondisc_backed_sceptre_object}
 \alias{write_ondisc_backed_sceptre_object}
-\title{Write/read an \code{ondisc}-backed \code{sceptre_object}}
+\title{Write or read an \code{ondisc}-backed \code{sceptre_object}}
 \usage{
 read_ondisc_backed_sceptre_object(
   sceptre_object_fp,

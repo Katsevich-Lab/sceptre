@@ -403,8 +403,10 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
 
 #' Get result
 #'
-#' `get_result()` returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+#' `get_result()` returns a data frame containing the result of a calibration check, power check, or discovery analysis. We pass as arguments `sceptre_object` and `analysis`, where the latter is a string indicating the function whose results we are querying. The output is a data frame, the rows of which correspond to target-response pairs, and the columns of which are as follows: `response_id`, `grna_target`, `n_nonzero_trt`, `n_nonzero_cntrl`, `pass_qc` (a `TRUE`/`FALSE` value indicating whether the pair passes pairwise QC), `p_value`, `log_2_fold_change`, and `significant` (a `TRUE`/`FALSE` value indicating whether the pair is called as significant). The p-value contained within the `p_value` column is a raw (i.e., non-multiplicity-adjusted) p-value. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
+#'
+#' @note If `output_amount` is set to `2` or `3` in `run_calibration_check()`, `run_power_check()`, or `run_discovery_analysis()`, then the result data frame contains additional columns; see \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual} for more information.
 #' @param sceptre_object a `sceptre_object`
 #' @param analysis a string indicating the name of the analysis whose results we are querying, one of `"run_calibration_check"`, `"run_power_check"`, or `"run_discovery_analysis"`.
 #'
@@ -451,7 +453,7 @@ get_result <- function(sceptre_object, analysis) {
 
 #' Write outputs to directory
 #'
-#' `write_outputs_to_directory()` writes the outputs of a `sceptre` analysis to a directory on disk. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+#' `write_outputs_to_directory()` writes the outputs of a `sceptre` analysis to a directory on disk. `write_outputs_to_directory()` writes several files to the specified directory: a text-based summary of the analysis (`analysis_summary.txt`), the various plots (`*.png`), the calibration check, power check, discovery analysis results (`results_run_calibration_check.rds`, `results_run_power_check.rds`, and `results_run_discovery_analysis.rds`, respectively), and the binary gRNA-to-cell assignment matrix (`grna_assignment_matrix.rds`). See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a string giving the file path to a directory on disk in which to write the results

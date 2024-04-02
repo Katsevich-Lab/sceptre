@@ -1,7 +1,7 @@
 ##########################
 # READ AND WRITE FUNCTIONS
 ##########################
-#' Write/read an `ondisc`-backed `sceptre_object`
+#' Write or read an `ondisc`-backed `sceptre_object`
 #'
 #' - `write_ondisc_backed_sceptre_object()` writes an `ondisc`-backed `sceptre_object` to disk, creating a file `sceptre_object.rds` in the specified directory
 #' - `read_ondisc_backed_sceptre_object()` reads and initializes a `sceptre_object` from a `sceptre_object.rds` file, `response.odm` file, and `grna.odm` file on disk

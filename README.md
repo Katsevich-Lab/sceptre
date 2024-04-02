@@ -40,20 +40,24 @@ a computing cluster or cloud.
   containing new sections about at-scale `sceptre` and the statistical
   methodology underlying `sceptre`
 - New functionality for plotting and inspecting gRNA-to-cell assignments
-- A comprehensive suite of unit tests, which help verify the correctness
+- A comprehensive suite of unit tests, helping to verify the correctness
   of the code
-- Fleshed out help pages and minor bug fixes
+- More detailed man pages (including a runnable example for each) and
+  minor bug fixes
 
 ## Featured publications
 
 - [Barry et al.,
-  2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
-  “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
+  2024+](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v2).
+  “Robust differential expression testing…”. *Genome Biology*.
+- [Barry et al., 2024+](https://arxiv.org/abs/2201.01879). “Exponential
+  family measurement error models…”. *Biostatistics.*
 - [Morris et al.,
   2023](https://www.science.org/doi/10.1126/science.adh7699). “Discovery
   of target genes and pathways…”. *Science*.
-- [Barry et al., 2024](https://arxiv.org/abs/2201.01879). “Exponential
-  family measurement error models…”. *Biostatistics.*
+- [Barry et al.,
+  2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
+  “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
 
 `sceptre` also recently was featured in a [10x
 Genomics](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre)
