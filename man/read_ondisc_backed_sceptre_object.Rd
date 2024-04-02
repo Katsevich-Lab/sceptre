@@ -16,9 +16,9 @@ write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 \arguments{
 \item{sceptre_object_fp}{file path to a \code{sceptre_object.rds} file}
 
-\item{response_odm_file_fp}{file path to a backing \code{.odm} file for the response modality}
+\item{response_odm_file_fp}{file path to the backing \code{.odm} file for the response modality}
 
-\item{grna_odm_file_fp}{file path to a backing \code{.odm} file for the gRNA modality}
+\item{grna_odm_file_fp}{file path to the backing \code{.odm} file for the gRNA modality}
 
 \item{sceptre_object}{a \code{sceptre_object}}
 
@@ -28,10 +28,7 @@ write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 \code{write_ondisc_backed_sceptre_object()} returns NULL, and \code{read_ondisc_backed_sceptre_object()} returns an \code{ondisc}-backed \code{sceptre_object}
 }
 \description{
-\itemize{
-\item \code{write_ondisc_backed_sceptre_object()} writes an \code{ondisc}-backed \code{sceptre_object} to disk, creating a file \code{sceptre_object.rds} in the specified directory
-\item \code{read_ondisc_backed_sceptre_object()} reads and initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file, \code{response.odm} file, and \code{grna.odm} file on disk
-}
+\code{write_ondisc_backed_sceptre_object()} and \code{read_ondisc_backed_sceptre_object()} enable the writing and reading of \code{ondisc}-backed \code{sceptre_object}s, respectively. First, \code{write_ondisc_backed_sceptre_object()} writes an \code{ondisc}-backed \code{sceptre_object} to disk, creating a file \code{sceptre_object.rds} in the specified directory. Next, \code{read_ondisc_backed_sceptre_object()} reads and initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file, \code{response.odm} file, and \code{grna.odm} file stored on disk.
 }
 \examples{
 library(sceptredata)

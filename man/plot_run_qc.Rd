@@ -27,7 +27,7 @@ plot_run_qc(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_run_qc()} creates a visualization of the outcome of the QC step. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_qc}{Section 4 of the introductory chapter in the manual} for guidance on interpreting this visual.
+\code{plot_run_qc()} creates a visualization of the outcome of the QC step. The top panel depicts the outcome of the cellwise QC. The various cellwise QC filters (e.g., "N nonzero responses," "N response UMIs," "Percent mito", etc.) are shown on the horizontal axis, and the percentage of cells removed due application of a given QC filter is shown on the vertical axis. Note that a cell can be flagged by multiple QC filters; for example, a cell might have an extremely high \code{response_n_umi} value \emph{and} an extremely high \code{response_n_nonzero} value. Thus, the height of the "any filter" bar (which indicates the percentage of cells removed due to application of \emph{any} filter) need not be equal to the sum of the heights of the other bars. The bottom panel depicts the outcome of the pairwise QC. Each point corresponds to a target-response pair; the vertical axis (resp., horizontal axis) indicates the \code{n_nonzero_trt} (resp., \code{n_nonzero_cntrl}) value of that pair. Pairs for which \code{n_nonzero_trt} or \code{n_nonzero_cntrl} fall below the threshold are removed (red), while the remaining pairs are retained (green).
 }
 \examples{
 library(sceptredata)

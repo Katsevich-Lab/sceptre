@@ -3,14 +3,13 @@
 ##########################
 #' Write or read an `ondisc`-backed `sceptre_object`
 #'
-#' - `write_ondisc_backed_sceptre_object()` writes an `ondisc`-backed `sceptre_object` to disk, creating a file `sceptre_object.rds` in the specified directory
-#' - `read_ondisc_backed_sceptre_object()` reads and initializes a `sceptre_object` from a `sceptre_object.rds` file, `response.odm` file, and `grna.odm` file on disk
+#' `write_ondisc_backed_sceptre_object()` and `read_ondisc_backed_sceptre_object()` enable the writing and reading of `ondisc`-backed `sceptre_object`s, respectively. First, `write_ondisc_backed_sceptre_object()` writes an `ondisc`-backed `sceptre_object` to disk, creating a file `sceptre_object.rds` in the specified directory. Next, `read_ondisc_backed_sceptre_object()` reads and initializes a `sceptre_object` from a `sceptre_object.rds` file, `response.odm` file, and `grna.odm` file stored on disk.
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param directory_to_write the directory in which to write the `sceptre_object.rds` file
 #' @param sceptre_object_fp file path to a `sceptre_object.rds` file
-#' @param response_odm_file_fp file path to a backing `.odm` file for the response modality
-#' @param grna_odm_file_fp file path to a backing `.odm` file for the gRNA modality
+#' @param response_odm_file_fp file path to the backing `.odm` file for the response modality
+#' @param grna_odm_file_fp file path to the backing `.odm` file for the gRNA modality
 #'
 #' @return `write_ondisc_backed_sceptre_object()` returns NULL, and `read_ondisc_backed_sceptre_object()` returns an `ondisc`-backed `sceptre_object`
 #' @export

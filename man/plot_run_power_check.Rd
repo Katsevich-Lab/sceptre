@@ -24,7 +24,7 @@ plot_run_power_check(
 a single \code{ggplot2} plot
 }
 \description{
-\code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Positive (resp., negative) control p-values are plotted in the left (resp., right) column on a negative log scale.
+\code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Each point in the plot corresponds to a target-response pair, with positive control pairs in the left column and negative control pairs in the right column. The vertical axis indicates the p-value of a given pair; smaller (i.e., more significant) p-values are positioned higher along this axis (p-values truncated at \code{clip_to} for visualization). The positive control p-values should be small, and in particular, smaller than the negative control p-values.
 }
 \examples{
 library(sceptredata)
