@@ -48,6 +48,7 @@ Suggests:
     testthat (>= 3.0.0),
     magrittr,
     MASS
+    covr
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre
