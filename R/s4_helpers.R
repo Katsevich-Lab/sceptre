@@ -35,7 +35,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 
 #' Print
 #'
-#' `print()` prints information about the dataset and the status of the analysis to the console.
+#' `print()` prints information about the dataset and the status of the analysis to the console. The output contains several fields: Attributes of the data (summarizing key features of the data), Analysis status (indicating the analysis functions that have been called), Analysis parameters (summarizing the analysis parameters set in `set_analysis_parameters()`), gRNA-to-cell assignment information (summarizing the outcome of the gRNA-to-cell assignment step), and Summary of results (summarizing the key analysis results). A subset of these fields may be printed, depending on the status of the analysis.
 #'
 #' @param x a `sceptre_object`
 #' @return the value NULL
