@@ -40,10 +40,10 @@ a computing cluster or cloud.
   containing new sections about at-scale `sceptre` and the statistical
   methodology underlying `sceptre`
 - New functionality for plotting and inspecting gRNA-to-cell assignments
-- A comprehensive suite of unit tests, helping to verify the correctness
-  of the code
-- More detailed man pages (including a runnable example for each) and
-  minor bug fixes
+- A comprehensive suite of unit tests, which verify the correctness of
+  the code
+- More detailed man pages (including runnable examples) and minor bug
+  fixes
 
 ## Featured publications
 

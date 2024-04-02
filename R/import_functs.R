@@ -3,7 +3,7 @@
 ############
 #' Import data
 #'
-#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. Users can create either a standard `sceptre` object or an `ondisc`-backed `sceptre` object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for detailed information about this function.
+#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. Users can create either a standard `sceptre` object or an `ondisc`-backed `sceptre` object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for more detailed information about this function.
 #'
 #' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the response IDs.
 #' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the gRNA IDs.

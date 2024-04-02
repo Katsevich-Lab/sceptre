@@ -14,9 +14,9 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 #' Plot gRNA count distributions
 #'
-#' `plot_grna_count_distributions()` plots the empirical UMI count distribution of one or more gRNAs.
+#' `plot_grna_count_distributions()` plots the empirical UMI count distribution of one or more gRNAs. `plot_grna_count_distributions()` can be called on a `sceptre_object` at any point in the pipeline after `import_data()`.
 #'
-#' @param sceptre_object any initialized `sceptre_object`. `plot_grna_count_distributions()` can be called at any point in the pipeline after `import_data()`.
+#' @param sceptre_object a `sceptre_object`
 #' @param n_grnas_to_plot (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
 #' @param grnas_to_plot (optional; default `NULL`) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then `n_grnas_to_plot` random gRNAs are plotted.
 #' @param threshold (optional; default `NULL`) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
@@ -136,7 +136,7 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 
 #' Plot assign gRNAs
 #'
-#' `plot_assign_grnas()` plots the outcome of the gRNA-to-cell assignment step. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_assign_grnas}{Section 3 of the introductory chapter in the manual} for guidance on interpreting this visual.
+#' `plot_assign_grnas()` plots the outcome of the gRNA-to-cell assignment step. The top panel plots the gRNA-to-cell assignments of `n_grnas_to_plot` (default 3) randomly selected gRNAs. In each plot the points represent cells; the vertical axis indicates the UMI count of the gRNA in a given cell, and the horizontal axis indicates whether the cell has been classified as “perturbed” (i.e., it contains the gRNA) or unperturbed (i.e., it does not contain the gRNA). Perturbed (resp., unperturbed) cells are shown in the left (resp., right) column. The bottom left panel is a barplot of the number of cells to which each gRNA has been mapped. Finally, the bottom right panel is a histogram of the number of gRNAs contained in each cell. The mean number of gRNAs per cell --- i.e., the MOI --- is displayed in purple text.
 #'
 #' @param sceptre_object a \code{sceptre_object} that has had `assign_grnas()` called on it
 #' @param n_grnas_to_plot (optional; default \code{3}) the number of gRNAs to display in the plots of gRNA count versus cell assignment
@@ -283,7 +283,11 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 ###########################
 #' Plot run calibration check
 #'
-#' \code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_calibration_check}{Section 5 of the introductory chapter in the manual} for guidance on interpreting this visual.
+#' \code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. The visualization consists of four panels, which we describe below.
+#' -   The upper left panel is a QQ plot of the p-values plotted on an untransformed scale. The p-values ideally should lie along the diagonal line, indicating uniformity of the p-values in the *bulk* of the distribution.
+#' -   The upper right panel is a QQ plot of the p-values plotted on a negative log-10 transformed scale. The p-values ideally should lie along the diagonal line (with the majority of the p-values falling within the gray confidence band), indicating uniformity of the p-values in the *tail* of the distribution.
+#' -   The lower left panel is a histogram of the estimated log-2 fold changes. The histogram ideally should be roughly symmetric and centered around zero.
+#' -   Finally, the bottom right panel is a text box displaying (i) the number of false discoveries that `sceptre` has made on the negative control data and (ii) the mean estimated log-fold change.
 #'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_calibration_check} called on it
 #' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot
@@ -478,8 +482,11 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 
 #' Plot run discovery analysis
 #'
-#' `plot_run_discovery_analysis()` creates a visualization of the outcome of the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_run_discovery_analysis}{Section 7 of the introductory chapter in the manual} for guidance on interpreting this visual.
-#'
+#' `plot_run_discovery_analysis()` creates a visualization of the outcome of the discovery analysis. The visualization consists of four plots:
+#' -   The upper left plot superimposes the discovery p-values (blue) on top of the negative control p-values (red) on an untransformed scale.
+#' -   The upper right plot is the same as the upper left plot, but the scale is negative log-10 transformed. The discovery p-values ideally should trend above the diagonal line, indicating the presence of signal in the discovery set. The horizontal dashed line indicates the multiple testing threshold; discovery pairs whose p-value falls above this line are called as significant.
+#' -   The bottom left panel is a volcano plot of the p-values and log fold changes of the discovery pairs. Each point corresponds to a pair; the estimated log-2 fold change of the pair is plotted on the horizontal axis, and the (negative log-10 transformed) p-value is plotted on the vertical axis. The horizontal dashed line again indicates the multiple testing threshold. Points above the dashed line (colored in purple) are called as discoveries, while points below (colored in blue) are called as insignificant.
+#' -   The bottom right panel is a text box displaying the number of discovery pairs called as significant.
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it
 #' @param x_limits (optional; default \code{c(-1.5, 1.5)}) a numeric vector of length 2 giving the lower and upper limits of the x-axis (corresponding to log-2 fold change) for the "Discovery volcano plot" panel
 #' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot
@@ -591,11 +598,11 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 ############
 #' Plot covariates
 #'
-#' `plot_covariates()` creates histograms of several cell-specific covariates: `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`.
+#' `plot_covariates()` creates a histogram of the covariates `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`. Cellwise QC removes cells that lie in the extreme right tail of the `response_p_mito` distribution or that lie in the extreme left *or* right tail of the `response_n_nonzero` or `response_n_umis` distribution. To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms. The optional arguments `response_n_nonzero_range`, `response_n_umis_range`, and `p_mito_threshold` control the location of these candidate QC thresholds. `response_n_nonzero_range` (resp., `response_n_umis_range`) is a length-two vector of quantiles (default: `c(0.01, 0.99)`) indicating the location at which to draw candidate QC thresholds on the `response_n_nonzero` (resp., `response_n_umis`) histogram. Next, `p_mito_threshold` is a single numeric value in the interval \[0,1\] specifying the location at which to draw a candidate QC threshold on the `response_p_mito` plot.
 #'
-#' To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms. If `run_qc()` has been called on the `sceptre_object`, then the QC thresholds plotted on the histograms are those contained within the `sceptre_object`.
+#' @note If `run_qc()` has already been called on the `sceptre_object`, then the parameters `response_n_umis_range`, `response_n_nonzero_range`, and `p_mito_threshold` are set to the corresponding parameters within the `sceptre_object`.
 #'
-#' @param sceptre_object any initialized `sceptre_object`. `plot_covariates()` can be called at any point in the pipeline after \code{import_data()}.
+#' @param sceptre_object a `sceptre_object`
 #' @param response_n_umis_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_umis` histogram
 #' @param response_n_nonzero_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_nonzero` histogram
 #' @param p_mito_threshold (optional; default \code{0.2}) a single numeric value in the interval \[0,1\] specifying the location at which to draw a vertical line on the `response_p_mito` histogram. Note that `p_mito_threshold` is an absolute number rather than a percentile.
@@ -667,7 +674,7 @@ plot_covariates <- function(sceptre_object,
 
 #' Plot run QC
 #'
-#' `plot_run_qc()` creates a visualization of the outcome of the QC step. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_qc}{Section 4 of the introductory chapter in the manual} for guidance on interpreting this visual.
+#' `plot_run_qc()` creates a visualization of the outcome of the QC step. The top panel depicts the outcome of the cellwise QC. The various cellwise QC filters (e.g., "N nonzero responses," "N response UMIs," "Percent mito", etc.) are shown on the horizontal axis, and the percentage of cells removed due application of a given QC filter is shown on the vertical axis. Note that a cell can be flagged by multiple QC filters; for example, a cell might have an extremely high `response_n_umi` value *and* an extremely high `response_n_nonzero` value. Thus, the height of the "any filter" bar (which indicates the percentage of cells removed due to application of *any* filter) need not be equal to the sum of the heights of the other bars. The bottom panel depicts the outcome of the pairwise QC. Each point corresponds to a target-response pair; the vertical axis (resp., horizontal axis) indicates the `n_nonzero_trt` (resp., `n_nonzero_cntrl`) value of that pair. Pairs for which `n_nonzero_trt` or `n_nonzero_cntrl` fall below the threshold are removed (red), while the remaining pairs are retained (green).
 #'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_qc()} called on it
 #' @param downsample_pairs (optional; default \code{10000}) the maximum number of points to plot in the lower panel of the figure (i.e., the "pairwise QC" plot)
@@ -791,7 +798,7 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
 ###############
 #' Plot run power check
 #'
-#' \code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Positive (resp., negative) control p-values are plotted in the left (resp., right) column on a negative log scale.
+#' \code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Each point in the plot corresponds to a target-response pair, with positive control pairs in the left column and negative control pairs in the right column. The vertical axis indicates the p-value of a given pair; smaller (i.e., more significant) p-values are positioned higher along this axis (p-values truncated at `clip_to` for visualization). The positive control p-values should be small, and in particular, smaller than the negative control p-values.
 #'
 #' @param sceptre_object a \code{sceptre_object} that has had \code{run_power_check()} called on it
 #' @param point_size (optional; default \code{1}) the size of the individual points in the plot
@@ -887,9 +894,9 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 
 #' Plot response-gRNA-target pair
 #'
-#' `plot_response_grna_target_pair()` creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by `n_response_umis`, adding a pseudo-count of 1, and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
+#' `plot_response_grna_target_pair()` creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by `n_response_umis`, adding a pseudo-count of 1 and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
 #'
-#' - If `grna_integration_strategy` is set to `"singleton"`, then `grna_target` should be set to a gRNA ID.
+#' If `grna_integration_strategy` is set to `"singleton"`, then `grna_target` should be set to a gRNA ID.
 #' @param sceptre_object a `sceptre_object` that has had `run_qc()` called on it
 #' @param response_id a string containing a response ID
 #' @param grna_target a string containing a gRNA target (or, if `grna_integration_strategy` is set to `"singleton"`, an individual gRNA ID)
