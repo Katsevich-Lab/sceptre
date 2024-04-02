@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,7 @@
 
       <dl><dt>
           
-          <code><a href="sceptre.html">sceptre</a></code> 
+          <code><a href="sceptre-package.html">sceptre</a></code> <code><a href="sceptre-package.html">sceptre-package</a></code> 
         </dt>
         <dd>sceptre</dd>
       </dl></div><div class="section level2">
@@ -115,7 +115,7 @@
           
           <code><a href="import_data_from_cellranger.html">import_data_from_cellranger()</a></code> 
         </dt>
-        <dd>Import data from cellranger</dd>
+        <dd>Import data from Cell Ranger</dd>
       </dl><dl><dt>
           
           <code><a href="import_data_from_parse.html">import_data_from_parse()</a></code> 
@@ -202,6 +202,11 @@
           <code><a href="plot_covariates.html">plot_covariates()</a></code> 
         </dt>
         <dd>Plot covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_response_grna_target_pair.html">plot_response_grna_target_pair()</a></code> 
+        </dt>
+        <dd>Plot response-gRNA-target pair</dd>
       </dl></div><div class="section level2">
       <h2 id="pair-constructor-functions">Pair constructor functions<a class="anchor" aria-label="anchor" href="#pair-constructor-functions"></a></h2>
       
@@ -228,6 +233,11 @@
           <code><a href="construct_trans_pairs.html">construct_trans_pairs()</a></code> 
         </dt>
         <dd>Construct <em>trans</em> pairs</dd>
+      </dl><dl><dt>
+          
+          <code><a href="gene_position_data_frame_grch38.html">gene_position_data_frame_grch38</a></code> 
+        </dt>
+        <dd>Gene position data frame</dd>
       </dl></div><div class="section level2">
       <h2 id="information-extraction-functions">Information extraction functions<a class="anchor" aria-label="anchor" href="#information-extraction-functions"></a></h2>
       
@@ -254,10 +264,20 @@
           <code><a href="get_result.html">get_result()</a></code> 
         </dt>
         <dd>Get result</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_response_matrix.html">get_response_matrix()</a></code> <code><a href="get_response_matrix.html">get_grna_matrix()</a></code> <code><a href="get_response_matrix.html">get_cell_covariates()</a></code> 
+        </dt>
+        <dd>Data getter functions</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_grna_assignments.html">get_grna_assignments()</a></code> 
+        </dt>
+        <dd>Get gRNA assignments</dd>
       </dl></div><div class="section level2">
-      <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
+      <h2 id="-ondisc-intput-output-functions"><code>ondisc</code> intput/output functions<a class="anchor" aria-label="anchor" href="#-ondisc-intput-output-functions"></a></h2>
       
-      <p class="section-desc"></p><p>Example data to illustrate use of the functions</p>
+      
 
       
     </div><div id="" class="section level2">
@@ -267,31 +287,16 @@
 
       <dl><dt>
           
-          <code><a href="highmoi_example_data.html">highmoi_example_data</a></code> 
+          <code><a href="read_ondisc_backed_sceptre_object.html">read_ondisc_backed_sceptre_object()</a></code> <code><a href="read_ondisc_backed_sceptre_object.html">write_ondisc_backed_sceptre_object()</a></code> 
         </dt>
-        <dd>Example high-MOI data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="grna_target_data_frame_highmoi.html">grna_target_data_frame_highmoi</a></code> 
-        </dt>
-        <dd>gRNA target data frame</dd>
-      </dl><dl><dt>
-          
-          <code><a href="lowmoi_example_data.html">lowmoi_example_data</a></code> 
-        </dt>
-        <dd>Example low-MOI data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="gene_position_data_frame_grch38.html">gene_position_data_frame_grch38</a></code> 
-        </dt>
-        <dd>Gene position data frame</dd>
+        <dd>Write or read an <code>ondisc</code>-backed <code>sceptre_object</code></dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Timothy Barry, Eugene Katsevich.</p>
+  <p></p><p>Developed by Timothy Barry, Joseph Deutsch, Eugene Katsevich.</p>
 </div>
 
 <div class="pkgdown-footer-right">

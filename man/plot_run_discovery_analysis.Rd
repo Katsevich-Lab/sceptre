@@ -27,11 +27,47 @@ plot_run_discovery_analysis(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_run_discovery_analysis}{Section 7 of the introductory chapter in the manual} for guidance on interpreting this visual.
+\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. The visualization consists of four plots:
+\itemize{
+\item The upper left plot superimposes the discovery p-values (blue) on top of the negative control p-values (red) on an untransformed scale.
+\item The upper right plot is the same as the upper left plot, but the scale is negative log-10 transformed. The discovery p-values ideally should trend above the diagonal line, indicating the presence of signal in the discovery set. The horizontal dashed line indicates the multiple testing threshold; discovery pairs whose p-value falls above this line are called as significant.
+\item The bottom left panel is a volcano plot of the p-values and log fold changes of the discovery pairs. Each point corresponds to a pair; the estimated log-2 fold change of the pair is plotted on the horizontal axis, and the (negative log-10 transformed) p-value is plotted on the vertical axis. The horizontal dashed line again indicates the multiple testing threshold. Points above the dashed line (colored in purple) are called as discoveries, while points below (colored in blue) are called as insignificant.
+\item The bottom right panel is a text box displaying the number of discovery pairs called as significant.
+}
 }
 \examples{
-# A full example can be found at ?sceptre;
-# `plot_run_discovery_analysis()` is dispatched when
-# `plot()` is called on the `sceptre_object`
-# in step 7 (the run discovery analysis step).
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
+sceptre_object |>
+  set_analysis_parameters(
+    side = "left",
+    discovery_pairs = discovery_pairs,
+    resampling_mechanism = "permutations",
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc() |>
+  run_calibration_check(
+    parallel = TRUE,
+    n_processors = 2
+  ) |>
+  run_discovery_analysis(
+    parallel = TRUE,
+    n_processors = 2
+  ) |>
+  plot_run_discovery_analysis()
 }

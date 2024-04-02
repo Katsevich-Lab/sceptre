@@ -21,8 +21,45 @@ construct_trans_pairs(
 a data frame with columns \code{grna_target} and \code{response_id} containing the \emph{trans} discovery set
 }
 \description{
-\code{construct_trans_pairs()} is a helper function to facilitate construction the set of \emph{trans} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
+\code{construct_trans_pairs()} is a helper function to facilitate construction the set of \emph{trans} pairs. \code{construct_trans_pairs()} returns the entire set of possible target-response pairs. \code{construct_trans_pairs()} is a useful pair constructor function for analyses in which we seek to conduct a \emph{trans} analysis, testing each target against each response. \code{construct_trans_pairs()} takes as arguments \code{sceptre_object} (required), \code{positive_control_pairs} (optional), and \code{pairs_to_exclude} (optional). By default \code{construct_trans_pairs()} returns a data frame with columns \code{grna_target} and \code{response_id}, where each gRNA target is mapped to each response ID.
 }
 \details{
-Typically, in screens of genes (resp., noncoding regulatory elements), we set \code{pairs_to_exclude} to \code{"pc_pairs"} (resp., \code{"pairs_containing_pc_targets"}).
+The optional argument \code{pairs_to_exclude} enables the user to remove specific pairs from the \emph{trans} set and takes values \code{"none"}, \code{"pc_pairs"}, or \code{"pairs_containing_pc_targets"}. If \code{pairs_to_exclude} is set to \code{"none"} (the default), then no pairs are removed from the \emph{trans} set. Next, if \code{pairs_to_exclude} is set to \code{"pc_pairs"} (and the \code{positive_control_pairs} data frame is passed), then then the positive control target-response pairs are excluded from the \emph{trans} set. Finally, if \code{pairs_to_exclude} is set to \code{"pairs_containing_pc_targets"} (and \code{positive_control_pairs} is passed), then \emph{all} pairs containing a positive control gRNA target are excluded from the \emph{trans} pairs. (In this sense setting \code{pairs_to_exclude} to \code{"pairs_containing_pc_targets"} is stronger than setting \code{pairs_to_exclude} to \code{"pc_pairs"}.) Typically, in gene-targeting (resp., noncoding-regulatory-element-targeting) screens, we set \code{pairs_to_exclude} to \code{"pc_pairs"} (resp., \code{"pairs_containing_pc_targets"}). See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2 of the manual} for more detailed information about this function.
+}
+\examples{
+library(sceptredata)
+# 1. low-moi, gene-targeting screen
+data("lowmoi_example_data")
+sceptre_object <- import_data(
+  response_matrix = lowmoi_example_data$response_matrix,
+  grna_matrix = lowmoi_example_data$grna_matrix,
+  extra_covariates = lowmoi_example_data$extra_covariates,
+  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+  moi = "low"
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_trans_pairs(
+  sceptre_object = sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  pairs_to_exclude = "pc_pairs"
+)
+
+# 2. high-moi, enhancer-targeting screen
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_trans_pairs(
+  sceptre_object = sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  pairs_to_exclude = "pairs_containing_pc_targets"
+)
 }

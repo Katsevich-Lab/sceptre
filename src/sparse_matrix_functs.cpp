@@ -21,29 +21,37 @@ NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, in
 IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
   IntegerVector p(dim + 1);
   p[0] = 0;
-  int curr_idx = 0, counter = 0, j = 0;
-  for (curr_idx = 0; curr_idx < dim; curr_idx ++) {
-    while (i[j] == curr_idx) {
-      counter ++;
-      j ++;
+  // special case of dim = 1
+  if (dim == 1) {
+    p[1] = i.size();
+  } else {
+    int curr_idx = 0, counter = 0, j = 0;
+    for (curr_idx = 0; curr_idx < dim; curr_idx ++) {
+      while (i[j] == curr_idx) {
+        counter ++;
+        j ++;
+      }
+      p[curr_idx + 1] = counter;
     }
-    p[curr_idx + 1] = counter;
   }
   return p;
 }
 
 
 // [[Rcpp::export]]
-List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito) {
-  IntegerVector n_nonzero(n_cells);
-  NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes);
+List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
+                                 int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
+  IntegerVector n_nonzero(n_cells), max_feature(n_cells);
+  NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes), frac_umis_max_feature(n_cells);
   List out;
 
-  int n_nonzero_count;
-  double n_umi_count, n_umi_count_mito;
+  int n_nonzero_count, curr_max_feature;
+  double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature;
   for (int k = 0; k < mt_gene_idxs.size(); k ++) mt_gene_idxs[k] --;
 
   for (int k = 0; k < n_cells; k ++) {
+    curr_max_feature = 0;
+    umi_count_curr_max_feature = 0;
     n_umi_count = 0;
     n_nonzero_count = 0;
     load_sparse_vector(i, p, x, k, n_genes, y);
@@ -52,22 +60,33 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
       if (y[r] > 0.5) n_nonzero_count ++;
     }
 
+    // compute p mito
     if (compute_p_mito) {
       n_umi_count_mito = 0;
       for (int r = 0; r < mt_gene_idxs.size(); r ++) n_umi_count_mito += y[mt_gene_idxs[r]];
       p_mito[k] = n_umi_count_mito/n_umi_count;
     }
 
+    // compute max feature, fraction expressed
+    if (compute_max_feature) {
+      curr_max_feature = 0;
+      umi_count_curr_max_feature = 0;
+      for (int r = 0; r < n_genes; r ++) {
+        if (y[r] > umi_count_curr_max_feature) {
+          curr_max_feature = r;
+          umi_count_curr_max_feature = y[r];
+        }
+      }
+      max_feature[k] = curr_max_feature;
+      frac_umis_max_feature[k] = umi_count_curr_max_feature/n_umi_count;
+    }
+
     n_nonzero[k] = n_nonzero_count;
     n_umi[k] = n_umi_count;
   }
 
-  if (compute_p_mito) {
-    out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito);
-  } else {
-    out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi);
-  }
-
+  out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito,
+                     Named("max_feature") = max_feature, Named("frac_umis_max_feature") = frac_umis_max_feature);
   return out;
 }
 
@@ -118,7 +137,7 @@ void increment_vector(IntegerVector x, int value) {
 
 
 // [[Rcpp::export]]
-IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells, double threshold) {
+IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold) {
   IntegerVector out;
   int n_gte_threshold = 0, counter = 0, start = p[row_idx - 1], end = p[row_idx];
   for (int k = start; k < end; k ++) if (x[k] >= threshold) n_gte_threshold ++;

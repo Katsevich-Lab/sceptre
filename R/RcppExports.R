@@ -74,8 +74,12 @@ increment_matrix <- function(m) {
     invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
-sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use) {
-    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use)
+sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
+    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+}
+
+compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
+    .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
 }
 
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
@@ -110,8 +114,8 @@ obtain_pointer_vector <- function(i, dim) {
     .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
-compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito) {
-    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito)
+compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
+    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
 }
 
 compute_colwise_max <- function(i, p, x, n_cells, grna_lib_size) {
@@ -126,7 +130,7 @@ increment_vector <- function(x, value) {
     invisible(.Call(`_sceptre_increment_vector`, x, value))
 }
 
-threshold_count_matrix <- function(j, p, x, row_idx, n_cells, threshold) {
-    .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, n_cells, threshold)
+threshold_count_matrix <- function(j, p, x, row_idx, threshold) {
+    .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, threshold)
 }
 

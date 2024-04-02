@@ -211,8 +211,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sample_undercover_pairs_v2
-List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, bool calculate_ess_using_m_matrix, IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, List indiv_nt_grna_idxs, IntegerVector cells_in_use);
-RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP, SEXP calculate_ess_using_m_matrixSEXP, SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP indiv_nt_grna_idxsSEXP, SEXP cells_in_useSEXP) {
+List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh);
+RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -223,14 +223,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_calibration_pairs(n_calibration_pairsSEXP);
     Rcpp::traits::input_parameter< int >::type n_nonzero_trt_thresh(n_nonzero_trt_threshSEXP);
     Rcpp::traits::input_parameter< int >::type n_nonzero_cntrl_thresh(n_nonzero_cntrl_threshSEXP);
-    Rcpp::traits::input_parameter< bool >::type calculate_ess_using_m_matrix(calculate_ess_using_m_matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs_v2(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_n_trt_cells_matrix
+IntegerMatrix compute_n_trt_cells_matrix(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, int n_genes, List nt_grna_group_idxs, IntegerVector cells_in_use);
+RcppExport SEXP _sceptre_compute_n_trt_cells_matrix(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP n_genesSEXP, SEXP nt_grna_group_idxsSEXP, SEXP cells_in_useSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells_sub(n_cells_subSEXP);
-    Rcpp::traits::input_parameter< List >::type indiv_nt_grna_idxs(indiv_nt_grna_idxsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
+    Rcpp::traits::input_parameter< List >::type nt_grna_group_idxs(nt_grna_group_idxsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs_v2(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, calculate_ess_using_m_matrix, j, p, n_cells_orig, n_cells_sub, indiv_nt_grna_idxs, cells_in_use));
+    rcpp_result_gen = Rcpp::wrap(compute_n_trt_cells_matrix(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -347,8 +357,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_cell_covariates_cpp
-List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito);
-RcppExport SEXP _sceptre_compute_cell_covariates_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_genesSEXP, SEXP n_cellsSEXP, SEXP mt_gene_idxsSEXP, SEXP compute_p_mitoSEXP) {
+List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature);
+RcppExport SEXP _sceptre_compute_cell_covariates_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_genesSEXP, SEXP n_cellsSEXP, SEXP mt_gene_idxsSEXP, SEXP compute_p_mitoSEXP, SEXP compute_max_featureSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -359,7 +369,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type mt_gene_idxs(mt_gene_idxsSEXP);
     Rcpp::traits::input_parameter< bool >::type compute_p_mito(compute_p_mitoSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_cpp(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito));
+    Rcpp::traits::input_parameter< bool >::type compute_max_feature(compute_max_featureSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_cpp(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -402,8 +413,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // threshold_count_matrix
-IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells, double threshold);
-RcppExport SEXP _sceptre_threshold_count_matrix(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP, SEXP thresholdSEXP) {
+IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold);
+RcppExport SEXP _sceptre_threshold_count_matrix(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -411,9 +422,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type row_idx(row_idxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
     Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(threshold_count_matrix(j, p, x, row_idx, n_cells, threshold));
+    rcpp_result_gen = Rcpp::wrap(threshold_count_matrix(j, p, x, row_idx, threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -434,7 +444,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
-    {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 14},
+    {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 7},
+    {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_compute_empirical_p_value", (DL_FUNC) &_sceptre_compute_empirical_p_value, 3},
@@ -443,11 +454,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_fit_and_evaluate_skew_normal", (DL_FUNC) &_sceptre_fit_and_evaluate_skew_normal, 3},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
-    {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 7},
+    {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
     {"_sceptre_compute_colwise_max", (DL_FUNC) &_sceptre_compute_colwise_max, 5},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_increment_vector", (DL_FUNC) &_sceptre_increment_vector, 2},
-    {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 6},
+    {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
     {NULL, NULL, 0}
 };
 

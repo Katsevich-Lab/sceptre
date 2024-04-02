@@ -3,10 +3,9 @@
 # `response_matrix`, `grna_matrix`, `grna_target_data_frame`,
 # and `extra_covariates` all are ok.
 test_that("check_import_data_inputs", {
-
   ##### setting up data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   valid_grna_target_data_frame <- make_mock_grna_target_data(
-    num_guides_per_target = c(2,3), chr_distances = 1, chr_starts = 1,
+    num_guides_per_target = c(2, 3), chr_distances = 1, chr_starts = 1,
     num_nt_guides = 2
   )
   num_cells <- 23
@@ -31,13 +30,14 @@ test_that("check_import_data_inputs", {
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
-    ))
+    )
+  )
 
   # it should also work if `valid_response_matrix` has no row names
   expect_no_error(
     check_import_data_inputs(
       response_matrix = valid_response_matrix |>
-        set_rownames(NULL),
+        `rownames<-`(NULL),
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
@@ -78,7 +78,7 @@ test_that("check_import_data_inputs", {
   expect_error(
     check_import_data_inputs(
       response_matrix = valid_response_matrix |>
-        set_rownames(c("a", "a", paste0("b", 1:(num_responses - 2)))),
+        `rownames<-`(c("a", "a", paste0("b", 1:(num_responses - 2)))),
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
@@ -92,7 +92,7 @@ test_that("check_import_data_inputs", {
     check_import_data_inputs(
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix |>
-        set_rownames(c("a", "a", paste0("b", 1:(num_targets - 2)))),
+        `rownames<-`(c("a", "a", paste0("b", 1:(num_targets - 2)))),
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
@@ -105,7 +105,7 @@ test_that("check_import_data_inputs", {
     check_import_data_inputs(
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix |>
-        set_rownames(NULL),
+        `rownames<-`(NULL),
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = valid_extra_covariates
@@ -116,14 +116,14 @@ test_that("check_import_data_inputs", {
   ##### 5. checking that "&" does not appear in any grna ids and that no grna is named "non-targeting"
 
   FAIL_id_contains_ampersand_target_df <- valid_grna_target_data_frame |>
-    inset(1,1,"bad&id")
+    .Primitive("[<-")(1, 1, "bad&id") # using .Primitive since I can't use `[<-` with base R pipe
   FAIL_id_contains_ampersand_grna_matrix <- valid_grna_matrix |>
-    set_rownames(FAIL_id_contains_ampersand_target_df$grna_id)
+    `rownames<-`(FAIL_id_contains_ampersand_target_df$grna_id)
 
   FAIL_id_contains_non_targeting_target_df <- valid_grna_target_data_frame |>
-    inset(2,1,"non-targeting")
+    .Primitive("[<-")(2, 1, "non-targeting") # using .Primitive since I can't use `[<-` with base R pipe
   FAIL_id_contains_non_targeting_grna_matrix <- valid_grna_matrix |>
-    set_rownames(FAIL_id_contains_non_targeting_target_df$grna_id)
+    `rownames<-`(FAIL_id_contains_non_targeting_target_df$grna_id)
 
   expect_error(
     check_import_data_inputs(
@@ -153,7 +153,8 @@ test_that("check_import_data_inputs", {
       response_matrix = valid_response_matrix,
       grna_matrix = valid_grna_matrix,
       grna_target_data_frame = valid_grna_target_data_frame |>
-        inset(3,1,"this grna id is not in the grna matrix"),
+        # using .Primitive since I can't use `[<-` with base R pipe
+        .Primitive("[<-")(3, 1, "this grna id is not in the grna matrix"),
       moi = "low",
       extra_covariates = valid_extra_covariates
     ),
@@ -223,9 +224,9 @@ test_that("check_import_data_inputs", {
   )
 
   ##### 8. agreement in number of cells
-  FAIL_ncol_resonse_matrix <- valid_response_matrix[,-1]
-  FAIL_ncol_grna_matrix <- valid_grna_matrix[,2:num_cells]
-  FAIL_nrow_extra_covariates <- valid_extra_covariates[-1,, drop = FALSE]
+  FAIL_ncol_resonse_matrix <- valid_response_matrix[, -1]
+  FAIL_ncol_grna_matrix <- valid_grna_matrix[, 2:num_cells]
+  FAIL_nrow_extra_covariates <- valid_extra_covariates[-1, , drop = FALSE]
 
   expect_error(
     check_import_data_inputs(
@@ -393,7 +394,7 @@ test_that("check_import_data_inputs", {
       grna_target_data_frame = valid_grna_target_data_frame,
       moi = "low",
       extra_covariates = make_mock_extra_covariates_data_frames(num_cells, patterns = "many_columns") |>
-        dplyr::mutate(list_col = c(list(c(1,1,1)), as.list(2:num_cells)))
+        dplyr::mutate(list_col = c(list(c(1, 1, 1)), as.list(2:num_cells)))
     ),
     regex = "of the `extra_covariates` data frame should be of type numeric"
   )
@@ -430,7 +431,7 @@ test_that("check_import_data_inputs", {
 
   ##### 13. NAs or Infs in extra_covariates
   FAIL_extra_covariates_with_na <- valid_extra_covariates
-  FAIL_extra_covariates_with_na[1,1] <- NA
+  FAIL_extra_covariates_with_na[1, 1] <- NA
   expect_error(
     check_import_data_inputs(
       response_matrix = valid_response_matrix,
@@ -439,7 +440,7 @@ test_that("check_import_data_inputs", {
       moi = "high",
       extra_covariates = FAIL_extra_covariates_with_na
     ),
-    regex = "`extra_covariates` has NA values which need to be removed"
+    regex = "`extra_covariates` has NA values that need to be removed"
   )
   FAIL_extra_covariates_with_inf <- valid_extra_covariates |>
     dplyr::mutate(x = c(-Inf, rnorm(num_cells - 1)))
@@ -451,6 +452,6 @@ test_that("check_import_data_inputs", {
       moi = "high",
       extra_covariates = FAIL_extra_covariates_with_inf
     ),
-    regex = "`extra_covariates` has infinite values which need to be removed"
+    regex = "`extra_covariates` has infinite values that need to be removed"
   )
 })

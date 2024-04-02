@@ -21,8 +21,27 @@ construct_cis_pairs(
 \item{response_position_data_frame}{(optional) a data frame with columns \code{response_id}, \code{chr}, and \code{position} giving the genomic coordinate of each response; by default \code{response_position_data_frame} is set to a data frame containing the genomic coordinate of each gene in the human genome relative to reference genome GRCh38.}
 }
 \value{
-a data frame with columns \code{grna_target} and \code{response_id} containing the \emph{cis} discovery set
+a data frame with columns \code{grna_target} and \code{response_id} containing the \emph{cis} pairs
 }
 \description{
-\code{construct_cis_pairs()} is a helper function to facilitate construction the \emph{cis} pairs. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2} of the manual for more detailed information about this function.
+\code{construct_cis_pairs()} is a helper function to facilitate construction the \emph{cis} pairs. \code{construct_cis_pairs()} returns the set of target-response pairs for which the target and response are located on the same chromosome and in close physical proximity to one another. \code{construct_cis_pairs()} is a useful pair constructor function for screens that aim to map noncoding regulatory elements (e.g., enhancers or noncoding GWAS variants) to target genes in \emph{cis}. \code{construct_cis_pairs()} assumes that the columns \code{chr}, \code{start}, and \code{stop} are present in the \code{grna_target_data_frame}, giving the chromosome, start position, and end position, respectively, of the region that each gRNA targets. \code{construct_cis_pairs()} takes several arguments: \code{sceptre_object} (required) \code{distance_threshold} (optional), \code{positive_control_pairs} (optional), and \code{response_position_data_frame} (optional). By default, \code{construct_cis_pairs()} pairs each gRNA target to the set of responses on the same chromosome as that target and within \code{distance_threshold} bases of that target. (The default value of \code{distance_threshold} is 500,000 bases, or half a megabase.) The \code{positive_control_pairs} data frame optionally can be passed to \code{construct_cis_pairs()}, in which case the positive control targets (i.e., the entries within the \code{grna_target} column of \code{positive_control_pairs}) are excluded from the \emph{cis} pairs. One may want to exclude these from the discovery analysis if these targets are intended for positive control purposes only. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2 of the manual} for more detailed information about this function.
+}
+\examples{
+library(sceptredata)
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+# import data
+sceptre_object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
+discovery_pairs <- construct_cis_pairs(sceptre_object,
+  positive_control_pairs = positive_control_pairs,
+  distance_threshold = 5e6
+)
 }

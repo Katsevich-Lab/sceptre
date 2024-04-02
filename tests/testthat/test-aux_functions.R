@@ -6,7 +6,7 @@ test_that("auto_compute_cell_covariates", {
   num_responses <- 21
 
   # only needed to make grna_matrix
-  grna_target_data_frame <- make_mock_grna_target_data(c(1,2,4), 1, 1, 5)
+  grna_target_data_frame <- make_mock_grna_target_data(c(1, 2, 4), 1, 1, 5)
   fixed_response_matrix <- make_mock_response_matrices(num_responses, num_cells, patterns = "column")
   fixed_grna_matrix <- make_mock_grna_matrices(grna_target_data_frame, num_cells, non_nt_patterns = "column", nt_pattern = "row") |>
     `rownames<-`(grna_target_data_frame$grna_id)
@@ -15,12 +15,12 @@ test_that("auto_compute_cell_covariates", {
 
   ## testing response_matrix
   # only `response_n_nonzero` and `response_n_umis` are tested for this part
-  for(response_matrix in make_mock_response_matrices(num_responses, num_cells, patterns = "all")) {
+  for (response_matrix in make_mock_response_matrices(num_responses, num_cells, patterns = "all")) {
     results <- auto_compute_cell_covariates(
       response_matrix = response_matrix,
       grna_matrix = fixed_grna_matrix,
       extra_covariates = extra_covariates_big,
-      response_names = NA_character_  # this is what it is by default in `import_data`
+      response_names = NA_character_ # this is what it is by default in `import_data`
     )
 
     expect_equal(
@@ -35,7 +35,7 @@ test_that("auto_compute_cell_covariates", {
 
   ## testing grna_matrix
   # only `response_n_nonzero` and `response_n_umis` are tested for this part
-  for(grna_matrix in make_mock_grna_matrices(grna_target_data_frame, num_cells, non_nt_patterns = "all", nt_patterns = "column")) {
+  for (grna_matrix in make_mock_grna_matrices(grna_target_data_frame, num_cells, non_nt_patterns = "all", nt_patterns = "column")) {
     results <- auto_compute_cell_covariates(
       response_matrix = fixed_response_matrix,
       grna_matrix = grna_matrix,
@@ -61,7 +61,7 @@ test_that("auto_compute_cell_covariates", {
     response_names = NA_character_
   )
   expect_equal(
-    results_big[,names(extra_covariates_big)],
+    results_big[, names(extra_covariates_big)],
     extra_covariates_big
   )
 
@@ -73,7 +73,10 @@ test_that("auto_compute_cell_covariates", {
   )
   expect_equal(
     colnames(results_empty),
-    c("response_n_nonzero", "response_n_umis", "grna_n_nonzero", "grna_n_umis")
+    c(
+      "response_n_nonzero", "response_n_umis", "grna_n_nonzero",
+      "grna_n_umis", "grna_frac_umis_max_feature", "grna_feature_w_max_expression"
+    )
   )
 
   ## testing response_names
@@ -129,4 +132,3 @@ test_that("auto_construct_formula_object", {
     "log(aaa_n_umis + 1) + log(n_nonzero_aaa) + x"
   )
 })
-
