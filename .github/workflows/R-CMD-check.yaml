@@ -27,7 +27,10 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
 
     - name: Install R dependencies
+      env:
+        GITHUB_PAT: ${{ secrets.CI_PAT }}
       run: |
+        Rscript -e "Sys.setenv(CI_PAT = Sys.getenv('CI_PAT'))"
         Rscript -e "options(warn = 2)"
         Rscript -e "install.packages(c('remotes', 'covr'))"
         Rscript -e "remotes::install_github('Katsevich-Lab/sceptredata')"
