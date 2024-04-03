@@ -193,17 +193,12 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
-  # 10. if using a backing .odm file, verify that resampling mechanism is permutations
-  if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
-    stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
-  }
-
-  # 11. verify resampling_approximation acceptable
+  # 10. verify resampling_approximation acceptable
   if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
     stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
   }
 
-  # 12. verify that response_regression_method is "nb" if resampling_mechanism is "asymptotic_normality"
+  # 11. verify that response_regression_method is "nb" if resampling_mechanism is "asymptotic_normality"
   if (resampling_mechanism == "asymptotic_normality" && response_regression_method != "nb") {
     stop("`response_regression_method` must be set to 'nb' when `resampling_mechanism` is 'asymptotic_normality'.")
   }
