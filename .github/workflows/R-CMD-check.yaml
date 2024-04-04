@@ -37,11 +37,16 @@ jobs:
         Rscript -e "remotes::install_deps(dependencies=TRUE)"
 
     - name: Generate coverage report
-      run: Rscript -e "covr::codecov()" 
+      run: Rscript -e "covr::coveralls(file='coverage.xml')" 
+    - name: List files in the current directory
+      run: ls -la
+
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+
 
 
