@@ -33,7 +33,7 @@ jobs:
         Rscript -e "Sys.setenv(CI_PAT = Sys.getenv('CI_PAT'))"
         Rscript -e "options(warn = 2)"
         Rscript -e "install.packages(c('remotes', 'covr', 'DT'))"
-        Rscript -e "remotes::install_github('Katsevich-Lab/sceptredata')"
+        #   Rscript -e "remotes::install_github('Katsevich-Lab/sceptredata')"
         Rscript -e "remotes::install_deps(dependencies=TRUE)"
 
     - name: Generate coverage report
