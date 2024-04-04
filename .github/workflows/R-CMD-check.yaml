@@ -37,7 +37,7 @@ jobs:
         Rscript -e "remotes::install_deps(dependencies=TRUE)"
 
     - name: Generate coverage report
-      run: Rscript -e "covr::coveralls(file='coverage.xml')" 
+      run: Rscript -e "covr::codecov()"
     - name: List files in the current directory
       run: ls -la
 
