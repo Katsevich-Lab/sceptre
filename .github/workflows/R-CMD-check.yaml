@@ -37,7 +37,7 @@ jobs:
         Rscript -e "remotes::install_deps(dependencies=TRUE)"
 
     - name: Generate coverage report
-      run: Rscript -e "covr::codecov(quiet = FALSE)" 
+      run: Rscript -e "covr::codecov()" 
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
