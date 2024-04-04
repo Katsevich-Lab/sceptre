@@ -38,15 +38,19 @@ jobs:
 
     - name: Generate coverage report
       run: Rscript -e "covr::codecov()"
-    - name: List files in the current directory
+    - name: Debug saving
       run: ls -la
+      run: pwd
+      run: Rscript -e "covr::file_report(file = 'coverage.xml')"
+      run: ls -la
+
 
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
+        files: ./coverage.xml
 
 
 
