@@ -15,6 +15,13 @@ on:
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macOS-latest,   r: 'release'}
+
     steps:
     - uses: actions/checkout@v2
 
