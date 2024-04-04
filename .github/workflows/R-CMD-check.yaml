@@ -37,12 +37,13 @@ jobs:
         Rscript -e "remotes::install_deps(dependencies=TRUE)"
 
     - name: Generate coverage report
-      run: Rscript -e "covr::codecov()"
+      # run: Rscript -e "covr::codecov()"
+      run: Rscript -e "covr::file_report(file='coverage.xml')"
     - name: Debug saving
       run: |
         ls -la
         pwd
-        Rscript -e "covr::file_report(file = 'coverage.xml')"
+        # Rscript -e "covr::file_report(file = 'coverage.xml')"
         ls -la
 
     - name: Upload coverage reports to Codecov
