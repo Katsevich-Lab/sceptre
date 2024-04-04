@@ -45,8 +45,6 @@ jobs:
         Rscript -e "covr::file_report(file = 'coverage.xml')"
         ls -la
 
-
-
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
