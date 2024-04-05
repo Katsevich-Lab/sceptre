@@ -24,7 +24,13 @@ plot_run_calibration_check(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_calibration_check}{Section 5 of the introductory chapter in the manual} for guidance on interpreting this visual.
+\code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. The visualization consists of four panels, which we describe below.
+\itemize{
+\item The upper left panel is a QQ plot of the p-values plotted on an untransformed scale. The p-values ideally should lie along the diagonal line, indicating uniformity of the p-values in the \emph{bulk} of the distribution.
+\item The upper right panel is a QQ plot of the p-values plotted on a negative log-10 transformed scale. The p-values ideally should lie along the diagonal line (with the majority of the p-values falling within the gray confidence band), indicating uniformity of the p-values in the \emph{tail} of the distribution.
+\item The lower left panel is a histogram of the estimated log-2 fold changes. The histogram ideally should be roughly symmetric and centered around zero.
+\item Finally, the bottom right panel is a text box displaying (i) the number of false discoveries that \code{sceptre} has made on the negative control data and (ii) the mean estimated log-fold change.
+}
 }
 \examples{
 library(sceptredata)

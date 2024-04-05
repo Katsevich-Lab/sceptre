@@ -1,5 +1,5 @@
 assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors, log_dir, grna_ids) {
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
   # 0. get random starting guesses for pi and g_pert
   starting_guesses <- get_random_starting_guesses(
     n_em_rep = grna_assignment_hyperparameters$n_em_rep,

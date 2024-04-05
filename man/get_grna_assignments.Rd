@@ -15,12 +15,10 @@ get_grna_assignments(sceptre_object, apply_cellwise_qc = FALSE)
 a sparse logical matrix containing the gRNA-to-cell assignments
 }
 \description{
-Obtains the gRNA-to-cell assignments from a \code{sceptre_object}. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is TRUE if the given gRNA is assigned to the given cell.
+\code{get_grna_assignments()} returns the gRNA-to-cell assignments contained within a \code{sceptre_object}. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is set to \code{TRUE} if the given gRNA is assigned to the given cell (and \code{FALSE} otherwise).
 }
 \details{
-\itemize{
-\item When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
-}
+When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 }
 \examples{
 library(sceptredata)
@@ -46,7 +44,9 @@ sceptre_object <- sceptre_object |>
   ) |>
   run_qc()
 
-grna_assignment_matrix <- get_grna_assignments(sceptre_object)
+grna_assignment_matrix <- get_grna_assignments(
+  sceptre_object = sceptre_object
+)
 grna_assignment_matrix_with_qc <- get_grna_assignments(
   sceptre_object = sceptre_object,
   apply_cellwise_qc = TRUE

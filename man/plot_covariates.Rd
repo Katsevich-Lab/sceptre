@@ -13,7 +13,7 @@ plot_covariates(
 )
 }
 \arguments{
-\item{sceptre_object}{any initialized \code{sceptre_object}. \code{plot_covariates()} can be called at any point in the pipeline after \code{import_data()}.}
+\item{sceptre_object}{a \code{sceptre_object}}
 
 \item{response_n_umis_range}{(optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the \code{response_n_umis} histogram}
 
@@ -27,10 +27,10 @@ plot_covariates(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_covariates()} creates histograms of several cell-specific covariates: \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}.
+\code{plot_covariates()} creates a histogram of the covariates \code{response_n_nonzero}, \code{response_n_umis}, and (if applicable) \code{response_p_mito}. Cellwise QC removes cells that lie in the extreme right tail of the \code{response_p_mito} distribution or that lie in the extreme left \emph{or} right tail of the \code{response_n_nonzero} or \code{response_n_umis} distribution. To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms. The optional arguments \code{response_n_nonzero_range}, \code{response_n_umis_range}, and \code{p_mito_threshold} control the location of these candidate QC thresholds. \code{response_n_nonzero_range} (resp., \code{response_n_umis_range}) is a length-two vector of quantiles (default: \code{c(0.01, 0.99)}) indicating the location at which to draw candidate QC thresholds on the \code{response_n_nonzero} (resp., \code{response_n_umis}) histogram. Next, \code{p_mito_threshold} is a single numeric value in the interval [0,1] specifying the location at which to draw a candidate QC threshold on the \code{response_p_mito} plot.
 }
-\details{
-To help guide the selection of QC thresholds, \code{plot_covariates()} plots candidate QC thresholds as vertical lines on the histograms. If \code{run_qc()} has been called on the \code{sceptre_object}, then the QC thresholds plotted on the histograms are those contained within the \code{sceptre_object}.
+\note{
+If \code{run_qc()} has already been called on the \code{sceptre_object}, then the parameters \code{response_n_umis_range}, \code{response_n_nonzero_range}, and \code{p_mito_threshold} are set to the corresponding parameters within the \code{sceptre_object}.
 }
 \examples{
 library(sceptredata)
