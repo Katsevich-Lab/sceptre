@@ -70,6 +70,20 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a, const N
   return(out);
 }
 
+enum class ResamplingApproximation {
+  skew_normal,
+  no_approximation,
+  standard_normal
+};
+
+ResamplingApproximation resampling_approximation_code_to_enum(int resampling_approximation_code) {
+  switch (resampling_approximation_code) {
+  case 1: return ResamplingApproximation::skew_normal;
+  case 2: return ResamplingApproximation::no_approximation;
+  case 3: return ResamplingApproximation::standard_normal;
+  default: throw std::range_error("Invalid option");
+  }
+}
 
 // [[Rcpp::export]]
 SEXP run_low_level_test_full_v4(NumericVector y,
@@ -84,9 +98,8 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int B1,
                                 int B2,
                                 int B3,
-                                bool fit_parametric_curve,
+                                int resampling_approximation_code,
                                 bool return_resampling_dist,
-                                bool asymptotic_normality,
                                 int side_code) {
   // initialize the output list and p-value
   List out;
@@ -96,6 +109,9 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   std::vector<double> fit_sn_out;
   int stage = 1;
 
+  // convert the resampling approximation code to an enum
+  ResamplingApproximation resampling_approximation = resampling_approximation_code_to_enum(resampling_approximation_code);
+
   // estimate the log fold change
   double lfc = estimate_log_fold_change_v2(y, mu, trt_idxs, n_trt);
 
@@ -103,7 +119,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   double z_orig = compute_observed_full_statistic_v2(a, w, D, trt_idxs);
 
   // if p-value based on asymptotic normality is requested, compute and return it
-  if (asymptotic_normality) {
+  if (resampling_approximation == ResamplingApproximation::standard_normal) {
     p = compute_normal_p_value(z_orig, side_code);
     out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = 0, Named("sn_params") = sn_params);
     return(out);
@@ -115,7 +131,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
 
   if (p <= P_THRESH) {
     // stage 2: if fit_parametric_curve true, draw stage 2 null statistics and get the SN p-value
-    if (fit_parametric_curve) {
+    if (resampling_approximation == ResamplingApproximation::skew_normal) {
       // compute the stage 2 vector of null statistics
       null_statistics = compute_null_full_statistics(a, w, D, B1, B2, n_trt, use_all_cells, synthetic_idxs);
 
@@ -128,7 +144,7 @@ SEXP run_low_level_test_full_v4(NumericVector y,
     }
 
     // stage 3: if skew normal fit failed, or if fit_parametric_curve false, draw stage 3 statistics and compute empirical p-value
-    if (!fit_parametric_curve || !sn_fit_used) {
+    if (resampling_approximation == ResamplingApproximation::no_approximation || !sn_fit_used) {
       if (B3 > 0) null_statistics = compute_null_full_statistics(a, w, D, B1 + B2, B3, n_trt, use_all_cells, synthetic_idxs);
       p = compute_empirical_p_value(null_statistics, z_orig, side_code);
       stage = 3;

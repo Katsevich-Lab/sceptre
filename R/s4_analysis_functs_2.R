@@ -314,7 +314,7 @@ process_discovery_result <- function(result, sceptre_object) {
 run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type,
                                             output_amount, print_progress, parallel, n_processors, log_dir) {
   # if running permutations, generate the permutation idxs
-  if (sceptre_object@resampling_mechanism == "permutations") {
+  if (sceptre_object@run_permutations) {
     cat("Generating permutation resamples.")
     synthetic_idxs <- get_synthetic_permutation_idxs(
       grna_assignments = sceptre_object@grna_assignments,
@@ -326,7 +326,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
     )
     cat(crayon::green(" \u2713\n"))
   }
-  if(sceptre_object@resampling_mechanism == "asymptotic_normality"){
+  if(sceptre_object@resampling_approximation == "standard_normal"){
     synthetic_idxs <- integer(0)
   }
   gc() |> invisible()
@@ -338,7 +338,6 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
     covariate_matrix = sceptre_object@covariate_matrix,
     response_grna_group_pairs = response_grna_group_pairs |> dplyr::filter(pass_qc),
     output_amount = output_amount,
-    resampling_mechanism = sceptre_object@resampling_mechanism,
     resampling_approximation = sceptre_object@resampling_approximation,
     B1 = sceptre_object@B1, B2 = sceptre_object@B2,
     B3 = sceptre_object@B3, calibration_check = calibration_check,
@@ -354,7 +353,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   )
 
   # run the method
-  out <- if (sceptre_object@resampling_mechanism %in% c("permutations", "asymptotic_normality")) {
+  out <- if (sceptre_object@run_permutations) {
     args_to_pass$synthetic_idxs <- synthetic_idxs
     do.call(what = "run_perm_test_in_memory", args = args_to_pass)
   } else {

@@ -10,7 +10,6 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
   return(response_id)
 }
 
-
 # core function 1. run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
                                     synthetic_idxs, output_amount, resampling_mechanism, resampling_approximation,
@@ -26,7 +25,6 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
-  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
   covariate_matrix <- covariate_matrix[cells_in_use, ]
@@ -79,14 +77,13 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
           full_test_stat = TRUE
         )
         curr_response_result <- perm_test_glm_factored_out(
-          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-          resampling_mechanism, output_amount, grna_groups, expression_vector,
-          pieces_precomp, get_idx_f, side_code
+          synthetic_idxs, B1, B2, B3, resampling_approximation, output_amount,
+          grna_groups, expression_vector, pieces_precomp, get_idx_f, side_code
         )
       } else {
         curr_response_result <- discovery_ntcells_perm_test(
-          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-          resampling_mechanism, response_regression_method, output_amount,
+          synthetic_idxs, B1, B2, B3, resampling_approximation,
+          response_regression_method, output_amount,
           covariate_matrix, all_nt_idxs, grna_group_idxs, grna_groups, expression_vector, side_code
         )
       }
@@ -142,7 +139,6 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
-  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
   covariate_matrix <- covariate_matrix[cells_in_use, ]
@@ -220,14 +216,14 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
       # 8. call the low-level analysis function
       if (run_outer_regression) {
         curr_response_result <- crt_glm_factored_out(
-          B1, B2, B3, fit_parametric_curve, output_amount,
+          B1, B2, B3, resampling_approximation, output_amount,
           response_ids, response_precomputations, covariate_matrix,
           get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
           response_matrix, side_code, cells_in_use
         )
       } else {
         curr_response_result <- discovery_ntcells_crt(
-          B1, B2, B3, fit_parametric_curve, response_regression_method, output_amount,
+          B1, B2, B3, resampling_approximation, response_regression_method, output_amount,
           get_idx_f, response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
           response_matrix, side_code, cells_in_use
         )

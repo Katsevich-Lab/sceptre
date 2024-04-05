@@ -75,10 +75,10 @@ set_analysis_parameters <- function(sceptre_object,
     )
   }
   if(response_regression_method == "default"){
-    if(resampling_mechanism %in% c("permutations", "crt")){
+    if(resampling_approximation %in% c("skew_normal", "no_approximation")){
       response_regression_method <- "approximate_nb"
     }
-    if(resampling_mechanism == "asymptotic_normality"){
+    if(resampling_approximation == "standard_normal"){
       response_regression_method <- "nb"
     }
   }
@@ -86,9 +86,9 @@ set_analysis_parameters <- function(sceptre_object,
   if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
     B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
-  } else if (resampling_approximation == "no_approximation") {
+  } else if (resampling_approximation %in% c("no_approximation", "standard_normal")) {
     B2 <- 0L # no curve fitting; thus, B2 = 0L
-    B3 <- 0L # to be updated in the run_qc step
+    B3 <- 0L # to be updated in the run_qc step for no_approximation
   }
 
   # 2. check inputs
@@ -116,6 +116,7 @@ set_analysis_parameters <- function(sceptre_object,
   # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
+  run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
@@ -124,7 +125,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@side_code <- side_code
   sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
-  sceptre_object@resampling_mechanism <- resampling_mechanism
+  sceptre_object@run_permutations <- run_permutations
   sceptre_object@response_regression_method <- response_regression_method
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
