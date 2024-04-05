@@ -2,7 +2,7 @@
 % Please edit documentation in R/import_functs.R
 \name{import_data_from_cellranger}
 \alias{import_data_from_cellranger}
-\title{Import data from cellranger}
+\title{Import data from Cell Ranger}
 \usage{
 import_data_from_cellranger(
   directories,
@@ -14,23 +14,23 @@ import_data_from_cellranger(
 )
 }
 \arguments{
-\item{directories}{a character vector of directories containing the output of one or more calls to cellranger count. Each directory should contain the files "matrix.mtx.gz" and "features.tsv.gz" (and optionally "barcodes.tsv.gz").}
+\item{directories}{a character vector of file paths to directories containing the output of one or more calls to Cell Ranger count. Each directory should contain the files \code{matrix.mtx.gz} and \code{features.tsv.gz} (and optionally \code{barcodes.tsv.gz}).}
 
-\item{moi}{a string indicating the MOI of the dataset, either "low" or "high"}
+\item{moi}{a string indicating the MOI of the dataset, either "low" or "high".}
 
-\item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target. Optionally, \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end}, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, \code{grna_target_data_frame} can contain the column \code{vector_id} specifying the vector to which a given gRNA belongs.}
+\item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and \code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs should be assigned a label of "non-targeting". Optionally, \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end}, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, \code{grna_target_data_frame} can contain the column \code{vector_id} specifying the vector to which a given gRNA belongs.}
 
-\item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute}
+\item{extra_covariates}{(optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.}
 
-\item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to store the expression data in a disk-backed \code{ondisc} matrix (TRUE) or an in-memory sparse matrix (FALSE)}
+\item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to store the expression data in a disk-backed \code{ondisc} matrix (\code{TRUE}) or an in-memory sparse matrix (\code{FALSE}).}
 
-\item{directory_to_write}{(optional) a string indicating the directory in which to write the backing \code{.odm} files (must be specified if \code{use_ondisc} is set to \code{TRUE})}
+\item{directory_to_write}{(optional) a string indicating the directory in which to write the backing \code{.odm} files (must be specified if \code{use_ondisc} is set to \code{TRUE}).}
 }
 \value{
 an initialized \code{sceptre_object}
 }
 \description{
-\code{import_data_from_cellranger()} imports data from the output of one or more calls to cellranger count. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{Section 1 of the introductory chapter in the manual} for more information about this function.
+\code{import_data_from_cellranger()} imports data from the output of one or more calls to Cell Ranger count. Each directory supplied as an input to this function should be in feature-barcode format, containing the files \code{features.tsv.gz} and  \code{matrix.mtx.gz} (and optionally \code{barcodes.tsv.gz}). Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed \code{sceptre} object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter} or \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1} of the manual for more information about this function.
 }
 \examples{
 library(sceptredata)
@@ -40,14 +40,14 @@ directories <- paste0(
   "/highmoi_example/gem_group_", c(1, 2)
 )
 
-# 1. create a standard sceptre_object from cellranger output
+# 1. create a standard sceptre_object from Cell Ranger output
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",
   grna_target_data_frame = grna_target_data_frame_highmoi,
 )
 
-# 2. create an ondisc-backed sceptre_object from cellranger output
+# 2. create an ondisc-backed sceptre_object from Cell Ranger output
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",

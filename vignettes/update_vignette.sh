@@ -4,6 +4,7 @@ sed -i -e '/::: callout-note/,/:::/d' sceptre.Rmd
 sed -i -e 's/# The whole game {#sec-whole_game .unnumbered}//g' sceptre.Rmd
 sed -i -e 's|\[@gasperini2019\]|\[(Gasperini, 2019)\](https://pubmed.ncbi.nlm.nih.gov/30612741/)|g' sceptre.Rmd
 sed -i -e 's|\[@replogle2022\]|\[(Replogle, 2022)\](https://pubmed.ncbi.nlm.nih.gov/35688146/)|g' sceptre.Rmd
+sed -i -e 's|\[frequently asked questions page\](faq.qmd)|\[frequently asked questions page\](https://timothy-barry.github.io/sceptre-book/faq.html)|g' sceptre.Rmd
 sed -i -e 's/{#[^}]*}//g' sceptre.Rmd
 sed -i -e 's|\[`sceptre` Nextflow pipeline\](at-scale.qmd)|\[`sceptre` Nextflow pipeline\](https://timothy-barry.github.io/sceptre-book/)|g' sceptre.Rmd
 sed -i -e 's/[^.]*@sec-[^.]*\.//g' sceptre.Rmd

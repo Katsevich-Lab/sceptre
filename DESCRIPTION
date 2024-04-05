@@ -1,6 +1,6 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
-Version: 0.9.1
+Version: 0.10.0
 Authors@R: 
     c(person(given = "Timothy",
            family = "Barry",
@@ -22,12 +22,12 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 LinkingTo: Rcpp, BH
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
-BugReports: https://github.com/Katsevich-Lab/sceptre/issues
 Imports:
     BH,
     cowplot,
     crayon,
     data.table,
+    R.utils,
     dplyr,
     ggplot2,
     Matrix,
@@ -48,6 +48,7 @@ Suggests:
     testthat (>= 3.0.0),
     magrittr,
     MASS
+Remotes: github::timothy-barry/ondisc, github::katsevich-lab/sceptredata
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre
