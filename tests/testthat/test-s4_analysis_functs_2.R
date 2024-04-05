@@ -102,8 +102,39 @@ test_that("run_calibration_check with score test", {
   covariate_matrix <- scep@covariate_matrix
   grna_assignment_matrix <- get_grna_assignments(scep)
 
+
   # TODO: Apply statmod::score.test to calibration pairs and compare the resulting
   # p-values those output by sceptre's run_calibration_check
+
+  sceptre_pvals <- scep |>
+    get_result(analysis = "run_calibration_check") |>
+    dplyr::pull(p_value) |>
+    array()
+
+  non_targeting <- grna_target_data_frame[which(grna_target_data_frame$grna_target == "non-targeting"), ]
+
+  X <- t(as.matrix(grna_matrix[non_targeting$grna_id, ] > 5))
+  X <- apply(X, c(1, 2), as.numeric)
+  Y1 <- response_matrix["response_1", ]
+  Y2 <- response_matrix["response_2", ]
+  Z <- as.data.frame(covariate_matrix) |>
+    dplyr::select(`log(response_n_nonzero)`, `log(response_n_umis)`, `log(grna_n_nonzero)`, `log(grna_n_umis)`)
+
+  partial_model1 <- glm(Y1 ~ ., data = Z, family = MASS::negative.binomial(theta = theta_vals[1]))
+  z_stats1 <- statmod::glm.scoretest(partial_model1, X, 1)
+  statmod_pvals1 <- 2 * pnorm(-abs(z_stats1))
+
+  partial_model2 <- glm(Y2 ~ ., data = Z, family = MASS::negative.binomial(theta = theta_vals[2]))
+  z_stats2 <- statmod::glm.scoretest(partial_model2, X, 1)
+  statmod_pvals2 <- 2 * pnorm(-abs(z_stats2))
+
+  statmod_combined_pvals <- array(c(statmod_pvals1, statmod_pvals2)) |>
+    sort()
+
+  print(sceptre_pvals)
+  print(statmod_combined_pvals)
+
+  expect_equal(sceptre_pvals, statmod_combined_pvals)
 })
 
 test_that("run_calibration_check negative control pairs complement set with cellwise and pairwise qc", {
