@@ -84,7 +84,7 @@ test_that("run_calibration_check with score test", {
     moi = "high"
   ) |>
     set_analysis_parameters(
-      resampling_mechanism = "asymptotic_normality" # vanilla score test functionality
+      resampling_approximation = "standard_normal" # vanilla score test functionality
     ) |>
     assign_grnas(method = "thresholding", threshold = 5) |>
     run_qc(
