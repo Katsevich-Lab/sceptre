@@ -21,13 +21,18 @@ NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, in
 IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
   IntegerVector p(dim + 1);
   p[0] = 0;
-  int curr_idx = 0, counter = 0, j = 0;
-  for (curr_idx = 0; curr_idx < dim; curr_idx ++) {
-    while (i[j] == curr_idx) {
-      counter ++;
-      j ++;
+  // special case of dim = 1
+  if (dim == 1) {
+    p[1] = i.size();
+  } else {
+    int curr_idx = 0, counter = 0, j = 0;
+    for (curr_idx = 0; curr_idx < dim; curr_idx ++) {
+      while (i[j] == curr_idx) {
+        counter ++;
+        j ++;
+      }
+      p[curr_idx + 1] = counter;
     }
-    p[curr_idx + 1] = counter;
   }
   return p;
 }

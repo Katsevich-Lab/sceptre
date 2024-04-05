@@ -1,14 +1,14 @@
 #' Run calibration check
 #'
-#' `run_calibration_check()` runs the calibration check. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for detailed information about this function.
+#' `run_calibration_check()` runs the calibration check. The calibration check involves applying sceptre to analyze negative control target-response pairs --- pairs for which we know there is no association between the target and response --- to ensure control of the false discovery rate. The calibration check enables us to verify that the discovery set that sceptre ultimately produces is not contaminated by excess false positives. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
+#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return. `1` returns the least amount of information and `3` the most.
 #' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
-#' @param calibration_group_size (optional) the number of negative control gRNAs to put into each negative control target
+#' @param calibration_group_size (optional) the number of negative control gRNAs to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
+#' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
@@ -41,9 +41,9 @@
 #'     parallel = TRUE,
 #'     n_processors = 2
 #'   )
-run_calibration_check <- function(sceptre_object, output_amount = 1, n_calibration_pairs = NULL,
+run_calibration_check <- function(sceptre_object, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
-                                  n_processors = "auto", log_dir = tempdir()) {
+                                  n_processors = "auto", log_dir = tempdir(), output_amount = 1) {
   sceptre_object <- sceptre_object |>
     run_calibration_check_pt_1(
       n_calibration_pairs = n_calibration_pairs,
@@ -67,7 +67,7 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. handle the default arguments
   if (sceptre_object@n_discovery_pairs == 0L && (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
@@ -137,14 +137,10 @@ process_calibration_result <- function(result, sceptre_object) {
 
 #' Run power check
 #'
-#' `run_power_check()` runs the power check. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+#' `run_power_check()` runs the power check. The power check entails applying `sceptre` to analyze positive control pairs --- pairs for which we know there is an association between the target and the response --- to ensure that `sceptre` is capable of detecting true associations. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
-#' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
+#' @inheritParams run_calibration_check
 #' @return an updated `sceptre_object` in which the power check has been carried out
 #'
 #' @export
@@ -178,7 +174,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
@@ -220,14 +216,10 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
 #' Run discovery analysis
 #'
-#' `run_discovery_analysis()` runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+#' `run_discovery_analysis()` runs the discovery analysis. The discovery analysis involves applying `sceptre` to analyze discovery pairs, or target-response pairs whose association status we do not know but seek to learn. Identifying associations among the discovery pairs is the primary objective of the single-cell CRISPR screen analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param output_amount (optional; default `1`) an integer taking values 1, 2, or 3 specifying the amount of information to return
-#' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
-#' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
+#' @inheritParams run_calibration_check
 #' @return an updated `sceptre_object` in which the discovery analysis has been carried out
 #'
 #' @export
@@ -263,7 +255,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   # 0. verify that function called in correct order
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
-  if (!parallel) cat(crayon::red("Note: Set `parallel = TRUE` in the function call to improve speed.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
@@ -415,8 +407,10 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
 
 #' Get result
 #'
-#' `get_result()` returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+#' `get_result()` returns a data frame containing the result of a calibration check, power check, or discovery analysis. We pass as arguments `sceptre_object` and `analysis`, where the latter is a string indicating the function whose results we are querying. The output is a data frame, the rows of which correspond to target-response pairs, and the columns of which are as follows: `response_id`, `grna_target`, `n_nonzero_trt`, `n_nonzero_cntrl`, `pass_qc` (a `TRUE`/`FALSE` value indicating whether the pair passes pairwise QC), `p_value`, `log_2_fold_change`, and `significant` (a `TRUE`/`FALSE` value indicating whether the pair is called as significant). The p-value contained within the `p_value` column is a raw (i.e., non-multiplicity-adjusted) p-value. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
+#'
+#' @note If `output_amount` is set to `2` or `3` in `run_calibration_check()`, `run_power_check()`, or `run_discovery_analysis()`, then the result data frame contains additional columns; see \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual} for more information.
 #' @param sceptre_object a `sceptre_object`
 #' @param analysis a string indicating the name of the analysis whose results we are querying, one of `"run_calibration_check"`, `"run_power_check"`, or `"run_discovery_analysis"`.
 #'
@@ -463,7 +457,7 @@ get_result <- function(sceptre_object, analysis) {
 
 #' Write outputs to directory
 #'
-#' `write_outputs_to_directory()` writes the outputs of a `sceptre` analysis to a directory on disk. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+#' `write_outputs_to_directory()` writes the outputs of a `sceptre` analysis to a directory on disk. `write_outputs_to_directory()` writes several files to the specified directory: a text-based summary of the analysis (`analysis_summary.txt`), the various plots (`*.png`), the calibration check, power check, discovery analysis results (`results_run_calibration_check.rds`, `results_run_power_check.rds`, and `results_run_discovery_analysis.rds`, respectively), and the binary gRNA-to-cell assignment matrix (`grna_assignment_matrix.rds`). See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a string giving the file path to a directory on disk in which to write the results

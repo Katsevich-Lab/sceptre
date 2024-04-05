@@ -27,7 +27,13 @@ plot_run_discovery_analysis(
 a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_run_discovery_analysis}{Section 7 of the introductory chapter in the manual} for guidance on interpreting this visual.
+\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. The visualization consists of four plots:
+\itemize{
+\item The upper left plot superimposes the discovery p-values (blue) on top of the negative control p-values (red) on an untransformed scale.
+\item The upper right plot is the same as the upper left plot, but the scale is negative log-10 transformed. The discovery p-values ideally should trend above the diagonal line, indicating the presence of signal in the discovery set. The horizontal dashed line indicates the multiple testing threshold; discovery pairs whose p-value falls above this line are called as significant.
+\item The bottom left panel is a volcano plot of the p-values and log fold changes of the discovery pairs. Each point corresponds to a pair; the estimated log-2 fold change of the pair is plotted on the horizontal axis, and the (negative log-10 transformed) p-value is plotted on the vertical axis. The horizontal dashed line again indicates the multiple testing threshold. Points above the dashed line (colored in purple) are called as discoveries, while points below (colored in blue) are called as insignificant.
+\item The bottom right panel is a text box displaying the number of discovery pairs called as significant.
+}
 }
 \examples{
 library(sceptredata)
