@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,7 +19,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
-  <a class="nav-link" href="../doc/sceptre.html">
+  <a class="nav-link" href="../articles/sceptre.html">
     <span class="fa fa-play"></span>
      
     Get started
@@ -80,6 +80,29 @@
       <small>Source: <a href="https://github.com/Katsevich-Lab/sceptre/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.0" id="sceptre-0100-2024-04-02">sceptre 0.10.0 (2024-04-02)<a class="anchor" aria-label="anchor" href="#sceptre-0100-2024-04-02"></a></h2>
+<p>Version 0.10.0 is a major update to the <code>sceptre</code> package. This version provides support for the analysis of large-scale single-cell CRISPR screen data. It also includes several other, minor updates.</p>
+<ul><li><p>We have introduced the <code>ondisc</code>-backed <code>sceptre_object</code>, which is a special kind of <code>sceptre_object</code> in which the data are stored on-disk as opposed to in-memory.</p></li>
+<li><p>We have made the <code>sceptre</code> R package compatible with the <code>sceptre</code> Nextflow pipeline.</p></li>
+<li><p>We have added the function <code><a href="../reference/plot_response_grna_target_pair.html">plot_response_grna_target_pair()</a></code>, which creates a violin plot of the expression level of a specified gene across treatment and control groups of a specified target.</p></li>
+<li><p>We have added the function <code><a href="../reference/get_grna_assignments.html">get_grna_assignments()</a></code>, which facilitates obtaining the gRNA-to-cell assignments.</p></li>
+<li><p>We have updated the <code>sceptre</code> e-book, adding two new parts: a part on at-scale <code>sceptre</code> and a part on the methodology underlying <code>sceptre</code>.</p></li>
+<li><p>We have made the discovery pairs data frame and the positive control pairs data frame optional arguments to the <code><a href="../reference/set_analysis_parameters.html">set_analysis_parameters()</a></code> function.</p></li>
+<li><p>We have added a comprehensive suite of unit tests to help verify correctness of the code.</p></li>
+<li><p>We have fleshed out the man pages, for example by adding a runable example to each.</p></li>
+<li><p>We have moved the example data within the <code>sceptre</code> package into the companion <code>sceptredata</code> package.</p></li>
+<li><p>We have issued minor bug fixes.</p></li>
+</ul><p>Please note that v0.10.0 is a higher version number than v0.9.2.</p>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.2" id="sceptre-092-2023-12-08">sceptre 0.9.2 (2023-12-08)<a class="anchor" aria-label="anchor" href="#sceptre-092-2023-12-08"></a></h2>
+<p>Version 0.9.2 is a minor update to version 0.9.0.</p>
+<ol style="list-style-type: decimal"><li>Add an <code>n_processors</code> argument to the functions that enable parallelization to allow users to select the number of processors to use. (The default, <code>n_processors = "auto"</code>, selects the number of processors to use based on the number of processors available on the machine.)</li>
+<li>Add a <code>log_dir</code> argument, enabling users to specify the directory in which to write the log files.</li>
+<li>Accelerate the <code><a href="../reference/plot_assign_grnas.html">plot_assign_grnas()</a></code> function.</li>
+<li>Fix the functionality for identifying mitochondrial genes; now, genes prefixed by “MT-” or “mt-” are considered mitochondrial.</li>
+</ol></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1" id="sceptre-091-2023-10-24">sceptre 0.9.1 (2023-10-24)<a class="anchor" aria-label="anchor" href="#sceptre-091-2023-10-24"></a></h2>
 <p>Version 0.9.1 is a minor update to version 0.9.0.</p>

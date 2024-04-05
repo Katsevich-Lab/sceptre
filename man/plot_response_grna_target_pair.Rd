@@ -17,12 +17,10 @@ plot_response_grna_target_pair(sceptre_object, response_id, grna_target)
 a violin plot
 }
 \description{
-\code{plot_response_grna_target_pair()} creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by \code{n_response_umis}, adding a pseudo-count of 1, and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
+\code{plot_response_grna_target_pair()} creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by \code{n_response_umis}, adding a pseudo-count of 1 and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
 }
 \details{
-\itemize{
-\item If \code{grna_integration_strategy} is set to \code{"singleton"}, then \code{grna_target} should be set to a gRNA ID.
-}
+If \code{grna_integration_strategy} is set to \code{"singleton"}, then \code{grna_target} should be set to a gRNA ID.
 }
 \examples{
 library(sceptredata)

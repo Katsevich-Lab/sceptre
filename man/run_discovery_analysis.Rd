@@ -16,13 +16,13 @@ run_discovery_analysis(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return}
+\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return. \code{1} returns the least amount of information and \code{3} the most.}
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
 \item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
 
-\item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, "auto," automatically detects the number of processors available on the machine.}
+\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, automatically detects the number of processors available on the machine.}
 
 \item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
 }
@@ -30,7 +30,7 @@ run_discovery_analysis(
 an updated \code{sceptre_object} in which the discovery analysis has been carried out
 }
 \description{
-\code{run_discovery_analysis()} runs the discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for detailed information about this function.
+\code{run_discovery_analysis()} runs the discovery analysis. The discovery analysis involves applying \code{sceptre} to analyze discovery pairs, or target-response pairs whose association status we do not know but seek to learn. Identifying associations among the discovery pairs is the primary objective of the single-cell CRISPR screen analysis. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 }
 \examples{
 library(sceptredata)

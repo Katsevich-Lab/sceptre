@@ -35,7 +35,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 
 #' Print
 #'
-#' `print()` prints information about the dataset and the status of the analysis to the console.
+#' `print()` prints information about the dataset and the status of the analysis to the console. The output contains several fields: Attributes of the data (summarizing key features of the data), Analysis status (indicating the analysis functions that have been called), Analysis parameters (summarizing the analysis parameters set in `set_analysis_parameters()`), gRNA-to-cell assignment information (summarizing the outcome of the gRNA-to-cell assignment step), and Summary of results (summarizing the key analysis results). A subset of these fields may be printed, depending on the status of the analysis.
 #'
 #' @param x a `sceptre_object`
 #' @return the value NULL
@@ -98,9 +98,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     } else {
       paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))
     },
-    "\n\t\U2022 Resampling mechanism: ", crayon::blue(resampling_mechanism_to_string(x@resampling_mechanism)),
+    "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else if(x@resampling_approximation == "standard_normal") crayon::blue("no resampling") else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
     "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
-    "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else if (x@resampling_mechanism == "asymptotic_normality") crayon::blue("no approximation") else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
+    "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
     "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
     "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
     "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),

@@ -1,17 +1,19 @@
 #' Set analysis parameters
 #'
-#' `set_analysis_parameters()` sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for detailed information about this function.
+#' `set_analysis_parameters()` sets the analysis parameters that control how the statistical analysis is to be conducted. See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual} for more detailed information about this function.
+#'
+#' @note Every argument to this function is optional, but typically, users want to specify `discovery_pairs` at minimum.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param discovery_pairs a data frame with columns `grna_target` and `response_id` specifying the discovery pairs to analyze
+#' @param discovery_pairs (optional) a data frame with columns `grna_target` and `response_id` specifying the discovery pairs to analyze
 #' @param positive_control_pairs (optional) a data frame with columns `grna_target` and `response_id` specifying the positive control pairs to analyze
 #' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
-#' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"` or `"union"`
-#' @param resampling_approximation (optional; default "skew_normal") a string indicating the resampling approximation to make to the null distribution of test statistics, either "skew_normal" or "no_approximation".
+#' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"`, `"union"`, or `"bonferroni"`
+#' @param resampling_approximation (optional; default `"skew_normal"`) a string indicating the resampling approximation to make to the null distribution of test statistics, either `"skew_normal"`, `"no_approximation"`, or `"standard_normal"`
 #' @param response_regression_method (optional) a string specifying the regression method to use for the response, either `"approximate_nb"` or `"nb"`
-#' @param control_group (optional) a string specifying the control group to use, either `"complement"` or `"nt_cells"`
-#' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"`, `"crt"`, or `"asymptotic_normality"`
+#' @param control_group (optional) a string specifying the control group to use in the differential expression analysis, either `"complement"` or `"nt_cells"`
+#' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
 #' @param multiple_testing_alpha (optional; default `0.1`) a numeric specifying the nominal level of the multiple testing correction method
 #'
@@ -45,8 +47,10 @@
 #'     side = "left"
 #'   )
 set_analysis_parameters <- function(sceptre_object,
-                                    discovery_pairs = data.frame(grna_target = character(0), response_id = character(0)),
-                                    positive_control_pairs = data.frame(grna_target = character(0), response_id = character(0)),
+                                    discovery_pairs = data.frame(grna_target = character(0),
+                                                                 response_id = character(0)),
+                                    positive_control_pairs = data.frame(grna_target = character(0),
+                                                                        response_id = character(0)),
                                     side = "both",
                                     grna_integration_strategy = "union",
                                     formula_object = "default",
@@ -75,10 +79,10 @@ set_analysis_parameters <- function(sceptre_object,
     )
   }
   if(response_regression_method == "default"){
-    if(resampling_mechanism %in% c("permutations", "crt")){
+    if(resampling_approximation %in% c("skew_normal", "no_approximation")){
       response_regression_method <- "approximate_nb"
     }
-    if(resampling_mechanism == "asymptotic_normality"){
+    if(resampling_approximation == "standard_normal"){
       response_regression_method <- "nb"
     }
   }
@@ -86,9 +90,9 @@ set_analysis_parameters <- function(sceptre_object,
   if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
     B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
-  } else if (resampling_approximation == "no_approximation") {
+  } else if (resampling_approximation %in% c("no_approximation", "standard_normal")) {
     B2 <- 0L # no curve fitting; thus, B2 = 0L
-    B3 <- 0L # to be updated in the run_qc step
+    B3 <- 0L # to be updated in the run_qc step for no_approximation
   }
 
   # 2. check inputs
@@ -116,6 +120,7 @@ set_analysis_parameters <- function(sceptre_object,
   # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
   control_group_complement <- control_group == "complement"
+  run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@positive_control_pairs <- positive_control_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
   sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
@@ -124,7 +129,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@side_code <- side_code
   sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
-  sceptre_object@resampling_mechanism <- resampling_mechanism
+  sceptre_object@run_permutations <- run_permutations
   sceptre_object@response_regression_method <- response_regression_method
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
@@ -150,13 +155,14 @@ set_analysis_parameters <- function(sceptre_object,
 
 #' Assign gRNAs to cells
 #'
-#' `assign_grnas()` performs the gRNA-to-cell assignments. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for detailed information about this function.
+#' `assign_grnas()` performs the gRNA-to-cell assignments. `sceptre` provides three gRNA-to-cell assignment strategies: the mixture method, the thresholding method, and the maximum method. The mixture method involves assigning gRNAs to cells using a principled mixture model. Next, the thresholding method assigns a gRNA to a cell if the UMI count of the gRNA in the cell is greater than or equal to some integer threshold. Finally, the maximum method assigns the gRNA that accounts for the greatest number of UMIs in a given cell to that cell. The maximum method is available only in low MOI. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for more detailed information about `assign_grnas()`.
 #'
+#' @note See the manual for information about the method-specific additional arguments.
 #' @param sceptre_object a `sceptre_object`
 #' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of `"mixture"`, `"thresholding"`, or `"maximum"`
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
-#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, "auto," automatically detects the number of processors available on the machine.
+#' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @param ... optional method-specific additional arguments
 #'
@@ -235,17 +241,17 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 
 #' Run QC
 #'
-#' `run_qc()` runs cellwise and pairwise QC on the data. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for detailed information about this function.
+#' `run_qc()` runs cellwise and pairwise QC on the data. Cellwise QC involves filtering cells on the covariates `response_n_nonzero`, `response_n_umis`, and `response_p_mito`. In low-MOI we additionally remove cells that contain zero or multiple gRNAs. Next, pairwise QC involves filtering out target-response pairs whose data are too sparse to be analyzed reliably. In this context we define the “number of nonzero treatment cells” (resp., the “number of nonzero control cells”) as the number of cells in the treatment group (resp., control group) that contain nonzero expression of the response. (We sometimes use the shorthand `n_nonzero_trt` and `n_nonzero_cntrl` to refer to the number of nonzero treatment cells and control cells, respectively.) Pairwise QC involves filtering target-response pairs on `n_nonzero_trt` and `n_nonzero_cntrl`. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for more detailed information about this function.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param n_nonzero_trt_thresh (optional; default `7L`) an integer specifying the number of nonzero treatment cells a pair must contain for it to be retained
-#' @param n_nonzero_cntrl_thresh (optional; default `7L`) an integer specifying the number of nonzero control cells a pair must contain for it to be retained
+#' @param n_nonzero_trt_thresh (optional; default `7L`) an integer specifying the number of nonzero *treatment* cells a pair must contain for it to be retained
+#' @param n_nonzero_cntrl_thresh (optional; default `7L`) an integer specifying the number of nonzero *control* cells a pair must contain for it to be retained
 #' @param response_n_umis_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
-#' @return an updated `sceptre_object` in which QC has been carried out
+#' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
 #' @export
 #' @examples
 #' library(sceptredata)

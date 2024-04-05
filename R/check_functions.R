@@ -165,9 +165,8 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
 
   # 5. verify that resampling_mechanism is one of "permutations", "crt",
   #     "asymptotic_normality", or "default"
-  if (!(resampling_mechanism %in% c("permutations", "crt",
-                                    "asymptotic_normality", "default"))) {
-    stop("`resampling_mechanism` should set to `permutations`, `crt`, `asymptotic_normality` or `default`.")
+  if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
+    stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
 
   # 6. verify that the moi is consistent with the control group
@@ -194,13 +193,13 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   }
 
   # 10. verify resampling_approximation acceptable
-  if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
-    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
+  if (!(resampling_approximation %in% c("skew_normal", "no_approximation", "standard_normal"))) {
+    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation', or 'standard_normal'.")
   }
 
   # 11. verify that response_regression_method is "nb" if resampling_mechanism is "asymptotic_normality"
-  if (resampling_mechanism == "asymptotic_normality" && response_regression_method != "nb") {
-    stop("`response_regression_method` must be set to 'nb' when `resampling_mechanism` is 'asymptotic_normality'.")
+  if (resampling_approximation == "standard_normal" && response_regression_method != "nb") {
+    stop("`response_regression_method` must be set to 'nb' when `resampling_approximation` is 'standard_normal'.")
   }
 
   return(NULL)

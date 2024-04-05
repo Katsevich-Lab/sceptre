@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,8 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../doc/sceptre.html">
+<li class="active nav-item">
+  <a class="nav-link" href="../articles/sceptre.html">
     <span class="fa fa-play"></span>
      
     Get started
@@ -112,18 +112,22 @@
     
 <p><code>sceptre</code> is an R package that facilitates statistically
 rigorous, massively scalable, and user-friendly single-cell CRISPR
-screen data analysis. First, users should install <code>sceptre</code>.
-Users also should install the <code>sceptredata</code> package, which
-contains the example data used in this vignette.</p>
+screen data analysis. To get started, users should install
+<code>sceptre</code>. Users also should install the
+<code>sceptredata</code> package, which contains the example data used
+in this vignette.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptre"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"katsevich-lab/sceptredata"</span><span class="op">)</span></span></code></pre></div>
-<p>Users can load <code>sceptre</code> and <code>sceptredata</code> via
-a call to <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>.</p>
+<p>See the <a href="https://timothy-barry.github.io/sceptre-book/faq.html" class="external-link">frequently
+asked questions page</a> for tips on installing <code>sceptre</code>
+such that it runs as fast as possible. Users can load
+<code>sceptre</code> and <code>sceptredata</code> via a call to
+<code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">sceptre</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">sceptredata</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">sceptredata</a></span><span class="op">)</span></span></code></pre></div>
 <p>The standard pipeline involved in applying <code>sceptre</code> to
 analyze a dataset consists of several steps, which we summarize in the
 following schematic.</p>
@@ -163,7 +167,7 @@ the outputs to the directory <code>~/sceptre_outputs</code>.</p>
 <span><span class="co"># construct the grna-gene pairs to analyze</span></span>
 <span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
 <span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span></span>
-<span>  <span class="va">sceptre_object</span>,</span>
+<span>  <span class="va">sceptre_object</span>, </span>
 <span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -208,7 +212,7 @@ locations of the directories outputted by one or more calls to
 example CRISPRi data on disk.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptredata"</span><span class="op">)</span>, </span>
 <span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">directories</span> <span class="co"># file paths to the example data on your computer</span></span></code></pre></div>
@@ -220,7 +224,7 @@ store the expression data in matrix market format and contain the files
 <code>matrix.mtx.gz</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">directories</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "barcodes.tsv.gz" "features.tsv.gz" "matrix.mtx.gz"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "barcodes.tsv.gz" "features.tsv"    "matrix.mtx"</span></span></code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">directories</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "barcodes.tsv.gz" "features.tsv.gz" "matrix.mtx.gz"</span></span></code></pre>
@@ -247,7 +251,7 @@ We load and examine the <code>grna_target_data_frame</code>
 corresponding to the example data.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
-<span><span class="va">grna_target_data_frame_highmoi</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">24</span>, <span class="fl">80</span><span class="op">:</span><span class="fl">83</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
+<span><span class="va">grna_target_data_frame_highmoi</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">21</span><span class="op">:</span><span class="fl">24</span>, <span class="fl">80</span><span class="op">:</span><span class="fl">83</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##         grna_id      grna_target   chr     start       end</span></span>
 <span><span class="co">## 1  grna_CCGGGCG  ENSG00000069482 chr11  68451943  68451958</span></span>
 <span><span class="co">## 2  grna_TGGCGGC  ENSG00000069482 chr11  68451958  68451974</span></span>
@@ -391,7 +395,7 @@ chromatin-derived features.)</p>
 <span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
 <span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">discovery_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">101</span><span class="op">:</span><span class="fl">104</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
+<span><span class="va">discovery_pairs</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">101</span><span class="op">:</span><span class="fl">104</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##          grna_target     response_id</span></span>
 <span><span class="co">## 1    candidate_enh_1 ENSG00000174529</span></span>
 <span><span class="co">## 2    candidate_enh_1 ENSG00000117222</span></span>
@@ -737,7 +741,7 @@ directory in which to write the results contained within the
 <code>sceptre_object</code>.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span>
-<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>, </span>
 <span>  directory <span class="op">=</span> <span class="st">"~/sceptre_outputs"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/write_outputs_to_directory.html">write_outputs_to_directory()</a></code> writes several files to the
@@ -803,7 +807,7 @@ p-value.</p>
 <p>We encourage readers interested in learning more to consult the <a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">sceptre
 manual</a>.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">sessioninfo</span><span class="fu">::</span><span class="fu"><a href="https://r-lib.github.io/sessioninfo/reference/session_info.html" class="external-link">session_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/sessioninfo#readme" class="external-link">sessioninfo</a></span><span class="op">)</span>; <span class="fu"><a href="https://r-lib.github.io/sessioninfo/reference/session_info.html" class="external-link">session_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">##  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
 <span><span class="co">##  version  R version 4.3.3 (2024-02-29)</span></span>
@@ -814,21 +818,21 @@ manual</a>.</p>
 <span><span class="co">##  collate  en_US.UTF-8</span></span>
 <span><span class="co">##  ctype    en_US.UTF-8</span></span>
 <span><span class="co">##  tz       America/New_York</span></span>
-<span><span class="co">##  date     2024-03-21</span></span>
+<span><span class="co">##  date     2024-04-02</span></span>
 <span><span class="co">##  pandoc   3.1.1 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/ (via rmarkdown)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## <span style="color: #00BBBB; font-weight: bold;">─ Packages ───────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">##  <span style="color: #555555; font-style: italic;">package    </span> <span style="color: #555555; font-style: italic;">*</span> <span style="color: #555555; font-style: italic;">version </span> <span style="color: #555555; font-style: italic;">date (UTC)</span> <span style="color: #555555; font-style: italic;">lib</span> <span style="color: #555555; font-style: italic;">source</span></span></span>
 <span><span class="co">##  BH            1.84.0-0 <span style="color: #555555;">2024-01-10</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
-<span><span class="co">##  bslib         0.6.1    <span style="color: #555555;">2023-11-28</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  bslib         0.7.0    <span style="color: #555555;">2024-03-29</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  cachem        1.0.8    <span style="color: #555555;">2023-05-01</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  cli           3.6.2    <span style="color: #555555;">2023-12-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  colorspace    2.1-0    <span style="color: #555555;">2023-01-23</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  cowplot       1.1.3    <span style="color: #555555;">2024-01-22</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  crayon        1.5.2    <span style="color: #555555;">2022-09-29</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
-<span><span class="co">##  data.table    1.15.2   <span style="color: #555555;">2024-02-29</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  data.table    1.15.4   <span style="color: #555555;">2024-03-30</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  desc          1.4.3    <span style="color: #555555;">2023-12-10</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
-<span><span class="co">##  digest        0.6.34   <span style="color: #555555;">2024-01-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  digest        0.6.35   <span style="color: #555555;">2024-03-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  dplyr         1.1.4    <span style="color: #555555;">2023-11-17</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  evaluate      0.23     <span style="color: #555555;">2023-11-01</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  fansi         1.0.6    <span style="color: #555555;">2023-12-08</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
@@ -840,7 +844,7 @@ manual</a>.</p>
 <span><span class="co">##  glue          1.7.0    <span style="color: #555555;">2024-01-09</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  gtable        0.3.4    <span style="color: #555555;">2023-08-21</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  highr         0.10     <span style="color: #555555;">2022-12-22</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
-<span><span class="co">##  htmltools     0.5.7    <span style="color: #555555;">2023-11-03</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  htmltools     0.5.8    <span style="color: #555555;">2024-03-25</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  jquerylib     0.1.4    <span style="color: #555555;">2021-04-26</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  jsonlite      1.8.8    <span style="color: #555555;">2023-12-04</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  knitr         1.45     <span style="color: #555555;">2023-10-30</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
@@ -864,22 +868,22 @@ manual</a>.</p>
 <span><span class="co">##  rlang         1.1.3    <span style="color: #555555;">2024-01-10</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  rmarkdown     2.26     <span style="color: #555555;">2024-03-05</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  rstudioapi    0.15.0   <span style="color: #555555;">2023-07-07</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
-<span><span class="co">##  sass          0.4.8    <span style="color: #555555;">2023-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  sass          0.4.9    <span style="color: #555555;">2024-03-15</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  scales        1.3.0    <span style="color: #555555;">2023-11-28</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
-<span><span class="co">##  sceptre     * 0.9.1    <span style="color: #555555;">2024-03-21</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
-<span><span class="co">##  sceptredata * 0.0.1    <span style="color: #555555;">2024-03-04</span> <span style="color: #555555;">[2]</span> <span style="color: #BB00BB; font-weight: bold;">local</span></span></span>
-<span><span class="co">##  sessioninfo   1.2.2    <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
+<span><span class="co">##  sceptre     * 0.10.0   <span style="color: #555555;">2024-04-02</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
+<span><span class="co">##  sceptredata * 0.9.0    <span style="color: #555555;">2024-03-29</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">Bioconductor</span></span></span>
+<span><span class="co">##  sessioninfo * 1.2.2    <span style="color: #555555;">2021-12-06</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
 <span><span class="co">##  systemfonts   1.0.5    <span style="color: #555555;">2023-10-09</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  textshaping   0.3.7    <span style="color: #555555;">2023-10-09</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  tibble        3.2.1    <span style="color: #555555;">2023-03-20</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
-<span><span class="co">##  tidyselect    1.2.0    <span style="color: #555555;">2022-10-10</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.0)</span></span></span>
+<span><span class="co">##  tidyselect    1.2.1    <span style="color: #555555;">2024-03-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  utf8          1.2.4    <span style="color: #555555;">2023-10-22</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  vctrs         0.6.5    <span style="color: #555555;">2023-12-01</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  withr         3.0.0    <span style="color: #555555;">2024-01-16</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
-<span><span class="co">##  xfun          0.42     <span style="color: #555555;">2024-02-08</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
+<span><span class="co">##  xfun          0.43     <span style="color: #555555;">2024-03-25</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">##  yaml          2.3.8    <span style="color: #555555;">2023-12-11</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.3.1)</span></span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T/Rtmp9Zo3VU/temp_libpath12ca4fdfdac5</span></span></span>
+<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/7v/5sqjgh8j28lgf8qx3gbtq1h00000gp/T/RtmpTm3CRN/temp_libpath1756e88cdd4c</span></span></span>
 <span><span class="co">## <span style="color: #555555;"> [2] /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/library</span></span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## <span style="color: #00BBBB; font-weight: bold;">──────────────────────────────────────────────────────────────────────────────</span></span></span></code></pre>

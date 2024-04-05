@@ -15,7 +15,10 @@ get_result(sceptre_object, analysis)
 a data frame containing the results of the analysis
 }
 \description{
-\code{get_result()} returns a data frame containing the result of a calibration check, power analysis, or discovery analysis. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+\code{get_result()} returns a data frame containing the result of a calibration check, power check, or discovery analysis. We pass as arguments \code{sceptre_object} and \code{analysis}, where the latter is a string indicating the function whose results we are querying. The output is a data frame, the rows of which correspond to target-response pairs, and the columns of which are as follows: \code{response_id}, \code{grna_target}, \code{n_nonzero_trt}, \code{n_nonzero_cntrl}, \code{pass_qc} (a \code{TRUE}/\code{FALSE} value indicating whether the pair passes pairwise QC), \code{p_value}, \code{log_2_fold_change}, and \code{significant} (a \code{TRUE}/\code{FALSE} value indicating whether the pair is called as significant). The p-value contained within the \code{p_value} column is a raw (i.e., non-multiplicity-adjusted) p-value. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
+}
+\note{
+If \code{output_amount} is set to \code{2} or \code{3} in \code{run_calibration_check()}, \code{run_power_check()}, or \code{run_discovery_analysis()}, then the result data frame contains additional columns; see \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual} for more information.
 }
 \examples{
 library(sceptredata)

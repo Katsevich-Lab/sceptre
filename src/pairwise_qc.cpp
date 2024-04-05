@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 // this function outputs four pieces:
 // 1. N nonzero mat; this is the number of nonzero cells for each gene-NT gRNA pair (same regardless of control group)
-// 2. n_nonzero_tot; this is the vector giving the number of nonzero cells per gene; when using the NT cells as the complement, we restrict our attention to the NT cells; when using the complement set as the control group, by contrast, we sum over all cells.
+// 2. n_nonzero_tot; this is the vector giving the number of nonzero cells per gene; when using the NT cells as the control group, we restrict our attention to the NT cells; when using the complement set as the control group, by contrast, we sum over all cells.
 // 3,4. n nonzero trt, n nonzero cntrl vectors
 // [[Rcpp::export]]
 List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub,
