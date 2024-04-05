@@ -306,7 +306,7 @@ process_discovery_result <- function(result, sceptre_object) {
 run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_pairs, calibration_check, analysis_type,
                                             output_amount, print_progress, parallel, n_processors, log_dir) {
   # if running permutations, generate the permutation idxs
-  if (sceptre_object@run_permutations) {
+  if (sceptre_object@run_permutations & sceptre_object@resampling_approximation != "standard_normal") {
     cat("Generating permutation resamples.")
     synthetic_idxs <- get_synthetic_permutation_idxs(
       grna_assignments = sceptre_object@grna_assignments,
@@ -345,7 +345,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
   )
 
   # run the method
-  out <- if (sceptre_object@run_permutations) {
+  out <- if (sceptre_object@run_permutations | sceptre_object@resampling_approximation == "standard_normal") {
     args_to_pass$synthetic_idxs <- synthetic_idxs
     do.call(what = "run_perm_test_in_memory", args = args_to_pass)
   } else {
