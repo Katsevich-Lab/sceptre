@@ -92,8 +92,7 @@ test_that("run_calibration_check with score test", {
       n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
     ) |>
     run_calibration_check(calibration_group_size = 1,
-                          n_calibration_pairs = num_nt_guides * num_responses,
-                          output_amount = 2)
+                          n_calibration_pairs = num_nt_guides * num_responses)
 
   # extract values of theta for each response
   theta_vals <- c(scep@response_precomputations$response_1$theta,
