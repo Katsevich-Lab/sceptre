@@ -98,9 +98,10 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     } else {
       paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))
     },
+    "\n\t\U2022 Response regression method: ", if (length(x@response_regression_method) == 0L) "not specified" else if(x@response_regression_method == "nb") crayon::blue("negative binomial") else if (x@response_regression_method == "approximate_nb") crayon::blue("approximation negative binomial"),
     "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else if(x@resampling_approximation == "standard_normal") crayon::blue("no resampling") else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
-    "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
     "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
+    "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
     "\n\t\U2022 Multiple testing adjustment: ", if (x@nuclear || length(x@multiple_testing_method) == 0L) "none" else paste0(crayon::blue(x@multiple_testing_method), " at level ", crayon::blue(x@multiple_testing_alpha)),
     "\n\t\U2022 N nonzero treatment cells threshold: ", if (length(x@n_nonzero_trt_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_trt_thresh),
     "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
