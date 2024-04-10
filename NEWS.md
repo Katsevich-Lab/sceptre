@@ -22,7 +22,7 @@ Version 0.10.0 is a major update to the `sceptre` package. This version provides
 
 -   We have issued minor bug fixes.
 
-Please note that v0.10.0 is a higher version number than v0.9.2.
+Please note that v0.10.0 is a higher version number than v0.9.2. Also, note that you will need to recreate your `sceptre_object` and rerun your analysis to use version 0.10.0. However, you should be able to use the exact same code to do so (assuming you currently are using v0.9.0 or higher).
 
 # sceptre 0.9.2 (2023-12-08)
 
