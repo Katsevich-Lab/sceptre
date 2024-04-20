@@ -27,7 +27,6 @@ Imports:
     cowplot,
     crayon,
     data.table,
-    R.utils,
     dplyr,
     ggplot2,
     Matrix,
@@ -47,7 +46,8 @@ Suggests:
     parallel,
     testthat (>= 3.0.0),
     magrittr,
-    MASS
+    MASS,
+    statmod
 Remotes: github::timothy-barry/ondisc, github::katsevich-lab/sceptredata
 VignetteBuilder: knitr
 Config/testthat/edition: 3
