@@ -85,13 +85,18 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     stop("The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame.")
   }
 
-  # 11. verify that the types of the extra covariates are acceptable
+  # 11. verify that the types of the extra covariates are acceptable; if factor, check correctness of factor
   for (extra_covariate_name in extra_covariate_names) {
     v <- extra_covariates[, extra_covariate_name]
     accept_type <- methods::is(v, "numeric") || methods::is(v, "character") ||
       methods::is(v, "factor") || methods::is(v, "logical")
     if (!accept_type) {
       stop("The column `", extra_covariate_name, "` of the `extra_covariates` data frame should be of type numeric, character, or factor.")
+    }
+    if (methods::is(v, "factor")) {
+      if (length(levels(v)) != length(unique(v))) {
+        stop("The factor column `", extra_covariate_name, "` is incorrectly formatted. The number of unique elements in this column must equal the number of factors in this column. Consider relabeling the factors or converting this column into a character vector.")
+      }
     }
   }
 
