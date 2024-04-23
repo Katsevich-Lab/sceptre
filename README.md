@@ -50,8 +50,8 @@ a computing cluster or cloud.
 - [Barry et al.,
   2024+](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v2).
   “Robust differential expression testing…”. *Genome Biology*.
-- [Barry et al., 2024+](https://arxiv.org/abs/2201.01879). “Exponential
-  family measurement error models…”. *Biostatistics.*
+- [Barry et al., 2024](https://doi.org/10.1093/biostatistics/kxae010).
+  “Exponential family measurement error models…”. *Biostatistics.*
 - [Morris et al.,
   2023](https://www.science.org/doi/10.1126/science.adh7699). “Discovery
   of target genes and pathways…”. *Science*.
