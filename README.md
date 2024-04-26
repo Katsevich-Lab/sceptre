@@ -45,6 +45,10 @@ a computing cluster or cloud.
 - More detailed man pages (including runnable examples) and minor bug
   fixes
 
+You can see our [RECOMB
+poster](https://timothy-barry.github.io/poster_recomb_2024.pdf) for more
+information about this update.
+
 ## Featured publications
 
 - [Barry et al.,
