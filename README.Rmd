@@ -40,6 +40,8 @@ knitr::opts_chunk$set(
 -   A comprehensive suite of unit tests, which verify the correctness of the code
 -   More detailed man pages (including runnable examples) and minor bug fixes
 
+You can see our [RECOMB poster](https://timothy-barry.github.io/poster_recomb_2024.pdf) for more information about this update.
+
 ## Featured publications
 
 -   [Barry et al., 2024+](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v2). "Robust differential expression testing...". *Genome Biology*.
