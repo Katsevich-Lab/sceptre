@@ -14,7 +14,8 @@ author = "Timothy Barry, and Kathryn Roeder, and Eugene Katsevich",
 title = "Exponential family measurement error models for single-cell CRISPR screens",
 journal = "Biostatistics",
 year = "2024",
-textVersion = "Barry, T., Roeder, K., & Katsevich, E. (2024). Exponential family measurement error models for single-cell CRISPR screens. Biostatistics, to appear.")
+url = "https://doi.org/10.1093/biostatistics/kxae010",
+textVersion = "Barry, T., Roeder, K., & Katsevich, E. (2024). Exponential family measurement error models for single-cell CRISPR screens. Biostatistics, kxae010.")
 
 citEntry(entry = "article",
 note = "Please cite if you are using the low-MOI functionality.",
