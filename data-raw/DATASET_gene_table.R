@@ -1,12 +1,10 @@
 library(data.table)
-library(dplyr)
 conflicts_prefer(dplyr::rename)
 conflicts_prefer(dplyr::filter)
 
 #############
 # hg 38 table
 #############
-
 # CellRanger provides a human reference genome, which can be downloaded via the following command:
 # curl -O https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
 # The version of the reference is GRCh38. This script extracts the start position, end position,
@@ -34,17 +32,26 @@ gene_table <- cbind(dt_gene_chr[,c("chr", "start", "end", "strand")], gene_ids_a
   dplyr::select(-start, -end, -strand)
 data.table::setorderv(gene_table, c("chr", "position"))
 gene_position_data_frame_grch38 <- gene_table
-usethis::use_data(gene_position_data_frame_grch38, internal = TRUE, overwrite = TRUE)
+usethis::use_data(gene_position_data_frame_grch38, internal = FALSE, overwrite = TRUE)
 
 #############
 # hg 19 table
 #############
-
-# The UCSC genome browser provides an hg 19 reference genome, which can be
-# downloaded at the following link:
-# https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/.
+rm(list = ls())
+# We obtained the hg37 reference genome from cellranger
+# wget ftp://ftp.ensembl.org/pub/grch37/release-84/gtf/homo_sapiens/Homo_sapiens.GRCh37.82.gtf.gz
 library(rtracklayer)
 dt <- readGFF("~/research_offsite/external/ref/Homo_sapiens.GRCh37.82.gtf.gz")
+# retain only genes
+dt <- dt |> dplyr::filter(type == "gene")
+# keep only those genes on a chromosome
 dt <- dt[!grepl(pattern = "^G", x = dt$seqid),]
 dt$chr <- paste0("chr", as.character(dt$seqid))
-
+dt <- dt |>
+  dplyr::mutate(position = ifelse(strand == "+", start, end)) |>
+  dplyr::select(response_id = gene_id,
+                response_name = gene_name,
+                chr, position)
+gene_position_data_frame_grch19 <- dt
+gene_position_data_frame_grch19$chr <- factor(gene_position_data_frame_grch19$chr)
+usethis::use_data(gene_position_data_frame_grch19, internal = FALSE, overwrite = TRUE)
