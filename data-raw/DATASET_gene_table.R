@@ -1,13 +1,22 @@
 library(data.table)
+library(dplyr)
+conflicts_prefer(dplyr::rename)
+conflicts_prefer(dplyr::filter)
+
+#############
+# hg 38 table
+#############
 
 # CellRanger provides a human reference genome, which can be downloaded via the following command:
 # curl -O https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
 # The version of the reference is GRCh38. This script extracts the start position, end position,
 # strand, ID, and name of each gene in the reference. The resulting data frame contains 36,572 genes
-# and is saved as an internal dataset in the package.
+# and is saved as an internal dataset in the package called gene_position_data_frame_grch38. The
+# file `genes.gtf` that we load is contained within the download.
 
-dt <- fread(file = "/Users/timbarry/research_offsite/external/ref/genes.gtf", skip = 5,
+dt <- fread(file = "~/research_offsite/external/ref/genes.gtf", skip = 5,
             col.names = c("chr", "source", "feature", "start", "end", "score", "strand", "frame", "attribute"))
+
 # extract the genes
 dt_gene <- dt |> dplyr::filter(feature == "gene")
 # keep only those genes on a chromosome
@@ -17,14 +26,25 @@ attr_split <- strsplit(x = dt_gene_chr$attribute, split = ";", fixed = TRUE)
 gene_ids_and_names <- sapply(attr_split, function(elem) {
   gene_id <- strsplit(x = elem[1], split = "\"", fixed = TRUE)[[1]][2]
   gene_name <- strsplit(x = elem[4], split = "\"", fixed = TRUE)[[1]][2]
-  c(gene_id = gene_id, gene_name = gene_name)
+  c(response_id = gene_id, response_name = gene_name)
 }) |> t() |> as.data.frame()
 # append these columns to dt_gene
 gene_table <- cbind(dt_gene_chr[,c("chr", "start", "end", "strand")], gene_ids_and_names) |>
-  dplyr::mutate(chr = factor(chr)) |> dplyr::mutate(tss_position = ifelse(strand == "+", start, end)) |>
+  dplyr::mutate(chr = factor(chr)) |> dplyr::mutate(position = ifelse(strand == "+", start, end)) |>
   dplyr::select(-start, -end, -strand)
-data.table::setorderv(gene_table, c("chr", "tss_position"))
-gene_table <- gene_table
+data.table::setorderv(gene_table, c("chr", "position"))
+gene_position_data_frame_grch38 <- gene_table
+usethis::use_data(gene_position_data_frame_grch38, internal = TRUE, overwrite = TRUE)
 
-# save internally
-usethis::use_data(gene_table, internal = TRUE, overwrite = TRUE)
+#############
+# hg 19 table
+#############
+
+# The UCSC genome browser provides an hg 19 reference genome, which can be
+# downloaded at the following link:
+# https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/.
+library(rtracklayer)
+dt <- readGFF("~/research_offsite/external/ref/Homo_sapiens.GRCh37.82.gtf.gz")
+dt <- dt[!grepl(pattern = "^G", x = dt$seqid),]
+dt$chr <- paste0("chr", as.character(dt$seqid))
+
