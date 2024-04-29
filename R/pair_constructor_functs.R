@@ -29,7 +29,7 @@
 #' )
 construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
                                 response_position_data_frame = gene_position_data_frame_grch38) {
-  if (!all(colnames(response_position_data_frame) %in% c("response_id", "chr", "position"))) {
+  if (!all(c("response_id", "chr", "position") %in% colnames(response_position_data_frame))) {
     stop("`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'.")
   }
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
