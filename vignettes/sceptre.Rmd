@@ -113,7 +113,7 @@ We describe each step of the pipeline in greater detail below.
 
 ## 1. Import data 
 
-The first step is to import the data. **Data can be imported into `sceptre` from 10X Cell Ranger or Parse outputs, as well as from R matrices.** The simplest way to import the data is to read the output of one or more calls to `cellranger_count` into `sceptre` via the function `import_data_from_cellranger()`. `import_data_from_cellranger()` requires three arguments: `directories`, `grna_target_data_frame`, and `moi`.
+The first step is to import the data. **Data can be imported into `sceptre` from 10x Cell Ranger or Parse outputs, as well as from R matrices.** The simplest way to import the data is to read the output of one or more calls to `cellranger_count` into `sceptre` via the function `import_data_from_cellranger()`. `import_data_from_cellranger()` requires three arguments: `directories`, `grna_target_data_frame`, and `moi`.
 
 1.  `directories` is a character vector specifying the locations of the directories outputted by one or more calls to `cellranger_count`. Below, we set the variable `directories` to the (machine-dependent) location of the example CRISPRi data on disk.
 
