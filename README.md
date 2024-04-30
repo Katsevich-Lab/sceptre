@@ -54,11 +54,12 @@ information about this update.
 - [Barry et al.,
   2024+](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v2).
   “Robust differential expression testing…”. *Genome Biology*.
-- [Barry et al., 2024](https://doi.org/10.1093/biostatistics/kxae010).
+- [Barry et al.,
+  2024](https://timothy-barry.github.io/biostatistics_2024.pdf).
   “Exponential family measurement error models…”. *Biostatistics.*
 - [Morris et al.,
-  2023](https://www.science.org/doi/10.1126/science.adh7699). “Discovery
-  of target genes and pathways…”. *Science*.
+  2023](http://sanjanalab.org/reprints/Morris_Science_2023.pdf).
+  “Discovery of target genes and pathways…”. *Science*.
 - [Barry et al.,
   2021](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02545-2).
   “SCEPTRE improves calibration and sensitivity…”. *Genome Biology*.
