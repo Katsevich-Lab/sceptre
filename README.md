@@ -52,7 +52,7 @@ information about this update.
 ## Featured publications
 
 - [Barry et al.,
-  2024+](https://www.biorxiv.org/content/10.1101/2023.05.15.540875v2).
+  2024](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-024-03254-2).
   “Robust differential expression testing…”. *Genome Biology*.
 - [Barry et al.,
   2024](https://timothy-barry.github.io/biostatistics_2024.pdf).
