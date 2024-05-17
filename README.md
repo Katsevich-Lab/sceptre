@@ -70,9 +70,7 @@ guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-ana
 ## Bug reports, feature requests, and software questions
 
 For bug reports, please open a [GitHub
-issue](https://github.com/Katsevich-Lab/sceptre/issues). For feature
-requests, please start a discussion under [feature
-requests](https://github.com/Katsevich-Lab/sceptre/discussions/categories/feature-requests).
-For questions about `sceptre` functionality, documentation, or how to
-apply it to your data, please start a discussion under
+issue](https://github.com/Katsevich-Lab/sceptre/issues). For questions
+about `sceptre` functionality, documentation, or how to apply it to your
+data, please start a discussion under
 [Q&A](https://github.com/Katsevich-Lab/sceptre/discussions/categories/q-a).
