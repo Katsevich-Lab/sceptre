@@ -347,7 +347,9 @@ run_qc_pt_2 <- function(sceptre_object) {
   sceptre_object <- compute_qc_metrics(sceptre_object)
 
   # update B3, the number of resamples to draw, if resampling_approximation is no_approximation
-  if (sceptre_object@resampling_approximation == "no_approximation") {
+  if (sceptre_object@resampling_approximation == "no_approximation" &&
+      (length(sceptre_object@n_ok_discovery_pairs) >= 1L ||
+       length(sceptre_object@n_ok_positive_control_pairs) >= 1L)) {
     mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
     sceptre_object@B3 <- ceiling(mult_fact * max(
       sceptre_object@n_ok_discovery_pairs,
