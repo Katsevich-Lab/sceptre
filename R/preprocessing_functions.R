@@ -173,6 +173,7 @@ update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
 
     # function to update targeting pairs
     update_targeting_pairs <- function(targeting_pairs, updated_grna_target_data_frame) {
+      targeting_pairs$grna_group <- NULL
       dplyr::left_join(targeting_pairs,
         updated_grna_target_data_frame |> dplyr::select(grna_target, grna_group),
         by = "grna_target", relationship = "many-to-many"
