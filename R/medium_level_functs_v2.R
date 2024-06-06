@@ -27,8 +27,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   response_ids <- unique(response_grna_group_pairs$response_id)
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use, ]
-  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+  covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
+  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ,drop = FALSE]
 
   # 2. define function to loop subset of response IDs
   analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
