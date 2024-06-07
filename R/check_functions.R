@@ -119,7 +119,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
 check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
                                           control_group, resampling_mechanism, side, low_moi,
-                                          grna_integration_strategy, resampling_approximation) {
+                                          grna_integration_strategy, resampling_approximation, response_regression_method) {
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
@@ -168,7 +168,8 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
+  # 5. verify that resampling_mechanism is one of "permutations", "crt",
+  #     "asymptotic_normality", or "default"
   if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
@@ -196,14 +197,14 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
-  # 10. if using a backing .odm file, verify that resampling mechanism is permutations
-  if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
-    stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
+  # 10. verify resampling_approximation acceptable
+  if (!(resampling_approximation %in% c("skew_normal", "no_approximation", "standard_normal"))) {
+    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation', or 'standard_normal'.")
   }
 
-  # 11. verify resampling_approximation acceptable
-  if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
-    stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
+  # 11. verify that response_regression_method is "nb" if resampling_mechanism is "asymptotic_normality"
+  if (resampling_approximation == "standard_normal" && response_regression_method != "nb") {
+    stop("`response_regression_method` must be set to 'nb' when `resampling_approximation` is 'standard_normal'.")
   }
 
   return(NULL)

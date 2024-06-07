@@ -50,7 +50,102 @@ test_that("run_calibration_check", {
   expect_false(any(scep_calib_3@calibration_result$significant))
 })
 
+test_that("run_calibration_check with score test", {
+  set.seed(2)
 
+  # mock dataset parameters
+  num_cells <- 100
+  num_responses <- 2
+  num_nt_guides <- 10
+
+  # create mock grna_target_data_frame
+  grna_target_data_frame <- make_mock_grna_target_data(
+    num_guides_per_target = c(1, 1, 1),
+    chr_distances = 1,
+    chr_starts = 1,
+    num_nt_guides = num_nt_guides
+  )
+
+  # create mock grna matrix
+  grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 5) |>
+    matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+
+  # create mock response matrix
+  response_matrix <- rpois(num_cells * num_responses, 5) |>
+    matrix(nrow = num_responses, ncol = num_cells) |>
+    `rownames<-`(paste0("response_", 1:num_responses))
+
+  # run sceptre up to and including calibration check
+  scep <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "high"
+  ) |>
+    set_analysis_parameters(
+      resampling_approximation = "standard_normal" # vanilla score test functionality
+    ) |>
+    assign_grnas(method = "thresholding", threshold = 5) |>
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) |>
+    run_calibration_check(calibration_group_size = 1,
+                          n_calibration_pairs = num_nt_guides * num_responses)
+
+  # extract values of theta for each response
+  theta_vals <- c(scep@response_precomputations$response_1$theta,
+                  scep@response_precomputations$response_2$theta)
+
+  # extract sceptre covariate matrix and gRNA assignment matrix
+  covariate_matrix <- scep@covariate_matrix
+  grna_assignment_matrix <- get_grna_assignments(scep)
+
+  # extract sceptre p-values
+  sceptre_pvals <- scep |>
+    get_result(analysis = "run_calibration_check") |>
+    dplyr::select(grna_target, response_id, p_value)
+
+  # identify non-targeting gRNAs
+  non_targeting_grnas <- grna_target_data_frame |>
+    dplyr::filter(grna_target == "non-targeting") |>
+    dplyr::pull(grna_id)
+
+  # extract X, Y, and Z vectors/matrices
+  X <- (grna_assignment_matrix[non_targeting_grnas, ] * 1) |> t() |> as.matrix()
+  Y1 <- response_matrix["response_1", ]
+  Y2 <- response_matrix["response_2", ]
+  Z <- covariate_matrix
+
+  # run score test using statmod for response_1
+  partial_model1 <- glm(Y1 ~ Z - 1, family = MASS::negative.binomial(theta = theta_vals[1]))
+  z_stats1 <- statmod::glm.scoretest(partial_model1, X, 1)
+  statmod_pvals1 <- 2 * pnorm(-abs(z_stats1))
+
+  # run score test using statmod for response_2
+  partial_model2 <- glm(Y2 ~ Z - 1, family = MASS::negative.binomial(theta = theta_vals[2]))
+  z_stats2 <- statmod::glm.scoretest(partial_model2, X, 1)
+  statmod_pvals2 <- 2 * pnorm(-abs(z_stats2))
+
+  # check that the sceptre and statmod p-values are close to each other
+  sceptre_pvals |>
+    dplyr::rename(sceptre_pval = p_value) |>
+    dplyr::left_join(
+      rbind(
+        data.frame(grna_target = non_targeting_grnas,
+                 response_id = "response_1",
+                 statmod_pval = statmod_pvals1),
+        data.frame(grna_target = non_targeting_grnas,
+                 response_id = "response_2",
+                 statmod_pval = statmod_pvals2)
+      ),
+      by = c("grna_target", "response_id")
+    ) |>
+    dplyr::summarize(max(abs(sceptre_pval - statmod_pval)) < 1e-5) |>
+    dplyr::pull() |>
+    expect_true()
+})
 
 test_that("run_calibration_check negative control pairs complement set with cellwise and pairwise qc", {
   grna_target_data_frame <- data.frame(

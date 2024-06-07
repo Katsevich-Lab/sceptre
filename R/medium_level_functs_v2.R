@@ -10,12 +10,11 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
   return(response_id)
 }
 
-
 # core function 1. run permutation test in memory
 run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                    synthetic_idxs, output_amount, resampling_approximation, B1, B2, B3, calibration_check,
-                                    control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
-                                    side_code, low_moi, response_precomputations, cells_in_use, print_progress,
+                                    synthetic_idxs, output_amount, resampling_mechanism, resampling_approximation,
+                                    B1, B2, B3, calibration_check, control_group_complement, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh,
+                                    side_code, low_moi, response_precomputations, response_regression_method, cells_in_use, print_progress,
                                     parallel, n_processors, log_dir, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -26,11 +25,10 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
-  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use, ]
-  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+  covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
+  if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ,drop = FALSE]
 
   # 2. define function to loop subset of response IDs
   analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
@@ -66,7 +64,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
           # perform the regression to get the coefficients
           response_precomp <- perform_response_precomputation(
             expressions = expression_vector,
-            covariate_matrix = covariate_matrix
+            covariate_matrix = covariate_matrix,
+            response_regression_method = response_regression_method
           )
           # save precomputation
           precomp_out_list[[response_id]] <- response_precomp
@@ -78,15 +77,14 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
           full_test_stat = TRUE
         )
         curr_response_result <- perm_test_glm_factored_out(
-          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-          output_amount, grna_groups, expression_vector,
-          pieces_precomp, get_idx_f, side_code
+          synthetic_idxs, B1, B2, B3, resampling_approximation, output_amount,
+          grna_groups, expression_vector, pieces_precomp, get_idx_f, side_code
         )
       } else {
         curr_response_result <- discovery_ntcells_perm_test(
-          synthetic_idxs, B1, B2, B3, fit_parametric_curve,
-          output_amount, covariate_matrix, all_nt_idxs,
-          grna_group_idxs, grna_groups, expression_vector, side_code
+          synthetic_idxs, B1, B2, B3, resampling_approximation,
+          response_regression_method, output_amount,
+          covariate_matrix, all_nt_idxs, grna_group_idxs, grna_groups, expression_vector, side_code
         )
       }
 
@@ -129,8 +127,8 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
 
 # core function 2: run crt in memory
 run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_matrix, response_grna_group_pairs,
-                                 output_amount, resampling_approximation, B1, B2, B3, calibration_check, control_group_complement,
-                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, response_precomputations,
+                                 output_amount, resampling_mechanism, resampling_approximation, B1, B2, B3, calibration_check, control_group_complement,
+                                 n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, side_code, low_moi, response_precomputations, response_regression_method,
                                  cells_in_use, print_progress, parallel, n_processors, log_dir, analysis_type) {
   # 0. define several variables
   subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -141,7 +139,6 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   n_cells_orig <- ncol(response_matrix)
   get_idx_f <- get_idx_vector_factory(calibration_check, indiv_nt_grna_idxs, grna_group_idxs, low_moi)
   response_ids <- unique(response_grna_group_pairs$response_id)
-  fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
   covariate_matrix <- covariate_matrix[cells_in_use, ]
@@ -164,13 +161,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
       )
 
       # 3. load the expressions of the current response
-      expression_vector <- load_csr_row(
-        j = response_matrix@j,
-        p = response_matrix@p,
-        x = response_matrix@x,
-        row_idx = which(rownames(response_matrix) == response_id),
-        n_cells = n_cells_orig
-      )[cells_in_use]
+      expression_vector <- load_row(response_matrix, response_id)[cells_in_use]
       if (subset_to_nt_cells) expression_vector <- expression_vector[all_nt_idxs]
 
       # 4. # if precomp is available, load
@@ -180,7 +171,8 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
         # perform the regression to get the coefficients
         response_precomp <- perform_response_precomputation(
           expressions = expression_vector,
-          covariate_matrix = covariate_matrix
+          covariate_matrix = covariate_matrix,
+          response_regression_method = response_regression_method
         )
         # save precomputation
         precomp_out_list[[response_id]] <- response_precomp
@@ -224,15 +216,15 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
       # 8. call the low-level analysis function
       if (run_outer_regression) {
         curr_response_result <- crt_glm_factored_out(
-          B1, B2, B3, fit_parametric_curve, output_amount,
+          B1, B2, B3, resampling_approximation, output_amount,
           response_ids, response_precomputations, covariate_matrix,
           get_idx_f, curr_grna_group, subset_to_nt_cells, all_nt_idxs,
           response_matrix, side_code, cells_in_use
         )
       } else {
         curr_response_result <- discovery_ntcells_crt(
-          B1, B2, B3, fit_parametric_curve, output_amount, get_idx_f,
-          response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
+          B1, B2, B3, resampling_approximation, response_regression_method, output_amount,
+          get_idx_f, response_ids, covariate_matrix, curr_grna_group, all_nt_idxs,
           response_matrix, side_code, cells_in_use
         )
       }

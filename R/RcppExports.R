@@ -50,8 +50,12 @@ crt_index_sampler_fast <- function(fitted_probabilities, B) {
     .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
 }
 
-run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
-    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
+compute_observed_full_statistic_v2 <- function(a, w, D, trt_idxs) {
+    .Call(`_sceptre_compute_observed_full_statistic_v2`, a, w, D, trt_idxs)
+}
+
+run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, resampling_approximation_code, return_resampling_dist, side_code) {
+    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, resampling_approximation_code, return_resampling_dist, side_code)
 }
 
 compute_tolerance_cpp <- function(curr_log_lik, prev_log_lik) {
@@ -92,6 +96,10 @@ compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_ce
 
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {
     .Call(`_sceptre_compute_empirical_p_value`, null_statistics, z_orig, side)
+}
+
+compute_normal_p_value <- function(z_orig, side) {
+    .Call(`_sceptre_compute_normal_p_value`, z_orig, side)
 }
 
 fit_skew_normal_funct <- function(y) {

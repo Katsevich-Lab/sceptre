@@ -33,7 +33,7 @@ test_that("import_data", {
     "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
     "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
     "positive_control_pairs", "formula_object", "side_code", "resampling_approximation",
-    "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
+    "control_group_complement", "run_permutations", "response_regression_method", "n_nonzero_trt_thresh",
     "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
     "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
     "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
@@ -169,5 +169,4 @@ test_that("set_analysis_parameters", {
     as.character(sceptre_object_nonsense_formula@formula_object)[2],
     "aaa"
   )
-
 })

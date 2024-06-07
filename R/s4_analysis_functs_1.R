@@ -10,7 +10,8 @@
 #' @param formula_object (optional) a formula object specifying how to adjust for the covariates in the model
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"`, `"union"`, or `"bonferroni"`
-#' @param resampling_approximation (optional; default `"skew_normal"`) a string indicating the resampling approximation to make to the null distribution of test statistics, either `"skew_normal"` or `"no_approximation"`
+#' @param resampling_approximation (optional; default `"skew_normal"`) a string indicating the resampling approximation to make to the null distribution of test statistics, either `"skew_normal"`, `"no_approximation"`, or `"standard_normal"`
+#' @param response_regression_method (optional) a string specifying the regression method to use for the response, either `"approximate_nb"` or `"nb"`
 #' @param control_group (optional) a string specifying the control group to use in the differential expression analysis, either `"complement"` or `"nt_cells"`
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
@@ -56,6 +57,7 @@ set_analysis_parameters <- function(sceptre_object,
                                     resampling_approximation = "skew_normal",
                                     control_group = "default",
                                     resampling_mechanism = "default",
+                                    response_regression_method = "default",
                                     multiple_testing_method = "BH",
                                     multiple_testing_alpha = 0.1) {
   # 0. verify that function called in correct order
@@ -76,13 +78,21 @@ set_analysis_parameters <- function(sceptre_object,
       include_grna_covariates = !sceptre_object@low_moi
     )
   }
+  if(response_regression_method == "default"){
+    if(resampling_approximation %in% c("skew_normal", "no_approximation")){
+      response_regression_method <- "approximate_nb"
+    }
+    if(resampling_approximation == "standard_normal"){
+      response_regression_method <- "nb"
+    }
+  }
   B1 <- 499L
   if (resampling_approximation == "skew_normal") {
     B2 <- 4999L
     B3 <- if (resampling_mechanism == "permutations") 24999L else 0L
-  } else if (resampling_approximation == "no_approximation") {
+  } else if (resampling_approximation %in% c("no_approximation", "standard_normal")) {
     B2 <- 0L # no curve fitting; thus, B2 = 0L
-    B3 <- 0L # to be updated in the run_qc step
+    B3 <- 0L # to be updated in the run_qc step for no_approximation
   }
 
   # 2. check inputs
@@ -97,12 +107,15 @@ set_analysis_parameters <- function(sceptre_object,
     resampling_mechanism = resampling_mechanism,
     side = side, low_moi = sceptre_object@low_moi,
     grna_integration_strategy = grna_integration_strategy,
-    resampling_approximation = resampling_approximation
+    resampling_approximation = resampling_approximation,
+    response_regression_method = response_regression_method
   ) |> invisible()
 
   # 3. determine whether to reset response precomputations
-  reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
-    identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
+  formula_object_same <- (length(sceptre_object@formula_object) >= 2) &&
+                             identical(sceptre_object@formula_object[[2L]], formula_object[[2L]])
+  response_regression_method_same <- identical(sceptre_object@response_regression_method, response_regression_method)
+  reset_response_precomps <- !formula_object_same || !response_regression_method_same
 
   # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
@@ -117,6 +130,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@resampling_approximation <- resampling_approximation
   sceptre_object@control_group_complement <- control_group_complement
   sceptre_object@run_permutations <- run_permutations
+  sceptre_object@response_regression_method <- response_regression_method
   sceptre_object@B1 <- B1
   sceptre_object@B2 <- B2
   sceptre_object@B3 <- B3
