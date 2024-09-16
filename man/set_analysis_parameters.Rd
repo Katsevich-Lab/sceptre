@@ -15,6 +15,7 @@ set_analysis_parameters(
   resampling_approximation = "skew_normal",
   control_group = "default",
   resampling_mechanism = "default",
+  response_regression_method = "default",
   multiple_testing_method = "BH",
   multiple_testing_alpha = 0.1
 )
@@ -32,11 +33,13 @@ set_analysis_parameters(
 
 \item{formula_object}{(optional) a formula object specifying how to adjust for the covariates in the model}
 
-\item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string indicating the resampling approximation to make to the null distribution of test statistics, either \code{"skew_normal"} or \code{"no_approximation"}}
+\item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string indicating the resampling approximation to make to the null distribution of test statistics, either \code{"skew_normal"}, \code{"no_approximation"}, or \code{"standard_normal"}}
 
 \item{control_group}{(optional) a string specifying the control group to use in the differential expression analysis, either \code{"complement"} or \code{"nt_cells"}}
 
 \item{resampling_mechanism}{(optional) a string specifying the resampling mechanism to use, either \code{"permutations"} or \code{"crt"}}
+
+\item{response_regression_method}{(optional) a string specifying the regression method to use for the response, either \code{"approximate_nb"} or \code{"nb"}}
 
 \item{multiple_testing_method}{(optional; default \code{"BH"}) a string specifying the multiple testing correction method to use; see \code{p.adjust.methods} for options}
 
