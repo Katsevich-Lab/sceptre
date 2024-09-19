@@ -991,7 +991,9 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
 
   # obtain the p-value (if available); deal with the singleton situation
   p_val <- 1.5
-  df_list <- list(sceptre_object@power_result, sceptre_object@discovery_result)
+  df_list <- list(if (functs_called[["run_power_check"]]) sceptre_object@power_result else NULL,
+                  if (functs_called[["run_discovery_analysis"]]) sceptre_object@discovery_result else NULL) |>
+    purrr::compact()
   for (curr_df in df_list) {
     if (singleton_integration_strategy) {
       subset_result <- curr_df |>
