@@ -29,7 +29,7 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use, ]
+  covariate_matrix <- covariate_matrix[cells_in_use,,drop=FALSE]
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
 
   # 2. define function to loop subset of response IDs
@@ -144,7 +144,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
   fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
   # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
-  covariate_matrix <- covariate_matrix[cells_in_use, ]
+  covariate_matrix <- covariate_matrix[cells_in_use,,drop=FALSE]
   if (subset_to_nt_cells) covariate_matrix <- covariate_matrix[all_nt_idxs, ]
 
   # 2. define the run precomputation function
