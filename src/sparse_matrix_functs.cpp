@@ -19,18 +19,16 @@ NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, in
 
 // [[Rcpp::export]]
 IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
+  int i_size = i.size();
   IntegerVector p(dim + 1);
   p[0] = 0;
   // special case of dim = 1
   if (dim == 1) {
-    p[1] = i.size();
+    p[1] = i_size;
   } else {
-    int curr_idx = 0, counter = 0, j = 0;
+    int curr_idx = 0, counter = 0;
     for (curr_idx = 0; curr_idx < dim; curr_idx ++) {
-      while (i[j] == curr_idx) {
-        counter ++;
-        j ++;
-      }
+      while (counter < i_size && i[counter] == curr_idx) counter ++;
       p[curr_idx + 1] = counter;
     }
   }
