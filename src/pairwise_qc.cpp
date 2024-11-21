@@ -47,7 +47,7 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
     }
 
     // iterate through the discovery pairs containing this gene
-    while (to_analyze_response_idxs[pair_pointer] - 1 == row_idx) {
+    while (pair_pointer < n_pairs && to_analyze_response_idxs[pair_pointer] - 1 == row_idx) {
       curr_idxs = grna_group_idxs[to_analyze_grna_idxs[pair_pointer] - 1];
       curr_n_nonzero_trt = 0;
       // first, get n nonzero trt
