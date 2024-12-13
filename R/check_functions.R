@@ -118,7 +118,7 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
 
 
 check_set_analysis_parameters <- function(sceptre_object, formula_object, response_grna_target_pairs_list,
-                                          control_group, resampling_mechanism, side, low_moi,
+                                          treatment_group, control_group, resampling_mechanism, side, low_moi,
                                           grna_integration_strategy, resampling_approximation) {
   response_matrix <- get_response_matrix(sceptre_object)
   grna_matrix <- get_grna_matrix(sceptre_object)
@@ -163,22 +163,27 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
 
-  # 4. verify that control group is either nt_cells, complement, or default
+  # 4. verify that treatment group is either inclusive, exclusive, or default
+  if (!treatment_group %in% c("inclusive", "exclusive", "default")) {
+    stop("`treatment_group` should set to `inclusive`, `exclusive`, or `default`.")
+  }
+
+  # 5. verify that control group is either nt_cells, complement, or default
   if (!control_group %in% c("nt_cells", "complement", "default")) {
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
 
-  # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
+  # 6. verify that resampling_mechanism is one of "permutations", "crt", or "default"
   if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
 
-  # 6. verify that the moi is consistent with the control group
+  # 7. verify that the moi is consistent with the control group
   if (!low_moi && control_group == "nt_cells") {
     stop("The control group cannot be the NT cells in high MOI.")
   }
 
-  # 7. verify that, if the control_group is NT cells, there are NT gRNAs present
+  # 8. verify that, if the control_group is NT cells, there are NT gRNAs present
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
@@ -186,22 +191,22 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     }
   }
 
-  # 8. verify that "side" is among "both", "left", or "right"
+  # 9. verify that "side" is among "both", "left", or "right"
   if (!(side %in% c("both", "left", "right"))) {
     stop("`side` must be one of 'both', 'left', or 'right'.")
   }
 
-  # 9. verify that "grna_integration_strategy" is union or singleton
+  # 10. verify that "grna_integration_strategy" is union or singleton
   if (!(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))) {
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
-  # 10. if using a backing .odm file, verify that resampling mechanism is permutations
+  # 11. if using a backing .odm file, verify that resampling mechanism is permutations
   if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
   }
 
-  # 11. verify resampling_approximation acceptable
+  # 12. verify resampling_approximation acceptable
   if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
     stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
   }
@@ -281,7 +286,7 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
 }
 
 
-check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range, initial_grna_assignment_list) {
+check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range, remove_cells_w_zero_or_twoplus_grnas, initial_grna_assignment_list) {
   if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
     stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
   }
@@ -295,6 +300,9 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
   }
   if (all(vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1)) == 0L)) {
     stop("At least one gRNA must be assigned to at least one cell to call `run_qc()`.")
+  }
+  if (!is.null(remove_cells_w_zero_or_twoplus_grnas) && !is.logical(remove_cells_w_zero_or_twoplus_grnas)) {
+    stop("`remove_cells_w_zero_or_twoplus_grnas` must be a logical value (TRUE, FALSE, or NULL).")
   }
   return(NULL)
 }

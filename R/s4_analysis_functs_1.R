@@ -11,6 +11,7 @@
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"`, `"union"`, or `"bonferroni"`
 #' @param resampling_approximation (optional; default `"skew_normal"`) a string indicating the resampling approximation to make to the null distribution of test statistics, either `"skew_normal"` or `"no_approximation"`
+#' @param treatment_group (optional) a string specifying the treatment group to use in the differential expression analysis, either `"inclusive"` or `"exclusive"`
 #' @param control_group (optional) a string specifying the control group to use in the differential expression analysis, either `"complement"` or `"nt_cells"`
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
@@ -54,6 +55,7 @@ set_analysis_parameters <- function(sceptre_object,
                                     grna_integration_strategy = "union",
                                     formula_object = "default",
                                     resampling_approximation = "skew_normal",
+                                    treatment_group = "default",
                                     control_group = "default",
                                     resampling_mechanism = "default",
                                     multiple_testing_method = "BH",
@@ -63,10 +65,12 @@ set_analysis_parameters <- function(sceptre_object,
 
   # 1. handle default arguments
   if (!sceptre_object@low_moi) {
-    control_group <- "complement"
+    if (treatment_group == "default") treatment_group <- "inclusive"
+    if (control_group == "default") control_group <- "complement"
     if (resampling_mechanism == "default") resampling_mechanism <- "crt"
   }
   if (sceptre_object@low_moi) {
+    if (treatment_group == "default") treatment_group <- "exclusive"
     if (control_group == "default") control_group <- "nt_cells"
     if (resampling_mechanism == "default") resampling_mechanism <- "permutations"
   }
@@ -93,6 +97,7 @@ set_analysis_parameters <- function(sceptre_object,
       discovery_pairs = discovery_pairs,
       positive_control_pairs = positive_control_pairs
     ),
+    treatment_group = treatment_group,
     control_group = control_group,
     resampling_mechanism = resampling_mechanism,
     side = side, low_moi = sceptre_object@low_moi,
@@ -106,6 +111,7 @@ set_analysis_parameters <- function(sceptre_object,
 
   # 4. update uncached fields of the sceptre object
   side_code <- which(side == c("left", "both", "right")) - 2L
+  treatment_group_inclusive <- treatment_group == "inclusive"
   control_group_complement <- control_group == "complement"
   run_permutations <- resampling_mechanism == "permutations"
   sceptre_object@discovery_pairs <- discovery_pairs |> dplyr::mutate(grna_target = as.character(grna_target), response_id = as.character(response_id))
@@ -115,6 +121,7 @@ set_analysis_parameters <- function(sceptre_object,
   sceptre_object@formula_object <- formula_object
   sceptre_object@side_code <- side_code
   sceptre_object@resampling_approximation <- resampling_approximation
+  sceptre_object@treatment_group_inclusive <- treatment_group_inclusive
   sceptre_object@control_group_complement <- control_group_complement
   sceptre_object@run_permutations <- run_permutations
   sceptre_object@B1 <- B1
@@ -235,6 +242,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @param response_n_umis_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
+#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
@@ -273,6 +281,7 @@ run_qc <- function(sceptre_object,
                    response_n_umis_range = c(0.01, 0.99),
                    response_n_nonzero_range = c(0.01, 0.99),
                    p_mito_threshold = 0.2,
+                   remove_cells_w_zero_or_twoplus_grnas = NULL,
                    additional_cells_to_remove = integer()) {
   run_qc_pt_1(
     sceptre_object,
@@ -281,6 +290,7 @@ run_qc <- function(sceptre_object,
     response_n_umis_range,
     response_n_nonzero_range,
     p_mito_threshold,
+    remove_cells_w_zero_or_twoplus_grnas,
     additional_cells_to_remove
   ) |>
     run_qc_pt_2()
@@ -293,6 +303,7 @@ run_qc_pt_1 <- function(sceptre_object,
                         response_n_umis_range = c(0.01, 0.99),
                         response_n_nonzero_range = c(0.01, 0.99),
                         p_mito_threshold = 0.2,
+                        remove_cells_w_zero_or_twoplus_grnas = NULL,
                         additional_cells_to_remove = integer()) {
   # cellwise start
   # 1. verify that function called in correct order
@@ -304,8 +315,14 @@ run_qc_pt_1 <- function(sceptre_object,
     n_nonzero_cntrl_thresh,
     response_n_umis_range,
     response_n_nonzero_range,
+    remove_cells_w_zero_or_twoplus_grnas,
     sceptre_object@initial_grna_assignment_list
   ) |> invisible()
+
+  # 2.25 set default value of remove_cells_w_zero_or_twoplus_grnas
+  if (is.null(remove_cells_w_zero_or_twoplus_grnas)) {
+    if(sceptre_object@low_moi) remove_cells_w_zero_or_twoplus_grnas <- TRUE else FALSE
+  }
 
   # 2.5 update fields of sceptre_object
   sceptre_object@cellwise_qc_thresholds <- list(
@@ -324,7 +341,7 @@ run_qc_pt_1 <- function(sceptre_object,
   # 5. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(
     sceptre_object, response_n_umis_range, response_n_nonzero_range,
-    p_mito_threshold, additional_cells_to_remove
+    p_mito_threshold, remove_cells_w_zero_or_twoplus_grnas, additional_cells_to_remove
   )
 
   # 6. determine whether to reset response precomputation
