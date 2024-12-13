@@ -1,4 +1,4 @@
-determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, response_n_nonzero_range, p_mito_threshold, additional_cells_to_remove) {
+determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, response_n_nonzero_range, p_mito_threshold, remove_cells_w_zero_or_twoplus_grnas, additional_cells_to_remove) {
   # 1. remove additional cells specified by the user
   cells_to_exclude_user_specified <- additional_cells_to_remove
   n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
@@ -22,8 +22,12 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
     n_cells_rm_p_mito <- 0L
   }
 
-  # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
-  cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+  # 4. compute cells to retain based on cells containing multiple grnas (if desired)
+  if(remove_cells_w_zero_or_twoplus_grnas) {
+    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+  } else{
+    cells_to_exclude_zero_twoplus_grnas <- integer()
+  }
   n_cells_rm_zero_twoplus_grnas <- length(sceptre_object@cells_w_zero_or_twoplus_grnas)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
@@ -50,7 +54,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
 
 
 update_grna_assignments_given_qc <- function(sceptre_object) {
-  # 0. define several varaibles
+  # 0. define several variables
   cells_in_use <- sceptre_object@cells_in_use
   grna_assignments_raw <- sceptre_object@grna_assignments_raw
   n_cells <- ncol(get_response_matrix(sceptre_object))
