@@ -11,6 +11,7 @@ run_qc(
   response_n_umis_range = c(0.01, 0.99),
   response_n_nonzero_range = c(0.01, 0.99),
   p_mito_threshold = 0.2,
+  remove_cells_w_zero_or_twoplus_grnas = NULL,
   additional_cells_to_remove = integer()
 )
 }
@@ -26,6 +27,8 @@ run_qc(
 \item{response_n_nonzero_range}{(optional; default \code{c(0.01, 0.99)}) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the \code{response_n_nonzero} distribution}
 
 \item{p_mito_threshold}{(optional; default \code{0.2}) a numeric value specifying the location at which to clip the right tail of the \code{response_p_mito} distribution}
+
+\item{remove_cells_w_zero_or_twoplus_grnas}{(optional; default \code{TRUE} in low MOI and \code{FALSE} in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs}
 
 \item{additional_cells_to_remove}{(optional) a vector of integer indices specifying additional cells to remove}
 }

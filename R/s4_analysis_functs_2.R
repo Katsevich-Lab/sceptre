@@ -129,7 +129,8 @@ run_calibration_check_pt_2 <- function(sceptre_object, output_amount = 1, print_
 
 process_calibration_result <- function(result, sceptre_object) {
   result |>
-    apply_grouping_to_result(sceptre_object, TRUE) |>
+    apply_grouping_to_result(sceptre_object, is_calibration_check = TRUE) |>
+    add_num_cells_to_result(sceptre_object, is_calibration_check = TRUE) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
       sceptre_object@multiple_testing_alpha)
 }
@@ -205,7 +206,9 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 
   # 4. update fields of sceptre object with results
   sceptre_object@power_result <- if (!sceptre_object@nf_pipeline) {
-    out$result |> apply_grouping_to_result(sceptre_object)
+    out$result |>
+      apply_grouping_to_result(sceptre_object) |>
+      add_num_cells_to_result(sceptre_object)
   } else {
     out$result
   }
@@ -298,6 +301,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
 process_discovery_result <- function(result, sceptre_object) {
   result |>
     apply_grouping_to_result(sceptre_object) |>
+    add_num_cells_to_result(sceptre_object) |>
     dplyr::mutate(significant = stats::p.adjust(p_value, method = sceptre_object@multiple_testing_method) <
       sceptre_object@multiple_testing_alpha)
 }
@@ -400,6 +404,101 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
   return(new_result)
 }
 
+# post-process the result data frame to add columns n_trt and n_cntrl, which are
+# the number of cells in the treatment and control groups, respectively
+add_num_cells_to_result <- function(result, sceptre_object, is_calibration_check = FALSE){
+  grna_integration_strategy <- sceptre_object@grna_integration_strategy
+  control_group_complement <- sceptre_object@control_group_complement
+  if(!is_calibration_check){
+    cells_per_trt_group <- vapply(
+      X = sceptre_object@grna_assignments$grna_group_idxs,
+      FUN = length,
+      FUN.VALUE = integer(1)
+    )
+    if(grna_integration_strategy == "bonferroni"){
+      cells_per_trt_group <- data.frame(
+        grna_id = names(cells_per_trt_group),
+        n_trt = unname(cells_per_trt_group)
+      ) |>
+        dplyr::left_join(sceptre_object@grna_target_data_frame,
+                         by = "grna_id") |>
+        dplyr::summarize(cells_per_target = sum(cells_per_grna),
+                         .by = "grna_target")
+      result <- result |>
+        dplyr::left_join(cells_per_trt_group, by = "grna_target")
+    } else if(grna_integration_strategy == "singleton"){
+      cells_per_trt_group <- data.frame(
+        grna_id = names(cells_per_trt_group),
+        n_trt = unname(cells_per_trt_group)
+      )
+      result <- result |>
+        dplyr::left_join(cells_per_trt_group, by = "grna_id")
+    } else{ # grna_integration_strategy == "union"
+      cells_per_trt_group <- data.frame(
+        grna_target = names(cells_per_trt_group),
+        n_trt = unname(cells_per_trt_group)
+      )
+      result <- result |>
+        dplyr::left_join(cells_per_trt_group, by = "grna_target")
+    }
+    if(control_group_complement){
+      num_cells_in_use <- length(sceptre_object@cells_in_use)
+      result <- result |>
+        dplyr::mutate(n_cntrl = num_cells_in_use - n_trt)
+    } else{
+      num_ctrl_cells <- length(sceptre_object@grna_assignments$all_nt_idxs)
+      result <- result |>
+        dplyr::mutate(n_cntrl = num_ctrl_cells)
+    }
+  } else{
+    if(grna_integration_strategy != "union"){
+      cells_per_nt_grna <- vapply(
+        X = sceptre_object@grna_assignments$indiv_nt_grna_idxs,
+        FUN = length,
+        FUN.VALUE = integer(1)
+      )
+      cells_per_nt_grna <- data.frame(
+        grna_id = names(cells_per_nt_grna),
+        n_trt = unname(cells_per_nt_grna)
+      )
+      result <- result |>
+        dplyr::left_join(cells_per_nt_grna, by = "grna_id")
+    } else{
+      # 1. Extract the unique grna_target values
+      unique_targets <- result |>
+        dplyr::distinct(grna_target)
+      # 2. For each unique grna_target value, compute n_trt
+      unique_targets <- unique_targets |>
+        dplyr::rowwise() |>
+        dplyr::mutate(
+          n_trt = length(unique(
+            unlist(
+              sceptre_object@grna_assignments$indiv_nt_grna_idxs[
+                strsplit(grna_target, "&", fixed = TRUE)[[1]]
+              ]
+            )
+          ))
+        ) |>
+        dplyr::ungroup()
+      # 3. Join back to the original data frame
+      result <- result |>
+        dplyr::left_join(unique_targets, by = "grna_target")
+    }
+    if(control_group_complement){
+      num_cells_in_use <- length(sceptre_object@cells_in_use)
+      result <- result |>
+        dplyr::mutate(n_cntrl = num_cells_in_use - n_trt)
+    } else{
+      num_ctrl_cells <- length(sceptre_object@grna_assignments$all_nt_idxs)
+      result <- result |>
+        dplyr::mutate(n_cntrl = num_ctrl_cells - n_trt)
+    }
+  }
+  # move n_trt and n_cntrl columns closer to the front
+  result <- result |>
+    dplyr::relocate(n_trt, n_cntrl, .after = grna_target)
+  return(result)
+}
 
 #' Get result
 #'

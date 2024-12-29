@@ -311,6 +311,7 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
 check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs, n_processors) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   control_group_complement <- sceptre_object@control_group_complement
+  treatment_group_inclusive <- sceptre_object@treatment_group_inclusive
   n_nt_grnas <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |>
     nrow()
@@ -327,6 +328,10 @@ check_calibration_check_inputs <- function(sceptre_object, n_calibration_pairs, 
   # 3. check n_processors
   if (!(identical(n_processors, "auto") || (is.numeric(n_processors) && n_processors >= 2))) {
     stop("`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.")
+  }
+  # 4. check that calibration check is not attempted with inclusive treatment group and NT control group
+  if(treatment_group_inclusive && !control_group_complement) {
+    stop("Currently, calibration check is not supported with the NT cells as the control group and inclusive treatment group.")
   }
   return(NULL)
 }
