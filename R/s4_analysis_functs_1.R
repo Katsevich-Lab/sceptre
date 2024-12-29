@@ -242,7 +242,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @param response_n_umis_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
-#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs
+#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI and `FALSE` in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
@@ -309,6 +309,15 @@ run_qc_pt_1 <- function(sceptre_object,
   # 1. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
 
+  # 1.5 set default value of remove_cells_w_zero_or_twoplus_grnas
+  if (is.null(remove_cells_w_zero_or_twoplus_grnas)) {
+    if(sceptre_object@low_moi){
+      remove_cells_w_zero_or_twoplus_grnas <- TRUE
+    } else{
+      remove_cells_w_zero_or_twoplus_grnas <- FALSE
+    }
+  }
+
   # 2. check inputs
   check_run_qc_inputs(
     n_nonzero_trt_thresh,
@@ -319,17 +328,16 @@ run_qc_pt_1 <- function(sceptre_object,
     sceptre_object@initial_grna_assignment_list
   ) |> invisible()
 
-  # 2.25 set default value of remove_cells_w_zero_or_twoplus_grnas
-  if (is.null(remove_cells_w_zero_or_twoplus_grnas)) {
-    if(sceptre_object@low_moi) remove_cells_w_zero_or_twoplus_grnas <- TRUE else FALSE
-  }
-
   # 2.5 update fields of sceptre_object
   sceptre_object@cellwise_qc_thresholds <- list(
     response_n_umis_range = response_n_umis_range,
     response_n_nonzero_range = response_n_nonzero_range,
     p_mito_threshold = p_mito_threshold
   )
+  # change treatment group to exclusive if removing cells with zero or two or more gRNAs
+  if(remove_cells_w_zero_or_twoplus_grnas){
+    sceptre_object@treatment_group_inclusive <- FALSE
+  }
 
   # 3. obtain previous cells_in_use for caching purposes
   current_cells_in_use <- sceptre_object@cells_in_use

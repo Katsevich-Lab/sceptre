@@ -28,7 +28,7 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
   } else{
     cells_to_exclude_zero_twoplus_grnas <- integer()
   }
-  n_cells_rm_zero_twoplus_grnas <- length(sceptre_object@cells_w_zero_or_twoplus_grnas)
+  n_cells_rm_zero_twoplus_grnas <- length(cells_to_exclude_zero_twoplus_grnas)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   cells_to_exclude <- c(
@@ -75,15 +75,21 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) {
     update_idxs(v, cells_in_use, n_cells)
   }) |> stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
+  all_nt_idxs_new <- grna_assignments_raw$all_nt_idxs |>
+    update_idxs(cells_in_use, n_cells)
+
   # remove those nt grnas with 0 cells (after QC)
   nt_idxs_new <- nt_idxs_new[vapply(nt_idxs_new, length, FUN.VALUE = integer(1)) != 0L]
-  grna_assignments <- list(grna_group_idxs = grna_group_idxs_new, indiv_nt_grna_idxs = nt_idxs_new)
+  grna_assignments <- list(grna_group_idxs = grna_group_idxs_new,
+                           indiv_nt_grna_idxs = nt_idxs_new,
+                           all_nt_idxs = all_nt_idxs_new)
 
   # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
-  if (!sceptre_object@control_group_complement) {
-    l <- update_indiv_grna_assignments_for_nt_cells(grna_assignments$indiv_nt_grna_idxs)
-    grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
-    grna_assignments$all_nt_idxs <- l$all_nt_idxs
+  if (!sceptre_object@control_group_complement & !sceptre_object@treatment_group_inclusive) {
+    grna_assignments$indiv_nt_grna_idxs <- update_indiv_grna_assignments_for_nt_cells(
+      grna_assignments$indiv_nt_grna_idxs,
+      grna_assignments$all_nt_idxs
+    )
   }
 
   # 4. update the sceptre_object and return
@@ -91,18 +97,12 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   return(sceptre_object)
 }
 
-
-update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
+update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs, all_nt_idxs) {
   out <- list()
   nt_grnas <- names(indiv_nt_grna_idxs)
-  all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
-  n_cells_per_nt <- vapply(indiv_nt_grna_idxs, length, FUN.VALUE = integer(1))
-  stop <- cumsum(n_cells_per_nt)
-  start <- c(0L, stop[-length(stop)]) + 1L
-  indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-    seq(start[i], stop[i])
+  # updated to no longer assume that indiv_nt_grna_idxs has nonoverlapping entries
+  indiv_nt_grna_idxs <- lapply(indiv_nt_grna_idxs, function(idx) {
+    match(idx, all_nt_idxs)
   }) |> stats::setNames(nt_grnas)
-  out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-  out$all_nt_idxs <- all_nt_idxs
-  return(out)
+  return(indiv_nt_grna_idxs)
 }

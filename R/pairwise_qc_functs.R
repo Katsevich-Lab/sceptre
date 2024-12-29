@@ -6,6 +6,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
   discovery_pairs <- sceptre_object@discovery_pairs
   positive_control_pairs <- sceptre_object@positive_control_pairs
   control_group_complement <- sceptre_object@control_group_complement
+  treatment_group_inclusive <- sceptre_object@treatment_group_inclusive
   grna_group_idxs <- grna_assignments$grna_group_idxs
 
   # 1. construct the entire set of response pairs by combining discovery pairs and pc pairs
@@ -79,6 +80,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
       to_analyze_response_idxs = to_analyze_response_idxs,
       to_analyze_grna_idxs = to_analyze_grna_idxs,
       control_group_complement = control_group_complement,
+      treatment_group_inclusive = treatment_group_inclusive,
       cells_in_use = cells_in_use
     )
   }
