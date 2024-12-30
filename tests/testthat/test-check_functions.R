@@ -440,7 +440,7 @@ test_that("check_import_data_inputs", {
       moi = "high",
       extra_covariates = FAIL_extra_covariates_with_na
     ),
-    regex = "`extra_covariates` has NA values that need to be removed"
+    regex = "incorrectly formatted. The number of unique elements in this column must equal the number of factors in this column."
   )
   FAIL_extra_covariates_with_inf <- valid_extra_covariates |>
     dplyr::mutate(x = c(-Inf, rnorm(num_cells - 1)))

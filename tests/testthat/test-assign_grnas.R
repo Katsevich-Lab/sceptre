@@ -80,7 +80,8 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
     scep_low_all_1@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part_all_1,
-      indiv_nt_grna_idxs = nt_part_all_1
+      indiv_nt_grna_idxs = nt_part_all_1,
+      all_nt_idxs = integer(0)
     )
   )
   # should be empty for maximum assignment
@@ -129,7 +130,8 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
         t1_c1_d1 = c(1L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L, 23L, 24L, 2L),
         t1_c2_d1 = 3:4, t1_c3_d1 = 5:6, t2_c3_d1 = 7:8
       ),
-      indiv_nt_grna_idxs = list(nt1 = 9L, nt2 = 10L, nt3 = 11L)
+      indiv_nt_grna_idxs = list(nt1 = 9L, nt2 = 10L, nt3 = 11L),
+      all_nt_idxs = c(9L, 10L, 11L)
     )
   )
   # should be empty for maximum assignment
@@ -221,7 +223,8 @@ test_that("assign_grnas method=threshold moi=low", {
     scep_low_with_low_thresh@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part,
-      indiv_nt_grna_idxs = nt_part
+      indiv_nt_grna_idxs = nt_part,
+      all_nt_idxs = integer(0)
     )
   )
 
@@ -258,7 +261,8 @@ test_that("assign_grnas method=threshold moi=low", {
     scep_low_with_high_thresh@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part,
-      indiv_nt_grna_idxs = nt_part
+      indiv_nt_grna_idxs = nt_part,
+      all_nt_idxs = integer(0)
     )
   )
   expect_equal(scep_low_with_high_thresh@grnas_per_cell, rep(1, num_cells))

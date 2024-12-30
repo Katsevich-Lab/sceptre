@@ -440,7 +440,7 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
   if (include_legend) {
     p_out <- p_out +
       ggplot2::theme(
-        legend.position = c(0.7, 0.1),
+        legend.position.inside = c(0.7, 0.1),
         legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
         legend.title = ggplot2::element_blank()
       ) +
@@ -780,7 +780,7 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
     ggplot2::scale_color_manual(values = my_cols) +
     ggplot2::ggtitle("Pairwise QC") +
     ggplot2::theme(
-      legend.position = c(0.85, 0.2),
+      legend.position.inside = c(0.85, 0.2),
       legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
       legend.title = ggplot2::element_blank()
     ) +
