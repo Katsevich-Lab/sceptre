@@ -34,20 +34,25 @@ test_that("run_calibration_check", {
       n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
     )
 
-  scep_calib_1 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size = 1)
-  scep_calib_3 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size = 3)
+  expect_error(
+    scep_pre_calib |> run_calibration_check(calibration_group_size = 1),
+    regex = "Currently, calibration check is not supported with the NT cells as the control group and inclusive treatment group."
+  )
 
-  expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
-  expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
+  expect_error(
+    scep_pre_calib |> run_calibration_check(calibration_group_size = 3),
+    regex = "Currently, calibration check is not supported with the NT cells as the control group and inclusive treatment group."
+  )
 
-  expect_false(any(grepl(pattern = "&", x = scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
-  expect_equal(strsplit(scep_calib_3@calibration_result$grna_target, "&") |> sapply(length), rep(3, nrow(discovery_pairs)))
-
-  # with this seed all nulls are false for both objects
-  expect_false(any(scep_calib_1@calibration_result$significant))
-  expect_false(any(scep_calib_3@calibration_result$significant))
+  # expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
+  # expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
+  #
+  # expect_false(any(grepl(pattern = "&", x = scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
+  # expect_equal(strsplit(scep_calib_3@calibration_result$grna_target, "&") |> sapply(length), rep(3, nrow(discovery_pairs)))
+  #
+  # # with this seed all nulls are false for both objects
+  # expect_false(any(scep_calib_1@calibration_result$significant))
+  # expect_false(any(scep_calib_3@calibration_result$significant))
 })
 
 
@@ -359,7 +364,7 @@ test_that("run_discovery_analysis", {
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  # grna_matrix["id3", cells_expressing_t3] <- 50
+  grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
@@ -411,4 +416,33 @@ test_that("run_discovery_analysis", {
 
   # t2 tests are not significant
   expect_false(any(disc_results[disc_results$grna_target == "t2", "significant"]))
+
+  # confirm that n_trt and n_cntrl are calculated correctly
+  expect_true(all(disc_results$n_trt == 10))
+  expect_true(all(disc_results$n_cntrl == 20))
+
+  ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  disc_results <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"
+  ) |>
+    set_analysis_parameters(
+      positive_control_pairs = positive_control_pairs,
+      discovery_pairs = discovery_pairs,
+      control_group = "complement"
+    ) |>
+    assign_grnas(method = "thresholding", threshold = 40) |>
+    # don't want to remove any cells for this one
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) |>
+    run_discovery_analysis() |>
+    get_result(analysis = "run_discovery_analysis")
+
+  # confirm that n_trt and n_cntrl are calculated correctly
+  expect_true(all(disc_results$n_trt == 10))
+  expect_true(all(disc_results$n_cntrl == 40))
 })

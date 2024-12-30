@@ -146,15 +146,37 @@ process_initial_assignment_list <- function(sceptre_object) {
       unlist() |>
       unique()
   }) |> stats::setNames(targeting_grna_groups)
-  # 4. obtain the individual non-targeting grna idxs
+  # 3. if using exclusive treatment groups, keep only cells for each group that do
+  # not have gRNAs in any other targeting gRNA groups
+  all_targeting_cells <- unlist(grna_group_idxs, use.names = FALSE)
+  if(!sceptre_object@treatment_group_inclusive){
+    index_counts <- table(all_targeting_cells)
+    grna_group_idxs <- lapply(grna_group_idxs, function(vec) {
+      vec[index_counts[as.character(vec)] == 1]
+    })
+  }
+  # 4. obtain the individual non-targeting grna idxs and all non-targeting idxs
   nontargeting_grna_ids <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |>
     dplyr::pull(grna_id)
   indiv_nt_grna_idxs <- initial_assignment_list[nontargeting_grna_ids]
+  # if using exclusive treatment groups, keep only cells for each group that do
+  # not have any targeting gRNAs
+  if(!sceptre_object@treatment_group_inclusive){
+    indiv_nt_grna_idxs <- lapply(indiv_nt_grna_idxs,
+                                 setdiff,
+                                 all_targeting_cells)
+  }
+  # regardless of treatment group, remove cells with targeting gRNAs from all_nt_idxs
+  all_nt_idxs <- initial_assignment_list[nontargeting_grna_ids] |>
+    unlist() |>
+    unique() |>
+    setdiff(all_targeting_cells)
   # 5. construct the grna_group_idxs list
   grna_assignments_raw <- list(
     grna_group_idxs = grna_group_idxs,
-    indiv_nt_grna_idxs = indiv_nt_grna_idxs
+    indiv_nt_grna_idxs = indiv_nt_grna_idxs,
+    all_nt_idxs = all_nt_idxs
   )
   # 6. initialize output
   sceptre_object@grna_assignments_raw <- grna_assignments_raw
@@ -165,7 +187,6 @@ process_initial_assignment_list <- function(sceptre_object) {
   ) |> mean()
   return(sceptre_object)
 }
-
 
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
   grna_target_data_frame <- sceptre_object@grna_target_data_frame

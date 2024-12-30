@@ -15,8 +15,8 @@ get_idx_vector_calibration_check <- function(curr_grna_group, indiv_nt_grna_idxs
   undercover_nts <- strsplit(x = curr_grna_group, split = "&", fixed = TRUE)[[1]]
   trt_idxs <- indiv_nt_grna_idxs[undercover_nts] |>
     unlist() |>
-    stats::setNames(NULL)
-  if (!low_moi) trt_idxs <- unique(trt_idxs)
+    stats::setNames(NULL) |>
+    unique()
   return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
 }
 

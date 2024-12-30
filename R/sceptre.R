@@ -5,7 +5,7 @@ utils::globalVariables(c(
   "grna_id", "pass_qc", "grna_group", "p_value", "gene_id", "response_id",
   "log_2_fold_change", "reject", "y", "grna_target", "gene_position_data_frame_grch38",
   "any_pass_qc", "vector_id", "bin", "normalized_count", "is_zero", "treatment",
-  "n_distinct_targets"
+  "n_distinct_targets", "cells_per_grna", "n_cntrl", "n_trt"
 ))
 #' sceptre
 #'
