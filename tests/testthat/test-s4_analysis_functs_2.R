@@ -34,20 +34,25 @@ test_that("run_calibration_check", {
       n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
     )
 
-  scep_calib_1 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size = 1)
-  scep_calib_3 <- scep_pre_calib |>
-    run_calibration_check(calibration_group_size = 3)
+  expect_error(
+    scep_pre_calib |> run_calibration_check(calibration_group_size = 1),
+    regex = "Currently, calibration check is not supported with the NT cells as the control group and inclusive treatment group."
+  )
 
-  expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
-  expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
+  expect_error(
+    scep_pre_calib |> run_calibration_check(calibration_group_size = 3),
+    regex = "Currently, calibration check is not supported with the NT cells as the control group and inclusive treatment group."
+  )
 
-  expect_false(any(grepl(pattern = "&", x = scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
-  expect_equal(strsplit(scep_calib_3@calibration_result$grna_target, "&") |> sapply(length), rep(3, nrow(discovery_pairs)))
-
-  # with this seed all nulls are false for both objects
-  expect_false(any(scep_calib_1@calibration_result$significant))
-  expect_false(any(scep_calib_3@calibration_result$significant))
+  # expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
+  # expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
+  #
+  # expect_false(any(grepl(pattern = "&", x = scep_calib_1@calibration_result$grna_target, fixed = TRUE)))
+  # expect_equal(strsplit(scep_calib_3@calibration_result$grna_target, "&") |> sapply(length), rep(3, nrow(discovery_pairs)))
+  #
+  # # with this seed all nulls are false for both objects
+  # expect_false(any(scep_calib_1@calibration_result$significant))
+  # expect_false(any(scep_calib_3@calibration_result$significant))
 })
 
 

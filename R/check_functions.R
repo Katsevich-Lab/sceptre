@@ -178,11 +178,6 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
 
-  # 7. verify that the moi is consistent with the control group
-  if (!low_moi && control_group == "nt_cells") {
-    stop("The control group cannot be the NT cells in high MOI.")
-  }
-
   # 8. verify that, if the control_group is NT cells, there are NT gRNAs present
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
