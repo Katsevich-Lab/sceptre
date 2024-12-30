@@ -11,7 +11,7 @@
 #' @param side (optional; default `"both"`) the sidedness of the test, one of `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string specifying the gRNA integration strategy, either `"singleton"`, `"union"`, or `"bonferroni"`
 #' @param resampling_approximation (optional; default `"skew_normal"`) a string indicating the resampling approximation to make to the null distribution of test statistics, either `"skew_normal"` or `"no_approximation"`
-#' @param treatment_group (optional) a string specifying the treatment group to use in the differential expression analysis, either `"inclusive"` or `"exclusive"`
+#' @param treatment_group (optional) a string specifying the treatment group to use in the differential expression analysis, either `"inclusive"` (any cell containing a gRNA with a given target is a treatment cell) or `"exclusive"` (only cells containing a gRNA with a given target but no other targeting gRNAs are treatment cells)
 #' @param control_group (optional) a string specifying the control group to use in the differential expression analysis, either `"complement"` or `"nt_cells"`
 #' @param resampling_mechanism (optional) a string specifying the resampling mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying the multiple testing correction method to use; see `p.adjust.methods` for options
@@ -242,7 +242,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @param response_n_umis_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
-#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI and `FALSE` in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs
+#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI and `FALSE` in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs. For low-MOI, consider setting this to `FALSE` in order to count cells with a targeting and a non-targeting gRNA as targeting (as is the case for the default `treatment_group = "exclusive"`) and cells with multiple NT gRNAs as controls.
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
