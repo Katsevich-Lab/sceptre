@@ -35,7 +35,7 @@ set_analysis_parameters(
 
 \item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string indicating the resampling approximation to make to the null distribution of test statistics, either \code{"skew_normal"} or \code{"no_approximation"}}
 
-\item{treatment_group}{(optional) a string specifying the treatment group to use in the differential expression analysis, either \code{"inclusive"} or \code{"exclusive"}}
+\item{treatment_group}{(optional) a string specifying the treatment group to use in the differential expression analysis, either \code{"inclusive"} (any cell containing a gRNA with a given target is a treatment cell) or \code{"exclusive"} (only cells containing a gRNA with a given target but no other targeting gRNAs are treatment cells)}
 
 \item{control_group}{(optional) a string specifying the control group to use in the differential expression analysis, either \code{"complement"} or \code{"nt_cells"}}
 

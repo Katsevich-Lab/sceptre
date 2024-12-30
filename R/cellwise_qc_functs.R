@@ -60,11 +60,37 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   n_cells <- ncol(get_response_matrix(sceptre_object))
 
   # 1. define update idxs funct
-  update_idxs <- function(v, cells_in_use, n_cells) {
+  # update_idxs <- function(v, cells_in_use, n_cells) {
+  #   v_log <- logical(length = n_cells)
+  #   v_log[v] <- TRUE
+  #   v_log_sub <- v_log[cells_in_use] # subset step
+  #   v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
+  #   return(v_updated)
+  # }
+
+  # 1. define update idxs funct
+  # The sort argument is for backward compatibility. Setting sort = FALSE for
+  # all_nt_idxs makes the function compatible with previous versions of the package.
+  # This argument specifies whether the indices outputted by the function are sorted.
+  update_idxs <- function(v, cells_in_use, n_cells, sort = TRUE) {
+    # Create a logical vector indicating which positions of length n_cells are used
     v_log <- logical(length = n_cells)
     v_log[v] <- TRUE
-    v_log_sub <- v_log[cells_in_use] # subset step
-    v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
+
+    # Subset to 'cells_in_use'
+    v_log_sub <- v_log[cells_in_use]
+
+    if (sort) {
+      # Original behavior: which(...) returns sorted indices by definition
+      v_updated <- which(v_log_sub)
+    } else {
+      # Preserve the original order from 'v'
+      # by matching each v[i] to its position in 'cells_in_use'
+      v_idx <- match(v, cells_in_use)
+      # Keep only the non-NA matches (these correspond to valid sub-indices in 'cells_in_use')
+      v_updated <- v_idx[!is.na(v_idx)]
+    }
+
     return(v_updated)
   }
 
@@ -76,7 +102,7 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     update_idxs(v, cells_in_use, n_cells)
   }) |> stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
   all_nt_idxs_new <- grna_assignments_raw$all_nt_idxs |>
-    update_idxs(cells_in_use, n_cells)
+    update_idxs(cells_in_use, n_cells, sort = FALSE)
 
   # remove those nt grnas with 0 cells (after QC)
   nt_idxs_new <- nt_idxs_new[vapply(nt_idxs_new, length, FUN.VALUE = integer(1)) != 0L]

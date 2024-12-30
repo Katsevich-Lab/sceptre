@@ -364,7 +364,7 @@ test_that("run_discovery_analysis", {
 
   grna_matrix["id1", cells_expressing_t1] <- 50
   grna_matrix["id2", cells_expressing_t2] <- 50
-  # grna_matrix["id3", cells_expressing_t3] <- 50
+  grna_matrix["id3", cells_expressing_t3] <- 50
   grna_matrix["nt1", cells_expressing_nt1] <- 50
   grna_matrix["nt2", cells_expressing_nt2] <- 50
 
@@ -416,4 +416,33 @@ test_that("run_discovery_analysis", {
 
   # t2 tests are not significant
   expect_false(any(disc_results[disc_results$grna_target == "t2", "significant"]))
+
+  # confirm that n_trt and n_cntrl are calculated correctly
+  expect_true(all(disc_results$n_trt == 10))
+  expect_true(all(disc_results$n_cntrl == 20))
+
+  ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  disc_results <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"
+  ) |>
+    set_analysis_parameters(
+      positive_control_pairs = positive_control_pairs,
+      discovery_pairs = discovery_pairs,
+      control_group = "complement"
+    ) |>
+    assign_grnas(method = "thresholding", threshold = 40) |>
+    # don't want to remove any cells for this one
+    run_qc(
+      response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+      n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
+    ) |>
+    run_discovery_analysis() |>
+    get_result(analysis = "run_discovery_analysis")
+
+  # confirm that n_trt and n_cntrl are calculated correctly
+  expect_true(all(disc_results$n_trt == 10))
+  expect_true(all(disc_results$n_cntrl == 40))
 })

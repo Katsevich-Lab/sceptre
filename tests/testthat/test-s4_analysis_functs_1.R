@@ -144,10 +144,13 @@ test_that("set_analysis_parameters", {
   expect_true(sceptre_object_post_all_defaults_high_moi@control_group_complement)
   expect_false(sceptre_object_post_all_defaults_low_moi@control_group_complement)
 
+  # treatment group inclusive should be TRUE for high MOI and FALSE for low
+  expect_true(sceptre_object_post_all_defaults_high_moi@treatment_group_inclusive)
+  expect_false(sceptre_object_post_all_defaults_low_moi@treatment_group_inclusive)
+
   # permutations should be used for low MOI and CRT for high
   expect_false(sceptre_object_post_all_defaults_high_moi@run_permutations)
   expect_true(sceptre_object_post_all_defaults_low_moi@run_permutations)
-
 
   ## 2. does the formula behave correctly?
   expect_equal(
