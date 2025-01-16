@@ -1,3 +1,9 @@
+# sceptre 0.10.1 (2025-01-16)
+
+Version 0.10.1 is a minor update in which we replaced the larger, real example
+data by smaller, simulated example data. Furthermore, the example data now live 
+in the `sceptre` package, rather than in the external `sceptredata` package.
+
 # sceptre 0.10.0 (2024-04-02)
 
 Version 0.10.0 is a major update to the `sceptre` package. This version provides support for the analysis of large-scale single-cell CRISPR screen data. It also includes several other, minor updates.

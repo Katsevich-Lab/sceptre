@@ -52,6 +52,12 @@
     <loc>https://katsevich-lab.github.io/sceptre/reference/get_result.html</loc>
   </url>
   <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/grna_target_data_frame_highmoi.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/highmoi_example_data.html</loc>
+  </url>
+  <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/import_data.html</loc>
   </url>
   <url>
@@ -62,6 +68,9 @@
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://katsevich-lab.github.io/sceptre/reference/lowmoi_example_data.html</loc>
   </url>
   <url>
     <loc>https://katsevich-lab.github.io/sceptre/reference/plot-sceptre_object-method.html</loc>
