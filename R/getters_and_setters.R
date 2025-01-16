@@ -13,7 +13,7 @@
 #' @export
 #' @examples
 #' # 1. create a sceptre_object
-#' library(sceptredata)
+#'
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data(
@@ -62,7 +62,6 @@ get_cell_covariates <- function(sceptre_object) {
 #' @return a sparse logical matrix containing the gRNA-to-cell assignments
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data

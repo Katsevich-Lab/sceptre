@@ -36,7 +36,6 @@ an updated \code{sceptre_object} in which cellwise and pairwise QC have been app
 \code{run_qc()} runs cellwise and pairwise QC on the data. Cellwise QC involves filtering cells on the covariates \code{response_n_nonzero}, \code{response_n_umis}, and \code{response_p_mito}. In low-MOI we additionally remove cells that contain zero or multiple gRNAs. Next, pairwise QC involves filtering out target-response pairs whose data are too sparse to be analyzed reliably. In this context we define the “number of nonzero treatment cells” (resp., the “number of nonzero control cells”) as the number of cells in the treatment group (resp., control group) that contain nonzero expression of the response. (We sometimes use the shorthand \code{n_nonzero_trt} and \code{n_nonzero_cntrl} to refer to the number of nonzero treatment cells and control cells, respectively.) Pairwise QC involves filtering target-response pairs on \code{n_nonzero_trt} and \code{n_nonzero_cntrl}. See \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual} for more detailed information about this function.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

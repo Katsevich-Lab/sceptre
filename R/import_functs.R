@@ -17,7 +17,6 @@
 #' @return an initialized `sceptre_object`
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data("lowmoi_example_data")
 #' # 1. initialize a standard sceptre_object from R objects
 #' sceptre_object <- import_data(
@@ -142,10 +141,9 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #' @return an initialized `sceptre_object`
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(grna_target_data_frame_highmoi)
 #' directories <- paste0(
-#'   system.file("extdata", package = "sceptredata"),
+#'   system.file("extdata", package = "sceptre"),
 #'   "/highmoi_example/gem_group_", c(1, 2)
 #' )
 #'
@@ -372,7 +370,7 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
 #'
 #' @examples
 #' directory <- paste0(
-#'   system.file("extdata", package = "sceptredata"),
+#'   system.file("extdata", package = "sceptre"),
 #'   "/parse_example/"
 #' )
 #' gene_mat_fp <- paste0(directory, "gene_mat.mtx")

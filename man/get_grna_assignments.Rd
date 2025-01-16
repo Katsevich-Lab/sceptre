@@ -21,7 +21,6 @@ a sparse logical matrix containing the gRNA-to-cell assignments
 When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

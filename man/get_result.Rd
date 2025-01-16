@@ -21,7 +21,6 @@ a data frame containing the results of the analysis
 If \code{output_amount} is set to \code{2} or \code{3} in \code{run_calibration_check()}, \code{run_power_check()}, or \code{run_discovery_analysis()}, then the result data frame contains additional columns; see \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual} for more information.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

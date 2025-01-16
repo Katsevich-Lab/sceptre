@@ -33,7 +33,6 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 If \code{run_qc()} has already been called on the \code{sceptre_object}, then the parameters \code{response_n_umis_range}, \code{response_n_nonzero_range}, and \code{p_mito_threshold} are set to the corresponding parameters within the \code{sceptre_object}.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 import_data(

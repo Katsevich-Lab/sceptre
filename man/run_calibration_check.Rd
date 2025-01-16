@@ -39,7 +39,6 @@ an updated \code{sceptre_object} in which the calibration check has been carried
 \code{run_calibration_check()} runs the calibration check. The calibration check involves applying sceptre to analyze negative control target-response pairs --- pairs for which we know there is no association between the target and response --- to ensure control of the false discovery rate. The calibration check enables us to verify that the discovery set that sceptre ultimately produces is not contaminated by excess false positives. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for more detailed information about this function.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

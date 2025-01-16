@@ -52,7 +52,6 @@ an updated \code{sceptre_object} in which the analysis parameters have been set
 Every argument to this function is optional, but typically, users want to specify \code{discovery_pairs} at minimum.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

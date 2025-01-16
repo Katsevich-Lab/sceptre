@@ -27,7 +27,7 @@ The data getter functions (i.e., \code{get_response_matrix()}, \code{get_grna_ma
 }
 \examples{
 # 1. create a sceptre_object
-library(sceptredata)
+
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data(
