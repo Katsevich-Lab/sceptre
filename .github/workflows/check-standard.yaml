@@ -43,14 +43,6 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Cache R packages
-        uses: actions/cache@v3
-        with:
-          path: ${{ runner.tool_cache }}/R
-          key: ${{ runner.os }}-R-${{ matrix.config.r }}-${{ hashFiles('**/DESCRIPTION') }}
-          restore-keys: |
-            ${{ runner.os }}-R-${{ matrix.config.r }}-
-
       - name: Build and check package
         run: |
           options(pak.verbose = TRUE)
