@@ -10,7 +10,6 @@
 #' @return a data frame with columns `grna_target` and `response_id` containing the *cis* pairs
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -91,7 +90,6 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
 #' @return a data frame with columns `grna_target` and `response_id` containing the *trans* discovery set
 #' @export
 #' @examples
-#' library(sceptredata)
 #' # 1. low-moi, gene-targeting screen
 #' data("lowmoi_example_data")
 #' sceptre_object <- import_data(
@@ -158,7 +156,6 @@ construct_trans_pairs <- function(sceptre_object, positive_control_pairs = data.
 #' @return a data frame with columns `grna_target` and `response_id` containing the positive control pairs
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data

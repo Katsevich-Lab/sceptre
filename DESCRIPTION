@@ -40,14 +40,13 @@ Depends:
 Suggests:
     ondisc,
     sessioninfo,
-    sceptredata,
     rmarkdown,
     knitr,
     parallel,
     testthat (>= 3.0.0),
     magrittr,
     MASS
-Remotes: github::timothy-barry/ondisc, github::katsevich-lab/sceptredata
+Remotes: github::timothy-barry/ondisc
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre

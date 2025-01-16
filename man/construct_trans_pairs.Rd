@@ -27,7 +27,6 @@ a data frame with columns \code{grna_target} and \code{response_id} containing t
 The optional argument \code{pairs_to_exclude} enables the user to remove specific pairs from the \emph{trans} set and takes values \code{"none"}, \code{"pc_pairs"}, or \code{"pairs_containing_pc_targets"}. If \code{pairs_to_exclude} is set to \code{"none"} (the default), then no pairs are removed from the \emph{trans} set. Next, if \code{pairs_to_exclude} is set to \code{"pc_pairs"} (and the \code{positive_control_pairs} data frame is passed), then then the positive control target-response pairs are excluded from the \emph{trans} set. Finally, if \code{pairs_to_exclude} is set to \code{"pairs_containing_pc_targets"} (and \code{positive_control_pairs} is passed), then \emph{all} pairs containing a positive control gRNA target are excluded from the \emph{trans} pairs. (In this sense setting \code{pairs_to_exclude} to \code{"pairs_containing_pc_targets"} is stronger than setting \code{pairs_to_exclude} to \code{"pc_pairs"}.) Typically, in gene-targeting (resp., noncoding-regulatory-element-targeting) screens, we set \code{pairs_to_exclude} to \code{"pc_pairs"} (resp., \code{"pairs_containing_pc_targets"}). See \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2 of the manual} for more detailed information about this function.
 }
 \examples{
-library(sceptredata)
 # 1. low-moi, gene-targeting screen
 data("lowmoi_example_data")
 sceptre_object <- import_data(

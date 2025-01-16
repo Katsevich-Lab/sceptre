@@ -27,7 +27,6 @@ get_my_theme <- function(element_text_size = 11) {
 #' @return a single \code{ggplot2} plot
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' import_data(
@@ -148,7 +147,6 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' import_data(
@@ -298,7 +296,6 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #' @export
 #'
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -440,7 +437,7 @@ compare_calibration_and_discovery_results <- function(calibration_result, discov
   if (include_legend) {
     p_out <- p_out +
       ggplot2::theme(
-        legend.position = c(0.7, 0.1),
+        legend.position.inside = c(0.7, 0.1),
         legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
         legend.title = ggplot2::element_blank()
       ) +
@@ -496,7 +493,6 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -611,7 +607,6 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 #' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' import_data(
@@ -685,7 +680,6 @@ plot_covariates <- function(sceptre_object,
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -780,7 +774,7 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
     ggplot2::scale_color_manual(values = my_cols) +
     ggplot2::ggtitle("Pairwise QC") +
     ggplot2::theme(
-      legend.position = c(0.85, 0.2),
+      legend.position.inside = c(0.85, 0.2),
       legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
       legend.title = ggplot2::element_blank()
     ) +
@@ -808,7 +802,6 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
 #' @return a single \code{ggplot2} plot
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -904,7 +897,6 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 #' @return a violin plot
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -930,8 +922,8 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 #'     n_processors = 2
 #'   ) |>
 #'   plot_response_grna_target_pair(
-#'     response_id = "ENSG00000136938",
-#'     grna_target = "candidate_enh_20"
+#'     response_id = "ENSG00000211641",
+#'     grna_target = "candidate_enh_15"
 #'   )
 plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_target) {
   # check that grnas have been assigned and qc has been called

@@ -33,7 +33,6 @@ an updated \code{sceptre_object} in which the power check has been carried out
 \code{run_power_check()} runs the power check. The power check entails applying \code{sceptre} to analyze positive control pairs --- pairs for which we know there is an association between the target and the response --- to ensure that \code{sceptre} is capable of detecting true associations. See \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual} for more detailed information about this function.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data

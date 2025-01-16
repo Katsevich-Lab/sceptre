@@ -33,7 +33,6 @@ a single \code{cowplot} object containing the combined panels (if \code{return_i
 }
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
