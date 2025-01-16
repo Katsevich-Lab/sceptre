@@ -51,12 +51,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-R-${{ matrix.config.r }}-
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: rcmdcheck testthat Matrix sceptre sceptredata
-          needs-packages: true
-          verbose: true
-
       - name: Build and check package
         run: |
           options(pak.verbose = TRUE)
