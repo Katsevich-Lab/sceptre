@@ -78,6 +78,12 @@ reference:
   - read_ondisc_backed_sceptre_object
   - write_ondisc_backed_sceptre_object
 
+- title: "Example data"
+  contents:
+  - highmoi_example_data
+  - grna_target_data_frame_highmoi
+  - lowmoi_example_data
+
 authors:
   sidebar:
     roles: [aut, ctb, ths]
