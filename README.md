@@ -14,7 +14,7 @@ emphasizing statistical rigor, massive scalability, and ease of use.
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg)](https://github.com/Katsevich-Lab/sceptre/actions)
+[![R-CMD-check](https://github.com/Katsevich-Lab/sceptre/workflows/R-CMD-check/badge.svg?branch=main)](https://github.com/Katsevich-Lab/sceptre/actions?query=workflow%3AR-CMD-check+branch%3Amain)
 
 <!-- badges: end -->
 
