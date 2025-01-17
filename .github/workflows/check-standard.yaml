@@ -29,12 +29,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install system dependencies (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libhdf5-dev libcurl4-openssl-dev libxml2-dev libssl-dev
-
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential libhdf5-dev libcurl4-openssl-dev libxml2-dev libssl-dev
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew update
+            brew install hdf5 curl libxml2 openssl
+            echo 'export PATH="/usr/local/opt/openssl/bin:$PATH"' >> ~/.zshrc
+          else
+            echo "Unsupported OS: $RUNNER_OS"
+            exit 1
+          fi
 
       - uses: r-lib/actions/setup-pandoc@v2
 

@@ -39,6 +39,7 @@ Depends:
     R (>= 4.1)
 Suggests:
     ondisc,
+    R.utils,
     sessioninfo,
     rmarkdown,
     knitr,
