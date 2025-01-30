@@ -6,7 +6,7 @@
 
 run_lowmoi_example <- function(){
   library(sceptre)
-  library(sceptredata)
+#  library(sceptredata)
   # 1. create the sceptre object
   data("lowmoi_example_data")
   sceptre_object <- import_data(
@@ -23,8 +23,8 @@ run_lowmoi_example <- function(){
     sceptre_object = sceptre_object,
     positive_control_pairs = positive_control_pairs,
     pairs_to_exclude = "pc_pairs"
-  ) |>
-    dplyr::filter(response_id == "PCBP3")
+  ) # |>
+#    dplyr::filter(response_id == "PCBP3")
 
   sceptre_object <- set_analysis_parameters(
     sceptre_object = sceptre_object,
@@ -55,11 +55,11 @@ run_lowmoi_example <- function(){
 
 run_highmoi_example <- function(){
   library(sceptre)
-  library(sceptredata)
+#  library(sceptredata)
 
   # 1. create the sceptre object from cellranger output
   directories <- paste0(
-    system.file("extdata", package = "sceptredata"),
+    system.file("extdata", package = "sceptre"),
     "/highmoi_example/gem_group_", c(1, 2)
   )
   data(grna_target_data_frame_highmoi)
@@ -74,8 +74,8 @@ run_highmoi_example <- function(){
   discovery_pairs <- construct_cis_pairs(sceptre_object,
                                          positive_control_pairs = positive_control_pairs,
                                          distance_threshold = 5e6
-  ) |>
-    dplyr::slice_head(n = 100)
+  ) # |>
+#    dplyr::slice_head(n = 100)
 
   sceptre_object <- set_analysis_parameters(
     sceptre_object = sceptre_object,
