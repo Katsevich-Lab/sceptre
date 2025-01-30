@@ -39,7 +39,6 @@ an initialized \code{sceptre_object}
 \code{import_data()} imports data from a collection of R objects to create a \code{sceptre_object}. Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed \code{sceptre} object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for more detailed information about this function.
 }
 \examples{
-library(sceptredata)
 data("lowmoi_example_data")
 # 1. initialize a standard sceptre_object from R objects
 sceptre_object <- import_data(

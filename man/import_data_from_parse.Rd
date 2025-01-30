@@ -40,7 +40,7 @@ an initialized \code{sceptre_object}
 }
 \examples{
 directory <- paste0(
-  system.file("extdata", package = "sceptredata"),
+  system.file("extdata", package = "sceptre"),
   "/parse_example/"
 )
 gene_mat_fp <- paste0(directory, "gene_mat.mtx")

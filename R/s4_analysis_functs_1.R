@@ -21,7 +21,6 @@
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -162,7 +161,6 @@ set_analysis_parameters <- function(sceptre_object,
 #' @return an updated `sceptre_object` in which the gRNA assignments have been carried out
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data("lowmoi_example_data")
 #' # 1. import data, set default analysis parameters
 #' sceptre_object <- import_data(
@@ -248,7 +246,6 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data

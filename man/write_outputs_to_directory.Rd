@@ -18,7 +18,6 @@ the value NULL
 \code{write_outputs_to_directory()} writes the outputs of a \code{sceptre} analysis to a directory on disk. \code{write_outputs_to_directory()} writes several files to the specified directory: a text-based summary of the analysis (\code{analysis_summary.txt}), the various plots (\verb{*.png}), the calibration check, power check, discovery analysis results (\code{results_run_calibration_check.rds}, \code{results_run_power_check.rds}, and \code{results_run_discovery_analysis.rds}, respectively), and the binary gRNA-to-cell assignment matrix (\code{grna_assignment_matrix.rds}). See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual} for more information about this function.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
