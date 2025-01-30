@@ -14,7 +14,6 @@
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -146,7 +145,6 @@ process_calibration_result <- function(result, sceptre_object) {
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -227,7 +225,6 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -512,7 +509,6 @@ add_num_cells_to_result <- function(result, sceptre_object, is_calibration_check
 #' @returns a data frame containing the results of the analysis
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -560,7 +556,6 @@ get_result <- function(sceptre_object, analysis) {
 #' @return the value NULL
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data

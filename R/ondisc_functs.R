@@ -14,7 +14,6 @@
 #' @return `write_ondisc_backed_sceptre_object()` returns NULL, and `read_ondisc_backed_sceptre_object()` returns an `ondisc`-backed `sceptre_object`
 #' @export
 #' @examples
-#' library(sceptredata)
 #' data(lowmoi_example_data)
 #' # 1. create ondisc-backed sceptre_object
 #' sceptre_object <- import_data(

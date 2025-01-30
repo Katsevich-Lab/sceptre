@@ -39,7 +39,6 @@ an updated \code{sceptre_object} in which the gRNA assignments have been carried
 See the manual for information about the method-specific additional arguments.
 }
 \examples{
-library(sceptredata)
 data("lowmoi_example_data")
 # 1. import data, set default analysis parameters
 sceptre_object <- import_data(

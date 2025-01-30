@@ -41,7 +41,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' @return the value NULL
 #' @export
 #' @examples
-#' library(sceptredata)
+#' 
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data
@@ -158,7 +158,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' @export
 #' @examples
-#' library(sceptredata)
+#' 
 #' data(highmoi_example_data)
 #' data(grna_target_data_frame_highmoi)
 #' # import data

@@ -33,10 +33,9 @@ an initialized \code{sceptre_object}
 \code{import_data_from_cellranger()} imports data from the output of one or more calls to Cell Ranger count. Each directory supplied as an input to this function should be in feature-barcode format, containing the files \code{features.tsv.gz} and  \code{matrix.mtx.gz} (and optionally \code{barcodes.tsv.gz}). Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed \code{sceptre} object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter} or \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1} of the manual for more information about this function.
 }
 \examples{
-library(sceptredata)
 data(grna_target_data_frame_highmoi)
 directories <- paste0(
-  system.file("extdata", package = "sceptredata"),
+  system.file("extdata", package = "sceptre"),
   "/highmoi_example/gem_group_", c(1, 2)
 )
 

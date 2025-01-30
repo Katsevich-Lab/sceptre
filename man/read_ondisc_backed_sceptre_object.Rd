@@ -31,7 +31,6 @@ write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 \code{write_ondisc_backed_sceptre_object()} and \code{read_ondisc_backed_sceptre_object()} enable the writing and reading of \code{ondisc}-backed \code{sceptre_object}s, respectively. First, \code{write_ondisc_backed_sceptre_object()} writes an \code{ondisc}-backed \code{sceptre_object} to disk, creating a file \code{sceptre_object.rds} in the specified directory. Next, \code{read_ondisc_backed_sceptre_object()} reads and initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file, \code{response.odm} file, and \code{grna.odm} file stored on disk.
 }
 \examples{
-library(sceptredata)
 data(lowmoi_example_data)
 # 1. create ondisc-backed sceptre_object
 sceptre_object <- import_data(

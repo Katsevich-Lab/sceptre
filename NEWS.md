@@ -1,3 +1,15 @@
+# sceptre 0.10.2 (2025-01-17)
+
+Version 0.10.2 is a minor update in which we replaced the larger, real example
+data by smaller, simulated example data. Furthermore, the example data now live 
+in the `sceptre` package, rather than in the external `sceptredata` package. 
+Finally, the R-CMD-CHECK badge was restored on the website.
+
+# sceptre 0.10.1 (2024-04-30)
+
+Version 0.10.1 includes minor updates to v0.10.0. A new gene position data frame 
+`gene_position_data_frame_grch37` was added.
+
 # sceptre 0.10.0 (2024-04-02)
 
 Version 0.10.0 is a major update to the `sceptre` package. This version provides support for the analysis of large-scale single-cell CRISPR screen data. It also includes several other, minor updates.

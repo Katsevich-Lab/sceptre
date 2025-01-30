@@ -23,7 +23,6 @@ a violin plot
 If \code{grna_integration_strategy} is set to \code{"singleton"}, then \code{grna_target} should be set to a gRNA ID.
 }
 \examples{
-library(sceptredata)
 data(highmoi_example_data)
 data(grna_target_data_frame_highmoi)
 # import data
@@ -49,7 +48,7 @@ sceptre_object |>
     n_processors = 2
   ) |>
   plot_response_grna_target_pair(
-    response_id = "ENSG00000136938",
-    grna_target = "candidate_enh_20"
+    response_id = "ENSG00000211641",
+    grna_target = "candidate_enh_15"
   )
 }
