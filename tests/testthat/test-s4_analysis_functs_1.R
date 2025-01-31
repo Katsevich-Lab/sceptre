@@ -33,10 +33,11 @@ test_that("import_data", {
     "response_matrix", "grna_matrix", "covariate_data_frame", "covariate_matrix",
     "grna_target_data_frame", "low_moi", "covariate_names", "discovery_pairs",
     "positive_control_pairs", "formula_object", "side_code", "resampling_approximation",
-    "control_group_complement", "treatment_group_inclusive", "run_permutations", "n_nonzero_trt_thresh",
+    "control_group_complement", "run_permutations", "n_nonzero_trt_thresh",
     "n_nonzero_cntrl_thresh", "B1", "B2", "B3", "grna_integration_strategy",
     "grna_assignment_method", "grna_assignment_hyperparameters", "multiple_testing_alpha",
     "multiple_testing_method", "cell_removal_metrics", "cellwise_qc_thresholds",
+    "remove_cells_w_zero_or_twoplus_grnas",
     "mitochondrial_gene", "M_matrix", "n_nonzero_tot_vector", "discovery_pairs_with_info",
     "positive_control_pairs_with_info", "negative_control_pairs", "initial_grna_assignment_list",
     "grna_assignments_raw", "grna_assignments", "grnas_per_cell", "cells_w_zero_or_twoplus_grnas",
@@ -144,10 +145,6 @@ test_that("set_analysis_parameters", {
   expect_true(sceptre_object_post_all_defaults_high_moi@control_group_complement)
   expect_false(sceptre_object_post_all_defaults_low_moi@control_group_complement)
 
-  # treatment group inclusive should be TRUE for high MOI and FALSE for low
-  expect_true(sceptre_object_post_all_defaults_high_moi@treatment_group_inclusive)
-  expect_false(sceptre_object_post_all_defaults_low_moi@treatment_group_inclusive)
-
   # permutations should be used for low MOI and CRT for high
   expect_false(sceptre_object_post_all_defaults_high_moi@run_permutations)
   expect_true(sceptre_object_post_all_defaults_low_moi@run_permutations)
@@ -171,6 +168,39 @@ test_that("set_analysis_parameters", {
   expect_equal(
     as.character(sceptre_object_nonsense_formula@formula_object)[2],
     "aaa"
+  )
+  
+  set.seed(2)
+  
+  num_cells <- 100
+  num_responses <- 40
+  
+  grna_target_data_frame <- make_mock_grna_target_data(c(2, 2, 2), 1, 1, 10)
+  grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 5) |>
+    matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  
+  response_matrix <- rpois(num_cells * num_responses, 5) |>
+    matrix(nrow = num_responses, ncol = num_cells) |>
+    `rownames<-`(paste0("response_", 1:num_responses))
+  
+  discovery_pairs <- data.frame(
+    grna_target = "t1_c1_d1",
+    response_id = rownames(response_matrix)[1:10]
+  )
+  
+  expect_error(
+    import_data(
+      grna_matrix = grna_matrix,
+      response_matrix = response_matrix,
+      grna_target_data_frame = grna_target_data_frame,
+      moi = "high"
+    ) |>
+      set_analysis_parameters(
+        discovery_pairs = discovery_pairs,
+        control_group = "nt_cells"
+      ),
+    regex = "`control_group` cannot be `nt_cells` in high-MOI."
   )
 
 })

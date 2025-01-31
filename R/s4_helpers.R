@@ -93,7 +93,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
       )
     },
     "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
-    paste0("\n\t\U2022 Treatment group: ", if (length(x@treatment_group_inclusive) == 0L) "not specified" else crayon::blue(ifelse(x@treatment_group_inclusive, "inclusive", "exclusive"))),
     paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells"))),
     "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
     "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
