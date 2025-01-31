@@ -31,6 +31,9 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
   if (!all(c("response_id", "chr", "position") %in% colnames(response_position_data_frame))) {
     stop("`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'.")
   }
+  if (!all(c("chr", "start", "end") %in% colnames(sceptre_object@grna_target_data_frame))) {
+    stop("`grna_target_data_frame` must contain columns 'chr', 'start', and 'end'.")
+  }
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
   grna_target_data_frame <- data.table::as.data.table(grna_target_data_frame)
   response_ids <- rownames(get_response_matrix(sceptre_object))

@@ -71,6 +71,26 @@ test_that("run_calibration_check negative control pairs complement set with cell
 
   expect_true(all(neg_df$pass_qc))
 
+  # check that n_nonzero_trt and n_nonzero_cntrl are computed correctly for 
+  # the discovery pairs
+  discovery_pairs_with_info <- scep_complement_size_1@discovery_pairs_with_info
+  for (i in 1:nrow(discovery_pairs_with_info)) {
+    trt_cells <- remaining_cells[scep_complement_size_1@grna_assignments$grna_group_idxs[[discovery_pairs_with_info$grna_group[i]]]]
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_trt[i],
+      sum(response_matrix[discovery_pairs$response_id[i], trt_cells] > 0)
+    )
+
+    # complement control group
+    cntrl_cells <- setdiff(scep_complement_size_1@cells_in_use, trt_cells)
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_cntrl[i],
+      sum(response_matrix[discovery_pairs$response_id[i], cntrl_cells] > 0)
+    )
+  }
+  
+  # check that n_nonzero_trt and n_nonzero_cntrl are computed correctly for 
+  # the negative control pairs
   for (i in 1:nrow(neg_df)) {
     trt_cells <- remaining_cells[scep_complement_size_1@grna_assignments$indiv_nt_grna_idxs[[neg_df$grna_group[i]]]]
     expect_equal(
@@ -326,7 +346,7 @@ test_that("run_discovery_analysis", {
   )
 
   ## testing `control_group = "nt_cells"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  disc_results <- import_data(
+  sceptre_object <- import_data(
     grna_matrix = grna_matrix,
     response_matrix = response_matrix,
     grna_target_data_frame = grna_target_data_frame,
@@ -346,8 +366,9 @@ test_that("run_discovery_analysis", {
     ) |>
     run_calibration_check(calibration_group_size = 1) |>
     run_power_check() |>
-    run_discovery_analysis() |>
-    get_result(analysis = "run_discovery_analysis")
+    run_discovery_analysis()
+    
+  disc_results <- sceptre_object |> get_result(analysis = "run_discovery_analysis")
 
   # confirming everything is ok with the pair failing pairwise QC
   expect_false(disc_results[disc_results$grna_target == "t1" & disc_results$response_id == "response_5", "pass_qc"][[1]])
@@ -357,13 +378,31 @@ test_that("run_discovery_analysis", {
 
   # t2 tests are not significant
   expect_false(any(disc_results[disc_results$grna_target == "t2", "significant"]))
+  
+  # check that n_nonzero_trt and n_nonzero_cntrl are computed correctly for 
+  # the discovery pairs
+  discovery_pairs_with_info <- sceptre_object@discovery_pairs_with_info
+  for (i in 1:nrow(discovery_pairs_with_info)) {
+    trt_cells <- sceptre_object@cells_in_use[sceptre_object@grna_assignments$grna_group_idxs[[discovery_pairs_with_info$grna_group[i]]]]
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_trt[i],
+      sum(response_matrix[discovery_pairs_with_info$response_id[i], trt_cells] > 0)
+    )
+    
+    # NT control group
+    cntrl_cells <- sceptre_object@grna_assignments$all_nt_idxs
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_cntrl[i],
+      sum(response_matrix[discovery_pairs_with_info$response_id[i], cntrl_cells] > 0)
+    )
+  }
 
   # confirm that n_trt and n_cntrl are calculated correctly
   expect_true(all(disc_results$n_trt == 10))
   expect_true(all(disc_results$n_cntrl == 20))
 
   ## testing `control_group = "complement"` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  disc_results <- import_data(
+  sceptre_object <- import_data(
     grna_matrix = grna_matrix,
     response_matrix = response_matrix,
     grna_target_data_frame = grna_target_data_frame,
@@ -380,8 +419,28 @@ test_that("run_discovery_analysis", {
       response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
       n_nonzero_trt_thresh = 0, n_nonzero_cntrl_thresh = 0
     ) |>
-    run_discovery_analysis() |>
+    run_discovery_analysis()
+  
+  disc_results <- sceptre_object |>
     get_result(analysis = "run_discovery_analysis")
+  
+  # check that n_nonzero_trt and n_nonzero_cntrl are computed correctly for 
+  # the discovery pairs
+  discovery_pairs_with_info <- sceptre_object@discovery_pairs_with_info
+  for (i in 1:nrow(discovery_pairs_with_info)) {
+    trt_cells <- sceptre_object@cells_in_use[sceptre_object@grna_assignments$grna_group_idxs[[discovery_pairs_with_info$grna_group[i]]]]
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_trt[i],
+      sum(response_matrix[discovery_pairs_with_info$response_id[i], trt_cells] > 0)
+    )
+    
+    # complement control group
+    cntrl_cells <- setdiff(sceptre_object@cells_in_use, trt_cells)
+    expect_equal(
+      discovery_pairs_with_info$n_nonzero_cntrl[i],
+      sum(response_matrix[discovery_pairs_with_info$response_id[i], cntrl_cells] > 0)
+    )
+  }
 
   # confirm that n_trt and n_cntrl are calculated correctly
   expect_true(all(disc_results$n_trt == 10))

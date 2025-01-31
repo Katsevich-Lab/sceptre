@@ -40,9 +40,9 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
 
     // 1.2 update n_nonzero_tot for this gene
     n_nonzero_tot[row_idx] = 0;
-    if (remove_cells_w_zero_or_twoplus_grnas) { // low-MOI
+    if (!control_group_complement & remove_cells_w_zero_or_twoplus_grnas) {
       for (int k = 0; k < n_nt_grnas; k ++) n_nonzero_tot[row_idx] += M(k, row_idx);
-    } else { // high-MOI and low-MOI when not removing cells with zero or two-plus grnas
+    } else {
       for (int k = 0; k < y_sub.size(); k++) if (y_sub[k]) n_nonzero_tot[row_idx] ++;
     }
 

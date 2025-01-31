@@ -209,7 +209,6 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   return(NULL)
 }
 
-
 check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters, n_processors) {
   if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
     stop("`assignment_method` must be `mixture`, `maximum`, or `thresholding`.")
@@ -281,7 +280,7 @@ check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperpar
 }
 
 
-check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range, remove_cells_w_zero_or_twoplus_grnas, initial_grna_assignment_list, low_moi) {
+check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, response_n_umis_range, response_n_nonzero_range, remove_cells_w_zero_or_twoplus_grnas, initial_grna_assignment_list, low_moi, grna_assignment_method) {
   if (n_nonzero_trt_thresh < 0 || n_nonzero_cntrl_thresh < 0) {
     stop("`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.")
   }
@@ -301,6 +300,9 @@ check_run_qc_inputs <- function(n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, re
   }
   if (remove_cells_w_zero_or_twoplus_grnas && !low_moi) {
     stop("`remove_cells_w_zero_or_twoplus_grnas` must be set to FALSE in low MOI.")
+  }
+  if (!remove_cells_w_zero_or_twoplus_grnas && grna_assignment_method == "maximum"){
+    stop("`remove_cells_w_zero_or_twoplus_grnas` must be set to TRUE when using the maximum assignment method.")
   }
   return(NULL)
 }
