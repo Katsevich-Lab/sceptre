@@ -18,7 +18,6 @@ See the [frequently asked questions page](https://timothy-barry.github.io/sceptr
 
 ```{r,message = FALSE}
 library(sceptre)
-
 ```
 
 The standard pipeline involved in applying `sceptre` to analyze a dataset consists of several steps, which we summarize in the following schematic.

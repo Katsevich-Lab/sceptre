@@ -112,10 +112,9 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
 
   # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
   if (!sceptre_object@control_group_complement) {
-    grna_assignments$indiv_nt_grna_idxs <- update_indiv_grna_assignments_for_nt_cells(
-      grna_assignments$indiv_nt_grna_idxs,
-      grna_assignments$all_nt_idxs
-    )
+    l <- update_indiv_grna_assignments_for_nt_cells(grna_assignments$indiv_nt_grna_idxs)
+    grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
+    grna_assignments$all_nt_idxs <- l$all_nt_idxs
   }
 
   # 4. update the sceptre_object and return
@@ -123,12 +122,15 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   return(sceptre_object)
 }
 
-update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs, all_nt_idxs) {
+update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
   out <- list()
   nt_grnas <- names(indiv_nt_grna_idxs)
+  all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
   # updated to no longer assume that indiv_nt_grna_idxs has nonoverlapping entries
   indiv_nt_grna_idxs <- lapply(indiv_nt_grna_idxs, function(idx) {
     match(idx, all_nt_idxs)
   }) |> stats::setNames(nt_grnas)
-  return(indiv_nt_grna_idxs)
+  out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
+  out$all_nt_idxs <- all_nt_idxs
+  return(out)
 }

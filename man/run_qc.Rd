@@ -28,7 +28,7 @@ run_qc(
 
 \item{p_mito_threshold}{(optional; default \code{0.2}) a numeric value specifying the location at which to clip the right tail of the \code{response_p_mito} distribution}
 
-\item{remove_cells_w_zero_or_twoplus_grnas}{(optional; default \code{TRUE} in low MOI and \code{FALSE} in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs. For low-MOI, consider setting this to \code{FALSE} in order to count cells with a targeting and a non-targeting gRNA as targeting (as is the case for the default \code{treatment_group = "exclusive"}) and cells with multiple NT gRNAs as controls.}
+\item{remove_cells_w_zero_or_twoplus_grnas}{(optional; default \code{TRUE} in low MOI and \code{FALSE} in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs. For low-MOI, consider setting this to \code{FALSE} in order to count cells with a targeting and a non-targeting gRNA as targeting and cells with multiple NT gRNAs as controls.}
 
 \item{additional_cells_to_remove}{(optional) a vector of integer indices specifying additional cells to remove}
 }

@@ -80,8 +80,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
     scep_low_all_1@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part_all_1,
-      indiv_nt_grna_idxs = nt_part_all_1,
-      all_nt_idxs = integer(0)
+      indiv_nt_grna_idxs = nt_part_all_1
     )
   )
   # should be empty for maximum assignment
@@ -130,8 +129,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
         t1_c1_d1 = c(1L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L, 23L, 24L, 2L),
         t1_c2_d1 = 3:4, t1_c3_d1 = 5:6, t2_c3_d1 = 7:8
       ),
-      indiv_nt_grna_idxs = list(nt1 = 9L, nt2 = 10L, nt3 = 11L),
-      all_nt_idxs = c(9L, 10L, 11L)
+      indiv_nt_grna_idxs = list(nt1 = 9L, nt2 = 10L, nt3 = 11L)
     )
   )
   # should be empty for maximum assignment
@@ -223,8 +221,7 @@ test_that("assign_grnas method=threshold moi=low", {
     scep_low_with_low_thresh@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part,
-      indiv_nt_grna_idxs = nt_part,
-      all_nt_idxs = integer(0)
+      indiv_nt_grna_idxs = nt_part
     )
   )
 
@@ -261,8 +258,7 @@ test_that("assign_grnas method=threshold moi=low", {
     scep_low_with_high_thresh@grna_assignments_raw,
     list(
       grna_group_idxs = guide_part,
-      indiv_nt_grna_idxs = nt_part,
-      all_nt_idxs = integer(0)
+      indiv_nt_grna_idxs = nt_part
     )
   )
   expect_equal(scep_low_with_high_thresh@grnas_per_cell, rep(1, num_cells))
@@ -425,9 +421,7 @@ test_that("assign_grnas with remove_cells_w_zero_or_twoplus_grnas", {
       # cell 1 is excluded from all lists because it has multiple targeting guides
       grna_group_idxs = list(target_1 = 2:3, target_2 = 4:5, target_3 = 6:7),
       # indiv_nt_grna_idxs contains cells with each NT guide and no targeting guides
-      indiv_nt_grna_idxs = list(nt_1 = 8:9, nt_2 = 10L),
-      # all_nt_idxs contains cells with only NT guides
-      all_nt_idxs = 8:10
+      indiv_nt_grna_idxs = list(nt_1 = 8:9, nt_2 = 10L)
     )
   )
 
