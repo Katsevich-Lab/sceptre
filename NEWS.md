@@ -1,3 +1,21 @@
+# sceptre 0.10.3 (2025-01-31)
+
+Version 0.10.3 is a minor update, containing the following changes: 
+
+- We added the optional logical argument `remove_cells_w_zero_or_twoplus_grnas` 
+to `run_qc()`, which is relevant for low-MOI analyses with `control_group = "nt_cells".` 
+If set to `TRUE`, then cells with zero or two or more gRNAs are removed from the analysis, as before.
+If set to `FALSE`, then cells with multiple gRNAs are kept in the analysis if 
+they contain at most one targeting gRNA. For these cells, a perturbation identity
+can be unambiguously defined, and their inclusion increases the number of cells
+available for downstream analysis.
+- The data frames outputted by the calibration check, power check, and discovery 
+analysis have two additional columns called `n_trt` and `n_cntrl`, giving the 
+number of cells used in the treatment and control groups, respectively.
+- We have resolved the plotting bug described in [this issue](https://github.com/Katsevich-Lab/sceptre/issues/162).
+- We have added a check in `construct_cis_pairs()` that `grna_target_data_frame`
+has columns `chr`, `start`, and `end`, resolving [this issue](https://github.com/Katsevich-Lab/sceptre/issues/164).
+
 # sceptre 0.10.2 (2025-01-17)
 
 Version 0.10.2 is a minor update in which we replaced the larger, real example

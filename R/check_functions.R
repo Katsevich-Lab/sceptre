@@ -124,7 +124,7 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
   grna_matrix <- get_grna_matrix(sceptre_object)
   covariate_data_frame <- sceptre_object@covariate_data_frame
   grna_target_data_frame <- sceptre_object@grna_target_data_frame
-
+  
   # 1. if response_grna_target_pairs has been supplied, check its characteristics
   for (idx in seq_along(response_grna_target_pairs_list)) {
     response_grna_target_pairs <- response_grna_target_pairs_list[[idx]]
@@ -152,60 +152,60 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
       }
     }
   }
-
+  
   # 2. check that there are no offsets in the formula object
   if (grepl("offset", as.character(formula_object)[2])) stop("Offsets are not currently supported in formula objects.")
-
+  
   # 3. check that the variables in the formula object are a subset of the column names of the covariate data frame
   formula_object_vars <- all.vars(formula_object)
   check_var <- formula_object_vars %in% colnames(covariate_data_frame)
   if (!all(check_var)) {
     stop(paste0("The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: ", paste0(formula_object_vars[!check_var], collapse = ", ")))
   }
-
+  
   # 4. verify that control group is either nt_cells, complement, or default
   if (!control_group %in% c("nt_cells", "complement", "default")) {
     stop("`control_group` should set to `nt_cells`, `complement`, or `default`.")
   }
-
+  
   # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
   if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
     stop("`resampling_mechanism` should set to `permutations`, `crt`, or `default`.")
   }
-
-  # 6. verify that, if the control_group is NT cells, there are NT gRNAs present
+  
+  # 6. verify that the moi is consistent with the control group
+  if (!low_moi && control_group == "nt_cells") {
+    stop("The control group cannot be the NT cells in high MOI.")
+  }
+  
+  # 7. verify that, if the control_group is NT cells, there are NT gRNAs present
   if (control_group == "nt_cells") {
     nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
     if (!nt_present) {
       stop("The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'.")
     }
   }
-
-  # 7. verify that "side" is among "both", "left", or "right"
+  
+  # 8. verify that "side" is among "both", "left", or "right"
   if (!(side %in% c("both", "left", "right"))) {
     stop("`side` must be one of 'both', 'left', or 'right'.")
   }
-
-  # 8. verify that "grna_integration_strategy" is union or singleton
+  
+  # 9. verify that "grna_integration_strategy" is union or singleton
   if (!(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))) {
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
-
-  # 9. if using a backing .odm file, verify that resampling mechanism is permutations
+  
+  # 10. if using a backing .odm file, verify that resampling mechanism is permutations
   if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")
   }
-
-  # 10. verify resampling_approximation acceptable
+  
+  # 11. verify resampling_approximation acceptable
   if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
     stop("`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.")
   }
   
-  # 11. verify that control_group is not nt_cells for high MOI
-  if (!sceptre_object@low_moi && control_group == "nt_cells") {
-    stop("`control_group` cannot be `nt_cells` in high-MOI.")
-  }
-
   return(NULL)
 }
 
