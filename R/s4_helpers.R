@@ -56,7 +56,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' print(sceptre_object)
 setMethod("print", signature = signature("sceptre_object"), function(x) {
   show(x)
-
+  
   # 1. print analysis status
   funct_run_vect <- x@functs_called
   get_mark <- function(bool) ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
@@ -64,7 +64,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
   for (i in seq_along(funct_run_vect)) {
     cat(paste0("\t", get_mark(funct_run_vect[i]), " ", names(funct_run_vect)[i], "()\n"))
   }
-
+  
   # 2. print analysis parameters
   n_discovery_pairs <- x@n_discovery_pairs
   disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
@@ -93,7 +93,11 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
       )
     },
     "\n\t\U2022 Sidedness of test: ", if (length(x@side_code) == 0L) "not specified" else crayon::blue(c("left", "both", "right")[x@side_code + 2L]),
-    paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells"))),
+    if (!x@low_moi) {
+      NULL
+    } else {
+      paste0("\n\t\U2022 Control group: ", if (length(x@control_group_complement) == 0L) "not specified" else crayon::blue(ifelse(x@control_group_complement, "complement set", "non-targeting cells")))
+    },
     "\n\t\U2022 Resampling mechanism: ", if (length(x@run_permutations) == 0L) "not specified" else crayon::blue(ifelse(x@run_permutations, "permutations", "conditional resampling")),
     "\n\t\U2022 gRNA integration strategy: ", if (length(x@grna_integration_strategy) == 0L) "not specified" else crayon::blue(x@grna_integration_strategy),
     "\n\t\U2022 Resampling approximation: ", if (length(x@resampling_approximation) == 0L) "not specified" else crayon::blue(gsub(pattern = "_", replacement = " ", fixed = TRUE, x = x@resampling_approximation)),
@@ -102,7 +106,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     "\n\t\U2022 N nonzero control cells threshold: ", if (length(x@n_nonzero_cntrl_thresh) == 0L) "not specified" else crayon::blue(x@n_nonzero_cntrl_thresh),
     "\n\t\U2022 Formula object: ", if (length(x@formula_object) == 0L) "not specified" else crayon::blue(as.character(x@formula_object)[2])
   ))
-
+  
   # 3. print the gRNA-to-cell assignment information
   grna_assignment_run <- funct_run_vect[["assign_grnas"]]
   if (grna_assignment_run) {
@@ -117,7 +121,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
       if (x@grna_assignment_method == "mixture") paste0("\n\t\U2022 gRNA assignment formula object: ", crayon::blue(as.character(x@grna_assignment_hyperparameters$formula_object)[2])) else NULL
     )
   }
-
+  
   # 4. print the results summary
   calib_check_run <- funct_run_vect[["run_calibration_check"]]
   discovery_analysis_run <- funct_run_vect[["run_discovery_analysis"]]
@@ -142,7 +146,6 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     cat(paste0("\n\t\U2022 N", crayon::yellow(" discovery pairs "), "called as significant: ", crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))))
   }
 })
-
 
 #' Plot
 #'

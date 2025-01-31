@@ -1,6 +1,6 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
-Version: 0.10.2
+Version: 0.10.3
 Authors@R: 
     c(person(given = "Timothy",
            family = "Barry",
