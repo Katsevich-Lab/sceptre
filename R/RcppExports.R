@@ -86,8 +86,8 @@ compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_th
     .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }
 
-compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
-    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
+compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, remove_cells_w_zero_or_twoplus_grnas, cells_in_use) {
+    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, remove_cells_w_zero_or_twoplus_grnas, cells_in_use)
 }
 
 compute_empirical_p_value <- function(null_statistics, z_orig, side) {

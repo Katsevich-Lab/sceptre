@@ -10,7 +10,7 @@ using namespace Rcpp;
 List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub,
                                                  List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs,
                                                  IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs,
-                                                 bool control_group_complement, IntegerVector cells_in_use) {
+                                                 bool control_group_complement, bool remove_cells_w_zero_or_twoplus_grnas, IntegerVector cells_in_use) {
   // 0. initialize variables and objects
   int n_nt_grnas = indiv_nt_grna_idxs.size(), n_genes = p.size() - 1, n_pairs = to_analyze_response_idxs.size(), pair_pointer = 0, n_nonzero = 0, curr_n_nonzero_cntrl = 0, curr_n_nonzero_trt = 0;
   IntegerVector curr_idxs, n_nonzero_tot(n_genes), n_nonzero_trt(n_pairs), n_nonzero_cntrl(n_pairs);
@@ -40,7 +40,7 @@ List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector 
 
     // 1.2 update n_nonzero_tot for this gene
     n_nonzero_tot[row_idx] = 0;
-    if (!control_group_complement) {
+    if (!control_group_complement & remove_cells_w_zero_or_twoplus_grnas) {
       for (int k = 0; k < n_nt_grnas; k ++) n_nonzero_tot[row_idx] += M(k, row_idx);
     } else {
       for (int k = 0; k < y_sub.size(); k++) if (y_sub[k]) n_nonzero_tot[row_idx] ++;

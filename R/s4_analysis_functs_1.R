@@ -62,7 +62,7 @@ set_analysis_parameters <- function(sceptre_object,
 
   # 1. handle default arguments
   if (!sceptre_object@low_moi) {
-    control_group <- "complement"
+    if (control_group == "default") control_group <- "complement"
     if (resampling_mechanism == "default") resampling_mechanism <- "crt"
   }
   if (sceptre_object@low_moi) {
@@ -233,6 +233,7 @@ assign_grnas <- function(sceptre_object, method = "default", print_progress = TR
 #' @param response_n_umis_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_umis` distribution
 #' @param response_n_nonzero_range (optional; default `c(0.01, 0.99)`) a length-two vector of percentiles specifying the location at which to clip the left and right tails of the `response_n_nonzero` distribution
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying the location at which to clip the right tail of the `response_p_mito` distribution
+#' @param remove_cells_w_zero_or_twoplus_grnas (optional; default `TRUE` in low MOI and `FALSE` in high MOI) a logical specifying whether to remove cells that contain zero or multiple gRNAs. For low-MOI, consider setting this to `FALSE` in order to count cells with a targeting and a non-targeting gRNA as targeting and cells with multiple NT gRNAs as controls.
 #' @param additional_cells_to_remove (optional) a vector of integer indices specifying additional cells to remove
 #'
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have been applied
@@ -270,6 +271,7 @@ run_qc <- function(sceptre_object,
                    response_n_umis_range = c(0.01, 0.99),
                    response_n_nonzero_range = c(0.01, 0.99),
                    p_mito_threshold = 0.2,
+                   remove_cells_w_zero_or_twoplus_grnas = NULL,
                    additional_cells_to_remove = integer()) {
   run_qc_pt_1(
     sceptre_object,
@@ -278,6 +280,7 @@ run_qc <- function(sceptre_object,
     response_n_umis_range,
     response_n_nonzero_range,
     p_mito_threshold,
+    remove_cells_w_zero_or_twoplus_grnas,
     additional_cells_to_remove
   ) |>
     run_qc_pt_2()
@@ -290,10 +293,21 @@ run_qc_pt_1 <- function(sceptre_object,
                         response_n_umis_range = c(0.01, 0.99),
                         response_n_nonzero_range = c(0.01, 0.99),
                         p_mito_threshold = 0.2,
+                        remove_cells_w_zero_or_twoplus_grnas = NULL,
                         additional_cells_to_remove = integer()) {
   # cellwise start
   # 1. verify that function called in correct order
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
+
+  # 1.5 set default value of remove_cells_w_zero_or_twoplus_grnas
+  if (is.null(remove_cells_w_zero_or_twoplus_grnas)) {
+    if(sceptre_object@low_moi){
+      remove_cells_w_zero_or_twoplus_grnas <- TRUE
+    } else{
+      remove_cells_w_zero_or_twoplus_grnas <- FALSE
+    }
+  }
+  sceptre_object@remove_cells_w_zero_or_twoplus_grnas <- remove_cells_w_zero_or_twoplus_grnas
 
   # 2. check inputs
   check_run_qc_inputs(
@@ -301,7 +315,10 @@ run_qc_pt_1 <- function(sceptre_object,
     n_nonzero_cntrl_thresh,
     response_n_umis_range,
     response_n_nonzero_range,
-    sceptre_object@initial_grna_assignment_list
+    remove_cells_w_zero_or_twoplus_grnas,
+    sceptre_object@initial_grna_assignment_list,
+    sceptre_object@low_moi,
+    sceptre_object@grna_assignment_method
   ) |> invisible()
 
   # 2.5 update fields of sceptre_object
@@ -321,7 +338,7 @@ run_qc_pt_1 <- function(sceptre_object,
   # 5. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(
     sceptre_object, response_n_umis_range, response_n_nonzero_range,
-    p_mito_threshold, additional_cells_to_remove
+    p_mito_threshold, remove_cells_w_zero_or_twoplus_grnas, additional_cells_to_remove
   )
 
   # 6. determine whether to reset response precomputation

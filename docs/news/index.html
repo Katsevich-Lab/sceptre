@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sceptre</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,6 +80,14 @@
       <small>Source: <a href="https://github.com/Katsevich-Lab/sceptre/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.3" id="sceptre-0103-2025-01-31">sceptre 0.10.3 (2025-01-31)<a class="anchor" aria-label="anchor" href="#sceptre-0103-2025-01-31"></a></h2>
+<p>Version 0.10.3 is a minor update, containing the following changes:</p>
+<ul><li>We added the optional logical argument <code>remove_cells_w_zero_or_twoplus_grnas</code> to <code><a href="../reference/run_qc.html">run_qc()</a></code>, which is relevant for low-MOI analyses with <code>control_group = "nt_cells".</code> If set to <code>TRUE</code>, then cells with zero or two or more gRNAs are removed from the analysis, as before. If set to <code>FALSE</code>, then cells with multiple gRNAs are kept in the analysis if they contain at most one targeting gRNA. For these cells, a perturbation identity can be unambiguously defined, and their inclusion increases the number of cells available for downstream analysis.</li>
+<li>The data frames outputted by the calibration check, power check, and discovery analysis have two additional columns called <code>n_trt</code> and <code>n_cntrl</code>, giving the number of cells used in the treatment and control groups, respectively.</li>
+<li>We have resolved the plotting bug described in <a href="https://github.com/Katsevich-Lab/sceptre/issues/162" class="external-link">this issue</a>.</li>
+<li>We have added a check in <code><a href="../reference/construct_cis_pairs.html">construct_cis_pairs()</a></code> that <code>grna_target_data_frame</code> has columns <code>chr</code>, <code>start</code>, and <code>end</code>, resolving <a href="https://github.com/Katsevich-Lab/sceptre/issues/164" class="external-link">this issue</a>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.10.2" id="sceptre-0102-2025-01-17">sceptre 0.10.2 (2025-01-17)<a class="anchor" aria-label="anchor" href="#sceptre-0102-2025-01-17"></a></h2>
 <p>Version 0.10.2 is a minor update in which we replaced the larger, real example data by smaller, simulated example data. Furthermore, the example data now live in the <code>sceptre</code> package, rather than in the external <code>sceptredata</code> package. Finally, the R-CMD-CHECK badge was restored on the website.</p>

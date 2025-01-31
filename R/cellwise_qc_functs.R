@@ -1,4 +1,4 @@
-determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, response_n_nonzero_range, p_mito_threshold, additional_cells_to_remove) {
+determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, response_n_nonzero_range, p_mito_threshold, remove_cells_w_zero_or_twoplus_grnas, additional_cells_to_remove) {
   # 1. remove additional cells specified by the user
   cells_to_exclude_user_specified <- additional_cells_to_remove
   n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
@@ -22,9 +22,13 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
     n_cells_rm_p_mito <- 0L
   }
 
-  # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
-  cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
-  n_cells_rm_zero_twoplus_grnas <- length(sceptre_object@cells_w_zero_or_twoplus_grnas)
+  # 4. compute cells to retain based on cells containing multiple grnas (if desired)
+  if(remove_cells_w_zero_or_twoplus_grnas) {
+    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+  } else{
+    cells_to_exclude_zero_twoplus_grnas <- integer()
+  }
+  n_cells_rm_zero_twoplus_grnas <- length(cells_to_exclude_zero_twoplus_grnas)
 
   # 5. finally, determine the set of cells to retain, and update the sceptre_object
   cells_to_exclude <- c(
@@ -50,17 +54,43 @@ determine_cells_to_retain <- function(sceptre_object, response_n_umis_range, res
 
 
 update_grna_assignments_given_qc <- function(sceptre_object) {
-  # 0. define several varaibles
+  # 0. define several variables
   cells_in_use <- sceptre_object@cells_in_use
   grna_assignments_raw <- sceptre_object@grna_assignments_raw
   n_cells <- ncol(get_response_matrix(sceptre_object))
 
   # 1. define update idxs funct
-  update_idxs <- function(v, cells_in_use, n_cells) {
+  # update_idxs <- function(v, cells_in_use, n_cells) {
+  #   v_log <- logical(length = n_cells)
+  #   v_log[v] <- TRUE
+  #   v_log_sub <- v_log[cells_in_use] # subset step
+  #   v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
+  #   return(v_updated)
+  # }
+
+  # 1. define update idxs funct
+  # The sort argument is for backward compatibility. Setting sort = FALSE for
+  # all_nt_idxs makes the function compatible with previous versions of the package.
+  # This argument specifies whether the indices outputted by the function are sorted.
+  update_idxs <- function(v, cells_in_use, n_cells, sort = TRUE) {
+    # Create a logical vector indicating which positions of length n_cells are used
     v_log <- logical(length = n_cells)
     v_log[v] <- TRUE
-    v_log_sub <- v_log[cells_in_use] # subset step
-    v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
+
+    # Subset to 'cells_in_use'
+    v_log_sub <- v_log[cells_in_use]
+
+    if (sort) {
+      # Original behavior: which(...) returns sorted indices by definition
+      v_updated <- which(v_log_sub)
+    } else {
+      # Preserve the original order from 'v'
+      # by matching each v[i] to its position in 'cells_in_use'
+      v_idx <- match(v, cells_in_use)
+      # Keep only the non-NA matches (these correspond to valid sub-indices in 'cells_in_use')
+      v_updated <- v_idx[!is.na(v_idx)]
+    }
+
     return(v_updated)
   }
 
@@ -71,9 +101,14 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) {
     update_idxs(v, cells_in_use, n_cells)
   }) |> stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
+  all_nt_idxs_new <- grna_assignments_raw$all_nt_idxs |>
+    update_idxs(cells_in_use, n_cells, sort = FALSE)
+
   # remove those nt grnas with 0 cells (after QC)
   nt_idxs_new <- nt_idxs_new[vapply(nt_idxs_new, length, FUN.VALUE = integer(1)) != 0L]
-  grna_assignments <- list(grna_group_idxs = grna_group_idxs_new, indiv_nt_grna_idxs = nt_idxs_new)
+  grna_assignments <- list(grna_group_idxs = grna_group_idxs_new,
+                           indiv_nt_grna_idxs = nt_idxs_new,
+                           all_nt_idxs = all_nt_idxs_new)
 
   # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
   if (!sceptre_object@control_group_complement) {
@@ -87,16 +122,13 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
   return(sceptre_object)
 }
 
-
 update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
   out <- list()
   nt_grnas <- names(indiv_nt_grna_idxs)
   all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
-  n_cells_per_nt <- vapply(indiv_nt_grna_idxs, length, FUN.VALUE = integer(1))
-  stop <- cumsum(n_cells_per_nt)
-  start <- c(0L, stop[-length(stop)]) + 1L
-  indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-    seq(start[i], stop[i])
+  # updated to no longer assume that indiv_nt_grna_idxs has nonoverlapping entries
+  indiv_nt_grna_idxs <- lapply(indiv_nt_grna_idxs, function(idx) {
+    match(idx, all_nt_idxs)
   }) |> stats::setNames(nt_grnas)
   out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
   out$all_nt_idxs <- all_nt_idxs

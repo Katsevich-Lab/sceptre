@@ -34,6 +34,7 @@ setClass("sceptre_object",
     multiple_testing_method = "character",
     cell_removal_metrics = "integer",
     cellwise_qc_thresholds = "list",
+    remove_cells_w_zero_or_twoplus_grnas = "logical",
 
     # computed objects
     mitochondrial_gene = "logical",

@@ -368,3 +368,96 @@ test_that("assign_grnas method=mixture moi=high", {
   expect_equal(scep_high_mixture@initial_grna_assignment_list$grna_3, cells_getting_grna_3)
   expect_equal(scep_high_mixture@initial_grna_assignment_list$nt_1, cells_getting_nt_1)
 })
+
+test_that("assign_grnas with remove_cells_w_zero_or_twoplus_grnas", {
+  set.seed(1312)
+  num_guides <- 3
+  num_nt <- 2
+  num_cells <- 10
+  num_responses <- 20
+
+  grna_target_data_frame <- data.frame(
+    grna_id = c(paste0("grna_", 1:num_guides), paste0("nt_", 1:num_nt)),
+    grna_target = c("target_1", "target_2", "target_3", rep("non-targeting", num_nt)),
+    chr = "", start = 0, end = 1
+  )
+
+  grna_matrix <- sample(0:2, (num_guides + num_nt) * num_cells, TRUE) |>
+    matrix(ncol = num_cells) |>
+    `rownames<-`(grna_target_data_frame$grna_id)
+  cells_getting_grna_1 <- c(1, 2, 3)
+  cells_getting_grna_2 <- c(1, 4, 5)
+  cells_getting_grna_3 <- c(1, 6:7)
+  cells_getting_nt_1 <- c(2, 8:9)
+  cells_getting_nt_2 <- c(2, 10)
+
+  expressed_value <- 20
+  grna_matrix["grna_1", cells_getting_grna_1] <- expressed_value
+  grna_matrix["grna_2", cells_getting_grna_2] <- expressed_value
+  grna_matrix["grna_3", cells_getting_grna_3] <- expressed_value
+  grna_matrix["nt_1", cells_getting_nt_1] <- expressed_value
+  grna_matrix["nt_2", cells_getting_nt_2] <- expressed_value
+
+  response_matrix <- sample(0:2, num_responses * num_cells, TRUE) |>
+    matrix(ncol = num_cells) |>
+    `rownames<-`(paste0("response_", 1:num_responses))
+
+  scep_low_threshold <- import_data(
+    grna_matrix = grna_matrix,
+    response_matrix = response_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    moi = "low"
+  ) |>
+    set_analysis_parameters(
+      discovery_pairs = data.frame(
+        grna_target = "target_1", response_id = "response_1"
+      )
+    ) |>
+    assign_grnas(method = "thresholding")
+
+  expect_equal(
+    scep_low_threshold@grna_assignments_raw,
+    list(
+      # cell 1 is excluded from all lists because it has multiple targeting guides
+      grna_group_idxs = list(target_1 = 2:3, target_2 = 4:5, target_3 = 6:7),
+      # indiv_nt_grna_idxs contains cells with each NT guide and no targeting guides
+      indiv_nt_grna_idxs = list(nt_1 = 8:9, nt_2 = 10L)
+    )
+  )
+
+  scep_low_threshold_qc_remove_z_two_plus <- scep_low_threshold |>
+    run_qc(response_n_nonzero_range = c(0, 1),
+           response_n_umis_range = c(0,1),
+           n_nonzero_trt_thresh = 0,
+           n_nonzero_cntrl_thresh = 0,
+           remove_cells_w_zero_or_twoplus_grnas = TRUE)
+
+  # cells 1 and 2 got excluded because they had two gRNAs each
+  expect_equal(scep_low_threshold_qc_remove_z_two_plus@cells_in_use,
+               3:10)
+
+  expect_equal(scep_low_threshold_qc_remove_z_two_plus@grna_assignments,
+               list(grna_group_idxs = list(target_1 = 1L,
+                                           target_2 = 2:3,
+                                           target_3 = 4:5),
+                    # NT gRNAs got reindexed with respect to all NT cells
+                    indiv_nt_grna_idxs = list(nt_1 = 1:2,
+                                              nt_2 = 3L),
+                    all_nt_idxs = 6:8))
+
+  scep_low_threshold_qc_dont_remove_z_two_plus <- scep_low_threshold |>
+    run_qc(response_n_nonzero_range = c(0, 1),
+           response_n_umis_range = c(0,1),
+           n_nonzero_trt_thresh = 0,
+           n_nonzero_cntrl_thresh = 0,
+           remove_cells_w_zero_or_twoplus_grnas = FALSE)
+
+  # no cells got removed
+  expect_equal(scep_low_threshold_qc_dont_remove_z_two_plus@cells_in_use,
+               1:10)
+
+  expect_equal(scep_low_threshold_qc_dont_remove_z_two_plus@grna_assignments,
+               # same as grna_assignment_raw, but re-indexing NT gRNAs
+               list(grna_group_idxs = list(target_1 = 2:3, target_2 = 4:5, target_3 = 6:7),
+                    indiv_nt_grna_idxs = list(nt_1 = 1:2, nt_2 = 3L), all_nt_idxs = 8:10))
+})
