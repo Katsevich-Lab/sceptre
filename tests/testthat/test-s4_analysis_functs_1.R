@@ -200,7 +200,7 @@ test_that("set_analysis_parameters", {
         discovery_pairs = discovery_pairs,
         control_group = "nt_cells"
       ),
-    regex = "`control_group` cannot be `nt_cells` in high-MOI."
+    regex = "The control group cannot be the NT cells in high MOI."
   )
 
 })
