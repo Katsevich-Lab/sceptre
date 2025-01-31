@@ -111,7 +111,7 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
                            all_nt_idxs = all_nt_idxs_new)
 
   # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
-  if (!sceptre_object@control_group_complement & !sceptre_object@treatment_group_inclusive) {
+  if (!sceptre_object@control_group_complement) {
     grna_assignments$indiv_nt_grna_idxs <- update_indiv_grna_assignments_for_nt_cells(
       grna_assignments$indiv_nt_grna_idxs,
       grna_assignments$all_nt_idxs
