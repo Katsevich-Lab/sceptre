@@ -3,7 +3,7 @@ using namespace Rcpp;
 
 #ifndef ESTIMATE_LOG_FOLD_CHANGE_V2
 #define ESTIMATE_LOG_FOLD_CHANGE_V2
-double estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt);
+std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt);
 #endif
 
 #ifndef COMPUTE_EMPIRICAL_P_VALUE

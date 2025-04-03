@@ -94,7 +94,9 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   List out;
 
   // estimate the log fold change
-  double lfc = estimate_log_fold_change_v2(y, mu, trt_idxs, n_trt);
+  std::vector<double> fc_out = estimate_log_fold_change_v2(y, mu, trt_idxs, n_trt);
+  double fc = fc_out[0];
+  double se_over_root_n = fc_out[1];
 
   // compute the original statistic
   double z_orig = compute_observed_full_statistic_v2(a, w, D, trt_idxs);
@@ -127,9 +129,9 @@ SEXP run_low_level_test_full_v4(NumericVector y,
 
   // construct output
   if (return_resampling_dist) {
-    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = stage, Named("sn_params") = sn_params, Named("resampling_dist") = null_statistics);
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("fc") = fc, Named("se_over_root_n") = se_over_root_n, Named("stage") = stage, Named("sn_params") = sn_params, Named("resampling_dist") = null_statistics);
   } else {
-    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("lfc") = lfc, Named("stage") = stage, Named("sn_params") = sn_params);
+    out = List::create(Named("p") = p, Named("z_orig") = z_orig, Named("fc") = fc, Named("se_over_root_n") = se_over_root_n, Named("stage") = stage, Named("sn_params") = sn_params);
   }
 
   return(out);
