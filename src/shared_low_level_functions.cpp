@@ -9,13 +9,17 @@ using boost::math::skew_normal;
 #include <algorithm>
 
 
-double estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt) {
-  double sum_y = 0, sum_mu = 0, n_trt_double = (double) n_trt;
+std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt) {
+  double sum_y = 0, sum_mu = 0, sum_y2 = 0, curr_y = 0, n_trt_double = (double) n_trt;
   for (int i = 0; i < n_trt; i ++) {
-    sum_y += y[trt_idxs[i] - 1];
+    curr_y = y[trt_idxs[i] - 1];
+    sum_y += curr_y;
     sum_mu += mu[trt_idxs[i] - 1];
+    sum_y2 += curr_y * curr_y;
   }
-  return(log2(sum_y/n_trt_double) - log2(sum_mu/n_trt_double));
+  double fc = sum_y/n_trt_double - sum_mu/n_trt_double;
+  double se_over_root_n = sqrt((n_trt_double * sum_y2 - sum_y * sum_y)/(n_trt_double * sum_mu * sum_mu));
+  return std::vector<double> {fc, se_over_root_n};
 }
 
 
