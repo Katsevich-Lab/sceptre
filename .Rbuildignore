@@ -10,3 +10,5 @@
 ^LICENSE\.md$
 ^doc$
 ^Meta$
+^\.claude$
+^CLAUDE\.md$

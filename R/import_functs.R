@@ -134,6 +134,7 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #' @param directories a character vector of file paths to directories containing the output of one or more calls to Cell Ranger count. Each directory should contain the files `matrix.mtx.gz` and `features.tsv.gz` (and optionally `barcodes.tsv.gz`).
 #' @param moi a string indicating the MOI of the dataset, either "low" or "high".
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs should be assigned a label of "non-targeting". Optionally, `grna_target_data_frame` can contain columns `chr`, `start`, and `end`, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, `grna_target_data_frame` can contain the column `vector_id` specifying the vector to which a given gRNA belongs.
+#' @param compute_cell_cycle (optional; default `FALSE`) a logical value indicating whether to compute cell cycle scores during import. Uses Seurat's default parameters and gene sets. Only allowed when `use_ondisc = TRUE`.
 #' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an in-memory sparse matrix (`FALSE`).
 #' @param directory_to_write (optional) a string indicating the directory in which to write the backing `.odm` files (must be specified if `use_ondisc` is set to `TRUE`).
@@ -162,12 +163,17 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
 #'   use_ondisc = TRUE,
 #'   directory_to_write = tempdir()
 #' )
-import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, extra_covariates = data.frame(), use_ondisc = FALSE, directory_to_write = NULL) {
+import_data_from_cellranger <- function(directories, moi, grna_target_data_frame, compute_cell_cycle = FALSE, extra_covariates = data.frame(), use_ondisc = FALSE, directory_to_write = NULL) {
+  # validate compute_cell_cycle argument
+  if (compute_cell_cycle && !use_ondisc) {
+    stop("`compute_cell_cycle = TRUE` is only allowed when `use_ondisc = TRUE`.")
+  }
+  
   # take cases on use_ondisc
   if (!use_ondisc) {
     import_data_from_cellranger_memory(directories, moi, grna_target_data_frame, extra_covariates)
   } else {
-    import_data_from_cellranger_use_ondisc(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write)
+    import_data_from_cellranger_use_ondisc(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write, compute_cell_cycle)
   }
 }
 
@@ -307,7 +313,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
 
 
 # 2. disk
-import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
+import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write, compute_cell_cycle = FALSE) {
   # 0. check that directory_to_write has been supplied
   if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
 
@@ -317,7 +323,8 @@ import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target
     directories_to_load = directories,
     directory_to_write = directory_to_write,
     write_cellwise_covariates = FALSE,
-    grna_target_data_frame = if (vector_supplied) grna_target_data_frame else NULL
+    grna_target_data_frame = if (vector_supplied) grna_target_data_frame else NULL,
+    compute_cell_cycle = compute_cell_cycle
   )
 
   # 1.5. update grna_target_data_frame, if vector supplied
