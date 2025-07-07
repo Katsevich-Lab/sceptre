@@ -1,6 +1,8 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
 Version: 0.10.2
+Author: Timothy Barry [aut, cre] (<tbarry@hsph.harvard.edu>), Joseph Deutsch [aut], Eugene Katsevich [aut]
+Maintainer: Timothy Barry <tbarry@hsph.harvard.edu>
 Authors@R: 
     c(person(given = "Timothy",
            family = "Barry",
