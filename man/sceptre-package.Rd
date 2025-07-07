@@ -145,7 +145,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Joseph Deutsch
+  \item Louis Deutsch
   \item Eugene Katsevich \email{ekatsevi@wharton.upenn.edu}
 }
 
