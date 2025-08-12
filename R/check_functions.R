@@ -113,6 +113,11 @@ check_import_data_inputs <- function(response_matrix, grna_matrix, grna_target_d
     stop("`extra_covariates` has infinite values that need to be removed.")
   }
 
+  # 14. Fail if grna_target_data_frame has NA values
+  if (any(is.na(grna_target_data_frame))) {
+    stop("`grna_target_data_frame` has NA values that need to be removed.")
+  }
+
   return(NULL)
 }
 
@@ -130,6 +135,10 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     response_grna_target_pairs <- response_grna_target_pairs_list[[idx]]
     if (nrow(response_grna_target_pairs) >= 1L) {
       df_name <- names(response_grna_target_pairs_list)[idx]
+      # 0. ensure no NA
+      if (any(is.na(response_grna_target_pairs))) {
+        stop("The `", df_name, "` data frame has NA values that need to be removed.")
+      }
       # i. verify that `grna_target` and `response_id` are columns
       if (!all(c("grna_target", "response_id") %in% colnames(response_grna_target_pairs))) {
         stop("The data frame `", df_name, "` must contain the columns `grna_target` and `response_id`.")
