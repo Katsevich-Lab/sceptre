@@ -55,6 +55,8 @@ jobs:
         if: ${{ matrix.config.os == 'macOS-latest' }}
         run: |
           Rscript -e "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
+          Rscript -e "install.packages('BiocManager')"
+          Rscript -e "BiocManager::install('Rhdf5lib', type = 'source')"
           Rscript -e "remotes::install_github('timothy-barry/ondisc')"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
