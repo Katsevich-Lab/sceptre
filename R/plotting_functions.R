@@ -173,7 +173,7 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   grna_ids <- grna_ids[assigned]
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- sample(x = grna_ids, size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+    grnas_to_plot <- sample(x = grna_ids, size = min(length(grna_ids), n_grnas_to_plot), replace = FALSE)
   } else {
     if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }

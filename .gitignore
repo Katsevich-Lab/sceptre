@@ -11,3 +11,4 @@ src/*.d
 src/*.so
 /doc/
 /Meta/
+.claude
