@@ -323,6 +323,14 @@ run_qc_pt_1 <- function(sceptre_object,
     sceptre_object, response_n_umis_range, response_n_nonzero_range,
     p_mito_threshold, additional_cells_to_remove
   )
+  # informative error/warning messages
+  frac_cells_removed_2p_grna <- sceptre_object@cell_removal_metrics[["n_cells_rm_zero_twoplus_grnas"]]/nrow(sceptre_object@covariate_data_frame)
+  if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@low_moi) {
+    warning("A large percentage of cells (", round(100 * frac_cells_removed_2p_grna, 3), "%) contain two or more gRNAs. Consider switching from a low-MOI to a high-MOI analysis.")
+  }
+  if (length(sceptre_object@cells_in_use) == 0) {
+    stop("All cells were removed as part of cellwise QC. Consider relaxing the cellwise QC thresholds (`response_n_umis_range`, `response_n_nonzero_range`, `p_mito_threshold`).", if (sceptre_object@low_moi) " Additionally, consider switching from a low-MOI to high-MOI analysis." else "")
+  }
 
   # 6. determine whether to reset response precomputation
   if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
