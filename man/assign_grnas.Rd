@@ -17,7 +17,7 @@ assign_grnas(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{method}{(optional) a string indicating the method to use to assign the gRNAs to cells, one of \code{"mixture"}, \code{"thresholding"}, or \code{"maximum"}}
+\item{method}{(optional) a string indicating the method to use to assign the gRNAs to cells, one of \code{"mixture"}, \code{"thresholding"}, or \code{"maximum"}. The default is \code{"maximum"} in low MOI and \code{"mixture"} in high MOI.}
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
