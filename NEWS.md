@@ -1,6 +1,6 @@
 # sceptre 0.10.3 (2025-08-28)
 
-In Version 0.10.3, we added standard errors to fold change estimates; see new `fold_change` and `se_fold_change` columns of association analysis outputs. In addition, we fixed bugs reported in issues [#162](https://github.com/Katsevich-Lab/sceptre/issues/162) and [#164](https://github.com/Katsevich-Lab/sceptre/issues/164), as well as a bug reported via email that arose when `grna_target_data_frame` contained `NA` values in the `grna_id` or `grna_target` columns.
+In Version 0.10.3, we added standard errors to fold change estimates; see new `fold_change` and `se_fold_change` columns of association analysis outputs. In addition, we fixed bugs reported in issues [#162](https://github.com/Katsevich-Lab/sceptre/issues/162), [#164](https://github.com/Katsevich-Lab/sceptre/issues/164), and [#187](https://github.com/Katsevich-Lab/sceptre/issues/187) as well as a bug reported via email that arose when `grna_target_data_frame` contained `NA` values in the `grna_id` or `grna_target` columns.
 
 # sceptre 0.10.2 (2025-01-17)
 
