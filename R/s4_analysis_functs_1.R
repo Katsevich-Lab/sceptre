@@ -144,7 +144,7 @@ set_analysis_parameters <- function(sceptre_object,
 #'
 #' @note See the manual for information about the method-specific additional arguments.
 #' @param sceptre_object a `sceptre_object`
-#' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of `"mixture"`, `"thresholding"`, or `"maximum"`
+#' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of `"mixture"`, `"thresholding"`, or `"maximum"`. The default is `"maximum"` in low MOI and `"mixture"` in high MOI.
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
 #' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
