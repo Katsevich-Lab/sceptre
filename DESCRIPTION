@@ -36,7 +36,8 @@ Imports:
     Rcpp (>= 1.0.9),
     scales,
     stats,
-    purrr
+    purrr,
+    parallelly
 Depends: 
     R (>= 4.1)
 Suggests:
