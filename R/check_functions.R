@@ -205,6 +205,23 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
     stop("`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.")
   }
 
+  # 9.5. warn about multi-target gRNAs in union mode
+  if (grna_integration_strategy == "union") {
+    multi_target_grna_ids <- grna_target_data_frame |>
+      dplyr::group_by(grna_id) |>
+      dplyr::summarize(n_targets = dplyr::n_distinct(grna_target), .groups = "drop") |>
+      dplyr::filter(n_targets > 1L)
+    if (nrow(multi_target_grna_ids) >= 1L) {
+      example_ids <- head(as.character(multi_target_grna_ids$grna_id), 5L)
+      warning(
+        "In `union` mode, some `grna_id`s map to multiple `grna_target`s. ",
+        "These guides will contribute treated cells to multiple target groups (overlapping treated sets), ",
+        "which can induce correlation across tests. ",
+        "Example `grna_id`s: ", paste0(example_ids, collapse = ", ")
+      )
+    }
+  }
+
   # 10. if using a backing .odm file, verify that resampling mechanism is permutations
   if (methods::is(get_response_matrix(sceptre_object), "odm") && (resampling_mechanism != "permutations")) {
     stop("`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.")

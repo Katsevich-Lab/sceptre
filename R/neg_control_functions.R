@@ -106,13 +106,15 @@ construct_negative_control_pairs_v2 <- function(sceptre_object, n_calibration_pa
 compute_calibration_group_size <- function(grna_target_data_frame) {
   median_group_size <- grna_target_data_frame |>
     dplyr::filter(grna_group != "non-targeting") |>
-    dplyr::pull(grna_group) |>
-    table() |>
+    dplyr::group_by(grna_group) |>
+    dplyr::summarize(n_guides = dplyr::n_distinct(grna_id), .groups = "drop") |>
+    dplyr::pull(n_guides) |>
     stats::median() |>
     round()
   n_ntc <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |>
-    nrow()
+    dplyr::summarize(n_guides = dplyr::n_distinct(grna_id)) |>
+    dplyr::pull(n_guides)
   calibration_group_size <- as.integer(min(median_group_size, n_ntc))
   return(calibration_group_size)
 }
