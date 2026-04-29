@@ -1,42 +1,42 @@
 ---
-title: "Getting started with sceptre" 
-output: rmarkdown::html_vignette 
-vignette: > 
-  %\VignetteIndexEntry{Getting started with sceptre} 
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteEncoding{UTF-8} 
+title: "Getting started with sceptre"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with sceptre}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 `sceptre` is an R package that facilitates statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. To get started, users should install `sceptre`.
 
-```{r, eval=FALSE}
+```{r install, eval=FALSE}
 install.packages("devtools")
 devtools::install_github("katsevich-lab/sceptre")
 ```
 
 See the [frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html) for tips on installing `sceptre` such that it runs as fast as possible. Users can load `sceptre` via a call to `library()`.
 
-```{r,message = FALSE}
+```{r library, message=FALSE}
 library(sceptre)
 
 ```
 
 The standard pipeline involved in applying `sceptre` to analyze a dataset consists of several steps, which we summarize in the following schematic.
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Standard `sceptre` pipeline")}
+```{r schematic, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Standard `sceptre` pipeline")}
 knitr::include_graphics("pipeline_schematic.png")
 ```
 
 This chapter illustrates application of `sceptre` to a small simulated CRISPRi screen of candidate enhancers, modeled on that of [Gasperini, 2019](https://pubmed.ncbi.nlm.nih.gov/30612741/). The goal of the analysis is to confidently link enhancers to genes by testing for changes in gene expression in response to the CRISPR perturbations of the candidate enhancers.
 
-```{r, echo = FALSE}
+```{r setup, echo = FALSE}
 library(Matrix)
 system("rm -rf ~/sceptre_outputs")
 ```
 
 Using `sceptre` is simple; carrying out an entire analysis requires only a few lines of code. Below, we provide a minimal working example of applying `sceptre` to analyze the example data. First, we load the example data into R via the function `import_data_from_cellranger()`, which creates a `sceptre_object`, an object-based representation of the single-cell CRISPR screen data. Next, we specify the gRNA-gene pairs that we seek to test for association. Then, we call the pipeline functions on the `sceptre_object` in order. Finally, we write the outputs to the directory `~/sceptre_outputs`.
 
-```{r, eval=FALSE}
+```{r minimal-example-shown, eval=FALSE}
 # load the data, creating a sceptre_object
 directories <- paste0(
   system.file("extdata", package = "sceptre"),
@@ -52,7 +52,7 @@ sceptre_object <- import_data_from_cellranger(
 # construct the grna-gene pairs to analyze
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(
-  sceptre_object, 
+  sceptre_object,
   positive_control_pairs = positive_control_pairs
 )
 
@@ -69,7 +69,7 @@ write_outputs_to_directory(sceptre_object, "~/sceptre_outputs")
 
 That's it. The directory `sceptre_outputs` now contains a variety of results and plots from the analysis, including the set of significant gRNA-gene pairs:
 
-```{r, echo=FALSE, message=FALSE, results = "hide"}
+```{r minimal-example-run, echo=FALSE, message=FALSE, results = "hide"}
 # load the data, creating a sceptre_object
 directories <- paste0(
   system.file("extdata", package = "sceptre"),
@@ -85,7 +85,7 @@ sceptre_object <- import_data_from_cellranger(
 # construct the grna-gene pairs to analyze
 positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 discovery_pairs <- construct_cis_pairs(
-  sceptre_object, 
+  sceptre_object,
   positive_control_pairs = positive_control_pairs
 )
 
@@ -97,7 +97,7 @@ sceptre_object <- sceptre_object |> # |> is R's base pipe, similar to %>%
   run_discovery_analysis(print_progress = FALSE, parallel = TRUE, n_processors = 2)
 ```
 
-```{r, echo = FALSE}
+```{r print-discoveries, echo = FALSE}
 # print a subset of the discovery results
 sceptre_object |>
   get_result("run_discovery_analysis") |>
@@ -115,9 +115,9 @@ The first step is to import the data. **Data can be imported into `sceptre` from
 
 1.  `directories` is a character vector specifying the locations of the directories outputted by one or more calls to `cellranger_count`. Below, we set the variable `directories` to the (machine-dependent) location of the example CRISPRi data on disk.
 
-    ```{r}
+    ```{r directories}
     directories <- paste0(
-      system.file("extdata", package = "sceptre"), 
+      system.file("extdata", package = "sceptre"),
       "/highmoi_example/gem_group_", 1:2
     )
     directories # file paths to the example data on your computer
@@ -125,14 +125,14 @@ The first step is to import the data. **Data can be imported into `sceptre` from
 
     `directories` points to two directories, both of which store the expression data in matrix market format and contain the files `barcodes.tsv.gz`, `features.tsv.gz`, and `matrix.mtx.gz`.
 
-    ```{r}
+    ```{r list-files}
     list.files(directories[1])
     list.files(directories[2])
     ```
 
 2.  `grna_target_data_frame` is a data frame mapping each individual gRNA to the genomic element that the gRNA targets. `grna_target_data_frame` contains two required columns: `grna_id` and `grna_target`. `grna_id` is the ID of an individual gRNA, while `grna_target` is a label specifying the genomic element that the gRNA targets. (Typically, multiple gRNAs are designed to target a given genomic element in a single-cell CRISPR screen.) Non-targeting (NT) gRNAs are assigned a gRNA target label of "non-targeting". `grna_target_data_frame` optionally contains the columns `chr`, `start`, and `end`, which give the chromosome, start coordinate, and end coordinate, respectively, of the genomic region that each gRNA targets. Finally, `grna_target_data_frame` optionally can contain the column `vector_id` specifying the vector to which a given gRNA belongs. `vector_id` should be supplied in experiments in which each viral vector contains two or more distinct gRNAs (as in, e.g., [(Replogle, 2022)](https://pubmed.ncbi.nlm.nih.gov/35688146/)). We load and examine the `grna_target_data_frame` corresponding to the example data.
 
-    ```{r}
+    ```{r load-grna-target-df}
     data(grna_target_data_frame_highmoi)
     grna_target_data_frame_highmoi[c(1:4, 11:14, 51:54),]
     ```
@@ -141,13 +141,13 @@ The first step is to import the data. **Data can be imported into `sceptre` from
 
 3.  `moi` is a string specifying the multiplicity-of-infection (MOI) of the data, taking values `"high"` or `"low"`. A high-MOI (respectively, low-MOI) dataset is one in which the experimenter has aimed to insert multiple gRNAs (respectively, a single gRNA) into each cell. (If a given cell is determined to contain multiple gRNAs in a low-MOI screen, that cell is removed as part of the quality control step, as discussed below.) The example dataset is a high MOI dataset, and so we set `moi` to `"high"`.
 
-    ```{r}
+    ```{r set-moi}
     moi <- "high"
     ```
 
 Finally, we call the function `import_data_from_cellranger()`, passing `directories`, `grna_target_data_frame`, and `moi` as arguments.
 
-```{r,results='hide'}
+```{r import, results='hide'}
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
   grna_target_data_frame = grna_target_data_frame_highmoi,
@@ -157,7 +157,7 @@ sceptre_object <- import_data_from_cellranger(
 
 `import_data_from_cellranger()` returns a `sceptre_object`, which is an object-based representation of the single-cell CRISPR screen data. Evaluating `sceptre_object` in the console prints a helpful summary of the data.
 
-```{r}
+```{r print-object}
 sceptre_object
 ```
 
@@ -173,14 +173,14 @@ The second step is to set the analysis parameters. The most important analysis p
 
     `sceptre` offers several helper functions to facilitate the construction of positive control and discovery pairs. The function `construct_positive_control_pairs()` takes as argument a `sceptre_object` and outputs the set of positive control pairs formed by matching gRNA targets (as contained in the `grna_target_data_frame`) to response IDs. Positive control pairs are optional and need not be computed.
 
-    ```{r}
+    ```{r pos-control-pairs}
     positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
     head(positive_control_pairs)
     ```
 
     Next, the functions `construct_cis_pairs()` and `construct_trans_pairs()` facilitate the construction of *cis* and *trans* discovery sets, respectively. `construct_cis_pairs()` takes as arguments a `sceptre_object` and an integer `distance_threshold` and returns the set of response-target pairs located on the same chromosome within `distance_threshold` bases of one another. `positive_control_pairs` optionally can be passed to this function, in which case positive control gRNA targets are excluded from the *cis* pairs. (Note that `construct_cis_pairs()` assumes that the responses are genes rather than, say, proteins or chromatin-derived features.)
 
-    ```{r}
+    ```{r discovery-pairs}
     discovery_pairs <- construct_cis_pairs(
       sceptre_object = sceptre_object,
       positive_control_pairs = positive_control_pairs,
@@ -193,7 +193,7 @@ The second step is to set the analysis parameters. The most important analysis p
 
 2.  **Sidedness**. The parameter `side` controls whether to run a left-tailed (`"left"`), right-tailed (`"right"`), or two-tailed (`"both"`; default) test. A left-tailed (resp., right-tailed) test is appropriate when testing for a decrease (resp., increase) in expression; a two-tailed test, by contrast, is appropriate when testing for an increase *or* decrease in expression. A left-tailed test is the most appropriate choice for a CRISPRi screen of enhancers, and so we set `side` to `"left"`.
 
-    ```{r}
+    ```{r set-side}
     side <- "left"
     ```
 
@@ -201,7 +201,7 @@ The second step is to set the analysis parameters. The most important analysis p
 
 Finally, we set the analysis parameters by calling the function `set_analysis_parameters()`, passing `sceptre_object`, `discovery_pairs`, `positive_control_pairs`, and `side` as arguments. Note that `sceptre_object` is the only required arguments to this function.
 
-```{r, message=FALSE,results='hide'}
+```{r set-analysis-params, message=FALSE, results='hide'}
 sceptre_object <- set_analysis_parameters(
   sceptre_object = sceptre_object,
   discovery_pairs = discovery_pairs,
@@ -215,11 +215,11 @@ print(sceptre_object) # output suppressed for brevity
 
 The third step is to assign gRNAs to cells. This step can be skipped, in which case gRNAs are assigned to cells automatically using default options. The gRNA assignment step involves using the gRNA UMI counts to determine which cells contain which gRNAs. We begin by plotting the UMI count distribution of several randomly selected gRNAs via a call to the function `plot_grna_count_distributions()`.
 
-```{r, eval=FALSE}
+```{r plot-grna-counts-shown, eval=FALSE}
 plot_grna_count_distributions(sceptre_object)
 ```
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Histograms of the gRNA count distributions")}
+```{r plot-grna-counts, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Histograms of the gRNA count distributions")}
 set.seed(2)
 p <- plot_grna_count_distributions(sceptre_object = sceptre_object)
 ggplot2::ggsave(filename = "grna_count_distribution.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
@@ -232,18 +232,18 @@ The gRNAs display bimodal count distributions. Consider, for example, `candidate
 
 We carry out the gRNA assignment step via a call to the function `assign_grnas()`. `assign_grnas()` takes arguments `sceptre_object` (required) and `method` (optional); the latter argument can be set to `"mixture"`, `"maximum"`, or `"thresholding"`. We parallelize execution of `assign_grnas()` by setting `parallel` to `TRUE`. (Parallel execution is not yet configured for Windows. We recommend that Windows users seeking to parallelize their analysis leverage the [`sceptre` Nextflow pipeline](https://timothy-barry.github.io/sceptre-book/).)
 
-```{r,results='hide'}
+```{r assign-grnas, results='hide'}
 sceptre_object <- assign_grnas(sceptre_object = sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
 We can call `plot()` on the resulting `sceptre_object` to render a plot summarizing the output of the gRNA-to-cell assignment step.
 
-```{r,eval=FALSE}
+```{r plot-assignments-shown, eval=FALSE}
 plot(sceptre_object)
 ```
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("gRNA-to-cell assignments")}
+```{r plot-assignments, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("gRNA-to-cell assignments")}
 set.seed(3)
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "grna_count_assignments.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
@@ -262,18 +262,18 @@ The cellwise QC that `sceptre` implements is standard in single-cell analysis. C
 
 We call the function `run_qc()` on the `sceptre_object` to carry out cellwise and pairwise QC. `run_qc()` has several optional arguments that control the stringency of the various QC thresholds. For example, we set `p_mito_threshold = 0.075`, which filters out cells whose `response_p_mito` value exceeds 0.075. (The optional arguments are set to reasonable defaults; the default for `p_mito_threshold` is 0.2, for instance).
 
-```{r,results='hide'}
+```{r run-qc, results='hide'}
 sceptre_object <- run_qc(sceptre_object, p_mito_threshold = 0.075)
 print(sceptre_object) # output suppressed for brevity
 ```
 
 We can visualize the output of the QC step by calling `plot()` on the updated `sceptre_object`.
 
-```{r,eval=FALSE}
+```{r plot-qc-shown, eval=FALSE}
 plot(sceptre_object)
 ```
 
-```{r, out.width = "450px", fig.align="center", echo = FALSE, fig.cap=c("Cellwise and pairwise quality control")}
+```{r plot-qc, out.width = "450px", fig.align="center", echo = FALSE, fig.cap=c("Cellwise and pairwise quality control")}
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "qc.png", plot = p, device = "png", scale = 1.1, width = 4, height = 4.5, dpi = 330)
 knitr::include_graphics("qc.png")
@@ -287,18 +287,18 @@ The fifth step is to run the calibration check. **The calibration check is an an
 
 We run the calibration check by calling the function `run_calibration_check()` on the `sceptre_object`.
 
-```{r,results='hide'}
+```{r run-calibration-check, results='hide'}
 sceptre_object <- run_calibration_check(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
 We can assess the outcome of the calibration check by calling `plot()` on the resulting `sceptre_object`.
 
-```{r,eval=FALSE}
+```{r plot-calibration-shown, eval=FALSE}
 plot(sceptre_object)
 ```
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Calibration check results")}
+```{r plot-calibration, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Calibration check results")}
 set.seed(3)
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "calibration_check.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
@@ -321,18 +321,18 @@ The visualization consists of four panels, which we describe below.
 
 The sixth step --- which is optional --- is to run the power check. The power check involves applying `sceptre` to analyze the positive control pairs. Given that the positive control pairs are known to contain signal, `sceptre` should produce significant (i.e., small) p-values on the positive control pairs. **The power check enables us to assess `sceptre`'s power (i.e., its ability to detect true associations) on the dataset under analysis.** We run the power check by calling the function `run_power_check()` on the `sceptre_object`.
 
-```{r,results='hide'}
+```{r run-power-check, results='hide'}
 sceptre_object <- run_power_check(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
 We can visualize the outcome of the power check by calling `plot()` on the resulting `sceptre_object`.
 
-```{r,eval=FALSE}
+```{r plot-power-shown, eval=FALSE}
 plot(sceptre_object)
 ```
 
-```{r, out.width = "550px", fig.align="center", echo = FALSE, fig.cap=c("Power check results")}
+```{r plot-power, out.width = "550px", fig.align="center", echo = FALSE, fig.cap=c("Power check results")}
 set.seed(3)
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "power_check.png", plot = p, device = "png", scale = 1.1, width = 4, height = 3, dpi = 330)
@@ -345,18 +345,18 @@ Each point in the plot corresponds to a target-response pair, with positive cont
 
 The seventh and penultimate step is to run the discovery analysis. The discovery analysis entails applying `sceptre` to analyze the discovery pairs. We run the discovery analysis by calling the function `run_discovery_analysis()`.
 
-```{r,results='hide'}
+```{r run-discovery, results='hide'}
 sceptre_object <- run_discovery_analysis(sceptre_object, parallel = TRUE, n_processors = 2)
 print(sceptre_object) # output suppressed for brevity
 ```
 
 We can visualize the outcome of the discovery analysis by calling `plot()` on the resulting `sceptre_object`.
 
-```{r,eval=FALSE}
+```{r plot-discovery-shown, eval=FALSE}
 plot(sceptre_object)
 ```
 
-```{r, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Discovery analysis results")}
+```{r plot-discovery, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Discovery analysis results")}
 set.seed(3)
 p <- plot(sceptre_object)
 ggplot2::ggsave(filename = "discovery_analysis.png", plot = p, device = "png", scale = 1.1, width = 5, height = 4, dpi = 330)
@@ -377,22 +377,22 @@ The visualization consists of four panels.
 
 The eighth and final step is to write the outputs of the analysis to a directory on disk. We call the function `write_outputs_to_directory()`, which takes as arguments a `sceptre_object` and `directory`; `directory` is a string indicating the location of the directory in which to write the results contained within the `sceptre_object`.
 
-```{r,results='hide'}
+```{r write-outputs, results='hide'}
 write_outputs_to_directory(
-  sceptre_object = sceptre_object, 
+  sceptre_object = sceptre_object,
   directory = "~/sceptre_outputs"
 )
 ```
 
 `write_outputs_to_directory()` writes several files to the specified directory: a text-based summary of the analysis (`analysis_summary.txt`), the various plots (`*.png`), the calibration check, power check, discovery analysis results (`results_run_calibration_check.rds`, `results_run_power_check.rds`, and `results_run_discovery_analysis.rds`, respectively), and the binary gRNA-to-cell assignment matrix (`grna_assignment_matrix.rds`).
 
-```{r}
+```{r list-output-files}
 list.files("~/sceptre_outputs")
 ```
 
 We also can obtain the calibration check, power check, and discovery analysis results in R via a call to the function `get_result()`, passing as arguments `sceptre_object` and `analysis`, where the latter is a string indicating the function whose results we are querying.
 
-```{r}
+```{r get-result}
 result <- get_result(
   sceptre_object = sceptre_object,
   analysis = "run_discovery_analysis"
@@ -401,7 +401,7 @@ result <- get_result(
 
 The variable `result` is a data frame, the rows of which correspond to target-response pairs, and the columns of which are as follows: `response_id`, `grna_target`, `n_nonzero_trt`, `n_nonzero_cntrl`, `pass_qc` (a `TRUE`/`FALSE` value indicating whether the pair passes pairwise QC), `p_value`, `fold_change`, `se_fold_change` (standard error for fold change estimate), `log_2_fold_change`, and `significant` (a `TRUE`/`FALSE` value indicating whether the pair is called as significant). The p-value contained within the `p_value` column is a raw (i.e., non-multiplicity-adjusted) p-value.
 
-```{r}
+```{r head-result}
 head(result)
 ```
 
@@ -409,6 +409,6 @@ head(result)
 
 We encourage readers interested in learning more to consult the [sceptre manual](https://timothy-barry.github.io/sceptre-book/).
 
-```{r}
+```{r session-info}
 library(sessioninfo); session_info()
 ```
