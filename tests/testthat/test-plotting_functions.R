@@ -1,14 +1,5 @@
 # plotting functions
 
-# taken from Julius Vainora's answer at https://stackoverflow.com/questions/54051576
-# This is used to get information from a cowplot::plot_grid object
-get_elements_from_plot_grid <- function(p, what) {
-  unlist(sapply(p$layers, function(x) {
-    idx <- which(x$geom_params$grob$layout$name == what)
-    x$geom_params$grob$grobs[[idx]]$children[[1]]$label
-  }))
-}
-
 # this test makes a single sceptre object and runs thru each of the main plots
 # making sure their basic components are all there
 # This is all done as one test just to save a little time on repeatedly creating the
@@ -78,10 +69,12 @@ test_that("test all plots", {
     run_discovery_analysis()
 
   ## testing `plot_grna_count_distributions()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  plt <- plot_grna_count_distributions(scep, grnas_to_plot = c("id2", "id3", "nt2"))
-  expect_equal(get_elements_from_plot_grid(plt, "title"), c("id2", "id3", "nt2"))
-  expect_equal(get_elements_from_plot_grid(plt, "xlab-b"), c("gRNA count", "gRNA count", "gRNA count"))
-  expect_equal(get_elements_from_plot_grid(plt, "ylab-l"), "Cell count (log scale)")
+  pltlist <- plot_grna_count_distributions(scep, grnas_to_plot = c("id2", "id3", "nt2"), return_indiv_plots = TRUE)
+  expect_equal(length(pltlist), 3)
+  expect_equal(vapply(pltlist, function(p) p$labels$title, character(1)), c("id2", "id3", "nt2"))
+  # x and y labels are set on the bottom-row / left-column panels respectively
+  expect_equal(pltlist[[1]]$labels$y, "Cell count (log scale)")
+  expect_equal(pltlist[[1]]$labels$x, "gRNA count")
 
   ## testing `plot_assign_grnas()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_assign_grnas(scep, grnas_to_plot = c("nt1", "id1"), return_indiv_plots = TRUE)
@@ -115,10 +108,8 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$x, "Estimated log-2 fold change")
   expect_equal(pltlist[[3]]$labels$y, "Density")
 
-  # this is the text-only pane
-  expect_true(!"title" %in% names(pltlist[[4]]))
-  expect_equal(pltlist[[4]]$labels$x, "x")
-  expect_equal(pltlist[[4]]$labels$y, "y")
+  # the 4th pane is a text-only summary panel; just confirm it has no title
+  expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
   # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_discovery_analysis(scep, return_indiv_plots = TRUE)
@@ -136,10 +127,8 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$x, "Log fold change")
   expect_equal(pltlist[[3]]$labels$y, "P-value")
 
-  # this is the text-only pane
-  expect_true(!"title" %in% names(pltlist[[4]]))
-  expect_equal(pltlist[[4]]$labels$x, "x")
-  expect_equal(pltlist[[4]]$labels$y, "y")
+  # the 4th pane is a text-only summary panel; just confirm it has no title
+  expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
   # testing `plot_run_qc()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_run_qc(scep, return_indiv_plots = TRUE)

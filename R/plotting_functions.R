@@ -20,11 +20,12 @@ get_my_theme <- function(element_text_size = 11) {
 #' @param n_grnas_to_plot (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
 #' @param grnas_to_plot (optional; default `NULL`) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then `n_grnas_to_plot` random gRNAs are plotted.
 #' @param threshold (optional; default `NULL`) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, a single combined \code{cowplot} object is returned; if \code{TRUE}, a list of the per-gRNA \code{ggplot} panels is returned instead.
 #'
 #' @details
 #' The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
 #'
-#' @return a single \code{ggplot2} plot
+#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is \code{FALSE}, the default) or a list of the per-gRNA \code{ggplot2} panels (if \code{return_indiv_plots} is \code{TRUE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -37,7 +38,7 @@ get_my_theme <- function(element_text_size = 11) {
 #'   extra_covariates = highmoi_example_data$extra_covariates,
 #'   response_names = highmoi_example_data$gene_names
 #' ) |> plot_grna_count_distributions()
-plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL) {
+plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL, return_indiv_plots = FALSE) {
   grna_matrix <- get_grna_matrix(sceptre_object)
   # rounding just in case the user provides a non-integer one
   if (!is.null(threshold)) threshold <- round(threshold)
@@ -125,6 +126,9 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   for (j in (1 + (n_row - 1) * n_col):length(grnas_to_plot)) {
     plot_list[[j]] <- plot_list[[j]] + ggplot2::xlab("gRNA count") +
       ggplot2::theme(axis.title.x = ggplot2::element_text())
+  }
+  if (return_indiv_plots) {
+    return(plot_list)
   }
   p <- do.call(
     what = cowplot::plot_grid,
@@ -736,6 +740,7 @@ plot_cellwise_qc <- function(sceptre_object) {
     ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") +
     get_my_theme() +
     ggplot2::scale_y_continuous(expand = c(0, NA)) +
+    ggplot2::xlab("Filter") +
     ggplot2::ylab("Percent cells removed") +
     ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
     get_my_theme() +
@@ -1012,7 +1017,8 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
     dplyr::group_by(is_zero, treatment) |>
     dplyr::sample_n(size = min(dplyr::n(), 1000))
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
-    ggplot2::geom_violin(draw_quantiles = 0.5, linewidth = 0.6) +
+    ggplot2::geom_violin(linewidth = 0.6) +
+    ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.4, linewidth = 0.4) +
     ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5) +
     get_my_theme() +
     ggplot2::theme(legend.position = "none") +
