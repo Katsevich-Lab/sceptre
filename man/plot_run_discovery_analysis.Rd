@@ -61,11 +61,11 @@ sceptre_object |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
   run_calibration_check(
-    parallel = TRUE,
+    parallel = FALSE,
     n_processors = 2
   ) |>
   run_discovery_analysis(
-    parallel = TRUE,
+    parallel = FALSE,
     n_processors = 2
   ) |>
   plot_run_discovery_analysis()
