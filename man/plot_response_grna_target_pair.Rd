@@ -44,7 +44,7 @@ sceptre_object |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
   run_discovery_analysis(
-    parallel = TRUE,
+    parallel = FALSE,
     n_processors = 2
   ) |>
   plot_response_grna_target_pair(
