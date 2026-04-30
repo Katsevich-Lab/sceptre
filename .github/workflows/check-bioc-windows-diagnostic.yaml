@@ -61,19 +61,37 @@ jobs:
             install.packages("BiocManager")
           }
           BiocManager::install(version = "devel", ask = FALSE, update = FALSE)
-          BiocManager::valid()
+          message("Bioconductor version: ", BiocManager::version())
 
-      - name: Install package dependencies
+      - name: Check Bioconductor dependency policy
         shell: Rscript {0}
         run: |
-          if (!requireNamespace("remotes", quietly = TRUE)) {
-            install.packages("remotes")
+          description <- read.dcf("DESCRIPTION")[1, ]
+          if ("Remotes" %in% names(description)) {
+            warning(
+              "Bioconductor submissions cannot use Remotes:. Current Remotes: ",
+              description[["Remotes"]]
+            )
           }
-          BiocManager::install(c("BiocCheck", "rcmdcheck", "sessioninfo"), ask = FALSE, update = FALSE)
+
+      - name: Install package dependencies
+        timeout-minutes: 20
+        shell: Rscript {0}
+        run: |
+          bioc_repos <- BiocManager::repositories()
+          bioc_repos <- bioc_repos[!names(bioc_repos) %in% c("BioCann", "BioCworkflows")]
+          message("Using repositories:")
+          print(bioc_repos)
+          message("Note: BioCann and BioCworkflows are filtered because their Bioconductor devel Windows binary indexes can be absent.")
+          if (!requireNamespace("remotes", quietly = TRUE)) {
+            install.packages("remotes", repos = bioc_repos)
+          }
+          install.packages(c("BiocCheck", "rcmdcheck", "sessioninfo"), repos = bioc_repos)
           remotes::install_deps(
             dependencies = TRUE,
-            repos = BiocManager::repositories(),
-            upgrade = "never"
+            repos = bioc_repos,
+            upgrade = "never",
+            quiet = FALSE
           )
 
       - name: Session info
