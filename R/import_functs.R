@@ -87,7 +87,7 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
   #  perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
   # check directory_to_write
-  if (is.null(directory_to_write)) stop("`directory_to_write` cannot be `NULL`.")
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
 
   # process covariates and matrices
   processed_inputs <- process_covariates_and_matrices(
@@ -309,7 +309,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
 # 2. disk
 import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
   # 0. check that directory_to_write has been supplied
-  if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
 
   # 1. call the corresponding ondisc function
   vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
@@ -520,17 +520,50 @@ get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_no
 
 
 write_matrices_to_disk <- function(response_matrix, grna_matrix, directory_to_write, integer_id) {
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
   response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
     mat = response_matrix,
-    file_to_write = paste0(directory_to_write, "/response.odm"),
+    file_to_write = file.path(directory_to_write, "response.odm"),
     integer_id = integer_id
   )
   grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
     mat = grna_matrix,
-    file_to_write = paste0(directory_to_write, "/grna.odm"),
+    file_to_write = file.path(directory_to_write, "grna.odm"),
     integer_id = integer_id
   )
   return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
+}
+
+
+prepare_directory_to_write <- function(directory_to_write) {
+  if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
+  if (!(is.character(directory_to_write) && length(directory_to_write) == 1L && !is.na(directory_to_write))) {
+    stop("`directory_to_write` must be a single file path.")
+  }
+  directory_to_write <- path.expand(directory_to_write)
+  if (!dir.exists(directory_to_write)) dir.create(directory_to_write, recursive = TRUE)
+  directory_to_write <- normalizePath(directory_to_write, winslash = "/", mustWork = TRUE)
+  check_path_has_no_tilde(directory_to_write, "`directory_to_write`")
+  return(directory_to_write)
+}
+
+
+prepare_ondisc_file_path <- function(file_path, arg_name) {
+  if (is.null(file_path)) stop(arg_name, " must be supplied.")
+  if (!(is.character(file_path) && length(file_path) == 1L && !is.na(file_path))) {
+    stop(arg_name, " must be a single file path.")
+  }
+  file_path <- normalizePath(path.expand(file_path), winslash = "/", mustWork = TRUE)
+  check_path_has_no_tilde(file_path, arg_name)
+  return(file_path)
+}
+
+
+check_path_has_no_tilde <- function(file_path, arg_name) {
+  if (grepl("~", file_path, fixed = TRUE)) {
+    stop(arg_name, " cannot contain '~' after path normalization.")
+  }
+  return(NULL)
 }
 
 
