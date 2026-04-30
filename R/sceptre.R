@@ -16,7 +16,7 @@ utils::globalVariables(c(
 #' @import BH
 #' @keywords package
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ##########################
 #' # Low-MOI CRISPRko example
 #' ##########################
