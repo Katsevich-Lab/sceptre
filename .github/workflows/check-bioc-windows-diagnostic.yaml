@@ -98,6 +98,11 @@ jobs:
         run: |
           sessioninfo::session_info(include_base = TRUE)
 
+      - name: Run BiocCheck git-clone checks
+        shell: Rscript {0}
+        run: |
+          BiocCheck::BiocCheckGitClone(".")
+
       - name: Run R CMD check
         shell: Rscript {0}
         run: |
@@ -115,7 +120,6 @@ jobs:
           if (!length(tarballs)) {
             stop("No source tarball found in check/")
           }
-          BiocCheck::BiocCheckGitClone(".")
           BiocCheck::BiocCheck(
             tarballs[[1]],
             `new-package` = TRUE,
