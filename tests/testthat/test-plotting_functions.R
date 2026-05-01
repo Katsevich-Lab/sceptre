@@ -148,8 +148,11 @@ test_that("test all plots", {
   expect_equal(plt$labels$x, "Pair type")
   expect_equal(plt$labels$y, "p-value")
 
-  # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # testing `plot_response_grna_target_pair()` ~~~~~~~~~~~~~~~~~~~~~~~~~
+  set.seed(321)
+  seed_before <- .Random.seed
   plt <- plot_response_grna_target_pair(scep, response_id = "response_4", grna_target = "t1")
+  expect_equal(.Random.seed, seed_before)
   expect_equal(plt$labels$title, "Response: response_4\ngRNA target: t1")
   expect_equal(plt$labels$x, "Treatment status")
   expect_equal(plt$labels$y, "Normalized expression")

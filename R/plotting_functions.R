@@ -840,7 +840,6 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
     stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
   }
   my_theme <- get_my_theme()
-  set.seed(3)
   my_cols <- c("mediumseagreen", "firebrick1")
 
   pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
@@ -1011,11 +1010,12 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
     labels = c(paste0("p <= 10^{", seq(-10, -2), "}"), "p > 0.01", "")
   ) |> as.character()
   # create the plot
-  set.seed(4)
-  to_plot_downsample <- to_plot |>
-    dplyr::mutate(is_zero = (normalized_count == 0)) |>
-    dplyr::group_by(is_zero, treatment) |>
-    dplyr::sample_n(size = min(dplyr::n(), 1000))
+  to_plot_downsample <- withr::with_seed(4, {
+    to_plot |>
+      dplyr::mutate(is_zero = (normalized_count == 0)) |>
+      dplyr::group_by(is_zero, treatment) |>
+      dplyr::sample_n(size = min(dplyr::n(), 1000))
+  })
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
     ggplot2::geom_violin(linewidth = 0.6) +
     ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.4, linewidth = 0.4) +

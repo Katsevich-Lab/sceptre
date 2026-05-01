@@ -5,7 +5,7 @@
 #' @param sceptre_object a `sceptre_object`
 #' @param distance_threshold (optional) target-response pairs located within `distance_threshold` bases of one another and on the same chromosome are included in the *cis* discovery set.
 #' @param positive_control_pairs (optional) a data frame with columns `grna_target` and `response_id` containing the positive control pairs; if supplied, the positive control targets are excluded from the *cis* pairs.
-#' @param response_position_data_frame (optional) a data frame with columns `response_id`, `chr`, and `position` giving the genomic coordinate of each response; by default `response_position_data_frame` is set to a data frame containing the genomic coordinate of each gene in the human genome relative to reference genome GRCh38.
+#' @param response_position_data_frame (optional) a data frame with columns `response_id`, `chr`, and `position` giving the genomic coordinate of each response; by default, the packaged GRCh38 gene position data frame is used.
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing the *cis* pairs
 #' @export
@@ -27,7 +27,11 @@
 #'   distance_threshold = 5e6
 #' )
 construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.frame(), distance_threshold = 500000L,
-                                response_position_data_frame = gene_position_data_frame_grch38) {
+                                response_position_data_frame = NULL) {
+  if (is.null(response_position_data_frame)) {
+    utils::data("gene_position_data_frame_grch38", package = "sceptre", envir = environment())
+    response_position_data_frame <- gene_position_data_frame_grch38
+  }
   if (!all(c("response_id", "chr", "position") %in% colnames(response_position_data_frame))) {
     stop("`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'.")
   }

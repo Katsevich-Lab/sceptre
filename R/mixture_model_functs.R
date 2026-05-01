@@ -99,8 +99,9 @@ obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matri
 
 
 get_random_starting_guesses <- function(n_em_rep = 5, pi_guess_range = c(1e-5, 0.1), g_pert_guess_range = c(10, 5000)) {
-  set.seed(4)
-  pi_guesses <- stats::runif(n = n_em_rep, min = pi_guess_range[1], max = pi_guess_range[2])
-  g_pert_guesses <- stats::runif(n = n_em_rep, min = g_pert_guess_range[1], max = g_pert_guess_range[2])
-  list(pi_guesses = pi_guesses, g_pert_guesses = g_pert_guesses)
+  withr::with_seed(4, {
+    pi_guesses <- stats::runif(n = n_em_rep, min = pi_guess_range[1], max = pi_guess_range[2])
+    g_pert_guesses <- stats::runif(n = n_em_rep, min = g_pert_guess_range[1], max = g_pert_guess_range[2])
+    list(pi_guesses = pi_guesses, g_pert_guesses = g_pert_guesses)
+  })
 }
