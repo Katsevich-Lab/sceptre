@@ -25,7 +25,7 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
       data
     }
   },
-  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ci_level = 0.95) {
+  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ci_level = 0.95, seed = 1) {
     # get the quantile function from the stats package
     quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
     # set x and y transformations to identity if they are not given
@@ -36,30 +36,32 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
       scales$y$trans <- scales::identity_trans()
     }
     # compute the upper and lower confidence bands
-    data |>
-      # the given y is already transformed, so transform it back first
-      dplyr::mutate(y = scales$y$trans$inverse(y)) |>
-      # apply the formulas for the confidence bands
-      dplyr::mutate(
-        r = rank(y, ties.method = "first"),
-        x = quantile_fun(stats::ppoints(dplyr::n())[r]),
-        ymin = quantile_fun(stats::qbeta(p = (1 - ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
-        ymax = quantile_fun(stats::qbeta(p = (1 + ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r))
-      ) |>
-      # transform
-      dplyr::mutate(
-        x = scales$x$trans$transform(x),
-        y = scales$y$trans$transform(y),
-        ymin = scales$y$trans$transform(ymin),
-        ymax = scales$y$trans$transform(ymax)
-      ) |> # downsample
-      dplyr::mutate(
-        x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
-        y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
-      ) |>
-      dplyr::group_by(x_int, y_int) |>
-      dplyr::slice_sample(n = 1) |>
-      dplyr::ungroup()
+    withr::with_seed(seed, {
+      data |>
+        # the given y is already transformed, so transform it back first
+        dplyr::mutate(y = scales$y$trans$inverse(y)) |>
+        # apply the formulas for the confidence bands
+        dplyr::mutate(
+          r = rank(y, ties.method = "first"),
+          x = quantile_fun(stats::ppoints(dplyr::n())[r]),
+          ymin = quantile_fun(stats::qbeta(p = (1 - ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
+          ymax = quantile_fun(stats::qbeta(p = (1 + ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r))
+        ) |>
+        # transform
+        dplyr::mutate(
+          x = scales$x$trans$transform(x),
+          y = scales$y$trans$transform(y),
+          ymin = scales$y$trans$transform(ymin),
+          ymax = scales$y$trans$transform(ymax)
+        ) |> # downsample
+        dplyr::mutate(
+          x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
+          y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
+        ) |>
+        dplyr::group_by(x_int, y_int) |>
+        dplyr::slice_sample(n = 1) |>
+        dplyr::ungroup()
+    })
   }
 )
 
@@ -76,13 +78,13 @@ stat_qq_band <- function(mapping = NULL, data = NULL, geom = "ribbon",
                          position = "identity", show.legend = FALSE,
                          inherit.aes = TRUE, distribution = "unif",
                          max_pts_to_plot = 500,
-                         ci_level = 0.95, ...) {
+                         ci_level = 0.95, seed = 1, ...) {
   ggplot2::layer(
     stat = StatQQBand, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       alpha = 0.25, distribution = distribution,
-      max_pts_to_plot = max_pts_to_plot, ci_level = ci_level, ...
+      max_pts_to_plot = max_pts_to_plot, ci_level = ci_level, seed = seed, ...
     )
   )
 }
@@ -90,7 +92,7 @@ stat_qq_band <- function(mapping = NULL, data = NULL, geom = "ribbon",
 # workhorse function for \code{stat_qq_points}
 StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
   required_aes = c("y"),
-  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ymin = -Inf, ymax = Inf) {
+  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ymin = -Inf, ymax = Inf, seed = 1) {
     # set x and y transformations to identity if they are not given
     if (is.null(scales$x$trans)) {
       scales$x$trans <- scales::identity_trans()
@@ -100,26 +102,28 @@ StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
     }
     # get the quantile function from the stats package
     quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
-    data |>
-      # the given y is already transformed, so transform it back first
-      dplyr::mutate(
-        y = scales$y$trans$inverse(y),
-        # apply the formula
-        x = quantile_fun(stats::ppoints(dplyr::n())[rank(y, ties.method = "first")]),
-        # threshold
-        y = pmin(pmax(y, ymin), ymax),
-        # transform
-        x = scales$x$trans$transform(x),
-        y = scales$y$trans$transform(y)
-      ) |>
-      # downsample
-      dplyr::mutate(
-        x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
-        y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
-      ) |>
-      dplyr::group_by(x_int, y_int) |>
-      dplyr::slice_sample(n = 1) |>
-      dplyr::ungroup()
+    withr::with_seed(seed, {
+      data |>
+        # the given y is already transformed, so transform it back first
+        dplyr::mutate(
+          y = scales$y$trans$inverse(y),
+          # apply the formula
+          x = quantile_fun(stats::ppoints(dplyr::n())[rank(y, ties.method = "first")]),
+          # threshold
+          y = pmin(pmax(y, ymin), ymax),
+          # transform
+          x = scales$x$trans$transform(x),
+          y = scales$y$trans$transform(y)
+        ) |>
+        # downsample
+        dplyr::mutate(
+          x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
+          y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
+        ) |>
+        dplyr::group_by(x_int, y_int) |>
+        dplyr::slice_sample(n = 1) |>
+        dplyr::ungroup()
+    })
   }
 )
 
@@ -139,13 +143,13 @@ stat_qq_points <- function(mapping = NULL, data = NULL, geom = "point",
                            position = "identity", show.legend = NA,
                            distribution = "unif", max_pts_to_plot = 500,
                            ymin = -Inf, ymax = Inf,
-                           inherit.aes = TRUE, ...) {
+                           inherit.aes = TRUE, seed = 1, ...) {
   ggplot2::layer(
     stat = StatQQPoints, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       distribution = distribution, max_pts_to_plot = max_pts_to_plot,
-      ymin = ymin, ymax = ymax, ...
+      ymin = ymin, ymax = ymax, seed = seed, ...
     )
   )
 }
