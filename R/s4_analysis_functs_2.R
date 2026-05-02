@@ -360,10 +360,11 @@ apply_grouping_to_result <- function(result, sceptre_object, is_calibration_chec
   }
   if (grna_integration_strategy %in% c("singleton", "bonferroni")) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
-      dplyr::select(grna_id, grna_target)
+      dplyr::select(grna_id, grna_target) |>
+      dplyr::distinct()
     new_result <- result |>
       dplyr::rename("grna_id" = "grna_group") |>
-      dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
+      dplyr::left_join(grna_target_data_frame, by = "grna_id", relationship = "many-to-many") |>
       dplyr::relocate(response_id, grna_id, grna_target)
     if (grna_integration_strategy == "bonferroni" && !is_calibration_check) {
       new_result <- new_result |>

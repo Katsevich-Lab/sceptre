@@ -142,6 +142,7 @@ process_initial_assignment_list <- function(sceptre_object) {
     curr_grna_ids <- targeting_grna_group_data_table[
       targeting_grna_group_data_table$grna_group == targeting_grna_group,
     ]$grna_id
+    curr_grna_ids <- unique(curr_grna_ids)
     initial_assignment_list[curr_grna_ids] |>
       unlist() |>
       unique()
@@ -149,7 +150,8 @@ process_initial_assignment_list <- function(sceptre_object) {
   # 4. obtain the individual non-targeting grna idxs
   nontargeting_grna_ids <- grna_target_data_frame |>
     dplyr::filter(grna_group == "non-targeting") |>
-    dplyr::pull(grna_id)
+    dplyr::pull(grna_id) |>
+    unique()
   indiv_nt_grna_idxs <- initial_assignment_list[nontargeting_grna_ids]
   # 5. construct the grna_group_idxs list
   grna_assignments_raw <- list(
@@ -182,9 +184,10 @@ determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
         dplyr::sample_n(min(dplyr::n(), 30)) |> dplyr::pull(grna_target), "non-targeting")
     }
     grnas_in_use <- dplyr::filter(grna_target_data_frame, grna_target %in% all_grna_targets) |>
-      dplyr::pull(grna_id)
+      dplyr::pull(grna_id) |>
+      unique()
   } else {
-    grnas_in_use <- grna_target_data_frame$grna_id
+    grnas_in_use <- unique(grna_target_data_frame$grna_id)
   }
   return(grnas_in_use)
 }
