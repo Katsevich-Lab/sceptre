@@ -52,10 +52,8 @@ sceptre_object |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
   run_calibration_check(
-    parallel = TRUE,
-    n_processors = 2,
     n_calibration_pairs = 500,
-    calibration_group_size = 2,
+    calibration_group_size = 2
   ) |>
   plot_run_calibration_check()
 }
