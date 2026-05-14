@@ -4,6 +4,8 @@
 #'
 #' @usage data(gene_position_data_frame_grch38)
 #' @examples
+#' data(gene_position_data_frame_grch38)
+#' data(gene_position_data_frame_grch37)
 #' head(gene_position_data_frame_grch38)
 #' head(gene_position_data_frame_grch37)
 "gene_position_data_frame_grch38"
