@@ -1,5 +1,5 @@
 assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame, grna_assignment_hyperparameters, print_progress, parallel, n_processors, log_dir, grna_ids) {
-  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) message(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."))
   # 0. get random starting guesses for pi and g_pert
   starting_guesses <- get_random_starting_guesses(
     n_em_rep = grna_assignment_hyperparameters$n_em_rep,
@@ -46,12 +46,12 @@ assign_grnas_to_cells_mixture <- function(grna_matrix, cell_covariate_data_frame
   if (!parallel) {
     initial_assignment_list <- analyze_given_grna_ids(grna_ids)
   } else {
-    cat("Running gRNA assignments in parallel. ")
+    message("Running gRNA assignments in parallel.")
     if (print_progress) {
-      cat(paste0(
+      message(
         "Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ",
-        crayon::blue("assign_grnas_*.out"), " for progress updates.\n"
-      ))
+        crayon::blue("assign_grnas_*.out"), " for progress updates."
+      )
     }
     grna_ids_partitioned <- partition_response_ids(grna_ids, parallel, n_processors)
     res <- parallel::mclapply(seq_along(grna_ids_partitioned),

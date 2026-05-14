@@ -215,7 +215,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   out_list <- vector(mode = "list", length = length(directories))
   n_cells_per_matrix <- vector(mode = "integer", length = length(directories))
   for (i in seq_along(directories)) {
-    cat(paste0("Processing directory ", i, "."))
+    message("Processing directory ", i, ".")
     # check that the features df matches
     features_fp <- feature_fps[i]
     curr_feature_df <- data.table::fread(
@@ -258,11 +258,11 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
     rm(dt)
     gc() |> invisible()
     out_list[[i]] <- subsetted_mats
-    cat(crayon::green(" \u2713\n"))
+    message(crayon::green(" \u2713"))
   }
 
   # 6. combine the matrices via do.call cbind
-  cat("Combining matrices across directories.")
+  message("Combining matrices across directories.")
   out_mats <- lapply(modalities, function(modality) {
     l <- lapply(out_list, function(mat) mat[[modality]])
     combined_mat <- do.call(what = "cbind", args = l)
@@ -270,7 +270,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   })
   rm(out_list)
   gc() |> invisible()
-  cat(crayon::green(" \u2713\n"))
+  message(crayon::green(" \u2713"))
 
   # 7. collect metadata pieces
   for (modality in modalities) {
@@ -291,7 +291,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   }
 
   # 9. initialize the sceptre object
-  cat("Creating the sceptre object.")
+  message("Creating the sceptre object.")
   sceptre_object <- import_data_memory(
     response_matrix = out_mats[["Gene Expression"]],
     grna_matrix = out_mats[["CRISPR Guide Capture"]],
@@ -301,7 +301,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
     response_names = gene_names
   )
   gc() |> invisible()
-  cat(crayon::green(" \u2713"))
+  message(crayon::green(" \u2713"))
   return(sceptre_object)
 }
 
