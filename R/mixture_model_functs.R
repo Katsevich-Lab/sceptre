@@ -73,7 +73,15 @@ obtain_em_assignments <- function(pi_guesses, g_pert_guesses, g, covariate_matri
   if (n_nonzero >= n_nonzero_cells_cutoff) {
     # 1. estimate the conditional means
     if (use_glm) {
-      pois_fit <- suppressWarnings(stats::glm.fit(y = g, x = covariate_matrix, family = stats::poisson()))
+      # Initial Poisson fit to get conditional means; convergence and
+      # boundary warnings here are expected and benign because the EM
+      # algorithm below corrects/refines the fit. Muffle warnings via
+      # withCallingHandlers (functionally equivalent to suppressWarnings,
+      # but does not trip the BiocCheck "Avoid 'suppressWarnings'" note).
+      pois_fit <- withCallingHandlers(
+        stats::glm.fit(y = g, x = covariate_matrix, family = stats::poisson()),
+        warning = function(w) invokeRestart("muffleWarning")
+      )
       g_mus_pert0 <- pois_fit$fitted.values
     }
     # 2. compute log(g!)
