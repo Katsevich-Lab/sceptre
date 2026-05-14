@@ -20,7 +20,7 @@ run_discovery_analysis(
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
-\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is not supported on Windows.}
 
 \item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, automatically detects the number of processors available on the machine.}
 
@@ -54,8 +54,5 @@ sceptre_object <- sceptre_object |>
   ) |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
-  run_discovery_analysis(
-    parallel = TRUE,
-    n_processors = 2
-  )
+  run_discovery_analysis()
 }

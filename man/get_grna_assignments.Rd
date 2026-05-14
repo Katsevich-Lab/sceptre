@@ -38,9 +38,7 @@ sceptre_object <- sceptre_object |>
     discovery_pairs = discovery_pairs,
     side = "left"
   ) |>
-  assign_grnas(
-    method = "mixture", parallel = TRUE, n_processors = 2
-  ) |>
+  assign_grnas(method = "mixture") |>
   run_qc()
 
 grna_assignment_matrix <- get_grna_assignments(
