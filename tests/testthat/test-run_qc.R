@@ -58,18 +58,22 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
   response_matrix[] <- rep(c(0, 0, 1, 0), times = prod(dim(response_matrix)) / 4)
   for (i in 1:nrow(response_matrix)) response_matrix[i, i] <- 2 # to avoid low rank covariate data frame
 
-  scep_low <- import_data(
-    grna_matrix = grna_matrix,
-    response_matrix = response_matrix,
-    grna_target_data_frame = test_data_list$grna_target_data_frame,
-    moi = "low"
-  ) |>
-    set_analysis_parameters(
-      positive_control_pairs = test_data_list$positive_control_pairs,
-      discovery_pairs = test_data_list$discovery_pairs
+  scep_low <- NULL
+  expect_warning(
+    scep_low <- import_data(
+      grna_matrix = grna_matrix,
+      response_matrix = response_matrix,
+      grna_target_data_frame = test_data_list$grna_target_data_frame,
+      moi = "low"
     ) |>
-    assign_grnas(method = "thresholding", threshold = 9) |>
-    run_qc()
+      set_analysis_parameters(
+        positive_control_pairs = test_data_list$positive_control_pairs,
+        discovery_pairs = test_data_list$discovery_pairs
+      ) |>
+      assign_grnas(method = "thresholding", threshold = 9) |>
+      run_qc(),
+    "large percentage of cells"
+  )
 
   # the only cells in use are those with a single grna UMI count exceeding
   # the threshold
