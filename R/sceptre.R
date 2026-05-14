@@ -13,7 +13,6 @@ utils::globalVariables(c(
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @import BH
 #' @keywords package
 #' @examples
 #' \donttest{

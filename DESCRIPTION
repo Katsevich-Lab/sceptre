@@ -23,7 +23,6 @@ RoxygenNote: 7.3.3
 LinkingTo: Rcpp, BH
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
-    BH,
     cowplot,
     crayon,
     data.table,
@@ -34,7 +33,9 @@ Imports:
     Rcpp (>= 1.0.9),
     scales,
     stats,
-    purrr
+    purrr,
+    parallelly (>= 1.47.0),
+    withr
 Depends: 
     R (>= 4.1)
 Suggests:
@@ -43,14 +44,11 @@ Suggests:
     sessioninfo,
     rmarkdown,
     knitr,
-    parallel,
     testthat (>= 3.0.0),
-    magrittr,
     MASS
 Remotes: github::timothy-barry/ondisc
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre
 BugReports: https://github.com/Katsevich-Lab/sceptre/issues
-LazyDataCompression: gzip
-LazyData: true
+LazyData: false
