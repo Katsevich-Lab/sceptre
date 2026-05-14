@@ -41,6 +41,9 @@
 #' )
 read_ondisc_backed_sceptre_object <- function(sceptre_object_fp, response_odm_file_fp, grna_odm_file_fp) {
   # read in objects
+  sceptre_object_fp <- prepare_ondisc_file_path(sceptre_object_fp, "`sceptre_object_fp`")
+  response_odm_file_fp <- prepare_ondisc_file_path(response_odm_file_fp, "`response_odm_file_fp`")
+  grna_odm_file_fp <- prepare_ondisc_file_path(grna_odm_file_fp, "`grna_odm_file_fp`")
   sceptre_object <- readRDS(sceptre_object_fp)
   response_odm <- ondisc::initialize_odm_from_backing_file(response_odm_file_fp)
   grna_odm <- ondisc::initialize_odm_from_backing_file(grna_odm_file_fp)
@@ -64,8 +67,8 @@ write_ondisc_backed_sceptre_object <- function(sceptre_object, directory_to_writ
   sceptre_object <- set_grna_matrix(sceptre_object, list())
   sceptre_object <- set_response_matrix(sceptre_object, list())
   # check that dir exists
-  if (!dir.exists(directory_to_write)) dir.create(directory_to_write, recursive = TRUE)
-  saveRDS(sceptre_object, paste0(directory_to_write, "/sceptre_object.rds"))
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
+  saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))
 }
 
 
