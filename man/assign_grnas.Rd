@@ -21,7 +21,7 @@ assign_grnas(
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
 
-\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is not supported on Windows.}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.}
 
 \item{n_processors}{(optional; default "auto") an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, automatically detects the number of processors available on the machine.}
 

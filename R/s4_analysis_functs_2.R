@@ -7,7 +7,7 @@
 #' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
 #' @param calibration_group_size (optional) the number of negative control gRNAs to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel. `parallel = TRUE` is not supported on Windows.
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel. `parallel = TRUE` is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.
 #' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
@@ -65,7 +65,7 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
-  if (!parallel) cat(crayon::red("Note: On Unix-alike systems, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. handle the default arguments
   if (sceptre_object@n_discovery_pairs == 0L && (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
@@ -172,7 +172,7 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
   check_parallel_supported(parallel) |> invisible()
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
-  if (!parallel) cat(crayon::red("Note: On Unix-alike systems, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
@@ -250,7 +250,7 @@ run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_prog
   check_parallel_supported(parallel) |> invisible()
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
-  if (!parallel) cat(crayon::red("Note: On Unix-alike systems, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
