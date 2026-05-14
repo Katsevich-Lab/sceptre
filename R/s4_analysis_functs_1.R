@@ -146,7 +146,7 @@ set_analysis_parameters <- function(sceptre_object,
 #' @param sceptre_object a `sceptre_object`
 #' @param method (optional) a string indicating the method to use to assign the gRNAs to cells, one of `"mixture"`, `"thresholding"`, or `"maximum"`. The default is `"maximum"` in low MOI and `"mixture"` in high MOI.
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel. `parallel = TRUE` is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.
 #' @param n_processors (optional; default "auto") an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @param ... optional method-specific additional arguments
@@ -167,12 +167,11 @@ set_analysis_parameters <- function(sceptre_object,
 #' # 2. assign gRNAs (three different methods)
 #' sceptre_object <- sceptre_object |> assign_grnas(method = "thresholding")
 #' sceptre_object <- sceptre_object |> assign_grnas(method = "maximum")
-#' sceptre_object <- sceptre_object |> assign_grnas(
-#'   method = "mixture", parallel = TRUE, n_processors = 2
-#' )
+#' sceptre_object <- sceptre_object |> assign_grnas(method = "mixture")
 assign_grnas <- function(sceptre_object, method = "default", print_progress = TRUE, parallel = FALSE,
                          n_processors = "auto", log_dir = tempdir(), ...) {
   # 0. verify that function called in correct order
+  check_parallel_supported(parallel) |> invisible()
   sceptre_object <- perform_status_check_and_update(sceptre_object, "assign_grnas")
 
   # 1. handle the default arguments
