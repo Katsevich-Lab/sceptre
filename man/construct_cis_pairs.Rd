@@ -8,7 +8,7 @@ construct_cis_pairs(
   sceptre_object,
   positive_control_pairs = data.frame(),
   distance_threshold = 500000L,
-  response_position_data_frame = gene_position_data_frame_grch38
+  response_position_data_frame = NULL
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ construct_cis_pairs(
 
 \item{distance_threshold}{(optional) target-response pairs located within \code{distance_threshold} bases of one another and on the same chromosome are included in the \emph{cis} discovery set.}
 
-\item{response_position_data_frame}{(optional) a data frame with columns \code{response_id}, \code{chr}, and \code{position} giving the genomic coordinate of each response; by default \code{response_position_data_frame} is set to a data frame containing the genomic coordinate of each gene in the human genome relative to reference genome GRCh38.}
+\item{response_position_data_frame}{(optional) a data frame with columns \code{response_id}, \code{chr}, and \code{position} giving the genomic coordinate of each response; by default, the packaged GRCh38 gene position data frame is used.}
 }
 \value{
 a data frame with columns \code{grna_target} and \code{response_id} containing the \emph{cis} pairs
