@@ -68,6 +68,23 @@ test_that("test all plots", {
     run_power_check() |>
     run_discovery_analysis()
 
+  expect_rng_preserved <- function(expr) {
+    set.seed(123)
+    seed_before <- .Random.seed
+    out <- force(expr)
+    expect_equal(.Random.seed, seed_before)
+    out
+  }
+  expect_plot_build_rng_preserved <- function(plot) {
+    set.seed(456)
+    seed_before <- .Random.seed
+    ggplot2::ggplot_build(plot)
+    expect_equal(.Random.seed, seed_before)
+  }
+
+  default_grna_plots <- expect_rng_preserved(plot_grna_count_distributions(scep, return_indiv_plots = TRUE))
+  expect_length(default_grna_plots, 4)
+
   ## testing `plot_grna_count_distributions()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   pltlist <- plot_grna_count_distributions(scep, grnas_to_plot = c("id2", "id3", "nt2"), return_indiv_plots = TRUE)
   expect_equal(length(pltlist), 3)
@@ -77,7 +94,8 @@ test_that("test all plots", {
   expect_equal(pltlist[[1]]$labels$x, "gRNA count")
 
   ## testing `plot_assign_grnas()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  pltlist <- plot_assign_grnas(scep, grnas_to_plot = c("nt1", "id1"), return_indiv_plots = TRUE)
+  pltlist <- expect_rng_preserved(plot_assign_grnas(scep, grnas_to_plot = c("nt1", "id1"), return_indiv_plots = TRUE))
+  expect_plot_build_rng_preserved(pltlist[[1]])
   expect_equal(length(pltlist), 3)
 
   expect_true(!"title" %in% names(pltlist[[1]]$labels)) # no title for this plot
@@ -93,7 +111,8 @@ test_that("test all plots", {
   expect_equal(pltlist[[3]]$labels$y, "Frequency")
 
   ## testing `plot_run_calibration_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  pltlist <- plot_run_calibration_check(scep, return_indiv_plots = TRUE)
+  pltlist <- expect_rng_preserved(plot_run_calibration_check(scep, return_indiv_plots = TRUE))
+  invisible(lapply(pltlist[1:2], expect_plot_build_rng_preserved))
   expect_equal(length(pltlist), 4)
 
   expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
@@ -112,7 +131,8 @@ test_that("test all plots", {
   expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
   # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  pltlist <- plot_run_discovery_analysis(scep, return_indiv_plots = TRUE)
+  pltlist <- expect_rng_preserved(plot_run_discovery_analysis(scep, return_indiv_plots = TRUE))
+  invisible(lapply(pltlist[1:2], expect_plot_build_rng_preserved))
   expect_equal(length(pltlist), 4)
 
   expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
@@ -131,7 +151,7 @@ test_that("test all plots", {
   expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
   # testing `plot_run_qc()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  pltlist <- plot_run_qc(scep, return_indiv_plots = TRUE)
+  pltlist <- expect_rng_preserved(plot_run_qc(scep, return_indiv_plots = TRUE))
   expect_equal(length(pltlist), 2)
 
   expect_equal(pltlist[[1]]$labels$title, "Cellwise QC")
@@ -143,13 +163,15 @@ test_that("test all plots", {
   expect_equal(pltlist[[2]]$labels$y, "N nonzero cntrl. cells")
 
   # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  plt <- plot_run_power_check(scep)
+  plt <- expect_rng_preserved(plot_run_power_check(scep))
+  expect_plot_build_rng_preserved(plt)
   expect_equal(plt$labels$title, "Positive and negative control p-values")
   expect_equal(plt$labels$x, "Pair type")
   expect_equal(plt$labels$y, "p-value")
 
-  # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  plt <- plot_response_grna_target_pair(scep, response_id = "response_4", grna_target = "t1")
+  # testing `plot_response_grna_target_pair()` ~~~~~~~~~~~~~~~~~~~~~~~~~
+  plt <- expect_rng_preserved(plot_response_grna_target_pair(scep, response_id = "response_4", grna_target = "t1"))
+  expect_plot_build_rng_preserved(plt)
   expect_equal(plt$labels$title, "Response: response_4\ngRNA target: t1")
   expect_equal(plt$labels$x, "Treatment status")
   expect_equal(plt$labels$y, "Normalized expression")

@@ -43,7 +43,9 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
   # rounding just in case the user provides a non-integer one
   if (!is.null(threshold)) threshold <- round(threshold)
   if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+    grnas_to_plot <- withr::with_seed(4, {
+      sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
+    })
   } else {
     if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
@@ -177,7 +179,9 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   grna_ids <- grna_ids[assigned]
   # sample grnas to plot
   if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- sample(x = grna_ids, size = min(length(grna_ids), n_grnas_to_plot), replace = FALSE)
+    grnas_to_plot <- withr::with_seed(4, {
+      sample(x = grna_ids, size = min(length(grna_ids), n_grnas_to_plot), replace = FALSE)
+    })
   } else {
     if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
   }
@@ -198,14 +202,16 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   }) |> data.table::rbindlist()
 
   # downsample the unperturbed cells
-  to_plot_a <- to_plot_a |>
-    dplyr::group_by(g) |>
-    dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
-    dplyr::ungroup()
+  to_plot_a <- withr::with_seed(4, {
+    to_plot_a |>
+      dplyr::group_by(g) |>
+      dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
+      dplyr::ungroup()
+  })
 
   # plot a
   p_a <- ggplot2::ggplot(data = to_plot_a, mapping = ggplot2::aes(x = assignment, y = g, col = assignment)) +
-    ggplot2::geom_jitter(alpha = transparency, size = point_size) +
+    ggplot2::geom_jitter(alpha = transparency, size = point_size, position = ggplot2::position_jitter(seed = 4)) +
     ggplot2::facet_wrap(nrow = 1, facets = grna_id ~ ., scales = "free_y") +
     ggplot2::scale_y_continuous(trans = "log1p", breaks = c(0, 1, 5, 15, 50, 200, 1000, 5000, 10000)) +
     ggplot2::xlab("Assignment") +
@@ -218,13 +224,15 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
   # plot b
   n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
   mean_c_cells_per_grna <- mean(n_cells_per_grna)
-  to_plot_b <- data.frame(
-    x = n_cells_per_grna,
-    y = names(n_cells_per_grna)
-  ) |>
-    dplyr::arrange(n_cells_per_grna) |>
-    dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
-    dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
+  to_plot_b <- withr::with_seed(4, {
+    data.frame(
+      x = n_cells_per_grna,
+      y = names(n_cells_per_grna)
+    ) |>
+      dplyr::arrange(n_cells_per_grna) |>
+      dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
+      dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
+  })
   p_b <- ggplot2::ggplot(
     data = to_plot_b,
     mapping = ggplot2::aes(x = x, y = y)
@@ -755,7 +763,9 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
   discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
     dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
     dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
-  if (nrow(discovery_pairs) >= downsample_pairs) discovery_pairs <- discovery_pairs |> dplyr::sample_n(downsample_pairs)
+  if (nrow(discovery_pairs) >= downsample_pairs) {
+    discovery_pairs <- withr::with_seed(4, discovery_pairs |> dplyr::sample_n(downsample_pairs))
+  }
 
   p_b <- ggplot2::ggplot(
     data = discovery_pairs,
@@ -840,14 +850,11 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
     stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
   }
   my_theme <- get_my_theme()
-  set.seed(3)
   my_cols <- c("mediumseagreen", "firebrick1")
 
   pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
   neg_ctrl_pval_sub <- if (nrow(sceptre_object@calibration_result) >= 1) {
-    downsample_result_data_frame(
-      result_df = sceptre_object@calibration_result
-    ) |> dplyr::pull(p_value)
+    downsample_result_data_frame(result_df = sceptre_object@calibration_result) |> dplyr::pull(p_value)
   } else {
     numeric(0)
   }
@@ -868,7 +875,7 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
   )
   my_breaks <- 10^(seq(-2, -40, by = -4))
   p <- p +
-    ggplot2::geom_jitter(width = .25, height = 0, size = point_size, alpha = transparency) +
+    ggplot2::geom_jitter(position = ggplot2::position_jitter(width = .25, height = 0, seed = 4), size = point_size, alpha = transparency) +
     ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0), breaks = my_breaks) +
     ggplot2::scale_color_manual(values = my_cols, guide = "none") +
     ggplot2::labs(
@@ -883,10 +890,12 @@ plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 
 
 
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
-  result_df |>
-    dplyr::mutate(bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))) |>
-    dplyr::group_by(bin) |>
-    dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
+  withr::with_seed(4, {
+    result_df |>
+      dplyr::mutate(bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))) |>
+      dplyr::group_by(bin) |>
+      dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
+  })
 }
 
 
@@ -1011,15 +1020,16 @@ plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_tar
     labels = c(paste0("p <= 10^{", seq(-10, -2), "}"), "p > 0.01", "")
   ) |> as.character()
   # create the plot
-  set.seed(4)
-  to_plot_downsample <- to_plot |>
-    dplyr::mutate(is_zero = (normalized_count == 0)) |>
-    dplyr::group_by(is_zero, treatment) |>
-    dplyr::sample_n(size = min(dplyr::n(), 1000))
+  to_plot_downsample <- withr::with_seed(4, {
+    to_plot |>
+      dplyr::mutate(is_zero = (normalized_count == 0)) |>
+      dplyr::group_by(is_zero, treatment) |>
+      dplyr::sample_n(size = min(dplyr::n(), 1000))
+  })
   p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
     ggplot2::geom_violin(linewidth = 0.6) +
     ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.4, linewidth = 0.4) +
-    ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5) +
+    ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5, position = ggplot2::position_jitter(seed = 4)) +
     get_my_theme() +
     ggplot2::theme(legend.position = "none") +
     ggplot2::scale_color_manual(values = c("dodgerblue4", "firebrick4")) +

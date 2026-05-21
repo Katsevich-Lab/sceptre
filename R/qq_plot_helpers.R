@@ -36,30 +36,32 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
       scales$y$trans <- scales::identity_trans()
     }
     # compute the upper and lower confidence bands
-    data |>
-      # the given y is already transformed, so transform it back first
-      dplyr::mutate(y = scales$y$trans$inverse(y)) |>
-      # apply the formulas for the confidence bands
-      dplyr::mutate(
-        r = rank(y, ties.method = "first"),
-        x = quantile_fun(stats::ppoints(dplyr::n())[r]),
-        ymin = quantile_fun(stats::qbeta(p = (1 - ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
-        ymax = quantile_fun(stats::qbeta(p = (1 + ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r))
-      ) |>
-      # transform
-      dplyr::mutate(
-        x = scales$x$trans$transform(x),
-        y = scales$y$trans$transform(y),
-        ymin = scales$y$trans$transform(ymin),
-        ymax = scales$y$trans$transform(ymax)
-      ) |> # downsample
-      dplyr::mutate(
-        x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
-        y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
-      ) |>
-      dplyr::group_by(x_int, y_int) |>
-      dplyr::slice_sample(n = 1) |>
-      dplyr::ungroup()
+    withr::with_seed(4, {
+      data |>
+        # the given y is already transformed, so transform it back first
+        dplyr::mutate(y = scales$y$trans$inverse(y)) |>
+        # apply the formulas for the confidence bands
+        dplyr::mutate(
+          r = rank(y, ties.method = "first"),
+          x = quantile_fun(stats::ppoints(dplyr::n())[r]),
+          ymin = quantile_fun(stats::qbeta(p = (1 - ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r)),
+          ymax = quantile_fun(stats::qbeta(p = (1 + ci_level) / 2, shape1 = r, shape2 = dplyr::n() + 1 - r))
+        ) |>
+        # transform
+        dplyr::mutate(
+          x = scales$x$trans$transform(x),
+          y = scales$y$trans$transform(y),
+          ymin = scales$y$trans$transform(ymin),
+          ymax = scales$y$trans$transform(ymax)
+        ) |> # downsample
+        dplyr::mutate(
+          x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
+          y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
+        ) |>
+        dplyr::group_by(x_int, y_int) |>
+        dplyr::slice_sample(n = 1) |>
+        dplyr::ungroup()
+    })
   }
 )
 
@@ -100,26 +102,28 @@ StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
     }
     # get the quantile function from the stats package
     quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
-    data |>
-      # the given y is already transformed, so transform it back first
-      dplyr::mutate(
-        y = scales$y$trans$inverse(y),
-        # apply the formula
-        x = quantile_fun(stats::ppoints(dplyr::n())[rank(y, ties.method = "first")]),
-        # threshold
-        y = pmin(pmax(y, ymin), ymax),
-        # transform
-        x = scales$x$trans$transform(x),
-        y = scales$y$trans$transform(y)
-      ) |>
-      # downsample
-      dplyr::mutate(
-        x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
-        y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
-      ) |>
-      dplyr::group_by(x_int, y_int) |>
-      dplyr::slice_sample(n = 1) |>
-      dplyr::ungroup()
+    withr::with_seed(4, {
+      data |>
+        # the given y is already transformed, so transform it back first
+        dplyr::mutate(
+          y = scales$y$trans$inverse(y),
+          # apply the formula
+          x = quantile_fun(stats::ppoints(dplyr::n())[rank(y, ties.method = "first")]),
+          # threshold
+          y = pmin(pmax(y, ymin), ymax),
+          # transform
+          x = scales$x$trans$transform(x),
+          y = scales$y$trans$transform(y)
+        ) |>
+        # downsample
+        dplyr::mutate(
+          x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
+          y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
+        ) |>
+        dplyr::group_by(x_int, y_int) |>
+        dplyr::slice_sample(n = 1) |>
+        dplyr::ungroup()
+    })
   }
 )
 
