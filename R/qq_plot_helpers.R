@@ -25,7 +25,7 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
       data
     }
   },
-  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ci_level = 0.95, seed = 1) {
+  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ci_level = 0.95) {
     # get the quantile function from the stats package
     quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
     # set x and y transformations to identity if they are not given
@@ -36,7 +36,7 @@ StatQQBand <- ggplot2::ggproto("StatQQBand", ggplot2::Stat,
       scales$y$trans <- scales::identity_trans()
     }
     # compute the upper and lower confidence bands
-    withr::with_seed(seed, {
+    withr::with_seed(4, {
       data |>
         # the given y is already transformed, so transform it back first
         dplyr::mutate(y = scales$y$trans$inverse(y)) |>
@@ -78,13 +78,13 @@ stat_qq_band <- function(mapping = NULL, data = NULL, geom = "ribbon",
                          position = "identity", show.legend = FALSE,
                          inherit.aes = TRUE, distribution = "unif",
                          max_pts_to_plot = 500,
-                         ci_level = 0.95, seed = 1, ...) {
+                         ci_level = 0.95, ...) {
   ggplot2::layer(
     stat = StatQQBand, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       alpha = 0.25, distribution = distribution,
-      max_pts_to_plot = max_pts_to_plot, ci_level = ci_level, seed = seed, ...
+      max_pts_to_plot = max_pts_to_plot, ci_level = ci_level, ...
     )
   )
 }
@@ -92,7 +92,7 @@ stat_qq_band <- function(mapping = NULL, data = NULL, geom = "ribbon",
 # workhorse function for \code{stat_qq_points}
 StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
   required_aes = c("y"),
-  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ymin = -Inf, ymax = Inf, seed = 1) {
+  compute_group = function(data, scales, distribution = "unif", max_pts_to_plot = 500, ymin = -Inf, ymax = Inf) {
     # set x and y transformations to identity if they are not given
     if (is.null(scales$x$trans)) {
       scales$x$trans <- scales::identity_trans()
@@ -102,7 +102,7 @@ StatQQPoints <- ggplot2::ggproto("StatQQPoints", ggplot2::Stat,
     }
     # get the quantile function from the stats package
     quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
-    withr::with_seed(seed, {
+    withr::with_seed(4, {
       data |>
         # the given y is already transformed, so transform it back first
         dplyr::mutate(
@@ -143,13 +143,13 @@ stat_qq_points <- function(mapping = NULL, data = NULL, geom = "point",
                            position = "identity", show.legend = NA,
                            distribution = "unif", max_pts_to_plot = 500,
                            ymin = -Inf, ymax = Inf,
-                           inherit.aes = TRUE, seed = 1, ...) {
+                           inherit.aes = TRUE, ...) {
   ggplot2::layer(
     stat = StatQQPoints, data = data, mapping = mapping, geom = geom,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(
       distribution = distribution, max_pts_to_plot = max_pts_to_plot,
-      ymin = ymin, ymax = ymax, seed = seed, ...
+      ymin = ymin, ymax = ymax, ...
     )
   )
 }
