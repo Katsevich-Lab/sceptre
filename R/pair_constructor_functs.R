@@ -50,7 +50,7 @@ construct_cis_pairs <- function(sceptre_object, positive_control_pairs = data.fr
   # 2. subset response_position_data_frame so that only genes within response matrix remain
   response_position_data_frame <- response_position_data_frame |> dplyr::filter(response_id %in% response_ids)
   if (nrow(response_position_data_frame) == 0L) {
-    stop("The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `head(gene_position_data_frame_grch38)`.")
+    stop("The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `data(gene_position_data_frame_grch38); head(gene_position_data_frame_grch38)`.")
   }
 
   # 3. loop over chromosomes in grna group df
