@@ -561,7 +561,14 @@ prepare_ondisc_file_path <- function(file_path, arg_name) {
 
 check_path_has_no_tilde <- function(file_path, arg_name) {
   if (grepl("~", file_path, fixed = TRUE)) {
-    stop(arg_name, " cannot contain '~' after path normalization.")
+    stop(
+      arg_name, " resolves to '", file_path, "', which contains a '~' character ",
+      "inside a directory or file name. HDF5 misinterprets embedded tildes as ",
+      "user-home expansion and produces a corrupted path. Please choose a path ",
+      "where no directory or file name contains '~' (a leading '~/' is fine — ",
+      "it is expanded before this check).",
+      call. = FALSE
+    )
   }
   return(NULL)
 }
