@@ -327,10 +327,8 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
 #'   run_calibration_check(
-#'     parallel = TRUE,
-#'     n_processors = 2,
 #'     n_calibration_pairs = 500,
-#'     calibration_group_size = 2,
+#'     calibration_group_size = 2
 #'   ) |>
 #'   plot_run_calibration_check()
 plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
@@ -529,14 +527,8 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 #'   ) |>
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
-#'   run_calibration_check(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   ) |>
-#'   run_discovery_analysis(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   ) |>
+#'   run_calibration_check() |>
+#'   run_discovery_analysis() |>
 #'   plot_run_discovery_analysis()
 plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5), point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
   if (!sceptre_object@functs_called["run_discovery_analysis"]) {
@@ -838,8 +830,6 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
 #'   run_calibration_check(
-#'     parallel = TRUE,
-#'     n_processors = 2,
 #'     n_calibration_pairs = 500,
 #'     calibration_group_size = 2
 #'   ) |>
@@ -931,10 +921,7 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 #'   ) |>
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
-#'   run_discovery_analysis(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   ) |>
+#'   run_discovery_analysis() |>
 #'   plot_response_grna_target_pair(
 #'     response_id = "ENSG00000211641",
 #'     grna_target = "candidate_enh_15"
