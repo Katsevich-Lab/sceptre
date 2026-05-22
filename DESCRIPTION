@@ -34,7 +34,7 @@ Imports:
     scales,
     stats,
     purrr,
-    parallelly,
+    parallelly (>= 1.23.0),
     withr
 Depends: 
     R (>= 4.1)
