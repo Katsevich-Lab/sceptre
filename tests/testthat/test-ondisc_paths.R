@@ -13,9 +13,19 @@ test_that("ondisc output paths reject tildes after normalization", {
 
   expect_error(
     prepare_directory_to_write(directory_to_write),
-    "cannot contain '~'",
+    "contains a '~' character inside a directory or file name",
     fixed = TRUE
   )
+})
+
+test_that("leading ~/ paths are accepted (expanded before the tilde check)", {
+  directory_to_write <- "~/sceptre_leading_tilde_test"
+  on.exit(unlink(path.expand(directory_to_write), recursive = TRUE), add = TRUE)
+
+  prepared <- prepare_directory_to_write(directory_to_write)
+
+  expect_true(dir.exists(prepared))
+  expect_false(grepl("~", prepared, fixed = TRUE))
 })
 
 test_that("import_data can create ondisc-backed objects in a normalized directory", {
