@@ -3,7 +3,7 @@ get_id_from_idx <- function(response_idx, print_progress, response_ids, print_mu
                             feature = "response", str = "Analyzing pairs containing ", parallel = FALSE, f_name = NULL) {
   if ((response_idx == 1 || response_idx %% print_multiple == 0) && print_progress) {
     msg <- paste0(str, feature, " ", as.character(response_ids[response_idx]), " (", response_idx, " of ", length(response_ids), ")\n")
-    if (parallel) write(x = msg, file = f_name, append = TRUE) else cat(msg)
+    if (parallel) write(x = msg, file = f_name, append = TRUE) else message(msg, appendLF = FALSE)
   }
   if (response_idx %% gc_multiple == 0) gc() |> invisible()
   response_id <- as.character(response_ids[response_idx])
@@ -109,13 +109,14 @@ run_perm_test_in_memory <- function(response_matrix, grna_assignments, covariate
   if (!parallel) {
     res <- lapply(partitioned_response_ids, analyze_given_response_ids)
   } else {
-    cat(paste0("Running ", analysis_type, " in parallel. "))
-    if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates.\n"))
+    message("Running ", analysis_type, " in parallel.")
+    log_file_pattern <- paste0(analysis_type, "_*.out")
+    if (print_progress) message("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(log_file_pattern), " for progress updates.")
     res <- parallel::mclapply(seq_along(partitioned_response_ids),
       function(proc_id) analyze_given_response_ids(partitioned_response_ids[[proc_id]], proc_id),
       mc.cores = length(partitioned_response_ids)
     )
-    cat(crayon::green(" \u2713\n"))
+    message(crayon::green(" \u2713"))
   }
 
   # 5. combine and sort result
@@ -195,8 +196,9 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
     if (!parallel) {
       res <- lapply(partitioned_response_ids, run_precomp_on_given_responses)
     } else {
-      cat(paste0("Running ", analysis_type, " in parallel. "))
-      if (print_progress) cat(paste0("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(paste0(analysis_type, "_*.out")), " for progress updates. "))
+      message("Running ", analysis_type, " in parallel.")
+      log_file_pattern <- paste0(analysis_type, "_*.out")
+      if (print_progress) message("Change directories to ", crayon::blue(get_log_dir(log_dir)), " and view the files ", crayon::blue(log_file_pattern), " for progress updates.")
       res <- parallel::mclapply(seq_along(partitioned_response_ids),
         function(proc_id) run_precomp_on_given_responses(partitioned_response_ids[[proc_id]], proc_id),
         mc.cores = length(partitioned_response_ids)
@@ -252,7 +254,7 @@ run_crt_in_memory_v2 <- function(response_matrix, grna_assignments, covariate_ma
       function(proc_id) perform_association_analysis(partitioned_grna_group_ids[[proc_id]], proc_id),
       mc.cores = length(partitioned_grna_group_ids)
     )
-    cat(crayon::green(" \u2713\n"))
+    message(crayon::green(" \u2713"))
   }
   result <- res |> data.table::rbindlist(fill = TRUE)
 
