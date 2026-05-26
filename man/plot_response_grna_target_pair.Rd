@@ -43,10 +43,7 @@ sceptre_object |>
   ) |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
-  run_discovery_analysis(
-    parallel = TRUE,
-    n_processors = 2
-  ) |>
+  run_discovery_analysis() |>
   plot_response_grna_target_pair(
     response_id = "ENSG00000211641",
     grna_target = "candidate_enh_15"

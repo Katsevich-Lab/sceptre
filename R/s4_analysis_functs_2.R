@@ -7,7 +7,7 @@
 #' @param n_calibration_pairs (optional) the number of negative control pairs to construct and test for association
 #' @param calibration_group_size (optional) the number of negative control gRNAs to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel
+#' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel. `parallel = TRUE` is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.
 #' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
@@ -36,13 +36,12 @@
 #'   run_qc() |>
 #'   run_calibration_check(
 #'     n_calibration_pairs = 500,
-#'     calibration_group_size = 2,
-#'     parallel = TRUE,
-#'     n_processors = 2
+#'     calibration_group_size = 2
 #'   )
 run_calibration_check <- function(sceptre_object, n_calibration_pairs = NULL,
                                   calibration_group_size = NULL, print_progress = TRUE, parallel = FALSE,
                                   n_processors = "auto", log_dir = tempdir(), output_amount = 1) {
+  check_parallel_supported(parallel) |> invisible()
   sceptre_object <- sceptre_object |>
     run_calibration_check_pt_1(
       n_calibration_pairs = n_calibration_pairs,
@@ -66,7 +65,7 @@ run_calibration_check_pt_1 <- function(sceptre_object, n_calibration_pairs = NUL
   # 0. advance function (if necessary), and check function call
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_calibration_check")
-  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) message(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."))
 
   # 1. handle the default arguments
   if (sceptre_object@n_discovery_pairs == 0L && (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
@@ -170,9 +169,10 @@ process_calibration_result <- function(result, sceptre_object) {
 run_power_check <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                             n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
+  check_parallel_supported(parallel) |> invisible()
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_power_check")
-  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) message(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@positive_control_pairs_with_info
@@ -243,16 +243,14 @@ run_power_check <- function(sceptre_object, output_amount = 1, print_progress = 
 #'   ) |>
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
-#'   run_discovery_analysis(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   )
+#'   run_discovery_analysis()
 run_discovery_analysis <- function(sceptre_object, output_amount = 1, print_progress = TRUE, parallel = FALSE,
                                    n_processors = "auto", log_dir = tempdir()) {
   # 0. verify that function called in correct order
+  check_parallel_supported(parallel) |> invisible()
   sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
   sceptre_object <- perform_status_check_and_update(sceptre_object, "run_discovery_analysis")
-  if (!parallel) cat(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.\n\n"))
+  if (!parallel) message(crayon::red("Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."))
 
   # 1. extract relevant arguments
   response_grna_group_pairs <- sceptre_object@discovery_pairs_with_info
@@ -304,7 +302,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
                                             output_amount, print_progress, parallel, n_processors, log_dir) {
   # if running permutations, generate the permutation idxs
   if (sceptre_object@run_permutations) {
-    cat("Generating permutation resamples.")
+    message("Generating permutation resamples.")
     synthetic_idxs <- get_synthetic_permutation_idxs(
       grna_assignments = sceptre_object@grna_assignments,
       B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
@@ -313,7 +311,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
       calibration_group_size = sceptre_object@calibration_group_size,
       n_cells = length(sceptre_object@cells_in_use)
     )
-    cat(crayon::green(" \u2713\n"))
+    message(crayon::green(" \u2713"))
   }
   gc() |> invisible()
 
@@ -482,15 +480,9 @@ get_result <- function(sceptre_object, analysis) {
 #'   ) |>
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
-#'   run_calibration_check(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   ) |>
+#'   run_calibration_check() |>
 #'   run_power_check() |>
-#'   run_discovery_analysis(
-#'     parallel = TRUE,
-#'     n_processors = 2
-#'   ) |>
+#'   run_discovery_analysis() |>
 #'   write_outputs_to_directory(paste0(tempdir(), "/sceptre_outputs"))
 #' # files written to "sceptre_outputs" in tempdir()
 write_outputs_to_directory <- function(sceptre_object, directory) {
@@ -541,11 +533,11 @@ skip_assign_grnas_and_run_qc <- function(sceptre_object, parallel, n_processors)
   functs_run <- sceptre_object@functs_called
   if (functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]) {
     if (!functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
-      cat(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.\n\n"))
+      message(crayon::red("Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments."))
       sceptre_object <- assign_grnas(sceptre_object, parallel = parallel, n_processors = n_processors) |> run_qc() # advance by two
     }
     if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
-      cat(crayon::red("Note: Automatically running `run_qc()` with default arguments.\n\n"))
+      message(crayon::red("Note: Automatically running `run_qc()` with default arguments."))
       sceptre_object <- sceptre_object |> run_qc() # advance by one
     }
   }

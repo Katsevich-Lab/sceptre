@@ -219,6 +219,21 @@ check_set_analysis_parameters <- function(sceptre_object, formula_object, respon
 }
 
 
+check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
+  if (!is.logical(parallel) || length(parallel) != 1L || is.na(parallel)) {
+    stop("`parallel` should be a single logical value.")
+  }
+  if (parallel && identical(os_type, "windows")) {
+    stop(
+      "`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. ",
+      "Please set `parallel = FALSE`.",
+      call. = FALSE
+    )
+  }
+  return(NULL)
+}
+
+
 check_assign_grna_inputs <- function(sceptre_object, assignment_method, hyperparameters, n_processors) {
   if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
     stop("`assignment_method` must be `mixture`, `maximum`, or `thresholding`.")
@@ -362,7 +377,8 @@ check_discovery_analysis_inputs <- function(response_grna_group_pairs,
 
   # 3. check for the presence of a calibration result
   if (nrow(calibration_result) == 0L) {
-    cat(crayon::red(paste0("Warning: The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".\n\n")))
+    warn_text <- paste0("The calibration check (`run_calibration_check()`) should be run before the ", ifelse(pc_analysis, "power check", "discovery analysis"), ".")
+    message(crayon::red(warn_text))
   }
 
   # 4. check that at least one pair passes qc
