@@ -87,7 +87,7 @@ import_data_use_ondisc <- function(response_matrix, grna_matrix, grna_target_dat
   #  perform initial check
   check_import_data_inputs(response_matrix, grna_matrix, grna_target_data_frame, moi, extra_covariates) |> invisible()
   # check directory_to_write
-  if (is.null(directory_to_write)) stop("`directory_to_write` cannot be `NULL`.")
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
 
   # process covariates and matrices
   processed_inputs <- process_covariates_and_matrices(
@@ -215,7 +215,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   out_list <- vector(mode = "list", length = length(directories))
   n_cells_per_matrix <- vector(mode = "integer", length = length(directories))
   for (i in seq_along(directories)) {
-    cat(paste0("Processing directory ", i, "."))
+    message("Processing directory ", i, ".")
     # check that the features df matches
     features_fp <- feature_fps[i]
     curr_feature_df <- data.table::fread(
@@ -258,11 +258,11 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
     rm(dt)
     gc() |> invisible()
     out_list[[i]] <- subsetted_mats
-    cat(crayon::green(" \u2713\n"))
+    message(crayon::green(" \u2713"))
   }
 
   # 6. combine the matrices via do.call cbind
-  cat("Combining matrices across directories.")
+  message("Combining matrices across directories.")
   out_mats <- lapply(modalities, function(modality) {
     l <- lapply(out_list, function(mat) mat[[modality]])
     combined_mat <- do.call(what = "cbind", args = l)
@@ -270,7 +270,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   })
   rm(out_list)
   gc() |> invisible()
-  cat(crayon::green(" \u2713\n"))
+  message(crayon::green(" \u2713"))
 
   # 7. collect metadata pieces
   for (modality in modalities) {
@@ -291,7 +291,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
   }
 
   # 9. initialize the sceptre object
-  cat("Creating the sceptre object.")
+  message("Creating the sceptre object.")
   sceptre_object <- import_data_memory(
     response_matrix = out_mats[["Gene Expression"]],
     grna_matrix = out_mats[["CRISPR Guide Capture"]],
@@ -301,7 +301,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
     response_names = gene_names
   )
   gc() |> invisible()
-  cat(crayon::green(" \u2713"))
+  message(crayon::green(" \u2713"))
   return(sceptre_object)
 }
 
@@ -309,7 +309,7 @@ import_data_from_cellranger_memory <- function(directories, moi, grna_target_dat
 # 2. disk
 import_data_from_cellranger_use_ondisc <- function(directories, moi, grna_target_data_frame, extra_covariates, directory_to_write) {
   # 0. check that directory_to_write has been supplied
-  if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
 
   # 1. call the corresponding ondisc function
   vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
@@ -520,17 +520,57 @@ get_mtx_metadata <- function(mtx_file, col_id = c("n_features", "n_cells", "n_no
 
 
 write_matrices_to_disk <- function(response_matrix, grna_matrix, directory_to_write, integer_id) {
+  directory_to_write <- prepare_directory_to_write(directory_to_write)
   response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
     mat = response_matrix,
-    file_to_write = paste0(directory_to_write, "/response.odm"),
+    file_to_write = file.path(directory_to_write, "response.odm"),
     integer_id = integer_id
   )
   grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
     mat = grna_matrix,
-    file_to_write = paste0(directory_to_write, "/grna.odm"),
+    file_to_write = file.path(directory_to_write, "grna.odm"),
     integer_id = integer_id
   )
   return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
+}
+
+
+prepare_directory_to_write <- function(directory_to_write) {
+  if (is.null(directory_to_write)) stop("`directory_to_write` must be supplied.")
+  if (!(is.character(directory_to_write) && length(directory_to_write) == 1L && !is.na(directory_to_write))) {
+    stop("`directory_to_write` must be a single file path.")
+  }
+  directory_to_write <- path.expand(directory_to_write)
+  if (!dir.exists(directory_to_write)) dir.create(directory_to_write, recursive = TRUE)
+  directory_to_write <- normalizePath(directory_to_write, winslash = "/", mustWork = TRUE)
+  check_path_has_no_tilde(directory_to_write, "`directory_to_write`")
+  return(directory_to_write)
+}
+
+
+prepare_ondisc_file_path <- function(file_path, arg_name) {
+  if (is.null(file_path)) stop(arg_name, " must be supplied.")
+  if (!(is.character(file_path) && length(file_path) == 1L && !is.na(file_path))) {
+    stop(arg_name, " must be a single file path.")
+  }
+  file_path <- normalizePath(path.expand(file_path), winslash = "/", mustWork = TRUE)
+  check_path_has_no_tilde(file_path, arg_name)
+  return(file_path)
+}
+
+
+check_path_has_no_tilde <- function(file_path, arg_name) {
+  if (grepl("~", file_path, fixed = TRUE)) {
+    stop(
+      arg_name, " resolves to '", file_path, "', which contains a '~' character ",
+      "inside a directory or file name. HDF5 misinterprets embedded tildes as ",
+      "user-home expansion and produces a corrupted path. Please choose a path ",
+      "where no directory or file name contains '~' (a leading '~/' is fine - ",
+      "it is expanded before this check).",
+      call. = FALSE
+    )
+  }
+  return(NULL)
 }
 
 

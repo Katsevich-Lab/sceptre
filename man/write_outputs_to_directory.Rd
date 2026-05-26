@@ -43,15 +43,9 @@ sceptre_object |>
   ) |>
   assign_grnas(method = "thresholding") |>
   run_qc() |>
-  run_calibration_check(
-    parallel = TRUE,
-    n_processors = 2
-  ) |>
+  run_calibration_check() |>
   run_power_check() |>
-  run_discovery_analysis(
-    parallel = TRUE,
-    n_processors = 2
-  ) |>
+  run_discovery_analysis() |>
   write_outputs_to_directory(paste0(tempdir(), "/sceptre_outputs"))
 # files written to "sceptre_outputs" in tempdir()
 }
