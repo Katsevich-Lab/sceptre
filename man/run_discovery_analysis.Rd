@@ -22,7 +22,7 @@ run_discovery_analysis(
 
 \item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.}
 
-\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, uses half the physical cores. The fraction may be tuned via the \code{parallelly.availableCores.fraction} R option (or the \code{R_PARALLELLY_AVAILABLECORES_FRACTION} environment variable).}
+\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, uses half the physical cores. The fraction may be tuned via the \code{parallelly.availableCores.fraction} R option.}
 
 \item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
 }
