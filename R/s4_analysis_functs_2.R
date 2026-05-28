@@ -8,7 +8,7 @@
 #' @param calibration_group_size (optional) the number of negative control gRNAs to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether to print progress updates
 #' @param parallel (optional; default `FALSE`) a logical indicating whether to run the function in parallel. `parallel = TRUE` is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.
-#' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, automatically detects the number of processors available on the machine.
+#' @param n_processors (optional; default `"auto"`) an integer specifying the number of processors to use if `parallel` is set to `TRUE`. The default, `"auto"`, uses half the physical cores. The fraction may be tuned via the `parallelly.availableCores.fraction` R option (or the `R_PARALLELLY_AVAILABLECORES_FRACTION` environment variable).
 #' @param log_dir (optional; default `tempdir()`) a string indicating the directory in which to write the log files (ignored if `parallel = FALSE`)
 #' @return an updated `sceptre_object` in which the calibration check has been carried out
 #'
