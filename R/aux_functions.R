@@ -85,7 +85,24 @@ auto_compute_cell_covariates <- function(response_matrix, grna_matrix, extra_cov
 partition_response_ids <- function(response_ids, parallel, n_processors) {
   groups_set <- FALSE
   if (parallel) {
-    if (identical(n_processors, "auto")) n_processors <- parallelly::availableCores(fraction = 0.5, logical = FALSE)
+    if (identical(n_processors, "auto")) {
+      # Read the user's preferred fraction (default 0.5 = half cores), then
+      # neutralize that option on the parallelly call so parallelly's own
+      # option-aware default does not apply the same fraction a second time.
+      # parallelly's `fraction` arg defaults to getOption(
+      # "parallelly.availableCores.fraction", 1), so omitting it would
+      # silently double-scale when the user has set that option. The arg
+      # itself was only added in 1.47.0, so passing `fraction = 1` directly
+      # would break parallelly < 1.47.0 -- `withr::with_options` neutralizes
+      # the option for the call on any parallelly >= 1.23.0.
+      frac <- getOption("parallelly.availableCores.fraction", 0.5)
+      n_processors <- max(1L, floor(
+        withr::with_options(
+          list(parallelly.availableCores.fraction = 1),
+          parallelly::availableCores(logical = FALSE)
+        ) * frac
+      ))
+    }
     if (length(response_ids) >= 2 * n_processors) {
       s <- withr::with_seed(4, sample(response_ids))
       out <- split(s, cut(seq_along(s), n_processors, labels = paste0("group_", seq(1, n_processors))))
