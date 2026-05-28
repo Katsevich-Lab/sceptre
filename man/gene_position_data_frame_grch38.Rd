@@ -3,25 +3,18 @@
 \docType{data}
 \name{gene_position_data_frame_grch38}
 \alias{gene_position_data_frame_grch38}
-\alias{gene_position_data_frame_grch37}
-\title{Gene position data frames}
+\title{Gene position data frame (GRCh38)}
 \format{
 An object of class \code{data.table} (inherits from \code{data.frame}) with 36572 rows and 4 columns.
-
-An object of class \code{data.table} (inherits from \code{data.frame}) with 57773 rows and 4 columns.
 }
 \usage{
 data(gene_position_data_frame_grch38)
-
-data(gene_position_data_frame_grch37)
 }
 \description{
-\code{gene_position_data_frame_grch38} and \code{gene_position_data_frame_grch37} contain the coordinate and transcription start site position of each gene relative to reference genome GRCh38 and GRCh37, respectively. Both \code{gene_position_data_frame_grch38} and \code{gene_position_data_frame_grch37} were constructed from reference genomes available on the 10x Genomics website. The GRCh38 reference genome has been used by 10x Cell Ranger since 2020.
+\code{gene_position_data_frame_grch38} contains the coordinate and transcription start site position of each gene relative to reference genome GRCh38. It was constructed from the reference genome available on the 10x Genomics website. The GRCh38 reference genome has been used by 10x Cell Ranger since 2020.
 }
 \examples{
 data(gene_position_data_frame_grch38)
-data(gene_position_data_frame_grch37)
 head(gene_position_data_frame_grch38)
-head(gene_position_data_frame_grch37)
 }
 \keyword{datasets}
