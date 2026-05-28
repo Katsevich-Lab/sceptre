@@ -4,7 +4,6 @@ using namespace Rcpp;
 #include <algorithm>
 
 
-// [[Rcpp::export]]
 double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
   double tol;
   if (curr_log_lik == -std::numeric_limits<double>::infinity() || prev_log_lik == -std::numeric_limits<double>::infinity()) {
