@@ -26,7 +26,6 @@ std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector m
 
 
 // side: -1 is left, 0 is both, 1 is right
-// [[Rcpp::export]]
 double compute_empirical_p_value(const std::vector<double>& null_statistics, double z_orig, int side) {
   double p;
   if (side == -1 || side == 1) { // left or right
@@ -46,7 +45,6 @@ double compute_empirical_p_value(const std::vector<double>& null_statistics, dou
 }
 
 
-// [[Rcpp::export]]
 std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   // initialize variables
   int n = y.size();
@@ -82,8 +80,7 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
 }
 
 
-// [[Rcpp::export]]
-bool check_sn_tail (const std::vector<double>& y, double xi_hat, double omega_hat, double alpha_hat) {
+bool check_sn_tail(const std::vector<double>& y, double xi_hat, double omega_hat, double alpha_hat) {
   // define variables
   double n = y.size(), ratio, quantile, p, sn_tail_prob;
   double RATIO_THRESH = 2.0;
@@ -119,7 +116,6 @@ bool check_for_outliers (std::vector<double>& null_statistics, double mu, double
   return ok;
 }
 
-// [[Rcpp::export]]
 std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
   // 0. define variables
   double p = -1.0;
