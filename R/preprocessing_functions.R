@@ -134,11 +134,11 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
     indiv_nt_sizes <- vapply(grna_assignments$indiv_nt_grna_idxs, length, FUN.VALUE = integer(1)) |> sort(decreasing = TRUE)
     M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
     n_control_cells <- length(grna_assignments$all_nt_idxs)
-    out <- fisher_yates_samlper(n_tot = n_control_cells, M = M, B = B)
+    out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
   } else if (calibration_check && control_group_complement) { # 2. calibration check, complement (low and high MOI)
     indiv_nt_sizes <- vapply(grna_assignments$indiv_nt_grna_idxs, length, FUN.VALUE = integer(1)) |> sort(decreasing = TRUE)
     M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
-    out <- fisher_yates_samlper(n_tot = n_cells, M = M, B = B)
+    out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
   } else if (!calibration_check && !control_group_complement) { # 3. discovery, nt cells (low MOI only)
     grna_group_sizes <- vapply(grna_assignments$grna_group_idxs, length, FUN.VALUE = integer(1))
     grna_group_sizes <- grna_group_sizes[grna_group_sizes != 0L]
@@ -152,7 +152,7 @@ get_synthetic_permutation_idxs <- function(grna_assignments, B, calibration_chec
     )
   } else if (!calibration_check && control_group_complement) { # 4. discovery, complement (low and high MOI)
     max_cells_per_grna_group <- vapply(grna_assignments$grna_group_idxs, length, FUN.VALUE = integer(1)) |> max()
-    out <- fisher_yates_samlper(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
+    out <- fisher_yates_sampler(n_tot = n_cells, M = max_cells_per_grna_group, B = B)
   }
 
   return(out)

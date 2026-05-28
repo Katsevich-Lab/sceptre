@@ -27,8 +27,8 @@ estimate_theta <- function(y, mu, dfr, limit, eps) {
 #' @param M the maximum number of cells in a given gRNA group
 #' @param B the number of WOR samples to generate
 #' @noRd
-fisher_yates_samlper <- function(n_tot, M, B) {
-    .Call(`_sceptre_fisher_yates_samlper`, n_tot, M, B)
+fisher_yates_sampler <- function(n_tot, M, B) {
+    .Call(`_sceptre_fisher_yates_sampler`, n_tot, M, B)
 }
 
 #' @title Hybrid Fisher-Yates/IWOR sampler
