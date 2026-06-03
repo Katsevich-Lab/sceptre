@@ -11,3 +11,4 @@
 ^doc$
 ^Meta$
 ^\.claude$
+^\.git$
