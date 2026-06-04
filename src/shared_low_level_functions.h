@@ -1,9 +1,8 @@
 #include <Rcpp.h>
-using namespace Rcpp;
 
 #ifndef ESTIMATE_LOG_FOLD_CHANGE_V2
 #define ESTIMATE_LOG_FOLD_CHANGE_V2
-std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt);
+std::vector<double> estimate_log_fold_change_v2(Rcpp::NumericVector y, Rcpp::NumericVector mu, Rcpp::IntegerVector trt_idxs, int n_trt);
 #endif
 
 #ifndef COMPUTE_EMPIRICAL_P_VALUE
@@ -31,6 +30,6 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
 
 #ifndef LOAD_NONZERO_POSITS
 #define LOAD_NONZERO_POSITS
-void load_nonzero_posits(IntegerVector j, IntegerVector p, int column_idx, std::vector<bool>& y_orig,
+void load_nonzero_posits(Rcpp::IntegerVector j, Rcpp::IntegerVector p, int column_idx, std::vector<bool>& y_orig,
                          std::vector<bool>& y_sub, std::vector<int>& cells_in_use_zero_idx);
 #endif
