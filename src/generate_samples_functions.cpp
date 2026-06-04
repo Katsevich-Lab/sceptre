@@ -27,7 +27,7 @@ void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_r
 //' @param B the number of WOR samples to generate
 //' @noRd
 // [[Rcpp::export]]
-SEXP fisher_yates_samlper(int n_tot, int M, int B) {
+SEXP fisher_yates_sampler(int n_tot, int M, int B) {
   // initialize output vector, x vector shared across samples
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
   std::vector<int> x(n_tot);
