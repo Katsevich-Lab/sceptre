@@ -1,12 +1,16 @@
 get_my_theme <- function(element_text_size = 11) {
-  ggplot2::theme_bw() + ggplot2::theme(
-    axis.line = ggplot2::element_line(color = "black"),
-    panel.grid.major = ggplot2::element_blank(),
-    panel.grid.minor = ggplot2::element_blank(),
-    panel.border = ggplot2::element_blank(),
-    panel.background = ggplot2::element_blank(),
-    plot.title = ggplot2::element_text(hjust = 0.5, size = element_text_size)
-  )
+    ggplot2::theme_bw() +
+        ggplot2::theme(
+            axis.line = ggplot2::element_line(color = "black"),
+            panel.grid.major = ggplot2::element_blank(),
+            panel.grid.minor = ggplot2::element_blank(),
+            panel.border = ggplot2::element_blank(),
+            panel.background = ggplot2::element_blank(),
+            plot.title = ggplot2::element_text(
+                hjust = 0.5,
+                size = element_text_size
+            )
+        )
 }
 
 ######################
@@ -38,105 +42,164 @@ get_my_theme <- function(element_text_size = 11) {
 #'   extra_covariates = highmoi_example_data$extra_covariates,
 #'   response_names = highmoi_example_data$gene_names
 #' ) |> plot_grna_count_distributions()
-plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, grnas_to_plot = NULL, threshold = NULL, return_indiv_plots = FALSE) {
-  grna_matrix <- get_grna_matrix(sceptre_object)
-  # rounding just in case the user provides a non-integer one
-  if (!is.null(threshold)) threshold <- round(threshold)
-  if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- withr::with_seed(4, {
-      sample(x = rownames(grna_matrix), size = min(nrow(grna_matrix), n_grnas_to_plot), replace = FALSE)
-    })
-  } else {
-    if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
-  }
-  grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
-  grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
-    load_row(grna_matrix, grna_id)
-  }) |> unlist()
-  grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
-  to_plot <- data.frame(grna_id = grna_ids_rep, grna_expressions = grna_expressions) |>
-    dplyr::filter(grna_expressions < 10000)
-
-  # this function takes a vector of grna expressions and returns a data.frame
-  # which gets passed to `cut` for binning that vector. In the returned data.frame,
-  # one column (`bin_upper_bounds`) contains the upper end point of the resulting bin,
-  # and the other column (`bin_labels`) has the name that that bin will get.
-  grna_expressions_to_binned_factor <- function(gnra_expressions) {
-    max_expression_count <- max(gnra_expressions)
-    max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
-    bin_upper_bounds <- 0:max_single_bin
-    bin_labels <- as.character(bin_upper_bounds)
-    if (max_expression_count > 10) { # now we need to add exp growing bins, w/ more complex labels
-      # this next section relies on the fact that the upper bounds are going to be at locations
-      # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 + 2^2 + 2^3, ...
-      # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
-      # smallest n such that this biggest bin width is above `max_expression_count`
-      num_exp_bins <- log2((max_expression_count - max_single_bin) / 2 + 1) |> ceiling()
-      bin_upper_bounds <- c(bin_upper_bounds, max_single_bin + 2 * (2^seq_len(num_exp_bins) - 1))
-      bin_labels <- c(bin_labels, as.character(max_single_bin + (2^((seq_len(num_exp_bins)) - 1) - 1)))
-    }
-    return(data.frame(bin_upper_bounds = bin_upper_bounds, bin_labels = bin_labels))
-  }
-
-  # creating a list of bar plots for each grna_id, so that we can avoid dropping
-  # any bins inside the range of the expressions for each grna_id, but we don't
-  # keep empty ones in the tail.
-  plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
-    curr_df <- dplyr::filter(to_plot, as.character(grna_id) == curr_grna_id) |>
-      dplyr::mutate(grna_id = droplevels(grna_id))
-    bin_info <- grna_expressions_to_binned_factor(curr_df$grna_expressions)
-    p <- curr_df |>
-      dplyr::mutate(
-        grna_expressions_bin = cut(grna_expressions,
-          breaks = c(-Inf, bin_info$bin_upper_bounds),
-          labels = bin_info$bin_labels
-        )
-      ) |>
-      dplyr::group_by(grna_id, grna_expressions_bin) |>
-      dplyr::summarize(bin_counts = dplyr::n(), .groups = "drop_last") |>
-      ggplot2::ggplot(mapping = ggplot2::aes(x = grna_expressions_bin, y = bin_counts)) +
-      ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "midnightblue") +
-      ggplot2::scale_y_continuous(
-        trans = scales::pseudo_log_trans(base = 10, sigma = 0.5),
-        breaks = c(0, 10, 100, 1000, 100000), expand = c(0, NA)
-      ) +
-      get_my_theme() +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
-        axis.title = ggplot2::element_blank()
-      ) +
-      ggplot2::ggtitle(curr_grna_id) +
-      ggplot2::scale_x_discrete(drop = FALSE)
+plot_grna_count_distributions <- function(
+    sceptre_object,
+    n_grnas_to_plot = 4L,
+    grnas_to_plot = NULL,
+    threshold = NULL,
+    return_indiv_plots = FALSE
+) {
+    grna_matrix <- get_grna_matrix(sceptre_object)
+    # rounding just in case the user provides a non-integer one
     if (!is.null(threshold)) {
-      # adding +.5 so it is after the bin rather than through the middle
-      p <- p + ggplot2::geom_vline(xintercept = threshold + .5, color = "mediumseagreen", linetype = "dashed")
+        threshold <- round(threshold)
     }
+    if (is.null(grnas_to_plot)) {
+        grnas_to_plot <- withr::with_seed(4, {
+            sample(
+                x = rownames(grna_matrix),
+                size = min(nrow(grna_matrix), n_grnas_to_plot),
+                replace = FALSE
+            )
+        })
+    } else {
+        if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) {
+            stop(
+                "gRNA IDs must be a subset of the rownames of the gRNA matrix."
+            )
+        }
+    }
+    grna_matrix <- set_matrix_accessibility(
+        grna_matrix,
+        make_row_accessible = TRUE
+    )
+    grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
+        load_row(grna_matrix, grna_id)
+    }) |>
+        unlist()
+    grna_ids_rep <- rep(factor(grnas_to_plot), each = ncol(grna_matrix))
+    to_plot <- data.frame(
+        grna_id = grna_ids_rep,
+        grna_expressions = grna_expressions
+    ) |>
+        dplyr::filter(grna_expressions < 10000)
+
+    # this function takes a vector of grna expressions and returns a data.frame
+    # which gets passed to `cut` for binning that vector. In the returned data.frame,
+    # one column (`bin_upper_bounds`) contains the upper end point of the resulting bin,
+    # and the other column (`bin_labels`) has the name that that bin will get.
+    grna_expressions_to_binned_factor <- function(gnra_expressions) {
+        max_expression_count <- max(gnra_expressions)
+        max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
+        bin_upper_bounds <- 0:max_single_bin
+        bin_labels <- as.character(bin_upper_bounds)
+        if (max_expression_count > 10) {
+            # now we need to add exp growing bins, w/ more complex labels
+            # this next section relies on the fact that the upper bounds are going to be at locations
+            # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 + 2^2 + 2^3, ...
+            # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
+            # smallest n such that this biggest bin width is above `max_expression_count`
+            num_exp_bins <- log2(
+                (max_expression_count - max_single_bin) / 2 + 1
+            ) |>
+                ceiling()
+            bin_upper_bounds <- c(
+                bin_upper_bounds,
+                max_single_bin + 2 * (2^seq_len(num_exp_bins) - 1)
+            )
+            bin_labels <- c(
+                bin_labels,
+                as.character(
+                    max_single_bin + (2^((seq_len(num_exp_bins)) - 1) - 1)
+                )
+            )
+        }
+        return(data.frame(
+            bin_upper_bounds = bin_upper_bounds,
+            bin_labels = bin_labels
+        ))
+    }
+
+    # creating a list of bar plots for each grna_id, so that we can avoid dropping
+    # any bins inside the range of the expressions for each grna_id, but we don't
+    # keep empty ones in the tail.
+    plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
+        curr_df <- dplyr::filter(
+            to_plot,
+            as.character(grna_id) == curr_grna_id
+        ) |>
+            dplyr::mutate(grna_id = droplevels(grna_id))
+        bin_info <- grna_expressions_to_binned_factor(curr_df$grna_expressions)
+        p <- curr_df |>
+            dplyr::mutate(
+                grna_expressions_bin = cut(
+                    grna_expressions,
+                    breaks = c(-Inf, bin_info$bin_upper_bounds),
+                    labels = bin_info$bin_labels
+                )
+            ) |>
+            dplyr::group_by(grna_id, grna_expressions_bin) |>
+            dplyr::summarize(bin_counts = dplyr::n(), .groups = "drop_last") |>
+            ggplot2::ggplot(
+                mapping = ggplot2::aes(x = grna_expressions_bin, y = bin_counts)
+            ) +
+            ggplot2::geom_bar(
+                stat = "identity",
+                fill = "grey90",
+                col = "midnightblue"
+            ) +
+            ggplot2::scale_y_continuous(
+                trans = scales::pseudo_log_trans(base = 10, sigma = 0.5),
+                breaks = c(0, 10, 100, 1000, 100000),
+                expand = c(0, NA)
+            ) +
+            get_my_theme() +
+            ggplot2::theme(
+                axis.text.x = ggplot2::element_text(
+                    angle = 90,
+                    vjust = 0.5,
+                    hjust = 1
+                ),
+                axis.title = ggplot2::element_blank()
+            ) +
+            ggplot2::ggtitle(curr_grna_id) +
+            ggplot2::scale_x_discrete(drop = FALSE)
+        if (!is.null(threshold)) {
+            # adding +.5 so it is after the bin rather than through the middle
+            p <- p +
+                ggplot2::geom_vline(
+                    xintercept = threshold + .5,
+                    color = "mediumseagreen",
+                    linetype = "dashed"
+                )
+        }
+        return(p)
+    })
+
+    # these are the dimensions of our cowplot grid
+    n_row <- floor(sqrt(length(grnas_to_plot)))
+    n_col <- ceiling(length(grnas_to_plot) / n_row)
+
+    # for plots on the left-most edge, add a y-axis label
+    for (i in 0:(n_row - 1)) {
+        plot_list[[1 + i * n_col]] <- plot_list[[1 + i * n_col]] +
+            ggplot2::ylab("Cell count (log scale)") +
+            ggplot2::theme(axis.title.y = ggplot2::element_text())
+    }
+    # for plots on the bottom row, add a x-axis label
+    for (j in (1 + (n_row - 1) * n_col):length(grnas_to_plot)) {
+        plot_list[[j]] <- plot_list[[j]] +
+            ggplot2::xlab("gRNA count") +
+            ggplot2::theme(axis.title.x = ggplot2::element_text())
+    }
+    if (return_indiv_plots) {
+        return(plot_list)
+    }
+    p <- do.call(
+        what = cowplot::plot_grid,
+        args = c(plot_list, nrow = n_row)
+    )
     return(p)
-  })
-
-  # these are the dimensions of our cowplot grid
-  n_row <- floor(sqrt(length(grnas_to_plot)))
-  n_col <- ceiling(length(grnas_to_plot) / n_row)
-
-  # for plots on the left-most edge, add a y-axis label
-  for (i in 0:(n_row - 1)) {
-    plot_list[[1 + i * n_col]] <- plot_list[[1 + i * n_col]] +
-      ggplot2::ylab("Cell count (log scale)") +
-      ggplot2::theme(axis.title.y = ggplot2::element_text())
-  }
-  # for plots on the bottom row, add a x-axis label
-  for (j in (1 + (n_row - 1) * n_col):length(grnas_to_plot)) {
-    plot_list[[j]] <- plot_list[[j]] + ggplot2::xlab("gRNA count") +
-      ggplot2::theme(axis.title.x = ggplot2::element_text())
-  }
-  if (return_indiv_plots) {
-    return(plot_list)
-  }
-  p <- do.call(
-    what = cowplot::plot_grid,
-    args = c(plot_list, nrow = n_row)
-  )
-  return(p)
 }
 
 #' Plot assign gRNAs
@@ -166,126 +229,194 @@ plot_grna_count_distributions <- function(sceptre_object, n_grnas_to_plot = 4L, 
 #'   set_analysis_parameters() |>
 #'   assign_grnas(method = "thresholding") |>
 #'   plot_assign_grnas()
-plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plot = NULL, point_size = 0.9, transparency = 0.8, return_indiv_plots = FALSE) {
-  n_points_to_plot_per_umi <- 1000
-  n_grnas_to_plot_panel_b <- 1000
-  if (!sceptre_object@functs_called["assign_grnas"]) {
-    stop("This `sceptre_object` has not yet had `assign_grnas` called on it.")
-  }
-  init_assignments <- sceptre_object@initial_grna_assignment_list
-  grna_matrix <- get_grna_matrix(sceptre_object) |> set_matrix_accessibility(make_row_accessible = TRUE)
-  grna_ids <- names(init_assignments)
-  assigned <- vapply(init_assignments, length, FUN.VALUE = integer(1)) >= 1
-  grna_ids <- grna_ids[assigned]
-  # sample grnas to plot
-  if (is.null(grnas_to_plot)) {
-    grnas_to_plot <- withr::with_seed(4, {
-      sample(x = grna_ids, size = min(length(grna_ids), n_grnas_to_plot), replace = FALSE)
+plot_assign_grnas <- function(
+    sceptre_object,
+    n_grnas_to_plot = 3L,
+    grnas_to_plot = NULL,
+    point_size = 0.9,
+    transparency = 0.8,
+    return_indiv_plots = FALSE
+) {
+    n_points_to_plot_per_umi <- 1000
+    n_grnas_to_plot_panel_b <- 1000
+    if (!sceptre_object@functs_called["assign_grnas"]) {
+        stop(
+            "This `sceptre_object` has not yet had `assign_grnas` called on it."
+        )
+    }
+    init_assignments <- sceptre_object@initial_grna_assignment_list
+    grna_matrix <- get_grna_matrix(sceptre_object) |>
+        set_matrix_accessibility(make_row_accessible = TRUE)
+    grna_ids <- names(init_assignments)
+    assigned <- vapply(init_assignments, length, FUN.VALUE = integer(1)) >= 1
+    grna_ids <- grna_ids[assigned]
+    # sample grnas to plot
+    if (is.null(grnas_to_plot)) {
+        grnas_to_plot <- withr::with_seed(4, {
+            sample(
+                x = grna_ids,
+                size = min(length(grna_ids), n_grnas_to_plot),
+                replace = FALSE
+            )
+        })
+    } else {
+        if (!(all(grnas_to_plot %in% grna_ids))) {
+            stop(
+                "gRNA IDs must be a subset of the rownames of the gRNA matrix."
+            )
+        }
+    }
+    to_plot_a <- lapply(X = grnas_to_plot, function(curr_grna_id) {
+        assignment <- cells_w_zero_or_twoplus_grnas <- logical(
+            length = ncol(grna_matrix)
+        ) # logical vecs w/ one entry per cell
+        assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
+        cells_w_zero_or_twoplus_grnas[
+            sceptre_object@cells_w_zero_or_twoplus_grnas
+        ] <- TRUE # indicates which cells have 0/2+ grnas
+        g <- load_row(grna_matrix, curr_grna_id)
+        df <- data.frame(
+            g = g,
+            assignment = ifelse(assignment, "pert", "unpert") |> factor(),
+            grna_id = curr_grna_id |> factor(),
+            cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas
+        )
+        # if assignment method maximum, remove cells with 0/2+ grnas
+        if (sceptre_object@grna_assignment_method == "maximum") {
+            df <- df |> dplyr::filter(!cells_w_zero_or_twoplus_grnas)
+        }
+        return(df)
+    }) |>
+        data.table::rbindlist()
+
+    # downsample the unperturbed cells
+    to_plot_a <- withr::with_seed(4, {
+        to_plot_a |>
+            dplyr::group_by(g) |>
+            dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
+            dplyr::ungroup()
     })
-  } else {
-    if (!(all(grnas_to_plot %in% grna_ids))) stop("gRNA IDs must be a subset of the rownames of the gRNA matrix.")
-  }
-  to_plot_a <- lapply(X = grnas_to_plot, function(curr_grna_id) {
-    assignment <- cells_w_zero_or_twoplus_grnas <- logical(length = ncol(grna_matrix)) # logical vecs w/ one entry per cell
-    assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
-    cells_w_zero_or_twoplus_grnas[sceptre_object@cells_w_zero_or_twoplus_grnas] <- TRUE # indicates which cells have 0/2+ grnas
-    g <- load_row(grna_matrix, curr_grna_id)
-    df <- data.frame(
-      g = g,
-      assignment = ifelse(assignment, "pert", "unpert") |> factor(),
-      grna_id = curr_grna_id |> factor(),
-      cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas
-    )
-    # if assignment method maximum, remove cells with 0/2+ grnas
-    if (sceptre_object@grna_assignment_method == "maximum") df <- df |> dplyr::filter(!cells_w_zero_or_twoplus_grnas)
-    return(df)
-  }) |> data.table::rbindlist()
 
-  # downsample the unperturbed cells
-  to_plot_a <- withr::with_seed(4, {
-    to_plot_a |>
-      dplyr::group_by(g) |>
-      dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
-      dplyr::ungroup()
-  })
-
-  # plot a
-  p_a <- ggplot2::ggplot(data = to_plot_a, mapping = ggplot2::aes(x = assignment, y = g, col = assignment)) +
-    ggplot2::geom_jitter(alpha = transparency, size = point_size, position = ggplot2::position_jitter(seed = 4)) +
-    ggplot2::facet_wrap(nrow = 1, facets = grna_id ~ ., scales = "free_y") +
-    ggplot2::scale_y_continuous(trans = "log1p", breaks = c(0, 1, 5, 15, 50, 200, 1000, 5000, 10000)) +
-    ggplot2::xlab("Assignment") +
-    ggplot2::ylab("gRNA count") +
-    get_my_theme() +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
-    ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
-
-  # plot b
-  n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
-  mean_c_cells_per_grna <- mean(n_cells_per_grna)
-  to_plot_b <- withr::with_seed(4, {
-    data.frame(
-      x = n_cells_per_grna,
-      y = names(n_cells_per_grna)
-    ) |>
-      dplyr::arrange(n_cells_per_grna) |>
-      dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
-      dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
-  })
-  p_b <- ggplot2::ggplot(
-    data = to_plot_b,
-    mapping = ggplot2::aes(x = x, y = y)
-  ) +
-    ggplot2::geom_bar(stat = "identity", width = 0.5, fill = "grey90", col = "darkblue") +
-    get_my_theme() +
-    ggplot2::scale_x_continuous(expand = c(0, 0)) +
-    ggplot2::theme(
-      axis.text.y = ggplot2::element_blank(),
-      axis.ticks.y = ggplot2::element_blank()
+    # plot a
+    p_a <- ggplot2::ggplot(
+        data = to_plot_a,
+        mapping = ggplot2::aes(x = assignment, y = g, col = assignment)
     ) +
-    ggplot2::xlab("N cells") +
-    ggplot2::ylab("gRNA") +
-    ggplot2::ggtitle("N cells per gRNA") +
-    ggplot2::geom_vline(xintercept = mean_c_cells_per_grna, col = "darkorchid1", lwd = 1.0) +
-    ggplot2::annotate(
-      geom = "text", label = paste0("Mean cells per\ngRNA = ", round(mean_c_cells_per_grna, 2)),
-      x = Inf, y = -Inf, vjust = -0.5, hjust = 1, col = "darkorchid1", size = 3.0
-    )
+        ggplot2::geom_jitter(
+            alpha = transparency,
+            size = point_size,
+            position = ggplot2::position_jitter(seed = 4)
+        ) +
+        ggplot2::facet_wrap(nrow = 1, facets = grna_id ~ ., scales = "free_y") +
+        ggplot2::scale_y_continuous(
+            trans = "log1p",
+            breaks = c(0, 1, 5, 15, 50, 200, 1000, 5000, 10000)
+        ) +
+        ggplot2::xlab("Assignment") +
+        ggplot2::ylab("gRNA count") +
+        get_my_theme() +
+        ggplot2::theme(legend.position = "none") +
+        ggplot2::theme(axis.title.x = ggplot2::element_blank()) +
+        ggplot2::scale_color_manual(values = c("firebrick1", "darkorchid1"))
 
-  # plot c
-  if (sceptre_object@grna_assignment_method == "maximum") {
-    p_c <- ggplot2::ggplot() +
-      ggplot2::theme_void()
-  } else {
-    n_grnas_per_cell <- sceptre_object@grnas_per_cell
-    moi <- mean(n_grnas_per_cell)
-    p_c <- ggplot2::ggplot(
-      data = data.frame(x = n_grnas_per_cell),
-      mapping = ggplot2::aes(x = x)
+    # plot b
+    n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
+    mean_c_cells_per_grna <- mean(n_cells_per_grna)
+    to_plot_b <- withr::with_seed(4, {
+        data.frame(
+            x = n_cells_per_grna,
+            y = names(n_cells_per_grna)
+        ) |>
+            dplyr::arrange(n_cells_per_grna) |>
+            dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
+            dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
+    })
+    p_b <- ggplot2::ggplot(
+        data = to_plot_b,
+        mapping = ggplot2::aes(x = x, y = y)
     ) +
-      ggplot2::geom_histogram(
-        binwidth = max(1, 0.02 * length(unique(n_grnas_per_cell))),
-        fill = "grey90", color = "darkblue"
-      ) +
-      ggplot2::scale_y_continuous(expand = c(0, 0), trans = "log1p", breaks = 10^(seq(1, 8))) +
-      get_my_theme() +
-      ggplot2::ylab("Frequency") +
-      ggplot2::ggtitle("N gRNAs per cell") +
-      ggplot2::xlab("N gRNAs") +
-      ggplot2::geom_vline(xintercept = mean(n_grnas_per_cell), col = "darkorchid1", lwd = 1.0) +
-      ggplot2::annotate(
-        geom = "text", label = paste0("MOI = ", round(moi, 2)),
-        x = Inf, y = Inf, vjust = 2.0, hjust = 1, col = "darkorchid1", size = 3.0
-      )
-  }
-  if (return_indiv_plots) {
-    out <- list(p_a, p_b, p_c)
-  } else {
-    bottom <- cowplot::plot_grid(p_b, p_c, nrow = 1)
-    out <- cowplot::plot_grid(p_a, bottom, ncol = 1)
-  }
-  return(out)
+        ggplot2::geom_bar(
+            stat = "identity",
+            width = 0.5,
+            fill = "grey90",
+            col = "darkblue"
+        ) +
+        get_my_theme() +
+        ggplot2::scale_x_continuous(expand = c(0, 0)) +
+        ggplot2::theme(
+            axis.text.y = ggplot2::element_blank(),
+            axis.ticks.y = ggplot2::element_blank()
+        ) +
+        ggplot2::xlab("N cells") +
+        ggplot2::ylab("gRNA") +
+        ggplot2::ggtitle("N cells per gRNA") +
+        ggplot2::geom_vline(
+            xintercept = mean_c_cells_per_grna,
+            col = "darkorchid1",
+            lwd = 1.0
+        ) +
+        ggplot2::annotate(
+            geom = "text",
+            label = paste0(
+                "Mean cells per\ngRNA = ",
+                round(mean_c_cells_per_grna, 2)
+            ),
+            x = Inf,
+            y = -Inf,
+            vjust = -0.5,
+            hjust = 1,
+            col = "darkorchid1",
+            size = 3.0
+        )
+
+    # plot c
+    if (sceptre_object@grna_assignment_method == "maximum") {
+        p_c <- ggplot2::ggplot() +
+            ggplot2::theme_void()
+    } else {
+        n_grnas_per_cell <- sceptre_object@grnas_per_cell
+        moi <- mean(n_grnas_per_cell)
+        p_c <- ggplot2::ggplot(
+            data = data.frame(x = n_grnas_per_cell),
+            mapping = ggplot2::aes(x = x)
+        ) +
+            ggplot2::geom_histogram(
+                binwidth = max(1, 0.02 * length(unique(n_grnas_per_cell))),
+                fill = "grey90",
+                color = "darkblue"
+            ) +
+            ggplot2::scale_y_continuous(
+                expand = c(0, 0),
+                trans = "log1p",
+                breaks = 10^(seq(1, 8))
+            ) +
+            get_my_theme() +
+            ggplot2::ylab("Frequency") +
+            ggplot2::ggtitle("N gRNAs per cell") +
+            ggplot2::xlab("N gRNAs") +
+            ggplot2::geom_vline(
+                xintercept = mean(n_grnas_per_cell),
+                col = "darkorchid1",
+                lwd = 1.0
+            ) +
+            ggplot2::annotate(
+                geom = "text",
+                label = paste0("MOI = ", round(moi, 2)),
+                x = Inf,
+                y = Inf,
+                vjust = 2.0,
+                hjust = 1,
+                col = "darkorchid1",
+                size = 3.0
+            )
+    }
+    if (return_indiv_plots) {
+        out <- list(p_a, p_b, p_c)
+    } else {
+        bottom <- cowplot::plot_grid(p_b, p_c, nrow = 1)
+        out <- cowplot::plot_grid(p_a, bottom, ncol = 1)
+    }
+    return(out)
 }
 
 ###########################
@@ -331,159 +462,241 @@ plot_assign_grnas <- function(sceptre_object, n_grnas_to_plot = 3L, grnas_to_plo
 #'     calibration_group_size = 2
 #'   ) |>
 #'   plot_run_calibration_check()
-plot_run_calibration_check <- function(sceptre_object, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if (!sceptre_object@functs_called["run_calibration_check"]) {
-    stop("This `sceptre_object` has not yet had `run_calibration_check` called on it.")
-  }
-  calibration_result <- sceptre_object@calibration_result
-  my_theme <- get_my_theme()
+plot_run_calibration_check <- function(
+    sceptre_object,
+    point_size = 0.55,
+    transparency = 0.8,
+    return_indiv_plots = FALSE
+) {
+    if (!sceptre_object@functs_called["run_calibration_check"]) {
+        stop(
+            "This `sceptre_object` has not yet had `run_calibration_check` called on it."
+        )
+    }
+    calibration_result <- sceptre_object@calibration_result
+    my_theme <- get_my_theme()
 
-  # compute n rejections
-  n_rejections <- sum(calibration_result$significant)
-  str1 <- paste0("Number of\nfalse discoveries\n(at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "): ", n_rejections)
-  str2 <- paste0("\n\nMean log-2-fold\nchange: ", signif(mean(calibration_result$log_2_fold_change), 2))
-  str <- paste0(str1, str2)
+    # compute n rejections
+    n_rejections <- sum(calibration_result$significant)
+    str1 <- paste0(
+        "Number of\nfalse discoveries\n(at alpha ",
+        signif(sceptre_object@multiple_testing_alpha, 1),
+        "): ",
+        n_rejections
+    )
+    str2 <- paste0(
+        "\n\nMean log-2-fold\nchange: ",
+        signif(mean(calibration_result$log_2_fold_change), 2)
+    )
+    str <- paste0(str1, str2)
 
-  p_a <- ggplot2::ggplot(
-    data = calibration_result,
-    mapping = ggplot2::aes(y = p_value)
-  ) +
-    stat_qq_points(
-      ymin = 1e-8, size = point_size,
-      col = "firebrick2",
-      alpha = transparency
+    p_a <- ggplot2::ggplot(
+        data = calibration_result,
+        mapping = ggplot2::aes(y = p_value)
     ) +
-    stat_qq_band() +
-    ggplot2::scale_x_reverse() +
-    ggplot2::scale_y_reverse() +
-    ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
-    ggplot2::geom_abline(col = "black") +
-    ggplot2::ggtitle("QQ plot (bulk)") +
-    my_theme
+        stat_qq_points(
+            ymin = 1e-8,
+            size = point_size,
+            col = "firebrick2",
+            alpha = transparency
+        ) +
+        stat_qq_band() +
+        ggplot2::scale_x_reverse() +
+        ggplot2::scale_y_reverse() +
+        ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
+        ggplot2::geom_abline(col = "black") +
+        ggplot2::ggtitle("QQ plot (bulk)") +
+        my_theme
 
-  p_b <- ggplot2::ggplot(data = calibration_result, mapping = ggplot2::aes(y = p_value)) +
-    stat_qq_points(
-      ymin = 1e-8, size = point_size,
-      col = "firebrick2", alpha = transparency
+    p_b <- ggplot2::ggplot(
+        data = calibration_result,
+        mapping = ggplot2::aes(y = p_value)
     ) +
-    stat_qq_band() +
-    ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
-    ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
-    ggplot2::geom_abline(col = "black") +
-    ggplot2::ggtitle("QQ plot (tail)") +
-    my_theme
+        stat_qq_points(
+            ymin = 1e-8,
+            size = point_size,
+            col = "firebrick2",
+            alpha = transparency
+        ) +
+        stat_qq_band() +
+        ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
+        ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
+        ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
+        ggplot2::geom_abline(col = "black") +
+        ggplot2::ggtitle("QQ plot (tail)") +
+        my_theme
 
-  p_c <- ggplot2::ggplot(
-    data = calibration_result |> dplyr::filter(abs(log_2_fold_change) < 0.6),
-    mapping = ggplot2::aes(x = log_2_fold_change)
-  ) +
-    ggplot2::geom_histogram(
-      binwidth = if (nrow(calibration_result) > 10000) 0.02 else 0.05,
-      fill = "grey90", col = "black", boundary = 0
+    p_c <- ggplot2::ggplot(
+        data = calibration_result |>
+            dplyr::filter(abs(log_2_fold_change) < 0.6),
+        mapping = ggplot2::aes(x = log_2_fold_change)
     ) +
-    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.0, .01))) +
-    ggplot2::ggtitle("Log fold changes") +
-    ggplot2::xlab("Estimated log-2 fold change") +
-    ggplot2::ylab("Density") +
-    ggplot2::geom_vline(xintercept = 0, col = "firebrick2", linewidth = 1) +
-    my_theme
+        ggplot2::geom_histogram(
+            binwidth = if (nrow(calibration_result) > 10000) 0.02 else 0.05,
+            fill = "grey90",
+            col = "black",
+            boundary = 0
+        ) +
+        ggplot2::scale_y_continuous(
+            expand = ggplot2::expansion(mult = c(0.0, .01))
+        ) +
+        ggplot2::ggtitle("Log fold changes") +
+        ggplot2::xlab("Estimated log-2 fold change") +
+        ggplot2::ylab("Density") +
+        ggplot2::geom_vline(xintercept = 0, col = "firebrick2", linewidth = 1) +
+        my_theme
 
-  p_d <- ggplot2::ggplot() +
-    ggplot2::annotate(geom = "text", label = str, x = 1.3, y = 1.2) +
-    ggplot2::theme_void() +
-    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "white", color = "white")) +
-    ggplot2::xlim(c(0, 2)) +
-    ggplot2::ylim(c(0, 2))
+    p_d <- ggplot2::ggplot() +
+        ggplot2::annotate(geom = "text", label = str, x = 1.3, y = 1.2) +
+        ggplot2::theme_void() +
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(
+                fill = "white",
+                color = "white"
+            )
+        ) +
+        ggplot2::xlim(c(0, 2)) +
+        ggplot2::ylim(c(0, 2))
 
-  if (return_indiv_plots) {
-    out <- list(p_a, p_b, p_c, p_d)
-  } else {
-    out <- cowplot::plot_grid(p_a, p_b, p_c, p_d, nrow = 2, rel_heights = c(0.55, 0.45))
-  }
-  return(out)
+    if (return_indiv_plots) {
+        out <- list(p_a, p_b, p_c, p_d)
+    } else {
+        out <- cowplot::plot_grid(
+            p_a,
+            p_b,
+            p_c,
+            p_d,
+            nrow = 2,
+            rel_heights = c(0.55, 0.45)
+        )
+    }
+    return(out)
 }
 
 ############################
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
-compare_calibration_and_discovery_results <- function(calibration_result, discovery_result, p_thresh,
-                                                      transform_scale = TRUE, include_legend = FALSE,
-                                                      include_y_axis_text = TRUE, point_size = 0.55,
-                                                      transparency = 0.8) {
-  lab <- c(
-    rep(factor("Negative control"), nrow(calibration_result)),
-    rep(factor("Discovery"), nrow(discovery_result))
-  ) |>
-    factor(levels = c("Discovery", "Negative control"))
-  df <- data.frame(p_value = c(calibration_result$p_value, discovery_result$p_value), lab = lab)
+compare_calibration_and_discovery_results <- function(
+    calibration_result,
+    discovery_result,
+    p_thresh,
+    transform_scale = TRUE,
+    include_legend = FALSE,
+    include_y_axis_text = TRUE,
+    point_size = 0.55,
+    transparency = 0.8
+) {
+    lab <- c(
+        rep(factor("Negative control"), nrow(calibration_result)),
+        rep(factor("Discovery"), nrow(discovery_result))
+    ) |>
+        factor(levels = c("Discovery", "Negative control"))
+    df <- data.frame(
+        p_value = c(calibration_result$p_value, discovery_result$p_value),
+        lab = lab
+    )
 
-  p_out <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(y = p_value, col = lab)) +
-    stat_qq_points(ymin = 1e-8, size = point_size, alpha = transparency) +
-    stat_qq_band() +
-    ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
-    ggplot2::geom_abline(col = "black") +
-    get_my_theme() +
-    ggplot2::theme(
-      legend.title = ggplot2::element_blank(),
-      legend.position = if (include_legend) "bottom" else "none",
-      axis.title.y = if (include_y_axis_text) ggplot2::element_text() else ggplot2::element_blank()
+    p_out <- ggplot2::ggplot(
+        data = df,
+        mapping = ggplot2::aes(y = p_value, col = lab)
     ) +
-    ggplot2::scale_color_manual(values = c("dodgerblue3", "firebrick2"))
+        stat_qq_points(ymin = 1e-8, size = point_size, alpha = transparency) +
+        stat_qq_band() +
+        ggplot2::labs(x = "Expected null p-value", y = "Observed p-value") +
+        ggplot2::geom_abline(col = "black") +
+        get_my_theme() +
+        ggplot2::theme(
+            legend.title = ggplot2::element_blank(),
+            legend.position = if (include_legend) "bottom" else "none",
+            axis.title.y = if (include_y_axis_text) {
+                ggplot2::element_text()
+            } else {
+                ggplot2::element_blank()
+            }
+        ) +
+        ggplot2::scale_color_manual(values = c("dodgerblue3", "firebrick2"))
 
-  if (!transform_scale) {
-    p_out <- p_out +
-      ggplot2::scale_x_reverse() +
-      ggplot2::scale_y_reverse() +
-      ggplot2::ggtitle("QQ plot (bulk)")
-  } else {
-    p_out <- p_out +
-      ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
-      ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
-      ggplot2::ggtitle("QQ plot (tail)") +
-      (if (!is.na(p_thresh)) ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") else NULL)
-  }
+    if (!transform_scale) {
+        p_out <- p_out +
+            ggplot2::scale_x_reverse() +
+            ggplot2::scale_y_reverse() +
+            ggplot2::ggtitle("QQ plot (bulk)")
+    } else {
+        p_out <- p_out +
+            ggplot2::scale_x_continuous(trans = revlog_trans(10)) +
+            ggplot2::scale_y_continuous(trans = revlog_trans(10)) +
+            ggplot2::ggtitle("QQ plot (tail)") +
+            (if (!is.na(p_thresh)) {
+                ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed")
+            } else {
+                NULL
+            })
+    }
 
-  if (include_legend) {
-    p_out <- p_out +
-      ggplot2::theme(
-        legend.position.inside = c(0.7, 0.1),
-        legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
-        legend.title = ggplot2::element_blank()
-      ) +
-      ggplot2::guides(color = ggplot2::guide_legend(
-        keywidth = 0.0,
-        keyheight = 0.15,
-        default.unit = "inch",
-        override.aes = list(size = 1.25)
-      ))
-  }
+    if (include_legend) {
+        p_out <- p_out +
+            ggplot2::theme(
+                legend.position.inside = c(0.7, 0.1),
+                legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
+                legend.title = ggplot2::element_blank()
+            ) +
+            ggplot2::guides(
+                color = ggplot2::guide_legend(
+                    keywidth = 0.0,
+                    keyheight = 0.15,
+                    default.unit = "inch",
+                    override.aes = list(size = 1.25)
+                )
+            )
+    }
 
-  return(p_out)
+    return(p_out)
 }
 
 
-make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5), transparency = 0.5, point_size = 0.55) {
-  p_lower_lim <- 1e-12
-  out <- ggplot2::ggplot(
-    data = discovery_result |> dplyr::mutate(
-      reject = p_value < p_thresh,
-      p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
-      log_2_fold_change = ifelse(log_2_fold_change > x_limits[2], x_limits[2], log_2_fold_change),
-      log_2_fold_change = ifelse(log_2_fold_change < x_limits[1], x_limits[1], log_2_fold_change)
-    ),
-    mapping = ggplot2::aes(x = log_2_fold_change, y = p_value, col = reject)
-  ) +
-    ggplot2::geom_point(alpha = transparency, size = point_size) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(10), expand = c(0.02, 0)) +
-    get_my_theme() +
-    ggplot2::xlab("Log fold change") +
-    ggplot2::ylab("P-value") +
-    (if (!is.na(p_thresh)) ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed") else NULL) +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
-    ggplot2::ggtitle("Discovery volcano plot")
-  return(out)
+make_volcano_plot <- function(
+    discovery_result,
+    p_thresh,
+    x_limits = c(-1.5, 1.5),
+    transparency = 0.5,
+    point_size = 0.55
+) {
+    p_lower_lim <- 1e-12
+    out <- ggplot2::ggplot(
+        data = discovery_result |>
+            dplyr::mutate(
+                reject = p_value < p_thresh,
+                p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
+                log_2_fold_change = ifelse(
+                    log_2_fold_change > x_limits[2],
+                    x_limits[2],
+                    log_2_fold_change
+                ),
+                log_2_fold_change = ifelse(
+                    log_2_fold_change < x_limits[1],
+                    x_limits[1],
+                    log_2_fold_change
+                )
+            ),
+        mapping = ggplot2::aes(x = log_2_fold_change, y = p_value, col = reject)
+    ) +
+        ggplot2::geom_point(alpha = transparency, size = point_size) +
+        ggplot2::scale_y_continuous(
+            trans = revlog_trans(10),
+            expand = c(0.02, 0)
+        ) +
+        get_my_theme() +
+        ggplot2::xlab("Log fold change") +
+        ggplot2::ylab("P-value") +
+        (if (!is.na(p_thresh)) {
+            ggplot2::geom_hline(yintercept = p_thresh, linetype = "dashed")
+        } else {
+            NULL
+        }) +
+        ggplot2::theme(legend.position = "none") +
+        ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
+        ggplot2::ggtitle("Discovery volcano plot")
+    return(out)
 }
 
 
@@ -530,67 +743,102 @@ make_volcano_plot <- function(discovery_result, p_thresh, x_limits = c(-1.5, 1.5
 #'   run_calibration_check() |>
 #'   run_discovery_analysis() |>
 #'   plot_run_discovery_analysis()
-plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5), point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if (!sceptre_object@functs_called["run_discovery_analysis"]) {
-    stop("This `sceptre_object` has not yet had `run_discovery_analysis` called on it.")
-  }
-  # first, compute the rejection set
-  discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
-  calibration_result <- sceptre_object@calibration_result
-  discovery_set <- discovery_result |> dplyr::filter(significant)
-  p_thresh <- if (nrow(discovery_set) >= 1L) max(discovery_set$p_value) else NA
-  if (nrow(calibration_result) != nrow(discovery_result)) { # if the two sets of pairs do not coincide in number, set calibration_result to data.frame()
-    calibration_result <- data.frame()
-  }
-  # create the bulk QQ plot
-  p1 <- compare_calibration_and_discovery_results(
-    calibration_result = calibration_result,
-    discovery_result = discovery_result,
-    p_thresh = p_thresh,
-    point_size = point_size,
-    transparency = transparency,
-    transform_scale = FALSE,
-    include_legend = TRUE,
-    include_y_axis_text = TRUE
-  )
-  # create tail qq plot
-  p2 <- compare_calibration_and_discovery_results(
-    calibration_result = calibration_result,
-    discovery_result = discovery_result,
-    p_thresh = p_thresh,
-    point_size = point_size,
-    transparency = transparency,
-    transform_scale = TRUE,
-    include_legend = FALSE,
-    include_y_axis_text = FALSE
-  )
-  # make the volcano plot
-  discovery_result_downsample <- downsample_result_data_frame(result_df = discovery_result)
-  p3 <- make_volcano_plot(
-    discovery_result = discovery_result_downsample,
-    p_thresh = p_thresh,
-    transparency = transparency,
-    point_size = point_size,
-    x_limits = x_limits
-  )
-  # create the final panel
-  n_rejections <- nrow(discovery_set)
-  n_pairs <- nrow(discovery_result)
-  str <- paste0("Number of discovery pairs\ncalled as significant\n(at alpha ", signif(sceptre_object@multiple_testing_alpha, 1), "): ", n_rejections, " of ", n_pairs)
-  p4 <- ggplot2::ggplot() +
-    ggplot2::annotate(geom = "text", label = str, x = 1.1, y = 1.2) +
-    ggplot2::theme_void() +
-    ggplot2::theme(panel.background = ggplot2::element_rect(fill = "white", color = "white")) +
-    ggplot2::xlim(c(0, 2)) +
-    ggplot2::ylim(c(0, 2))
+plot_run_discovery_analysis <- function(
+    sceptre_object,
+    x_limits = c(-1.5, 1.5),
+    point_size = 0.55,
+    transparency = 0.8,
+    return_indiv_plots = FALSE
+) {
+    if (!sceptre_object@functs_called["run_discovery_analysis"]) {
+        stop(
+            "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
+        )
+    }
+    # first, compute the rejection set
+    discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
+    calibration_result <- sceptre_object@calibration_result
+    discovery_set <- discovery_result |> dplyr::filter(significant)
+    p_thresh <- if (nrow(discovery_set) >= 1L) {
+        max(discovery_set$p_value)
+    } else {
+        NA
+    }
+    if (nrow(calibration_result) != nrow(discovery_result)) {
+        # if the two sets of pairs do not coincide in number, set calibration_result to data.frame()
+        calibration_result <- data.frame()
+    }
+    # create the bulk QQ plot
+    p1 <- compare_calibration_and_discovery_results(
+        calibration_result = calibration_result,
+        discovery_result = discovery_result,
+        p_thresh = p_thresh,
+        point_size = point_size,
+        transparency = transparency,
+        transform_scale = FALSE,
+        include_legend = TRUE,
+        include_y_axis_text = TRUE
+    )
+    # create tail qq plot
+    p2 <- compare_calibration_and_discovery_results(
+        calibration_result = calibration_result,
+        discovery_result = discovery_result,
+        p_thresh = p_thresh,
+        point_size = point_size,
+        transparency = transparency,
+        transform_scale = TRUE,
+        include_legend = FALSE,
+        include_y_axis_text = FALSE
+    )
+    # make the volcano plot
+    discovery_result_downsample <- downsample_result_data_frame(
+        result_df = discovery_result
+    )
+    p3 <- make_volcano_plot(
+        discovery_result = discovery_result_downsample,
+        p_thresh = p_thresh,
+        transparency = transparency,
+        point_size = point_size,
+        x_limits = x_limits
+    )
+    # create the final panel
+    n_rejections <- nrow(discovery_set)
+    n_pairs <- nrow(discovery_result)
+    str <- paste0(
+        "Number of discovery pairs\ncalled as significant\n(at alpha ",
+        signif(sceptre_object@multiple_testing_alpha, 1),
+        "): ",
+        n_rejections,
+        " of ",
+        n_pairs
+    )
+    p4 <- ggplot2::ggplot() +
+        ggplot2::annotate(geom = "text", label = str, x = 1.1, y = 1.2) +
+        ggplot2::theme_void() +
+        ggplot2::theme(
+            panel.background = ggplot2::element_rect(
+                fill = "white",
+                color = "white"
+            )
+        ) +
+        ggplot2::xlim(c(0, 2)) +
+        ggplot2::ylim(c(0, 2))
 
-  # combine the plots
-  if (return_indiv_plots) {
-    p_out <- list(p1, p2, p3, p4)
-  } else {
-    p_out <- cowplot::plot_grid(p1, p2, p3, p4, labels = c("a", "b", "c"), rel_heights = c(0.55, 0.45), nrow = 2)
-  }
-  return(p_out)
+    # combine the plots
+    if (return_indiv_plots) {
+        p_out <- list(p1, p2, p3, p4)
+    } else {
+        p_out <- cowplot::plot_grid(
+            p1,
+            p2,
+            p3,
+            p4,
+            labels = c("a", "b", "c"),
+            rel_heights = c(0.55, 0.45),
+            nrow = 2
+        )
+    }
+    return(p_out)
 }
 
 ############
@@ -621,53 +869,89 @@ plot_run_discovery_analysis <- function(sceptre_object, x_limits = c(-1.5, 1.5),
 #'   extra_covariates = highmoi_example_data$extra_covariates,
 #'   response_names = highmoi_example_data$gene_names
 #' ) |> plot_covariates(p_mito_threshold = 0.07)
-plot_covariates <- function(sceptre_object,
-                            response_n_umis_range = c(0.01, 0.99),
-                            response_n_nonzero_range = c(0.01, 0.99),
-                            p_mito_threshold = 0.2,
-                            return_indiv_plots = FALSE) {
-  if (sceptre_object@functs_called[["run_qc"]]) {
-    response_n_umis_range <- sceptre_object@cellwise_qc_thresholds$response_n_umis_range
-    response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
-    p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
-  }
-  covariate_data_frame <- sceptre_object@covariate_data_frame
-  make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
-    cutoffs <- if (use_quantile) stats::quantile(v, probs = curr_range) else curr_range
-    p1 <- ggplot2::ggplot(
-      data = data.frame(x = v),
-      mapping = ggplot2::aes(x = x)
-    ) +
-      ggplot2::geom_histogram(col = "darkblue", fill = "grey90", bins = 50) +
-      get_my_theme() +
-      ggplot2::scale_y_continuous(expand = c(0, NA)) +
-      ggplot2::geom_vline(xintercept = cutoffs[1], col = "darkorchid1", lwd = 1.0) +
-      (if (length(cutoffs) == 2) {
-        ggplot2::geom_vline(xintercept = cutoffs[2], col = "darkorchid1", lwd = 1.0)
-      } else {
-        NULL
-      }) +
-      ggplot2::ggtitle(plot_tit) +
-      ggplot2::theme(axis.title.x = ggplot2::element_blank(), axis.title.y = ggplot2::element_blank())
-  }
-  p1 <- make_histogram(covariate_data_frame$response_n_nonzero, response_n_nonzero_range,
-    "Response N nonzero",
-    use_quantile = TRUE
-  )
-  p2 <- make_histogram(covariate_data_frame$response_n_umis, response_n_umis_range,
-    "Response N UMIs",
-    use_quantile = TRUE
-  )
-  p_mito_present <- "response_p_mito" %in% colnames(covariate_data_frame)
-  if (p_mito_present) {
-    p3 <- make_histogram(covariate_data_frame$response_p_mito, p_mito_threshold,
-      plot_tit = "Percent mito", use_quantile = FALSE
+plot_covariates <- function(
+    sceptre_object,
+    response_n_umis_range = c(0.01, 0.99),
+    response_n_nonzero_range = c(0.01, 0.99),
+    p_mito_threshold = 0.2,
+    return_indiv_plots = FALSE
+) {
+    if (sceptre_object@functs_called[["run_qc"]]) {
+        response_n_umis_range <- sceptre_object@cellwise_qc_thresholds$response_n_umis_range
+        response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
+        p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
+    }
+    covariate_data_frame <- sceptre_object@covariate_data_frame
+    make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
+        cutoffs <- if (use_quantile) {
+            stats::quantile(v, probs = curr_range)
+        } else {
+            curr_range
+        }
+        p1 <- ggplot2::ggplot(
+            data = data.frame(x = v),
+            mapping = ggplot2::aes(x = x)
+        ) +
+            ggplot2::geom_histogram(
+                col = "darkblue",
+                fill = "grey90",
+                bins = 50
+            ) +
+            get_my_theme() +
+            ggplot2::scale_y_continuous(expand = c(0, NA)) +
+            ggplot2::geom_vline(
+                xintercept = cutoffs[1],
+                col = "darkorchid1",
+                lwd = 1.0
+            ) +
+            (if (length(cutoffs) == 2) {
+                ggplot2::geom_vline(
+                    xintercept = cutoffs[2],
+                    col = "darkorchid1",
+                    lwd = 1.0
+                )
+            } else {
+                NULL
+            }) +
+            ggplot2::ggtitle(plot_tit) +
+            ggplot2::theme(
+                axis.title.x = ggplot2::element_blank(),
+                axis.title.y = ggplot2::element_blank()
+            )
+    }
+    p1 <- make_histogram(
+        covariate_data_frame$response_n_nonzero,
+        response_n_nonzero_range,
+        "Response N nonzero",
+        use_quantile = TRUE
     )
-    p_out <- if (return_indiv_plots) list(p1, p2, p3) else cowplot::plot_grid(p1, p2, p3, NULL, ncol = 2)
-  } else {
-    p_out <- if (return_indiv_plots) list(p1, p2) else cowplot::plot_grid(p1, p2, ncol = 2)
-  }
-  return(p_out)
+    p2 <- make_histogram(
+        covariate_data_frame$response_n_umis,
+        response_n_umis_range,
+        "Response N UMIs",
+        use_quantile = TRUE
+    )
+    p_mito_present <- "response_p_mito" %in% colnames(covariate_data_frame)
+    if (p_mito_present) {
+        p3 <- make_histogram(
+            covariate_data_frame$response_p_mito,
+            p_mito_threshold,
+            plot_tit = "Percent mito",
+            use_quantile = FALSE
+        )
+        p_out <- if (return_indiv_plots) {
+            list(p1, p2, p3)
+        } else {
+            cowplot::plot_grid(p1, p2, p3, NULL, ncol = 2)
+        }
+    } else {
+        p_out <- if (return_indiv_plots) {
+            list(p1, p2)
+        } else {
+            cowplot::plot_grid(p1, p2, ncol = 2)
+        }
+    }
+    return(p_out)
 }
 
 
@@ -704,94 +988,139 @@ plot_covariates <- function(sceptre_object,
 #'   assign_grnas(method = "thresholding") |>
 #'   run_qc() |>
 #'   plot_run_qc()
-plot_run_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  if (!sceptre_object@functs_called["run_qc"]) {
-    stop("This `sceptre_object` has not yet had `run_qc` called on it.")
-  }
-  p_a <- plot_cellwise_qc(sceptre_object)
-  if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
-    p_b <- plot_pairwise_qc(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE)
-    # combine the plots
-    if (return_indiv_plots) {
-      p_out <- list(p_a, p_b)
-    } else {
-      p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+plot_run_qc <- function(
+    sceptre_object,
+    downsample_pairs = 10000L,
+    point_size = 0.55,
+    transparency = 0.8,
+    return_indiv_plots = FALSE
+) {
+    if (!sceptre_object@functs_called["run_qc"]) {
+        stop("This `sceptre_object` has not yet had `run_qc` called on it.")
     }
-  } else {
-    p_out <- p_a
-  }
-  return(p_out)
+    p_a <- plot_cellwise_qc(sceptre_object)
+    if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
+        p_b <- plot_pairwise_qc(
+            sceptre_object,
+            downsample_pairs = 10000L,
+            point_size = 0.55,
+            transparency = 0.8,
+            return_indiv_plots = FALSE
+        )
+        # combine the plots
+        if (return_indiv_plots) {
+            p_out <- list(p_a, p_b)
+        } else {
+            p_out <- cowplot::plot_grid(p_a, p_b, ncol = 1)
+        }
+    } else {
+        p_out <- p_a
+    }
+    return(p_out)
 }
 
 plot_cellwise_qc <- function(sceptre_object) {
-  cell_removal_metrics <- sceptre_object@cell_removal_metrics
-  n_orig_cells <- ncol(get_response_matrix(sceptre_object))
-  cell_removal_metrics_frac <- cell_removal_metrics / n_orig_cells * 100
-  df <- data.frame(
-    fraction_cells_removed = cell_removal_metrics_frac,
-    Filter = c(
-      "N response UMIs", "N nonzero responses", "Percent mito",
-      "Zero or 2+ gRNAs", "User-specified", "Any filter"
+    cell_removal_metrics <- sceptre_object@cell_removal_metrics
+    n_orig_cells <- ncol(get_response_matrix(sceptre_object))
+    cell_removal_metrics_frac <- cell_removal_metrics / n_orig_cells * 100
+    df <- data.frame(
+        fraction_cells_removed = cell_removal_metrics_frac,
+        Filter = c(
+            "N response UMIs",
+            "N nonzero responses",
+            "Percent mito",
+            "Zero or 2+ gRNAs",
+            "User-specified",
+            "Any filter"
+        )
     )
-  )
-  if (!sceptre_object@low_moi) df <- df |> dplyr::filter(Filter != "Zero or 2+ gRNAs")
-  # make a barplot. remove x-axis text
-  p_a <- ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)) +
-    ggplot2::geom_bar(stat = "identity", fill = "grey90", col = "darkblue") +
-    get_my_theme() +
-    ggplot2::scale_y_continuous(expand = c(0, NA)) +
-    ggplot2::xlab("Filter") +
-    ggplot2::ylab("Percent cells removed") +
-    ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
-    get_my_theme() +
-    ggplot2::theme(legend.position = "none", axis.title.x = ggplot2::element_blank()) +
-    ggplot2::ggtitle("Cellwise QC")
-  return(p_a)
+    if (!sceptre_object@low_moi) {
+        df <- df |> dplyr::filter(Filter != "Zero or 2+ gRNAs")
+    }
+    # make a barplot. remove x-axis text
+    p_a <- ggplot2::ggplot(
+        data = df,
+        mapping = ggplot2::aes(x = Filter, y = fraction_cells_removed)
+    ) +
+        ggplot2::geom_bar(
+            stat = "identity",
+            fill = "grey90",
+            col = "darkblue"
+        ) +
+        get_my_theme() +
+        ggplot2::scale_y_continuous(expand = c(0, NA)) +
+        ggplot2::xlab("Filter") +
+        ggplot2::ylab("Percent cells removed") +
+        ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
+        get_my_theme() +
+        ggplot2::theme(
+            legend.position = "none",
+            axis.title.x = ggplot2::element_blank()
+        ) +
+        ggplot2::ggtitle("Cellwise QC")
+    return(p_a)
 }
 
-plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_size = 0.55, transparency = 0.8, return_indiv_plots = FALSE) {
-  my_cols <- c("mediumseagreen", "indianred2")
-  my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
-  discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
-    dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
-    dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
-  if (nrow(discovery_pairs) >= downsample_pairs) {
-    discovery_pairs <- withr::with_seed(4, discovery_pairs |> dplyr::sample_n(downsample_pairs))
-  }
+plot_pairwise_qc <- function(
+    sceptre_object,
+    downsample_pairs = 10000L,
+    point_size = 0.55,
+    transparency = 0.8,
+    return_indiv_plots = FALSE
+) {
+    my_cols <- c("mediumseagreen", "indianred2")
+    my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
+    discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
+        dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
+        dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
+    if (nrow(discovery_pairs) >= downsample_pairs) {
+        discovery_pairs <- withr::with_seed(
+            4,
+            discovery_pairs |> dplyr::sample_n(downsample_pairs)
+        )
+    }
 
-  p_b <- ggplot2::ggplot(
-    data = discovery_pairs,
-    mapping = ggplot2::aes(x = n_nonzero_trt, y = n_nonzero_cntrl, col = pass_qc)
-  ) +
-    ggplot2::geom_point(alpha = transparency, size = point_size) +
-    get_my_theme() +
-    ggplot2::scale_y_continuous(
-      trans = scales::pseudo_log_trans(base = 10, sigma = 1),
-      breaks = my_breaks
+    p_b <- ggplot2::ggplot(
+        data = discovery_pairs,
+        mapping = ggplot2::aes(
+            x = n_nonzero_trt,
+            y = n_nonzero_cntrl,
+            col = pass_qc
+        )
     ) +
-    ggplot2::scale_x_continuous(
-      trans = scales::pseudo_log_trans(base = 10, sigma = 1),
-      breaks = my_breaks
-    ) +
-    ggplot2::geom_hline(yintercept = sceptre_object@n_nonzero_cntrl_thresh) +
-    ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh) +
-    ggplot2::xlab("N nonzero trt. cells") +
-    ggplot2::ylab("N nonzero cntrl. cells") +
-    ggplot2::theme(legend.position = "bot") +
-    ggplot2::scale_color_manual(values = my_cols) +
-    ggplot2::ggtitle("Pairwise QC") +
-    ggplot2::theme(
-      legend.position.inside = c(0.85, 0.2),
-      legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
-      legend.title = ggplot2::element_blank()
-    ) +
-    ggplot2::guides(color = ggplot2::guide_legend(
-      keywidth = 0.0,
-      keyheight = 0.15,
-      default.unit = "inch",
-      override.aes = list(size = 1.25)
-    ))
-  return(p_b)
+        ggplot2::geom_point(alpha = transparency, size = point_size) +
+        get_my_theme() +
+        ggplot2::scale_y_continuous(
+            trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+            breaks = my_breaks
+        ) +
+        ggplot2::scale_x_continuous(
+            trans = scales::pseudo_log_trans(base = 10, sigma = 1),
+            breaks = my_breaks
+        ) +
+        ggplot2::geom_hline(
+            yintercept = sceptre_object@n_nonzero_cntrl_thresh
+        ) +
+        ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh) +
+        ggplot2::xlab("N nonzero trt. cells") +
+        ggplot2::ylab("N nonzero cntrl. cells") +
+        ggplot2::theme(legend.position = "bot") +
+        ggplot2::scale_color_manual(values = my_cols) +
+        ggplot2::ggtitle("Pairwise QC") +
+        ggplot2::theme(
+            legend.position.inside = c(0.85, 0.2),
+            legend.margin = ggplot2::margin(t = -0.5, unit = "cm"),
+            legend.title = ggplot2::element_blank()
+        ) +
+        ggplot2::guides(
+            color = ggplot2::guide_legend(
+                keywidth = 0.0,
+                keyheight = 0.15,
+                default.unit = "inch",
+                override.aes = list(size = 1.25)
+            )
+        )
+    return(p_b)
 }
 
 ###############
@@ -835,57 +1164,81 @@ plot_pairwise_qc <- function(sceptre_object, downsample_pairs = 10000L, point_si
 #'   ) |>
 #'   run_power_check() |>
 #'   plot_run_power_check()
-plot_run_power_check <- function(sceptre_object, point_size = 1, transparency = 0.8, clip_to = 1e-20) {
-  if (!sceptre_object@functs_called["run_power_check"]) {
-    stop("This `sceptre_object` has not yet had `run_power_check` called on it.")
-  }
-  my_theme <- get_my_theme()
-  my_cols <- c("mediumseagreen", "firebrick1")
+plot_run_power_check <- function(
+    sceptre_object,
+    point_size = 1,
+    transparency = 0.8,
+    clip_to = 1e-20
+) {
+    if (!sceptre_object@functs_called["run_power_check"]) {
+        stop(
+            "This `sceptre_object` has not yet had `run_power_check` called on it."
+        )
+    }
+    my_theme <- get_my_theme()
+    my_cols <- c("mediumseagreen", "firebrick1")
 
-  pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
-  neg_ctrl_pval_sub <- if (nrow(sceptre_object@calibration_result) >= 1) {
-    downsample_result_data_frame(result_df = sceptre_object@calibration_result) |> dplyr::pull(p_value)
-  } else {
-    numeric(0)
-  }
-  group_names <- c("Positive Control", "Negative Control")
-  df <- data.frame(
-    lab = rep(
-      group_names,
-      c(length(pos_ctrl_pvals), length(neg_ctrl_pval_sub))
-    ) |>
-      factor(levels = group_names),
-    p_values = c(pos_ctrl_pvals, neg_ctrl_pval_sub) |>
-      pmax(clip_to)
-  )
+    pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
+    neg_ctrl_pval_sub <- if (nrow(sceptre_object@calibration_result) >= 1) {
+        downsample_result_data_frame(
+            result_df = sceptre_object@calibration_result
+        ) |>
+            dplyr::pull(p_value)
+    } else {
+        numeric(0)
+    }
+    group_names <- c("Positive Control", "Negative Control")
+    df <- data.frame(
+        lab = rep(
+            group_names,
+            c(length(pos_ctrl_pvals), length(neg_ctrl_pval_sub))
+        ) |>
+            factor(levels = group_names),
+        p_values = c(pos_ctrl_pvals, neg_ctrl_pval_sub) |>
+            pmax(clip_to)
+    )
 
-  p <- ggplot2::ggplot(
-    data = df,
-    mapping = ggplot2::aes(x = lab, y = p_values, color = lab)
-  )
-  my_breaks <- 10^(seq(-2, -40, by = -4))
-  p <- p +
-    ggplot2::geom_jitter(position = ggplot2::position_jitter(width = .25, height = 0, seed = 4), size = point_size, alpha = transparency) +
-    ggplot2::scale_y_continuous(trans = revlog_trans(base = 10), expand = c(0.01, 0), breaks = my_breaks) +
-    ggplot2::scale_color_manual(values = my_cols, guide = "none") +
-    ggplot2::labs(
-      x = "Pair type",
-      y = "p-value",
-      title = "Positive and negative control p-values"
-    ) +
-    my_theme
+    p <- ggplot2::ggplot(
+        data = df,
+        mapping = ggplot2::aes(x = lab, y = p_values, color = lab)
+    )
+    my_breaks <- 10^(seq(-2, -40, by = -4))
+    p <- p +
+        ggplot2::geom_jitter(
+            position = ggplot2::position_jitter(
+                width = .25,
+                height = 0,
+                seed = 4
+            ),
+            size = point_size,
+            alpha = transparency
+        ) +
+        ggplot2::scale_y_continuous(
+            trans = revlog_trans(base = 10),
+            expand = c(0.01, 0),
+            breaks = my_breaks
+        ) +
+        ggplot2::scale_color_manual(values = my_cols, guide = "none") +
+        ggplot2::labs(
+            x = "Pair type",
+            y = "p-value",
+            title = "Positive and negative control p-values"
+        ) +
+        my_theme
 
-  return(p)
+    return(p)
 }
 
 
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
-  withr::with_seed(4, {
-    result_df |>
-      dplyr::mutate(bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))) |>
-      dplyr::group_by(bin) |>
-      dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
-  })
+    withr::with_seed(4, {
+        result_df |>
+            dplyr::mutate(
+                bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))
+            ) |>
+            dplyr::group_by(bin) |>
+            dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
+    })
 }
 
 
@@ -926,106 +1279,170 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 #'     response_id = "ENSG00000211641",
 #'     grna_target = "candidate_enh_15"
 #'   )
-plot_response_grna_target_pair <- function(sceptre_object, response_id, grna_target) {
-  # check that grnas have been assigned and qc has been called
-  functs_called <- sceptre_object@functs_called
-  singleton_integration_strategy <- sceptre_object@grna_integration_strategy == "singleton"
-  if (!functs_called[["assign_grnas"]]) {
-    stop("`assign_grnas()` must be called on the `sceptre_object`.")
-  }
-  if (!functs_called[["run_qc"]]) {
-    stop("`run_qc()` must be called on the `sceptre_object`.")
-  }
+plot_response_grna_target_pair <- function(
+    sceptre_object,
+    response_id,
+    grna_target
+) {
+    # check that grnas have been assigned and qc has been called
+    functs_called <- sceptre_object@functs_called
+    singleton_integration_strategy <- sceptre_object@grna_integration_strategy ==
+        "singleton"
+    if (!functs_called[["assign_grnas"]]) {
+        stop("`assign_grnas()` must be called on the `sceptre_object`.")
+    }
+    if (!functs_called[["run_qc"]]) {
+        stop("`run_qc()` must be called on the `sceptre_object`.")
+    }
 
-  # get grna integration strategy, control group
-  control_group_complement <- sceptre_object@control_group_complement
-  cells_in_use <- sceptre_object@cells_in_use
+    # get grna integration strategy, control group
+    control_group_complement <- sceptre_object@control_group_complement
+    cells_in_use <- sceptre_object@cells_in_use
 
-  # check that grna_target is present in grna_assignments
-  grna_group_idxs <- sceptre_object@grna_assignments$grna_group_idxs
-  grna_group_names <- names(grna_group_idxs)
-  if (!grna_target %in% grna_group_names) {
-    stop(if (singleton_integration_strategy) "gRNA ID" else "gRNA target `", grna_target, "` is not present within the data.")
-  }
+    # check that grna_target is present in grna_assignments
+    grna_group_idxs <- sceptre_object@grna_assignments$grna_group_idxs
+    grna_group_names <- names(grna_group_idxs)
+    if (!grna_target %in% grna_group_names) {
+        stop(
+            if (singleton_integration_strategy) "gRNA ID" else "gRNA target `",
+            grna_target,
+            "` is not present within the data."
+        )
+    }
 
-  # check that the response is present within the data
-  response_matrix <- get_response_matrix(sceptre_object)
-  if (!(response_id %in% rownames(response_matrix))) {
-    stop("Response `", response_id, "` is not present within the data.")
-  }
+    # check that the response is present within the data
+    response_matrix <- get_response_matrix(sceptre_object)
+    if (!(response_id %in% rownames(response_matrix))) {
+        stop("Response `", response_id, "` is not present within the data.")
+    }
 
-  # extract the counts for this pair; filter for cells in use
-  y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
+    # extract the counts for this pair; filter for cells in use
+    y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
 
-  # get the sequencing depths; filter for cells in use
-  response_n_umis <- sceptre_object@covariate_data_frame$response_n_umis[cells_in_use]
+    # get the sequencing depths; filter for cells in use
+    response_n_umis <- sceptre_object@covariate_data_frame$response_n_umis[
+        cells_in_use
+    ]
 
-  # compute the normalized counts
-  normalized_counts <- log(10000 * y / response_n_umis + 1)
+    # compute the normalized counts
+    normalized_counts <- log(10000 * y / response_n_umis + 1)
 
-  # get the treated cells and control cells
-  trt_cells <- normalized_counts[grna_group_idxs[[grna_target]]]
-  if (control_group_complement) { # complement set
-    cntrl_cells <- normalized_counts[-grna_group_idxs[[grna_target]]]
-  } else { # nt cells
-    nt_idxs <- sceptre_object@grna_assignments$all_nt_idxs
-    cntrl_cells <- normalized_counts[nt_idxs]
-  }
-
-  # construct the data frame to plot
-  to_plot <- data.frame(
-    normalized_count = c(trt_cells, cntrl_cells),
-    treatment = c(
-      rep("Treatment", length(trt_cells)),
-      rep("Control", length(cntrl_cells))
-    ) |>
-      factor(levels = c("Treatment", "Control"))
-  )
-
-  # obtain the p-value (if available); deal with the singleton situation
-  p_val <- 1.5
-  df_list <- list(if (functs_called[["run_power_check"]]) sceptre_object@power_result else NULL,
-                  if (functs_called[["run_discovery_analysis"]]) sceptre_object@discovery_result else NULL) |>
-    purrr::compact()
-  for (curr_df in df_list) {
-    if (singleton_integration_strategy) {
-      subset_result <- curr_df |>
-        dplyr::filter(response_id == !!response_id, grna_id == !!grna_target)
+    # get the treated cells and control cells
+    trt_cells <- normalized_counts[grna_group_idxs[[grna_target]]]
+    if (control_group_complement) {
+        # complement set
+        cntrl_cells <- normalized_counts[-grna_group_idxs[[grna_target]]]
     } else {
-      subset_result <- curr_df |>
-        dplyr::filter(response_id == !!response_id, grna_target == !!grna_target)
+        # nt cells
+        nt_idxs <- sceptre_object@grna_assignments$all_nt_idxs
+        cntrl_cells <- normalized_counts[nt_idxs]
     }
-    if (nrow(subset_result) >= 1) {
-      p_val <- subset_result$p_value
-      if (is.na(p_val)) p_val <- 1
+
+    # construct the data frame to plot
+    to_plot <- data.frame(
+        normalized_count = c(trt_cells, cntrl_cells),
+        treatment = c(
+            rep("Treatment", length(trt_cells)),
+            rep("Control", length(cntrl_cells))
+        ) |>
+            factor(levels = c("Treatment", "Control"))
+    )
+
+    # obtain the p-value (if available); deal with the singleton situation
+    p_val <- 1.5
+    df_list <- list(
+        if (functs_called[["run_power_check"]]) {
+            sceptre_object@power_result
+        } else {
+            NULL
+        },
+        if (functs_called[["run_discovery_analysis"]]) {
+            sceptre_object@discovery_result
+        } else {
+            NULL
+        }
+    ) |>
+        purrr::compact()
+    for (curr_df in df_list) {
+        if (singleton_integration_strategy) {
+            subset_result <- curr_df |>
+                dplyr::filter(
+                    response_id == !!response_id,
+                    grna_id == !!grna_target
+                )
+        } else {
+            subset_result <- curr_df |>
+                dplyr::filter(
+                    response_id == !!response_id,
+                    grna_target == !!grna_target
+                )
+        }
+        if (nrow(subset_result) >= 1) {
+            p_val <- subset_result$p_value
+            if (is.na(p_val)) p_val <- 1
+        }
     }
-  }
 
-  # obtain the annotation
-  annotation <- cut(p_val,
-    breaks = c(2, 1, 10^(-seq(2, 10)), 0),
-    labels = c(paste0("p <= 10^{", seq(-10, -2), "}"), "p > 0.01", "")
-  ) |> as.character()
-  # create the plot
-  to_plot_downsample <- withr::with_seed(4, {
-    to_plot |>
-      dplyr::mutate(is_zero = (normalized_count == 0)) |>
-      dplyr::group_by(is_zero, treatment) |>
-      dplyr::sample_n(size = min(dplyr::n(), 1000))
-  })
-  p_out <- ggplot2::ggplot(data = to_plot, mapping = ggplot2::aes(x = treatment, y = normalized_count, col = treatment)) +
-    ggplot2::geom_violin(linewidth = 0.6) +
-    ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.4, linewidth = 0.4) +
-    ggplot2::geom_jitter(data = to_plot_downsample, alpha = 0.1, size = 0.5, position = ggplot2::position_jitter(seed = 4)) +
-    get_my_theme() +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::scale_color_manual(values = c("dodgerblue4", "firebrick4")) +
-    ggplot2::xlab("Treatment status") +
-    ggplot2::ylab("Normalized expression") +
-    ggplot2::annotate("text", x = 1.5, y = max(to_plot$normalized_count) + 0.5, label = annotation, parse = TRUE) +
-    ggplot2::scale_y_continuous(expand = c(0.0, 0.1), limits = c(-0.01, max(to_plot$normalized_count) + 0.7)) +
-    ggplot2::ggtitle(paste0("Response: ", response_id, "\ngRNA", if (singleton_integration_strategy) "" else " target", ": ", grna_target)) +
-    ggplot2::theme(plot.title = ggplot2::element_text(size = 10))
+    # obtain the annotation
+    annotation <- cut(
+        p_val,
+        breaks = c(2, 1, 10^(-seq(2, 10)), 0),
+        labels = c(paste0("p <= 10^{", seq(-10, -2), "}"), "p > 0.01", "")
+    ) |>
+        as.character()
+    # create the plot
+    to_plot_downsample <- withr::with_seed(4, {
+        to_plot |>
+            dplyr::mutate(is_zero = (normalized_count == 0)) |>
+            dplyr::group_by(is_zero, treatment) |>
+            dplyr::sample_n(size = min(dplyr::n(), 1000))
+    })
+    p_out <- ggplot2::ggplot(
+        data = to_plot,
+        mapping = ggplot2::aes(
+            x = treatment,
+            y = normalized_count,
+            col = treatment
+        )
+    ) +
+        ggplot2::geom_violin(linewidth = 0.6) +
+        ggplot2::stat_summary(
+            fun = stats::median,
+            geom = "crossbar",
+            width = 0.4,
+            linewidth = 0.4
+        ) +
+        ggplot2::geom_jitter(
+            data = to_plot_downsample,
+            alpha = 0.1,
+            size = 0.5,
+            position = ggplot2::position_jitter(seed = 4)
+        ) +
+        get_my_theme() +
+        ggplot2::theme(legend.position = "none") +
+        ggplot2::scale_color_manual(values = c("dodgerblue4", "firebrick4")) +
+        ggplot2::xlab("Treatment status") +
+        ggplot2::ylab("Normalized expression") +
+        ggplot2::annotate(
+            "text",
+            x = 1.5,
+            y = max(to_plot$normalized_count) + 0.5,
+            label = annotation,
+            parse = TRUE
+        ) +
+        ggplot2::scale_y_continuous(
+            expand = c(0.0, 0.1),
+            limits = c(-0.01, max(to_plot$normalized_count) + 0.7)
+        ) +
+        ggplot2::ggtitle(paste0(
+            "Response: ",
+            response_id,
+            "\ngRNA",
+            if (singleton_integration_strategy) "" else " target",
+            ": ",
+            grna_target
+        )) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = 10))
 
-  return(p_out)
+    return(p_out)
 }

@@ -29,50 +29,58 @@ set.seed(123)
 # generate the gRNA target data frame
 gene_names <- sample(gene_position_data_frame_grch38$response_id, num_genes)
 grna_target_data_frame <- dplyr::tibble(
-  grna_target = c(
-    rep(sample(gene_names, num_targets), each = grnas_per_target),
-    rep("nt", num_nt_grnas)
-  ),
-  grna_id = paste0(grna_target, "_grna", c(
-    rep(1:grnas_per_target, num_targets),
-    1:num_nt_grnas
-  ))
+    grna_target = c(
+        rep(sample(gene_names, num_targets), each = grnas_per_target),
+        rep("nt", num_nt_grnas)
+    ),
+    grna_id = paste0(
+        grna_target,
+        "_grna",
+        c(
+            rep(1:grnas_per_target, num_targets),
+            1:num_nt_grnas
+        )
+    )
 ) |>
-  dplyr::mutate(grna_target = ifelse(grna_target == "nt",
-                                     "non-targeting",
-                                     grna_target)) |>
-  dplyr::relocate(grna_id)
+    dplyr::mutate(
+        grna_target = ifelse(grna_target == "nt", "non-targeting", grna_target)
+    ) |>
+    dplyr::relocate(grna_id)
 
 # generate which cells received which gRNAs via multinomial sampling
 num_grnas <- nrow(grna_target_data_frame)
 grna_per_cell <- rmultinom(
-  n = num_cells,
-  size = 1,
-  prob = rep(1 / num_grnas, num_grnas)
+    n = num_cells,
+    size = 1,
+    prob = rep(1 / num_grnas, num_grnas)
 ) |>
-  apply(MARGIN = 2, FUN = function(col) which(col == 1))
+    apply(MARGIN = 2, FUN = function(col) which(col == 1))
 
 # generate gRNA expression matrix based on the vector grna_per_cell; gRNAs not in a
 # cell get a background expression level
 grna_matrix <- matrix(
-  rpois(
-    n = num_grnas * num_cells,
-    lambda = exp(rnorm(num_grnas * num_cells,
-      mean = mean_log_background_grna_expression,
-      sd = sd_log_background_grna_expression
-    ))
-  ),
-  nrow = num_grnas,
-  ncol = num_cells,
-  dimnames = list(grna_target_data_frame$grna_id, paste0("Cell_", 1:num_cells))
+    rpois(
+        n = num_grnas * num_cells,
+        lambda = exp(rnorm(
+            num_grnas * num_cells,
+            mean = mean_log_background_grna_expression,
+            sd = sd_log_background_grna_expression
+        ))
+    ),
+    nrow = num_grnas,
+    ncol = num_cells,
+    dimnames = list(
+        grna_target_data_frame$grna_id,
+        paste0("Cell_", 1:num_cells)
+    )
 )
 grna_specific_values <- rpois(
-  n = num_cells,
-  lambda = exp(rnorm(
     n = num_cells,
-    mean = mean_log_grna_expression,
-    sd = sd_log_grna_expression
-  ))
+    lambda = exp(rnorm(
+        n = num_cells,
+        mean = mean_log_grna_expression,
+        sd = sd_log_grna_expression
+    ))
 )
 grna_matrix[cbind(grna_per_cell, 1:num_cells)] <- grna_specific_values
 
@@ -81,10 +89,10 @@ grna_matrix[cbind(grna_per_cell, 1:num_cells)] <- grna_specific_values
 
 # Initialize the log-fold change matrix with zeros
 grna_log_fold_change_matrix <- matrix(
-  0,
-  nrow = num_grnas,
-  ncol = num_genes,
-  dimnames = list(grna_target_data_frame$grna_id, gene_names)
+    0,
+    nrow = num_grnas,
+    ncol = num_genes,
+    dimnames = list(grna_target_data_frame$grna_id, gene_names)
 )
 
 # Assign On-Target Log-Fold Changes
@@ -93,7 +101,10 @@ grna_log_fold_change_matrix <- matrix(
 target_gene_indices <- match(grna_target_data_frame$grna_target, gene_names)
 
 # Assign the on-target log-fold change
-grna_log_fold_change_matrix[cbind(1:num_grnas, target_gene_indices)] <- on_target_log_fold_change
+grna_log_fold_change_matrix[cbind(
+    1:num_grnas,
+    target_gene_indices
+)] <- on_target_log_fold_change
 
 # Identify Off-Target Pairs
 # Create a logical matrix indicating on-target pairs
@@ -105,7 +116,9 @@ on_target_matrix[cbind(1:num_grnas, target_gene_indices)] <- TRUE
 off_target_indices <- which(!on_target_matrix, arr.ind = TRUE)
 # Exclude NTs from off-target indices
 nt_grna_rows <- which(grna_target_data_frame$grna_target == "non-targeting")
-off_target_indices <- off_target_indices[!off_target_indices[, 1] %in% nt_grna_rows, ]
+off_target_indices <- off_target_indices[
+    !off_target_indices[, 1] %in% nt_grna_rows,
+]
 
 # Total number of off-target pairs
 num_off_target <- nrow(off_target_indices)
@@ -114,15 +127,22 @@ num_off_target <- nrow(off_target_indices)
 num_nonnull <- floor(nonnull_fraction * num_off_target)
 
 # Randomly select indices for non-null off-target effects
-selected_off_target_indices <- off_target_indices[sample(1:num_off_target, num_nonnull), ]
+selected_off_target_indices <- off_target_indices[
+    sample(1:num_off_target, num_nonnull),
+]
 
 # Assign random log-fold changes to selected off-target pairs
-grna_log_fold_change_matrix[cbind(selected_off_target_indices[, 1], selected_off_target_indices[, 2])] <-
-  rnorm(num_nonnull, mean = mean_log_fold_change, sd = sd_log_fold_change)
+grna_log_fold_change_matrix[cbind(
+    selected_off_target_indices[, 1],
+    selected_off_target_indices[, 2]
+)] <-
+    rnorm(num_nonnull, mean = mean_log_fold_change, sd = sd_log_fold_change)
 
 # vector of batch indicators
 batch_indicator <- sample(1:num_batches, size = num_cells, replace = TRUE)
-extra_covariates <- data.frame(batch = factor(paste0("batch_", batch_indicator)))
+extra_covariates <- data.frame(
+    batch = factor(paste0("batch_", batch_indicator))
+)
 
 # matrix of gene expressions
 
@@ -133,7 +153,11 @@ batch_effect <- ifelse(batch_indicator == 1, 0, batch_log_fold_change)
 
 # ----- Generate Baseline Gene Expression -----
 # For each gene, generate a baseline mean expression from a log-normal distribution
-mu_gene <- exp(rnorm(num_genes, mean = mean_log_gene_expression, sd = sd_log_gene_expression))
+mu_gene <- exp(rnorm(
+    num_genes,
+    mean = mean_log_gene_expression,
+    sd = sd_log_gene_expression
+))
 
 # ----- Incorporate gRNA Effects -----
 # grna_log_fold_change_matrix: num_grnas x num_genes
@@ -148,14 +172,24 @@ grna_effect_matrix <- t(grna_effect_matrix) # Now rows = genes, columns = cells
 
 # ----- Incorporate Batch Effects -----
 # Create a num_genes x num_cells matrix where each column has the batch effect added to all genes
-batch_effect_matrix <- matrix(batch_effect, nrow = num_genes, ncol = num_cells, byrow = TRUE)
+batch_effect_matrix <- matrix(
+    batch_effect,
+    nrow = num_genes,
+    ncol = num_cells,
+    byrow = TRUE
+)
 
 # ----- Calculate Mean Expression Matrix -----
 # For each gene and cell, compute the mean expression incorporating baseline, gRNA, and batch effects
 # log_mu_matrix = log(mu_gene) + grna_effect + batch_effect
-log_mu_matrix <- matrix(log(mu_gene), nrow = num_genes, ncol = num_cells, byrow = FALSE) +
-  grna_effect_matrix +
-  batch_effect_matrix
+log_mu_matrix <- matrix(
+    log(mu_gene),
+    nrow = num_genes,
+    ncol = num_cells,
+    byrow = FALSE
+) +
+    grna_effect_matrix +
+    batch_effect_matrix
 
 # Convert log-scale to linear scale
 mu_expression <- exp(log_mu_matrix)
@@ -168,25 +202,27 @@ mu_expression <- exp(log_mu_matrix)
 size_parameter <- 1 / gene_dispersion # Here, size_parameter = 1
 
 # Simulate counts for all gene-cell pairs
-gene_expression_vector <- rnbinom(n = num_genes * num_cells,
-                                  mu = mu_expression,
-                                  size = size_parameter)
+gene_expression_vector <- rnbinom(
+    n = num_genes * num_cells,
+    mu = mu_expression,
+    size = size_parameter
+)
 
 # Reshape the vector into a matrix
 gene_expression_matrix <- matrix(
-  gene_expression_vector,
-  nrow = num_genes,
-  ncol = num_cells,
-  dimnames = list(gene_names, paste0("Cell_", 1:num_cells))
+    gene_expression_vector,
+    nrow = num_genes,
+    ncol = num_cells,
+    dimnames = list(gene_names, paste0("Cell_", 1:num_cells))
 )
 
 # ----- Package and save -----
 
 lowmoi_example_data <- list(
-  response_matrix = gene_expression_matrix,
-  grna_matrix = grna_matrix,
-  grna_target_data_frame = grna_target_data_frame,
-  extra_covariates = extra_covariates
+    response_matrix = gene_expression_matrix,
+    grna_matrix = grna_matrix,
+    grna_target_data_frame = grna_target_data_frame,
+    extra_covariates = extra_covariates
 )
 usethis::use_data(lowmoi_example_data, overwrite = TRUE)
 
