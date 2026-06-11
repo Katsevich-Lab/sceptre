@@ -107,10 +107,11 @@ compute_qc_metrics <- function(sceptre_object) {
         dplyr::mutate(pass_qc = (n_nonzero_trt >= n_nonzero_trt_thresh & n_nonzero_cntrl >= n_nonzero_cntrl_thresh))
       if (sceptre_object@grna_integration_strategy == "bonferroni") {
         grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
-          dplyr::select(grna_id, grna_target)
+          dplyr::select(grna_id, grna_target) |>
+          dplyr::distinct()
         n_ok_pairs <- methods::slot(sceptre_object, data_frame_name) |>
           dplyr::select("grna_id" = "grna_group", pass_qc, response_id) |>
-          dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
+          dplyr::left_join(grna_target_data_frame, by = "grna_id", relationship = "many-to-many") |>
           dplyr::group_by(response_id, grna_target) |>
           dplyr::summarize(any_pass_qc = any(pass_qc), .groups = "drop") |>
           dplyr::pull(any_pass_qc) |>
