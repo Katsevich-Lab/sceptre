@@ -18,18 +18,38 @@ get_my_theme <- function(element_text_size = 11) {
 ######################
 #' Plot gRNA count distributions
 #'
-#' `plot_grna_count_distributions()` plots the empirical UMI count distribution of one or more gRNAs. `plot_grna_count_distributions()` can be called on a `sceptre_object` at any point in the pipeline after `import_data()`.
+#' `plot_grna_count_distributions()` plots the empirical UMI count distribution
+#' of one or more gRNAs. `plot_grna_count_distributions()` can be called on a
+#' `sceptre_object` at any point in the pipeline after `import_data()`.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param n_grnas_to_plot (optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot
-#' @param grnas_to_plot (optional; default `NULL`) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then `n_grnas_to_plot` random gRNAs are plotted.
-#' @param threshold (optional; default `NULL`) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, a single combined \code{cowplot} object is returned; if \code{TRUE}, a list of the per-gRNA \code{ggplot} panels is returned instead.
+#' @param n_grnas_to_plot (optional; default \code{4}) an integer specifying the
+#' number of randomly selected gRNAs to plot
+#' @param grnas_to_plot (optional; default `NULL`) a character vector giving the
+#' names of one or more specific gRNAs to plot. If \code{NULL}, then
+#' `n_grnas_to_plot` random gRNAs are plotted.
+#' @param threshold (optional; default `NULL`) an integer representing a gRNA
+#' count cut-off; if provided, the bins of length 1 will go up to and include
+#' this value, after which the exponentially growing bins begin. A vertical line
+#' is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA
+#' count with its own bin. Non-integer values will be rounded.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, a
+#' single combined \code{cowplot} object is returned; if \code{TRUE}, a list of
+#' the per-gRNA \code{ggplot} panels is returned instead.
 #'
 #' @details
-#' The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
+#' The x-axis is a piecewise linear-log scale, with bins of size 1 going from
+#' gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths
+#' grow exponentially in size. The number under each bar indicates the first
+#' value that is counted for that bar, and that bar includes all integers from
+#' that label up until the integer immediately preceding the label of the next
+#' bar on the right. For example, if one bar has a label of "23" and the next
+#' bar on the right has a label of "26" then the bar with the label of "23"
+#' counts values of 23, 24, and 25 in the data.
 #'
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is \code{FALSE}, the default) or a list of the per-gRNA \code{ggplot2} panels (if \code{return_indiv_plots} is \code{TRUE})
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is \code{FALSE}, the default) or a list of the
+#' per-gRNA \code{ggplot2} panels (if \code{return_indiv_plots} is \code{TRUE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -85,8 +105,10 @@ plot_grna_count_distributions <- function(
         dplyr::filter(grna_expressions < 10000)
 
     # this function takes a vector of grna expressions and returns a data.frame
-    # which gets passed to `cut` for binning that vector. In the returned data.frame,
-    # one column (`bin_upper_bounds`) contains the upper end point of the resulting bin,
+    # which gets passed to `cut` for binning that vector. In the returned
+    # data.frame,
+    # one column (`bin_upper_bounds`) contains the upper end point of the
+    # resulting bin,
     # and the other column (`bin_labels`) has the name that that bin will get.
     grna_expressions_to_binned_factor <- function(gnra_expressions) {
         max_expression_count <- max(gnra_expressions)
@@ -95,10 +117,14 @@ plot_grna_count_distributions <- function(
         bin_labels <- as.character(bin_upper_bounds)
         if (max_expression_count > 10) {
             # now we need to add exp growing bins, w/ more complex labels
-            # this next section relies on the fact that the upper bounds are going to be at locations
-            # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 + 2^2 + 2^3, ...
-            # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes from finding the
-            # smallest n such that this biggest bin width is above `max_expression_count`
+            # this next section relies on the fact that the upper bounds are
+            # going to be at locations
+            # max_single_bin + 2, max_single_bin + 2 + 2^2, max_single_bin + 2 +
+            # 2^2 + 2^3, ...
+            # and 2 + 2^2 + 2^3 + ... + 2^n = 2(2^n-1), so `num_exp_bins` comes
+            # from finding the
+            # smallest n such that this biggest bin width is above
+            # `max_expression_count`
             num_exp_bins <- log2(
                 (max_expression_count - max_single_bin) / 2 + 1
             ) |>
@@ -120,8 +146,10 @@ plot_grna_count_distributions <- function(
         ))
     }
 
-    # creating a list of bar plots for each grna_id, so that we can avoid dropping
-    # any bins inside the range of the expressions for each grna_id, but we don't
+    # creating a list of bar plots for each grna_id, so that we can avoid
+    # dropping
+    # any bins inside the range of the expressions for each grna_id, but we
+    # don't
     # keep empty ones in the tail.
     plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
         curr_df <- dplyr::filter(
@@ -204,16 +232,36 @@ plot_grna_count_distributions <- function(
 
 #' Plot assign gRNAs
 #'
-#' `plot_assign_grnas()` plots the outcome of the gRNA-to-cell assignment step. The top panel plots the gRNA-to-cell assignments of `n_grnas_to_plot` (default 3) randomly selected gRNAs. In each plot the points represent cells; the vertical axis indicates the UMI count of the gRNA in a given cell, and the horizontal axis indicates whether the cell has been classified as “perturbed” (i.e., it contains the gRNA) or unperturbed (i.e., it does not contain the gRNA). Perturbed (resp., unperturbed) cells are shown in the left (resp., right) column. The bottom left panel is a barplot of the number of cells to which each gRNA has been mapped. Finally, the bottom right panel is a histogram of the number of gRNAs contained in each cell. The mean number of gRNAs per cell --- i.e., the MOI --- is displayed in purple text.
+#' `plot_assign_grnas()` plots the outcome of the gRNA-to-cell assignment step.
+#' The top panel plots the gRNA-to-cell assignments of `n_grnas_to_plot`
+#' (default 3) randomly selected gRNAs. In each plot the points represent cells;
+#' the vertical axis indicates the UMI count of the gRNA in a given cell, and
+#' the horizontal axis indicates whether the cell has been classified as
+#' “perturbed” (i.e., it contains the gRNA) or unperturbed (i.e., it does not
+#' contain the gRNA). Perturbed (resp., unperturbed) cells are shown in the left
+#' (resp., right) column. The bottom left panel is a barplot of the number of
+#' cells to which each gRNA has been mapped. Finally, the bottom right panel is
+#' a histogram of the number of gRNAs contained in each cell. The mean number of
+#' gRNAs per cell --- i.e., the MOI --- is displayed in purple text.
 #'
-#' @param sceptre_object a \code{sceptre_object} that has had `assign_grnas()` called on it
-#' @param n_grnas_to_plot (optional; default \code{3}) the number of gRNAs to display in the plots of gRNA count versus cell assignment
-#' @param grnas_to_plot (optional; default \code{NULL}) a character vector giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs are chosen at random.
-#' @param point_size (optional; default \code{0.9}) the size of the individual points in the plot
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
+#' @param sceptre_object a \code{sceptre_object} that has had `assign_grnas()`
+#' called on it
+#' @param n_grnas_to_plot (optional; default \code{3}) the number of gRNAs to
+#' display in the plots of gRNA count versus cell assignment
+#' @param grnas_to_plot (optional; default \code{NULL}) a character vector
+#' giving the names of specific gRNAs to plot; if \code{NULL}, then the gRNAs
+#' are chosen at random.
+#' @param point_size (optional; default \code{0.9}) the size of the individual
+#' points in the plot
+#' @param transparency (optional; default \code{0.8}) the transparency of the
+#' individual points in the plot
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE},
+#' then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
+#' single \code{cowplot} object is returned.
 #'
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -424,18 +472,36 @@ plot_assign_grnas <- function(
 ###########################
 #' Plot run calibration check
 #'
-#' \code{plot_run_calibration_check()} creates a visualization of the outcome of the calibration check. The visualization consists of four panels, which we describe below.
-#' -   The upper left panel is a QQ plot of the p-values plotted on an untransformed scale. The p-values ideally should lie along the diagonal line, indicating uniformity of the p-values in the *bulk* of the distribution.
-#' -   The upper right panel is a QQ plot of the p-values plotted on a negative log-10 transformed scale. The p-values ideally should lie along the diagonal line (with the majority of the p-values falling within the gray confidence band), indicating uniformity of the p-values in the *tail* of the distribution.
-#' -   The lower left panel is a histogram of the estimated log-2 fold changes. The histogram ideally should be roughly symmetric and centered around zero.
-#' -   Finally, the bottom right panel is a text box displaying (i) the number of false discoveries that `sceptre` has made on the negative control data and (ii) the mean estimated log-fold change.
+#' \code{plot_run_calibration_check()} creates a visualization of the outcome of
+#' the calibration check. The visualization consists of four panels, which we
+#' describe below.
+#' - The upper left panel is a QQ plot of the p-values plotted on an
+#' untransformed scale. The p-values ideally should lie along the diagonal line,
+#' indicating uniformity of the p-values in the *bulk* of the distribution.
+#' - The upper right panel is a QQ plot of the p-values plotted on a negative
+#' log-10 transformed scale. The p-values ideally should lie along the diagonal
+#' line (with the majority of the p-values falling within the gray confidence
+#' band), indicating uniformity of the p-values in the *tail* of the
+#' distribution.
+#' - The lower left panel is a histogram of the estimated log-2 fold changes.
+#' The histogram ideally should be roughly symmetric and centered around zero.
+#' - Finally, the bottom right panel is a text box displaying (i) the number of
+#' false discoveries that `sceptre` has made on the negative control data and
+#' (ii) the mean estimated log-fold change.
 #'
-#' @param sceptre_object a \code{sceptre_object} that has had \code{run_calibration_check} called on it
-#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
+#' @param sceptre_object a \code{sceptre_object} that has had
+#' \code{run_calibration_check} called on it
+#' @param point_size (optional; default \code{0.55}) the size of the individual
+#' points in the plot
+#' @param transparency (optional; default \code{0.8}) the transparency of the
+#' individual points in the plot
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
+#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
+#' \code{cowplot} object is returned.
 #'
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #'
 #' @examples
@@ -702,17 +768,41 @@ make_volcano_plot <- function(
 
 #' Plot run discovery analysis
 #'
-#' `plot_run_discovery_analysis()` creates a visualization of the outcome of the discovery analysis. The visualization consists of four plots:
-#' -   The upper left plot superimposes the discovery p-values (blue) on top of the negative control p-values (red) on an untransformed scale.
-#' -   The upper right plot is the same as the upper left plot, but the scale is negative log-10 transformed. The discovery p-values ideally should trend above the diagonal line, indicating the presence of signal in the discovery set. The horizontal dashed line indicates the multiple testing threshold; discovery pairs whose p-value falls above this line are called as significant.
-#' -   The bottom left panel is a volcano plot of the p-values and log fold changes of the discovery pairs. Each point corresponds to a pair; the estimated log-2 fold change of the pair is plotted on the horizontal axis, and the (negative log-10 transformed) p-value is plotted on the vertical axis. The horizontal dashed line again indicates the multiple testing threshold. Points above the dashed line (colored in purple) are called as discoveries, while points below (colored in blue) are called as insignificant.
-#' -   The bottom right panel is a text box displaying the number of discovery pairs called as significant.
-#' @param sceptre_object a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it
-#' @param x_limits (optional; default \code{c(-1.5, 1.5)}) a numeric vector of length 2 giving the lower and upper limits of the x-axis (corresponding to log-2 fold change) for the "Discovery volcano plot" panel
-#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
-#' @return  a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' `plot_run_discovery_analysis()` creates a visualization of the outcome of the
+#' discovery analysis. The visualization consists of four plots:
+#' - The upper left plot superimposes the discovery p-values (blue) on top of
+#' the negative control p-values (red) on an untransformed scale.
+#' - The upper right plot is the same as the upper left plot, but the scale is
+#' negative log-10 transformed. The discovery p-values ideally should trend
+#' above the diagonal line, indicating the presence of signal in the discovery
+#' set. The horizontal dashed line indicates the multiple testing threshold;
+#' discovery pairs whose p-value falls above this line are called as
+#' significant.
+#' - The bottom left panel is a volcano plot of the p-values and log fold
+#' changes of the discovery pairs. Each point corresponds to a pair; the
+#' estimated log-2 fold change of the pair is plotted on the horizontal axis,
+#' and the (negative log-10 transformed) p-value is plotted on the vertical
+#' axis. The horizontal dashed line again indicates the multiple testing
+#' threshold. Points above the dashed line (colored in purple) are called as
+#' discoveries, while points below (colored in blue) are called as
+#' insignificant.
+#' - The bottom right panel is a text box displaying the number of discovery
+#' pairs called as significant.
+#' @param sceptre_object a \code{sceptre_object} that has had
+#' \code{run_discovery_analysis} called on it
+#' @param x_limits (optional; default \code{c(-1.5, 1.5)}) a numeric vector of
+#' length 2 giving the lower and upper limits of the x-axis (corresponding to
+#' log-2 fold change) for the "Discovery volcano plot" panel
+#' @param point_size (optional; default \code{0.55}) the size of the individual
+#' points in the plot
+#' @param transparency (optional; default \code{0.8}) the transparency of the
+#' individual points in the plot
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
+#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
+#' \code{cowplot} object is returned.
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
 #' @export
 #' @examples
@@ -765,7 +855,8 @@ plot_run_discovery_analysis <- function(
         NA
     }
     if (nrow(calibration_result) != nrow(discovery_result)) {
-        # if the two sets of pairs do not coincide in number, set calibration_result to data.frame()
+        # if the two sets of pairs do not coincide in number, set
+        # calibration_result to data.frame()
         calibration_result <- data.frame()
     }
     # create the bulk QQ plot
@@ -846,17 +937,46 @@ plot_run_discovery_analysis <- function(
 ############
 #' Plot covariates
 #'
-#' `plot_covariates()` creates a histogram of the covariates `response_n_nonzero`, `response_n_umis`, and (if applicable) `response_p_mito`. Cellwise QC removes cells that lie in the extreme right tail of the `response_p_mito` distribution or that lie in the extreme left *or* right tail of the `response_n_nonzero` or `response_n_umis` distribution. To help guide the selection of QC thresholds, `plot_covariates()` plots candidate QC thresholds as vertical lines on the histograms. The optional arguments `response_n_nonzero_range`, `response_n_umis_range`, and `p_mito_threshold` control the location of these candidate QC thresholds. `response_n_nonzero_range` (resp., `response_n_umis_range`) is a length-two vector of quantiles (default: `c(0.01, 0.99)`) indicating the location at which to draw candidate QC thresholds on the `response_n_nonzero` (resp., `response_n_umis`) histogram. Next, `p_mito_threshold` is a single numeric value in the interval \[0,1\] specifying the location at which to draw a candidate QC threshold on the `response_p_mito` plot.
+#' `plot_covariates()` creates a histogram of the covariates
+#' `response_n_nonzero`, `response_n_umis`, and (if applicable)
+#' `response_p_mito`. Cellwise QC removes cells that lie in the extreme right
+#' tail of the `response_p_mito` distribution or that lie in the extreme left
+#' *or* right tail of the `response_n_nonzero` or `response_n_umis`
+#' distribution. To help guide the selection of QC thresholds,
+#' `plot_covariates()` plots candidate QC thresholds as vertical lines on the
+#' histograms. The optional arguments `response_n_nonzero_range`,
+#' `response_n_umis_range`, and `p_mito_threshold` control the location of these
+#' candidate QC thresholds. `response_n_nonzero_range` (resp.,
+#' `response_n_umis_range`) is a length-two vector of quantiles (default:
+#' `c(0.01, 0.99)`) indicating the location at which to draw candidate QC
+#' thresholds on the `response_n_nonzero` (resp., `response_n_umis`) histogram.
+#' Next, `p_mito_threshold` is a single numeric value in the interval \[0,1\]
+#' specifying the location at which to draw a candidate QC threshold on the
+#' `response_p_mito` plot.
 #'
-#' @note If `run_qc()` has already been called on the `sceptre_object`, then the parameters `response_n_umis_range`, `response_n_nonzero_range`, and `p_mito_threshold` are set to the corresponding parameters within the `sceptre_object`.
+#' @note If `run_qc()` has already been called on the `sceptre_object`, then the
+#' parameters `response_n_umis_range`, `response_n_nonzero_range`, and
+#' `p_mito_threshold` are set to the corresponding parameters within the
+#' `sceptre_object`.
 #'
 #' @param sceptre_object a `sceptre_object`
-#' @param response_n_umis_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_umis` histogram
-#' @param response_n_nonzero_range (optional; default \code{c(0.01, 0.99)}) a length-2 vector of quantiles indicating the location at which to draw vertical lines on the `response_n_nonzero` histogram
-#' @param p_mito_threshold (optional; default \code{0.2}) a single numeric value in the interval \[0,1\] specifying the location at which to draw a vertical line on the `response_p_mito` histogram. Note that `p_mito_threshold` is an absolute number rather than a percentile.
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}, then a list of \code{ggplot} objects is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
+#' @param response_n_umis_range (optional; default \code{c(0.01, 0.99)}) a
+#' length-2 vector of quantiles indicating the location at which to draw
+#' vertical lines on the `response_n_umis` histogram
+#' @param response_n_nonzero_range (optional; default \code{c(0.01, 0.99)}) a
+#' length-2 vector of quantiles indicating the location at which to draw
+#' vertical lines on the `response_n_nonzero` histogram
+#' @param p_mito_threshold (optional; default \code{0.2}) a single numeric value
+#' in the interval \[0,1\] specifying the location at which to draw a vertical
+#' line on the `response_p_mito` histogram. Note that `p_mito_threshold` is an
+#' absolute number rather than a percentile.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE},
+#' then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
+#' single \code{cowplot} object is returned.
 #'
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -957,14 +1077,37 @@ plot_covariates <- function(
 
 #' Plot run QC
 #'
-#' `plot_run_qc()` creates a visualization of the outcome of the QC step. The top panel depicts the outcome of the cellwise QC. The various cellwise QC filters (e.g., "N nonzero responses," "N response UMIs," "Percent mito", etc.) are shown on the horizontal axis, and the percentage of cells removed due application of a given QC filter is shown on the vertical axis. Note that a cell can be flagged by multiple QC filters; for example, a cell might have an extremely high `response_n_umi` value *and* an extremely high `response_n_nonzero` value. Thus, the height of the "any filter" bar (which indicates the percentage of cells removed due to application of *any* filter) need not be equal to the sum of the heights of the other bars. The bottom panel depicts the outcome of the pairwise QC. Each point corresponds to a target-response pair; the vertical axis (resp., horizontal axis) indicates the `n_nonzero_trt` (resp., `n_nonzero_cntrl`) value of that pair. Pairs for which `n_nonzero_trt` or `n_nonzero_cntrl` fall below the threshold are removed (red), while the remaining pairs are retained (green).
+#' `plot_run_qc()` creates a visualization of the outcome of the QC step. The
+#' top panel depicts the outcome of the cellwise QC. The various cellwise QC
+#' filters (e.g., "N nonzero responses," "N response UMIs," "Percent mito",
+#' etc.) are shown on the horizontal axis, and the percentage of cells removed
+#' due application of a given QC filter is shown on the vertical axis. Note that
+#' a cell can be flagged by multiple QC filters; for example, a cell might have
+#' an extremely high `response_n_umi` value *and* an extremely high
+#' `response_n_nonzero` value. Thus, the height of the "any filter" bar (which
+#' indicates the percentage of cells removed due to application of *any* filter)
+#' need not be equal to the sum of the heights of the other bars. The bottom
+#' panel depicts the outcome of the pairwise QC. Each point corresponds to a
+#' target-response pair; the vertical axis (resp., horizontal axis) indicates
+#' the `n_nonzero_trt` (resp., `n_nonzero_cntrl`) value of that pair. Pairs for
+#' which `n_nonzero_trt` or `n_nonzero_cntrl` fall below the threshold are
+#' removed (red), while the remaining pairs are retained (green).
 #'
-#' @param sceptre_object a \code{sceptre_object} that has had \code{run_qc()} called on it
-#' @param downsample_pairs (optional; default \code{10000}) the maximum number of points to plot in the lower panel of the figure (i.e., the "pairwise QC" plot)
-#' @param point_size (optional; default \code{0.55}) the size of the individual points in the plot
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.
-#' @return  a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' @param sceptre_object a \code{sceptre_object} that has had \code{run_qc()}
+#' called on it
+#' @param downsample_pairs (optional; default \code{10000}) the maximum number
+#' of points to plot in the lower panel of the figure (i.e., the "pairwise QC"
+#' plot)
+#' @param point_size (optional; default \code{0.55}) the size of the individual
+#' points in the plot
+#' @param transparency (optional; default \code{0.8}) the transparency of the
+#' individual points in the plot
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
+#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
+#' \code{cowplot} object is returned.
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
 #' @export
 #' @examples
@@ -1128,12 +1271,24 @@ plot_pairwise_qc <- function(
 ###############
 #' Plot run power check
 #'
-#' \code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Each point in the plot corresponds to a target-response pair, with positive control pairs in the left column and negative control pairs in the right column. The vertical axis indicates the p-value of a given pair; smaller (i.e., more significant) p-values are positioned higher along this axis (p-values truncated at `clip_to` for visualization). The positive control p-values should be small, and in particular, smaller than the negative control p-values.
+#' \code{plot_run_power_check()} creates a visualization of the outcome of the
+#' power check analysis. Each point in the plot corresponds to a target-response
+#' pair, with positive control pairs in the left column and negative control
+#' pairs in the right column. The vertical axis indicates the p-value of a given
+#' pair; smaller (i.e., more significant) p-values are positioned higher along
+#' this axis (p-values truncated at `clip_to` for visualization). The positive
+#' control p-values should be small, and in particular, smaller than the
+#' negative control p-values.
 #'
-#' @param sceptre_object a \code{sceptre_object} that has had \code{run_power_check()} called on it
-#' @param point_size (optional; default \code{1}) the size of the individual points in the plot
-#' @param transparency (optional; default \code{0.8}) the transparency of the individual points in the plot
-#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.
+#' @param sceptre_object a \code{sceptre_object} that has had
+#' \code{run_power_check()} called on it
+#' @param point_size (optional; default \code{1}) the size of the individual
+#' points in the plot
+#' @param transparency (optional; default \code{0.8}) the transparency of the
+#' individual points in the plot
+#' @param clip_to (optional; default \code{1e-20}) p-values smaller than this
+#' value are set to \code{clip_to} for better visualization. If \code{clip_to=0}
+#' is used then no clipping is done.
 #'
 #' @return a single \code{ggplot2} plot
 #' @export
@@ -1244,12 +1399,21 @@ downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
 
 #' Plot response-gRNA-target pair
 #'
-#' `plot_response_grna_target_pair()` creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by `n_response_umis`, adding a pseudo-count of 1 and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
+#' `plot_response_grna_target_pair()` creates a violin plot of the expression
+#' level of a given response as a function of the "treatment status" (i.e.,
+#' treatment or control) of a given gRNA target. The left (resp., right) violin
+#' plot shows the expression level of the response in treatment (resp., control)
+#' cells. The expression level is normalized by dividing by `n_response_umis`,
+#' adding a pseudo-count of 1 and then taking the log transform. If the given
+#' response-gRNA-target pair has been analyzed, the p-value for the test of
+#' association also is displayed.
 #'
-#' If `grna_integration_strategy` is set to `"singleton"`, then `grna_target` should be set to a gRNA ID.
+#' If `grna_integration_strategy` is set to `"singleton"`, then `grna_target`
+#' should be set to a gRNA ID.
 #' @param sceptre_object a `sceptre_object` that has had `run_qc()` called on it
 #' @param response_id a string containing a response ID
-#' @param grna_target a string containing a gRNA target (or, if `grna_integration_strategy` is set to `"singleton"`, an individual gRNA ID)
+#' @param grna_target a string containing a gRNA target (or, if
+#' `grna_integration_strategy` is set to `"singleton"`, an individual gRNA ID)
 #'
 #' @return a violin plot
 #' @export

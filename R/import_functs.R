@@ -3,16 +3,41 @@
 ############
 #' Import data
 #'
-#' `import_data()` imports data from a collection of R objects to create a `sceptre_object`. Users can create either a standard `sceptre` object or an `ondisc`-backed `sceptre` object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual} for more detailed information about this function.
+#' `import_data()` imports data from a collection of R objects to create a
+#' `sceptre_object`. Users can create either a standard `sceptre` object or an
+#' `ondisc`-backed `sceptre` object; the latter is more appropriate for
+#' large-scale data. See
+#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual}
+#' for more detailed information about this function.
 #'
-#' @param response_matrix a matrix of response UMI counts, with responses in rows and cells in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the response IDs.
-#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the gRNA IDs.
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs should be assigned a label of "non-targeting". Optionally, `grna_target_data_frame` can contain columns `chr`, `start`, and `end`, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, `grna_target_data_frame` can contain the column `vector_id` specifying the vector to which a given gRNA belongs.
-#' @param moi a string indicating the MOI of the dataset, either "low" or "high".
-#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
-#' @param response_names (optional) a vector of human-readable response names; names with the prefix "MT-" are taken as mitochondrial genes and are used to compute the covariate `response_p_mito`.
-#' @param use_ondisc (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`) indicating whether to create an `ondisc`-backed `sceptre_object` (`TRUE`) or a standard `sceptre_object` (`FALSE`).
-#' @param directory_to_write (optional) a file path to a directory in which to write the backing `.odm` files for the response and gRNA expression matrices. Must be supplied if `use_ondisc` is set to `TRUE`.
+#' @param response_matrix a matrix of response UMI counts, with responses in
+#' rows and cells in columns. The matrix should be of type `"matrix"`,
+#' `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix
+#' should give the response IDs.
+#' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells
+#' in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`,
+#' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the
+#' gRNA IDs.
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and
+#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
+#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
+#' giving the chromosome, start coordinate, and end coordiante, respectively, of
+#' each gRNA. Additionally, `grna_target_data_frame` can contain the column
+#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' @param moi a string indicating the MOI of the dataset, either "low" or
+#' "high".
+#' @param extra_covariates (optional) a data frame containing extra covariates
+#' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
+#' @param response_names (optional) a vector of human-readable response names;
+#' names with the prefix "MT-" are taken as mitochondrial genes and are used to
+#' compute the covariate `response_p_mito`.
+#' @param use_ondisc (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`)
+#' indicating whether to create an `ondisc`-backed `sceptre_object` (`TRUE`) or
+#' a standard `sceptre_object` (`FALSE`).
+#' @param directory_to_write (optional) a file path to a directory in which to
+#' write the backing `.odm` files for the response and gRNA expression matrices.
+#' Must be supplied if `use_ondisc` is set to `TRUE`.
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -180,14 +205,38 @@ import_data_use_ondisc <- function(
 ############
 #' Import data from Cell Ranger
 #'
-#' `import_data_from_cellranger()` imports data from the output of one or more calls to Cell Ranger count. Each directory supplied as an input to this function should be in feature-barcode format, containing the files `features.tsv.gz` and  `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`). Users can create either a standard `sceptre` object or an `ondisc`-backed `sceptre` object; the latter is more appropriate for large-scale data. See \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter} or \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1} of the manual for more information about this function.
+#' `import_data_from_cellranger()` imports data from the output of one or more
+#' calls to Cell Ranger count. Each directory supplied as an input to this
+#' function should be in feature-barcode format, containing the files
+#' `features.tsv.gz` and `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`).
+#' Users can create either a standard `sceptre` object or an `ondisc`-backed
+#' `sceptre` object; the latter is more appropriate for large-scale data. See
+#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
+#' or
+#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
+#' of the manual for more information about this function.
 #'
-#' @param directories a character vector of file paths to directories containing the output of one or more calls to Cell Ranger count. Each directory should contain the files `matrix.mtx.gz` and `features.tsv.gz` (and optionally `barcodes.tsv.gz`).
-#' @param moi a string indicating the MOI of the dataset, either "low" or "high".
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs should be assigned a label of "non-targeting". Optionally, `grna_target_data_frame` can contain columns `chr`, `start`, and `end`, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, `grna_target_data_frame` can contain the column `vector_id` specifying the vector to which a given gRNA belongs.
-#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
-#' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an in-memory sparse matrix (`FALSE`).
-#' @param directory_to_write (optional) a string indicating the directory in which to write the backing `.odm` files (must be specified if `use_ondisc` is set to `TRUE`).
+#' @param directories a character vector of file paths to directories containing
+#' the output of one or more calls to Cell Ranger count. Each directory should
+#' contain the files `matrix.mtx.gz` and `features.tsv.gz` (and optionally
+#' `barcodes.tsv.gz`).
+#' @param moi a string indicating the MOI of the dataset, either "low" or
+#' "high".
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and
+#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
+#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
+#' giving the chromosome, start coordinate, and end coordiante, respectively, of
+#' each gRNA. Additionally, `grna_target_data_frame` can contain the column
+#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' @param extra_covariates (optional) a data frame containing extra covariates
+#' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
+#' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to
+#' store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an
+#' in-memory sparse matrix (`FALSE`).
+#' @param directory_to_write (optional) a string indicating the directory in
+#' which to write the backing `.odm` files (must be specified if `use_ondisc` is
+#' set to `TRUE`).
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -497,17 +546,34 @@ import_data_from_cellranger_use_ondisc <- function(
 #######
 #' Import data from Parse (experimental)
 #'
-#' `import_data_from_parse()` imports data from the output of the Parse count matrix generation program. See \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual} for more information about this function.
+#' `import_data_from_parse()` imports data from the output of the Parse count
+#' matrix generation program. See
+#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual}
+#' for more information about this function.
 #'
-#' `import_data_from_parse()` is experimental, and the API of this function is subject to change. We expect the API to solidify as we learn more about the Parse platform and the structure of the Parse count matrix generation program output.
+#' `import_data_from_parse()` is experimental, and the API of this function is
+#' subject to change. We expect the API to solidify as we learn more about the
+#' Parse platform and the structure of the Parse count matrix generation program
+#' output.
 #'
 #' @param gene_mat_fp file path to the gene `count_matrix.mtx` file.
 #' @param grna_mat_fp file path to the gRNA `count_matrix.mtx` file.
-#' @param all_genes_fp file path to the `all_genes.csv` file containing the gene IDs.
-#' @param all_grnas_fp file path to the `all_guides.csv` file containing the gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the "gene_name" column) of this file.
-#' @param moi a string indicating the MOI of the dataset, either "low" or "high".
-#' @param grna_target_data_frame a data frame containing columns `grna_id` and `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs should be assigned a label of "non-targeting". Optionally, `grna_target_data_frame` can contain columns `chr`, `start`, and `end`, giving the chromosome, start coordinate, and end coordiante, respectively, of each gRNA. Additionally, `grna_target_data_frame` can contain the column `vector_id` specifying the vector to which a given gRNA belongs.
-#' @param extra_covariates (optional) a data frame containing extra covariates (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
+#' @param all_genes_fp file path to the `all_genes.csv` file containing the gene
+#' IDs.
+#' @param all_grnas_fp file path to the `all_guides.csv` file containing the
+#' gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the
+#' "gene_name" column) of this file.
+#' @param moi a string indicating the MOI of the dataset, either "low" or
+#' "high".
+#' @param grna_target_data_frame a data frame containing columns `grna_id` and
+#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
+#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
+#' giving the chromosome, start coordinate, and end coordiante, respectively, of
+#' each gRNA. Additionally, `grna_target_data_frame` can contain the column
+#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' @param extra_covariates (optional) a data frame containing extra covariates
+#' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -839,7 +905,8 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 
 collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
     # temporary function; we may rewrite this function to improve its
-    # speed and memory efficiency if multiguide vector data become more prevalent.
+    # speed and memory efficiency if multiguide vector data become more
+    # prevalent.
     vector_ids <- grna_target_data_frame$vector_id |> unique()
     grna_matrix <- as.matrix(grna_matrix)
     n_cells <- ncol(grna_matrix)

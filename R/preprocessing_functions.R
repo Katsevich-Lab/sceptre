@@ -1,5 +1,6 @@
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
-    # if a logical matrix, convert to the corresponding numeric matrix; consider more efficient implementation later
+    # if a logical matrix, convert to the corresponding numeric matrix; consider
+    # more efficient implementation later
     if (methods::is(matrix_in, "lgRMatrix")) {
         attr(matrix_in, "class") <- "dgRMatrix"
         matrix_in@x <- rep(1.0, length(matrix_in@j))

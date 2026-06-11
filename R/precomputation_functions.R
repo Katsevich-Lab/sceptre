@@ -1,13 +1,19 @@
 #' Run response precomputation
 #'
-#' Runs the precomputation for a given response vector, which consists of regressing the response expressions onto the covariate matrix.
+#' Runs the precomputation for a given response vector, which consists of
+#' regressing the response expressions onto the covariate matrix.
 #'
-#' We (i) perform an initial Poisson regression, (ii) estimate the size parameter using the Poisson residuals, and then (iii) perform an NB regression, treating the size parameter as estimated in step (ii) as fixed and known.
+#' We (i) perform an initial Poisson regression, (ii) estimate the size
+#' parameter using the Poisson residuals, and then (iii) perform an NB
+#' regression, treating the size parameter as estimated in step (ii) as fixed
+#' and known.
 #'
 #' @param expressions the numeric vector of response expressions
-#' @param covariate_matrix the covariate matrix on which to regress the expressions (NOTE: the matrix should contain an interecept term)
+#' @param covariate_matrix the covariate matrix on which to regress the
+#' expressions (NOTE: the matrix should contain an interecept term)
 #'
-#' @return a list containing the following elements: (i) "fitted_coefs": a vector of fitted coefficients; (ii) "theta": the fitted theta.
+#' @return a list containing the following elements: (i) "fitted_coefs": a
+#' vector of fitted coefficients; (ii) "theta": the fitted theta.
 #' @noRd
 perform_response_precomputation <- function(expressions, covariate_matrix) {
     pois_fit <- stats::glm.fit(

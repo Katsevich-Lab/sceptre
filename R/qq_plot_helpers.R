@@ -7,7 +7,8 @@ StatQQBand <- ggplot2::ggproto(
     # rather than having one band per group
     setup_data = function(data, params) {
         if ("group" %in% names(data)) {
-            # calculate the maximum across panels of the number of unique numbers of
+            # calculate the maximum across panels of the number of unique
+            # numbers of
             # points there are in each group
             max_unique_pts_per_group <- data |>
                 dplyr::group_by(PANEL, group) |>
@@ -18,7 +19,8 @@ StatQQBand <- ggplot2::ggproto(
                 dplyr::summarise(max(unique_pts_per_group)) |>
                 dplyr::pull()
             if (max_unique_pts_per_group > 1) {
-                # throw an error if there is a panel with differing numbers of points per group
+                # throw an error if there is a panel with differing numbers of
+                # points per group
                 stop(
                     "Within each panel, you must have the same number of points per QQ plot!"
                 )
@@ -220,7 +222,8 @@ stat_qq_points <- function(
 
 #' Reverse logarithm transformation
 #'
-#' @param base The base with respect to which to take the logarithm (defaults to e).
+#' @param base The base with respect to which to take the logarithm (defaults to
+#' e).
 #'
 #' @return A scale transformation object.
 #' @noRd

@@ -98,7 +98,8 @@ assign_grnas_to_cells_thresholding <- function(
         }) |>
             stats::setNames(grna_ids)
     } else {
-        # 1. make the grna expression matrix row-accessible; ensure threshold is numeric
+        # 1. make the grna expression matrix row-accessible; ensure threshold is
+        # numeric
         grna_matrix <- set_matrix_accessibility(
             grna_matrix,
             make_row_accessible = TRUE
@@ -163,7 +164,8 @@ process_initial_assignment_list <- function(sceptre_object) {
     low_moi <- sceptre_object@low_moi
     n_cells <- ncol(get_grna_matrix(sceptre_object))
     maximum_assignment <- sceptre_object@grna_assignment_method == "maximum"
-    # 1. if not using maximum assignment, compute n grnas per cell and cells with multiple grnas
+    # 1. if not using maximum assignment, compute n grnas per cell and cells
+    # with multiple grnas
     if (!maximum_assignment) {
         sceptre_object@grnas_per_cell <- compute_n_grnas_per_cell_vector(
             initial_assignment_list,

@@ -127,7 +127,8 @@ construct_negative_control_pairs_v2 <- function(
     )
     message(crayon::green(" \u2713"))
 
-    # 5. check the number of rows of df, and issue a warning if less than the required amount
+    # 5. check the number of rows of df, and issue a warning if less than the
+    # required amount
     if (nrow(df) < n_calibration_pairs) {
         note_text <- paste0(
             "Note: Unable to generate the number of negative control pairs (",
