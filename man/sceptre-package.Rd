@@ -10,7 +10,6 @@
 emphasizing statistical rigor, massive scalability, and ease of use.
 }
 \examples{
-\donttest{
 ##########################
 # Low-MOI CRISPRko example
 ##########################
@@ -69,7 +68,12 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
+output_dir <- file.path(tempdir(), "sceptre_outputs_lowmoi")
+write_outputs_to_directory(
+  sceptre_object = sceptre_object,
+  directory = output_dir
+)
+message("sceptre outputs written to ", output_dir)
 
 ##########################
 # High-MOI CRISPRi example
@@ -130,8 +134,12 @@ plot(sceptre_object)
 print(sceptre_object)
 
 # 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
-}
+output_dir <- file.path(tempdir(), "sceptre_outputs_highmoi")
+write_outputs_to_directory(
+  sceptre_object = sceptre_object,
+  directory = output_dir
+)
+message("sceptre outputs written to ", output_dir)
 }
 \seealso{
 Useful links:
