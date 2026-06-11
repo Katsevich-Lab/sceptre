@@ -85,7 +85,8 @@ run_perm_test_in_memory <- function(
     response_ids <- unique(response_grna_group_pairs$response_id)
     fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
-    # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
+    # 1. subset covariate matrix to cells_in_use and then to nt cells (if
+    # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
         covariate_matrix <- covariate_matrix[all_nt_idxs, ]
@@ -185,7 +186,8 @@ run_perm_test_in_memory <- function(
                 )
             }
 
-            # 9. combine the response-wise results into a data table; insert into list
+            # 9. combine the response-wise results into a data table; insert
+            # into list
             result_out_list[[response_idx]] <- construct_data_frame_v2(
                 curr_df,
                 curr_response_result,
@@ -297,7 +299,8 @@ run_crt_in_memory_v2 <- function(
     response_ids <- unique(response_grna_group_pairs$response_id)
     fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
-    # 1. subset covariate matrix to cells_in_use and then to nt cells (if applicable)
+    # 1. subset covariate matrix to cells_in_use and then to nt cells (if
+    # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
         covariate_matrix <- covariate_matrix[all_nt_idxs, ]

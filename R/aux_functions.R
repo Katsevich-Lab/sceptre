@@ -146,14 +146,18 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
     groups_set <- FALSE
     if (parallel) {
         if (identical(n_processors, "auto")) {
-            # Read the user's preferred fraction (default 0.5 = half cores), then
+            # Read the user's preferred fraction (default 0.5 = half cores),
+            # then
             # neutralize that option on the parallelly call so parallelly's own
-            # option-aware default does not apply the same fraction a second time.
+            # option-aware default does not apply the same fraction a second
+            # time.
             # parallelly's `fraction` arg defaults to getOption(
             # "parallelly.availableCores.fraction", 1), so omitting it would
             # silently double-scale when the user has set that option. The arg
-            # itself was only added in 1.47.0, so passing `fraction = 1` directly
-            # would break parallelly < 1.47.0 -- `withr::with_options` neutralizes
+            # itself was only added in 1.47.0, so passing `fraction = 1`
+            # directly
+            # would break parallelly < 1.47.0 -- `withr::with_options`
+            # neutralizes
             # the option for the call on any parallelly >= 1.23.0.
             frac <- getOption("parallelly.availableCores.fraction", 0.5)
             n_processors <- max(

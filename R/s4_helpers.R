@@ -53,7 +53,15 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 
 #' Print
 #'
-#' `print()` prints information about the dataset and the status of the analysis to the console. The output contains several fields: Attributes of the data (summarizing key features of the data), Analysis status (indicating the analysis functions that have been called), Analysis parameters (summarizing the analysis parameters set in `set_analysis_parameters()`), gRNA-to-cell assignment information (summarizing the outcome of the gRNA-to-cell assignment step), and Summary of results (summarizing the key analysis results). A subset of these fields may be printed, depending on the status of the analysis.
+#' `print()` prints information about the dataset and the status of the analysis
+#' to the console. The output contains several fields: Attributes of the data
+#' (summarizing key features of the data), Analysis status (indicating the
+#' analysis functions that have been called), Analysis parameters (summarizing
+#' the analysis parameters set in `set_analysis_parameters()`), gRNA-to-cell
+#' assignment information (summarizing the outcome of the gRNA-to-cell
+#' assignment step), and Summary of results (summarizing the key analysis
+#' results). A subset of these fields may be printed, depending on the status of
+#' the analysis.
 #'
 #' @param x a `sceptre_object`
 #' @return the value NULL
@@ -298,12 +306,21 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' `plot()` creates a plot depicting the current state of a `sceptre_object`.
 #'
-#' `plot()` is "generic" in the sense that it dispatches a specific plotting function based on the pipeline function that was most recently called on the `sceptre_object`. For example, if `run_assign_grnas()` is the most recently called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`. Similarly, if `run_power_check()` is the most recently called pipeline function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users can pass arguments to the function dispatched by `plot()` as named arguments to `plot()`.
+#' `plot()` is "generic" in the sense that it dispatches a specific plotting
+#' function based on the pipeline function that was most recently called on the
+#' `sceptre_object`. For example, if `run_assign_grnas()` is the most recently
+#' called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`.
+#' Similarly, if `run_power_check()` is the most recently called pipeline
+#' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
+#' can pass arguments to the function dispatched by `plot()` as named arguments
+#' to `plot()`.
 #'
 #' @param x a `sceptre_object`
 #' @param y ignored argument
 #' @param ... arguments passed to the plotting function dispatched by `plot()`
-#' @return a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' @return a single \code{cowplot} object containing the combined panels (if
+#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
 #' @export
 #' @examples

@@ -37,13 +37,15 @@ determine_cells_to_retain <- function(
         n_cells_rm_p_mito <- 0L
     }
 
-    # 4. compute cells to retain based on cells containing multiple grnas (if in low MOI)
+    # 4. compute cells to retain based on cells containing multiple grnas (if in
+    # low MOI)
     cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
     n_cells_rm_zero_twoplus_grnas <- length(
         sceptre_object@cells_w_zero_or_twoplus_grnas
     )
 
-    # 5. finally, determine the set of cells to retain, and update the sceptre_object
+    # 5. finally, determine the set of cells to retain, and update the
+    # sceptre_object
     cells_to_exclude <- c(
         cells_to_exclude_n_umis,
         cells_to_exclude_n_responses,
@@ -88,7 +90,8 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
         return(v_updated)
     }
 
-    # 2. for each gRNA group and NT gRNA, subset the grna vector and the update the indices
+    # 2. for each gRNA group and NT gRNA, subset the grna vector and the update
+    # the indices
     grna_group_idxs_new <- lapply(
         grna_assignments_raw$grna_group_idxs,
         function(v) {
@@ -109,7 +112,8 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
         indiv_nt_grna_idxs = nt_idxs_new
     )
 
-    # 3. if using the NT cells, update indiv gRNA indices so that they are relative to all NTs
+    # 3. if using the NT cells, update indiv gRNA indices so that they are
+    # relative to all NTs
     if (!sceptre_object@control_group_complement) {
         l <- update_indiv_grna_assignments_for_nt_cells(
             grna_assignments$indiv_nt_grna_idxs

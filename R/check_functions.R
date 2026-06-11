@@ -15,7 +15,8 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 2. verify that the row names are unique for both response and grna modalities
+    # 2. verify that the row names are unique for both response and grna
+    # modalities
     response_ids <- rownames(response_matrix)
     grna_ids <- rownames(grna_matrix)
     if (length(response_ids) != length(unique(response_ids))) {
@@ -25,7 +26,8 @@ check_import_data_inputs <- function(
         stop("The rownames of the `grna_matrix` must be unique.")
     }
 
-    # 5. ensure that the ampersand symbol (&) is absent from the grna ids; ensure that no gRNA is named "non-targeting"
+    # 5. ensure that the ampersand symbol (&) is absent from the grna ids;
+    # ensure that no gRNA is named "non-targeting"
     problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
     if (length(problematic_grna_ids) >= 1) {
         stop(paste0(
@@ -39,7 +41,8 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 6. check that the ids in the grna group data frame are a subset of the ids in the grna matrix
+    # 6. check that the ids in the grna group data frame are a subset of the ids
+    # in the grna matrix
     if (!all(grna_target_data_frame$grna_id %in% rownames(grna_matrix))) {
         stop(
             "The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix. The row names of the grna expression matrix are as follows: ",
@@ -101,15 +104,18 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 9. if cell barcodes are provided for at least two of `response_matrix`, `grna_matrix`, and `extra_covariates`,
+    # 9. if cell barcodes are provided for at least two of `response_matrix`,
+    # `grna_matrix`, and `extra_covariates`,
     # then they must be identical
     barcode_list <- list(
         response_matrix = colnames(response_matrix),
         grna_matrix = colnames(grna_matrix),
         extra_covariates = rownames(extra_covariates)
     )
-    # for matrices we can just check if the names are not NULL, but `extra_covariates` is a data.frame so
-    # non-default names were provided if (1) it is not just `data.frame()` and (2) the names are not
+    # for matrices we can just check if the names are not NULL, but
+    # `extra_covariates` is a data.frame so
+    # non-default names were provided if (1) it is not just `data.frame()` and
+    # (2) the names are not
     # just "1", "2", ...
     were_names_provided <- c(
         !is.null(barcode_list$response_matrix),
@@ -120,7 +126,8 @@ check_import_data_inputs <- function(
                 as.character(seq_len(nrow(extra_covariates)))
             )
     )
-    # If at least 2 non-default barcode names were provided, they must all be identical.
+    # If at least 2 non-default barcode names were provided, they must all be
+    # identical.
     # This is done by looping over all pairs of non-default names
     barcodes_with_names <- barcode_list[were_names_provided]
     if (length(barcodes_with_names) >= 2) {
@@ -159,7 +166,8 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 11. verify that the types of the extra covariates are acceptable; if factor, check correctness of factor
+    # 11. verify that the types of the extra covariates are acceptable; if
+    # factor, check correctness of factor
     for (extra_covariate_name in extra_covariate_names) {
         v <- extra_covariates[, extra_covariate_name]
         accept_type <- methods::is(v, "numeric") ||
@@ -204,7 +212,8 @@ check_import_data_inputs <- function(
         stop("`extra_covariates` has infinite values that need to be removed.")
     }
 
-    # 14. Fail if grna_target_data_frame has NA values in grna_id or grna_target columns
+    # 14. Fail if grna_target_data_frame has NA values in grna_id or grna_target
+    # columns
     if (any(is.na(grna_target_data_frame[, c("grna_id", "grna_target")]))) {
         stop(
             "The `grna_id` or `grna_target` column of `grna_target_data_frame` contains NA values."
@@ -231,7 +240,8 @@ check_set_analysis_parameters <- function(
     covariate_data_frame <- sceptre_object@covariate_data_frame
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
-    # 1. if response_grna_target_pairs has been supplied, check its characteristics
+    # 1. if response_grna_target_pairs has been supplied, check its
+    # characteristics
     for (idx in seq_along(response_grna_target_pairs_list)) {
         response_grna_target_pairs <- response_grna_target_pairs_list[[idx]]
         if (nrow(response_grna_target_pairs) >= 1L) {
@@ -262,7 +272,9 @@ check_set_analysis_parameters <- function(
                     "` must contain the columns `grna_target` and `response_id`."
                 )
             }
-            # ii. check that the response ids in the `response_grna_target_pairs` data frame are a subset of the response ids
+            # ii. check that the response ids in the
+            # `response_grna_target_pairs` data frame are a subset of the
+            # response ids
             if (
                 !all(
                     response_grna_target_pairs$response_id %in%
@@ -275,7 +287,9 @@ check_set_analysis_parameters <- function(
                     "` data frame must be a subset of the row names of the response expression matrix."
                 )
             }
-            # iii. check that the `grna_target` column of the `response_grna_target_pairs` data frame is a subset of the `grna_target` column of the `grna_target_data_frame`
+            # iii. check that the `grna_target` column of the
+            # `response_grna_target_pairs` data frame is a subset of the
+            # `grna_target` column of the `grna_target_data_frame`
             if (
                 !all(
                     response_grna_target_pairs$grna_target %in%
@@ -288,7 +302,8 @@ check_set_analysis_parameters <- function(
                     "` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."
                 )
             }
-            # iv. ensure that "non-targeting" is not a group in the pairs to analyze data frame
+            # iv. ensure that "non-targeting" is not a group in the pairs to
+            # analyze data frame
             if (
                 "non-targeting" %in%
                     unique(response_grna_target_pairs$grna_target)
@@ -314,7 +329,8 @@ check_set_analysis_parameters <- function(
         stop("Offsets are not currently supported in formula objects.")
     }
 
-    # 3. check that the variables in the formula object are a subset of the column names of the covariate data frame
+    # 3. check that the variables in the formula object are a subset of the
+    # column names of the covariate data frame
     formula_object_vars <- all.vars(formula_object)
     check_var <- formula_object_vars %in% colnames(covariate_data_frame)
     if (!all(check_var)) {
@@ -331,7 +347,8 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 5. verify that resampling_mechanism is one of "permutations", "crt", or "default"
+    # 5. verify that resampling_mechanism is one of "permutations", "crt", or
+    # "default"
     if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
         stop(
             "`resampling_mechanism` should set to `permutations`, `crt`, or `default`."
@@ -343,7 +360,8 @@ check_set_analysis_parameters <- function(
         stop("The control group cannot be the NT cells in high MOI.")
     }
 
-    # 7. verify that, if the control_group is NT cells, there are NT gRNAs present
+    # 7. verify that, if the control_group is NT cells, there are NT gRNAs
+    # present
     if (control_group == "nt_cells") {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
         if (!nt_present) {
@@ -367,7 +385,8 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 10. if using a backing .odm file, verify that resampling mechanism is permutations
+    # 10. if using a backing .odm file, verify that resampling mechanism is
+    # permutations
     if (
         methods::is(get_response_matrix(sceptre_object), "odm") &&
             (resampling_mechanism != "permutations")
@@ -652,7 +671,8 @@ check_discovery_analysis_inputs <- function(
         )
     }
 
-    # 2. check that negative control gRNAs are present (if the control group is the nt cells)
+    # 2. check that negative control gRNAs are present (if the control group is
+    # the nt cells)
     if (!control_group_complement) {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
         if (!nt_present) {

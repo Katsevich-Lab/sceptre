@@ -8,7 +8,8 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     control_group_complement <- sceptre_object@control_group_complement
     grna_group_idxs <- grna_assignments$grna_group_idxs
 
-    # 1. construct the entire set of response pairs by combining discovery pairs and pc pairs
+    # 1. construct the entire set of response pairs by combining discovery pairs
+    # and pc pairs
     response_grna_group_pairs <- rbind(
         dplyr::mutate(discovery_pairs, discovery = TRUE),
         dplyr::mutate(positive_control_pairs, discovery = FALSE)

@@ -11,16 +11,25 @@ plot_response_grna_target_pair(sceptre_object, response_id, grna_target)
 
 \item{response_id}{a string containing a response ID}
 
-\item{grna_target}{a string containing a gRNA target (or, if \code{grna_integration_strategy} is set to \code{"singleton"}, an individual gRNA ID)}
+\item{grna_target}{a string containing a gRNA target (or, if
+\code{grna_integration_strategy} is set to \code{"singleton"}, an individual gRNA ID)}
 }
 \value{
 a violin plot
 }
 \description{
-\code{plot_response_grna_target_pair()} creates a violin plot of the expression level of a given response as a function of the "treatment status" (i.e., treatment or control) of a given gRNA target. The left (resp., right) violin plot shows the expression level of the response in treatment (resp., control) cells. The expression level is normalized by dividing by \code{n_response_umis}, adding a pseudo-count of 1 and then taking the log transform. If the given response-gRNA-target pair has been analyzed, the p-value for the test of association also is displayed.
+\code{plot_response_grna_target_pair()} creates a violin plot of the expression
+level of a given response as a function of the "treatment status" (i.e.,
+treatment or control) of a given gRNA target. The left (resp., right) violin
+plot shows the expression level of the response in treatment (resp., control)
+cells. The expression level is normalized by dividing by \code{n_response_umis},
+adding a pseudo-count of 1 and then taking the log transform. If the given
+response-gRNA-target pair has been analyzed, the p-value for the test of
+association also is displayed.
 }
 \details{
-If \code{grna_integration_strategy} is set to \code{"singleton"}, then \code{grna_target} should be set to a gRNA ID.
+If \code{grna_integration_strategy} is set to \code{"singleton"}, then \code{grna_target}
+should be set to a gRNA ID.
 }
 \examples{
 data(highmoi_example_data)

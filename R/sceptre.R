@@ -35,7 +35,8 @@ utils::globalVariables(c(
 ))
 #' sceptre
 #'
-#' `sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
+#' `sceptre` is an R package for single-cell CRISPR screen data analysis,
+#' emphasizing statistical rigor, massive scalability, and ease of use.
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp

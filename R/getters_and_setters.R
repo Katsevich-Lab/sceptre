@@ -1,15 +1,20 @@
 #' Data getter functions
 #'
-#' The data getter functions (i.e., `get_response_matrix()`, `get_grna_matrix()`, `get_cell_covariates()`) return of a specified data field from a `sceptre_object`.
+#' The data getter functions (i.e., `get_response_matrix()`,
+#' `get_grna_matrix()`, `get_cell_covariates()`) return of a specified data
+#' field from a `sceptre_object`.
 #'
 #' @param sceptre_object a `sceptre_object`
 #'
 #' @return
-#' `get_response_matrix()` returns the response matrix contained within a `sceptre_object`.
+#' `get_response_matrix()` returns the response matrix contained within a
+#' `sceptre_object`.
 #'
-#' `get_grna_matrix()` returns the gRNA matrix contained within a `sceptre_object`.
+#' `get_grna_matrix()` returns the gRNA matrix contained within a
+#' `sceptre_object`.
 #'
-#' `get_cell_covariates()` returns the cell covariate data frame contained within a `sceptre_object`.
+#' `get_cell_covariates()` returns the cell covariate data frame contained
+#' within a `sceptre_object`.
 #' @export
 #' @examples
 #' # 1. create a sceptre_object
@@ -52,12 +57,21 @@ get_cell_covariates <- function(sceptre_object) {
 
 #' Get gRNA assignments
 #'
-#' `get_grna_assignments()` returns the gRNA-to-cell assignments contained within a `sceptre_object`. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is set to `TRUE` if the given gRNA is assigned to the given cell (and `FALSE` otherwise).
+#' `get_grna_assignments()` returns the gRNA-to-cell assignments contained
+#' within a `sceptre_object`. The output is a sparse logical matrix, with gRNAs
+#' in the rows and cells in the columns. A given entry of the matrix is set to
+#' `TRUE` if the given gRNA is assigned to the given cell (and `FALSE`
+#' otherwise).
 #'
-#' When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
+#' When using the "maximum" assignment strategy, exactly one gRNA is assigned to
+#' a given cell. In other words, each column of the gRNA-to-cell assignment
+#' matrix contains exactly one TRUE entry.
 #'
-#' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called on it
-#' @param apply_cellwise_qc a logical value (i.e., `TRUE` or `FALSE`) indicating whether to return the gRNA-to-cell assignment matrix after cellwise QC has been applied (default `FALSE`)
+#' @param sceptre_object a `sceptre_object` that has had `assign_grnas()` called
+#' on it
+#' @param apply_cellwise_qc a logical value (i.e., `TRUE` or `FALSE`) indicating
+#' whether to return the gRNA-to-cell assignment matrix after cellwise QC has
+#' been applied (default `FALSE`)
 #'
 #' @return a sparse logical matrix containing the gRNA-to-cell assignments
 #' @export
