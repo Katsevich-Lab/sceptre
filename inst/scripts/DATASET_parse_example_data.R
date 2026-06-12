@@ -10,6 +10,10 @@
 
 library(Matrix)
 
+# pin the sampler so the subset is reproducible across R versions
+# (sample()'s algorithm changed in R 3.6); "Rejection" is the R >= 3.6
+# default, so this matches the committed files.
+RNGkind(sample.kind = "Rejection")
 set.seed(4)
 n_cells <- 5000L
 n_genes <- 266L
@@ -32,17 +36,24 @@ wt_mat <- readMM(wt_mtx_fp)             # 51242 cells x 58395 genes
 crispr_mat <- readMM(crispr_mtx_fp)     # 51242 cells x 3 guides
 wt_genes <- read.csv(wt_genes_fp, colClasses = "character")
 crispr_genes <- read.csv(crispr_genes_fp, colClasses = "character")
-# the wt and crispr libraries share the same cells in the same row order
-stopifnot(nrow(wt_mat) == nrow(crispr_mat))
+# the wt and crispr libraries share the same cells in the same row order,
+# and each all_genes.csv is row-aligned with its matrix columns
+stopifnot(
+    nrow(wt_mat) == nrow(crispr_mat),
+    ncol(wt_mat) == nrow(wt_genes),
+    ncol(crispr_mat) == nrow(crispr_genes)
+)
 
 # ---- choose a deterministic subset of cells and genes ----------------
 # one cell-index vector subsets both matrices, keeping them aligned
 cell_idx <- sort(sample.int(nrow(wt_mat), n_cells))
+wt_sub <- wt_mat[cell_idx, ]
 # keep genes detected in the chosen cells, then sample n_genes of them
-detected <- which(colSums(wt_mat[cell_idx, ]) > 0)
+detected <- which(colSums(wt_sub) > 0)
+stopifnot(length(detected) >= n_genes)
 gene_idx <- sort(sample(detected, n_genes))
 
-gene_mat <- wt_mat[cell_idx, gene_idx]
+gene_mat <- wt_sub[, gene_idx]
 grna_mat <- crispr_mat[cell_idx, ]
 genes_out <- wt_genes[gene_idx, ]
 
@@ -50,7 +61,7 @@ genes_out <- wt_genes[gene_idx, ]
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 write_parse_mtx <- function(mat, fp) {
-    trip <- as(mat, "TsparseMatrix")
+    trip <- as(drop0(mat), "TsparseMatrix")
     o <- order(trip@i, trip@j)
     con <- file(fp, "w")
     on.exit(close(con))

@@ -150,5 +150,11 @@ Authors:
   \item Eugene Katsevich \email{ekatsevi@wharton.upenn.edu}
 }
 
+Other contributors:
+\itemize{
+  \item Wharton Analytics [funder]
+  \item National Science Foundation (Grants DMS-2113072 and DMS-2310654) [funder]
+}
+
 }
 \keyword{package}

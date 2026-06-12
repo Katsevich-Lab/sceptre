@@ -7,7 +7,8 @@ documentation of these files in either `inst/scripts/` (preferred) or
 (https://contributions.bioconductor.org/data.html).
 
 Each script records the provenance and parameters of a dataset and
-reproduces it; some download large public reference data first.
+reproduces it. Several download large public reference data first --
+e.g. `DATASET_gene_table.R` pulls the ~11 GB 10x GRCh38 reference.
 
 ## Scripts and the objects they produce
 
