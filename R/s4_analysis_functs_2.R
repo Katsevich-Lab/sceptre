@@ -452,7 +452,7 @@ get_result <- function(sceptre_object, analysis) {
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a string giving the file path to a directory on disk in which to write the results
 #'
-#' @return the value NULL
+#' @return `NULL`, invisibly
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -525,7 +525,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
   # 4. save gRNA-to-cell assignments
   grna_assignments <- get_grna_assignments(sceptre_object)
   saveRDS(object = grna_assignments, file = paste0(directory, "/grna_assignment_matrix.rds"))
-  return(NULL)
+  return(invisible(NULL))
 }
 
 
