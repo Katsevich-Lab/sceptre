@@ -52,7 +52,6 @@ usethis::use_data(gene_position_data_frame_grch38, internal = FALSE,
 # grch 37 table
 ###############
 rm(list = ls())
-library(data.table)
 library(rtracklayer)
 # The GRCh37 reference genome is obtained from Ensembl (release 84).
 url <- paste0("https://ftp.ensembl.org/pub/grch37/release-84/",
