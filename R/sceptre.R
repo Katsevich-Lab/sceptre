@@ -72,13 +72,16 @@ utils::globalVariables(c(
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 8. write results
+#' # 8. write results to a directory. tempdir() is used so this example is
+#' # self-contained; for a real analysis choose a directory you can find again,
+#' # e.g. file.path("~", "sceptre_outputs").
 #' output_dir <- file.path(tempdir(), "sceptre_outputs_lowmoi")
 #' write_outputs_to_directory(
 #'   sceptre_object = sceptre_object,
 #'   directory = output_dir
 #' )
 #' message("sceptre outputs written to ", output_dir)
+#' # to open this directory in your file browser: browseURL(output_dir)
 #'
 #' ##########################
 #' # High-MOI CRISPRi example
@@ -138,11 +141,14 @@ utils::globalVariables(c(
 #' plot(sceptre_object)
 #' print(sceptre_object)
 #'
-#' # 8. write results
+#' # 8. write results to a directory. tempdir() is used so this example is
+#' # self-contained; for a real analysis choose a directory you can find again,
+#' # e.g. file.path("~", "sceptre_outputs").
 #' output_dir <- file.path(tempdir(), "sceptre_outputs_highmoi")
 #' write_outputs_to_directory(
 #'   sceptre_object = sceptre_object,
 #'   directory = output_dir
 #' )
 #' message("sceptre outputs written to ", output_dir)
+#' # to open this directory in your file browser: browseURL(output_dir)
 "_PACKAGE"
