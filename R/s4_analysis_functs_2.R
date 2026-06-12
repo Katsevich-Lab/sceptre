@@ -660,7 +660,7 @@ get_result <- function(sceptre_object, analysis) {
 #' @param directory a string giving the file path to a directory on disk in
 #' which to write the results
 #'
-#' @return `NULL`, invisibly
+#' @return No return value; called for its side effect of writing files to `directory`.
 #' @export
 #' @examples
 #' data(highmoi_example_data)
