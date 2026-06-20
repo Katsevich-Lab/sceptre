@@ -12,19 +12,31 @@ plot_run_power_check(
 )
 }
 \arguments{
-\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_power_check()} called on it}
+\item{sceptre_object}{a \code{sceptre_object} that has had
+\code{run_power_check()} called on it}
 
-\item{point_size}{(optional; default \code{1}) the size of the individual points in the plot}
+\item{point_size}{(optional; default \code{1}) the size of the individual
+points in the plot}
 
-\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the
+individual points in the plot}
 
-\item{clip_to}{(optional; default \code{1e-20}) p-values smaller than this value are set to \code{clip_to} for better visualization. If \code{clip_to=0} is used then no clipping is done.}
+\item{clip_to}{(optional; default \code{1e-20}) p-values smaller than this
+value are set to \code{clip_to} for better visualization. If \code{clip_to=0}
+is used then no clipping is done.}
 }
 \value{
 a single \code{ggplot2} plot
 }
 \description{
-\code{plot_run_power_check()} creates a visualization of the outcome of the power check analysis. Each point in the plot corresponds to a target-response pair, with positive control pairs in the left column and negative control pairs in the right column. The vertical axis indicates the p-value of a given pair; smaller (i.e., more significant) p-values are positioned higher along this axis (p-values truncated at \code{clip_to} for visualization). The positive control p-values should be small, and in particular, smaller than the negative control p-values.
+\code{plot_run_power_check()} creates a visualization of the outcome of the
+power check analysis. Each point in the plot corresponds to a target-response
+pair, with positive control pairs in the left column and negative control
+pairs in the right column. The vertical axis indicates the p-value of a given
+pair; smaller (i.e., more significant) p-values are positioned higher along
+this axis (p-values truncated at \code{clip_to} for visualization). The positive
+control p-values should be small, and in particular, smaller than the
+negative control p-values.
 }
 \examples{
 data(highmoi_example_data)

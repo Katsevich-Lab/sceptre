@@ -7,18 +7,27 @@
 get_grna_assignments(sceptre_object, apply_cellwise_qc = FALSE)
 }
 \arguments{
-\item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_grnas()} called on it}
+\item{sceptre_object}{a \code{sceptre_object} that has had \code{assign_grnas()} called
+on it}
 
-\item{apply_cellwise_qc}{a logical value (i.e., \code{TRUE} or \code{FALSE}) indicating whether to return the gRNA-to-cell assignment matrix after cellwise QC has been applied (default \code{FALSE})}
+\item{apply_cellwise_qc}{a logical value (i.e., \code{TRUE} or \code{FALSE}) indicating
+whether to return the gRNA-to-cell assignment matrix after cellwise QC has
+been applied (default \code{FALSE})}
 }
 \value{
 a sparse logical matrix containing the gRNA-to-cell assignments
 }
 \description{
-\code{get_grna_assignments()} returns the gRNA-to-cell assignments contained within a \code{sceptre_object}. The output is a sparse logical matrix, with gRNAs in the rows and cells in the columns. A given entry of the matrix is set to \code{TRUE} if the given gRNA is assigned to the given cell (and \code{FALSE} otherwise).
+\code{get_grna_assignments()} returns the gRNA-to-cell assignments contained
+within a \code{sceptre_object}. The output is a sparse logical matrix, with gRNAs
+in the rows and cells in the columns. A given entry of the matrix is set to
+\code{TRUE} if the given gRNA is assigned to the given cell (and \code{FALSE}
+otherwise).
 }
 \details{
-When using the "maximum" assignment strategy, exactly one gRNA is assigned to a given cell. In other words, each column of the gRNA-to-cell assignment matrix contains exactly one TRUE entry.
+When using the "maximum" assignment strategy, exactly one gRNA is assigned to
+a given cell. In other words, each column of the gRNA-to-cell assignment
+matrix contains exactly one TRUE entry.
 }
 \examples{
 data(highmoi_example_data)
