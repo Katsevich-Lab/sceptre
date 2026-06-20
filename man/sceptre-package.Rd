@@ -6,7 +6,8 @@
 \alias{sceptre-package}
 \title{sceptre}
 \description{
-\code{sceptre} is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
+\code{sceptre} is an R package for single-cell CRISPR screen data analysis,
+emphasizing statistical rigor, massive scalability, and ease of use.
 }
 \examples{
 \donttest{
@@ -148,6 +149,12 @@ Authors:
 \itemize{
   \item Louis Deutsch
   \item Eugene Katsevich \email{ekatsevi@wharton.upenn.edu}
+}
+
+Other contributors:
+\itemize{
+  \item Wharton Analytics [funder]
+  \item National Science Foundation (Grants DMS-2113072 and DMS-2310654) [funder]
 }
 
 }

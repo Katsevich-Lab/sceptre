@@ -15,22 +15,42 @@ plot_grna_count_distributions(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{n_grnas_to_plot}{(optional; default \code{4}) an integer specifying the number of randomly selected gRNAs to plot}
+\item{n_grnas_to_plot}{(optional; default \code{4}) an integer specifying the
+number of randomly selected gRNAs to plot}
 
-\item{grnas_to_plot}{(optional; default \code{NULL}) a character vector giving the names of one or more specific gRNAs to plot. If \code{NULL}, then \code{n_grnas_to_plot} random gRNAs are plotted.}
+\item{grnas_to_plot}{(optional; default \code{NULL}) a character vector giving the
+names of one or more specific gRNAs to plot. If \code{NULL}, then
+\code{n_grnas_to_plot} random gRNAs are plotted.}
 
-\item{threshold}{(optional; default \code{NULL}) an integer representing a gRNA count cut-off; if provided, the bins of length 1 will go up to and include this value, after which the exponentially growing bins begin. A vertical line is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA count with its own bin. Non-integer values will be rounded.}
+\item{threshold}{(optional; default \code{NULL}) an integer representing a gRNA
+count cut-off; if provided, the bins of length 1 will go up to and include
+this value, after which the exponentially growing bins begin. A vertical line
+is also drawn at this value. If \code{NULL}, then 10 is the largest gRNA
+count with its own bin. Non-integer values will be rounded.}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, a single combined \code{cowplot} object is returned; if \code{TRUE}, a list of the per-gRNA \code{ggplot} panels is returned instead.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}, a
+single combined \code{cowplot} object is returned; if \code{TRUE}, a list of
+the per-gRNA \code{ggplot} panels is returned instead.}
 }
 \value{
-a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is \code{FALSE}, the default) or a list of the per-gRNA \code{ggplot2} panels (if \code{return_indiv_plots} is \code{TRUE})
+a single \code{cowplot} object containing the combined panels (if
+\code{return_indiv_plots} is \code{FALSE}, the default) or a list of the
+per-gRNA \code{ggplot2} panels (if \code{return_indiv_plots} is \code{TRUE})
 }
 \description{
-\code{plot_grna_count_distributions()} plots the empirical UMI count distribution of one or more gRNAs. \code{plot_grna_count_distributions()} can be called on a \code{sceptre_object} at any point in the pipeline after \code{import_data()}.
+\code{plot_grna_count_distributions()} plots the empirical UMI count distribution
+of one or more gRNAs. \code{plot_grna_count_distributions()} can be called on a
+\code{sceptre_object} at any point in the pipeline after \code{import_data()}.
 }
 \details{
-The x-axis is a piecewise linear-log scale, with bins of size 1 going from gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths grow exponentially in size. The number under each bar indicates the first value that is counted for that bar, and that bar includes all integers from that label up until the integer immediately preceding the label of the next bar on the right. For example, if one bar has a label of "23" and the next bar on the right has a label of "26" then the bar with the label of "23" counts values of 23, 24, and 25 in the data.
+The x-axis is a piecewise linear-log scale, with bins of size 1 going from
+gRNA counts of 0 up to max(10, \code{threshold}), and then the bin widths
+grow exponentially in size. The number under each bar indicates the first
+value that is counted for that bar, and that bar includes all integers from
+that label up until the integer immediately preceding the label of the next
+bar on the right. For example, if one bar has a label of "23" and the next
+bar on the right has a label of "26" then the bar with the label of "23"
+counts values of 23, 24, and 25 in the data.
 }
 \examples{
 data(highmoi_example_data)
