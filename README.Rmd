@@ -13,9 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src="man/figures/hex.jpg" align="right" width="150" alt="sceptre hex sticker"/>
-
-# sceptre
+# sceptre <img src="man/figures/logo.png" align="right" width="150" alt="sceptre hex sticker" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://img.shields.io/github/actions/workflow/status/Katsevich-Lab/sceptre/check-standard.yaml?branch=main&cacheSeconds=30)](https://github.com/Katsevich-Lab/sceptre/actions?query=workflow%3AR-CMD-check+branch%3Amain)

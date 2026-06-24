@@ -1,9 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src="man/figures/hex.jpg" align="right" width="150" alt="sceptre hex sticker"/>
-
-# sceptre
+# sceptre <img src="man/figures/logo.png" align="right" width="150" alt="sceptre hex sticker" />
 
 <!-- badges: start -->
 
