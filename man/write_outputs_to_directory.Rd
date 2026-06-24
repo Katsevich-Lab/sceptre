@@ -13,7 +13,7 @@ write_outputs_to_directory(sceptre_object, directory)
 which to write the results}
 }
 \value{
-the value NULL
+\code{NULL}, invisibly
 }
 \description{
 \code{write_outputs_to_directory()} writes the outputs of a \code{sceptre} analysis to
