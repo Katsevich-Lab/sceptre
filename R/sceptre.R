@@ -81,7 +81,7 @@ utils::globalVariables(c(
 #' )
 #' message(
 #'   "sceptre outputs written to a temporary directory; ",
-#'   'open with browseURL("', output_dir, '")'
+#'   'open with `browseURL("', output_dir, '")`'
 #' )
 #'
 #' ##########################
@@ -151,6 +151,6 @@ utils::globalVariables(c(
 #' )
 #' message(
 #'   "sceptre outputs written to a temporary directory; ",
-#'   'open with browseURL("', output_dir, '")'
+#'   'open by running `browseURL("', output_dir, '")` in the console.'
 #' )
 "_PACKAGE"
