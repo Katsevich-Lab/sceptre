@@ -76,7 +76,7 @@ write_outputs_to_directory(
 )
 message(
   "sceptre outputs written to a temporary directory; ",
-  'open with browseURL("', output_dir, '")'
+  'open with `browseURL("', output_dir, '")`'
 )
 
 ##########################
@@ -146,7 +146,7 @@ write_outputs_to_directory(
 )
 message(
   "sceptre outputs written to a temporary directory; ",
-  'open with browseURL("', output_dir, '")'
+  'open by running `browseURL("', output_dir, '")` in the console.'
 )
 }
 \seealso{
