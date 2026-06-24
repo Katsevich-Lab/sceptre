@@ -660,7 +660,7 @@ get_result <- function(sceptre_object, analysis) {
 #' @param directory a string giving the file path to a directory on disk in
 #' which to write the results
 #'
-#' @return the value NULL
+#' @return No return value; called for its side effect of writing files to `directory`.
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -783,7 +783,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
         object = grna_assignments,
         file = paste0(directory, "/grna_assignment_matrix.rds")
     )
-    return(NULL)
+    return(invisible(NULL))
 }
 
 
