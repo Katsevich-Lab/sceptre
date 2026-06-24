@@ -12,3 +12,4 @@
 ^Meta$
 ^\.claude$
 ^\.git$
+^air\.toml$

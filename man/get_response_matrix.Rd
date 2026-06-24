@@ -16,14 +16,19 @@ get_cell_covariates(sceptre_object)
 \item{sceptre_object}{a \code{sceptre_object}}
 }
 \value{
-\code{get_response_matrix()} returns the response matrix contained within a \code{sceptre_object}.
+\code{get_response_matrix()} returns the response matrix contained within a
+\code{sceptre_object}.
 
-\code{get_grna_matrix()} returns the gRNA matrix contained within a \code{sceptre_object}.
+\code{get_grna_matrix()} returns the gRNA matrix contained within a
+\code{sceptre_object}.
 
-\code{get_cell_covariates()} returns the cell covariate data frame contained within a \code{sceptre_object}.
+\code{get_cell_covariates()} returns the cell covariate data frame contained
+within a \code{sceptre_object}.
 }
 \description{
-The data getter functions (i.e., \code{get_response_matrix()}, \code{get_grna_matrix()}, \code{get_cell_covariates()}) return of a specified data field from a \code{sceptre_object}.
+The data getter functions (i.e., \code{get_response_matrix()},
+\code{get_grna_matrix()}, \code{get_cell_covariates()}) return of a specified data
+field from a \code{sceptre_object}.
 }
 \examples{
 # 1. create a sceptre_object

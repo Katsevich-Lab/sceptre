@@ -6,7 +6,8 @@
 \alias{sceptre-package}
 \title{sceptre}
 \description{
-\code{sceptre} is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
+\code{sceptre} is an R package for single-cell CRISPR screen data analysis,
+emphasizing statistical rigor, massive scalability, and ease of use.
 }
 \examples{
 ##########################

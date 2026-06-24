@@ -1,0 +1,7 @@
+# Air formatter configuration for Bioconductor style compliance.
+# https://posit-dev.github.io/air/
+# 4-space indent and an 80-character line width satisfy the BiocCheck
+# "multiples of 4 spaces" and "shorter lines" formatting notes.
+[format]
+indent-width = 4
+line-width = 80

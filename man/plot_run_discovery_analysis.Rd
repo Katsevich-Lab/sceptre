@@ -13,26 +13,50 @@ plot_run_discovery_analysis(
 )
 }
 \arguments{
-\item{sceptre_object}{a \code{sceptre_object} that has had \code{run_discovery_analysis} called on it}
+\item{sceptre_object}{a \code{sceptre_object} that has had
+\code{run_discovery_analysis} called on it}
 
-\item{x_limits}{(optional; default \code{c(-1.5, 1.5)}) a numeric vector of length 2 giving the lower and upper limits of the x-axis (corresponding to log-2 fold change) for the "Discovery volcano plot" panel}
+\item{x_limits}{(optional; default \code{c(-1.5, 1.5)}) a numeric vector of
+length 2 giving the lower and upper limits of the x-axis (corresponding to
+log-2 fold change) for the "Discovery volcano plot" panel}
 
-\item{point_size}{(optional; default \code{0.55}) the size of the individual points in the plot}
+\item{point_size}{(optional; default \code{0.55}) the size of the individual
+points in the plot}
 
-\item{transparency}{(optional; default \code{0.8}) the transparency of the individual points in the plot}
+\item{transparency}{(optional; default \code{0.8}) the transparency of the
+individual points in the plot}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE} then a list of \code{ggplot} is returned; if \code{TRUE} then a single \code{cowplot} object is returned.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}
+then a list of \code{ggplot} is returned; if \code{TRUE} then a single
+\code{cowplot} object is returned.}
 }
 \value{
-a single \code{cowplot} object containing the combined panels (if \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual panels (if \code{return_indiv_plots} is set to \code{FALSE})
+a single \code{cowplot} object containing the combined panels (if
+\code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
+panels (if \code{return_indiv_plots} is set to \code{FALSE})
 }
 \description{
-\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the discovery analysis. The visualization consists of four plots:
+\code{plot_run_discovery_analysis()} creates a visualization of the outcome of the
+discovery analysis. The visualization consists of four plots:
 \itemize{
-\item The upper left plot superimposes the discovery p-values (blue) on top of the negative control p-values (red) on an untransformed scale.
-\item The upper right plot is the same as the upper left plot, but the scale is negative log-10 transformed. The discovery p-values ideally should trend above the diagonal line, indicating the presence of signal in the discovery set. The horizontal dashed line indicates the multiple testing threshold; discovery pairs whose p-value falls above this line are called as significant.
-\item The bottom left panel is a volcano plot of the p-values and log fold changes of the discovery pairs. Each point corresponds to a pair; the estimated log-2 fold change of the pair is plotted on the horizontal axis, and the (negative log-10 transformed) p-value is plotted on the vertical axis. The horizontal dashed line again indicates the multiple testing threshold. Points above the dashed line (colored in purple) are called as discoveries, while points below (colored in blue) are called as insignificant.
-\item The bottom right panel is a text box displaying the number of discovery pairs called as significant.
+\item The upper left plot superimposes the discovery p-values (blue) on top of
+the negative control p-values (red) on an untransformed scale.
+\item The upper right plot is the same as the upper left plot, but the scale is
+negative log-10 transformed. The discovery p-values ideally should trend
+above the diagonal line, indicating the presence of signal in the discovery
+set. The horizontal dashed line indicates the multiple testing threshold;
+discovery pairs whose p-value falls above this line are called as
+significant.
+\item The bottom left panel is a volcano plot of the p-values and log fold
+changes of the discovery pairs. Each point corresponds to a pair; the
+estimated log-2 fold change of the pair is plotted on the horizontal axis,
+and the (negative log-10 transformed) p-value is plotted on the vertical
+axis. The horizontal dashed line again indicates the multiple testing
+threshold. Points above the dashed line (colored in purple) are called as
+discoveries, while points below (colored in blue) are called as
+insignificant.
+\item The bottom right panel is a text box displaying the number of discovery
+pairs called as significant.
 }
 }
 \examples{
