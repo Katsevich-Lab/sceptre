@@ -4,9 +4,6 @@ template:
   bootstrap: 5
 
 home:
-  links:
-    - text: Report a bug
-      href: https://github.com/Katsevich-Lab/sceptre/issues
   sidebar:
     structure: [links, license, citation, authors, custom, dev]
     components:
