@@ -10,7 +10,6 @@
 emphasizing statistical rigor, massive scalability, and ease of use.
 }
 \examples{
-\donttest{
 ##########################
 # Low-MOI CRISPRko example
 ##########################
@@ -68,8 +67,17 @@ sceptre_object <- run_discovery_analysis(sceptre_object)
 plot(sceptre_object)
 print(sceptre_object)
 
-# 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_lowmoi/")
+# 8. write results to a directory. tempdir() is used so this example is
+# self-contained; for a real analysis choose a directory you can find again.
+output_dir <- file.path(tempdir(), "sceptre_outputs_lowmoi")
+write_outputs_to_directory(
+  sceptre_object = sceptre_object,
+  directory = output_dir
+)
+message(
+  "sceptre outputs written to a temporary directory; ",
+  'open with `browseURL("', output_dir, '")`'
+)
 
 ##########################
 # High-MOI CRISPRi example
@@ -129,9 +137,17 @@ sceptre_object <- run_discovery_analysis(sceptre_object)
 plot(sceptre_object)
 print(sceptre_object)
 
-# 8. write results
-write_outputs_to_directory(sceptre_object = sceptre_object, "~/sceptre_outputs_highmoi/")
-}
+# 8. write results to a directory. tempdir() is used so this example is
+# self-contained; for a real analysis choose a directory you can find again.
+output_dir <- file.path(tempdir(), "sceptre_outputs_highmoi")
+write_outputs_to_directory(
+  sceptre_object = sceptre_object,
+  directory = output_dir
+)
+message(
+  "sceptre outputs written to a temporary directory; ",
+  'open by running `browseURL("', output_dir, '")` in the console.'
+)
 }
 \seealso{
 Useful links:
