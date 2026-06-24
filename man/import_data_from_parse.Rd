@@ -50,10 +50,16 @@ matrix generation program. See
 for more information about this function.
 }
 \details{
+<<<<<<< HEAD
 \code{import_data_from_parse()} is experimental, and the API of this function is
 subject to change. We expect the API to solidify as we learn more about the
 Parse platform and the structure of the Parse count matrix generation program
 output.
+=======
+\code{import_data_from_parse()} is experimental, and the API of this function is subject to change. We expect the API to solidify as we learn more about the Parse platform and the structure of the Parse count matrix generation program output.
+
+The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
+>>>>>>> feat/bioc-inst-scripts
 }
 \examples{
 directory <- paste0(
