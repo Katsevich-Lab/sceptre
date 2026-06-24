@@ -11,6 +11,10 @@ An object of class \code{data.frame} with 60 rows and 5 columns.
 data(grna_target_data_frame_highmoi)
 }
 \description{
-The gRNA target data frame corresponding to the example high MOI data. The data frame contains the columns \code{grna_id} (ID of an individual gRNA), \code{grna_target} (genomic target of the gRNA), \code{chr} (target chromosome), \code{start} (start coordinate of target location), and \code{end} (end coordinate of target location).
+The gRNA target data frame corresponding to the example high MOI data. The
+data frame contains the columns \code{grna_id} (ID of an individual gRNA),
+\code{grna_target} (genomic target of the gRNA), \code{chr} (target chromosome),
+\code{start} (start coordinate of target location), and \code{end} (end coordinate of
+target location).
 }
 \keyword{datasets}

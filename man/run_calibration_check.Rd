@@ -18,25 +18,44 @@ run_calibration_check(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{n_calibration_pairs}{(optional) the number of negative control pairs to construct and test for association}
+\item{n_calibration_pairs}{(optional) the number of negative control pairs to
+construct and test for association}
 
-\item{calibration_group_size}{(optional) the number of negative control gRNAs to randomly assemble to form each negative control target}
+\item{calibration_group_size}{(optional) the number of negative control gRNAs
+to randomly assemble to form each negative control target}
 
-\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
+\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether
+to print progress updates}
 
-\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to
+run the function in parallel. \code{parallel = TRUE} is recommended only on Mac;
+it is not supported on Windows and may behave unreliably on Linux clusters.}
 
-\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, uses half the physical cores. The fraction may be tuned via the \code{parallelly.availableCores.fraction} R option.}
+\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the
+number of processors to use if \code{parallel} is set to \code{TRUE}. The default,
+\code{"auto"}, uses half the physical cores. The fraction may be tuned via the
+\code{parallelly.availableCores.fraction} R option.}
 
-\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
+\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the
+directory in which to write the log files (ignored if \code{parallel = FALSE})}
 
-\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2, or 3 specifying the amount of information to return. \code{1} returns the least amount of information and \code{3} the most.}
+\item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2,
+or 3 specifying the amount of information to return. \code{1} returns the least
+amount of information and \code{3} the most.}
 }
 \value{
-an updated \code{sceptre_object} in which the calibration check has been carried out
+an updated \code{sceptre_object} in which the calibration check has been
+carried out
 }
 \description{
-\code{run_calibration_check()} runs the calibration check. The calibration check involves applying sceptre to analyze negative control target-response pairs --- pairs for which we know there is no association between the target and response --- to ensure control of the false discovery rate. The calibration check enables us to verify that the discovery set that sceptre ultimately produces is not contaminated by excess false positives. See \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual} for more detailed information about this function.
+\code{run_calibration_check()} runs the calibration check. The calibration check
+involves applying sceptre to analyze negative control target-response pairs
+--- pairs for which we know there is no association between the target and
+response --- to ensure control of the false discovery rate. The calibration
+check enables us to verify that the discovery set that sceptre ultimately
+produces is not contaminated by excess false positives. See
+\href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual}
+for more detailed information about this function.
 }
 \examples{
 data(highmoi_example_data)

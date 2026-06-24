@@ -17,26 +17,47 @@ assign_grnas(
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
 
-\item{method}{(optional) a string indicating the method to use to assign the gRNAs to cells, one of \code{"mixture"}, \code{"thresholding"}, or \code{"maximum"}. The default is \code{"maximum"} in low MOI and \code{"mixture"} in high MOI.}
+\item{method}{(optional) a string indicating the method to use to assign the
+gRNAs to cells, one of \code{"mixture"}, \code{"thresholding"}, or \code{"maximum"}. The
+default is \code{"maximum"} in low MOI and \code{"mixture"} in high MOI.}
 
-\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether to print progress updates}
+\item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether
+to print progress updates}
 
-\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to run the function in parallel. \code{parallel = TRUE} is recommended only on Mac; it is not supported on Windows and may behave unreliably on Linux clusters.}
+\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to
+run the function in parallel. \code{parallel = TRUE} is recommended only on Mac;
+it is not supported on Windows and may behave unreliably on Linux clusters.}
 
-\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the number of processors to use if \code{parallel} is set to \code{TRUE}. The default, \code{"auto"}, uses half the physical cores. The fraction may be tuned via the \code{parallelly.availableCores.fraction} R option.}
+\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the
+number of processors to use if \code{parallel} is set to \code{TRUE}. The default,
+\code{"auto"}, uses half the physical cores. The fraction may be tuned via the
+\code{parallelly.availableCores.fraction} R option.}
 
-\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the directory in which to write the log files (ignored if \code{parallel = FALSE})}
+\item{log_dir}{(optional; default \code{tempdir()}) a string indicating the
+directory in which to write the log files (ignored if \code{parallel = FALSE})}
 
 \item{...}{optional method-specific additional arguments}
 }
 \value{
-an updated \code{sceptre_object} in which the gRNA assignments have been carried out
+an updated \code{sceptre_object} in which the gRNA assignments have been
+carried out
 }
 \description{
-\code{assign_grnas()} performs the gRNA-to-cell assignments. \code{sceptre} provides three gRNA-to-cell assignment strategies: the mixture method, the thresholding method, and the maximum method. The mixture method involves assigning gRNAs to cells using a principled mixture model. Next, the thresholding method assigns a gRNA to a cell if the UMI count of the gRNA in the cell is greater than or equal to some integer threshold. Finally, the maximum method assigns the gRNA that accounts for the greatest number of UMIs in a given cell to that cell. The maximum method is available only in low MOI. See \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual} for more detailed information about \code{assign_grnas()}.
+\code{assign_grnas()} performs the gRNA-to-cell assignments. \code{sceptre} provides
+three gRNA-to-cell assignment strategies: the mixture method, the
+thresholding method, and the maximum method. The mixture method involves
+assigning gRNAs to cells using a principled mixture model. Next, the
+thresholding method assigns a gRNA to a cell if the UMI count of the gRNA in
+the cell is greater than or equal to some integer threshold. Finally, the
+maximum method assigns the gRNA that accounts for the greatest number of UMIs
+in a given cell to that cell. The maximum method is available only in low
+MOI. See
+\href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual}
+for more detailed information about \code{assign_grnas()}.
 }
 \note{
-See the manual for information about the method-specific additional arguments.
+See the manual for information about the method-specific additional
+arguments.
 }
 \examples{
 data("lowmoi_example_data")
