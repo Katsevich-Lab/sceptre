@@ -205,7 +205,7 @@ arguments: `directories`, `grna_target_data_frame`, and `moi`.
 Finally, we call the function `import_data_from_cellranger()`, passing
 `directories`, `grna_target_data_frame`, and `moi` as arguments.
 
-```{r import, results='hide'}
+```{r import, results='hide', message=FALSE}
 sceptre_object <- import_data_from_cellranger(
     directories = directories,
     grna_target_data_frame = grna_target_data_frame_highmoi,
@@ -388,7 +388,7 @@ We carry out the gRNA assignment step via a call to the function
 and `method` (optional); the latter argument can be set to `"mixture"`,
 `"maximum"`, or `"thresholding"`.
 
-```{r assign-grnas, results='hide'}
+```{r assign-grnas, results='hide', message=FALSE}
 sceptre_object <- assign_grnas(sceptre_object = sceptre_object)
 print(sceptre_object) # output suppressed for brevity
 ```
@@ -523,7 +523,7 @@ uncontaminated by excess false positives.
 We run the calibration check by calling the function `run_calibration_check()`
 on the `sceptre_object`.
 
-```{r run-calibration-check, results='hide'}
+```{r run-calibration-check, results='hide', message=FALSE}
 sceptre_object <- run_calibration_check(sceptre_object)
 print(sceptre_object) # output suppressed for brevity
 ```
@@ -586,7 +586,7 @@ power check enables us to assess `sceptre`'s power (i.e., its ability to detect
 true associations) on the dataset under analysis.** We run the power check by
 calling the function `run_power_check()` on the `sceptre_object`.
 
-```{r run-power-check, results='hide'}
+```{r run-power-check, results='hide', message=FALSE}
 sceptre_object <- run_power_check(sceptre_object)
 print(sceptre_object) # output suppressed for brevity
 ```
@@ -626,7 +626,7 @@ The seventh and penultimate step is to run the discovery analysis. The discovery
 analysis entails applying `sceptre` to analyze the discovery pairs. We run the
 discovery analysis by calling the function `run_discovery_analysis()`.
 
-```{r run-discovery, results='hide'}
+```{r run-discovery, results='hide', message=FALSE}
 sceptre_object <- run_discovery_analysis(sceptre_object)
 print(sceptre_object) # output suppressed for brevity
 ```
