@@ -85,6 +85,9 @@ sceptre_object <- sceptre_object |> # |> is R's base pipe, similar to %>%
 # write the results to disk
 output_directory <- file.path(tempdir(), "sceptre_outputs")
 write_outputs_to_directory(sceptre_object, output_directory)
+
+# open the output directory to inspect the results
+browseURL(output_directory)
 ```
 
 That's it. The output directory now contains a variety of results and plots from
