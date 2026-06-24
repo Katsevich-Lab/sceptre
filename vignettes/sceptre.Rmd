@@ -83,6 +83,7 @@ sceptre_object <- sceptre_object |> # |> is R's base pipe, similar to %>%
     run_discovery_analysis()
 
 # write the results to disk
+output_directory <- file.path(tempdir(), "sceptre_outputs")
 write_outputs_to_directory(sceptre_object, output_directory)
 ```
 
