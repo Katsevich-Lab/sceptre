@@ -13,43 +13,44 @@ knitr::opts_chunk$set(
 )
 ```
 
-::: {style="margin-top: 5px;"}
-<img src="man/figures/hex.jpg" align="right" width="150"/>
-:::
-
-## [`sceptre`]{style="font-size:60px;"}
-
-`sceptre` is an R package for single-cell CRISPR screen data analysis, emphasizing statistical rigor, massive scalability, and ease of use.
+# sceptre <img src="man/figures/logo.png" align="right" width="150" alt="sceptre hex sticker" />
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://img.shields.io/github/actions/workflow/status/Katsevich-Lab/sceptre/check-standard.yaml?branch=main&cacheSeconds=30)](https://github.com/Katsevich-Lab/sceptre/actions?query=workflow%3AR-CMD-check+branch%3Amain)
-
 <!-- badges: end -->
 
-## v0.10.0: `sceptre` at massive scale
+`sceptre` implements an analysis pipeline for single-cell CRISPR screen (i.e., Perturb-seq) data, including data import, gRNA-to-cell assignment, quality control, and testing association between CRISPR perturbations and changes in gene expression. It is built on three principles:
 
-`sceptre` v0.10.0 represents another a major upgrade to the `sceptre` software. We have integrated `sceptre` with [`ondisc`](https://timothy-barry.github.io/ondisc/), a companion R package that facilitates large-scale computing on single-cell data. `sceptre` now supports the analysis of single-cell CRISPR screen data out-of-core on a laptop or distributed across hundreds of processors on a computing cluster or cloud.
+- **Statistical rigor.** Association testing is built on a principled resampling-based methodology. Built-in
+  calibration and power checks let you verify that false positives are
+  controlled and that real effects are detectable — on your own data.
+- **Massive scalability.** Optimized C++ routines improve performance. Optional [disk-backed data structures](https://cran.r-project.org/package=ondisc) allow the analysis of datasets too large to fit in memory. The companion
+  [`sceptre` Nextflow pipeline](https://github.com/timothy-barry/sceptre-pipeline)
+  distributes analyses across hundreds of processors on a cluster or cloud.
+- **Ease of use.** A small, pipe-friendly set of functions takes you from raw
+  count matrices to results in a handful of steps.
 
-`sceptre` v0.10.0 includes the following updates:
+## Installation
 
--   Support for disk-backed `sceptre` objects, enabling the analysis of data too large to fit in memory
--   A `sceptre` [Nextflow pipeline](https://github.com/timothy-barry/sceptre-pipeline), enabling the deployment of `sceptre` across hundreds of processors on a cluster or cloud
--   An updated [e-book](https://timothy-barry.github.io/sceptre-book/) containing new sections about at-scale `sceptre` and the statistical methodology underlying `sceptre`
--   New functionality for plotting and inspecting gRNA-to-cell assignments
--   A comprehensive suite of unit tests, which verify the correctness of the code
--   More detailed man pages (including runnable examples) and minor bug fixes
+Install the development version of `sceptre` from GitHub:
 
-You can see our [RECOMB poster](https://timothy-barry.github.io/poster_recomb_2024.pdf) for more information about this update.
+```r
+# install.packages("remotes")
+remotes::install_github("Katsevich-Lab/sceptre")
+```
+
+## Documentation
+
+New to `sceptre`? [Get started](https://katsevich-lab.github.io/sceptre/articles/sceptre.html) offers a brief tour of the pipeline, with plots and explanation at each step. Other resources are the [function reference](https://katsevich-lab.github.io/sceptre/reference/index.html) and the comprehensive [`sceptre` manual](https://timothy-barry.github.io/sceptre-book/).
 
 ## Featured publications
 
--   [Barry et al., 2024](https://link.springer.com/article/10.1186/s13059-024-03254-2). "Robust differential expression testing...". *Genome Biology*.
--   [Barry et al., 2024](https://timothy-barry.github.io/biostatistics_2024.pdf). "Exponential family measurement error models...". *Biostatistics.*
--   [Morris et al., 2023](http://sanjanalab.org/reprints/Morris_Science_2023.pdf). "Discovery of target genes and pathways...". *Science*.
--   [Barry et al., 2021](https://link.springer.com/article/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
+- [Barry et al., 2024](https://link.springer.com/article/10.1186/s13059-024-03254-2). "Robust differential expression testing...". *Genome Biology*.
+- [Barry et al., 2024](https://timothy-barry.github.io/biostatistics_2024.pdf). "Exponential family measurement error models...". *Biostatistics.*
+- [Morris et al., 2023](http://sanjanalab.org/reprints/Morris_Science_2023.pdf). "Discovery of target genes and pathways...". *Science*.
+- [Barry et al., 2021](https://link.springer.com/article/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
 
-`sceptre` also recently was featured in a [10x Genomics analysis guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre).
+`sceptre` is also featured in a [10x Genomics analysis guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre).
 
 ## Bug reports, feature requests, and software questions
 
