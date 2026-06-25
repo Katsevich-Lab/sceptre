@@ -1,6 +1,6 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
-Version: 0.10.3
+Version: 0.99.0
 Authors@R:
     c(person(given = "Timothy",
            family = "Barry",
@@ -51,7 +51,6 @@ Suggests:
     knitr,
     testthat (>= 3.0.0),
     MASS
-Remotes: github::timothy-barry/ondisc
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre
