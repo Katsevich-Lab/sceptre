@@ -1,129 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/404.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/articles/install.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/articles/sceptre.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/index.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/assign_grnas.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/construct_cis_pairs.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/construct_positive_control_pairs.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/construct_trans_pairs.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/gene_position_data_frame_grch38.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/get_grna_assignments.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/get_response_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/get_result.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/grna_target_data_frame_highmoi.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/highmoi_example_data.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/import_data.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/import_data_from_cellranger.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/import_data_from_parse.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/lowmoi_example_data.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot-sceptre_object-method.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_assign_grnas.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_covariates.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_grna_count_distributions.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_response_grna_target_pair.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_calibration_check.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_discovery_analysis.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_power_check.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_qc.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/print-sceptre_object-method.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/read_ondisc_backed_sceptre_object.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/run_calibration_check.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/run_discovery_analysis.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/run_power_check.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/run_qc.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/sceptre-package.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/set_analysis_parameters.html</loc>
-  </url>
-  <url>
-    <loc>https://katsevich-lab.github.io/sceptre/reference/write_outputs_to_directory.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://katsevich-lab.github.io/sceptre/404.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/LICENSE.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/articles/index.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/articles/sceptre.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/authors.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/index.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/news/index.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/assign_grnas.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/construct_cis_pairs.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/construct_positive_control_pairs.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/construct_trans_pairs.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/gene_position_data_frame_grch38.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/get_grna_assignments.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/get_response_matrix.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/get_result.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/grna_target_data_frame_highmoi.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/highmoi_example_data.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/import_data.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/import_data_from_cellranger.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/import_data_from_parse.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/index.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/lowmoi_example_data.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot-sceptre_object-method.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_assign_grnas.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_covariates.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_grna_count_distributions.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_response_grna_target_pair.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_calibration_check.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_discovery_analysis.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_power_check.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/plot_run_qc.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/print-sceptre_object-method.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/read_ondisc_backed_sceptre_object.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/run_calibration_check.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/run_discovery_analysis.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/run_power_check.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/run_qc.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/sceptre-package.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/set_analysis_parameters.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/reference/write_outputs_to_directory.html</loc></url>
 </urlset>
+
