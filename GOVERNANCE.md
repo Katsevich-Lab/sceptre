@@ -8,8 +8,8 @@
 
 The current maintainers are:
 
-- **Timothy Barry** — Lead Maintainer.
-- **Eugene Katsevich** — Maintainer.
+- **Eugene Katsevich** — Lead Maintainer.
+- **Timothy Barry** — Maintainer.
 - **Louis Deutsch** — Maintainer.
 
 ## Decision making
@@ -24,7 +24,7 @@ The maintainer group discusses material decisions and seeks consensus. Material 
 - roadmap changes; and
 - changes to licensing, governance, or the Code of Conduct.
 
-If maintainers cannot reach consensus on a technical, release, or roadmap decision, the Lead Maintainer makes the final call. Changes to licensing, governance, the Code of Conduct, or maintainer membership require agreement of the maintainer group.
+If maintainers cannot reach consensus on a technical, release, or roadmap decision, the decision is made by majority vote, with the Lead Maintainer casting the tie-breaking vote if necessary. Changes to licensing, governance, the Code of Conduct, or maintainer membership require agreement of the maintainer group.
 
 ## Code review
 

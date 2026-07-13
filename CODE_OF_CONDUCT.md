@@ -11,7 +11,7 @@ Expected conduct includes:
 - respecting privacy, confidentiality, and appropriate attribution; and
 - acknowledging and correcting mistakes.
 
-Unacceptable conduct includes harassment, threats, personal attacks, discriminatory conduct, sexualized language or imagery, deliberate intimidation, publishing another person's private information without permission, and sustained disruption of project spaces.
+Unacceptable conduct includes harassment, threats, personal attacks, discrimination on the basis of protected characteristics, sexualized language or imagery, deliberate intimidation, publishing another person's private information without permission, and sustained disruption of project spaces.
 
 ## Scope
 

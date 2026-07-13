@@ -4,7 +4,7 @@ Version: 0.99.0
 Authors@R:
     c(person(given = "Timothy",
            family = "Barry",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "tbarry@hsph.harvard.edu",
            comment=c(ORCID="0000-0002-4356-627X")),
            person(given = "Louis",
@@ -12,7 +12,7 @@ Authors@R:
            role = c("aut")),
            person(given = "Eugene",
            family = "Katsevich",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "ekatsevi@wharton.upenn.edu"),
            person(given = "Wharton Analytics",
            role = "fnd"),
