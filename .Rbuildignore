@@ -12,3 +12,9 @@
 ^\.claude$
 ^\.git$
 ^air\.toml$
+^ROADMAP\.md$
+^CONTRIBUTING\.md$
+^CODE_OF_CONDUCT\.md$
+^GOVERNANCE\.md$
+^SUPPORT\.md$
+^CITATION\.cff$

@@ -1,27 +1,23 @@
 # Contributing to sceptre
 
-Contributions to `sceptre` are welcome, including code, tests, documentation, reproducible bug reports, and feature proposals.
+Contributions to `sceptre` are welcome, including code, tests, and documentation.
 
-Participation in the project is subject to the [Code of Conduct](CODE_OF_CONDUCT.md). Please do not include private data, credentials, protected health information, or other sensitive information in issues, discussions, pull requests, examples, or test fixtures.
+Participation in the project is subject to the [Code of Conduct](CODE_OF_CONDUCT.md).
+Please do not include private data, credentials, protected health information,
+or other sensitive information in pull requests, examples, or test fixtures.
 
-## Reporting bugs and requesting features
-
-For bugs and feature requests, open a [GitHub issue](https://github.com/Katsevich-Lab/sceptre/issues). For questions
-about using `sceptre`, start a [Q&A discussion](https://github.com/Katsevich-Lab/sceptre/discussions/categories/q-a).
-
-A useful bug report includes:
-
-- the installed `sceptre` version and installation source;
-- the R version and operating system;
-- a minimal reproducible example using simulated or public data;
-- the exact error or unexpected result; and
-- the expected behavior.
+For bug reports, feature requests, and questions about using `sceptre`, see
+[Getting help with sceptre](SUPPORT.md).
 
 ## Contributing code and documentation
 
 Small bug fixes and documentation corrections may be submitted as pull requests without prior discussion.
 
-Before implementing a substantial feature, public API change, or change to statistical methodology, open an issue or discussion. Early discussion helps the maintainers assess scope, compatibility, and validation requirements before substantial work is invested.
+Before implementing a substantial feature, public API change, or change to
+statistical methodology, start a [feature-request discussion](https://github.com/Katsevich-Lab/sceptre/discussions/categories/feature-requests).
+Early discussion helps the maintainers assess scope, compatibility, and
+validation requirements before substantial work is invested. Maintainers may
+promote a sufficiently scoped proposal to an issue for implementation tracking.
 
 ### Code, tests, and documentation
 

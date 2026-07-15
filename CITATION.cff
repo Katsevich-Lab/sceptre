@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use sceptre, please cite the method publication appropriate to your analysis; see inst/CITATION for the full set of references."
+type: software
+title: "sceptre"
+abstract: "Statistically rigorous, scalable, and user-friendly analysis of single-cell CRISPR screen data."
+authors:
+  - family-names: Barry
+    given-names: Timothy
+    orcid: "https://orcid.org/0000-0002-4356-627X"
+  - family-names: Deutsch
+    given-names: Louis
+  - family-names: Katsevich
+    given-names: Eugene
+repository-code: "https://github.com/Katsevich-Lab/sceptre"
+url: "https://katsevich-lab.github.io/sceptre/"
+license: "GPL-3.0-only"
+version: "0.99.0"
