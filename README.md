@@ -48,6 +48,16 @@ reference](https://katsevich-lab.github.io/sceptre/reference/index.html)
 and the comprehensive [`sceptre`
 manual](https://timothy-barry.github.io/sceptre-book/).
 
+## Project roadmap and community
+
+`sceptre` is maintained as an open-source research-software project. The
+current [roadmap](ROADMAP.md) describes the package’s technical and
+sustainability priorities. Please read the [contribution
+guide](CONTRIBUTING.md), [governance model](GOVERNANCE.md), and [Code of
+Conduct](CODE_OF_CONDUCT.md) before contributing. The [support
+guide](SUPPORT.md) explains where to ask questions, report bugs, and
+request features.
+
 ## Featured publications
 
 - [Barry et al.,
@@ -65,11 +75,3 @@ manual](https://timothy-barry.github.io/sceptre-book/).
 
 `sceptre` is also featured in a [10x Genomics analysis
 guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre).
-
-## Bug reports, feature requests, and software questions
-
-For bug reports, please open a [GitHub
-issue](https://github.com/Katsevich-Lab/sceptre/issues). For questions
-about `sceptre` functionality, documentation, or how to apply it to your
-data, please start a discussion under
-[Q&A](https://github.com/Katsevich-Lab/sceptre/discussions/categories/q-a).
