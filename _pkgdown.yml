@@ -4,8 +4,13 @@ template:
   bootstrap: 5
 
 home:
+  links:
+  - text: Roadmap
+    href: ROADMAP.html
+  - text: Governance
+    href: GOVERNANCE.html
   sidebar:
-    structure: [links, license, citation, authors, custom, dev]
+    structure: [links, license, community, citation, authors, custom, dev]
     components:
       custom:
         title: Funders

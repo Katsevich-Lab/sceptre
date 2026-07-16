@@ -43,6 +43,16 @@ remotes::install_github("Katsevich-Lab/sceptre")
 
 New to `sceptre`? [Get started](https://katsevich-lab.github.io/sceptre/articles/sceptre.html) offers a brief tour of the pipeline, with plots and explanation at each step. Other resources are the [function reference](https://katsevich-lab.github.io/sceptre/reference/index.html) and the comprehensive [`sceptre` manual](https://timothy-barry.github.io/sceptre-book/).
 
+## Project roadmap and community
+
+`sceptre` is maintained as an open-source research-software project. The current
+[roadmap](ROADMAP.md) describes
+the package's technical and sustainability priorities. Please read the
+[contribution guide](CONTRIBUTING.md), [governance model](GOVERNANCE.md), and
+[Code of Conduct](CODE_OF_CONDUCT.md) before contributing. The [support
+guide](SUPPORT.md)
+explains where to ask questions, report bugs, and request features.
+
 ## Featured publications
 
 - [Barry et al., 2024](https://link.springer.com/article/10.1186/s13059-024-03254-2). "Robust differential expression testing...". *Genome Biology*.
@@ -51,7 +61,3 @@ New to `sceptre`? [Get started](https://katsevich-lab.github.io/sceptre/articles
 - [Barry et al., 2021](https://link.springer.com/article/10.1186/s13059-021-02545-2). "SCEPTRE improves calibration and sensitivity...". *Genome Biology*.
 
 `sceptre` is also featured in a [10x Genomics analysis guide](https://www.10xgenomics.com/analysis-guides/single-cell-crispr-screen-analysis-with-sceptre).
-
-## Bug reports, feature requests, and software questions
-
-For bug reports, please open a [GitHub issue](https://github.com/Katsevich-Lab/sceptre/issues). For questions about `sceptre` functionality, documentation, or how to apply it to your data, please start a discussion under [Q&A](https://github.com/Katsevich-Lab/sceptre/discussions/categories/q-a).
