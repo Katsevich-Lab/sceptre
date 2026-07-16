@@ -26,7 +26,7 @@ Since we initially developed `sceptre`, its usage has increased, Perturb-seq dat
 
 **Goal.** We plan to overhaul the mixture-based gRNA assignment module to improve its statistical and computational performance.
 
-**Rationale.** We discovered a [bug](https://github.com/Katsevich-Lab/sceptre/issues/220) in our gRNA assignment mixture model (in the function [`run_reduced_em_algo_cpp()`](https://github.com/Katsevich-Lab/sceptre/blob/main/src/mixture_functs.cpp#L45)). This bugged version still performs well in our benchmarks (perhaps the reason why it took so long to discover the issue), better in fact than the correct mixture implementation. Furthermore, it was [demonstrated recently](https://www.biorxiv.org/content/10.64898/2026.01.22.701179v2) that statistically accurate gRNA assignment can be attained at much lower computational cost than traditional mixture models. Both of these factors motivated us to overhaul our mixture-based gRNA assignment module.
+**Rationale.** We discovered a [bug](https://github.com/Katsevich-Lab/sceptre/issues/220) in our gRNA assignment mixture model (in the function [`run_reduced_em_algo_cpp()`](https://github.com/Katsevich-Lab/sceptre/blob/main/src/mixture_functs.cpp#L45)). The affected implementation nevertheless performs well both in our benchmarks and in the benchmarks reported in the [fishash preprint](https://www.biorxiv.org/content/10.64898/2026.01.22.701179v2), which may explain why the issue took so long to surface. In our benchmarks, it even outperforms the corrected mixture implementation. The fishash study also demonstrated that statistically accurate gRNA assignment can be attained at much lower computational cost than traditional mixture models. Together, these results motivated us to overhaul our mixture-based gRNA assignment module.
 
 **Rough timing.** Summer-Fall 2026
 
@@ -34,9 +34,9 @@ Since we initially developed `sceptre`, its usage has increased, Perturb-seq dat
 
 ### 3. Hardening of the Nextflow pipeline
 
-**Goal.** We plan to harden the companion `sceptre` [Nextflow pipeline](https://github.com/timothy-barry/sceptre-pipeline) into a more mature execution path for large Perturb-seq studies on distributed computing infrastructure. We plan to harden it by adding features including containerization, testing and continuous integration, array job support, and feature parity with the `sceptre` R package.
+**Goal.** We plan to harden the companion `sceptre` [Nextflow pipeline](https://github.com/timothy-barry/sceptre-pipeline) into a more mature execution path for large Perturb-seq studies on distributed computing infrastructure. We plan to harden it through containerization, testing and continuous integration, array job support, documentation following nf-core conventions, and feature parity with the `sceptre` R package.
 
-**Rationale.** Modern Perturb-seq datasets can exceed the memory and compute capacity of a single worker. The existing Nextflow pipeline establishes the feasibility of distributed `sceptre` execution, but is still a prototype.
+**Rationale.** Modern Perturb-seq datasets can exceed the memory and compute capacity of a single process. The existing Nextflow pipeline establishes the feasibility of distributed `sceptre` execution, but is still a prototype.
 
 **Rough timing.** 2026-2027, as capacity and funding permit.
 
