@@ -13,3 +13,6 @@ src/*.so
 /doc/
 /Meta/
 .claude
+
+/.quarto/
+**/*.quarto_ipynb
