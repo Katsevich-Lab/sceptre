@@ -104,6 +104,18 @@ test_that("auto_compute_cell_covariates", {
         )
     )
 
+    ## testing cell IDs
+    cell_ids <- paste0("cell_", seq_len(num_cells))
+    response_matrix_with_cell_ids <- fixed_response_matrix
+    colnames(response_matrix_with_cell_ids) <- cell_ids
+    results_with_cell_ids <- auto_compute_cell_covariates(
+        response_matrix = response_matrix_with_cell_ids,
+        grna_matrix = fixed_grna_matrix,
+        extra_covariates = extra_covariates_big,
+        response_names = NA_character_
+    )
+    expect_identical(rownames(results_with_cell_ids), cell_ids)
+
     ## testing response_names
     results_no_names <- auto_compute_cell_covariates(
         response_matrix = fixed_response_matrix,

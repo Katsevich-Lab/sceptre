@@ -209,6 +209,12 @@ import_data_use_ondisc <- function(
 #' calls to Cell Ranger count. Each directory supplied as an input to this
 #' function should be in feature-barcode format, containing the files
 #' `features.tsv.gz` and `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`).
+#' For standard in-memory objects, when every supplied directory contains a
+#' barcode file, the cell barcodes are retained as the column names of the
+#' response and gRNA matrices and the row names of the cell covariate data frame.
+#' Barcodes that appear in multiple directories are prefixed with their batch
+#' identifiers (for example, `b1_` and `b2_`) to keep the cell IDs unique.
+#' Supplying barcode files for only some directories is an error.
 #' Users can create either a standard `sceptre` object or an `ondisc`-backed
 #' `sceptre` object; the latter is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
@@ -231,6 +237,8 @@ import_data_use_ondisc <- function(
 #' `vector_id` specifying the vector to which a given gRNA belongs.
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
+#' If row names are supplied and cell barcodes are retained, the row names must
+#' match the retained (and, if needed, batch-prefixed) cell IDs.
 #' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to
 #' store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an
 #' in-memory sparse matrix (`FALSE`).
@@ -334,6 +342,24 @@ import_data_from_cellranger_memory <- function(
             FUN.VALUE = character(1)
         ) |>
             stats::setNames(c("features", "matrix"))
+        barcode_file_names <- grep(
+            pattern = "^barcodes\\.tsv(\\.gz)?$",
+            x = fs,
+            value = TRUE
+        )
+        if (length(barcode_file_names) >= 2L) {
+            stop(
+                "There are multiple barcode files within the directory ",
+                curr_directory,
+                "."
+            )
+        }
+        barcode_fp <- if (length(barcode_file_names) == 1L) {
+            file.path(curr_directory, barcode_file_names)
+        } else {
+            NA_character_
+        }
+        c(out, barcodes = barcode_fp)
     }) |>
         stats::setNames(NULL)
 
@@ -348,6 +374,28 @@ import_data_from_cellranger_memory <- function(
         FUN = function(i) i[["matrix"]],
         FUN.VALUE = character(1)
     )
+    barcode_fps <- vapply(
+        X = input_files,
+        FUN = function(i) i[["barcodes"]],
+        FUN.VALUE = character(1)
+    )
+    barcode_files_present <- !is.na(barcode_fps)
+    if (any(barcode_files_present) && !all(barcode_files_present)) {
+        missing_directories <- directories[!barcode_files_present]
+        stop(
+            "Barcode files must either be present in every input directory ",
+            "or absent from every input directory. No barcode file was found ",
+            "in: ",
+            paste(missing_directories, collapse = ", "),
+            "."
+        )
+    }
+    retain_cell_barcodes <- all(barcode_files_present)
+    cell_barcodes <- if (retain_cell_barcodes) {
+        vector(mode = "list", length = length(directories))
+    } else {
+        NULL
+    }
 
     # 4. obtain the feature data frame; determine the ids of each feature
     feature_df <- data.table::fread(
@@ -395,6 +443,48 @@ import_data_from_cellranger_memory <- function(
         matrix_fp <- matrix_fps[i]
         matrix_metadata <- get_mtx_metadata(matrix_fp)
         n_cells_per_matrix[i] <- matrix_metadata$n_cells
+        if (retain_cell_barcodes) {
+            curr_barcodes <- data.table::fread(
+                file = barcode_fps[i],
+                header = FALSE,
+                colClasses = "character",
+                showProgress = FALSE
+            )
+            if (ncol(curr_barcodes) != 1L) {
+                stop(
+                    "The barcode file in directory ",
+                    directories[i],
+                    " must contain exactly one column."
+                )
+            }
+            curr_barcodes <- curr_barcodes[[1L]]
+            if (length(curr_barcodes) != matrix_metadata$n_cells) {
+                barcode_label <- if (length(curr_barcodes) == 1L) {
+                    "barcode"
+                } else {
+                    "barcodes"
+                }
+                stop(
+                    "The barcode file in directory ",
+                    directories[i],
+                    " contains ",
+                    length(curr_barcodes),
+                    " ",
+                    barcode_label,
+                    ", but its matrix contains ",
+                    matrix_metadata$n_cells,
+                    " cells."
+                )
+            }
+            if (anyDuplicated(curr_barcodes)) {
+                stop(
+                    "The barcode file in directory ",
+                    directories[i],
+                    " contains duplicate cell barcodes."
+                )
+            }
+            cell_barcodes[[i]] <- curr_barcodes
+        }
         dt <- data.table::fread(
             file = matrix_fp,
             skip = matrix_metadata$n_to_skip,
@@ -437,10 +527,30 @@ import_data_from_cellranger_memory <- function(
     message(crayon::green(" \u2713"))
 
     # 7. collect metadata pieces
+    cell_ids <- if (retain_cell_barcodes) {
+        unlist(cell_barcodes, use.names = FALSE)
+    } else {
+        NULL
+    }
+    if (!is.null(cell_ids) && anyDuplicated(cell_ids)) {
+        cell_ids <- unlist(
+            Map(
+                function(barcodes, batch_id) {
+                    paste0("b", batch_id, "_", barcodes)
+                },
+                cell_barcodes,
+                seq_along(cell_barcodes)
+            ),
+            use.names = FALSE
+        )
+    }
     for (modality in modalities) {
         rownames(out_mats[[modality]]) <- feature_df$feature_id[modality_idxs[[
             modality
         ]]]
+        if (retain_cell_barcodes) {
+            colnames(out_mats[[modality]]) <- cell_ids
+        }
     }
     gene_names <- feature_df$feature_name[modality_idxs[["Gene Expression"]]]
 

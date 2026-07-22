@@ -9,11 +9,14 @@ test_that("set_matrix_accessibility", {
         nrow = n_row,
         ncol = n_col
     )
+    cell_ids <- paste0("cell_", seq_len(n_col))
+    colnames(m) <- cell_ids
 
     ## testing row accessible when the input is a matrix
     m_r <- set_matrix_accessibility(matrix_in = m, make_row_accessible = TRUE)
     expect_true(is(m_r, "dgRMatrix"))
     expect_true(all(m_r == m))
+    expect_identical(colnames(m_r), cell_ids)
     expect_false("i" %in% names(attributes(m_r)))
 
     ## testing row accessible when the input is a TsparseMatrix
@@ -22,18 +25,21 @@ test_that("set_matrix_accessibility", {
         set_matrix_accessibility(make_row_accessible = TRUE)
     expect_true(is(m_r, "dgRMatrix"))
     expect_true(all(m_r == m))
+    expect_identical(colnames(m_r), cell_ids)
     expect_false("i" %in% names(attributes(m_r)))
 
     ## testing row accessible when the input is already a dgRMatrix
     m_r <- m_r |> set_matrix_accessibility(make_row_accessible = TRUE)
     expect_true(is(m_r, "dgRMatrix"))
     expect_true(all(m_r == m))
+    expect_identical(colnames(m_r), cell_ids)
     expect_false("i" %in% names(attributes(m_r)))
 
     ## testing col accessible when the input is a matrix
     m_c <- set_matrix_accessibility(matrix_in = m, make_row_accessible = FALSE)
     expect_true(is(m_c, "dgCMatrix"))
     expect_true(all(m_c == m))
+    expect_identical(colnames(m_c), cell_ids)
     expect_false("j" %in% names(attributes(m_c)))
 
     ## testing col accessible when the input is a TsparseMatrix
@@ -42,12 +48,14 @@ test_that("set_matrix_accessibility", {
         set_matrix_accessibility(make_row_accessible = FALSE)
     expect_true(is(m_c, "dgCMatrix"))
     expect_true(all(m_c == m))
+    expect_identical(colnames(m_c), cell_ids)
     expect_false("j" %in% names(attributes(m_c)))
 
     ## testing col accessible when the input is already a dgCMatrix
     m_c <- m_c |> set_matrix_accessibility(make_row_accessible = FALSE)
     expect_true(is(m_c, "dgCMatrix"))
     expect_true(all(m_c == m))
+    expect_identical(colnames(m_c), cell_ids)
     expect_false("j" %in% names(attributes(m_c)))
 })
 
