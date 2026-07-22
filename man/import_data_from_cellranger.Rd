@@ -31,7 +31,9 @@ each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
 \code{vector_id} specifying the vector to which a given gRNA belongs.}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates
-(e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.}
+(e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.
+If row names are supplied and cell barcodes are retained, the row names must
+match the retained (and, if needed, batch-prefixed) cell IDs.}
 
 \item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to
 store the expression data in a disk-backed \code{ondisc} matrix (\code{TRUE}) or an
@@ -49,6 +51,12 @@ an initialized \code{sceptre_object}
 calls to Cell Ranger count. Each directory supplied as an input to this
 function should be in feature-barcode format, containing the files
 \code{features.tsv.gz} and \code{matrix.mtx.gz} (and optionally \code{barcodes.tsv.gz}).
+For standard in-memory objects, when every supplied directory contains a
+barcode file, the cell barcodes are retained as the column names of the
+response and gRNA matrices and the row names of the cell covariate data frame.
+Barcodes that appear in multiple directories are prefixed with their batch
+identifiers (for example, \code{b1_} and \code{b2_}) to keep the cell IDs unique.
+Supplying barcode files for only some directories is an error.
 Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed
 \code{sceptre} object; the latter is more appropriate for large-scale data. See
 \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
