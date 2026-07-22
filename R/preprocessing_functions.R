@@ -24,6 +24,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
         # basic info: get matrix_in, n_responses, response_ids, and n_cells
         n_responses <- nrow(matrix_in)
         response_ids <- rownames(matrix_in)
+        cell_ids <- colnames(matrix_in)
         n_cells <- ncol(matrix_in)
         if (methods::is(matrix_in, "dgTMatrix")) {
             i <- matrix_in@i
@@ -69,6 +70,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
         out@x <- dt$x
         out@Dim <- c(n_responses, n_cells)
         rownames(out) <- response_ids
+        colnames(out) <- cell_ids
     }
     return(out)
 }
