@@ -508,14 +508,10 @@ test_that("assign_grnas method=mixture reports invalid assignment formulas", {
         set_analysis_parameters(formula_object = ~1)
 
     expect_error(
-        assign_grnas(
-            scep_redundant,
-            method = "mixture",
-            formula_object = ~ covariate_1 + covariate_2
-        ),
+        assign_grnas(scep_redundant, method = "mixture"),
         regexp = paste0(
             "formula_object.*gRNA assignment.*",
-            "perfectly collinear or redundant covariates.*",
+            "Possible causes include.*perfectly collinear or redundant.*",
             "formula used in `set_analysis_parameters\\(\\)` may be appropriate"
         )
     )
@@ -536,8 +532,28 @@ test_that("assign_grnas method=mixture reports invalid assignment formulas", {
         assign_grnas(scep_constant, method = "mixture"),
         regexp = paste0(
             "formula_object.*gRNA assignment.*",
-            "categorical covariate has at least two observed levels.*",
+            "Possible causes include.*",
+            "categorical covariates with fewer than two observed levels.*",
             "Underlying error: contrasts can be applied only to factors"
         )
     )
+
+    missing_covariate_error <- tryCatch(
+        assign_grnas(
+            scep_redundant,
+            method = "mixture",
+            formula_object = ~missing_covariate
+        ),
+        error = identity
+    )
+    expect_s3_class(missing_covariate_error, "error")
+    expect_match(
+        conditionMessage(missing_covariate_error),
+        paste0(
+            "formula_object.*gRNA assignment.*",
+            "Possible causes include missing variables or values.*",
+            "Underlying error: object 'missing_covariate' not found"
+        )
+    )
+    expect_false(is.null(conditionCall(missing_covariate_error)))
 })

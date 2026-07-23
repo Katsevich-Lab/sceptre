@@ -27,18 +27,20 @@ assign_grnas_to_cells_mixture <- function(
             formula_object = grna_assignment_hyperparameters$formula_object
         ),
         error = function(cnd) {
-            stop(
+            underlying_error <- conditionMessage(cnd)
+            cnd$message <- paste0(
                 "The `formula_object` used for gRNA assignment could not be ",
-                "converted to a valid design matrix. Check that the formula ",
-                "does not contain perfectly collinear or redundant covariates ",
-                "and that each categorical covariate has at least two observed ",
-                "levels. Supply a corrected `formula_object` to ",
+                "converted to a valid design matrix. Check the formula and ",
+                "covariate data. Possible causes include missing variables or ",
+                "values, non-finite values, categorical covariates with fewer ",
+                "than two observed levels, and perfectly collinear or ",
+                "redundant covariates. Supply a corrected `formula_object` to ",
                 "`assign_grnas()`; the formula used in ",
                 "`set_analysis_parameters()` may be appropriate.",
                 "\nUnderlying error: ",
-                conditionMessage(cnd),
-                call. = FALSE
+                underlying_error
             )
+            stop(cnd)
         }
     )
 
