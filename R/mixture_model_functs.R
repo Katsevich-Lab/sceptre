@@ -21,9 +21,25 @@ assign_grnas_to_cells_mixture <- function(
     )
 
     # 1. obtain the covariate matrix
-    covariate_matrix <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = cell_covariate_data_frame,
-        formula_object = grna_assignment_hyperparameters$formula_object
+    covariate_matrix <- tryCatch(
+        convert_covariate_df_to_design_matrix(
+            covariate_data_frame = cell_covariate_data_frame,
+            formula_object = grna_assignment_hyperparameters$formula_object
+        ),
+        error = function(cnd) {
+            stop(
+                "The `formula_object` used for gRNA assignment could not be ",
+                "converted to a valid design matrix. Check that the formula ",
+                "does not contain perfectly collinear or redundant covariates ",
+                "and that each categorical covariate has at least two observed ",
+                "levels. Supply a corrected `formula_object` to ",
+                "`assign_grnas()`; the formula used in ",
+                "`set_analysis_parameters()` may be appropriate.",
+                "\nUnderlying error: ",
+                conditionMessage(cnd),
+                call. = FALSE
+            )
+        }
     )
 
     # 2. make the grna expression matrix row-accessible
