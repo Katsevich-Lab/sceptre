@@ -489,3 +489,55 @@ test_that("assign_grnas method=mixture moi=high", {
         cells_getting_nt_1
     )
 })
+
+test_that("assign_grnas method=mixture reports invalid assignment formulas", {
+    test_data_list <- make_mock_base_data_for_testing_assign_grnas()
+    num_cells <- ncol(test_data_list$response_matrix)
+
+    redundant_covariates <- data.frame(
+        covariate_1 = seq_len(num_cells),
+        covariate_2 = 2 * seq_len(num_cells)
+    )
+    scep_redundant <- import_data(
+        grna_matrix = test_data_list$grna_matrix_all_0,
+        response_matrix = test_data_list$response_matrix,
+        grna_target_data_frame = test_data_list$grna_target_data_frame,
+        extra_covariates = redundant_covariates,
+        moi = "high"
+    ) |>
+        set_analysis_parameters(formula_object = ~1)
+
+    expect_error(
+        assign_grnas(
+            scep_redundant,
+            method = "mixture",
+            formula_object = ~ covariate_1 + covariate_2
+        ),
+        regexp = paste0(
+            "formula_object.*gRNA assignment.*",
+            "perfectly collinear or redundant covariates.*",
+            "formula used in `set_analysis_parameters\\(\\)` may be appropriate"
+        )
+    )
+
+    constant_covariate <- data.frame(
+        batch = factor(rep("batch_1", num_cells))
+    )
+    scep_constant <- import_data(
+        grna_matrix = test_data_list$grna_matrix_all_0,
+        response_matrix = test_data_list$response_matrix,
+        grna_target_data_frame = test_data_list$grna_target_data_frame,
+        extra_covariates = constant_covariate,
+        moi = "high"
+    ) |>
+        set_analysis_parameters(formula_object = ~1)
+
+    expect_error(
+        assign_grnas(scep_constant, method = "mixture"),
+        regexp = paste0(
+            "formula_object.*gRNA assignment.*",
+            "categorical covariate has at least two observed levels.*",
+            "Underlying error: contrasts can be applied only to factors"
+        )
+    )
+})
