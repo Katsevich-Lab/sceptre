@@ -26,18 +26,53 @@ copy_cellranger_input_files <- function(source_directory, output_directory) {
 test_that("import_data_from_cellranger retains cell barcodes", {
     inputs <- get_cellranger_test_inputs()
     expected_barcodes <- unlist(
-        lapply(inputs$directories, function(directory) {
-            data.table::fread(
-                file.path(directory, "barcodes.tsv.gz"),
-                header = FALSE,
-                colClasses = "character"
-            )[[1L]]
-        }),
+        Map(
+            function(directory, batch_id) {
+                barcodes <- data.table::fread(
+                    file.path(directory, "barcodes.tsv.gz"),
+                    header = FALSE,
+                    colClasses = "character"
+                )[[1L]]
+                paste0("b", batch_id, "_", barcodes)
+            },
+            inputs$directories,
+            seq_along(inputs$directories)
+        ),
         use.names = FALSE
     )
 
     sceptre_object <- suppressMessages(import_data_from_cellranger(
         directories = inputs$directories,
+        moi = "high",
+        grna_target_data_frame = inputs$grna_target_data_frame
+    ))
+
+    expect_identical(
+        colnames(get_response_matrix(sceptre_object)),
+        expected_barcodes
+    )
+    expect_identical(
+        colnames(get_grna_matrix(sceptre_object)),
+        expected_barcodes
+    )
+    expect_identical(
+        rownames(get_cell_covariates(sceptre_object)),
+        expected_barcodes
+    )
+})
+
+
+test_that("single-directory Cell Ranger imports retain raw cell barcodes", {
+    inputs <- get_cellranger_test_inputs()
+    directory <- inputs$directories[1L]
+    expected_barcodes <- data.table::fread(
+        file.path(directory, "barcodes.tsv.gz"),
+        header = FALSE,
+        colClasses = "character"
+    )[[1L]]
+
+    sceptre_object <- suppressMessages(import_data_from_cellranger(
+        directories = directory,
         moi = "high",
         grna_target_data_frame = inputs$grna_target_data_frame
     ))
@@ -95,7 +130,7 @@ test_that("Cell Ranger barcode files cannot be supplied only partially", {
 })
 
 
-test_that("duplicate barcodes across Cell Ranger directories are disambiguated", {
+test_that("batch prefixes disambiguate duplicate Cell Ranger barcodes", {
     inputs <- get_cellranger_test_inputs()
     directory <- inputs$directories[1L]
     barcodes <- data.table::fread(
@@ -155,6 +190,66 @@ test_that("Cell Ranger barcodes agree with named extra covariates", {
     expect_error(
         suppressMessages(import_data_from_cellranger(
             directories = directory,
+            moi = "high",
+            grna_target_data_frame = inputs$grna_target_data_frame,
+            extra_covariates = extra_covariates
+        )),
+        paste0(
+            "provided cell barcodes in the `response_matrix` and ",
+            "`extra_covariates`"
+        ),
+        fixed = TRUE
+    )
+})
+
+
+test_that("multi-directory barcodes agree with prefixed extra covariates", {
+    inputs <- get_cellranger_test_inputs()
+    raw_barcodes <- unlist(
+        lapply(inputs$directories, function(directory) {
+            data.table::fread(
+                file.path(directory, "barcodes.tsv.gz"),
+                header = FALSE,
+                colClasses = "character"
+            )[[1L]]
+        }),
+        use.names = FALSE
+    )
+    prefixed_barcodes <- unlist(
+        Map(
+            function(directory, batch_id) {
+                barcodes <- data.table::fread(
+                    file.path(directory, "barcodes.tsv.gz"),
+                    header = FALSE,
+                    colClasses = "character"
+                )[[1L]]
+                paste0("b", batch_id, "_", barcodes)
+            },
+            inputs$directories,
+            seq_along(inputs$directories)
+        ),
+        use.names = FALSE
+    )
+    extra_covariates <- data.frame(
+        covariate = seq_along(prefixed_barcodes),
+        row.names = prefixed_barcodes
+    )
+
+    sceptre_object <- suppressMessages(import_data_from_cellranger(
+        directories = inputs$directories,
+        moi = "high",
+        grna_target_data_frame = inputs$grna_target_data_frame,
+        extra_covariates = extra_covariates
+    ))
+    expect_identical(
+        rownames(get_cell_covariates(sceptre_object)),
+        prefixed_barcodes
+    )
+
+    rownames(extra_covariates) <- raw_barcodes
+    expect_error(
+        suppressMessages(import_data_from_cellranger(
+            directories = inputs$directories,
             moi = "high",
             grna_target_data_frame = inputs$grna_target_data_frame,
             extra_covariates = extra_covariates

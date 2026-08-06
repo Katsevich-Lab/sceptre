@@ -4,9 +4,16 @@
 more calls to Cell Ranger count. Each directory supplied as an input to
 this function should be in feature-barcode format, containing the files
 `features.tsv.gz` and `matrix.mtx.gz` (and optionally
-`barcodes.tsv.gz`). Users can create either a standard `sceptre` object
-or an `ondisc`-backed `sceptre` object; the latter is more appropriate
-for large-scale data. See [the introductory
+`barcodes.tsv.gz`). For standard in-memory objects, when every supplied
+directory contains a barcode file, the cell barcodes are retained as the
+column names of the response and gRNA matrices and the row names of the
+cell covariate data frame. When multiple directories are supplied, the
+retained cell barcodes are prefixed with their batch identifiers (for
+example, `b1_` and `b2_`) to keep the cell IDs unique and stable across
+imports. Supplying barcode files for only some directories is an error.
+Users can create either a standard `sceptre` object or an
+`ondisc`-backed `sceptre` object; the latter is more appropriate for
+large-scale data. See [the introductory
 chapter](https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data)
 or [Chapter
 1](https://timothy-barry.github.io/sceptre-book/import-data.html) of the
@@ -52,7 +59,10 @@ import_data_from_cellranger(
 - extra_covariates:
 
   (optional) a data frame containing extra covariates (e.g., batch,
-  biological replicate) beyond those that `sceptre` can compute.
+  biological replicate) beyond those that `sceptre` can compute. If row
+  names are supplied and cell barcodes are retained, the row names must
+  match the retained (and, for multiple directories, batch-prefixed)
+  cell IDs.
 
 - use_ondisc:
 

@@ -77,14 +77,15 @@ for more detailed information about this function.</p>
 <dd><p>a matrix of response UMI counts, with responses in
 rows and cells in columns. The matrix should be of type <code>"matrix"</code>,
 <code>"dgCMatrix"</code>, <code>"dgRMatrix"</code>, or <code>"dgTMatrix"</code>. The row names of the matrix
-should give the response IDs.</p></dd>
+should give the response IDs. The column names, when supplied, should give
+the cell IDs.</p></dd>
 
 
 <dt id="arg-grna-matrix">grna_matrix<a class="anchor" aria-label="anchor" href="#arg-grna-matrix"></a></dt>
 <dd><p>a matrix of gRNA UMI counts, with gRNAs in rows and cells
 in columns. The matrix should be of type <code>"matrix"</code>, <code>"dgCMatrix"</code>,
 <code>"dgRMatrix"</code>, or <code>"dgTMatrix"</code>. The row names of the matrix should give the
-gRNA IDs.</p></dd>
+gRNA IDs. The column names, when supplied, should give the cell IDs.</p></dd>
 
 
 <dt id="arg-grna-target-data-frame">grna_target_data_frame<a class="anchor" aria-label="anchor" href="#arg-grna-target-data-frame"></a></dt>
@@ -104,7 +105,11 @@ each gRNA. Additionally, <code>grna_target_data_frame</code> can contain the col
 
 <dt id="arg-extra-covariates">extra_covariates<a class="anchor" aria-label="anchor" href="#arg-extra-covariates"></a></dt>
 <dd><p>(optional) a data frame containing extra covariates
-(e.g., batch, biological replicate) beyond those that <code>sceptre</code> can compute.</p></dd>
+(e.g., batch, biological replicate) beyond those that <code>sceptre</code> can compute.
+The rows should follow the same cell ordering as the columns of
+<code>response_matrix</code> and <code>grna_matrix</code>. Cell IDs may be supplied as row names.
+When cell IDs are supplied for at least two of these three objects, they must
+be identical.</p></dd>
 
 
 <dt id="arg-response-names">response_names<a class="anchor" aria-label="anchor" href="#arg-response-names"></a></dt>

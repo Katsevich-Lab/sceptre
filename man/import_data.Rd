@@ -19,12 +19,13 @@ import_data(
 \item{response_matrix}{a matrix of response UMI counts, with responses in
 rows and cells in columns. The matrix should be of type \code{"matrix"},
 \code{"dgCMatrix"}, \code{"dgRMatrix"}, or \code{"dgTMatrix"}. The row names of the matrix
-should give the response IDs.}
+should give the response IDs. The column names, when supplied, should give
+the cell IDs.}
 
 \item{grna_matrix}{a matrix of gRNA UMI counts, with gRNAs in rows and cells
 in columns. The matrix should be of type \code{"matrix"}, \code{"dgCMatrix"},
 \code{"dgRMatrix"}, or \code{"dgTMatrix"}. The row names of the matrix should give the
-gRNA IDs.}
+gRNA IDs. The column names, when supplied, should give the cell IDs.}
 
 \item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and
 \code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs
@@ -38,7 +39,11 @@ each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
 "high".}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates
-(e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.}
+(e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.
+The rows should follow the same cell ordering as the columns of
+\code{response_matrix} and \code{grna_matrix}. Cell IDs may be supplied as row names.
+When cell IDs are supplied for at least two of these three objects, they must
+be identical.}
 
 \item{response_names}{(optional) a vector of human-readable response names;
 names with the prefix "MT-" are taken as mitochondrial genes and are used to

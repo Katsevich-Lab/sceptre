@@ -13,11 +13,12 @@
 #' @param response_matrix a matrix of response UMI counts, with responses in
 #' rows and cells in columns. The matrix should be of type `"matrix"`,
 #' `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix
-#' should give the response IDs.
+#' should give the response IDs. The column names, when supplied, should give
+#' the cell IDs.
 #' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells
 #' in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`,
 #' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the
-#' gRNA IDs.
+#' gRNA IDs. The column names, when supplied, should give the cell IDs.
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
 #' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
 #' should be assigned a label of "non-targeting". Optionally,
@@ -29,6 +30,10 @@
 #' "high".
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
+#' The rows should follow the same cell ordering as the columns of
+#' `response_matrix` and `grna_matrix`. Cell IDs may be supplied as row names.
+#' When cell IDs are supplied for at least two of these three objects, they must
+#' be identical.
 #' @param response_names (optional) a vector of human-readable response names;
 #' names with the prefix "MT-" are taken as mitochondrial genes and are used to
 #' compute the covariate `response_p_mito`.
@@ -212,8 +217,9 @@ import_data_use_ondisc <- function(
 #' For standard in-memory objects, when every supplied directory contains a
 #' barcode file, the cell barcodes are retained as the column names of the
 #' response and gRNA matrices and the row names of the cell covariate data frame.
-#' Barcodes that appear in multiple directories are prefixed with their batch
-#' identifiers (for example, `b1_` and `b2_`) to keep the cell IDs unique.
+#' When multiple directories are supplied, the retained cell barcodes are
+#' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
+#' the cell IDs unique and stable across imports.
 #' Supplying barcode files for only some directories is an error.
 #' Users can create either a standard `sceptre` object or an `ondisc`-backed
 #' `sceptre` object; the latter is more appropriate for large-scale data. See
@@ -238,7 +244,7 @@ import_data_use_ondisc <- function(
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #' If row names are supplied and cell barcodes are retained, the row names must
-#' match the retained (and, if needed, batch-prefixed) cell IDs.
+#' match the retained (and, for multiple directories, batch-prefixed) cell IDs.
 #' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to
 #' store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an
 #' in-memory sparse matrix (`FALSE`).
@@ -532,7 +538,7 @@ import_data_from_cellranger_memory <- function(
     } else {
         NULL
     }
-    if (!is.null(cell_ids) && anyDuplicated(cell_ids)) {
+    if (!is.null(cell_ids) && length(directories) >= 2L) {
         cell_ids <- unlist(
             Map(
                 function(barcodes, batch_id) {

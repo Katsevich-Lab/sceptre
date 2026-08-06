@@ -29,14 +29,15 @@ import_data(
   a matrix of response UMI counts, with responses in rows and cells in
   columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`,
   `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should
-  give the response IDs.
+  give the response IDs. The column names, when supplied, should give
+  the cell IDs.
 
 - grna_matrix:
 
   a matrix of gRNA UMI counts, with gRNAs in rows and cells in columns.
   The matrix should be of type `"matrix"`, `"dgCMatrix"`, `"dgRMatrix"`,
   or `"dgTMatrix"`. The row names of the matrix should give the gRNA
-  IDs.
+  IDs. The column names, when supplied, should give the cell IDs.
 
 - grna_target_data_frame:
 
@@ -56,7 +57,11 @@ import_data(
 - extra_covariates:
 
   (optional) a data frame containing extra covariates (e.g., batch,
-  biological replicate) beyond those that `sceptre` can compute.
+  biological replicate) beyond those that `sceptre` can compute. The
+  rows should follow the same cell ordering as the columns of
+  `response_matrix` and `grna_matrix`. Cell IDs may be supplied as row
+  names. When cell IDs are supplied for at least two of these three
+  objects, they must be identical.
 
 - response_names:
 
