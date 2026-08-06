@@ -24,7 +24,7 @@ The example data are stored in a list containing the following components:
 \item \code{grna_matrix}: the gRNA-by-cell expression matrix
 \item \code{extra_covariates}: a data frame containing a single column, \code{batch},
 specifying the batch in which each cell was sequenced (\code{batch_1} or
-\code{batch_2})
+\code{batch_2}); the row names give the cell IDs and match the matrix column names
 \item \code{gene_names}: the human-readable name of each gene
 }
 }

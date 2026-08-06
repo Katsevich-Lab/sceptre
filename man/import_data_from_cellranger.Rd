@@ -33,7 +33,7 @@ each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
 \item{extra_covariates}{(optional) a data frame containing extra covariates
 (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.
 If row names are supplied and cell barcodes are retained, the row names must
-match the retained (and, if needed, batch-prefixed) cell IDs.}
+match the retained (and, for multiple directories, batch-prefixed) cell IDs.}
 
 \item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to
 store the expression data in a disk-backed \code{ondisc} matrix (\code{TRUE}) or an
@@ -54,8 +54,9 @@ function should be in feature-barcode format, containing the files
 For standard in-memory objects, when every supplied directory contains a
 barcode file, the cell barcodes are retained as the column names of the
 response and gRNA matrices and the row names of the cell covariate data frame.
-Barcodes that appear in multiple directories are prefixed with their batch
-identifiers (for example, \code{b1_} and \code{b2_}) to keep the cell IDs unique.
+When multiple directories are supplied, the retained cell barcodes are
+prefixed with their batch identifiers (for example, \code{b1_} and \code{b2_}) to keep
+the cell IDs unique and stable across imports.
 Supplying barcode files for only some directories is an error.
 Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed
 \code{sceptre} object; the latter is more appropriate for large-scale data. See
