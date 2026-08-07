@@ -25,7 +25,8 @@ The example data are stored in a list containing four components:
 \item \code{grna_target_data_frame}: a data frame containing the columns \code{grna_id} (ID
 of an individual gRNA) and \code{grna_target} (genomic target of the gRNA)
 \item \code{extra_covariates}: a data frame with a single column, \code{batch}, specifying
-the batch in which each cell was sequenced (\code{batch_1} or \code{batch_2})
+the batch in which each cell was sequenced (\code{batch_1} or \code{batch_2}); the row
+names give the cell IDs and match the matrix column names
 }
 }
 \keyword{datasets}

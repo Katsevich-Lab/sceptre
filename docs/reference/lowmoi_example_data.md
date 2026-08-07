@@ -30,4 +30,5 @@ The example data are stored in a list containing four components:
 
 - `extra_covariates`: a data frame with a single column, `batch`,
   specifying the batch in which each cell was sequenced (`batch_1` or
-  `batch_2`)
+  `batch_2`); the row names give the cell IDs and match the matrix
+  column names
