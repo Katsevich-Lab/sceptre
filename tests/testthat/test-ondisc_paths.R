@@ -19,15 +19,16 @@ test_that("ondisc output paths reject tildes after normalization", {
 })
 
 test_that("leading ~/ paths are accepted (expanded before the tilde check)", {
-    directory_to_write <- "~/sceptre_leading_tilde_test"
-    on.exit(
-        unlink(path.expand(directory_to_write), recursive = TRUE),
-        add = TRUE
-    )
+    # Use the existing home directory to test path expansion without creating
+    # or deleting anything in the user's home.
+    directory_to_write <- "~/"
 
     prepared <- prepare_directory_to_write(directory_to_write)
 
-    expect_true(dir.exists(prepared))
+    expect_identical(
+        prepared,
+        normalizePath(path.expand("~"), winslash = "/", mustWork = TRUE)
+    )
     expect_false(grepl("~", prepared, fixed = TRUE))
 })
 

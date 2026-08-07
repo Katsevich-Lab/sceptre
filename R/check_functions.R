@@ -106,7 +106,7 @@ check_import_data_inputs <- function(
 
     # 9. if cell barcodes are provided for at least two of `response_matrix`,
     # `grna_matrix`, and `extra_covariates`,
-    # then they must be identical
+    # then they must be identical and in the same order
     barcode_list <- list(
         response_matrix = colnames(response_matrix),
         grna_matrix = colnames(grna_matrix),
@@ -127,7 +127,7 @@ check_import_data_inputs <- function(
             )
     )
     # If at least 2 non-default barcode names were provided, they must all be
-    # identical.
+    # identical and in the same order.
     # This is done by looping over all pairs of non-default names
     barcodes_with_names <- barcode_list[were_names_provided]
     if (length(barcodes_with_names) >= 2) {
@@ -144,7 +144,7 @@ check_import_data_inputs <- function(
                         names(barcodes_with_names)[i],
                         "` and `",
                         names(barcodes_with_names)[j],
-                        "`. These cell barcodes must be identical across objects."
+                        "`. These cell barcodes must be identical and in the same order across objects."
                     )
                 }
             }

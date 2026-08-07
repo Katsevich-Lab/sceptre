@@ -138,6 +138,10 @@ auto_compute_cell_covariates <- function(
     if (nrow(extra_covariates) >= 1L) {
         covariate_df <- cbind(covariate_df, extra_covariates)
     }
+    cell_ids <- colnames(response_matrix)
+    if (!is.null(cell_ids)) {
+        rownames(covariate_df) <- cell_ids
+    }
     return(covariate_df)
 }
 

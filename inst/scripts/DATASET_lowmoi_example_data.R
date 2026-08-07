@@ -215,6 +215,7 @@ gene_expression_matrix <- matrix(
     ncol = num_cells,
     dimnames = list(gene_names, paste0("Cell_", 1:num_cells))
 )
+rownames(extra_covariates) <- colnames(gene_expression_matrix)
 
 # ----- Package and save -----
 

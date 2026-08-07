@@ -32,7 +32,7 @@
 #' - `grna_matrix`: the gRNA-by-cell expression matrix
 #' - `extra_covariates`: a data frame containing a single column, `batch`,
 #' specifying the batch in which each cell was sequenced (`batch_1` or
-#' `batch_2`)
+#' `batch_2`); the row names give the cell IDs and match the matrix column names
 #' - `gene_names`: the human-readable name of each gene
 #'
 #' @usage data(highmoi_example_data)
@@ -62,7 +62,8 @@
 #' - `grna_target_data_frame`: a data frame containing the columns `grna_id` (ID
 #' of an individual gRNA) and `grna_target` (genomic target of the gRNA)
 #' - `extra_covariates`: a data frame with a single column, `batch`, specifying
-#' the batch in which each cell was sequenced (`batch_1` or `batch_2`)
+#' the batch in which each cell was sequenced (`batch_1` or `batch_2`); the row
+#' names give the cell IDs and match the matrix column names
 #'
 #' @usage data(lowmoi_example_data)
 "lowmoi_example_data"

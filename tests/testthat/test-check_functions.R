@@ -352,6 +352,30 @@ test_that("check_import_data_inputs", {
         )
     )
 
+    # the same cell barcodes in a different order should produce an error
+    cell_barcodes <- paste0("cell_", seq_len(num_cells))
+    response_matrix_with_barcodes <- valid_response_matrix |>
+        `colnames<-`(cell_barcodes)
+    grna_matrix_with_barcodes <- valid_grna_matrix |>
+        `colnames<-`(cell_barcodes)
+    extra_covariates_with_barcodes <- valid_extra_covariates |>
+        `rownames<-`(cell_barcodes)
+    out_of_order_extra_covariates <- extra_covariates_with_barcodes[
+        rev(seq_len(num_cells)),
+        ,
+        drop = FALSE
+    ]
+    expect_error(
+        check_import_data_inputs(
+            response_matrix = response_matrix_with_barcodes,
+            grna_matrix = grna_matrix_with_barcodes,
+            grna_target_data_frame = valid_grna_target_data_frame,
+            moi = "low",
+            extra_covariates = out_of_order_extra_covariates
+        ),
+        regex = "These cell barcodes must be identical and in the same order across objects"
+    )
+
     # but if at least two have names, then they should agree
     expect_error(
         check_import_data_inputs(
