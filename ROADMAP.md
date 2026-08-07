@@ -1,10 +1,10 @@
 # sceptre roadmap
 
-Last reviewed: July 2026
+Last reviewed: August 2026
 
 ## Purpose
 
-`sceptre` is an open-source R package for statistically rigorous, scalable analysis of single-cell CRISPR screens. This roadmap describes the maintainers' development priorities for the next two years. It is a living document: the maintainers review it at least annually and update it as priorities and capacity evolve.
+`sceptre` is an open-source R package for statistically rigorous, scalable analysis of single-cell CRISPR screens. This roadmap describes the maintainers' development priorities for the next two years. It is a living document: the maintainers review it at least annually and update it as priorities and capacity evolve. Each roadmap priority may encompass one or more GitHub issues, while issues also track work that is not currently prioritized on the roadmap.
 
 ## Overview of development priorities
 
@@ -57,6 +57,16 @@ Since we initially developed `sceptre`, its usage has increased, Perturb-seq dat
 **Goal.** We plan to refactor the `sceptre` code base around clearer, modular interfaces.
 
 **Rationale.** As `sceptre` has grown, its internals have become more complex and more difficult to test, maintain, and extend. Clear interfaces for data access, statistical test execution, and result generation will make it easier to add capabilities such as power-aware outputs and distributed execution without coupling them tightly to the current implementation. The refactor will also make the code base easier for community contributors to understand and support stable reference outputs for downstream implementations in other languages or on other hardware.
+
+**Rough timing.** 2027-2028, as capacity and funding permit.
+
+**Status.** Planned.
+
+### 6. Improved calibration functionality
+
+**Goal.** We plan to improve `sceptre`'s functionality for assessing and addressing miscalibration. These improvements will include methods for [assessing false discovery control under realistic mixtures of null and non-null pairs](https://github.com/Katsevich-Lab/sceptre/issues/224), approaches for [empirically calibrating discovery p-values using suitably comparable negative-control pairs](https://github.com/Katsevich-Lab/sceptre/issues/97), and more convenient [support for principal components as covariates](https://github.com/Katsevich-Lab/sceptre/issues/125).
+
+**Rationale.** Reliable calibration is essential for controlling false positives in large-scale association testing. The existing calibration check evaluates the multiple-testing procedure using negative-control pairs, effectively representing a global-null setting. The discovery analysis, however, generally contains a mixture of null and non-null pairs, so the calibration check does not directly characterize the false discovery rate expected in practice. Moreover, empirical calibration is complicated by possible heterogeneity among negative-control pairs: the appropriate null reference distribution may depend on gene expression and other pair characteristics. Addressing these questions will require methodological development and validation, but could provide users with a more realistic assessment of false discovery control and a principled fallback when model-based calibration remains inadequate.
 
 **Rough timing.** 2027-2028, as capacity and funding permit.
 
