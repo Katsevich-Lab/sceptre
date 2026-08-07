@@ -37,10 +37,10 @@
 
 <div id="sceptre-roadmap" class="section level1">
 
-<p>Last reviewed: July 2026</p>
+<p>Last reviewed: August 2026</p>
 <div class="section level2">
 <h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a></h2>
-<p><code>sceptre</code> is an open-source R package for statistically rigorous, scalable analysis of single-cell CRISPR screens. This roadmap describes the maintainers’ development priorities for the next two years. It is a living document: the maintainers review it at least annually and update it as priorities and capacity evolve.</p>
+<p><code>sceptre</code> is an open-source R package for statistically rigorous, scalable analysis of single-cell CRISPR screens. This roadmap describes the maintainers’ development priorities for the next two years. It is a living document: the maintainers review it at least annually and update it as priorities and capacity evolve. Each roadmap priority may encompass one or more GitHub issues, while issues also track work that is not currently prioritized on the roadmap.</p>
 </div>
 <div class="section level2">
 <h2 id="overview-of-development-priorities">Overview of development priorities<a class="anchor" aria-label="anchor" href="#overview-of-development-priorities"></a></h2>
@@ -80,6 +80,13 @@
 <h3 id="id_5-maintainable-and-extensible-software-architecture">5. Maintainable and extensible software architecture<a class="anchor" aria-label="anchor" href="#id_5-maintainable-and-extensible-software-architecture"></a></h3>
 <p><strong>Goal.</strong> We plan to refactor the <code>sceptre</code> code base around clearer, modular interfaces.</p>
 <p><strong>Rationale.</strong> As <code>sceptre</code> has grown, its internals have become more complex and more difficult to test, maintain, and extend. Clear interfaces for data access, statistical test execution, and result generation will make it easier to add capabilities such as power-aware outputs and distributed execution without coupling them tightly to the current implementation. The refactor will also make the code base easier for community contributors to understand and support stable reference outputs for downstream implementations in other languages or on other hardware.</p>
+<p><strong>Rough timing.</strong> 2027-2028, as capacity and funding permit.</p>
+<p><strong>Status.</strong> Planned.</p>
+</div>
+<div class="section level3">
+<h3 id="id_6-improved-calibration-functionality">6. Improved calibration functionality<a class="anchor" aria-label="anchor" href="#id_6-improved-calibration-functionality"></a></h3>
+<p><strong>Goal.</strong> We plan to improve <code>sceptre</code>’s functionality for assessing and addressing miscalibration. These improvements will include methods for <a href="https://github.com/Katsevich-Lab/sceptre/issues/224" class="external-link">assessing false discovery control under realistic mixtures of null and non-null pairs</a>, approaches for <a href="https://github.com/Katsevich-Lab/sceptre/issues/97" class="external-link">empirically calibrating discovery p-values using suitably comparable negative-control pairs</a>, and more convenient <a href="https://github.com/Katsevich-Lab/sceptre/issues/125" class="external-link">support for principal components as covariates</a>.</p>
+<p><strong>Rationale.</strong> Reliable calibration is essential for controlling false positives in large-scale association testing. The existing calibration check evaluates the multiple-testing procedure using negative-control pairs, effectively representing a global-null setting. The discovery analysis, however, generally contains a mixture of null and non-null pairs, so the calibration check does not directly characterize the false discovery rate expected in practice. Moreover, empirical calibration is complicated by possible heterogeneity among negative-control pairs: the appropriate null reference distribution may depend on gene expression and other pair characteristics. Addressing these questions will require methodological development and validation, but could provide users with a more realistic assessment of false discovery control and a principled fallback when model-based calibration remains inadequate.</p>
 <p><strong>Rough timing.</strong> 2027-2028, as capacity and funding permit.</p>
 <p><strong>Status.</strong> Planned.</p>
 </div>
