@@ -126,8 +126,8 @@ requires three arguments: `directories`, `grna_target_data_frame`, and
     directories # file paths to the example data on your computer
     ```
 
-        ## [1] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb/sceptre/extdata/highmoi_example/gem_group_1"
-        ## [2] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb/sceptre/extdata/highmoi_example/gem_group_2"
+        ## [1] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6/sceptre/extdata/highmoi_example/gem_group_1"
+        ## [2] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6/sceptre/extdata/highmoi_example/gem_group_2"
 
     `directories` points to two directories, both of which store the
     expression data in matrix market format and contain the files
@@ -418,14 +418,20 @@ to cells that do not contain the corresponding gRNA.
 **`sceptre` provides three methods for assigning gRNAs to cells (the
 “mixture method,” the “maximum method,” and the “thresholding
 method”)**, all of which account for background contamination. The
-default method for high-MOI data is the “mixture method.” The gRNA
-counts are regressed onto the (unobserved) gRNA presence/absence
-indicator and the cell-specific covariates (e.g., `grna_n_umis`,
-`batch`) via a latent variable Poisson GLM. The fitted model yields the
-probability that each cell contains the gRNA, and these probabilities
-are thresholded to assign the gRNA to cells. The default method in
-low-MOI is the simpler “maximum” approach: the gRNA that accounts for
-the greatest number of UMIs in a given cell is assigned to that cell. A
+default method for high-MOI data is the historical “mixture method.” In
+the intended model, the gRNA counts are regressed onto the (unobserved)
+gRNA presence/absence indicator and the cell- specific covariates (e.g.,
+`grna_n_umis`, `batch`) via a latent variable Poisson GLM. The
+historical implementation yields fitted posterior membership
+probabilities that each cell contains the gRNA, and these probabilities
+are thresholded to assign the gRNA to cells. Because of a known
+inconsistency in its fitting algorithm, the parameter estimates do not
+maximize the likelihood of the mixture model used to compute these
+probabilities; see
+[`?assign_grnas`](https://katsevich-lab.github.io/sceptre/reference/assign_grnas.md)
+and Chapter 3 of the manual for details. The default method in low-MOI
+is the simpler “maximum” approach: the gRNA that accounts for the
+greatest number of UMIs in a given cell is assigned to that cell. A
 backup option in both low- and high-MOI is the “thresholding” approach:
 a given gRNA is assigned to a given cell if the UMI count of that gRNA
 in that cell exceeds some integer threshold.
@@ -804,14 +810,14 @@ session_info()
     ## ─ Session info ───────────────────────────────────────────────────────────────
     ##  setting  value
     ##  version  R version 4.6.0 (2026-04-24)
-    ##  os       macOS Tahoe 26.4.1
+    ##  os       macOS Tahoe 26.6.2
     ##  system   aarch64, darwin23
     ##  ui       X11
     ##  language en
-    ##  collate  en_US
-    ##  ctype    en_US
+    ##  collate  C.UTF-8
+    ##  ctype    C.UTF-8
     ##  tz       America/New_York
-    ##  date     2026-06-24
+    ##  date     2026-08-27
     ##  pandoc   3.9.0.2 @ /opt/homebrew/bin/ (via rmarkdown)
     ##  quarto   1.9.38 @ /usr/local/bin/quarto
     ## 
@@ -855,13 +861,13 @@ session_info()
     ##  R6             2.6.1     2025-02-15 [3] CRAN (R 4.6.0)
     ##  ragg           1.5.2     2026-03-23 [3] CRAN (R 4.6.0)
     ##  RColorBrewer   1.1-3     2022-04-03 [3] CRAN (R 4.6.0)
-    ##  Rcpp           1.1.1-1.1 2026-04-24 [3] CRAN (R 4.6.0)
+    ##  Rcpp           1.1.1-1.1 2026-04-24 [2] CRAN (R 4.6.0)
     ##  rlang          1.2.0     2026-04-06 [3] CRAN (R 4.6.0)
     ##  rmarkdown      2.31      2026-03-26 [3] CRAN (R 4.6.0)
     ##  S7             0.2.2     2026-04-22 [3] CRAN (R 4.6.0)
     ##  sass           0.4.10    2025-04-11 [3] CRAN (R 4.6.0)
     ##  scales         1.4.0     2025-04-24 [3] CRAN (R 4.6.0)
-    ##  sceptre      * 0.99.0    2026-06-24 [1] Bioconductor
+    ##  sceptre      * 0.99.0    2026-08-27 [1] Bioconductor
     ##  sessioninfo  * 1.2.3     2025-02-05 [3] CRAN (R 4.6.0)
     ##  systemfonts    1.3.2     2026-03-05 [3] CRAN (R 4.6.0)
     ##  textshaping    1.0.5     2026-03-06 [3] CRAN (R 4.6.0)
@@ -873,7 +879,7 @@ session_info()
     ##  xfun           0.57      2026-03-20 [3] CRAN (R 4.6.0)
     ##  yaml           2.3.12    2025-12-10 [3] CRAN (R 4.6.0)
     ## 
-    ##  [1] /private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb
+    ##  [1] /private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6
     ##  [2] /Users/ekatsevi/Library/R/arm64/4.6/library
     ##  [3] /Library/Frameworks/R.framework/Versions/4.6/Resources/library
     ##  * ── Packages attached to the search path.
