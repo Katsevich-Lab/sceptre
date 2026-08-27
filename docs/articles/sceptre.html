@@ -79,7 +79,7 @@ asked questions page</a> for tips on installing <code>sceptre</code>
 such that it runs as fast as possible. Users can load
 <code>sceptre</code> via a call to <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://timothy-barry.github.io/sceptre-book/" class="external-link">sceptre</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://katsevich-lab.github.io/sceptre/">sceptre</a></span><span class="op">)</span></span></code></pre></div>
 <p>The standard pipeline involved in applying <code>sceptre</code> to
 analyze a dataset consists of several steps, which we summarize in the
 following schematic.</p>
@@ -177,8 +177,8 @@ example CRISPRi data on disk.</p>
 <span>    <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">directories</span> <span class="co"># file paths to the example data on your computer</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb/sceptre/extdata/highmoi_example/gem_group_1"</span></span>
-<span><span class="co">## [2] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb/sceptre/extdata/highmoi_example/gem_group_2"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6/sceptre/extdata/highmoi_example/gem_group_1"</span></span>
+<span><span class="co">## [2] "/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6/sceptre/extdata/highmoi_example/gem_group_2"</span></span></code></pre>
 <p><code>directories</code> points to two directories, both of which
 store the expression data in matrix market format and contain the files
 <code>barcodes.tsv.gz</code>, <code>features.tsv.gz</code>, and
@@ -437,18 +437,22 @@ sometimes map to cells that do not contain the corresponding gRNA.</p>
 <p><strong><code>sceptre</code> provides three methods for assigning
 gRNAs to cells (the “mixture method,” the “maximum method,” and the
 “thresholding method”)</strong>, all of which account for background
-contamination. The default method for high-MOI data is the “mixture
-method.” The gRNA counts are regressed onto the (unobserved) gRNA
-presence/absence indicator and the cell-specific covariates (e.g.,
-<code>grna_n_umis</code>, <code>batch</code>) via a latent variable
-Poisson GLM. The fitted model yields the probability that each cell
-contains the gRNA, and these probabilities are thresholded to assign the
-gRNA to cells. The default method in low-MOI is the simpler “maximum”
-approach: the gRNA that accounts for the greatest number of UMIs in a
-given cell is assigned to that cell. A backup option in both low- and
-high-MOI is the “thresholding” approach: a given gRNA is assigned to a
-given cell if the UMI count of that gRNA in that cell exceeds some
-integer threshold.</p>
+contamination. The default method for high-MOI data is the historical
+“mixture method.” In the intended model, the gRNA counts are regressed
+onto the (unobserved) gRNA presence/absence indicator and the cell-
+specific covariates (e.g., <code>grna_n_umis</code>, <code>batch</code>)
+via a latent variable Poisson GLM. The historical implementation yields
+fitted posterior membership probabilities that each cell contains the
+gRNA, and these probabilities are thresholded to assign the gRNA to
+cells. Because of a known inconsistency in its fitting algorithm, the
+parameter estimates do not maximize the likelihood of the mixture model
+used to compute these probabilities; see <code><a href="../reference/assign_grnas.html">?assign_grnas</a></code> and
+Chapter 3 of the manual for details. The default method in low-MOI is
+the simpler “maximum” approach: the gRNA that accounts for the greatest
+number of UMIs in a given cell is assigned to that cell. A backup option
+in both low- and high-MOI is the “thresholding” approach: a given gRNA
+is assigned to a given cell if the UMI count of that gRNA in that cell
+exceeds some integer threshold.</p>
 <p>We carry out the gRNA assignment step via a call to the function
 <code><a href="../reference/assign_grnas.html">assign_grnas()</a></code>. <code><a href="../reference/assign_grnas.html">assign_grnas()</a></code> takes arguments
 <code>sceptre_object</code> (required) and <code>method</code>
@@ -776,14 +780,14 @@ manual</a>.</p>
 <pre><code><span><span class="co">## <span style="color: #00BBBB; font-weight: bold;">─ Session info ───────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">##  <span style="color: #555555; font-style: italic;">setting </span> <span style="color: #555555; font-style: italic;">value</span></span></span>
 <span><span class="co">##  version  R version 4.6.0 (2026-04-24)</span></span>
-<span><span class="co">##  os       macOS Tahoe 26.4.1</span></span>
+<span><span class="co">##  os       macOS Tahoe 26.6.2</span></span>
 <span><span class="co">##  system   aarch64, darwin23</span></span>
 <span><span class="co">##  ui       X11</span></span>
 <span><span class="co">##  language en</span></span>
-<span><span class="co">##  collate  en_US</span></span>
-<span><span class="co">##  ctype    en_US</span></span>
+<span><span class="co">##  collate  C.UTF-8</span></span>
+<span><span class="co">##  ctype    C.UTF-8</span></span>
 <span><span class="co">##  tz       America/New_York</span></span>
-<span><span class="co">##  date     2026-06-24</span></span>
+<span><span class="co">##  date     2026-08-27</span></span>
 <span><span class="co">##  pandoc   3.9.0.2 @ /opt/homebrew/bin/ (via rmarkdown)</span></span>
 <span><span class="co">##  quarto   1.9.38 @ /usr/local/bin/quarto</span></span>
 <span><span class="co">## </span></span>
@@ -827,13 +831,13 @@ manual</a>.</p>
 <span><span class="co">##  R6             2.6.1     <span style="color: #555555;">2025-02-15</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  ragg           1.5.2     <span style="color: #555555;">2026-03-23</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  RColorBrewer   1.1-3     <span style="color: #555555;">2022-04-03</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
-<span><span class="co">##  Rcpp           1.1.1-1.1 <span style="color: #555555;">2026-04-24</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
+<span><span class="co">##  Rcpp           1.1.1-1.1 <span style="color: #555555;">2026-04-24</span> <span style="color: #555555;">[2]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  rlang          1.2.0     <span style="color: #555555;">2026-04-06</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  rmarkdown      2.31      <span style="color: #555555;">2026-03-26</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  S7             0.2.2     <span style="color: #555555;">2026-04-22</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  sass           0.4.10    <span style="color: #555555;">2025-04-11</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  scales         1.4.0     <span style="color: #555555;">2025-04-24</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
-<span><span class="co">##  sceptre      * 0.99.0    <span style="color: #555555;">2026-06-24</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
+<span><span class="co">##  sceptre      * 0.99.0    <span style="color: #555555;">2026-08-27</span> <span style="color: #555555;">[1]</span> <span style="color: #555555;">Bioconductor</span></span></span>
 <span><span class="co">##  sessioninfo  * 1.2.3     <span style="color: #555555;">2025-02-05</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  systemfonts    1.3.2     <span style="color: #555555;">2026-03-05</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  textshaping    1.0.5     <span style="color: #555555;">2026-03-06</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
@@ -845,7 +849,7 @@ manual</a>.</p>
 <span><span class="co">##  xfun           0.57      <span style="color: #555555;">2026-03-20</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">##  yaml           2.3.12    <span style="color: #555555;">2025-12-10</span> <span style="color: #555555;">[3]</span> <span style="color: #555555;">CRAN (R 4.6.0)</span></span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpgcetiN/temp_libpath124931c84cecb</span></span></span>
+<span><span class="co">## <span style="color: #555555;"> [1] /private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpmflZHi/temp_libpath16f99228992d6</span></span></span>
 <span><span class="co">## <span style="color: #555555;"> [2] /Users/ekatsevi/Library/R/arm64/4.6/library</span></span></span>
 <span><span class="co">## <span style="color: #555555;"> [3] /Library/Frameworks/R.framework/Versions/4.6/Resources/library</span></span></span>
 <span><span class="co">##  <span style="color: #BBBBBB; background-color: #BB0000;">*</span> ── Packages attached to the search path.</span></span>
