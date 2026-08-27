@@ -88,7 +88,7 @@ Version 0.9.0 is a total rework of the `sceptre` package. The new version of the
 -   We have added a `sceptre_object` class to represent the single-cell CRISPR screen data.
 -   We have unified low-MOI and high-MOI analysis into a single interface.
 -   We have written a [manual](https://timothy-barry.github.io/sceptre-book/) to guide users through the entire process of analyzing their single-cell CRISPR screen data.
--   We have added a new mixture model method for assigning gRNAs to cells.
+-   We have added a new mixture model method for assigning gRNAs to cells in a principled way.
 -   We have made the experimental high-MOI functionality (from version 0.3.0) the default functionality for high-MOI analysis.
 -   We have added functionality to carry out cell-wise QC.
 -   Mac and Linux users now can run `sceptre` in parallel.
