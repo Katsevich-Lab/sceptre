@@ -152,6 +152,7 @@ message(
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://katsevich-lab.github.io/sceptre/}
   \item \url{https://timothy-barry.github.io/sceptre-book/}
   \item \url{https://github.com/Katsevich-Lab/sceptre}
   \item Report bugs at \url{https://github.com/Katsevich-Lab/sceptre/issues}
@@ -159,12 +160,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Timothy Barry \email{tbarry@hsph.harvard.edu} (\href{https://orcid.org/0000-0002-4356-627X}{ORCID})
+\strong{Maintainer}: Eugene Katsevich \email{ekatsevi@wharton.upenn.edu} (\href{https://orcid.org/0000-0003-0598-2050}{ORCID})
 
 Authors:
 \itemize{
+  \item Timothy Barry \email{tbarry@hsph.harvard.edu} (\href{https://orcid.org/0000-0002-4356-627X}{ORCID})
   \item Louis Deutsch
-  \item Eugene Katsevich \email{ekatsevi@wharton.upenn.edu}
 }
 
 Other contributors:
