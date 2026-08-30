@@ -3,7 +3,7 @@
 `assign_grnas()` performs the gRNA-to-cell assignments. `sceptre`
 provides three gRNA-to-cell assignment strategies: the mixture method,
 the thresholding method, and the maximum method. The mixture method
-involves assigning gRNAs to cells using a principled mixture model.
+assigns gRNAs by thresholding fitted posterior membership probabilities.
 Next, the thresholding method assigns a gRNA to a cell if the UMI count
 of the gRNA in the cell is greater than or equal to some integer
 threshold. Finally, the maximum method assigns the gRNA that accounts
@@ -75,8 +75,21 @@ carried out
 
 ## Note
 
-See the manual for information about the method-specific additional
-arguments.
+The `"mixture"` method retains the historical fitting algorithm used in
+`sceptre` version 0.9.0 and later. Owing to an implementation
+inconsistency, the perturbation parameter is estimated under a
+multiplicative parameterization but applied additively in the subsequent
+E-step. The resulting parameter estimates therefore do not maximize the
+likelihood of the mixture model used to compute the fitted
+probabilities. The historical implementation is retained because it has
+performed well in benchmarks. This limitation affects only `"mixture"`;
+`"maximum"` and `"thresholding"` are unaffected. We plan to replace the
+historical mixture implementation after a statistically coherent and
+empirically validated alternative is available. Any change to the public
+API or high-MOI default will follow that validation. Progress is tracked
+in [GitHub issue
+\#220](https://github.com/Katsevich-Lab/sceptre/issues/220). See the
+manual for information about the method-specific additional arguments.
 
 ## Examples
 

@@ -7,6 +7,8 @@ emphasizing statistical rigor, massive scalability, and ease of use.
 
 Useful links:
 
+- <https://katsevich-lab.github.io/sceptre/>
+
 - <https://timothy-barry.github.io/sceptre-book/>
 
 - <https://github.com/Katsevich-Lab/sceptre>
@@ -15,14 +17,15 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Timothy Barry <tbarry@hsph.harvard.edu>
-([ORCID](https://orcid.org/0000-0002-4356-627X))
+**Maintainer**: Eugene Katsevich <ekatsevi@wharton.upenn.edu>
+([ORCID](https://orcid.org/0000-0003-0598-2050))
 
 Authors:
 
-- Louis Deutsch
+- Timothy Barry <tbarry@hsph.harvard.edu>
+  ([ORCID](https://orcid.org/0000-0002-4356-627X))
 
-- Eugene Katsevich <ekatsevi@wharton.upenn.edu>
+- Louis Deutsch
 
 Other contributors:
 
@@ -422,7 +425,7 @@ message(
   "sceptre outputs written to a temporary directory; ",
   'open with `browseURL("', output_dir, '")`'
 )
-#> sceptre outputs written to a temporary directory; open with `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpgcetiN/sceptre_outputs_lowmoi")`
+#> sceptre outputs written to a temporary directory; open with `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpmflZHi/sceptre_outputs_lowmoi")`
 
 ##########################
 # High-MOI CRISPRi example
@@ -841,5 +844,5 @@ message(
   "sceptre outputs written to a temporary directory; ",
   'open by running `browseURL("', output_dir, '")` in the console.'
 )
-#> sceptre outputs written to a temporary directory; open by running `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpgcetiN/sceptre_outputs_highmoi")` in the console.
+#> sceptre outputs written to a temporary directory; open by running `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpmflZHi/sceptre_outputs_highmoi")` in the console.
 ```
