@@ -13,7 +13,8 @@ Authors@R:
            person(given = "Eugene",
            family = "Katsevich",
            role = c("aut", "cre"),
-           email = "ekatsevi@wharton.upenn.edu"),
+           email = "ekatsevi@wharton.upenn.edu",
+           comment = c(ORCID = "0000-0003-0598-2050")),
            person(given = "Wharton Analytics",
            role = "fnd"),
            person(given = "National Science Foundation",
@@ -53,6 +54,8 @@ Suggests:
     MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-URL: https://timothy-barry.github.io/sceptre-book/, https://github.com/Katsevich-Lab/sceptre
+URL: https://katsevich-lab.github.io/sceptre/,
+    https://timothy-barry.github.io/sceptre-book/,
+    https://github.com/Katsevich-Lab/sceptre
 BugReports: https://github.com/Katsevich-Lab/sceptre/issues
 LazyData: false
