@@ -160,12 +160,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Eugene Katsevich \email{ekatsevi@wharton.upenn.edu} (\href{https://orcid.org/0000-0003-0598-2050}{ORCID})
+\strong{Maintainer}: Timothy Barry \email{tbarry@hsph.harvard.edu} (\href{https://orcid.org/0000-0002-4356-627X}{ORCID})
 
 Authors:
 \itemize{
-  \item Timothy Barry \email{tbarry@hsph.harvard.edu} (\href{https://orcid.org/0000-0002-4356-627X}{ORCID})
   \item Louis Deutsch
+  \item Eugene Katsevich \email{ekatsevi@wharton.upenn.edu} (\href{https://orcid.org/0000-0003-0598-2050}{ORCID})
 }
 
 Other contributors:
