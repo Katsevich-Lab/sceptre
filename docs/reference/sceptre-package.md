@@ -17,15 +17,15 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Eugene Katsevich <ekatsevi@wharton.upenn.edu>
-([ORCID](https://orcid.org/0000-0003-0598-2050))
+**Maintainer**: Timothy Barry <tbarry@hsph.harvard.edu>
+([ORCID](https://orcid.org/0000-0002-4356-627X))
 
 Authors:
 
-- Timothy Barry <tbarry@hsph.harvard.edu>
-  ([ORCID](https://orcid.org/0000-0002-4356-627X))
-
 - Louis Deutsch
+
+- Eugene Katsevich <ekatsevi@wharton.upenn.edu>
+  ([ORCID](https://orcid.org/0000-0003-0598-2050))
 
 Other contributors:
 
