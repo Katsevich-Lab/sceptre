@@ -2,12 +2,12 @@
 
 ## Authors
 
-- **Timothy Barry**. Author, maintainer.
-  [](https://orcid.org/0000-0002-4356-627X)
+- **Timothy Barry**. Author. [](https://orcid.org/0000-0002-4356-627X)
 
 - **Louis Deutsch**. Author.
 
-- **Eugene Katsevich**. Author.
+- **Eugene Katsevich**. Author, maintainer.
+  [](https://orcid.org/0000-0003-0598-2050)
 
 - **Wharton Analytics**. Funder.
 

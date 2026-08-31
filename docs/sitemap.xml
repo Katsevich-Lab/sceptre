@@ -1,6 +1,11 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://katsevich-lab.github.io/sceptre/404.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/CONTRIBUTING.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/GOVERNANCE.html</loc></url>
 <url><loc>https://katsevich-lab.github.io/sceptre/LICENSE.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/ROADMAP.html</loc></url>
+<url><loc>https://katsevich-lab.github.io/sceptre/SUPPORT.html</loc></url>
 <url><loc>https://katsevich-lab.github.io/sceptre/articles/index.html</loc></url>
 <url><loc>https://katsevich-lab.github.io/sceptre/articles/sceptre.html</loc></url>
 <url><loc>https://katsevich-lab.github.io/sceptre/authors.html</loc></url>
