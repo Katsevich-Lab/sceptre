@@ -175,9 +175,11 @@ set_analysis_parameters <- function(
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
 
-    # 6. update cached fields
+    # 6. update cached fields. Both precomputations regress onto the covariate
+    # matrix, so a change to the formula invalidates both.
     if (reset_response_precomps) {
         sceptre_object@response_precomputations <- list()
+        sceptre_object@grna_precomputations <- list()
     }
 
     # return
@@ -311,15 +313,25 @@ assign_grnas <- function(
     ) |>
         invisible()
 
-    # 3. determine whether to reset response precomputations
-    reset_response_precomps <- sceptre_object@low_moi &&
-        (!identical(sceptre_object@grna_assignment_method, method) ||
-            !identical(
-                sceptre_object@grna_assignment_hyperparameters,
-                hyperparameters
-            ))
+    # 3. determine whether to reset the precomputations
+    reset_grna_precomps <- !identical(
+        sceptre_object@grna_assignment_method,
+        method
+    ) ||
+        !identical(
+            sceptre_object@grna_assignment_hyperparameters,
+            hyperparameters
+        )
+    # the response precomputation depends on the assignments only through the
+    # cells in use, which reassignment changes in low MOI alone; the gRNA
+    # precomputation regresses on the assignments themselves, so it is
+    # invalidated in either MOI
+    reset_response_precomps <- sceptre_object@low_moi && reset_grna_precomps
     if (reset_response_precomps) {
         sceptre_object@response_precomputations <- list()
+    }
+    if (reset_grna_precomps) {
+        sceptre_object@grna_precomputations <- list()
     }
 
     # 4. update uncached fields
@@ -496,9 +508,10 @@ run_qc_pt_1 <- function(
         )
     }
 
-    # 6. determine whether to reset response precomputation
+    # 6. determine whether to reset the precomputations
     if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
         sceptre_object@response_precomputations <- list()
+        sceptre_object@grna_precomputations <- list()
     }
 
     # 7. update the grna assignments given the cellwise qc

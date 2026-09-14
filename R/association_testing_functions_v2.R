@@ -172,20 +172,29 @@ crt_glm_factored_out <- function(
     all_nt_idxs,
     response_matrix,
     side_code,
-    cells_in_use
+    cells_in_use,
+    grna_precomputations = list()
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # precomputation on grna
     idxs <- get_idx_f(curr_grna_group)
     trt_idxs <- idxs$trt_idxs
     n_trt <- idxs$n_trt
-    fitted_probabilities <- perform_grna_precomputation(
+    # the regression spans every cell in use, so the treated cells alone
+    # identify the fit
+    grna_precomp <- get_grna_fitted_probabilities(
+        grna_precomputations = grna_precomputations,
+        curr_grna_group = curr_grna_group,
         trt_idxs = trt_idxs,
         covariate_matrix = covariate_matrix,
-        return_fitted_values = TRUE
+        fit_idxs = trt_idxs
     )
+    # NOTE: only the logistic fit above may be cached across calls. The
+    # synthetic indices below are random draws from that fit and must be
+    # redrawn on every call; caching them would freeze the resampling
+    # distribution and invalidate the conditional randomization test.
     synthetic_idxs <- crt_index_sampler_fast(
-        fitted_probabilities = fitted_probabilities,
+        fitted_probabilities = grna_precomp$fitted_probabilities,
         B = B1 + B2 + B3
     )
     # loop over genes
@@ -232,7 +241,10 @@ crt_glm_factored_out <- function(
         )
         result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    return(list(
+        result_list_inner = result_list_inner,
+        to_cache = grna_precomp$to_cache
+    ))
 }
 
 # workhorse function 4: crt, glm run inside
@@ -249,7 +261,8 @@ discovery_ntcells_crt <- function(
     all_nt_idxs,
     response_matrix,
     side_code,
-    cells_in_use
+    cells_in_use,
+    grna_precomputations = list()
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # initialize the idxs
@@ -258,15 +271,23 @@ discovery_ntcells_crt <- function(
     combined_idxs <- c(idxs$trt_idxs, all_nt_idxs)
     trt_idxs <- seq(1L, n_trt)
     # subset the covariate matrix for this gRNA
-    curr_covariate_matrix <- covariate_matrix[combined_idxs, ]
-    # perform the grna precomputation
-    fitted_probabilities <- perform_grna_precomputation(
+    curr_covariate_matrix <- covariate_matrix[combined_idxs, , drop = FALSE]
+    # perform the grna precomputation. `trt_idxs` is `seq(1L, n_trt)` here, so
+    # it is the combined treated and non-targeting cell set that identifies the
+    # fit
+    grna_precomp <- get_grna_fitted_probabilities(
+        grna_precomputations = grna_precomputations,
+        curr_grna_group = curr_grna_group,
         trt_idxs = trt_idxs,
         covariate_matrix = curr_covariate_matrix,
-        return_fitted_values = TRUE
+        fit_idxs = combined_idxs
     )
+    # NOTE: only the logistic fit above may be cached across calls. The
+    # synthetic indices below are random draws from that fit and must be
+    # redrawn on every call; caching them would freeze the resampling
+    # distribution and invalidate the conditional randomization test.
     synthetic_idxs <- crt_index_sampler_fast(
-        fitted_probabilities = fitted_probabilities,
+        fitted_probabilities = grna_precomp$fitted_probabilities,
         B = B1 + B2 + B3
     )
     # loop over the response ids
@@ -314,5 +335,8 @@ discovery_ntcells_crt <- function(
         )
         result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    return(list(
+        result_list_inner = result_list_inner,
+        to_cache = grna_precomp$to_cache
+    ))
 }

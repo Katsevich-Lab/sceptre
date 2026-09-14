@@ -83,6 +83,7 @@ test_that("import_data", {
         "import_grna_assignment_info",
         "mean_cells_per_grna",
         "response_precomputations",
+        "grna_precomputations",
         "last_function_called",
         "functs_called",
         "calibration_result",

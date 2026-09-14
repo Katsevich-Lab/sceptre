@@ -277,7 +277,8 @@ run_crt_in_memory_v2 <- function(
     parallel,
     n_processors,
     log_dir,
-    analysis_type
+    analysis_type,
+    grna_precomputations = list()
 ) {
     # 0. define several variables
     subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -298,6 +299,12 @@ run_crt_in_memory_v2 <- function(
     )
     response_ids <- unique(response_grna_group_pairs$response_id)
     fit_parametric_curve <- (resampling_approximation == "skew_normal")
+    # the calibration check analyzes randomly chosen groups of non-targeting
+    # gRNAs, resampled on every call, so it has nothing durable to cache; it
+    # neither reads from nor writes to the gRNA precomputations
+    if (calibration_check) {
+        grna_precomputations <- list()
+    }
 
     # 1. subset covariate matrix to cells_in_use and then to nt cells (if
     # applicable)
@@ -411,6 +418,7 @@ run_crt_in_memory_v2 <- function(
             mode = "list",
             length = length(curr_grna_groups)
         )
+        grna_precomp_out_list <- list()
         f_name <- if (parallel && print_progress) {
             paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
         } else {
@@ -434,7 +442,7 @@ run_crt_in_memory_v2 <- function(
 
             # 8. call the low-level analysis function
             if (run_outer_regression) {
-                curr_response_result <- crt_glm_factored_out(
+                curr_out <- crt_glm_factored_out(
                     B1,
                     B2,
                     B3,
@@ -449,10 +457,11 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    grna_precomputations = grna_precomputations
                 )
             } else {
-                curr_response_result <- discovery_ntcells_crt(
+                curr_out <- discovery_ntcells_crt(
                     B1,
                     B2,
                     B3,
@@ -465,17 +474,26 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    grna_precomputations = grna_precomputations
                 )
+            }
+            # NULL when the fit was served from the cache or cannot be cached
+            if (!is.null(curr_out$to_cache)) {
+                grna_precomp_out_list[[curr_grna_group]] <- curr_out$to_cache
             }
             result_out_list[[grna_group_idx]] <- construct_data_frame_v2(
                 curr_df,
-                curr_response_result,
+                curr_out$result_list_inner,
                 output_amount
             )
         }
         # 9. prepare output
         ret_pass_qc <- data.table::rbindlist(result_out_list, fill = TRUE)
+        return(list(
+            ret_pass_qc = ret_pass_qc,
+            grna_precomp_out_list = grna_precomp_out_list
+        ))
     }
 
     # 10. perform the association analyses
@@ -500,10 +518,31 @@ run_crt_in_memory_v2 <- function(
         )
         message(crayon::green(" \u2713"))
     }
-    result <- res |> data.table::rbindlist(fill = TRUE)
+    result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
+        data.table::rbindlist(fill = TRUE)
+
+    # 11. collect the gRNA precomputations. The gRNA loop may run under
+    # `parallel::mclapply()`, so the fits the workers computed are returned
+    # alongside their results and merged here, as the response precomputations
+    # are above. We assign by name rather than concatenating so that an entry
+    # refit because it was stale replaces its predecessor.
+    grna_precomp_out_list <- lapply(res, function(chunk) {
+        chunk[["grna_precomp_out_list"]]
+    }) |>
+        purrr::flatten()
+    grna_precomputations[
+        names(grna_precomp_out_list)
+    ] <- grna_precomp_out_list
 
     return(list(
         result = result,
-        response_precomputations = response_precomputations
+        response_precomputations = response_precomputations,
+        # a calibration check leaves the cache alone; `NULL` signals the caller
+        # to retain whatever the `sceptre_object` already holds
+        grna_precomputations = if (calibration_check) {
+            NULL
+        } else {
+            grna_precomputations
+        }
     ))
 }
