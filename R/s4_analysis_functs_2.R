@@ -190,7 +190,7 @@ run_calibration_check_pt_2 <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- update_precomputation_caches(sceptre_object, out)
     return(sceptre_object)
 }
 
@@ -306,7 +306,7 @@ run_power_check <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- update_precomputation_caches(sceptre_object, out)
     return(sceptre_object)
 }
 
@@ -409,7 +409,7 @@ run_discovery_analysis <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- update_precomputation_caches(sceptre_object, out)
     return(sceptre_object)
 }
 
@@ -424,6 +424,28 @@ process_discovery_result <- function(result, sceptre_object) {
             ) <
                 sceptre_object@multiple_testing_alpha
         )
+}
+
+
+#' Write the precomputations an analysis produced back onto the object
+#'
+#' The gRNA precomputations are absent from `out` when the analysis had none to
+#' contribute: `run_perm_test_in_memory()` performs no logistic fit, and
+#' `run_crt_in_memory_v2()` withholds them for a calibration check, whose gRNA
+#' groups are randomly chosen sets of non-targeting gRNAs that are resampled on
+#' every call. In both cases the cache the object already holds is left intact.
+#'
+#' @param sceptre_object a `sceptre_object`
+#' @param out the list returned by the core analysis function
+#'
+#' @return the updated `sceptre_object`
+#' @noRd
+update_precomputation_caches <- function(sceptre_object, out) {
+    sceptre_object@response_precomputations <- out$response_precomputations
+    if (!is.null(out$grna_precomputations)) {
+        sceptre_object@grna_precomputations <- out$grna_precomputations
+    }
+    return(sceptre_object)
 }
 
 
@@ -480,11 +502,18 @@ run_sceptre_analysis_high_level <- function(
         analysis_type = analysis_type
     )
 
-    # run the method
+    # run the method. The gRNA precomputations are injected only on the CRT
+    # branch, in the same way as `synthetic_idxs` on the permutation branch: the
+    # two core functions share a single `args_to_pass` list, and the permutation
+    # path draws its resamples without a logistic fit, so it has no gRNA
+    # precomputation to reuse.
     out <- if (sceptre_object@run_permutations) {
         args_to_pass$synthetic_idxs <- synthetic_idxs
         do.call(what = "run_perm_test_in_memory", args = args_to_pass)
     } else {
+        args_to_pass$grna_precomputations <- get_grna_precomputations(
+            sceptre_object
+        )
         do.call(what = "run_crt_in_memory_v2", args = args_to_pass)
     }
 

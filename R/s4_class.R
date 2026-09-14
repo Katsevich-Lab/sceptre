@@ -63,6 +63,7 @@ setClass(
 
         # cached objects
         response_precomputations = "list",
+        grna_precomputations = "list",
 
         # flags
         last_function_called = "character",

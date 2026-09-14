@@ -2,6 +2,8 @@
 
 This release prepares `sceptre` for submission to Bioconductor.
 
+-   The gRNA precomputation is now cached on the `sceptre_object`, in a new `grna_precomputations` slot symmetric with `response_precomputations`. The gRNA precomputation is a logistic regression of the gRNA-presence indicator onto the covariate matrix; it does not depend on the response counts, so analyses that share a set of cells and a set of gRNA assignments now share the fit instead of repeating it. This matters most for workflows that run many analyses over the same assignments while varying only the counts, such as a power simulation. The cache is populated and reused automatically, is reset by `set_analysis_parameters()`, `assign_grnas()`, and `run_qc()`, and applies only when `resampling_mechanism` is `"crt"`. Results are unchanged: the resamples of the conditional randomization test are redrawn on every call as before. Note that any warning the gRNA regression raises (for example, about fitted probabilities numerically equal to zero or one) is now emitted on the call that performs the fit rather than on every call that uses it.
+
 -   On Windows, setting `parallel = TRUE` now raises a clear error explaining that sceptre's parallel mode is unsupported on Windows (it is fork-based). `ondisc`/HDF5 file paths are also normalized to avoid Windows-specific issues.
 
 -   Core detection for parallel processing now uses the `parallelly` package instead of `parallel::detectCores()`, giving more reliable core counts in containers and on computing clusters.
