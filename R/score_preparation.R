@@ -1,6 +1,15 @@
 # Score arrays share one ordered fit-cell view: y/mu/a/w are length n;
 # D is p by n, with design coefficients in rows and fit cells in columns.
 # Keep the legacy arithmetic/eigen decomposition order for numerical parity.
+#' Form the existing score denominator factor without changing eigensystem order
+#'
+#' @param Zt_wZ Numeric symmetric p-by-p design crossproduct.
+#' @param wZ Numeric n-by-p design multiplied rowwise by weights w, not sqrt(w).
+#' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the symmetric
+#'   eigendecomposition. Coefficient rows and fit-cell columns retain caller order.
+#' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced; existing
+#'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are untouched.
+#' @noRd
 compute_D_matrix <- function(Zt_wZ, wZ) {
     P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
     U <- P_decomp$vectors
@@ -10,6 +19,18 @@ compute_D_matrix <- function(Zt_wZ, wZ) {
 }
 
 
+#' Prepare ephemeral score arrays on the nuisance fit's cell view
+#'
+#' @param expression_vector Numeric response vector of length n.
+#' @param covariate_matrix Numeric n-by-p design aligned with the response and fit.
+#' @param fit Compact response record with p `fitted_coefs` in design-column order
+#'   and scalar `theta`, computed for this same fit-cell view.
+#' @param full_test_stat Logical; select the full or legacy reduced score arrays.
+#' @return Full mode: list `mu`, `w`, `a` (length n), `D` (p by n). Reduced mode:
+#'   list `mu`, `a`, `b` (length n), preserving the compatibility wrapper's formulas.
+#' @details Keeps the existing arithmetic and numerical warnings. Does not refit,
+#'   mutate inputs, persist fitted vectors, resample, or access storage/RNG/files.
+#' @noRd
 prepare_score_current <- function(
     expression_vector,
     covariate_matrix,

@@ -1,6 +1,18 @@
 # Current response fitting is Poisson glm.fit plus a clipped dispersion estimate.
 # It does not execute a second NB regression. Keep arithmetic/warnings here;
 # this module has no object, storage, scheduling, or cache responsibilities.
+#' Fit the existing response nuisance model on one aligned cell view
+#'
+#' @param expressions Numeric response vector of length n.
+#' @param covariate_matrix Numeric n-by-p design, ordered with `expressions`;
+#'   callers supply the validated design and select the fit-cell view.
+#' @return Compact list `fitted_coefs` (p coefficients in design-column order) and
+#'   scalar `theta`, clipped to [0.01, 1000] using the existing arithmetic.
+#' @details Fits Poisson `glm.fit`, then estimates dispersion at its fitted means;
+#'   no second negative-binomial regression is performed. Existing fit warnings
+#'   propagate and missing coefficients produce the existing covariate error.
+#'   Does not mutate inputs, cache results, access storage, or use RNG/files.
+#' @noRd
 fit_response_current <- function(expressions, covariate_matrix) {
     pois_fit <- stats::glm.fit(
         y = expressions,
@@ -28,6 +40,17 @@ fit_response_current <- function(expressions, covariate_matrix) {
     return(result)
 }
 
+#' Fit the existing binary assignment model on one aligned cell view
+#'
+#' @param trt_idxs Valid R 1-based design-row positions of treated cells, not source
+#'   columns. Repetitions set the same binary indicator entry to one.
+#' @param covariate_matrix Numeric n-by-p design in the selected fit-cell order.
+#' @param return_fitted_values Logical; return probabilities rather than coefficients.
+#' @return Numeric vector of n fitted probabilities in fit-cell order, or p
+#'   coefficients in design-column order. Uses binomial `glm.fit` with existing
+#'   warnings and coefficient behavior; no additional convergence checks occur.
+#' @details Does not mutate inputs, persist a cache, access storage, or use RNG/files.
+#' @noRd
 fit_assignment_current <- function(
     trt_idxs,
     covariate_matrix,
