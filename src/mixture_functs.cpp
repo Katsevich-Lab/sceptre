@@ -21,7 +21,7 @@ double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
 // Fit each supplied paired (pi, perturbation) start in its original order.
 // The R caller supplies aligned count/Poisson-mean/log-factorial cell vectors
 // and equal-length starting vectors. Inputs are read only; this routine has no
-// RNG or file effects. Keep the existing update arithmetic, probability floor,
+// RNG or file effects. Keep the existing update arithmetic, mixture-density floor,
 // label flip, 3/50 iteration bounds and likelihood-based winner selection.
 // Return cell-order posterior probabilities, the zero-based winning start,
 // convergence flag and likelihood. With no converged winner these remain

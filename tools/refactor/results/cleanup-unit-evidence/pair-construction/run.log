@@ -1,0 +1,9 @@
+/Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB -o 'sourceCpp_2.so' 'pair_construction_functs.cpp' 
+using C++ compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using SDK: ‘MacOSX26.5.sdk’
+clang++ -arch arm64 -std=gnu++20 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/include" -I"/private/tmp/sceptre-b2-pair-probe/source/src" -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2   -c pair_construction_functs.cpp -o pair_construction_functs.o
+clang++ -arch arm64 -std=gnu++20 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -L/Library/Frameworks/R.framework/Resources/lib -L/opt/R/arm64/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/lib -o sourceCpp_2.so pair_construction_functs.o -F/Library/Frameworks/R.framework/.. -framework R
+refactor-pair-construction: .............................................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+Passed 61 candidate-source pair construction checks. This is not installed-source qualification.

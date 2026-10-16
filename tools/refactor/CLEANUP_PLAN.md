@@ -93,6 +93,13 @@ frozen. No methodological repair is hidden in a cleanup.
 | B5 — invalid-input/output policy | Wrong mixture upper-range variable, validator error precedence, broader missing alpha/QC checks, dispersion catch-all masking nonnumerical failures. These differ from the S1/S2 memory-safety prerequisites. | Explicit dispositions below. Preserve numerical fallback arithmetic; characterize failure classes before narrowing catch policy. Additional public rejection/error changes are not a mechanical rename. |
 | B6 — storage/feature asymmetry | Vector-ID in-memory aggregation densifies counts; backed import does not perform the same aggregation. | A sparse replacement may preserve existing in-memory mathematical results, but backed aggregation would change supported behavior. Characterize the actual aggregation/duplicate/output contract and resource profile first; no new backed feature under a cleanup label. |
 
+Subsequent bounded finding B7: independent review of the copy optimization
+reproduced baseline symmetric/near-symmetric dense-input loss. The separate
+[B7 disposition](cleanup/behavior-dispositions.md#b7--subsequently-reproduced-dense-input-conversion-loss)
+records its general-before-sparse correction, source authority, independent
+regressions and dense-only copy-cost measurement. It does not alter the signed
+08e0260 plan bytes or waive the triplet/integrated resource gates.
+
 ## 4. Target design and concrete change paths
 
 Use the existing package/modules. No new classes, backend registry, plugin API,

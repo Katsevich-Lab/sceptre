@@ -1,0 +1,4 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-refactor-pair-construction.R","refactor-pair-construction","cis native positions follow the inclusive predicate in supplied order",33,0,FALSE,FALSE,0,0.027,0.00199999999999999,0.0289999999999999,33
+"test-refactor-pair-construction.R","refactor-pair-construction","public cis construction preserves row order and widens midpoint addition",3,0,FALSE,FALSE,0,0.129,0.00800000000000001,0.137,3
+"test-refactor-pair-construction.R","refactor-pair-construction","trans exclusion owns caller tables and retains product order and class",25,0,FALSE,FALSE,0,0.0289999999999999,0.001,0.0299999999999998,25

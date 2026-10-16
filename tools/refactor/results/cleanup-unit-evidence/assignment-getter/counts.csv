@@ -1,0 +1,2 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-refactor-assignment-getter.R","refactor-assignment-getter","assignment getter owns zero-based slots and preserves saved memberships",24,0,FALSE,FALSE,0,0.0439999999999999,0.009,0.053,24

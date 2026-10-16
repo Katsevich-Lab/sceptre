@@ -172,6 +172,150 @@
     "sceptre-dispersion-fault-proof-ef0c77b.log": {
       "origin": "/private/tmp/sceptre-dispersion-fault-proof-ef0c77b.log",
       "sha256": "f11d89acfa82423566ef2ab54058c30ecfb8f9481fce3fa524d75f32915df086"
+    },
+    "pair-construction/source-manifest.json": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/source-manifest.json",
+      "sha256": "17529260c74d461098a37effea1c6a803b75007c5abd98958d8984405b6d8648"
+    },
+    "pair-construction/compare-trans.R": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/compare-trans.R",
+      "sha256": "4f40f57cce639363c0ca16dc146a7b0c6a7ebc59f50101ffbcbdb77577c77c47"
+    },
+    "pair-construction/run.log": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/run.log",
+      "sha256": "accaf4b89b87610ef6c0150d81ec73401f077dfd73f93a688f7cf0702aef73b1"
+    },
+    "pair-construction/original.R": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/original.R",
+      "sha256": "8c49527b9d02c33273a5b337832947d7404c4e6b0c2ece62d05a869f5dcfb944"
+    },
+    "pair-construction/expected-attributes-attempt.log": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/expected-attributes-attempt.log",
+      "sha256": "966da91e29a3af5cc620b91b18c637776605820c2311eb09d3ef39ae2bd09fba"
+    },
+    "pair-construction/counts.csv": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/counts.csv",
+      "sha256": "ee82fd623125fc3b0fc28ec164f1a152c7c346410ab0dd71958ef2b599d98f3e"
+    },
+    "pair-construction/README.md": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/README.md",
+      "sha256": "0f4ea4190d1aeca81ce3907bc71dbd3467e142423652566ddeaa977e0a112396"
+    },
+    "pair-construction/results.rds": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/results.rds",
+      "sha256": "4bd4b10c43e0bd9eb322a5a880e0f90bef8416746119a707564f4fc31b557d55"
+    },
+    "pair-construction/compare-trans.log": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/compare-trans.log",
+      "sha256": "d8ee06520ded8e0232e625254686b14a268b6f8f1cd218fcb919b47dea5770f4"
+    },
+    "pair-construction/run.R": {
+      "origin": "/private/tmp/sceptre-b2-pair-probe/run.R",
+      "sha256": "3f94a9dd605b52a2b6753b35caf5b1c8a766aeb71c497e691fe4e3a4ae1c8e36"
+    },
+    "assignment-getter/compare.log": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/compare.log",
+      "sha256": "f8a3daeb62114c09828c822573b567cd61b6dc32a98ef8e502897a85554e22bf"
+    },
+    "assignment-getter/run.log": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/run.log",
+      "sha256": "ec0bdcc83d86e8b39eb69ef5896ffbea2c0a258089aae7e67681c3b33770ee1e"
+    },
+    "assignment-getter/original.R": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/original.R",
+      "sha256": "a6585eb117cdc76d7c64eac746b17a117a938a261d652742674b191d23653d70"
+    },
+    "assignment-getter/counts.csv": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/counts.csv",
+      "sha256": "dae3f9a55d2aca8edd886bfca979fe1ec8e362caa47ebb6b77c2bfacfb9b8006"
+    },
+    "assignment-getter/invalid-fixture-attempt.log": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/invalid-fixture-attempt.log",
+      "sha256": "4cbc012b5010b86eaec080f00c881658c07d359bd8002461316e3ed289aaf3e4"
+    },
+    "assignment-getter/README.md": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/README.md",
+      "sha256": "44b6db95362bfc420b1e570863a76b8bec2b4ced4fab2fd6f2221391b18cccc7"
+    },
+    "assignment-getter/compare.R": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/compare.R",
+      "sha256": "6139106d46e7530aa00af0bd1fb40131a1f5174feef240cde9317ecb99ba2a2b"
+    },
+    "assignment-getter/results.rds": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/results.rds",
+      "sha256": "70ad6a3da33cfb95a3a7169e78f126069b5741c59b381619e98510048d880f53"
+    },
+    "assignment-getter/run.R": {
+      "origin": "/private/tmp/sceptre-assignment-getter-probe/run.R",
+      "sha256": "87988434e05ee4037d74766d78e239e4b5e8750eda512bbe94a139998c736954"
+    },
+    "sceptre-ci-0b6ae38-dispersion-policies.json": {
+      "origin": "/private/tmp/sceptre-ci-0b6ae38-dispersion-policies.json",
+      "sha256": "bf57e11b941417c625f13d4b4204638570d9f2934337af4bc853618e58ca8edd"
+    },
+    "sceptre-mixture-contract-identity.json": {
+      "origin": "/private/tmp/sceptre-mixture-contract-identity.json",
+      "sha256": "5ef9c85720f6dc313bba6941175ee25379b168e5a830c37f69858bbf382dae1c"
+    },
+    "symmetric-dense-reproduction/candidate.rds": {
+      "origin": "/private/tmp/sceptre-symmetric-dense-review/candidate.rds",
+      "sha256": "4aa1a5787dceb405ef099d5cf157834a7a4df5a8eced043aaf553e3e7d376660"
+    },
+    "symmetric-dense-reproduction/candidate.log": {
+      "origin": "/private/tmp/sceptre-symmetric-dense-review/candidate.log",
+      "sha256": "72a6b9e464a8a8736e94d130ea684feb12a9905e63dd4c7b81461c543bc775be"
+    },
+    "symmetric-dense-reproduction/original.log": {
+      "origin": "/private/tmp/sceptre-symmetric-dense-review/original.log",
+      "sha256": "72a6b9e464a8a8736e94d130ea684feb12a9905e63dd4c7b81461c543bc775be"
+    },
+    "symmetric-dense-reproduction/original.rds": {
+      "origin": "/private/tmp/sceptre-symmetric-dense-review/original.rds",
+      "sha256": "4174a0018af45d23e9024028f1f79c48d6fd46e579f4e0bda79890cf6bb5cdb8"
+    },
+    "symmetric-dense-reproduction/run.R": {
+      "origin": "/private/tmp/sceptre-symmetric-dense-review/run.R",
+      "sha256": "dfb27982436fc5798df23dd3c79fc1d8ccbf85a831b5fa02796f32de4f6cf574"
+    },
+    "cl2-owned-columns/preparation.json": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/preparation.json",
+      "sha256": "327e0f4687b9aff848bc777076e2bdd9c0fa7ee13c2e977788465ed2e3c3c6b4"
+    },
+    "cl2-owned-columns/qualification-summary.json": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/qualification-summary.json",
+      "sha256": "934b44cd9c2afc2fc1376ed0a421a7633d13e89d6d94034682ad9047b3c9db0e"
+    },
+    "cl2-owned-columns/install.sh": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/install.sh",
+      "sha256": "d5421bd031bba8c901eaf6c3fa4f9f52864fb7aca69eabc09ed6f623d2d72ca6"
+    },
+    "cl2-owned-columns/focused-results.rds": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/focused-results.rds",
+      "sha256": "efaee3c29d15666e04b1d44b82f9deb9ee1ccbe7478770dd03d60409e0d78a65"
+    },
+    "cl2-owned-columns/focused.R": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/focused.R",
+      "sha256": "227e78f78bb3872eb3896fb353ef13e9f1cd1c6a944bff9854f7d46801a20eb3"
+    },
+    "cl2-owned-columns/focused-summary.json": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/focused-summary.json",
+      "sha256": "84f49fe34a7ba71d7f038400b0a079b214232d1e7b35da2469e4ee9fd92ca73b"
+    },
+    "cl2-owned-columns/install.log": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/install.log",
+      "sha256": "03f412839041205cf5211223a2278eb35131613a63b77afe07b560d08c6db2c3"
+    },
+    "cl2-owned-columns/focused.log": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/focused.log",
+      "sha256": "0318726dac1e1ea8db51e7ca60280289121e742f1b3c710aac52b8002d29f7b0"
+    },
+    "cl2-owned-columns/build.json": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/build.json",
+      "sha256": "63c1b4a52b809f150f51dbdd4afc130c0a8ecad6fb7499bf1dbf078c947ba8e8"
+    },
+    "cl2-owned-columns/focused-counts.csv": {
+      "origin": "/private/tmp/sceptre-cl2-owned-columns-pt5gsi1r/focused-counts.csv",
+      "sha256": "772291092887d123c91ef2a7468f21af6659e97b03393fa8f86796b364af87b0"
     }
   }
 }

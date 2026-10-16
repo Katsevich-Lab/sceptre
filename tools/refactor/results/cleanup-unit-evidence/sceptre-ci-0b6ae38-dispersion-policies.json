@@ -1,0 +1,127 @@
+[
+  {
+    "lane": "native-boundaries-macOS-latest-release",
+    "policy": {
+      "double_radix": 2,
+      "double_digits": 53,
+      "effective_precision": 53,
+      "evaluation_is_long_double": true,
+      "evaluation_digits": 53,
+      "domain": 0,
+      "pole": 0,
+      "overflow": 0,
+      "underflow": 2,
+      "denorm": 2,
+      "throw_on_error": 0,
+      "ignore_error": 2
+    },
+    "headers": ["0f0006710174f5bd9bacb6bdd860cf512282124f19c621877741822c9c135375", "5e814d688c6450caa45e4e18934dd9e713d49204800be7829b8f9d5091096e03", "9c51bf9e313062f50cb9b21e2a29e9c9210f27eb9689003b38a40e2552f9cb0f", "b1ae9e027ad15523504cc669a2f6de18edf0920cb3e3be9276923ed4c64d1ad4"],
+    "dependencies": {
+      "BH": "1.90.0.1",
+      "Rcpp": "1.1.2"
+    },
+    "numerical_cases": 107,
+    "controlled_pairs": 14,
+    "scope": "Fresh test-only compilation of actual source, not installed-package or universal exception qualification."
+  },
+  {
+    "lane": "native-boundaries-ubuntu-latest-oldrel-1",
+    "policy": {
+      "double_radix": 2,
+      "double_digits": 53,
+      "effective_precision": 53,
+      "evaluation_is_long_double": true,
+      "evaluation_digits": 64,
+      "domain": 0,
+      "pole": 0,
+      "overflow": 0,
+      "underflow": 2,
+      "denorm": 2,
+      "throw_on_error": 0,
+      "ignore_error": 2
+    },
+    "headers": ["0f0006710174f5bd9bacb6bdd860cf512282124f19c621877741822c9c135375", "5e814d688c6450caa45e4e18934dd9e713d49204800be7829b8f9d5091096e03", "9c51bf9e313062f50cb9b21e2a29e9c9210f27eb9689003b38a40e2552f9cb0f", "b1ae9e027ad15523504cc669a2f6de18edf0920cb3e3be9276923ed4c64d1ad4"],
+    "dependencies": {
+      "BH": "1.90.0.1",
+      "Rcpp": "1.1.2"
+    },
+    "numerical_cases": 107,
+    "controlled_pairs": 14,
+    "scope": "Fresh test-only compilation of actual source, not installed-package or universal exception qualification."
+  },
+  {
+    "lane": "native-boundaries-ubuntu-latest-release",
+    "policy": {
+      "double_radix": 2,
+      "double_digits": 53,
+      "effective_precision": 53,
+      "evaluation_is_long_double": true,
+      "evaluation_digits": 64,
+      "domain": 0,
+      "pole": 0,
+      "overflow": 0,
+      "underflow": 2,
+      "denorm": 2,
+      "throw_on_error": 0,
+      "ignore_error": 2
+    },
+    "headers": ["0f0006710174f5bd9bacb6bdd860cf512282124f19c621877741822c9c135375", "5e814d688c6450caa45e4e18934dd9e713d49204800be7829b8f9d5091096e03", "9c51bf9e313062f50cb9b21e2a29e9c9210f27eb9689003b38a40e2552f9cb0f", "b1ae9e027ad15523504cc669a2f6de18edf0920cb3e3be9276923ed4c64d1ad4"],
+    "dependencies": {
+      "BH": "1.90.0.1",
+      "Rcpp": "1.1.2"
+    },
+    "numerical_cases": 107,
+    "controlled_pairs": 14,
+    "scope": "Fresh test-only compilation of actual source, not installed-package or universal exception qualification."
+  },
+  {
+    "lane": "native-boundaries-windows-latest-release",
+    "policy": {
+      "double_radix": 2,
+      "double_digits": 53,
+      "effective_precision": 53,
+      "evaluation_is_long_double": true,
+      "evaluation_digits": 64,
+      "domain": 0,
+      "pole": 0,
+      "overflow": 0,
+      "underflow": 2,
+      "denorm": 2,
+      "throw_on_error": 0,
+      "ignore_error": 2
+    },
+    "headers": ["0f0006710174f5bd9bacb6bdd860cf512282124f19c621877741822c9c135375", "5e814d688c6450caa45e4e18934dd9e713d49204800be7829b8f9d5091096e03", "9c51bf9e313062f50cb9b21e2a29e9c9210f27eb9689003b38a40e2552f9cb0f", "b1ae9e027ad15523504cc669a2f6de18edf0920cb3e3be9276923ed4c64d1ad4"],
+    "dependencies": {
+      "BH": "1.90.0.1",
+      "Rcpp": "1.1.2"
+    },
+    "numerical_cases": 107,
+    "controlled_pairs": 14,
+    "scope": "Fresh test-only compilation of actual source, not installed-package or universal exception qualification."
+  },
+  {
+    "lane": "native-boundaries-without-ondisc",
+    "policy": {
+      "double_radix": 2,
+      "double_digits": 53,
+      "effective_precision": 53,
+      "evaluation_is_long_double": true,
+      "evaluation_digits": 64,
+      "domain": 0,
+      "pole": 0,
+      "overflow": 0,
+      "underflow": 2,
+      "denorm": 2,
+      "throw_on_error": 0,
+      "ignore_error": 2
+    },
+    "headers": ["0f0006710174f5bd9bacb6bdd860cf512282124f19c621877741822c9c135375", "5e814d688c6450caa45e4e18934dd9e713d49204800be7829b8f9d5091096e03", "9c51bf9e313062f50cb9b21e2a29e9c9210f27eb9689003b38a40e2552f9cb0f", "b1ae9e027ad15523504cc669a2f6de18edf0920cb3e3be9276923ed4c64d1ad4"],
+    "dependencies": {
+      "BH": "1.90.0.1",
+      "Rcpp": "1.1.2"
+    },
+    "numerical_cases": 107,
+    "controlled_pairs": 14,
+    "scope": "Fresh test-only compilation of actual source, not installed-package or universal exception qualification."
+  }
+]

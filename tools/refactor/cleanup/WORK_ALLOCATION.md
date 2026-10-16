@@ -67,6 +67,13 @@ sampler/inference names change in this unit. The count lane's current immutable
 resource sources are untouched; later native retirement adopts this binding
 checkpoint before regenerating the rest.
 
+Root also owns the completed assignment-getter caller migration at 09a704c and
+the contract-only native mixture change at 5875e22. Native retirement adopts
+the former before deleting increment_vector and excludes the latter file,
+along with root-owned compute_nb_size_param_functions.cpp, from parallel edits.
+The B6 resource window and the native dense/triplet experiments run sequentially;
+other lanes may prepare source or small reports while each quiet window is held.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current

@@ -1,0 +1,60 @@
+{
+  "scope": "Completed initial experiment with four large memory crossings; no resource acceptance or exception. Large fixtures, returned sparse objects and allocation traces remain external with hashes in the complete summary/plan.",
+  "files": {
+    "summary.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/summary.json",
+      "sha256": "ceeb98227660dc20c4a6da3d47c298355b473bcd94081f3bf1fe7de3dd502f34",
+      "bytes": 3164423
+    },
+    "summary.md": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/summary.md",
+      "sha256": "9f8c3dbd663cce536b30034a57d6ef02d004f985e3f56c302830f90e0cc212b8",
+      "bytes": 2119
+    },
+    "plan.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/plan.json",
+      "sha256": "4a01e86e6b4187a42b9f5f69862965e46d70b7fc28588681232ffda94b8be02f",
+      "bytes": 39373
+    },
+    "correctness.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/correctness.json",
+      "sha256": "23b5e247a5c1485216b0a64b9357be2d91a62ebd3394389d89e6139304d6897c",
+      "bytes": 105836
+    },
+    "prepare-host-memory.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/prepare-host-memory.json",
+      "sha256": "f34d89764401567d3deebdbf7ace8f986ed9cfc9b07c8a9128008b54d871bcd2",
+      "bytes": 2004
+    },
+    "correctness-host-memory.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/correctness-host-memory.json",
+      "sha256": "2a07fb5f94efa32ef86681a6516a63ab5cdfd4464292676259cc66ec824e3b10",
+      "bytes": 2004
+    },
+    "measure-host-memory.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/measure-host-memory.json",
+      "sha256": "9bacbc9d91ca214dcf6d129a3982c0501ab51b59e619a6b5256d6022e397fe5b",
+      "bytes": 2004
+    },
+    "large-case-scaling-check.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/large-case-scaling-check.json",
+      "sha256": "ed20e65d4a429e60a8b1de28b4eefcea920c80483b62b2f5ed7be235c9cf818d",
+      "bytes": 15298
+    },
+    "fixture-preparation.memory.json": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/fixture-preparation.memory.json",
+      "sha256": "db37215a0ab48193a86aa6699a7d4e95fd0886b46479862863927e3e57b1e382",
+      "bytes": 19023
+    },
+    "fixture-preparation.time.log": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/fixture-preparation.time.log",
+      "sha256": "4da59ef885848035f0a1a63c4d2e13db366a3f3002d206302960ef30e60a5b69",
+      "bytes": 777
+    },
+    "clock-build.log": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/clock-build.log",
+      "sha256": "628ef8123fcc1b6f6365b773bb2d57f9751f90435b394fc388f448ea780a104a",
+      "bytes": 839
+    }
+  }
+}

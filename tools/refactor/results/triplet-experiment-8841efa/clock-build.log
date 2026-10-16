@@ -1,0 +1,4 @@
+using C compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using SDK: ‘MacOSX26.5.sdk’
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c /private/tmp/sceptre-triplet-qualified-8841efa/triplet-clock.c -o /private/tmp/sceptre-triplet-qualified-8841efa/triplet-clock.o
+clang -arch arm64 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -L/Library/Frameworks/R.framework/Resources/lib -L/opt/R/arm64/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/lib -o /private/tmp/sceptre-triplet-qualified-8841efa/triplet-clock.so /private/tmp/sceptre-triplet-qualified-8841efa/triplet-clock.o -F/Library/Frameworks/R.framework/.. -framework R

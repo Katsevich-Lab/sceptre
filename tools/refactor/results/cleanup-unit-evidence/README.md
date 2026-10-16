@@ -17,3 +17,10 @@ CL3 and legacy reports identify their fresh original oracles, source/DLL pins,
 counts and pre-final/pre-allocation-remedy limits. Nothing here relabels an old
 resource/consumer report as final evidence. The manifest binds copied bytes to
 their original temporary paths.
+
+The pair-construction and assignment-getter folders preserve separate
+candidate-source probes, exact original comparisons and their test-only setup
+failures. They do not qualify a final installed package. The five hosted
+dispersion-policy readbacks are from 0b6ae38's completed native steps; that
+workflow's unrelated Windows progress assertions failed. The policy records
+do not turn the whole run into a passing package check.

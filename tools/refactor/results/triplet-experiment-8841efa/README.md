@@ -1,0 +1,5 @@
+# Initial triplet ownership experiment, 8841efa
+
+The complete predeclared experiment finished: 16 correctness children/eight exact comparisons, 16 warmups, 64 primary measured children, 16 allocation profiles and 32 five-conversion batch children. No safety stop occurred. All outputs match the original and all candidate caller inputs remain unchanged. Single calls are below one second and inconclusive; all four meaningful batch timing gates pass. All four 8M-entry settings exceed both memory gates (whole-child increases 111–125 MiB). The four 1M-entry settings pass memory gates.
+
+This report is a completed experiment, not resource acceptance. No correctness-cost exception is approved. The complete unchanged summary preserves every warmup, trial, profile summary, RSS trace, correctness result and build/fixture/tool hash. Large binary inputs/outputs and raw allocation profiles remain in the named external directory with hashes retained here. A separately source-reviewed static ownership optimization must be remeasured on its own immutable build; it does not replace these initial observations or waive integrated sparse/backed resource gates.

@@ -1,0 +1,24 @@
+refactor-assignment-getter: ...1.2
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test-refactor-assignment-getter.R:18:9'): assignment getter owns
+Expected `full@p` to be identical to `c(0L, cumsum(lengths(assignments)))`.
+Differences:
+`names(actual)` is absent
+`names(expected)` is a character vector ('', 'single')
+
+
+── 2. Error ('test-refactor-assignment-getter.R:22:9'): assignment getter owns z
+Error in `..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])`: invalid class "ngRMatrix" object: 'j' slot is not increasing within rows
+Backtrace:
+    ▆
+ 1. └─sceptre::get_grna_assignments(object, apply_cellwise_qc = TRUE) at test-refactor-assignment-getter.R:22:9
+ 2.   ├─mat[, sceptre_object@cells_in_use]
+ 3.   └─mat[, sceptre_object@cells_in_use]
+ 4.     └─Matrix:::.subscript.2ary(x, , j, drop = TRUE)
+ 5.       └─Matrix:::..subscript.2ary(x, l[[1L]], l[[2L]], drop = drop[1L])
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+No one gets it right on their first try
+Error: sum(d$failed) == 0 is not TRUE
+Execution halted

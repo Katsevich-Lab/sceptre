@@ -1,6 +1,6 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; count ownership repaired, resource qualification running.**
+**Active, incomplete; bounded cleanup and resource qualification continue.**
 Integration branch: `codex/refactor`, integration checkpoint
 `20945f0` includes the reviewed count allocation remedy; later bounded legacy
 plot/validation/assignment units are also integrated. Final acceptance is open.
@@ -73,7 +73,14 @@ scratch destructors. The explicit review amendment supersedes that part of the
 first closure. The narrow phase-order remedy at `8841efa` (integrated as
 `20945f0`) has independent source closure, 1,065 installed expectations in 50
 blocks and 214 controlled error/success cases plus an unsafe-order negative
-control. The exact-source triplet resource study is now running. Fresh
+control. The first complete exact-source triplet study is retained at 8841efa.
+All eight returned outputs match exactly and candidate inputs remain unchanged;
+all four large five-conversion timing gates pass. All four large settings exceed
+both memory gates (whole-process increases of 111–125 MiB), while small settings
+pass. The [unchanged complete experiment](results/triplet-experiment-8841efa/summary.md)
+is not resource acceptance. A source-static
+copy reduction at da6a079 passed 1,095 installed checks; its resource rerun is
+pending. Fresh
 pre-correction release builds remain separately labeled; no cost exception is
 approved and initial large-setting memory crossings are preserved.
 The indexing-test handoff to CL3 is complete. CL3 (`627e7e4`) passed 1,006
@@ -88,14 +95,32 @@ per Eugene's choice. Installed-source qualification is pending; sparse sorting
 workspace is unmeasured. The externally delegated ondisc file parser is unchanged
 and unqualified for this policy. See the explicit boundary in decisions.md.
 B6 characterization
-has 28 exact helper and 200 exact rounding matches, plus public import probes;
-resource qualification remains required. Dispersion taxonomy has 107 exact
+has 28 exact helper and 200 exact rounding matches, plus public import probes.
+The sparse-input candidate 88ed37c passed all 228 installed comparisons and 134
+focused checks; the separately scheduled representative resource gate remains
+required. Dense output, metadata multiplicity and backed capability are unchanged.
+Dispersion taxonomy has 107 exact
 original-state comparisons. The two-type narrowing at `ef0c77b` passed 107
 actual-source numerical comparisons and 14 paired controlled MLE/MM failure
 cases, including partial-state and unrelated failure propagation, plus
 independent source/proof review. Installed-package and hosted platform-policy
 evidence remain required. File-lifetime `abf7245` has 12 source-evaluated
 regressions and independent review; installed-source qualification is pending.
+
+B2/O1 at 2f40f4f has 61 independent candidate-source checks and six exact complete
+old/new trans outputs. It repairs unsorted cis selection and wide midpoint
+arithmetic, and owns trans exclusion tables. Getter 09a704c has 24 independent
+source checks and six exact original comparisons, replacing the final vector
+offset caller with owned R arithmetic. Independent source review found no
+material issue; final combined installed-source qualification remains open. Their initial test-only
+fixture/attribute mismatches are retained in the unit evidence.
+
+The legacy plotting source review and its held tiny old/new runtime comparison
+are complete: theme, layer data and appearance settings match in both MOI
+fixtures. A separate newly found dense symmetric/near-symmetric conversion loss
+has a reproduced P2 disposition: use supported general conversion before
+sparsification to retain all supplied values, then measure its dense-input-only
+copy cost. It is not folded into the qualified triplet-copy checkpoint.
 
 ## Completed qualification, pinned to earlier source
 

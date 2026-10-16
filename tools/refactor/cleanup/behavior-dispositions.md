@@ -33,6 +33,29 @@ scientific, duplicate-policy, or backend-capability choices.
 | **B5 — diagnostics and fallback policy.** Wrong mixture-range variable, validator precedence/gaps, success-only connection closure, and catch-all dispersion exceptions differ in scope. | **Adopted:** compare the perturbation upper bound to `g_pert_guess_range`; guarantee owned Matrix Market connection cleanup. **Conditionally adopted in this cleanup:** replace the blanket dispersion catch after actual exception/state characterization, preserving numerical suppression while allowing unrelated allocation/system exceptions to propagate. **Deferred:** broad public validation/error precedence and a new numerical fallback policy. | T6/T7/T12. Enumerate numerical exception types from executed BH/Rcpp paths and preserve each existing returned estimate/method state, MLE/MM/pilot arithmetic, iteration order, clipping and warnings. Do not infer the taxonomy from passing normal fixtures. If numerical and unrelated failures cannot be separated without a policy choice, record the concrete conflict and stop that correction. No invented estimator, candidate-rate floor, fallback probability, or method-label correction. S1/S2 safety checks below are adopted separately. |
 | **B6 — vector aggregation.** `collapse_grna_matrix()` materializes the R input densely; the R-backed import path does not provide the same vector aggregation. | **Conditionally adopted in this cleanup:** characterize/profile the existing **in-memory** operation, then replace full-input densification with bounded sparse aggregation after T11 establishes contract/resource parity. **Deferred capability:** backed aggregation. | Preserve the current returned dense matrix class, first-seen vector/cell order, metadata-duplicate multiplicity and numerical behavior. Removing avoidable full-assay densification is engineering work in scope; no present profile or speed/RSS improvement is claimed. A conflicting duplicate/rounding contract requires a concrete decision, not silent normalization. Sparse output/backed capability is not implicitly authorized. |
 
+## B7 — subsequently reproduced dense-input conversion loss
+
+Independent source review of da6a079 reproduced an existing P2 in both the
+original 21f9ea0 package and the candidate: a valid same-label symmetric dense
+matrix loses its lower triangle when automatic structured triplet storage is
+copied into a general sparse result. A tolerance-near-symmetric input also loses
+its supplied lower value. The safe 2-by-2 direct/public-import reproductions and
+source-pinned alternatives are retained in
+[the separate disposition](implementation-reviews/sceptre-symmetric-dense-disposition.md).
+This addition does not rewrite the original audit or its signed plan artifact.
+
+**Adopted bounded engineering correction:** force general shape through public
+Matrix coercion before sparsification, preserving every supplied dense value
+and dimname. No new method, missing-value definition, class registry or backed
+capability is introduced. Do not use deprecated direct dgT coercion, private
+Matrix API or invalid hand-built slots to evade allocation. Sparse/backed inputs
+must never densify. Qualify symmetric/near-symmetric direct and public paths
+against independent intended values; ordinary rectangular/triangular/integer
+cases retain exact output and caller nonmutation. Measure the supported public
+route's additional dense-input-only payload copy on matched immutable builds;
+retain all attempts and distinguish an explicit reviewed correctness cost from
+a general resource-gate pass. Triplet and integrated resource gates stay separate.
+
 ## Complete L01–L20 ledger
 
 The source findings remain as recorded in `legacy-findings.json`. This table
