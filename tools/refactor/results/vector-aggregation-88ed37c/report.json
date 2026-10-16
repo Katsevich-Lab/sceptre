@@ -1,0 +1,1009 @@
+{
+  "schema_version": 1,
+  "observed_utc": "2026-10-16T17:28:23.848603+00:00",
+  "scope": "B6/T11 conditional sparse vector-aggregation acceptance, not final integrated refactor qualification.",
+  "candidate_commit": "88ed37cd199c642edd0ba0c008ab507bab01d10f",
+  "base_commit": "7df5ad1b164b00ae45f91a0ded3085c45764a8ca",
+  "reference_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_import_blob": "5439e3daef59b58512ae588d4858a332d41aab64",
+  "source_tool_order": [
+    "3a013c6c5077cf774a457bd7394a317293abf907",
+    "88ed37cd199c642edd0ba0c008ab507bab01d10f"
+  ],
+  "original_and_candidate_release_compile_prefix_identical": true,
+  "exact_characterization": {
+    "frozen_cases": 28,
+    "independently_generated_rounding_duplicate_cases": 200,
+    "installed_total": 228,
+    "exact_output_equality": true,
+    "reference_and_candidate_input_nonmutation": true,
+    "authority": "Separate installed namespaces; stopifnot identical outputs and generated input digest in focused runner. No historical fixture regenerated."
+  },
+  "focused_checks": [
+    {
+      "file": "test-refactor-vector-aggregation.R",
+      "tests": 3,
+      "expectations": 71,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0,
+      "_row": "test-refactor-vector-aggregation.R"
+    },
+    {
+      "file": "test-refactor-import-coordinates.R",
+      "tests": 4,
+      "expectations": 46,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0,
+      "_row": "test-refactor-import-coordinates.R"
+    },
+    {
+      "file": "test-import_functs.R",
+      "tests": 8,
+      "expectations": 17,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0,
+      "_row": "test-import_functs.R"
+    }
+  ],
+  "complete_resource_attempts": 1,
+  "children_by_mode": {
+    "batch": 32,
+    "correctness": 8,
+    "profile": 8,
+    "timing": 32
+  },
+  "children_total": 80,
+  "all_80_environment_equal": true,
+  "all_80_inputs_unchanged": true,
+  "all_80_warnings_empty": true,
+  "all_80_input_file_and_object_hashes_match": true,
+  "all_80_output_structures_equal_within_case": true,
+  "fixed_threads_workers": {
+    "OMP_NUM_THREADS": 1,
+    "OPENBLAS_NUM_THREADS": 1,
+    "MKL_NUM_THREADS": 1,
+    "VECLIB_MAXIMUM_THREADS": 1,
+    "data_table": 1,
+    "workers": 1,
+    "forks": 0
+  },
+  "R_MAX_VSIZE": "1536M",
+  "RSS_sample_stop_bytes": 2147483648,
+  "headroom_proxy_floor_bytes": 8589934592,
+  "minimum_observed_headroom_proxy_bytes": 20659716096,
+  "coordinated_quiet_window": "Root and native/count owner explicitly held competing R jobs; this does not guarantee no unrelated host activity.",
+  "environment": {
+    "R": "R version 4.6.0 (2026-04-24)",
+    "platform": "aarch64-apple-darwin23",
+    "external": {
+      "zlib": "1.2.12",
+      "bzlib": "1.0.8, 13-Jul-2019",
+      "xz": "5.8.3",
+      "libdeflate": "1.25",
+      "zstd": "1.5.7",
+      "PCRE": "10.47 2025-10-21",
+      "ICU": "78.1",
+      "TRE": "TRE 0.8.0 R_fixes (BSD)",
+      "iconv": "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib",
+      "readline": "5.2",
+      "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+    },
+    "RNG": [
+      "Mersenne-Twister",
+      "Inversion",
+      "Rejection"
+    ],
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "data_table_threads": 1,
+    "dependencies": {
+      "Matrix": {
+        "version": "1.7.5",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix",
+        "DESCRIPTION_sha256": "4d13869ae07f7f76271990b26ac14b729c81b028267f852d0843a28b39d53105",
+        "binary_sha256": {
+          "libs/Matrix.so": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38",
+          "libs/Matrix.so.dSYM/Contents/Resources/DWARF/Matrix.so": "65100716c14649b0520b9cfd3be37afe3b9579e3c2e3c2d21dc05a6fca6eb810"
+        }
+      },
+      "dplyr": {
+        "version": "1.2.1",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/dplyr",
+        "DESCRIPTION_sha256": "ba5ea66f3ccbb8d27db08041f18e32ce35152e7175c8c9206e7c3de25fc09fbb",
+        "binary_sha256": {
+          "libs/dplyr.so": "41f1c6cc3d9976013a4b99523b4a97997bc45fc3cf6457cf1659f4918974a260",
+          "libs/dplyr.so.dSYM/Contents/Resources/DWARF/dplyr.so": "4d8defa2abb0db0e49283611c6affd762db550a174c8271f711b791d7c045773"
+        }
+      },
+      "data.table": {
+        "version": "1.18.4",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table",
+        "DESCRIPTION_sha256": "fca5a7a7af4d83286b8a64daaa6a37f741ae5c768960019a14350bf8079702c1",
+        "binary_sha256": {
+          "libs/data_table.so": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe",
+          "libs/data_table.so.dSYM/Contents/Resources/DWARF/data_table.so": "c835188f2baf201ac6eba3d6bc91881414ab6614cbfaee6c7926b0844e349758"
+        }
+      },
+      "Rcpp": {
+        "version": "1.1.1.1.1",
+        "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp",
+        "DESCRIPTION_sha256": "8ad26337e3e27ccb2ec8028aee6444f71581445f8a4dc8157f4ec79a11b3d78b",
+        "binary_sha256": {
+          "libs/Rcpp.so": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f",
+          "libs/Rcpp.so.dSYM/Contents/Resources/DWARF/Rcpp.so": "a89cc3ccbd4fa5f2bb55dae2f379ceb91b3e0d0f3bd3312e43c8012f6160a6bb"
+        }
+      },
+      "BH": {
+        "version": "1.90.0.1",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BH",
+        "DESCRIPTION_sha256": "9c530a98231c1cb2269ca5f6928f55ed63c3bf6300c04907431630a70b9e4ff4",
+        "binary_sha256": {}
+      },
+      "ondisc": {
+        "version": "1.3.5",
+        "path": "/private/tmp/sceptre-rf0-ondisc-library/ondisc",
+        "DESCRIPTION_sha256": "d26c509065b734ed09a42d9e5a983e6080ddec39a8ba46f47ea82925e90cfc21",
+        "binary_sha256": {
+          "libs/ondisc.so": "876191bbd08aaab169838b0e7073696070c8a12278e087c4e5e4bd949e090e6f"
+        }
+      },
+      "digest": {
+        "version": "0.6.39",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest",
+        "DESCRIPTION_sha256": "d1e1b06b9c0efa3f1f5ed36d91782952fc804bd1d4693593344f5c82cd287873",
+        "binary_sha256": {
+          "libs/digest.so": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d",
+          "libs/digest.so.dSYM/Contents/Resources/DWARF/digest.so": "9ae2453952bbc8cbd04fe3b6746e63289e8573c915551b30cbd9038c57aae53a"
+        }
+      },
+      "jsonlite": {
+        "version": "2.0.0",
+        "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite",
+        "DESCRIPTION_sha256": "641e6035925d81d915dddfbac2e2f51f5c30c5389aeb9a4a65342d09f2a9c33a",
+        "binary_sha256": {
+          "libs/jsonlite.so": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc",
+          "libs/jsonlite.so.dSYM/Contents/Resources/DWARF/jsonlite.so": "d590cceb61987b67ac30ffcbaac3242dcf7bc5b4159cfcf8855d2069bb78830a"
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "case": "large_numeric_C",
+      "exact_output_bytes": true,
+      "environment_equal": true,
+      "single": {
+        "reference": {
+          "median_elapsed_seconds": 1.281,
+          "max_os_peak_rss_bytes": 1440890880,
+          "median_os_peak_rss_bytes": 1420574720,
+          "max_sampled_active_peak_rss_bytes": 1379893248,
+          "min_active_samples": 36,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 0.847,
+          "max_os_peak_rss_bytes": 643416064,
+          "median_os_peak_rss_bytes": 637747200,
+          "max_sampled_active_peak_rss_bytes": 630407168,
+          "min_active_samples": 25,
+          "measured_trials": 3
+        }
+      },
+      "timing": {
+        "reference": {
+          "median_elapsed_seconds": 20.912,
+          "max_os_peak_rss_bytes": 1724317696,
+          "median_os_peak_rss_bytes": 1708720128,
+          "max_sampled_active_peak_rss_bytes": 1712029696,
+          "min_active_samples": 608,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 12.353,
+          "max_os_peak_rss_bytes": 785727488,
+          "median_os_peak_rss_bytes": 783204352,
+          "max_sampled_active_peak_rss_bytes": 773390336,
+          "min_active_samples": 370,
+          "measured_trials": 3
+        }
+      },
+      "timing_source": "sum of20 independently loaded conversion intervals; single-call RSS remains primary",
+      "elapsed_ratio": 0.5907134659525631,
+      "timing_gate": "pass",
+      "memory_gate": "pass",
+      "sampled_active_gate": "pass",
+      "fixture": {
+        "name": "large_numeric_C",
+        "file": "large_numeric_C.rds",
+        "sha256": "d93046561e0d75b99b5d7ce2e2520e90283cda2e6842ddfdde5cbc0a33858fef",
+        "recipe": {
+          "kind": "deterministic synthetic aggregation workload",
+          "guides": 3200,
+          "cells": 24000,
+          "stored_entries": 384000,
+          "stored_density": 0.005,
+          "nonzero_values": 384000,
+          "four_guides_per_vector": true,
+          "metadata_repetitions": "none",
+          "triplet_duplicates": false,
+          "logical_stored_FALSE": false,
+          "seed": 20261016,
+          "source_cell_order": "c1...cN",
+          "vector_order": "first-seen reversed metadata",
+          "dense_input_counterfactual_bytes": 614400000,
+          "dense_output_bytes": 153600000
+        }
+      },
+      "complete_output_sha256": {
+        "reference": "f5abae15f31f361ce4d4e2018749977520ddac2f4f8f2968044149a2b1f9fc6b",
+        "candidate": "f5abae15f31f361ce4d4e2018749977520ddac2f4f8f2968044149a2b1f9fc6b"
+      },
+      "output_structure": {
+        "class": [
+          "matrix",
+          "array"
+        ],
+        "typeof": "double",
+        "dim": [
+          800,
+          24000
+        ],
+        "dimnames_sha256": "d85041d2fac7e77573359fca0b0b43ad054c7c552105955c8cf218bf6b15dbdc",
+        "value_sum": 3455996,
+        "input_nonmutation": true
+      },
+      "profiles": {
+        "reference": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 3208,
+          "traced_allocation_bytes": 1921036704,
+          "largest_R_allocation_bytes": 614400048,
+          "dense_input_counterfactual_bytes": 614400000,
+          "allocations_at_least_dense_input": 1,
+          "largest_stack_examples": [
+            "614400048 :\".Call\" \"asMethod\" \"as\" \"as.matrix\" \"as.matrix\" \"fn\" \"withCallingHandlers\" ",
+            "153600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "153600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "768048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1819939,
+              97.2,
+              2937598,
+              156.9,
+              "NA",
+              2937598,
+              156.9
+            ],
+            [
+              22941682,
+              175.1,
+              116687679,
+              890.3,
+              1536,
+              127530865,
+              973
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        },
+        "candidate": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 809,
+          "traced_allocation_bytes": 466329552,
+          "largest_R_allocation_bytes": 153600048,
+          "dense_input_counterfactual_bytes": 614400000,
+          "allocations_at_least_dense_input": 0,
+          "largest_stack_examples": [
+            "153600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "153600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "3072048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "1536048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\"numeric\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1820562,
+              97.3,
+              2937638,
+              156.9,
+              "NA",
+              2937638,
+              156.9
+            ],
+            [
+              22918368,
+              174.9,
+              53328377,
+              406.9,
+              1536,
+              42697007,
+              325.8
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        }
+      },
+      "all_20_children_environment_input_structure_equal": true,
+      "actual_stored_density": 0.005
+    },
+    {
+      "case": "medium_numeric_T_repeats",
+      "exact_output_bytes": true,
+      "environment_equal": true,
+      "single": {
+        "reference": {
+          "median_elapsed_seconds": 0.308,
+          "max_os_peak_rss_bytes": 342310912,
+          "median_os_peak_rss_bytes": 342294528,
+          "max_sampled_active_peak_rss_bytes": 325304320,
+          "min_active_samples": 9,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 0.239,
+          "max_os_peak_rss_bytes": 292995072,
+          "median_os_peak_rss_bytes": 292552704,
+          "max_sampled_active_peak_rss_bytes": 275529728,
+          "min_active_samples": 7,
+          "measured_trials": 3
+        }
+      },
+      "timing": {
+        "reference": {
+          "median_elapsed_seconds": 2.043,
+          "max_os_peak_rss_bytes": 357908480,
+          "median_os_peak_rss_bytes": 355991552,
+          "max_sampled_active_peak_rss_bytes": 350928896,
+          "min_active_samples": 63,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 1.686,
+          "max_os_peak_rss_bytes": 295550976,
+          "median_os_peak_rss_bytes": 294813696,
+          "max_sampled_active_peak_rss_bytes": 288456704,
+          "min_active_samples": 45,
+          "measured_trials": 3
+        }
+      },
+      "timing_source": "sum of20 independently loaded conversion intervals; single-call RSS remains primary",
+      "elapsed_ratio": 0.8252569750367106,
+      "timing_gate": "pass",
+      "memory_gate": "pass",
+      "sampled_active_gate": "pass",
+      "fixture": {
+        "name": "medium_numeric_T_repeats",
+        "file": "medium_numeric_T_repeats.rds",
+        "sha256": "c20b5c734cc053da3e16073401e163df01b046c887850a5e0bdbf4e7c3a87b4a",
+        "recipe": {
+          "kind": "deterministic synthetic aggregation workload",
+          "guides": 800,
+          "cells": 6000,
+          "stored_entries": 24240,
+          "stored_density": 0.005,
+          "nonzero_values": 23465,
+          "four_guides_per_vector": true,
+          "metadata_repetitions": "one additional selection every 50 metadata rows",
+          "triplet_duplicates": true,
+          "logical_stored_FALSE": false,
+          "seed": 20261016,
+          "source_cell_order": "c1...cN",
+          "vector_order": "first-seen reversed metadata",
+          "dense_input_counterfactual_bytes": 38400000,
+          "dense_output_bytes": 9600000
+        }
+      },
+      "complete_output_sha256": {
+        "reference": "d2b632f408abaaf7c1e368770f2bb9b321c30df926f903da1426fa60e7a43025",
+        "candidate": "d2b632f408abaaf7c1e368770f2bb9b321c30df926f903da1426fa60e7a43025"
+      },
+      "output_structure": {
+        "class": [
+          "matrix",
+          "array"
+        ],
+        "typeof": "double",
+        "dim": [
+          200,
+          6000
+        ],
+        "dimnames_sha256": "eb500941c98cfb84cf7f324e783128abfc3bf2857d25e9c8558423796cb99781",
+        "value_sum": 26710.25,
+        "input_nonmutation": true
+      },
+      "profiles": {
+        "reference": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 207,
+          "traced_allocation_bytes": 97468656,
+          "largest_R_allocation_bytes": 38400048,
+          "dense_input_counterfactual_bytes": 38400000,
+          "allocations_at_least_dense_input": 1,
+          "largest_stack_examples": [
+            "38400048 :\".Call\" \"asMethod\" \"as\" \"as.matrix\" \"as.matrix\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "240048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1799140,
+              96.1,
+              2937598,
+              156.9,
+              "NA",
+              2937598,
+              156.9
+            ],
+            [
+              4335441,
+              33.1,
+              12755510,
+              97.4,
+              1536,
+              12753660,
+              97.4
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        },
+        "candidate": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 8,
+          "traced_allocation_bytes": 20179104,
+          "largest_R_allocation_bytes": 9600048,
+          "dense_input_counterfactual_bytes": 38400000,
+          "allocations_at_least_dense_input": 0,
+          "largest_stack_examples": [
+            "9600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "192048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1799760,
+              96.2,
+              2937638,
+              156.9,
+              "NA",
+              2937638,
+              156.9
+            ],
+            [
+              4330123,
+              33.1,
+              10146329,
+              77.5,
+              1536,
+              6354437,
+              48.5
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        }
+      },
+      "all_20_children_environment_input_structure_equal": true,
+      "actual_stored_density": 0.00505
+    },
+    {
+      "case": "medium_logical_C",
+      "exact_output_bytes": true,
+      "environment_equal": true,
+      "single": {
+        "reference": {
+          "median_elapsed_seconds": 0.305,
+          "max_os_peak_rss_bytes": 310476800,
+          "median_os_peak_rss_bytes": 310247424,
+          "max_sampled_active_peak_rss_bytes": 293093376,
+          "min_active_samples": 9,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 0.233,
+          "max_os_peak_rss_bytes": 294109184,
+          "median_os_peak_rss_bytes": 293765120,
+          "max_sampled_active_peak_rss_bytes": 284803072,
+          "min_active_samples": 7,
+          "measured_trials": 3
+        }
+      },
+      "timing": {
+        "reference": {
+          "median_elapsed_seconds": 1.982,
+          "max_os_peak_rss_bytes": 344965120,
+          "median_os_peak_rss_bytes": 325435392,
+          "max_sampled_active_peak_rss_bytes": 337870848,
+          "min_active_samples": 59,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 1.719,
+          "max_os_peak_rss_bytes": 298942464,
+          "median_os_peak_rss_bytes": 295649280,
+          "max_sampled_active_peak_rss_bytes": 291913728,
+          "min_active_samples": 45,
+          "measured_trials": 3
+        }
+      },
+      "timing_source": "sum of20 independently loaded conversion intervals; single-call RSS remains primary",
+      "elapsed_ratio": 0.8673057517658931,
+      "timing_gate": "pass",
+      "memory_gate": "pass",
+      "sampled_active_gate": "pass",
+      "fixture": {
+        "name": "medium_logical_C",
+        "file": "medium_logical_C.rds",
+        "sha256": "869e3037bb906c2fd220aa1d56594ce96b982dea36bbb3ee8883ac794ba2dc4d",
+        "recipe": {
+          "kind": "deterministic synthetic aggregation workload",
+          "guides": 800,
+          "cells": 6000,
+          "stored_entries": 24000,
+          "stored_density": 0.005,
+          "nonzero_values": 21000,
+          "four_guides_per_vector": true,
+          "metadata_repetitions": "none",
+          "triplet_duplicates": false,
+          "logical_stored_FALSE": true,
+          "seed": 20261016,
+          "source_cell_order": "c1...cN",
+          "vector_order": "first-seen reversed metadata",
+          "dense_input_counterfactual_bytes": 19200000,
+          "dense_output_bytes": 9600000
+        }
+      },
+      "complete_output_sha256": {
+        "reference": "641534fd54fefa231dd35d4f2f89d6aed4c844f6592df4867776bf6f49175743",
+        "candidate": "641534fd54fefa231dd35d4f2f89d6aed4c844f6592df4867776bf6f49175743"
+      },
+      "output_structure": {
+        "class": [
+          "matrix",
+          "array"
+        ],
+        "typeof": "double",
+        "dim": [
+          200,
+          6000
+        ],
+        "dimnames_sha256": "eb500941c98cfb84cf7f324e783128abfc3bf2857d25e9c8558423796cb99781",
+        "value_sum": 21000,
+        "input_nonmutation": true
+      },
+      "profiles": {
+        "reference": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 207,
+          "traced_allocation_bytes": 58300656,
+          "largest_R_allocation_bytes": 19200048,
+          "dense_input_counterfactual_bytes": 19200000,
+          "allocations_at_least_dense_input": 1,
+          "largest_stack_examples": [
+            "19200048 :\".Call\" \"asMethod\" \"as\" \"as.matrix\" \"as.matrix\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1798342,
+              96.1,
+              2937598,
+              156.9,
+              "NA",
+              2937598,
+              156.9
+            ],
+            [
+              4312286,
+              33,
+              10183935,
+              77.7,
+              1536,
+              9256802,
+              70.7
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        },
+        "candidate": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 8,
+          "traced_allocation_bytes": 20083104,
+          "largest_R_allocation_bytes": 9600048,
+          "dense_input_counterfactual_bytes": 19200000,
+          "allocations_at_least_dense_input": 0,
+          "largest_stack_examples": [
+            "9600048 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "9600048 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "101800 :\"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"requireNamespace\" \"<Anonymous>\" \"mapply\" \"do.call\" \"pmap\" \"enexpr\" \"inject\" \"list_c\" \"detect_installed\" \"is_installed\" \"ns_exports_has\" \"eval\" \"eval\" \"eval\" \"eval\" \"eval.parent\" \"local\" \"callback\" \"run_on_load\" \"fun\" \"doTryCatch\" \"tryCatchOne\" \"tryCatchList\" \"tryCatch\" \"runHook\" \"loadNamespace\" \"namespaceImport\" \"loadNamespace\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "96048 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1798962,
+              96.1,
+              2937638,
+              156.9,
+              "NA",
+              2937638,
+              156.9
+            ],
+            [
+              4306968,
+              32.9,
+              10146329,
+              77.5,
+              1536,
+              6512421,
+              49.7
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        }
+      },
+      "all_20_children_environment_input_structure_equal": true,
+      "actual_stored_density": 0.005
+    },
+    {
+      "case": "actual_papalexi_guides",
+      "exact_output_bytes": true,
+      "environment_equal": true,
+      "single": {
+        "reference": {
+          "median_elapsed_seconds": 0.184,
+          "max_os_peak_rss_bytes": 308215808,
+          "median_os_peak_rss_bytes": 308199424,
+          "max_sampled_active_peak_rss_bytes": 285999104,
+          "min_active_samples": 5,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 0.179,
+          "max_os_peak_rss_bytes": 284917760,
+          "median_os_peak_rss_bytes": 284082176,
+          "max_sampled_active_peak_rss_bytes": 276316160,
+          "min_active_samples": 5,
+          "measured_trials": 3
+        }
+      },
+      "timing": {
+        "reference": {
+          "median_elapsed_seconds": 0.673000000000001,
+          "max_os_peak_rss_bytes": 335495168,
+          "median_os_peak_rss_bytes": 327335936,
+          "max_sampled_active_peak_rss_bytes": 328531968,
+          "min_active_samples": 23,
+          "measured_trials": 3
+        },
+        "candidate": {
+          "median_elapsed_seconds": 0.467,
+          "max_os_peak_rss_bytes": 287277056,
+          "median_os_peak_rss_bytes": 286081024,
+          "max_sampled_active_peak_rss_bytes": 279068672,
+          "min_active_samples": 5,
+          "measured_trials": 3
+        }
+      },
+      "timing_source": "sum of20 independently loaded conversion intervals; single-call RSS remains primary",
+      "elapsed_ratio": 0.6939078751857345,
+      "timing_gate": "inconclusive (<1s)",
+      "memory_gate": "pass",
+      "sampled_active_gate": "pass",
+      "fixture": {
+        "name": "actual_papalexi_guides",
+        "file": "actual_papalexi_guides.rds",
+        "sha256": "ea68919093eea6f0ecb4d7f50555b8ad7a35d5fddf4f912b78cb52a17d27cf83",
+        "recipe": {
+          "kind": "actual Papalexi example guide counts; synthetic groups of four",
+          "source": "sceptredata::lowmoi_example_data$grna_matrix",
+          "sceptredata_version": "0.99.0",
+          "guides": 110,
+          "cells": 20729,
+          "stored_entries": 162681,
+          "stored_density": 0.0713,
+          "vector_count": 28,
+          "real_vector_metadata": false,
+          "dense_input_counterfactual_bytes": 18241520,
+          "dense_output_bytes": 4643296
+        }
+      },
+      "complete_output_sha256": {
+        "reference": "f8fbffb70644d28d0914ff0d8bba5a5f5367220e028751d2e232548350e7c8b1",
+        "candidate": "f8fbffb70644d28d0914ff0d8bba5a5f5367220e028751d2e232548350e7c8b1"
+      },
+      "output_structure": {
+        "class": [
+          "matrix",
+          "array"
+        ],
+        "typeof": "double",
+        "dim": [
+          28,
+          20729
+        ],
+        "dimnames_sha256": "354a0a7616a03ba1fff0bb769708f522a50440884111b5bcd4bd240843c5bdc1",
+        "value_sum": 4619963,
+        "input_nonmutation": true
+      },
+      "profiles": {
+        "reference": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 92,
+          "traced_allocation_bytes": 53595656,
+          "largest_R_allocation_bytes": 18241568,
+          "dense_input_counterfactual_bytes": 18241520,
+          "allocations_at_least_dense_input": 1,
+          "largest_stack_examples": [
+            "18241568 :\".Call\" \"asMethod\" \"as\" \"as.matrix\" \"as.matrix\" \"fn\" \"withCallingHandlers\" ",
+            "4643344 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "4643344 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "663376 :\"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1791300,
+              95.7,
+              2937598,
+              156.9,
+              "NA",
+              2937598,
+              156.9
+            ],
+            [
+              3968946,
+              30.3,
+              8388608,
+              64,
+              1536,
+              8370059,
+              63.9
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        },
+        "candidate": {
+          "threshold_bytes": 65536,
+          "traced_allocation_count": 44,
+          "traced_allocation_bytes": 17445320,
+          "largest_R_allocation_bytes": 4643344,
+          "dense_input_counterfactual_bytes": 18241520,
+          "allocations_at_least_dense_input": 0,
+          "largest_stack_examples": [
+            "4643344 :\"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "4643344 :\"t.default\" \"t\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "1301496 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "650776 :\".Call\" \"asMethod\" \"<Anonymous>\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "243656 :\"<Anonymous>\" \"filter_rows\" \"filter_impl\" \"filter.data.frame\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\"numeric\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" ",
+            "165880 :\".Call\" \".local\" \"<Anonymous>\" \"<Anonymous>\" \"FUN\" \"vapply\" \"t\" \"fn\" \"withCallingHandlers\" "
+          ],
+          "heap_high_water": [
+            [
+              1791939,
+              95.7,
+              2937638,
+              156.9,
+              "NA",
+              2937638,
+              156.9
+            ],
+            [
+              3969658,
+              30.3,
+              8388608,
+              64,
+              1536,
+              6028979,
+              46
+            ]
+          ],
+          "heap_rows": [
+            "Ncells",
+            "Vcells"
+          ],
+          "heap_columns": [
+            "used",
+            "(Mb)",
+            "gc trigger",
+            "(Mb)",
+            "limit (Mb)",
+            "max used",
+            "(Mb)"
+          ],
+          "scope": "R allocations >=64KiB; excludes smaller allocations and may omit native malloc. Profile child is excluded from timing/RSS gates."
+        }
+      },
+      "all_20_children_environment_input_structure_equal": true,
+      "actual_stored_density": 0.07134537034194519
+    }
+  ],
+  "disposition": "Exact and all four RSS gates pass; all three meaningful synthetic timing gates pass. Actual-data 20-call timing is inconclusive (<1s) as predeclared; no actual-data speed claim. Ready for independent review, not integrated yet.",
+  "limitations": [
+    "Actual Papalexi guide counts use synthetic groups of four, not real biological vector metadata.",
+    "20ms RSS sampling can miss brief peaks; macOS time-l whole-child maximum RSS is primary.",
+    "Rprofmem traces allocations >=64KiB and may omit native malloc or smaller allocations; required output and transpose remain dense.",
+    "Active minus pre-call RSS is a net increment, not isolated normalization workspace.",
+    "This pre-existing branch source pin is not the final integrated package, which needs separate final qualification."
+  ],
+  "pre_resource_report_sha256": "1eee0900f3d392a2ed80348e0206e7905c09667c24fecdc690319c5ea8883d36",
+  "attempts": [
+    {
+      "kind": "harness smoke",
+      "status": "sandbox ps EPERM; partial artifacts preserved; not a resource trial",
+      "path": "/private/tmp/sceptre-b6-harness-smoke-88ed37c"
+    },
+    {
+      "kind": "harness smoke",
+      "status": "narrow escalated original-only correctness/profile smoke passed",
+      "path": "/private/tmp/sceptre-b6-harness-smoke-88ed37c-escalated"
+    },
+    {
+      "kind": "full predeclared resource run",
+      "status": "completed 80 children, no failure/safety stop/threshold crossing",
+      "path": "/private/tmp/sceptre-b6-resource-88ed37c-run1"
+    }
+  ],
+  "durable_raw": {
+    "all_trials": "all-trials.json.gz",
+    "allocation_traces": "allocation-traces.json.gz",
+    "original_attempt_files": "attempt-file-manifest.json"
+  }
+}

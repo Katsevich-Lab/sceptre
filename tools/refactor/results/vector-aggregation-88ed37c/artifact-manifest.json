@@ -1,0 +1,72 @@
+{
+  "files": {
+    "README.md": {
+      "bytes": 9253,
+      "sha256": "3c6e7140e068d79f49969d3ea43735cdf4e7a4a912f525d792819638379a18c7"
+    },
+    "all-trials.json.gz": {
+      "bytes": 187566,
+      "sha256": "c315d16cd16d2f32a9a3782d2692f85cf58d7931e99d8591a4360773ca3580a8"
+    },
+    "allocation-traces.json.gz": {
+      "bytes": 64725,
+      "sha256": "3dcc55c33f3c0d09e15c227f337dcd436ac9469d043ae474d8a4b68a7b8d5f24"
+    },
+    "attempt-file-manifest.json": {
+      "bytes": 329283,
+      "sha256": "3bd4c21a8d3289accd42b3ec2b0f10386d4cbf0f920f93a02060ec5ac591bf45"
+    },
+    "candidate-build.json": {
+      "bytes": 5669,
+      "sha256": "a3149f643adddb782db71a8e99cb19c1f4a164cf3f18e810a1f287474ffdfa63"
+    },
+    "focused-checks.json": {
+      "bytes": 632,
+      "sha256": "f7e3dc93ddc329ebbefeca9d7e9a2e331ce9eb098e552c0a890174cf0043a615"
+    },
+    "focused-runner.R": {
+      "bytes": 2172,
+      "sha256": "cf237095471a799eee242e1a19e6026e10044328fa000fb8bda36200880759f4"
+    },
+    "focused.log": {
+      "bytes": 1734,
+      "sha256": "ea898dfc64229a2e1ecc3e335bbebeb3331c0c180cb3c6f14d3e8975b75a9b09"
+    },
+    "harness-smoke-attempts.json.gz": {
+      "bytes": 11322,
+      "sha256": "cb279a610848c404f31dc6c935c16a941bc9d170178f11713d84f39359b60c7a"
+    },
+    "harness-smoke.json": {
+      "bytes": 27604,
+      "sha256": "3cd7fc08deaa299d73ca31a32ea4e61ec42ce92ca5b0174b89df530be22b653d"
+    },
+    "input-manifest.json": {
+      "bytes": 3395,
+      "sha256": "91e4c68683225615d560b62c3e694e7c95a995c949370b79584ddc10309d6506"
+    },
+    "pre-resource-report.json": {
+      "bytes": 14757,
+      "sha256": "1eee0900f3d392a2ed80348e0206e7905c09667c24fecdc690319c5ea8883d36"
+    },
+    "reference-build.json": {
+      "bytes": 4685,
+      "sha256": "a006478334bb4d808786860921c8d2bc2cb0819d3e05d73058f6a093f1dfd117"
+    },
+    "replay-candidate.rds": {
+      "bytes": 4695,
+      "sha256": "ce4093d1c738f39fb8accd68fc3d8589c2b73220104be54299e81945736fdb06"
+    },
+    "replay-reference.rds": {
+      "bytes": 4706,
+      "sha256": "9d5c2e61b412b1ebeee622af5e70fd74030b4c1155e7418f17a390de641d96ad"
+    },
+    "report.json": {
+      "bytes": 43790,
+      "sha256": "3eb2a58ecc131aac97a191a551ac8deeb6bb318352f354ec7aa17fe459e3203a"
+    },
+    "run.log": {
+      "bytes": 3128,
+      "sha256": "4e565cc63e970a6119ed61e0ee764f155689641fe50e814253dfb763f3dec483"
+    }
+  }
+}

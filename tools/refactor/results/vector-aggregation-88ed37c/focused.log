@@ -1,0 +1,25 @@
+
+FILE test-refactor-vector-aggregation.R 
+refactor-vector-aggregation: .......................................................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+
+FILE test-refactor-import-coordinates.R 
+refactor-import-coordinates: ..............................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+
+FILE test-import_functs.R 
+import_functs: .................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+                                                                 file tests
+test-refactor-vector-aggregation.R test-refactor-vector-aggregation.R     3
+test-refactor-import-coordinates.R test-refactor-import-coordinates.R     4
+test-import_functs.R                             test-import_functs.R     8
+                                   expectations failed errors warnings skipped
+test-refactor-vector-aggregation.R           71      0      0        0       0
+test-refactor-import-coordinates.R           46      0      0        0       0
+test-import_functs.R                         17      0      0        0       0
+
+EXACT: all 228 installed original/candidate outputs identical; both input nonmutation checks passed.
