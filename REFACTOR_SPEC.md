@@ -1,6 +1,13 @@
 # Sceptre and ondisc refactor technical specification
 
-Status: Scope accepted; RF0 baseline work started. Date: October 16, 2026.
+Status: RF1–RF8 integrated and baseline-qualified; complete source cleanup is in a mandatory plan-review checkpoint. Date: October 16, 2026.
+
+The [source cleanup addendum](tools/refactor/CLEANUP_PLAN.md) and its per-module
+coverage, private-symbol crosswalk and behavior-disposition ledger govern the
+remaining cleanup. They distinguish bounded correctness corrections from
+unchanged normal-case compatibility, required complexity and deferred features.
+Further cleanup implementation waits for independent review of that addendum.
+See [current status](tools/refactor/STATUS.md) for source-pinned evidence and gaps.
 
 The refactor adds no new functionality and preserves the current sceptre public API. It will make the existing implementation substantially cleaner: fewer duplicated operations, explicit indexing, localized state/cache management, and small statistical functions with clear inputs and outputs. Future methods and integrations should be straightforward to add at those boundaries without adding their complexity to this refactor.
 

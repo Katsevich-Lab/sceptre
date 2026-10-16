@@ -1,0 +1,256 @@
+[
+  {
+    "id": "L01",
+    "priority": "P2",
+    "evidence": [
+      "all included handwritten R modules"
+    ],
+    "finding": "Internal contracts are absent for 60/63 named private functions at c635263; three QQ helpers have partial @noRd blocks. Anonymous callbacks do not need boilerplate.",
+    "proposed_cleanup": "Review paused 39-function checkpoint, then document the remaining 21 functions and shared QQ/method/module contracts with types, views, order, duplicate policy, returns and effects.",
+    "behavior_boundary": "Documentation/comments only; parsed expressions, exports, public formals and saved schema must remain identical.",
+    "uncertainty": "Draft accuracy still requires senior review; no claim of completed full-source cleanup.",
+    "validation": "AST identity, complete function checklist, no generated help/export churn for internal @noRd work."
+  },
+  {
+    "id": "L02",
+    "priority": "P2",
+    "evidence": [
+      "R/s4_helpers.R:311-312",
+      "R/plotting_functions.R:258-264,498-504,800-805,973-979,1105-1110",
+      "R/qq_plot_helpers.R:178-187"
+    ],
+    "finding": "Public plot return prose reverses TRUE-list/FALSE-combined behavior in several functions; generic plot help uses obsolete run_assign_grnas/plot_run_assign_grnas names; ymax QQ prose says less instead of greater.",
+    "proposed_cleanup": "Prepare one explicitly reviewed public-doc synchronization patch, generating only matching Rd text with unchanged aliases/formals.",
+    "behavior_boundary": "Documentation correction preserves current results; unlike @noRd work it intentionally changes help text and needs a narrow generated-file whitelist.",
+    "uncertainty": "Review every affected return variant; plot_run_qc returns a single cellwise plot if no discovery pairs even with list request.",
+    "validation": "API inventory exact; Rd usages/aliases unchanged; evaluate return-class branches without changing code."
+  },
+  {
+    "id": "L03",
+    "priority": "P3",
+    "evidence": [
+      "R/s4_class.R:1-7",
+      "R/sceptre.R:1-35",
+      "ten checkpoint files"
+    ],
+    "finding": "Commented-out class unions, duplicate globalVariables entries and broken numbered/narrative comments remain outside or before the checkpoint.",
+    "proposed_cleanup": "Remove dead comments/duplicates and retain concise explanations of compatibility/index decisions.",
+    "behavior_boundary": "Comment deletion can be AST-identical; globalVariables deduplication is metadata behavior and should be separately reviewed. Never remove S4 slots.",
+    "uncertainty": "Some apparently unused slots, including mitochondrial_gene, persist for saved-object compatibility.",
+    "validation": "AST diff for comments; preserve 56-slot/type inventory and NAMESPACE registration."
+  },
+  {
+    "id": "L04",
+    "priority": "P3",
+    "evidence": [
+      "R/s4_helpers.R:104,106",
+      "R/check_functions.R:239,656",
+      "R/plotting_functions.R:1193,1198,1212"
+    ],
+    "finding": "Confirmed unused print locals, unused check_discovery_analysis_inputs calibration_check_run formal, unused private plot return flag, redundant theme addition and repeated processor guards.",
+    "proposed_cleanup": "Remove proven dead locals; review unused private formals/call arguments and factor shared processor validation only if messages/order remain identical.",
+    "behavior_boundary": "Executable cleanup, not documentation. Removing formals changes private call shape; preserve known pipeline/private consumers or explicitly approve that change.",
+    "uncertainty": "No located caller uses calibration_check_run; dynamic/private external use is not globally excluded. Redundant getter call removal can change malformed-object errors.",
+    "validation": "Current callers/consumer inventory; supported workflow/result/print compatibility; focused invalid-input message/order checks if validators are consolidated."
+  },
+  {
+    "id": "L05",
+    "priority": "P3",
+    "evidence": [
+      "R/cellwise_qc_functs.R:124-126",
+      "R/import_functs.R:881-892",
+      "R/s4_analysis_functs_2.R:151-155"
+    ],
+    "finding": "The NT assignment helper is a one-call forwarder and the matrix writer repeats directory preparation already done by its sole import caller; v2 naming remains in handwritten calibration adapter.",
+    "proposed_cleanup": "Consider direct component calls/canonical private names after caller review; avoid adding compatibility wrappers solely to hide avoidable indirection.",
+    "behavior_boundary": "Keep algorithm, native entrypoints, saved slot layout and externally consumed pipeline functions stable.",
+    "uncertainty": "Private downstream consumers beyond the inspected repositories may exist.",
+    "validation": "Static/dynamic consumer search, unchanged input ownership/source maps/backed import output and RNG characterization."
+  },
+  {
+    "id": "L06",
+    "priority": "P2",
+    "evidence": [
+      "R/pair_constructor_functs.R:274-278"
+    ],
+    "finding": "construct_trans_pairs calls setDT on caller-supplied positive_control_pairs, changing a data.frame class by reference.",
+    "proposed_cleanup": "Decide explicit ownership policy; use a local owned conversion if removing this side effect is approved.",
+    "behavior_boundary": "Removing caller mutation is observable behavior and must not be mislabeled AST-only cleanup.",
+    "uncertainty": "Supported numeric pair results should match, but callers relying on incidental class mutation would differ.",
+    "validation": "Serialize/class-check caller before/after and compare returned class, row order and values under every exclusion mode."
+  },
+  {
+    "id": "L07",
+    "priority": "P2",
+    "evidence": [
+      "R/import_functs.R:1008-1027",
+      "R/import_functs.R:152-205"
+    ],
+    "finding": "Vector aggregation materializes a dense guide matrix; the R-backed import path does not perform vector_id aggregation although the in-memory path does.",
+    "proposed_cleanup": "Document current memory/aggregation boundaries now; scope later storage-aware aggregation separately rather than burying it in docs or claiming parity.",
+    "behavior_boundary": "Sparse aggregation or backed parity changes execution and potentially functionality/numeric summation order; outside pure cleanup.",
+    "uncertainty": "The intended cross-path vector contract needs product/statistical owner confirmation.",
+    "validation": "Existing vector import cases plus an approved paired in-memory/backed workload before any future behavior change."
+  },
+  {
+    "id": "L08",
+    "priority": "P2",
+    "evidence": [
+      "R/import_functs.R:503-513,851-859"
+    ],
+    "finding": "CSC construction directly adopts zero-based scratch vectors without sorting/coalescing/shape validation; Cell Ranger modality indexing subtracts a minimum and assumes contiguous feature blocks.",
+    "proposed_cleanup": "Make parser preconditions explicit; propose an owned validated triplet/index boundary only after examining interleaved modalities/duplicate coordinate policy.",
+    "behavior_boundary": "Sorting, coalescing or accepting interleaved features can change behavior; no silent normalization in this cleanup.",
+    "uncertainty": "Standard bundled inputs satisfy assumptions; frequency/validity of interleaved external Cell Ranger inputs is unverified.",
+    "validation": "Approved parser edge fixtures: dimensions/order/duplicate policy, explicit zeros, interleaved modality IDs, caller scratch ownership; existing import fixtures unchanged."
+  },
+  {
+    "id": "L09",
+    "priority": "P3",
+    "evidence": [
+      "R/import_functs.R:862-878"
+    ],
+    "finding": "Matrix Market metadata reader assumes a well-formed comment/header line and closes its connection only on the success path.",
+    "proposed_cleanup": "Separate metadata parsing from file lifetime; use guaranteed connection cleanup and clearly state accepted spacing/header contract.",
+    "behavior_boundary": "Success-path resource cleanup can preserve values; validation/error improvements alter malformed-input behavior and require explicit scope.",
+    "uncertainty": "Do not invent support for malformed Matrix Market variants; gzip behavior already exercised.",
+    "validation": "Existing gz/plain imports plus small malformed/truncated-header/connection-lifetime probes if approved."
+  },
+  {
+    "id": "L10",
+    "priority": "P2",
+    "evidence": [
+      "R/check_functions.R:565-649",
+      "R/s4_analysis_functs_1.R:406-425",
+      "R/s4_analysis_functs_2.R:89-149"
+    ],
+    "finding": "Calibration group size is not validated; zero-only pair-count guard accepts other invalid forms; QC omits validation of additional cell indices and mito cutoff, and alpha is not checked by set-parameters validator.",
+    "proposed_cleanup": "Inventory exact accepted/precondition sets; decide a separate input-validation issue or explicitly approved cleanup stage.",
+    "behavior_boundary": "New rejection/coercion changes public invalid-input behavior; not allowed to slip into a compatibility refactor.",
+    "uncertainty": "Severity for malformed sizes depends on native downstream constraints; no new crash claim without a reproducer.",
+    "validation": "Targeted scalar/NA/integer/range cases plus immutable existing edge behavior to distinguish intended fixes from accidental changes."
+  },
+  {
+    "id": "L11",
+    "priority": "P2",
+    "evidence": [
+      "R/check_functions.R:521-525"
+    ],
+    "finding": "g_pert_guess_range upper-bound validation reads pi_guess_range > 20 instead of the perturbation range.",
+    "proposed_cleanup": "Track a separate precise validation bug fix; preserve the legacy check while only documenting refactor contracts unless approved.",
+    "behavior_boundary": "Changing accepted input set is an observable bug fix.",
+    "uncertainty": "Source-level defect confirmed; downstream practical effect for values >20 was not executed in this audit.",
+    "validation": "Small validator test with valid pi range and perturbation upper bound >20, plus valid-boundary cases after approval."
+  },
+  {
+    "id": "L12",
+    "priority": "P2",
+    "evidence": [
+      "R/check_functions.R:247-274"
+    ],
+    "finding": "Pair validator subsets grna_target/response_id to check NAs before checking that those columns exist.",
+    "proposed_cleanup": "Decide whether the intended named-column error should precede NA checking; separate error-contract fix.",
+    "behavior_boundary": "Reordering changes error text/class on malformed public input.",
+    "uncertainty": "Valid scientific workflows unaffected; stored edge cases may not cover this malformed table.",
+    "validation": "Missing-column, NA-value and valid-pair cases with explicit expected error precedence."
+  },
+  {
+    "id": "L13",
+    "priority": "P2",
+    "evidence": [
+      "R/plotting_functions.R:1134-1152"
+    ],
+    "finding": "plot_run_qc ignores user downsample_pairs, point_size and transparency, passing constants to plot_pairwise_qc.",
+    "proposed_cleanup": "Track/approve a distinct argument-forwarding fix; document actual current boundary while planning.",
+    "behavior_boundary": "Nondefault exported plotting behavior changes; default output can remain the same.",
+    "uncertainty": "Confirmed by source and unused-formal analysis; no plot output was regenerated during inventory.",
+    "validation": "A small forwarding probe or ggplot layer-data comparison for nondefault values; default visualization unchanged."
+  },
+  {
+    "id": "L14",
+    "priority": "P2",
+    "evidence": [
+      "R/plotting_functions.R:734",
+      "R/plotting_functions.R:851-855"
+    ],
+    "finding": "Volcano coloring uses p < p_thresh although p_thresh is the maximum significant p-value, excluding that boundary from the rejection color.",
+    "proposed_cleanup": "Separate visual significance-boundary bug fix with explicitly agreed tie convention.",
+    "behavior_boundary": "Presentation behavior changes while scientific significant flags/results stay fixed.",
+    "uncertainty": "Depends on whether the intended plotted rejection set follows significant flags exactly; confirm with owner.",
+    "validation": "A two-point/tied-threshold plot-data test against agreed significant flags."
+  },
+  {
+    "id": "L15",
+    "priority": "P2",
+    "evidence": [
+      "R/plotting_functions.R:115-131"
+    ],
+    "finding": "Guide-count binning branches on max count >10 even when a larger supplied threshold makes max_single_bin exceed the data; log2 can receive a negative argument.",
+    "proposed_cleanup": "Track/approve a focused binning boundary fix; retain current formulas during documentation-only work.",
+    "behavior_boundary": "Fixes a valid nondefault plotting input, not refactor-only behavior preservation.",
+    "uncertainty": "Source arithmetic demonstrates risk; no reproduction claimed beyond inspection.",
+    "validation": "Guide max count between 10 and a high explicit threshold, and thresholds/defaults around the branch."
+  },
+  {
+    "id": "L16",
+    "priority": "P3",
+    "evidence": [
+      "R/plotting_functions.R:1388-1396",
+      "R/qq_plot_helpers.R:74-85,91-96,179-185"
+    ],
+    "finding": "Downsample helpers cap rows per occupied bin/grid rather than enforce a global max; result-frame helper returns a grouped tibble.",
+    "proposed_cleanup": "Correct contracts and misleading count prose; preserve sampling/RNG/order/grouping in cleanup.",
+    "behavior_boundary": "Ungrouping or imposing a true global cap changes values/classes/performance and is a separate change.",
+    "uncertainty": "Exact maximal QQ occupied-bin count depends on monotonicity/scales; do not promise a universal total cap.",
+    "validation": "Existing fixed-seed plots and grouped result class/order; typed internal docs sufficient for the first stage."
+  },
+  {
+    "id": "L17",
+    "priority": "P2",
+    "evidence": [
+      "R/plotting_functions.R:1453,1467-1474,1531-1542"
+    ],
+    "finding": "Response/group plot treats only singleton integration as guide-level; Bonferroni uses guide-level assignment groups but target-level result IDs.",
+    "proposed_cleanup": "Clarify current supported plot input/annotation behavior and separately scope Bonferroni plotting semantics.",
+    "behavior_boundary": "Changing guide-versus-target selection/annotation changes exported functionality.",
+    "uncertainty": "A source-level ID mismatch is visible; intended pooling/plot labeling requires owner decision.",
+    "validation": "Approved Bonferroni guide/target example, both control views, matching p-value annotation/result IDs."
+  },
+  {
+    "id": "L18",
+    "priority": "P3",
+    "evidence": [
+      "R/getters_and_setters.R:106-133"
+    ],
+    "finding": "Assignment getter constructs CSR slots manually and decrements unlist scratch through a native mutator.",
+    "proposed_cleanup": "Audit and explicitly test scratch ownership before simplifying it; preserve source/QC views and repeated calls.",
+    "behavior_boundary": "An ownership fix should not silently change sparse class, row/column IDs or raw assignments.",
+    "uncertainty": "No mutation bug is asserted; single-guide alias behavior needs a focused probe.",
+    "validation": "Caller raw serialization unchanged across one-guide/repeated get calls and optional QC columns."
+  },
+  {
+    "id": "L19",
+    "priority": "P3",
+    "evidence": [
+      "R/test_functs.R:1-9",
+      "tests/testthat/helper-mock-data.R:203,381-384"
+    ],
+    "finding": "Production namespace contains test-only set_colnames and unreferenced set_rownames; NT mock-pattern validation checks length(non_nt_patterns) instead of nt_patterns.",
+    "proposed_cleanup": "Relocate the used dimname helper into test support and consider removing the unreferenced helper after private-consumer review; treat mock validation correction separately.",
+    "behavior_boundary": "Package-private symbol removal and test-generation behavior are distinct from runtime numeric changes. Never regenerate frozen fixture inputs under this cleanup.",
+    "uncertainty": "Caller absence is scoped to R/tests/pinned pipeline, not every external user.",
+    "validation": "Full existing test helpers/fixtures; explicit old input checksums; no automatic fixture regeneration."
+  },
+  {
+    "id": "L20",
+    "priority": "P3",
+    "evidence": [
+      "R/qq_plot_helpers.R:8-37"
+    ],
+    "finding": "QQ setup requires equal group sizes within each panel, then selects group == min(group) globally; panels with distinct group IDs may lose their confidence band.",
+    "proposed_cleanup": "Record the per-panel grouping contract; scope any panel-local selection correction separately.",
+    "behavior_boundary": "Changes ggplot data returned for some facet inputs; not pure cleanup.",
+    "uncertainty": "Potential facet-specific issue inferred from source; needs a small ggplot-layer reproducer before being labeled confirmed runtime failure.",
+    "validation": "Two panels with distinct group IDs and equal per-panel sample sizes, plus existing single-panel QQ behavior."
+  }
+]

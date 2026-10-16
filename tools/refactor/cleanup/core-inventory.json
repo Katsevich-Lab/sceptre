@@ -1,0 +1,3263 @@
+{
+  "schema_version": 1,
+  "status": "READ-ONLY PLAN INPUT; NO IMPLEMENTATION AUTHORIZED BY THIS ARTIFACT",
+  "observed_at_utc": "2026-10-16T15:57:48.488271+00:00",
+  "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+  "held_proposal_revision": "8f1b8f4 (not accepted/integrated at source pin)",
+  "scope": {
+    "modules": [
+      "R/storage.R",
+      "R/fitting.R",
+      "R/score_preparation.R",
+      "R/fit_cache.R",
+      "R/pair_qc.R",
+      "R/workflow_state.R",
+      "R/analysis_context.R",
+      "R/result_processing.R",
+      "R/precomputation_functions.R"
+    ],
+    "named_handwritten_top_level_functions": 52,
+    "existing_noRd_contracts": 28,
+    "method": "Pinned Git source inspection, parsed R call tokens within named top-level function spans, manual behavior/native/caller audit, bounded executable consumer search. Anonymous print-method caller is noted separately.",
+    "limits": "Does not search arbitrary unpublished user scripts, all prior chats, remote repositories or execute complete regression/resource suite. Test string mentions and historical documentation are not executable consumer authority. Call graph is lexical, not dynamic proof."
+  },
+  "source_file_sha256": {
+    "R/storage.R": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+    "R/fitting.R": "435379e330e1cef6c3ad709a013ac9dafc8324585f60e536395b46d3a2baf084",
+    "R/score_preparation.R": "fef1338768e58f777d41cd7647a6ace025eaf9fa73ad5b86705622db23441387",
+    "R/fit_cache.R": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+    "R/pair_qc.R": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+    "R/workflow_state.R": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+    "R/analysis_context.R": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+    "R/result_processing.R": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+    "R/precomputation_functions.R": "ab5923e482adf963da55b9a1bd23459239763c940d5891500aaad1f1088ee5ec"
+  },
+  "external_repositories": {
+    "sceptre-pipeline": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+    "sceptre-book": "63704b0cca4b334f5b957da928ce718d38184f20",
+    "sceptre-team": null,
+    "sceptre3-project-v2": "01f1973a16363d6aeb04021bf476331fb77618bd"
+  },
+  "external_executable_references": [
+    {
+      "symbol": "process_calibration_result",
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "file": "bin/process_association_analysis_results.R",
+      "line": 34,
+      "text": "run_calibration_check = sceptre:::process_calibration_result,",
+      "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+      "matches_pinned_blob": true
+    },
+    {
+      "symbol": "apply_grouping_to_result",
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "file": "bin/process_association_analysis_results.R",
+      "line": 35,
+      "text": "run_power_check = sceptre:::apply_grouping_to_result,",
+      "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+      "matches_pinned_blob": true
+    },
+    {
+      "symbol": "process_discovery_result",
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "file": "bin/process_association_analysis_results.R",
+      "line": 36,
+      "text": "run_discovery_analysis = sceptre:::process_discovery_result)",
+      "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+      "matches_pinned_blob": true
+    },
+    {
+      "symbol": "process_discovery_result",
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "file": "bin/run_association_analysis_nuclear.R",
+      "line": 66,
+      "text": "sceptre_object@discovery_result <- sceptre:::process_discovery_result(result_df, sceptre_object)",
+      "sha256": "12306dffb1242eeb21462830be8832502a89d13ef83bd7350fcab4c8502d3cd3",
+      "matches_pinned_blob": true
+    }
+  ],
+  "supporting_native_boundaries": {
+    "sparse_pair_kernel": "src/pairwise_qc.cpp:10-83 uses current NT-local redirection; held proposal canonical replacement not current production",
+    "native_observed_base": "src/low_level_full_test.cpp:43-49 calls observed_positions_zero_based; synthetic banks already zero-based",
+    "group_mutation": "src/negative_control_functions.cpp:157-189 decrements passed R list members",
+    "cell_covariate_mutation": "src/sparse_matrix_functs.cpp:40-96 decrements mitochondrial indices; storage owns copy"
+  },
+  "classification_counts": {
+    "necessary coordinate core": 4,
+    "genuine saved-state boundary": 2,
+    "necessary request identity core": 1,
+    "necessary normalization boundary": 1,
+    "necessary fit-view core": 1,
+    "retain lean lookup; rename by purpose": 1,
+    "necessary boundary; incomplete composition": 1,
+    "remove private passthrough": 1,
+    "remove private alias": 5,
+    "remove unsupported private fallback": 1,
+    "contract correction required": 1,
+    "necessary cache policy": 2,
+    "necessary compact cache interface": 2,
+    "necessary facade commit": 1,
+    "necessary numerical core": 2,
+    "test-only alternate branch decision": 2,
+    "necessary measurement boundary": 1,
+    "necessary policy boundary": 1,
+    "necessary result core": 2,
+    "necessary family boundary": 2,
+    "genuine executable consumer boundary": 3,
+    "necessary adapter": 5,
+    "necessary defensive adapter": 1,
+    "simplify internal coordinates": 1,
+    "genuine compatibility boundary": 2,
+    "ownership correction adopted; qualification pending": 1,
+    "rename private helper": 1,
+    "necessary state policy": 2,
+    "genuine saved-state display boundary": 1,
+    "necessary facade boundary": 1
+  },
+  "findings": [
+    {
+      "id": "C01",
+      "priority": "P1 maintainability/coordinate ownership",
+      "title": "Canonical NT coordinates are undone and restored inside owned sparse path",
+      "evidence": [
+        "R/analysis_context.R:51-60",
+        "R/storage.R:97-111",
+        "src/pairwise_qc.cpp:28-39"
+      ],
+      "proposed_disposition": "Use one canonical sparse kernel with NT groups in analysis positions, convert owned native positions to zero once outside loops, remove old private v3 entry point rather than a test-only adapter. Keep external ondisc NT-local adaptation only in its branch.",
+      "validation": "Noncontiguous/reordered source maps, NT pool not sorted, response-sorted scan with exact request restoration/repeats, stored zeros/fractions, complement/NT totals, input nonmutation; frozen public science/RNG unchanged.",
+      "cost": "O(total position counts) native conversion/copy per scan, replacing redundant R group copies/match and per-response redirection; no dense realization, no extra summary matrix."
+    },
+    {
+      "id": "C02",
+      "priority": "P1 ownership contract",
+      "title": "Triplet conversion reorders caller-owned sparse slots",
+      "evidence": [
+        "R/storage.R:313-324"
+      ],
+      "proposed_disposition": "ADOPTED OWNERSHIP TARGET, PENDING IMPLEMENTATION/QUALIFICATION: use owned sorting vectors while preserving returned values/stored entries/dimnames and stored-FALSE-to-one semantics. The held implementation is not integrated at the audit pin. Qualify the new path using triplet-resource-plan.md.",
+      "validation": "Unsorted dgT/lgT input, row/column orientation, serialized input unchanged, exact old sceptre output on independent copies; ondisc comparison must restore column names because dependency drops them.",
+      "cost": "Roughly 16 bytes per numeric stored entry describes only an engineering estimate for owned i/j/x payload. It is not measured peak RSS, sorting workspace, or qualification. Measure total/conversion-phase RSS and timing on matched fresh builds; investigate a crossed general gate or obtain an explicit reviewed bounded-correctness exception. Earlier reports do not qualify this new path.",
+      "superseded_initial_proposal": {
+        "status": "Historical proposal at initial audit; overridden by planning_amendment, not the implementation target",
+        "proposed_disposition": "Use an owned sorting table for all numeric coordinate paths. Preserve output values/stored entries/dimnames and logical stored-FALSE->one semantics. Held proposal exists but is NOT integrated at this pin.",
+        "validation": "Unsorted dgT/lgT input, row/column orientation, serialized input unchanged, exact old sceptre output on independent copies; ondisc comparison must restore column names because dependency drops them.",
+        "cost": "About 16 bytes per numeric stored entry transient owned i/j/x copy plus table overhead; compressed paths already copy. Measure bounded triplet conversion at meaningful nnz; do not cite unchanged pre-proposal benchmark as qualification."
+      }
+    },
+    {
+      "id": "C03",
+      "priority": "P1 contract accuracy",
+      "title": "Full source-row cached design mislabeled analysis-cell order",
+      "evidence": [
+        "R/fit_cache.R:6-10",
+        "R/s4_analysis_functs_1.R:138-144",
+        "R/s4_analysis_functs_1.R:175",
+        "R/association_execution.R:91-97"
+      ],
+      "proposed_disposition": "Correct source contract. Preserve full source-row S4 design and strict full-matrix comparison; distinguish it from transient analysis/common/guide-fit design.",
+      "validation": "Noncontiguous cells and parameter change outside current analysis view; unchanged invalidation decisions and saved schema.",
+      "cost": "Documentation correction zero runtime; context composition should remove duplicate subsetting without persisting additional full designs."
+    },
+    {
+      "id": "C04",
+      "priority": "P2 obsolete surface",
+      "title": "Five private aliases have no production package or bounded executable downstream consumer",
+      "evidence": [
+        "R/precomputation_functions.R:3-15",
+        "R/result_processing.R:163-165",
+        "R/analysis_context.R:154-161",
+        "tests/testthat/test-refactor-indexing.R:61",
+        "tests/testthat/test-refactor-indexing.R:85"
+      ],
+      "proposed_disposition": "Delete perform_response_precomputation, perform_grna_precomputation, compute_precomputation_pieces, construct_data_frame_v2, get_idx_vector_calibration_check; remove empty file and retarget tests/docs to actual core. Historical proposal prose is not compatibility authority.",
+      "validation": "Re-run bounded pinned consumer search, exported API/formals/method snapshots, component tests and actual native numerical fixtures; no golden regeneration.",
+      "cost": "Removes wrappers/call layers; no material allocations."
+    },
+    {
+      "id": "C05",
+      "priority": "P2 unnecessary indirection",
+      "title": "Retain the lean treatment lookup closure by purpose; remove identity and fallback routes",
+      "evidence": [
+        "R/analysis_context.R:113-121",
+        "R/analysis_context.R:151",
+        "R/analysis_context.R:165-167",
+        "R/association_workers.R:143-147"
+      ],
+      "proposed_disposition": "ADOPTED PLAN: retain the useful per-run treatment lookup closure, renamed make_treatment_index_lookup, with its lean trt_idxs/n_trt result and existing shared scope. Remove native_observed_positions identity coercion and legacy_fit_source_cells reconstruction fallback with migrated callers. Keep observed one-based R versus synthetic zero-based bank conversion at the real Rcpp boundary. The earlier factory-removal proposal is superseded.",
+      "validation": "All four worker modes retain treatment order/n_trt, aligned source/design arrays, response/guide fit and bank sharing. Lookup tests exercise its actual membership semantics, including ordered NT calibration, not only a closure identity. Keep native observed-versus-synthetic score fixture; remove passthrough-only assertions.",
+      "cost": "The closure resolves treatment positions only. No full source/view construction per pair, no guide-by-cell view bank, and no additional fitted-vector cache.",
+      "superseded_initial_proposal": {
+        "status": "Historical proposal at initial audit; overridden by planning_amendment, not the implementation target",
+        "proposed_disposition": "Replace prepared_index_factory/get_idx_f closure with explicit context/treatment view at existing reuse scope; remove native_observed_positions identity coercion and legacy_fit_source_cells fallback together with unsupported optional direct-worker routes. Keep actual Rcpp observed-vs-synthetic base conversion at one native boundary.",
+        "validation": "All four worker modes, same treatment order/n_trt/source/design arrays, same banks and response/guide sharing. Keep native score fixture, delete identity-wrapper assertions.",
+        "cost": "Do not construct full n-cell source views per pair or precompute guide x cell maps. Direct treatment accessor or per-worker view avoids that regression."
+      }
+    },
+    {
+      "id": "C06",
+      "priority": "P2 unused branches",
+      "title": "Assignment-coefficient and reduced-score modes are test-only",
+      "evidence": [
+        "R/association_workers.R:135-139",
+        "R/association_workers.R:216-220",
+        "R/fitting.R:54-72",
+        "R/score_preparation.R:34-58",
+        "tests/testthat/test-refactor-fitting.R:12-16",
+        "tests/testthat/test-refactor-fitting.R:31-35"
+      ],
+      "proposed_disposition": "After deleting generic aliases, prefer probabilities-only assignment fitter and full current score preparation; remove unused flags/branches unless review identifies a concrete current supported consumer. Do not keep complexity solely for hypothetical extensions or self-authored tests.",
+      "validation": "Current production fit counts/probabilities/score arrays exact, all scientific fixtures unchanged; direct inference coordinate fixture uses current full score record.",
+      "cost": "No added allocation; do not couple fitting to score/D or introduce an extension registry to replace unused flags."
+    },
+    {
+      "id": "C07",
+      "priority": "P1 single context authority",
+      "title": "Context is partly duplicated and its options field is unused",
+      "evidence": [
+        "R/analysis_context.R:123-146",
+        "R/analysis.R:14-56",
+        "R/association_execution.R:78-97",
+        "R/association_execution.R:257-275"
+      ],
+      "proposed_disposition": "ADOPTED PLAN: compose one transient common fit view and aligned matrix design once, with drop=FALSE. Adopt the bounded B3 intercept-only dimension correction before or atomically with CL3; guide-specific NT slices also remain matrices. Choose one authority for options/index/cache and remove duplicate driver fallback routes. Preserve the full source-row S4 design and strict full-matrix cache comparison. The earlier decision to defer the repair is superseded; no temporary vector/error compatibility route is retained.",
+      "validation": "Independently construct intended retained-source and treatment/NT rows for NT calibration and NT discovery, exercising accepted intercept-only formulas under permutations and CRT. Assert matrix dimensions and numerical results from the independent view/calculation, not expectations generated by the new context helper. Preserve frozen normal-case fixtures and cold/warm, serial/fork fit/bank counts.",
+      "cost": "Reuse one common matrix view/design; form guide-specific matrices only at their existing reuse scope. No all-guide view bank, persistent design duplication, or per-response fitted-vector cache. The B3 repair is a prerequisite to or part of CL3.",
+      "superseded_initial_proposal": {
+        "status": "Historical proposal at initial audit; overridden by planning_amendment, not the implementation target",
+        "proposed_disposition": "Compose one transient context/common view and its aligned design once; choose one source of truth for options/index/cache. Remove unused test_options or make it the actual authority, and retire duplicated legacy driver argument routes only after actual consumer inventory. Saved source design stays unchanged.",
+        "validation": "Assert source map and design cell rows agree in complement, NT calibration, NT discovery; all roles/passing pairs, cold/warm cache and serial/fork match.",
+        "cost": "Reuse common view; avoid full per-response fitted vectors, persistent design copies or guide x source maps. Existing NT-only one-column drop is a separately reviewed behavior decision, not a prerequisite to this cleanup."
+      }
+    },
+    {
+      "id": "C08",
+      "priority": "P2 test authority",
+      "title": "Overlapping NT saved-schema test freezes malformed unsupported input",
+      "evidence": [
+        "tests/testthat/test-refactor-indexing.R:84-99",
+        "R/analysis_context.R:20-30",
+        "R/cellwise_qc_functs.R:98-116",
+        "R/s4_analysis_functs_1.R:93-99"
+      ],
+      "proposed_disposition": "Retain real saved low-MOI NT-local schema and ordered pool; test nonempty disjoint groups after QC. Separately test supported high-MOI union deduplication under complement. Do not require out-of-range cumulative runs for overlapping low-MOI groups.",
+      "validation": "Saved-object reopening/getter/assignment fixtures plus valid partition maps. If schema normalization is ever changed, treat that as a genuine serialized boundary decision.",
+      "cost": "No feature or matrix-layout change."
+    },
+    {
+      "id": "C09",
+      "priority": "retain deliberate invariants",
+      "title": "Cache compactness, miss-only merge and invalidation are real semantics",
+      "evidence": [
+        "R/fit_cache.R:27-85",
+        "R/association_execution.R:129-139",
+        "R/association_execution.R:213",
+        "R/association_execution.R:300-325",
+        "R/s4_analysis_functs_1.R:497-500"
+      ],
+      "proposed_disposition": "Keep setter/QC-owned invalidation and response-ID compact records; document merge as append, not upsert. Do not add assignment cache, opaque fingerprints, fitted-vector caches or PR233 behavior.",
+      "validation": "Cold/warm fit operation counts, parameter/control/low-MOI assignment/analysis-cell invalidations, no invalidation for mere report/QC-threshold changes with same view.",
+      "cost": "Existing compact saved cache only; no full response x cell state."
+    },
+    {
+      "id": "C10",
+      "priority": "retain genuine consumer boundary",
+      "title": "Three result adapters have actual pinned pipeline ::: consumers",
+      "evidence": [
+        "R/result_processing.R:145-161",
+        "sceptre-pipeline@38dc760:bin/process_association_analysis_results.R:34-36",
+        "sceptre-pipeline@38dc760:bin/run_association_analysis_nuclear.R:66"
+      ],
+      "proposed_disposition": "Retain process_calibration_result, process_discovery_result, apply_grouping_to_result as thin facade adapters until coordinated pipeline migration. Keep core finalization on plain tables. Add contracts stating complete-family standard correction versus existing nuclear raw shard behavior.",
+      "validation": "Pinned standard/nuclear artifact tests, Bonferroni integration, passing/failed rows, output amounts 1/2/3, diagnostic alpha collision and strict significance threshold.",
+      "cost": "No new cross-pod combine or global nuclear matrix/manifest."
+    },
+    {
+      "id": "C11",
+      "priority": "retain observed numerical/input semantics",
+      "title": "Similar count names do not imply interchangeable definitions",
+      "evidence": [
+        "src/sparse_matrix_functs.cpp:40-96",
+        "src/pairwise_qc.cpp:25-40",
+        "R/storage.R:265-287",
+        "tests/testthat/test-refactor-storage.R:16-28",
+        "tests/testthat/test-refactor-storage.R:55-77"
+      ],
+      "proposed_disposition": "Keep loaded-value >0.5 cell count, stored-position pair count, stored-FALSE conversion, sparse fractional values, and existing backed integer count/threshold coercion distinct. No scientific normalization disguised as source cleanup.",
+      "validation": "Existing stored-zero/fraction/threshold representation cases plus optional ondisc lane with real initialized handles; assertions should reflect supported representation differences.",
+      "cost": "No extra scans or dense realization."
+    },
+    {
+      "id": "C12",
+      "priority": "P2 contract completion",
+      "title": "28 source contracts exist but coverage does not establish accuracy; 24 assigned-module functions lack them",
+      "evidence": [
+        "R/storage.R",
+        "R/fitting.R",
+        "R/score_preparation.R",
+        "R/fit_cache.R",
+        "R/pair_qc.R",
+        "R/workflow_state.R",
+        "R/analysis_context.R",
+        "R/result_processing.R",
+        "R/precomputation_functions.R"
+      ],
+      "proposed_disposition": "Correct C03, label threshold/index validation as caller preconditions, then add concise @noRd contracts only to retained named helpers in context/results. Remove obsolete functions instead of documenting them into permanence.",
+      "validation": "Per-function caller/shape/order/side-effect audit in inventory.json; parse/generated-doc/API checks supplement but cannot substitute for that review.",
+      "cost": "No runtime cost; avoid ceremonial anonymous-closure documentation."
+    }
+  ],
+  "functions": [
+    {
+      "name": "prepare_cell_map",
+      "file": "R/analysis_context.R",
+      "start": 4,
+      "end": 12,
+      "formals": [
+        "source_cells",
+        "n_source"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary coordinate core",
+      "executed_contract": {
+        "purpose_shape": "Validate numeric nonmissing integer-valued unique source positions within n_source; return integer map.",
+        "coordinate_order_duplicate_policy": "R one-based source indices; caller order preserved; empty map allowed locally, workflow rejects no retained cells separately.",
+        "effects_cache_assumptions": "Pure; no RNG/files/cache."
+      },
+      "proposed_disposition": "Retain central source-view validation; source map uniqueness differs from duplicate pair request policy.",
+      "production_R_callsites": [
+        {
+          "callee": "prepare_cell_map",
+          "file": "R/analysis_context.R",
+          "line": 51,
+          "caller": "prepare_index_context"
+        },
+        {
+          "callee": "prepare_cell_map",
+          "file": "R/cellwise_qc_functs.R",
+          "line": 84,
+          "caller": "update_grna_assignments_given_qc"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 141,
+          "text": "make_map <- refactor_private(\"prepare_cell_map\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "source_membership_to_analysis",
+      "file": "R/analysis_context.R",
+      "start": 14,
+      "end": 18,
+      "formals": [
+        "source_members",
+        "analysis_to_source"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary coordinate core",
+      "executed_contract": {
+        "purpose_shape": "Map raw source-cell membership by which(analysis_to_source %in% source_members).",
+        "coordinate_order_duplicate_policy": "Returns unique R one-based ANALYSIS positions in ANALYSIS order; raw order/repeats deliberately discarded.",
+        "effects_cache_assumptions": "No input mutation/RNG/files/cache."
+      },
+      "proposed_disposition": "Retain; do not replace ordered NT concatenation with this set-membership rule.",
+      "production_R_callsites": [
+        {
+          "callee": "source_membership_to_analysis",
+          "file": "R/cellwise_qc_functs.R",
+          "line": 91,
+          "caller": "update_grna_assignments_given_qc"
+        },
+        {
+          "callee": "source_membership_to_analysis",
+          "file": "R/cellwise_qc_functs.R",
+          "line": 96,
+          "caller": "update_grna_assignments_given_qc"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 142,
+          "text": "normalize <- refactor_private(\"source_membership_to_analysis\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "legacy_nt_fit_assignments",
+      "file": "R/analysis_context.R",
+      "start": 20,
+      "end": 30,
+      "formals": "nt_groups_analysis",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "genuine saved-state boundary",
+      "executed_contract": {
+        "purpose_shape": "Create ordered unique NT pool and cumulative NT-local group runs for facade assignment slot.",
+        "coordinate_order_duplicate_policy": "Input nonempty disjoint low-MOI groups in analysis coordinates; pool concatenation order retained.",
+        "effects_cache_assumptions": "Pure. Overlapping unsupported groups can create out-of-pool runs; an existing test freezes that malformed representation."
+      },
+      "proposed_disposition": "Retain saved low-MOI schema and order; rename boundary clearly if useful; replace malformed-overlap characterization with supported partition test.",
+      "production_R_callsites": [
+        {
+          "callee": "legacy_nt_fit_assignments",
+          "file": "R/cellwise_qc_functs.R",
+          "line": 125,
+          "caller": "update_indiv_grna_assignments_for_nt_cells"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "calibration_group_membership",
+      "file": "R/analysis_context.R",
+      "start": 32,
+      "end": 37,
+      "formals": [
+        "group_id",
+        "nt_groups",
+        "low_moi"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary coordinate core",
+      "executed_contract": {
+        "purpose_shape": "Split compound group ID on &, concatenate selected NT memberships; unique only for high MOI.",
+        "coordinate_order_duplicate_policy": "Input/output R one-based ANALYSIS positions; low-MOI concatenation order/repeats preserved; high-MOI unique first-occurrence order.",
+        "effects_cache_assumptions": "Pure; expects valid named NT IDs/compound names from constructor."
+      },
+      "proposed_disposition": "Retain common actual union logic; test supported low-MOI partition and high-MOI overlap independently.",
+      "production_R_callsites": [
+        {
+          "callee": "calibration_group_membership",
+          "file": "R/analysis_context.R",
+          "line": 81,
+          "caller": "group_treatment_analysis"
+        },
+        {
+          "callee": "calibration_group_membership",
+          "file": "R/analysis_context.R",
+          "line": 159,
+          "caller": "get_idx_vector_calibration_check"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "resolve_pair_rows",
+      "file": "R/analysis_context.R",
+      "start": 39,
+      "end": 45,
+      "formals": [
+        "pairs",
+        "response_ids",
+        "group_ids"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary request identity core",
+      "executed_contract": {
+        "purpose_shape": "Assign sequential request row IDs and match response/group labels to canonical positions.",
+        "coordinate_order_duplicate_policy": "R one-based response/group/request positions; match uses first matching label; request order/repeats preserved, no rejection here.",
+        "effects_cache_assumptions": "No mutation/RNG/files/cache; caller validates IDs/unique lookup labels."
+      },
+      "proposed_disposition": "Retain identity map; invalid missing labels are precondition violations, not silently supported behavior.",
+      "production_R_callsites": [
+        {
+          "callee": "resolve_pair_rows",
+          "file": "R/analysis_context.R",
+          "line": 62,
+          "caller": "prepare_index_context"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "prepare_index_context",
+      "file": "R/analysis_context.R",
+      "start": 47,
+      "end": 77,
+      "formals": [
+        "cells_in_use",
+        "n_source",
+        "grna_assignments",
+        "pairs",
+        "response_ids",
+        "calibration_check",
+        "control_group_complement",
+        "low_moi"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary normalization boundary",
+      "executed_contract": {
+        "purpose_shape": "Convert persisted NT-local groups once to canonical analysis groups; build source map, request maps, splits and flags.",
+        "coordinate_order_duplicate_policy": "One-based all maps; ordered NT pool preserved; calibration group IDs first occurrence, discovery group IDs assignment-name order.",
+        "effects_cache_assumptions": "Transient lists only; no input mutation/RNG/files/cache."
+      },
+      "proposed_disposition": "Retain normalization at saved-facade boundary; avoid converting back for owned sparse kernel.",
+      "production_R_callsites": [
+        {
+          "callee": "prepare_index_context",
+          "file": "R/analysis_context.R",
+          "line": 136,
+          "caller": "prepare_analysis_context"
+        },
+        {
+          "callee": "prepare_index_context",
+          "file": "R/association_execution.R",
+          "line": 79,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "prepare_index_context",
+          "file": "R/association_execution.R",
+          "line": 258,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "prepare_index_context",
+          "file": "R/pairwise_qc_functs.R",
+          "line": 19,
+          "caller": "compute_pairwise_qc_information"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 102,
+          "text": "prepare <- refactor_private(\"prepare_index_context\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "group_treatment_analysis",
+      "file": "R/analysis_context.R",
+      "start": 79,
+      "end": 85,
+      "formals": [
+        "index",
+        "group_id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary coordinate core",
+      "executed_contract": {
+        "purpose_shape": "Resolve requested guide treatment from assignment groups or calibration NT union.",
+        "coordinate_order_duplicate_policy": "R one-based ANALYSIS membership; calibration duplicate policy belongs to calibration_group_membership.",
+        "effects_cache_assumptions": "Pure; IDs validated upstream."
+      },
+      "proposed_disposition": "Retain shared membership rule; keep distinct from fit-view positions.",
+      "production_R_callsites": [
+        {
+          "callee": "group_treatment_analysis",
+          "file": "R/analysis_context.R",
+          "line": 88,
+          "caller": "make_fit_view"
+        },
+        {
+          "callee": "group_treatment_analysis",
+          "file": "R/analysis_context.R",
+          "line": 115,
+          "caller": "prepared_index_factory"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "make_fit_view",
+      "file": "R/analysis_context.R",
+      "start": 87,
+      "end": 109,
+      "formals": [
+        "index",
+        "group_id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary fit-view core",
+      "executed_contract": {
+        "purpose_shape": "Compose fit->analysis->source map, treatment/control local positions and n_trt.",
+        "coordinate_order_duplicate_policy": "Complement uses all analysis cells; NT calibration uses ordered NT pool; NT discovery treatment-prefix then NT. Repeats not silently deduplicated.",
+        "effects_cache_assumptions": "Transient vectors only, no design/storage/RNG/cache mutation; control positions use ordered setdiff."
+      },
+      "proposed_disposition": "Retain explicit source/analysis/fit maps and order/duplicate semantics at existing shared scopes. The context selects a common matrix design and guide-specific workers use drop=FALSE, adopting B3 before or atomically with CL3; never construct full per-pair or all-guide view banks.",
+      "production_R_callsites": [
+        {
+          "callee": "make_fit_view",
+          "file": "R/association_execution.R",
+          "line": 84,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "make_fit_view",
+          "file": "R/association_execution.R",
+          "line": 263,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "make_fit_view",
+          "file": "R/association_workers.R",
+          "line": 66,
+          "caller": "discovery_ntcells_perm_test"
+        },
+        {
+          "callee": "make_fit_view",
+          "file": "R/association_workers.R",
+          "line": 210,
+          "caller": "discovery_ntcells_crt"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 103,
+          "text": "view_for <- refactor_private(\"make_fit_view\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary",
+      "superseded_initial_proposed_disposition": {
+        "status": "Historical planning text, superseded by planning_amendment; executed_contract remains pinned audit evidence",
+        "text": "Retain explicit view; compute at appropriate shared scope, not per cell or full guide-by-cell cache."
+      }
+    },
+    {
+      "name": "prepared_index_factory",
+      "file": "R/analysis_context.R",
+      "start": 113,
+      "end": 121,
+      "formals": "index",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "retain lean lookup; rename by purpose",
+      "executed_contract": {
+        "purpose_shape": "Return closure that resolves group treatment and NT-calibration fit-local positions; real driver callers use it.",
+        "coordinate_order_duplicate_policy": "Returns R one-based trt_idxs/n_trt; does not create source map; not safe generic NT-discovery fit map.",
+        "effects_cache_assumptions": "Closure captures index; no external observed caller or portable-state requirement."
+      },
+      "proposed_disposition": "ADOPTED PLAN: rename to make_treatment_index_lookup and retain its useful lean per-run closure returning trt_idxs/n_trt. Preserve membership/order semantics and shared scope; do not materialize full per-pair or all-guide cell views. Earlier factory-removal proposal is superseded.",
+      "production_R_callsites": [
+        {
+          "callee": "prepared_index_factory",
+          "file": "R/association_execution.R",
+          "line": 83,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "prepared_index_factory",
+          "file": "R/association_execution.R",
+          "line": 262,
+          "caller": "run_crt_in_memory_v2"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 134,
+          "text": "expect_identical(refactor_private(\"prepared_index_factory\")(calibration)(\"ntB\"),"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary lean current responsibility; retained and renamed in adopted plan",
+      "superseded_initial_proposed_disposition": {
+        "status": "Historical planning text, superseded by planning_amendment; executed_contract remains pinned audit evidence",
+        "text": "Remove factory by passing canonical context/index or explicit treatment accessor; compute view once per actual sharing scope without extra full-source allocations per pair."
+      },
+      "planned_symbol": "make_treatment_index_lookup"
+    },
+    {
+      "name": "prepare_analysis_context",
+      "file": "R/analysis_context.R",
+      "start": 123,
+      "end": 146,
+      "formals": [
+        "object",
+        "analysis",
+        "pairs"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "necessary boundary; incomplete composition",
+      "executed_contract": {
+        "purpose_shape": "Extract store, index, full source-row design, selected pairs, role, options and compact cache from facade.",
+        "coordinate_order_duplicate_policy": "CURRENT design is full-source, not common-fit subset; supplied pairs bypass role selection/filtering; internal caller supplies pass-QC pairs.",
+        "effects_cache_assumptions": "No fits/RNG/files/mutation. test_options currently unused downstream; options/index also passed separately to drivers."
+      },
+      "proposed_disposition": "ADOPTED PLAN: prepare one common fit view and aligned matrix design with drop=FALSE; remove duplicate option/index/cache authorities. Adopt accepted intercept-only formula repair before or atomically with CL3, including guide-specific matrix slices. Preserve the saved full source-row matrix/cache comparison; no temporary vector/error compatibility machinery.",
+      "production_R_callsites": [
+        {
+          "callee": "prepare_analysis_context",
+          "file": "R/analysis.R",
+          "line": 14,
+          "caller": "run_sceptre_analysis_high_level"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary",
+      "superseded_initial_proposed_disposition": {
+        "status": "Historical planning text, superseded by planning_amendment; executed_contract remains pinned audit evidence",
+        "text": "Make one authoritative transient plan and common fit view/design once; remove unused duplicate fields/argument authorities, preserve full source-row saved matrix."
+      }
+    },
+    {
+      "name": "native_observed_positions",
+      "file": "R/analysis_context.R",
+      "start": 151,
+      "end": 151,
+      "formals": "trt_fit_pos",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "remove private passthrough",
+      "executed_contract": {
+        "purpose_shape": "Only as.integer(trt_fit_pos); does not convert index base.",
+        "coordinate_order_duplicate_policy": "Input/output R one-based observed FIT positions; real zero-basing is observed_positions_zero_based at C++ inference boundary; synthetic banks already zero-based.",
+        "effects_cache_assumptions": "No mutation/RNG/files/cache."
+      },
+      "proposed_disposition": "Remove helper and identity-wrapper tests; keep explicit coordinate contract and meaningful observed-vs-synthetic native score fixture.",
+      "production_R_callsites": [
+        {
+          "callee": "native_observed_positions",
+          "file": "R/association_workers.R",
+          "line": 25,
+          "caller": "perm_test_glm_factored_out"
+        },
+        {
+          "callee": "native_observed_positions",
+          "file": "R/association_workers.R",
+          "line": 95,
+          "caller": "discovery_ntcells_perm_test"
+        },
+        {
+          "callee": "native_observed_positions",
+          "file": "R/association_workers.R",
+          "line": 167,
+          "caller": "crt_glm_factored_out"
+        },
+        {
+          "callee": "native_observed_positions",
+          "file": "R/association_workers.R",
+          "line": 250,
+          "caller": "discovery_ntcells_crt"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 151,
+          "text": "expect_identical(refactor_private(\"native_observed_positions\")(c(2L, 5L)), c(2L, 5L))"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary in current implementation; proposed simplification must migrate all callers"
+    },
+    {
+      "name": "get_idx_vector_calibration_check",
+      "file": "R/analysis_context.R",
+      "start": 154,
+      "end": 161,
+      "formals": [
+        "curr_grna_group",
+        "indiv_nt_grna_idxs",
+        "low_moi"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "remove private alias",
+      "executed_contract": {
+        "purpose_shape": "Wrap calibration_group_membership into trt_idxs/n_trt list; no production package caller.",
+        "coordinate_order_duplicate_policy": "Same one-based analysis membership/low-MOI repeat rule as target helper.",
+        "effects_cache_assumptions": "No side effects; only executable consumer found is refactor indexing test."
+      },
+      "proposed_disposition": "Delete; test calibration_group_membership directly and remove obsolete private-wrapper claims.",
+      "production_R_callsites": [],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 85,
+          "text": "get_indices <- refactor_private(\"get_idx_vector_calibration_check\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "obsolete: no supported executable consumer found in bounded inventory"
+    },
+    {
+      "name": "legacy_fit_source_cells",
+      "file": "R/analysis_context.R",
+      "start": 165,
+      "end": 167,
+      "formals": [
+        "analysis_to_source",
+        "nt_to_analysis",
+        "nt_only"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+      "classification": "remove unsupported private fallback",
+      "executed_contract": {
+        "purpose_shape": "Compose source map only when crt_glm_factored_out receives no explicit source_cells.",
+        "coordinate_order_duplicate_policy": "Analysis->source then optional NT->analysis map; current production plan always supplies source_cells.",
+        "effects_cache_assumptions": "Pure; no actual bounded external direct-worker consumer found."
+      },
+      "proposed_disposition": "Remove fallback and obsolete optional argument route with callers; if a real downstream worker consumer is discovered, localize named adapter there.",
+      "production_R_callsites": [
+        {
+          "callee": "legacy_fit_source_cells",
+          "file": "R/association_workers.R",
+          "line": 146,
+          "caller": "crt_glm_factored_out"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary in current implementation; proposed simplification must migrate all callers"
+    },
+    {
+      "name": "response_cache_parameters_changed",
+      "file": "R/fit_cache.R",
+      "start": 13,
+      "end": 16,
+      "formals": [
+        "object",
+        "design",
+        "complement"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "contract correction required",
+      "executed_contract": {
+        "purpose_shape": "Compare proposed full source-row design and complement flag by strict identical, including attributes/order.",
+        "coordinate_order_duplicate_policy": "Stored facade matrix rows index ORIGINAL SOURCE CELLS, not analysis-cell order as current @param claims.",
+        "effects_cache_assumptions": "Read-only; conservative invalidation can occur for changes outside current fit view; no RNG/files."
+      },
+      "proposed_disposition": "Correct text to full source-row schema; do not alter saved slot or replace comparison with view hashes.",
+      "production_R_callsites": [
+        {
+          "callee": "response_cache_parameters_changed",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 142,
+          "caller": "set_analysis_parameters"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Detect supported parameter changes that invalidate response fits",
+          "#'",
+          "#' @param object Existing sceptre S4 facade.",
+          "#' @param design Proposed design matrix in analysis-cell order.",
+          "#' @param complement Proposed scalar logical control-group flag.",
+          "#' @return Scalar logical from strict `identical` comparisons, including design",
+          "#'   attributes and order. Does not mutate the object or inspect numerical fits.",
+          "#' @noRd"
+        ],
+        "audit": "incorrect design-row wording: must say full SOURCE-cell matrix"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "response_cache_assignments_changed",
+      "file": "R/fit_cache.R",
+      "start": 27,
+      "end": 31,
+      "formals": [
+        "object",
+        "method",
+        "hyperparameters"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "necessary cache policy",
+      "executed_contract": {
+        "purpose_shape": "Low-MOI method/hyperparameter strict change invalidates response fits; high MOI false because assignment does not define common response-fit cells.",
+        "coordinate_order_duplicate_policy": "Assignment method scalar and options list from supported setter; cell-map changes handled separately.",
+        "effects_cache_assumptions": "Read-only; no assignment-fit cache, RNG or files."
+      },
+      "proposed_disposition": "Retain supported-setter ownership and explain why control/view combinations differ.",
+      "production_R_callsites": [
+        {
+          "callee": "response_cache_assignments_changed",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 319,
+          "caller": "assign_grnas"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Detect assignment changes affecting the low-MOI response-fit view",
+          "#'",
+          "#' @param object Existing sceptre S4 facade.",
+          "#' @param method Proposed assignment-method string.",
+          "#' @param hyperparameters Proposed assignment-hyperparameter list.",
+          "#' @return Scalar logical. Low MOI compares method and hyperparameters strictly;",
+          "#'   high MOI returns false because its response-fit view is not assignment-filtered.",
+          "#'   Analysis-cell changes are invalidated separately. No assignment-fit cache exists.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "invalidate_response_cache",
+      "file": "R/fit_cache.R",
+      "start": 42,
+      "end": 48,
+      "formals": [
+        "object",
+        "event",
+        "changed"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "necessary cache policy",
+      "executed_contract": {
+        "purpose_shape": "For an allowed explicit event label clear response_precomputations iff caller-resolved changed is true.",
+        "coordinate_order_duplicate_policy": "No map conversion; event in parameters/assignments/analysis_cells; returns updated S4 object.",
+        "effects_cache_assumptions": "Replaces only cache slot; caller must retain return; no fit/fingerprint/RNG/files."
+      },
+      "proposed_disposition": "Retain central mutation point; event documents ownership, not generic extensible event framework.",
+      "production_R_callsites": [
+        {
+          "callee": "invalidate_response_cache",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 181,
+          "caller": "set_analysis_parameters"
+        },
+        {
+          "callee": "invalidate_response_cache",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 317,
+          "caller": "assign_grnas"
+        },
+        {
+          "callee": "invalidate_response_cache",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 497,
+          "caller": "run_qc_pt_1"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Clear compact response fits after a supported facade change",
+          "#'",
+          "#' @param object Existing sceptre S4 facade; caller must retain the returned object.",
+          "#' @param event One of `parameters`, `assignments`, `analysis_cells`, checked here",
+          "#'   to keep the invalidation reason explicit at each caller.",
+          "#' @param changed Scalar logical already resolved by the supported setter/QC path.",
+          "#' @return Object with `response_precomputations` cleared iff `changed`; other",
+          "#'   slots are unchanged. No fit-view fingerprint or numerical check is inferred.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "lookup_response_fit",
+      "file": "R/fit_cache.R",
+      "start": 57,
+      "end": 57,
+      "formals": [
+        "cache",
+        "response_id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "necessary compact cache interface",
+      "executed_contract": {
+        "purpose_shape": "Named response-ID lookup returns compact record or NULL.",
+        "coordinate_order_duplicate_policy": "Key is response ID alone, so caller invalidation must ensure same cells/design/control fit view.",
+        "effects_cache_assumptions": "Read-only; no RNG/files; no duplicate-key validation."
+      },
+      "proposed_disposition": "Retain alongside explicit invalidation guarantees, not implied self-validating cache.",
+      "production_R_callsites": [
+        {
+          "callee": "lookup_response_fit",
+          "file": "R/association_execution.R",
+          "line": 129,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "lookup_response_fit",
+          "file": "R/association_execution.R",
+          "line": 130,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "lookup_response_fit",
+          "file": "R/association_execution.R",
+          "line": 300,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "lookup_response_fit",
+          "file": "R/association_execution.R",
+          "line": 301,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "lookup_response_fit",
+          "file": "R/association_workers.R",
+          "line": 157,
+          "caller": "crt_glm_factored_out"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Look up a compact response fit in the existing saved-cache schema",
+          "#'",
+          "#' @param cache Named list of compact coefficient/dispersion records.",
+          "#' @param response_id One response ID used as the list key.",
+          "#' @return Matching record or `NULL` for a miss. Caller-owned facade invalidation",
+          "#'   guarantees the fit view is still valid; the response-ID key alone cannot do so.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "merge_response_fits",
+      "file": "R/fit_cache.R",
+      "start": 68,
+      "end": 72,
+      "formals": [
+        "cache",
+        "updates"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "necessary compact cache interface",
+      "executed_contract": {
+        "purpose_shape": "Concatenate old cache then worker updates, preserving insertion order.",
+        "coordinate_order_duplicate_policy": "Updates must be uniquely named cache misses across partitioned responses; does NOT upsert or deduplicate.",
+        "effects_cache_assumptions": "No input mutation; stores compact coefficients/theta only, no fitted vectors/designs/draw banks."
+      },
+      "proposed_disposition": "Retain simple append under actual driver invariant; test warm-cache/repartition behavior, not hypothetical key framework.",
+      "production_R_callsites": [
+        {
+          "callee": "merge_response_fits",
+          "file": "R/association_execution.R",
+          "line": 213,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "merge_response_fits",
+          "file": "R/association_execution.R",
+          "line": 325,
+          "caller": "run_crt_in_memory_v2"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Append worker cache misses in the existing insertion order",
+          "#'",
+          "#' @param cache Existing named list of compact response-fit records.",
+          "#' @param updates Named list of newly fitted responses, absent from `cache` and",
+          "#'   unique across workers; callers establish this invariant before fitting.",
+          "#' @return Concatenated list, preserving old records then update order. This is",
+          "#'   not an upsert: duplicate names are neither replaced nor deduplicated. No fitted",
+          "#'   vectors, designs, or per-response cell maps are persisted or inputs mutated.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "commit_response_fits",
+      "file": "R/fit_cache.R",
+      "start": 82,
+      "end": 85,
+      "formals": [
+        "object",
+        "cache"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "e2438558283f2a574cedf5a43ebb9716c8908221eca677359e6efdc9dd0f784f",
+      "classification": "necessary facade commit",
+      "executed_contract": {
+        "purpose_shape": "Replace response_precomputations after successful analysis; return S4 object.",
+        "coordinate_order_duplicate_policy": "Cache already valid for current fit view; no revalidation/remapping here.",
+        "effects_cache_assumptions": "Only cache slot replaced, caller keeps result; no RNG/files."
+      },
+      "proposed_disposition": "Retain post-success facade boundary and compact saved schema.",
+      "production_R_callsites": [
+        {
+          "callee": "commit_response_fits",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 193,
+          "caller": "run_calibration_check_pt_2"
+        },
+        {
+          "callee": "commit_response_fits",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 296,
+          "caller": "run_power_check"
+        },
+        {
+          "callee": "commit_response_fits",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 399,
+          "caller": "run_discovery_analysis"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Commit completed analysis fits to the existing facade slot",
+          "#'",
+          "#' @param object Existing sceptre S4 facade; caller must retain the returned object.",
+          "#' @param cache Named list of compact response fits valid for the current fit view.",
+          "#' @return Object with only `response_precomputations` replaced. Analysis wrappers",
+          "#'   call this after successful execution; no validation, fitting or invalidation",
+          "#'   occurs here. No cache operation uses RNG or files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "fit_response_current",
+      "file": "R/fitting.R",
+      "start": 16,
+      "end": 41,
+      "formals": [
+        "expressions",
+        "covariate_matrix"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "435379e330e1cef6c3ad709a013ac9dafc8324585f60e536395b46d3a2baf084",
+      "classification": "necessary numerical core",
+      "executed_contract": {
+        "purpose_shape": "Poisson glm.fit then native dispersion estimate clipped [0.01,1000]; compact coefficients/theta; missing coefficients error.",
+        "coordinate_order_duplicate_policy": "Response length n, numeric design n x p in SAME ordered fit view; coefficient order follows design.",
+        "effects_cache_assumptions": "No second NB regression; warnings preserved; no mutation/RNG/storage/cache."
+      },
+      "proposed_disposition": "Retain arithmetic and named failure contract; input design is already selected by caller, not full-source slot.",
+      "production_R_callsites": [
+        {
+          "callee": "fit_response_current",
+          "file": "R/association_execution.R",
+          "line": 133,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "fit_response_current",
+          "file": "R/association_execution.R",
+          "line": 304,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "fit_response_current",
+          "file": "R/association_workers.R",
+          "line": 75,
+          "caller": "discovery_ntcells_perm_test"
+        },
+        {
+          "callee": "fit_response_current",
+          "file": "R/association_workers.R",
+          "line": 232,
+          "caller": "discovery_ntcells_crt"
+        },
+        {
+          "callee": "fit_response_current",
+          "file": "R/precomputation_functions.R",
+          "line": 4,
+          "caller": "perform_response_precomputation"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 6,
+          "text": "fit <- fit_response_current(y, design)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 15,
+          "text": "expect_error(fit_response_current(y, cbind(design, design)),"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Fit the existing response nuisance model on one aligned cell view",
+          "#'",
+          "#' @param expressions Numeric response vector of length n.",
+          "#' @param covariate_matrix Numeric n-by-p design, ordered with `expressions`;",
+          "#'   callers supply the validated design and select the fit-cell view.",
+          "#' @return Compact list `fitted_coefs` (p coefficients in design-column order) and",
+          "#'   scalar `theta`, clipped to [0.01, 1000] using the existing arithmetic.",
+          "#' @details Fits Poisson `glm.fit`, then estimates dispersion at its fitted means;",
+          "#'   no second negative-binomial regression is performed. Existing fit warnings",
+          "#'   propagate and missing coefficients produce the existing covariate error.",
+          "#'   Does not mutate inputs, cache results, access storage, or use RNG/files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "fit_assignment_current",
+      "file": "R/fitting.R",
+      "start": 54,
+      "end": 72,
+      "formals": [
+        "trt_idxs",
+        "covariate_matrix",
+        "return_fitted_values"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "435379e330e1cef6c3ad709a013ac9dafc8324585f60e536395b46d3a2baf084",
+      "classification": "test-only alternate branch decision",
+      "executed_contract": {
+        "purpose_shape": "Binomial glm.fit on indicator of treatment rows; production returns fitted probabilities.",
+        "coordinate_order_duplicate_policy": "Treatment indices R one-based fit-local rows; repeats set same indicator once; output probabilities n in view order.",
+        "effects_cache_assumptions": "No cache/RNG/storage/input mutation; existing warnings/convergence behavior. Coefficients-only FALSE branch has only a test consumer."
+      },
+      "proposed_disposition": "Prefer probabilities-only core after deleting unused aliases; otherwise name a real retained consumer for the flag.",
+      "production_R_callsites": [
+        {
+          "callee": "fit_assignment_current",
+          "file": "R/association_workers.R",
+          "line": 135,
+          "caller": "crt_glm_factored_out"
+        },
+        {
+          "callee": "fit_assignment_current",
+          "file": "R/association_workers.R",
+          "line": 216,
+          "caller": "discovery_ntcells_crt"
+        },
+        {
+          "callee": "fit_assignment_current",
+          "file": "R/precomputation_functions.R",
+          "line": 8,
+          "caller": "perform_grna_precomputation"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 10,
+          "text": "probability <- fit_assignment_current(treatment, design, TRUE)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 11,
+          "text": "coefficients <- fit_assignment_current(treatment, design, FALSE)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Fit the existing binary assignment model on one aligned cell view",
+          "#'",
+          "#' @param trt_idxs Valid R 1-based design-row positions of treated cells, not source",
+          "#'   columns. Repetitions set the same binary indicator entry to one.",
+          "#' @param covariate_matrix Numeric n-by-p design in the selected fit-cell order.",
+          "#' @param return_fitted_values Logical; return probabilities rather than coefficients.",
+          "#' @return Numeric vector of n fitted probabilities in fit-cell order, or p",
+          "#'   coefficients in design-column order. Uses binomial `glm.fit` with existing",
+          "#'   warnings and coefficient behavior; no additional convergence checks occur.",
+          "#' @details Does not mutate inputs, persist a cache, access storage, or use RNG/files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "uncertain: current main branch exists, but alternate output mode is test-only and needs explicit prune/retain decision"
+    },
+    {
+      "name": "collect_pair_qc_metrics",
+      "file": "R/pair_qc.R",
+      "start": 11,
+      "end": 15,
+      "formals": [
+        "store",
+        "pair_index",
+        "groups",
+        "source_cells",
+        "controls",
+        "nt_groups",
+        "nuclear"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+      "classification": "necessary measurement boundary",
+      "executed_contract": {
+        "purpose_shape": "Thin storage_pair_counts delegation separates observed measurements from eligibility rule.",
+        "coordinate_order_duplicate_policy": "Inherits storage analysis/source/request coordinates and exact output order.",
+        "effects_cache_assumptions": "No S4/policy/fitting/RNG/write work."
+      },
+      "proposed_disposition": "Retain semantic measurement stage required by accepted QC architecture; do not call it an external compatibility shim.",
+      "production_R_callsites": [
+        {
+          "callee": "collect_pair_qc_metrics",
+          "file": "R/pairwise_qc_functs.R",
+          "line": 36,
+          "caller": "compute_pairwise_qc_information"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Collect pair counts without applying a QC decision",
+          "#'",
+          "#' @inheritParams storage_pair_counts",
+          "#' @return The storage adapter's count list, with identical analysis/source index",
+          "#'   contracts, request order, optional summary shape and ownership guarantees.",
+          "#' @details Keeps the fused NT summary scan in storage; performs no S4 mutation,",
+          "#'   threshold policy, nuisance fitting, RNG draws or file writes.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "evaluate_pair_eligibility",
+      "file": "R/pair_qc.R",
+      "start": 29,
+      "end": 34,
+      "formals": [
+        "metrics",
+        "qc_options"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+      "classification": "necessary policy boundary",
+      "executed_contract": {
+        "purpose_shape": "Aligned counts meet treatment AND control thresholds; native shared predicate preserves old R NA & FALSE behavior.",
+        "coordinate_order_duplicate_policy": "One logical per input pair, same order; unequal lengths error, empty input logical(0).",
+        "effects_cache_assumptions": "Caller supplies integer-coerced stored thresholds; no input mutation/RNG/files. Native sampling shares acceptance predicate."
+      },
+      "proposed_disposition": "Retain one rule owner; clarify parameter preconditions instead of claiming comprehensive scalar validation.",
+      "production_R_callsites": [
+        {
+          "callee": "evaluate_pair_eligibility",
+          "file": "R/pairwise_qc_functs.R",
+          "line": 78,
+          "caller": "compute_qc_metrics"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-qc.R",
+          "line": 7,
+          "text": "expect_identical(evaluate_pair_eligibility(counts, options), expected)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-qc.R",
+          "line": 8,
+          "text": "expect_identical(evaluate_pair_eligibility(counts[7:1, ], options), rev(expected))"
+        },
+        {
+          "file": "tests/testthat/test-refactor-qc.R",
+          "line": 9,
+          "text": "expect_identical(evaluate_pair_eligibility(counts[FALSE, ], options), logical())"
+        },
+        {
+          "file": "tests/testthat/test-refactor-qc.R",
+          "line": 25,
+          "text": "eligible <- evaluate_pair_eligibility(metrics,"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Apply the shared observed-count eligibility rule in pair order",
+          "#'",
+          "#' @param metrics List of aligned integer `n_nonzero_trt`, `n_nonzero_cntrl`",
+          "#'   vectors, as returned by the storage adapter.",
+          "#' @param qc_options List with validated nonmissing integer",
+          "#'   `n_nonzero_trt_thresh`, `n_nonzero_cntrl_thresh` scalars.",
+          "#' @return Logical vector, one per pair: both counts must meet their threshold.",
+          "#'   Missing counts preserve the old R `&` semantics (a known failure wins over",
+          "#'   an unknown count); unequal count-vector lengths error and empty inputs return",
+          "#'   `logical()`. The native calibration sampler shares the same predicate.",
+          "#' @details Does not alter measurements, mutate inputs, draw RNG or access files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "perform_response_precomputation",
+      "file": "R/precomputation_functions.R",
+      "start": 3,
+      "end": 5,
+      "formals": [
+        "expressions",
+        "covariate_matrix"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "ab5923e482adf963da55b9a1bd23459239763c940d5891500aaad1f1088ee5ec",
+      "classification": "remove private alias",
+      "executed_contract": {
+        "purpose_shape": "Only delegates to fit_response_current; no production package caller.",
+        "coordinate_order_duplicate_policy": "Same aligned fit-cell response/design and compact result.",
+        "effects_cache_assumptions": "No executable bounded external caller; old proposal text is documentation, not code dependency."
+      },
+      "proposed_disposition": "Delete file alias and update developer guide to actual fitter; do not preserve for historical baseline naming.",
+      "production_R_callsites": [],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "obsolete: no supported executable consumer found in bounded inventory"
+    },
+    {
+      "name": "perform_grna_precomputation",
+      "file": "R/precomputation_functions.R",
+      "start": 7,
+      "end": 9,
+      "formals": [
+        "trt_idxs",
+        "covariate_matrix",
+        "return_fitted_values"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "ab5923e482adf963da55b9a1bd23459239763c940d5891500aaad1f1088ee5ec",
+      "classification": "remove private alias",
+      "executed_contract": {
+        "purpose_shape": "Only delegates to fit_assignment_current; no production package caller.",
+        "coordinate_order_duplicate_policy": "Same fit-local treatment and aligned design; forwards unused alternate output flag.",
+        "effects_cache_assumptions": "No executable bounded external caller found."
+      },
+      "proposed_disposition": "Delete with obsolete return-mode decision; keep actual numerical core.",
+      "production_R_callsites": [],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "obsolete: no supported executable consumer found in bounded inventory"
+    },
+    {
+      "name": "compute_precomputation_pieces",
+      "file": "R/precomputation_functions.R",
+      "start": 11,
+      "end": 15,
+      "formals": [
+        "expression_vector",
+        "covariate_matrix",
+        "fitted_coefs",
+        "theta",
+        "full_test_stat"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "ab5923e482adf963da55b9a1bd23459239763c940d5891500aaad1f1088ee5ec",
+      "classification": "remove private alias",
+      "executed_contract": {
+        "purpose_shape": "Construct fit list and delegate to prepare_score_current; only refactor indexing test calls it.",
+        "coordinate_order_duplicate_policy": "Same coefficient/fit-cell alignment; forwards test-only reduced score mode.",
+        "effects_cache_assumptions": "No executable bounded external caller; documentation mentions do not imply support."
+      },
+      "proposed_disposition": "Delete; retarget native coordinate fixture to prepare_score_current and actual compact record.",
+      "production_R_callsites": [],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-indexing.R",
+          "line": 61,
+          "text": "pieces <- refactor_private(\"compute_precomputation_pieces\")("
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "obsolete: no supported executable consumer found in bounded inventory"
+    },
+    {
+      "name": "pair_results_from_native",
+      "file": "R/result_processing.R",
+      "start": 3,
+      "end": 62,
+      "formals": [
+        "curr_df",
+        "curr_response_result",
+        "output_amount"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "necessary result core",
+      "executed_contract": {
+        "purpose_shape": "Append p/effect/se/log2 effect, diagnostic stage/score/SN fields, optional variable-length null-score columns to current request rows.",
+        "coordinate_order_duplicate_policy": "Native list length/order must align request rows; output_amount 1/2/3 schema and diagnostic NA padding retained; no dedup.",
+        "effects_cache_assumptions": "Ordinary table construction; no fits/store/RNG/S4/cache."
+      },
+      "proposed_disposition": "Retain; document row/schema/type contracts and actual data.frame/data.table behavior, test no accidental scientific column changes.",
+      "production_R_callsites": [
+        {
+          "callee": "pair_results_from_native",
+          "file": "R/association_execution.R",
+          "line": 179,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "pair_results_from_native",
+          "file": "R/association_execution.R",
+          "line": 394,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "pair_results_from_native",
+          "file": "R/result_processing.R",
+          "line": 164,
+          "caller": "construct_data_frame_v2"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-results.R",
+          "line": 37,
+          "text": "raw <- pair_results_from_native(requested[1:2, ], list(record, record), 3L)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "integrate_guides_current",
+      "file": "R/result_processing.R",
+      "start": 64,
+      "end": 121,
+      "formals": [
+        "result",
+        "grna_integration_strategy",
+        "grna_target_data_frame",
+        "is_calibration_check"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "necessary result core",
+      "executed_contract": {
+        "purpose_shape": "Union renames group to target; singleton joins guide-target map; Bonferroni groups response/target and uses passing-guide correction.",
+        "coordinate_order_duplicate_policy": "Preserve min-p tie selection, all-failed missing results/count maxima, p/response sort and intentional output columns.",
+        "effects_cache_assumptions": "New result table operations; setorderv mutates output table; no fit/RNG/storage/S4/cache."
+      },
+      "proposed_disposition": "Retain supported strategy semantics; document mapping cardinality/preconditions and no extra correction for calibration.",
+      "production_R_callsites": [
+        {
+          "callee": "integrate_guides_current",
+          "file": "R/result_processing.R",
+          "line": 134,
+          "caller": "finalize_association_result"
+        },
+        {
+          "callee": "integrate_guides_current",
+          "file": "R/result_processing.R",
+          "line": 159,
+          "caller": "apply_grouping_to_result"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "assemble_pair_results",
+      "file": "R/result_processing.R",
+      "start": 123,
+      "end": 129,
+      "formals": [
+        "raw_result",
+        "requested_pairs"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "necessary family boundary",
+      "executed_contract": {
+        "purpose_shape": "Bind raw eligible results with failed-QC requested rows, fill missing columns, sort p then response with NAs last.",
+        "coordinate_order_duplicate_policy": "Request duplicates are not normalized here; complete-family rows assembled before final correction.",
+        "effects_cache_assumptions": "rbindlist creates result table then sorts it; no RNG/storage/S4/cache."
+      },
+      "proposed_disposition": "Retain family assembly separate from inference; test failed rows and diagnostic schema.",
+      "production_R_callsites": [
+        {
+          "callee": "assemble_pair_results",
+          "file": "R/analysis.R",
+          "line": 66,
+          "caller": "run_sceptre_analysis_high_level"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-results.R",
+          "line": 38,
+          "text": "result <- assemble_pair_results(raw, requested)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "finalize_association_result",
+      "file": "R/result_processing.R",
+      "start": 131,
+      "end": 140,
+      "formals": [
+        "result",
+        "integration_strategy",
+        "target_map",
+        "correction_method",
+        "alpha",
+        "is_calibration_check"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "necessary family boundary",
+      "executed_contract": {
+        "purpose_shape": "Integrate guides, p.adjust full result family, append significant using strict adjusted-p < alpha.",
+        "coordinate_order_duplicate_policy": "NA p-values retained; correction settings outside data mask avoid diagnostic column alpha collision.",
+        "effects_cache_assumptions": "No fits/store/RNG/S4/cache; no cross-pod nuclear combine added."
+      },
+      "proposed_disposition": "Retain one complete-family standard finalizer; full outputs/Bonferroni/alpha-collision tests are material.",
+      "production_R_callsites": [
+        {
+          "callee": "finalize_association_result",
+          "file": "R/result_processing.R",
+          "line": 146,
+          "caller": "process_calibration_result"
+        },
+        {
+          "callee": "finalize_association_result",
+          "file": "R/result_processing.R",
+          "line": 152,
+          "caller": "process_discovery_result"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-results.R",
+          "line": 10,
+          "text": "result <- finalize_association_result(raw, \"bonferroni\", targets, \"BH\", 0.05)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-results.R",
+          "line": 19,
+          "text": "partial <- finalize_association_result(raw, \"bonferroni\", targets, \"BH\", 0.05)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-results.R",
+          "line": 27,
+          "text": "final <- finalize_association_result(union, \"union\", targets, \"BH\", 0.05)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "process_calibration_result",
+      "file": "R/result_processing.R",
+      "start": 145,
+      "end": 149,
+      "formals": [
+        "result",
+        "sceptre_object"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "genuine executable consumer boundary",
+      "executed_contract": {
+        "purpose_shape": "Extract facade integration/correction options and finalize calibration with is_calibration_check TRUE.",
+        "coordinate_order_duplicate_policy": "Same complete-family order/schema and calibration no-guide-Bonferroni behavior as current core.",
+        "effects_cache_assumptions": "No S4 writes; no RNG/files/cache; external pipeline calls private name."
+      },
+      "proposed_disposition": "Retain thin adapter until coordinated pipeline migration; genuine caller, not baseline/test justification.",
+      "production_R_callsites": [
+        {
+          "callee": "process_calibration_result",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 189,
+          "caller": "run_calibration_check_pt_2"
+        }
+      ],
+      "external_executable_references": [
+        {
+          "symbol": "process_calibration_result",
+          "repo": "sceptre-pipeline",
+          "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+          "file": "bin/process_association_analysis_results.R",
+          "line": 34,
+          "text": "run_calibration_check = sceptre:::process_calibration_result,",
+          "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+          "matches_pinned_blob": true
+        }
+      ],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "process_discovery_result",
+      "file": "R/result_processing.R",
+      "start": 151,
+      "end": 155,
+      "formals": [
+        "result",
+        "sceptre_object"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "genuine executable consumer boundary",
+      "executed_contract": {
+        "purpose_shape": "Extract facade options and finalize discovery.",
+        "coordinate_order_duplicate_policy": "Standard combine full family; nuclear script has existing pod-local correction-none/raw artifact contract.",
+        "effects_cache_assumptions": "No S4 writes/RNG/files/cache; actual pipeline combine and nuclear calls."
+      },
+      "proposed_disposition": "Retain adapter and both script contracts; do not introduce global nuclear correction.",
+      "production_R_callsites": [
+        {
+          "callee": "process_discovery_result",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 395,
+          "caller": "run_discovery_analysis"
+        }
+      ],
+      "external_executable_references": [
+        {
+          "symbol": "process_discovery_result",
+          "repo": "sceptre-pipeline",
+          "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+          "file": "bin/process_association_analysis_results.R",
+          "line": 36,
+          "text": "run_discovery_analysis = sceptre:::process_discovery_result)",
+          "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+          "matches_pinned_blob": true
+        },
+        {
+          "symbol": "process_discovery_result",
+          "repo": "sceptre-pipeline",
+          "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+          "file": "bin/run_association_analysis_nuclear.R",
+          "line": 66,
+          "text": "sceptre_object@discovery_result <- sceptre:::process_discovery_result(result_df, sceptre_object)",
+          "sha256": "12306dffb1242eeb21462830be8832502a89d13ef83bd7350fcab4c8502d3cd3",
+          "matches_pinned_blob": true
+        }
+      ],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "apply_grouping_to_result",
+      "file": "R/result_processing.R",
+      "start": 157,
+      "end": 161,
+      "formals": [
+        "result",
+        "sceptre_object",
+        "is_calibration_check"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "genuine executable consumer boundary",
+      "executed_contract": {
+        "purpose_shape": "Extract facade strategy/target map and integrate guides only; power does not apply standard significance correction here.",
+        "coordinate_order_duplicate_policy": "Existing guide family and ordering semantics; optional calibration flag forwarded.",
+        "effects_cache_assumptions": "No S4 write/RNG/files/cache; package power and pipeline combine actual callers."
+      },
+      "proposed_disposition": "Retain until coordinated external migration; source-contract needed, no generic alias cleanup.",
+      "production_R_callsites": [
+        {
+          "callee": "apply_grouping_to_result",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 292,
+          "caller": "run_power_check"
+        }
+      ],
+      "external_executable_references": [
+        {
+          "symbol": "apply_grouping_to_result",
+          "repo": "sceptre-pipeline",
+          "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+          "file": "bin/process_association_analysis_results.R",
+          "line": 35,
+          "text": "run_power_check = sceptre:::apply_grouping_to_result,",
+          "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+          "matches_pinned_blob": true
+        }
+      ],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "construct_data_frame_v2",
+      "file": "R/result_processing.R",
+      "start": 163,
+      "end": 165,
+      "formals": [
+        "curr_df",
+        "curr_response_result",
+        "output_amount"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+      "classification": "remove private alias",
+      "executed_contract": {
+        "purpose_shape": "Only delegates to pair_results_from_native; no production package caller.",
+        "coordinate_order_duplicate_policy": "Identical row/schema behavior of target; no independent contract.",
+        "effects_cache_assumptions": "No executable bounded external caller found."
+      },
+      "proposed_disposition": "Delete; no need to keep renamed private test-only aliases or old version suffix.",
+      "production_R_callsites": [],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": false,
+        "lines": [],
+        "audit": "source contract missing; add only if function is retained"
+      },
+      "triage_status": "obsolete: no supported executable consumer found in bounded inventory"
+    },
+    {
+      "name": "compute_D_matrix",
+      "file": "R/score_preparation.R",
+      "start": 13,
+      "end": 19,
+      "formals": [
+        "Zt_wZ",
+        "wZ"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fef1338768e58f777d41cd7647a6ace025eaf9fa73ad5b86705622db23441387",
+      "classification": "necessary numerical core",
+      "executed_contract": {
+        "purpose_shape": "Symmetric eigendecomposition forms p x n denominator factor from p x p Zt_wZ and n x p wZ.",
+        "coordinate_order_duplicate_policy": "wZ uses w, not sqrt(w); coefficient rows/cell columns retain order.",
+        "effects_cache_assumptions": "No clipping/ridge/pseudoinverse or new failure handling; no input mutation/RNG/files."
+      },
+      "proposed_disposition": "Retain exact algebra/eigen ordering; independently test shape and finite reference calculation.",
+      "production_R_callsites": [
+        {
+          "callee": "compute_D_matrix",
+          "file": "R/score_preparation.R",
+          "line": 49,
+          "caller": "prepare_score_current"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Form the existing score denominator factor without changing eigensystem order",
+          "#'",
+          "#' @param Zt_wZ Numeric symmetric p-by-p design crossproduct.",
+          "#' @param wZ Numeric n-by-p design multiplied rowwise by weights w, not sqrt(w).",
+          "#' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the symmetric",
+          "#'   eigendecomposition. Coefficient rows and fit-cell columns retain caller order.",
+          "#' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced; existing",
+          "#'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are untouched.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "prepare_score_current",
+      "file": "R/score_preparation.R",
+      "start": 34,
+      "end": 58,
+      "formals": [
+        "expression_vector",
+        "covariate_matrix",
+        "fit",
+        "full_test_stat"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "fef1338768e58f777d41cd7647a6ace025eaf9fa73ad5b86705622db23441387",
+      "classification": "test-only alternate branch decision",
+      "executed_contract": {
+        "purpose_shape": "Full production mode returns mu,w,a length n and D p x n from compact fit; FALSE returns reduced mu,a,b.",
+        "coordinate_order_duplicate_policy": "All arrays/design/fit share ordered fit cells and coefficient columns; no remapping here.",
+        "effects_cache_assumptions": "Ephemeral arrays; no refit/cache/RNG/storage/mutation. All actual production callers pass TRUE; FALSE is test-only."
+      },
+      "proposed_disposition": "Prefer pruning dead reduced branch/flag without coupling fit to D; defer new inference-specific preparation until an actual method.",
+      "production_R_callsites": [
+        {
+          "callee": "prepare_score_current",
+          "file": "R/association_execution.R",
+          "line": 140,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "prepare_score_current",
+          "file": "R/association_workers.R",
+          "line": 80,
+          "caller": "discovery_ntcells_perm_test"
+        },
+        {
+          "callee": "prepare_score_current",
+          "file": "R/association_workers.R",
+          "line": 154,
+          "caller": "crt_glm_factored_out"
+        },
+        {
+          "callee": "prepare_score_current",
+          "file": "R/association_workers.R",
+          "line": 237,
+          "caller": "discovery_ntcells_crt"
+        },
+        {
+          "callee": "prepare_score_current",
+          "file": "R/precomputation_functions.R",
+          "line": 13,
+          "caller": "compute_precomputation_pieces"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 24,
+          "text": "score <- prepare_score_current(y, design, fit)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-fitting.R",
+          "line": 31,
+          "text": "reduced <- prepare_score_current(y, design, fit, FALSE)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Prepare ephemeral score arrays on the nuisance fit's cell view",
+          "#'",
+          "#' @param expression_vector Numeric response vector of length n.",
+          "#' @param covariate_matrix Numeric n-by-p design aligned with the response and fit.",
+          "#' @param fit Compact response record with p `fitted_coefs` in design-column order",
+          "#'   and scalar `theta`, computed for this same fit-cell view.",
+          "#' @param full_test_stat Logical; select the full or legacy reduced score arrays.",
+          "#' @return Full mode: list `mu`, `w`, `a` (length n), `D` (p by n). Reduced mode:",
+          "#'   list `mu`, `a`, `b` (length n), preserving the compatibility wrapper's formulas.",
+          "#' @details Keeps the existing arithmetic and numerical warnings. Does not refit,",
+          "#'   mutate inputs, persist fitted vectors, resample, or access storage/RNG/files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "uncertain: current main branch exists, but alternate output mode is test-only and needs explicit prune/retain decision"
+    },
+    {
+      "name": "storage_response_index",
+      "file": "R/storage.R",
+      "start": 12,
+      "end": 14,
+      "formals": [
+        "store",
+        "id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary adapter",
+      "executed_contract": {
+        "purpose_shape": "Find row positions by ID; absent ID returns integer(0), duplicated row names yield multiple positions.",
+        "coordinate_order_duplicate_policy": "Source rows are R one-based; preserves which() row order; callers validate one ID and unique feature IDs.",
+        "effects_cache_assumptions": "Read-only; no RNG/files/cache."
+      },
+      "proposed_disposition": "Retain at the storage/ID boundary; document preconditions, not invented validation.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_response_index",
+          "file": "R/assign_grna_functions.R",
+          "line": 92,
+          "caller": "assign_grnas_to_cells_thresholding"
+        },
+        {
+          "callee": "storage_response_index",
+          "file": "R/s4_helpers.R",
+          "line": 365,
+          "caller": "load_row"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 84,
+          "text": "expect_identical(storage_response_index(mat, \"r2\"), 2L)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Resolve a feature ID in source-row coordinates",
+          "#'",
+          "#' @param store Row-accessible sparse matrix or initialized `odm` with row names.",
+          "#' @param id One feature ID, already validated by the caller.",
+          "#' @return Integer R 1-based row positions; an absent ID gives `integer()`.",
+          "#'   Duplicate row names are not resolved or rejected here.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_read_response",
+      "file": "R/storage.R",
+      "start": 26,
+      "end": 33,
+      "formals": [
+        "store",
+        "response_idx",
+        "source_cells"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary adapter",
+      "executed_contract": {
+        "purpose_shape": "Read one dgRMatrix/initialized odm response as numeric vector; materializes one complete row before subsetting.",
+        "coordinate_order_duplicate_policy": "Source row and requested source columns R one-based; NULL means all, integer(0) none, repeats/order preserved.",
+        "effects_cache_assumptions": "No caller mutation, RNG, or file writes; backed reads require process-local initialized handle."
+      },
+      "proposed_disposition": "Retain; no eager full assay or claim of arbitrary block-read efficiency.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_read_response",
+          "file": "R/association_execution.R",
+          "line": 118,
+          "caller": "run_perm_test_in_memory"
+        },
+        {
+          "callee": "storage_read_response",
+          "file": "R/association_execution.R",
+          "line": 296,
+          "caller": "run_crt_in_memory_v2"
+        },
+        {
+          "callee": "storage_read_response",
+          "file": "R/association_workers.R",
+          "line": 152,
+          "caller": "crt_glm_factored_out"
+        },
+        {
+          "callee": "storage_read_response",
+          "file": "R/association_workers.R",
+          "line": 230,
+          "caller": "discovery_ntcells_crt"
+        },
+        {
+          "callee": "storage_read_response",
+          "file": "R/s4_helpers.R",
+          "line": 365,
+          "caller": "load_row"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 85,
+          "text": "expect_identical(storage_read_response(mat, 1L, c(11L, 4L, 11L, 8L, 1L)),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 87,
+          "text": "expect_identical(storage_read_response(mat, 2L, 8L), 0)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 88,
+          "text": "expect_identical(storage_read_response(mat, 2L, integer()), numeric())"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 89,
+          "text": "expect_identical(storage_read_response(mat, 1L), load_row(mat, \"r1\"))"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 162,
+          "text": "expect_identical(storage_read_response(pair$response_matrix, 1L, c(11L, 4L, 11L, 8L, 1L)),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 167,
+          "text": "expect_identical(storage_read_response(reopened$response_matrix, 1L),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 168,
+          "text": "storage_read_response(pair$response_matrix, 1L))"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Read one response in an ordered source-cell view",
+          "#'",
+          "#' @param store A `dgRMatrix` or initialized, process-local `odm`.",
+          "#' @param response_idx One valid R 1-based row index in `store`.",
+          "#' @param source_cells Valid R 1-based source-column indices, or `NULL` for all",
+          "#'   columns. Their order and repetitions are retained; `integer()` reads no cells.",
+          "#' @return Numeric vector in the requested cell order, including for one cell.",
+          "#' @details Materializes one complete source row before subsetting, never the full",
+          "#'   assay. Does not mutate inputs, draw randomness, or write backing files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_threshold_row",
+      "file": "R/storage.R",
+      "start": 46,
+      "end": 56,
+      "formals": [
+        "store",
+        "feature_idx",
+        "threshold"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary adapter",
+      "executed_contract": {
+        "purpose_shape": "Test stored entries against threshold, returning their source-column positions.",
+        "coordinate_order_duplicate_policy": "R one-based row/columns; stored order; explicit zero can pass zero while implicit zero is absent.",
+        "effects_cache_assumptions": "No input mutation/RNG/writes; sparse double comparison versus backed integer coercion is existing semantics."
+      },
+      "proposed_disposition": "Retain backend boundary and representation characterization.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_threshold_row",
+          "file": "R/assign_grna_functions.R",
+          "line": 91,
+          "caller": "assign_grnas_to_cells_thresholding"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 90,
+          "text": "expect_identical(storage_threshold_row(mat, 1L, 2.8), c(8L, 11L))"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Find stored source positions passing a feature threshold",
+          "#'",
+          "#' @param store A `dgRMatrix` or initialized `odm`.",
+          "#' @param feature_idx One valid R 1-based source-row index.",
+          "#' @param threshold Scalar count threshold.",
+          "#' @return R 1-based source-column indices in native stored-column order.",
+          "#' @details Only stored entries are tested: implicit zeros are absent even at",
+          "#'   threshold zero, while explicit stored zeros can pass. Sparse values and the",
+          "#'   threshold remain doubles; the existing backed representation and native",
+          "#'   threshold use integer coercion. Does not mutate inputs or use RNG/file writes.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_owned_groups",
+      "file": "R/storage.R",
+      "start": 65,
+      "end": 67,
+      "formals": "groups",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary defensive adapter",
+      "executed_contract": {
+        "purpose_shape": "Allocate fresh integer vectors for list members; as.integer alone may alias.",
+        "coordinate_order_duplicate_policy": "Coordinates unchanged; names, order, repeats retained.",
+        "effects_cache_assumptions": "Protects callers from legacy native in-place decrements; O(total group members) copying."
+      },
+      "proposed_disposition": "Keep only where the actually called kernel mutates R vectors; remove redundant sparse-pair copies in canonical proposal.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_owned_groups",
+          "file": "R/storage.R",
+          "line": 110,
+          "caller": "storage_pair_counts"
+        },
+        {
+          "callee": "storage_owned_groups",
+          "file": "R/storage.R",
+          "line": 111,
+          "caller": "storage_pair_counts"
+        },
+        {
+          "callee": "storage_owned_groups",
+          "file": "R/storage.R",
+          "line": 163,
+          "caller": "storage_group_counts"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Own disposable copies of indices passed to native kernels",
+          "#'",
+          "#' @param groups List of index vectors; coordinates are unchanged here.",
+          "#' @return List of freshly allocated integer vectors, retaining names, order and",
+          "#'   repetitions. The copy protects callers from legacy kernels that decrement",
+          "#'   indices in place; integer coercion alone can alias an existing vector.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_pair_counts",
+      "file": "R/storage.R",
+      "start": 94,
+      "end": 149,
+      "formals": [
+        "store",
+        "pair_index",
+        "groups",
+        "source_cells",
+        "controls",
+        "nt_groups",
+        "nuclear"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "simplify internal coordinates",
+      "executed_contract": {
+        "purpose_shape": "Return requested pair counts and optional NT-group by all-response summary; pair-only mode discards summaries.",
+        "coordinate_order_duplicate_policy": "Groups/controls/NT groups index analysis view; source_cells indexes source columns, all R one-based. Sort pairs for native scan then invert permutation; preserve repeats.",
+        "effects_cache_assumptions": "Copies groups; no RNG/writes. Current analysis->NT-local match is undone by sparse native redirection. NT total sums groups, requiring supported partition for NT controls."
+      },
+      "proposed_disposition": "Canonical sparse kernel consumes analysis groups directly, converts positions once without R mutation; keep NT-local conversion only for external ondisc.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_pair_counts",
+          "file": "R/pair_qc.R",
+          "line": 13,
+          "caller": "collect_pair_qc_metrics"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 103,
+          "text": "out <- storage_pair_counts(mat, pairs, groups, cells, control,"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 116,
+          "text": "pair_only <- storage_pair_counts(mat, pairs, groups, cells, control)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 120,
+          "text": "empty <- storage_pair_counts(mat, pairs[integer(), ], groups, cells, control)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 136,
+          "text": "reordered <- storage_pair_counts("
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Count requested pairs and optional NT summaries in analysis coordinates",
+          "#'",
+          "#' @param store A `dgRMatrix` or initialized `odm` with responses in rows.",
+          "#' @param pair_index Data frame with R 1-based `response_idx` source rows and",
+          "#'   `group_idx` positions in `groups`. Request rows may repeat or be unordered.",
+          "#' @param groups List of treatment groups, each containing R 1-based positions in",
+          "#'   the ordered analysis view `source_cells`, not original source columns.",
+          "#' @param source_cells Valid R 1-based source-column indices defining that view.",
+          "#' @param controls Either `\"complement\"` or R 1-based analysis positions of NT cells.",
+          "#' @param nt_groups Optional list of NT groups in analysis coordinates. For NT",
+          "#'   controls these must partition `controls`, as supplied by the low-MOI caller.",
+          "#'   `NULL` requests pair counts without retaining the all-response summary.",
+          "#' @param nuclear Logical; backed storage skips the summary and scans requested",
+          "#'   response rows only. Sparse storage retains its fused scan when summarizing.",
+          "#' @return List with integer `n_nonzero_trt` and `n_nonzero_cntrl` vectors in exact",
+          "#'   request order. A retained summary contains `n_nonzero_mat` (NT groups by all",
+          "#'   source responses) and `n_nonzero_tot` (one total per source response); otherwise",
+          "#'   they are the legacy `matrix()` and `integer()` placeholders.",
+          "#' @details Counts refer to stored column positions, including explicit zeros,",
+          "#'   rather than positive loaded values. Complement totals use the analysis view;",
+          "#'   NT totals sum the group counts, so overlapping groups would count repeatedly.",
+          "#'   The adapter sorts requests for the scan and restores order, owns mutable",
+          "#'   native input vectors, and performs no RNG draws or file writes. Callers own",
+          "#'   index/range validation and the NT-partition invariant; no deduplication occurs.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary in current implementation; proposed simplification must migrate all callers"
+    },
+    {
+      "name": "storage_group_counts",
+      "file": "R/storage.R",
+      "start": 162,
+      "end": 179,
+      "formals": [
+        "store",
+        "response_idxs",
+        "groups",
+        "source_cells"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary adapter",
+      "executed_contract": {
+        "purpose_shape": "Native all-response group scan followed by requested-column selection; matrix groups x requested responses.",
+        "coordinate_order_duplicate_policy": "Group members are analysis positions; source_cells source columns; R one-based. Response order/repeats and zero/one dimensions retained.",
+        "effects_cache_assumptions": "Owns vectors because native kernel decrements groups; no RNG/writes. Allocates groups x all responses, not just selected responses."
+      },
+      "proposed_disposition": "Retain batched behavior and explicit allocation contract; no per-cell R loops.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_group_counts",
+          "file": "R/neg_control_functions.R",
+          "line": 75,
+          "caller": "construct_negative_control_pairs_v2"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 126,
+          "text": "expect_identical(storage_group_counts(mat, c(2L, 1L, 2L), groups, cells),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 129,
+          "text": "expect_identical(storage_group_counts(mat, 1L, groups[1L], cells),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 131,
+          "text": "expect_identical(storage_group_counts(mat, integer(), groups, cells),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 133,
+          "text": "expect_identical(storage_group_counts(mat, c(1L, 2L), list(), cells),"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Count analysis groups across requested source responses",
+          "#'",
+          "#' @inheritParams storage_pair_counts",
+          "#' @param response_idxs Valid R 1-based source-row indices in requested order.",
+          "#' @return Integer matrix with `length(groups)` rows and `length(response_idxs)`",
+          "#'   columns. Request order, repetitions, and zero/one-sized dimensions are kept.",
+          "#' @details The legacy calibration kernel scans all responses, then this boundary",
+          "#'   selects columns. Counts use stored positions, including explicit zeros.",
+          "#'   Disposable group copies protect callers from native in-place decrements;",
+          "#'   inputs, RNG state, and backing files are otherwise unchanged.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_create_backed_pair",
+      "file": "R/storage.R",
+      "start": 192,
+      "end": 208,
+      "formals": [
+        "response_matrix",
+        "grna_matrix",
+        "directory_to_write",
+        "integer_id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "genuine compatibility boundary",
+      "executed_contract": {
+        "purpose_shape": "Sequentially construct response.odm and grna.odm with supplied shared integer identity; return initialized pair.",
+        "coordinate_order_duplicate_policy": "Source row/column ordering and stored representation supplied by import.",
+        "effects_cache_assumptions": "Writes files and opens handles; not transactional; no ID generation/RNG here. Existing ondisc coercion/chunk restrictions retained."
+      },
+      "proposed_disposition": "Keep private adapter: public ondisc constructor fixes ID zero and cannot preserve existing import identity.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_create_backed_pair",
+          "file": "R/import_functs.R",
+          "line": 888,
+          "caller": "write_matrices_to_disk"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 158,
+          "text": "pair <- storage_create_backed_pair(mat, mat, directory, 9876L)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Create backing files with the existing shared import identity",
+          "#'",
+          "#' @param response_matrix,grna_matrix Sparse count matrices prepared by import.",
+          "#' @param directory_to_write Existing output directory prepared by the caller.",
+          "#' @param integer_id Scalar integer import ID, already drawn by the caller.",
+          "#' @return Named list `response_matrix`, `grna_matrix` of initialized `odm`s.",
+          "#' @details Writes `response.odm` then `grna.odm`; creation is not transactional.",
+          "#'   The private constructor preserves the supplied shared ID, unlike the public",
+          "#'   constructor's fixed ID. Existing ondisc count coercion, chunk-size restrictions",
+          "#'   and errors are retained. No RNG draws occur here; handles are process-local.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_reopen_backed_pair",
+      "file": "R/storage.R",
+      "start": 219,
+      "end": 229,
+      "formals": [
+        "response_file",
+        "grna_file",
+        "integer_id"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "genuine compatibility boundary",
+      "executed_contract": {
+        "purpose_shape": "Open both existing files, then check response and guide IDs against saved object; return initialized matrices.",
+        "coordinate_order_duplicate_policy": "Preserves file ordering; ID does not prove barcode order or distinguish modalities in same bundle.",
+        "effects_cache_assumptions": "Reads/reopens process-local handles; no writes/RNG; existing mismatch errors."
+      },
+      "proposed_disposition": "Retain for public saved-object reader and existing .odm layout, no serialized portable pointers.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_reopen_backed_pair",
+          "file": "R/ondisc_functs.R",
+          "line": 73,
+          "caller": "read_ondisc_backed_sceptre_object"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 165,
+          "text": "reopened <- storage_reopen_backed_pair(file.path(directory, \"response.odm\"),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 169,
+          "text": "expect_error(storage_reopen_backed_pair(file.path(directory, \"response.odm\"),"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Reattach backing files and check their saved import identity",
+          "#'",
+          "#' @param response_file,grna_file Existing backing-file paths prepared by caller.",
+          "#' @param integer_id Scalar integer ID saved in the sceptre object.",
+          "#' @return Named list `response_matrix`, `grna_matrix` of initialized `odm`s.",
+          "#' @details Opens both files before checking their IDs against the object, retaining",
+          "#'   the existing mismatch errors. Reconstructs process-local handles through",
+          "#'   ondisc; reads files without writing them or drawing randomness.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "storage_cell_covariates",
+      "file": "R/storage.R",
+      "start": 244,
+      "end": 254,
+      "formals": [
+        "store",
+        "mt_gene_idxs",
+        "compute_p_mito",
+        "compute_max_feature"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "necessary adapter",
+      "executed_contract": {
+        "purpose_shape": "dgCMatrix cell summaries: loaded values >0.5 for n_nonzero, totals, optional mitochondrial/max fractions.",
+        "coordinate_order_duplicate_policy": "Input mitochondrial feature rows R one-based; max_feature output deliberately zero-based, first maximum; vectors in source-cell order.",
+        "effects_cache_assumptions": "Owns decremented mitochondrial indices; optional outputs remain zero when disabled; zero-total ratios may be nonfinite. No RNG/files."
+      },
+      "proposed_disposition": "Retain native boundary; do not unify its positive-value count with stored-position pair counts.",
+      "production_R_callsites": [
+        {
+          "callee": "storage_cell_covariates",
+          "file": "R/preprocessing_functions.R",
+          "line": 59,
+          "caller": "compute_cell_covariates"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Compute existing cell summaries from column-accessible counts",
+          "#'",
+          "#' @param store A `dgCMatrix`, with features in rows and cells in columns.",
+          "#' @param mt_gene_idxs R 1-based mitochondrial feature-row indices; may be empty.",
+          "#' @param compute_p_mito,compute_max_feature Logical summary switches.",
+          "#' @return List of cell-ordered vectors: integer `n_nonzero` (loaded values > 0.5),",
+          "#'   numeric `n_umi`, `p_mito`, `frac_umis_max_feature`, and integer `max_feature`.",
+          "#'   The latter is deliberately a native zero-based row index, with first maximum",
+          "#'   winning ties. Disabled optional summaries retain native zero-filled vectors;",
+          "#'   zero-total ratios retain native non-finite results when computed.",
+          "#' @details Owns a mitochondrial-index copy because the native kernel decrements",
+          "#'   it in place. Does not convert storage, mutate caller inputs, or use RNG/files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "set_matrix_accessibility",
+      "file": "R/storage.R",
+      "start": 270,
+      "end": 344,
+      "formals": [
+        "matrix_in",
+        "make_row_accessible"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "ownership correction adopted; qualification pending",
+      "executed_contract": {
+        "purpose_shape": "Return requested dgR/dgC orientation, preserving dimensions/names, numeric values/stored zeros; stored logical entries become one including FALSE.",
+        "coordinate_order_duplicate_policy": "Native sparse coordinates zero-based; triplet duplicates not normalized; dense conversion does not create new dense assay.",
+        "effects_cache_assumptions": "CURRENT unsorted triplet slots can be sorted in caller by setDT/setorderv. Compressed conversions already deep-copy sorting table; no RNG/files."
+      },
+      "proposed_disposition": "ADOPTED OWNERSHIP TARGET, PENDING QUALIFICATION: own sorting vectors and preserve exact returned semantics. Execute triplet-resource-plan.md after approval; 16 bytes/nnz is a payload estimate, not measured total RSS/workspace or an automatic resource exception.",
+      "production_R_callsites": [
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/assign_grna_functions.R",
+          "line": 89,
+          "caller": "assign_grnas_to_cells_thresholding"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/import_functs.R",
+          "line": 974,
+          "caller": "process_covariates_and_matrices"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/import_functs.R",
+          "line": 978,
+          "caller": "process_covariates_and_matrices"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/mixture_model_functs.R",
+          "line": 48,
+          "caller": "assign_grnas_to_cells_mixture"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/plotting_functions.R",
+          "line": 92,
+          "caller": "plot_grna_count_distributions"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/plotting_functions.R",
+          "line": 297,
+          "caller": "plot_assign_grnas"
+        },
+        {
+          "callee": "set_matrix_accessibility",
+          "file": "R/preprocessing_functions.R",
+          "line": 43,
+          "caller": "compute_cell_covariates"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 49,
+          "text": "expect_identical(set_matrix_accessibility(input, row_access),"
+        },
+        {
+          "file": "tests/testthat/test-refactor-storage.R",
+          "line": 50,
+          "text": "ondisc:::set_matrix_accessibility(input, row_access))"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 3,
+          "text": "test_that(\"set_matrix_accessibility\", {"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 16,
+          "text": "m_r <- set_matrix_accessibility(matrix_in = m, make_row_accessible = TRUE)"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 25,
+          "text": "set_matrix_accessibility(make_row_accessible = TRUE)"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 32,
+          "text": "m_r <- m_r |> set_matrix_accessibility(make_row_accessible = TRUE)"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 39,
+          "text": "m_c <- set_matrix_accessibility(matrix_in = m, make_row_accessible = FALSE)"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 48,
+          "text": "set_matrix_accessibility(make_row_accessible = FALSE)"
+        },
+        {
+          "file": "tests/testthat/test-preprocessing_functs.R",
+          "line": 55,
+          "text": "m_c <- m_c |> set_matrix_accessibility(make_row_accessible = FALSE)"
+        },
+        {
+          "file": "tests/testthat/test-check_functions.R",
+          "line": 205,
+          "text": "response_matrix = set_matrix_accessibility("
+        },
+        {
+          "file": "tests/testthat/test-check_functions.R",
+          "line": 209,
+          "text": "grna_matrix = set_matrix_accessibility("
+        },
+        {
+          "file": "tests/testthat/test-s4_analysis_functs_1.R",
+          "line": 13,
+          "text": "set_matrix_accessibility()"
+        },
+        {
+          "file": "tests/testthat/test-s4_analysis_functs_1.R",
+          "line": 105,
+          "text": "set_matrix_accessibility(response_matrix)"
+        },
+        {
+          "file": "tests/testthat/test-s4_analysis_functs_1.R",
+          "line": 109,
+          "text": "set_matrix_accessibility(grna_matrix)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Convert the existing supported matrix representations for row/column access",
+          "#'",
+          "#' @param matrix_in Numeric dense matrix, numeric or logical sparse R/C/T matrix,",
+          "#'   or initialized `odm`.",
+          "#' @param make_row_accessible Logical; request `dgRMatrix` rather than `dgCMatrix`.",
+          "#' @return Sparse matrix with original dimensions and dimnames, or the input `odm`.",
+          "#'   A numeric sparse input already in the requested orientation is returned as-is.",
+          "#' @details Sparse numeric values, including stored zeros and fractions, are kept;",
+          "#'   stored logical entries become one, including explicitly stored `FALSE`.",
+          "#'   Triplet duplicates are not normalized here. Legacy triplet sorting can reorder",
+          "#'   the caller's slot vectors by reference; this is not a nonmutating conversion.",
+          "#'   No dense assay realization, RNG draws, or file writes occur. The local copy",
+          "#'   keeps in-memory workflows independent of the optional ondisc dependency.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary",
+      "superseded_initial_proposed_disposition": {
+        "status": "Historical planning text, superseded by planning_amendment; executed_contract remains pinned audit evidence",
+        "text": "Approve owned sorting vectors to remove accidental mutation; ~16 bytes/stored numeric entry transient copy; retain stored-FALSE semantics."
+      }
+    },
+    {
+      "name": "convert_pointer_to_index_vector_v2",
+      "file": "R/storage.R",
+      "start": 354,
+      "end": 357,
+      "formals": "p",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "3c8ccc699c703fa5c645a5e735e0f37772bd4f03d1001df83fe09481c3a38ec4",
+      "classification": "rename private helper",
+      "executed_contract": {
+        "purpose_shape": "Expand compressed pointer differences into zero-based run indices, no mutation.",
+        "coordinate_order_duplicate_policy": "Input pointer length dimension+1, starts zero; output length nnz, empty runs omitted, original entry order.",
+        "effects_cache_assumptions": "Pure; no RNG/files/cache."
+      },
+      "proposed_disposition": "Rename sparse_pointer_to_indices; only two callers in storage.R, no bounded external executable consumer.",
+      "production_R_callsites": [
+        {
+          "callee": "convert_pointer_to_index_vector_v2",
+          "file": "R/storage.R",
+          "line": 306,
+          "caller": "set_matrix_accessibility"
+        },
+        {
+          "callee": "convert_pointer_to_index_vector_v2",
+          "file": "R/storage.R",
+          "line": 308,
+          "caller": "set_matrix_accessibility"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Expand a compressed sparse pointer into native coordinates",
+          "#'",
+          "#' @param p Valid zero-based compressed pointer, length dimension plus one, with",
+          "#'   at least one dimension entry; differences are nonnegative stored-entry counts.",
+          "#' @return Zero-based coordinate vector of length `tail(p, 1)`, with empty runs",
+          "#'   omitted. Does not mutate `p` or change entry order.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "workflow_steps",
+      "file": "R/workflow_state.R",
+      "start": 9,
+      "end": 13,
+      "formals": {},
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "classification": "genuine saved-state boundary",
+      "executed_contract": {
+        "purpose_shape": "Seven named integer ranks in saved/display order; calibration/power/discovery are rank-five siblings.",
+        "coordinate_order_duplicate_policy": "Ranks are prerequisite/invalidation levels, not total analysis execution order.",
+        "effects_cache_assumptions": "Returns ordinary new vector; no side effects/cache/RNG/files."
+      },
+      "proposed_disposition": "Retain fixed saved names/order and sibling semantics.",
+      "production_R_callsites": [
+        {
+          "callee": "workflow_steps",
+          "file": "R/workflow_state.R",
+          "line": 21,
+          "caller": "workflow_initial_state"
+        },
+        {
+          "callee": "workflow_steps",
+          "file": "R/workflow_state.R",
+          "line": 37,
+          "caller": "workflow_transition"
+        },
+        {
+          "callee": "workflow_steps",
+          "file": "R/workflow_state.R",
+          "line": 63,
+          "caller": "workflow_status"
+        },
+        {
+          "callee": "workflow_steps",
+          "file": "R/workflow_state.R",
+          "line": 64,
+          "caller": "workflow_status"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Define the existing workflow ranks and saved-flag order",
+          "#'",
+          "#' @return Named integer vector of seven ranks. Calibration, power and discovery",
+          "#'   share rank five: they are independent siblings, not sequential prerequisites.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "workflow_initial_state",
+      "file": "R/workflow_state.R",
+      "start": 20,
+      "end": 23,
+      "formals": {},
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "classification": "necessary state policy",
+      "executed_contract": {
+        "purpose_shape": "After import, seven named flags: import TRUE, all others FALSE.",
+        "coordinate_order_duplicate_policy": "Names/order from workflow_steps.",
+        "effects_cache_assumptions": "No object mutation/cache/RNG/files."
+      },
+      "proposed_disposition": "Retain one initialization owner; public import behavior unchanged.",
+      "production_R_callsites": [
+        {
+          "callee": "workflow_initial_state",
+          "file": "R/import_functs.R",
+          "line": 846,
+          "caller": "init_sceptre_object"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 2,
+          "text": "state <- workflow_initial_state()"
+        },
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 22,
+          "text": "expect_identical(workflow_initial_state(), original)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Initialize the saved workflow flags after a successful import",
+          "#'",
+          "#' @return Named logical vector in workflow order: import true, all other flags",
+          "#'   false. Produces no object mutation, RNG draws or file side effects.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "workflow_transition",
+      "file": "R/workflow_state.R",
+      "start": 36,
+      "end": 51,
+      "formals": [
+        "functs_called",
+        "curr_funct"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "classification": "necessary state policy",
+      "executed_contract": {
+        "purpose_shape": "Check all immediately previous-rank flags, set current true, invalidate strictly later ranks.",
+        "coordinate_order_duplicate_policy": "Valid saved flags/current name expected; sibling and unknown extra flags preserved; original vector unchanged.",
+        "effects_cache_assumptions": "No analyses/cache/RNG/files; existing prerequisite error preserved."
+      },
+      "proposed_disposition": "Retain one owner; test reruns and siblings, do not add workflow framework.",
+      "production_R_callsites": [
+        {
+          "callee": "workflow_transition",
+          "file": "R/workflow_state.R",
+          "line": 77,
+          "caller": "perform_status_check_and_update"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 5,
+          "text": "state <- workflow_transition(state, step)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 13,
+          "text": "one <- workflow_transition(ready, analysis)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 17,
+          "text": "state <- workflow_transition(state, analysis)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 21,
+          "text": "expect_identical(workflow_transition(state, \"run_qc\"), ready)"
+        },
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 24,
+          "text": "expect_error(workflow_transition(original, \"run_qc\"),"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Check prerequisites and update the existing workflow flags",
+          "#'",
+          "#' @param functs_called Named logical vector with all seven supported saved flags.",
+          "#' @param curr_funct One supported workflow function name.",
+          "#' @return Updated flag vector: current flag true, all strictly later ranks false;",
+          "#'   flags at the same rank and unknown extra flags remain unchanged.",
+          "#' @details Requires all flags at the immediately preceding rank, preserving the",
+          "#'   existing prerequisite error text. Repeating a final analysis preserves its",
+          "#'   sibling flags. Callers supply valid names/flags; the input is not mutated and",
+          "#'   this operation neither runs analyses nor changes caches, RNG or files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "workflow_status",
+      "file": "R/workflow_state.R",
+      "start": 60,
+      "end": 66,
+      "formals": "functs_called",
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "classification": "genuine saved-state display boundary",
+      "executed_contract": {
+        "purpose_shape": "Order present known flags, then unknown extras in existing order, without changing truth values.",
+        "coordinate_order_duplicate_policy": "Saved-name order retained; no inference of prerequisite completion.",
+        "effects_cache_assumptions": "Pure; no object mutation/cache/RNG/files."
+      },
+      "proposed_disposition": "Retain unknown fields for display of supported historical objects; correct anonymous print-method caller attribution.",
+      "production_R_callsites": [
+        {
+          "callee": "workflow_status",
+          "file": "R/s4_helpers.R",
+          "line": 87,
+          "caller": "<top-level>"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-refactor-state.R",
+          "line": 20,
+          "text": "expect_identical(workflow_status(state), state)"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Order workflow flags for display without changing their meaning",
+          "#'",
+          "#' @param functs_called Named saved logical workflow flags.",
+          "#' @return Present known flags in workflow order, followed by unknown flags in",
+          "#'   their original order for saved-object compatibility. Does not infer completion",
+          "#'   or enforce prerequisites; the input is unchanged.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    },
+    {
+      "name": "perform_status_check_and_update",
+      "file": "R/workflow_state.R",
+      "start": 76,
+      "end": 82,
+      "formals": [
+        "sceptre_object",
+        "curr_funct"
+      ],
+      "source_revision": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+      "source_file_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "classification": "necessary facade boundary",
+      "executed_contract": {
+        "purpose_shape": "Apply transition to facade flags and set last_function_called; return object.",
+        "coordinate_order_duplicate_policy": "Same saved names and rank order; wrappers call before work on local object.",
+        "effects_cache_assumptions": "Only two slots replaced; no numerical/cache/RNG/files."
+      },
+      "proposed_disposition": "Retain supported wrapper boundary; no state transition injected in numerical core.",
+      "production_R_callsites": [
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 87,
+          "caller": "set_analysis_parameters"
+        },
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 266,
+          "caller": "assign_grnas"
+        },
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_1.R",
+          "line": 439,
+          "caller": "run_qc_pt_1"
+        },
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 102,
+          "caller": "run_calibration_check_pt_1"
+        },
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 252,
+          "caller": "run_power_check"
+        },
+        {
+          "callee": "perform_status_check_and_update",
+          "file": "R/s4_analysis_functs_2.R",
+          "line": 355,
+          "caller": "run_discovery_analysis"
+        }
+      ],
+      "external_executable_references": [],
+      "test_mentions": [
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 3,
+          "text": "test_that(\"perform_status_check_and_update\", {"
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 20,
+          "text": "results <- perform_status_check_and_update("
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 32,
+          "text": "perform_status_check_and_update(blank_object, \"run_qc\"),"
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 38,
+          "text": "perform_status_check_and_update(\"set_analysis_parameters\") |>"
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 39,
+          "text": "perform_status_check_and_update(\"assign_grnas\") |>"
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 40,
+          "text": "perform_status_check_and_update(\"run_qc\")"
+        },
+        {
+          "file": "tests/testthat/test-s4_helpers.R",
+          "line": 48,
+          "text": "results <- results |> perform_status_check_and_update(\"assign_grnas\")"
+        }
+      ],
+      "existing_source_contract": {
+        "has_noRd": true,
+        "lines": [
+          "#' Apply a workflow transition to the existing S4 facade",
+          "#'",
+          "#' @param sceptre_object Sceptre S4 facade; caller must retain the returned object.",
+          "#' @param curr_funct One supported workflow function name.",
+          "#' @return Object with transitioned `functs_called` and updated",
+          "#'   `last_function_called`; other slots are unchanged. Preserves the saved flag",
+          "#'   schema without running numerical work, invalidating fits, using RNG or files.",
+          "#' @noRd"
+        ],
+        "audit": "accurate subject to explicit caller preconditions; reviewed against executed caller/native rows"
+      },
+      "triage_status": "necessary current responsibility/boundary"
+    }
+  ],
+  "acceptance_after_plan_review": {
+    "order": [
+      "Record senior plan-review amendments and precise genuine boundaries before implementation resumes",
+      "Accept contract accuracy and final retained/deleted/renamed symbol crosswalk",
+      "One atomic canonical-kernel+adapter+generated-wrapper+focused-test change; no obsolete test-only v3 shim",
+      "Separate ownership correction with independent output parity/nonmutation and the explicit triplet resource protocol; crossed gates require investigation or reviewed exception",
+      "Before or atomically with CL3 adopt bounded drop=FALSE B3 repair, then context/worker migration with retained make_treatment_index_lookup closure and original fit/bank sharing",
+      "Complete source contracts for retained helpers and actual consumer/package/API/scientific checks",
+      "Requalify affected resource paths on matched fresh release builds; do not reuse old reports as qualification of new ownership path"
+    ],
+    "resource_gate": "Meaningful workloads use warm-up plus at least three measured repetitions, fixed inputs/dependencies/BLAS/threads/workers/budgets/cache. Existing general gates remain median elapsed <=+10% and peak worker RSS increase <=max(10%,64 MiB). The dedicated numeric/logical unsorted triplet experiment in triplet-resource-plan.md measures total and conversion-phase RSS including sorting workspace. Preserve initial crossings/outliers; investigate or record an explicitly reviewed ownership-correctness exception without relabeling the result a general-gate pass. Other general cases must still pass their agreed gates.",
+    "must_not_change": "Public exports/formals/methods/56-slot schema, supported statistical fits/QC/RNG/draw order/guide integration/family correction, ondisc optionality/.odm layout, backend support or pipeline standard/nuclear artifact contracts.",
+    "named_bounded_corrections": {
+      "B3": "Adopt matrix preservation for already accepted intercept-only formulas before or atomically with CL3; independent NT calibration/discovery permutation/CRT regressions, unchanged normal-case fixtures",
+      "O1": "Adopt input ownership correction with exact returned-value/schema/order parity; resource acceptance is separately measured/reviewed"
+    }
+  },
+  "planning_amendment": {
+    "status": "ADOPTED PLANNING DISPOSITIONS; implementation and measurement remain pending the overall plan checkpoint",
+    "audit_source_revision_unchanged": "c7d62502757f2a17741e2ef18b9e4d006bf063dc",
+    "review_source": "/private/tmp/sceptre-cleanup-plan-senior-review.md",
+    "review_sha256": "6262bc716f01070fdfdaab4db267b5c56aa901e048668b77e8476e3c1b390e5e",
+    "authority": "Parent planning-only assignment resolving senior-review required amendments 3 and 6; no production edits or test execution authorized here",
+    "supersedes": [
+      "C05 initial proposal to remove the useful treatment lookup closure",
+      "C07 initial deferral of the NT one-column design repair"
+    ],
+    "C05_final": "Retain the lean per-run treatment lookup closure and rename prepared_index_factory to make_treatment_index_lookup. Remove native_observed_positions and legacy_fit_source_cells with their migrated callers. Do not build full per-pair views or an all-guide cell-view bank.",
+    "C07_final": "Adopt the bounded drop=FALSE correction for already accepted intercept-only formulas before or atomically with CL3. Prepare one common-view matrix design; retain guide-specific matrix slicing, full source-row saved design and its strict cache comparison. Do not add a temporary vector/error compatibility route.",
+    "O1_resource_plan": "tools/refactor/cleanup/triplet-resource-plan.md; payload-byte estimates are not measured RSS or acceptance; crossed gates require explicit exception review or investigation",
+    "implementation_executed": false,
+    "resource_experiment_executed": false
+  }
+}

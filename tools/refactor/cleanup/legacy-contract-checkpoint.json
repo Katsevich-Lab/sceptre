@@ -1,0 +1,62 @@
+[
+  {
+    "file": "R/cellwise_qc_functs.R",
+    "AST_identical": true,
+    "named_internal_functions": ["determine_cells_to_retain", "update_grna_assignments_given_qc", "update_indiv_grna_assignments_for_nt_cells"],
+    "noRd_blocks": 3
+  },
+  {
+    "file": "R/assign_grna_functions.R",
+    "AST_identical": true,
+    "named_internal_functions": ["assign_grnas_to_cells", "assign_grnas_to_cells_thresholding", "assign_grnas_to_cells_maximum", "process_initial_assignment_list", "determine_grnas_in_use"],
+    "noRd_blocks": 5
+  },
+  {
+    "file": "R/import_functs.R",
+    "AST_identical": true,
+    "named_internal_functions": ["import_data_memory", "import_data_use_ondisc", "import_data_from_cellranger_memory", "import_data_from_cellranger_use_ondisc", "init_sceptre_object", "create_csc_matrix", "get_mtx_metadata", "write_matrices_to_disk", "prepare_directory_to_write", "prepare_ondisc_file_path", "check_path_has_no_tilde", "process_covariates_and_matrices", "collapse_grna_target_data_frame", "collapse_grna_matrix"],
+    "noRd_blocks": 14
+  },
+  {
+    "file": "R/ondisc_functs.R",
+    "AST_identical": true,
+    "named_internal_functions": ["get_id_vect", "write_vector"],
+    "noRd_blocks": 2
+  },
+  {
+    "file": "R/neg_control_functions.R",
+    "AST_identical": true,
+    "named_internal_functions": ["construct_negative_control_pairs_v2", "compute_calibration_group_size", "get_undercover_group_names"],
+    "noRd_blocks": 3
+  },
+  {
+    "file": "R/pairwise_qc_functs.R",
+    "AST_identical": true,
+    "named_internal_functions": ["compute_pairwise_qc_information", "compute_qc_metrics"],
+    "noRd_blocks": 2
+  },
+  {
+    "file": "R/preprocessing_functions.R",
+    "AST_identical": true,
+    "named_internal_functions": ["convert_covariate_df_to_design_matrix", "compute_cell_covariates", "get_synthetic_permutation_idxs", "update_dfs_based_on_grouping_strategy"],
+    "noRd_blocks": 4
+  },
+  {
+    "file": "R/s4_helpers.R",
+    "AST_identical": true,
+    "named_internal_functions": "load_row",
+    "noRd_blocks": 1
+  },
+  {
+    "file": "R/s4_analysis_functs_1.R",
+    "AST_identical": true,
+    "named_internal_functions": ["run_qc_pt_1", "run_qc_pt_2"],
+    "noRd_blocks": 2
+  },
+  {
+    "file": "R/s4_analysis_functs_2.R",
+    "AST_identical": true,
+    "named_internal_functions": ["run_calibration_check_pt_1", "run_calibration_check_pt_2", "skip_assign_grnas_and_run_qc"],
+    "noRd_blocks": 3
+  }
+]
