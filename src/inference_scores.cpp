@@ -6,15 +6,21 @@ using namespace Rcpp;
 namespace sceptre {
 namespace inference {
 
+IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
+  IntegerVector zero_based(positions.size());
+  for (R_xlen_t i = 0; i < positions.size(); ++i) zero_based[i] = positions[i] - 1;
+  return zero_based;
+}
+
 EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, const IntegerVector& trt_idxs, int n_trt) {
   double sum_y = 0, sum_mu = 0, sum_top = 0, curr_top, n_trt_double = (double) n_trt;
   for (int i = 0; i < n_trt; i ++) {
-    sum_y += y[trt_idxs[i] - 1];
-    sum_mu += mu[trt_idxs[i] - 1];
+    sum_y += y[trt_idxs[i]];
+    sum_mu += mu[trt_idxs[i]];
   }
   double fc = (sum_y/n_trt_double)/(sum_mu/n_trt_double);
   for (int i = 0; i < n_trt; i ++) {
-    curr_top = y[trt_idxs[i] - 1] - fc * mu[trt_idxs[i] - 1];
+    curr_top = y[trt_idxs[i]] - fc * mu[trt_idxs[i]];
     sum_top += curr_top * curr_top;
   }
   double se = sqrt(sum_top/(sum_mu * sum_mu));
@@ -30,15 +36,15 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
   for (int i = 0; i < D_nrow; i ++) {
     inner_sum = 0;
     for (int j = 0; j < trt_idxs.size(); j ++) {
-      inner_sum += D(i, trt_idxs[j] - 1);
+      inner_sum += D(i, trt_idxs[j]);
     }
     lower_right += inner_sum * inner_sum;
   }
 
   // second, compute the lower-left hand of the denominator; also, compute the top
   for (int j = 0; j < trt_idxs.size(); j ++) {
-    top += a[trt_idxs[j] - 1];
-    lower_left += w[trt_idxs[j] - 1];
+    top += a[trt_idxs[j]];
+    lower_left += w[trt_idxs[j]];
   }
 
   // finally, compute the z-score
@@ -90,6 +96,6 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
 
 // Retain the existing native helper signature for callers in the package.
 std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt) {
-  sceptre::inference::EffectEstimate effect = sceptre::inference::estimate_effect(y, mu, trt_idxs, n_trt);
+  sceptre::inference::EffectEstimate effect = sceptre::inference::estimate_effect(y, mu, sceptre::inference::observed_positions_zero_based(trt_idxs), n_trt);
   return std::vector<double> {effect.fold_change, effect.standard_error};
 }

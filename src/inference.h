@@ -5,13 +5,15 @@
 #include <array>
 #include <vector>
 
-// Private numeric components of the existing full-score test. Observed
-// treatment indices are R one-based positions; draw-bank entries are already
-// native zero-based positions. Only the compatibility wrapper accepts SEXP.
+// Private numeric components of the existing full-score test. Both observed
+// treatment indices and draw-bank entries are native zero-based positions.
+// Compatibility adapters alone convert R positions and unwrap SEXP pointers.
 namespace sceptre {
 namespace inference {
 
 typedef std::vector<std::vector<int>> DrawBank;
+
+Rcpp::IntegerVector observed_positions_zero_based(const Rcpp::IntegerVector& positions);
 
 struct EffectEstimate {
   double fold_change;

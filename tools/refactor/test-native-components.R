@@ -25,13 +25,13 @@ testthat::test_that("effect and scores have independent explicit inputs", {
     selected_mu <- mu[treatment]
     fc <- mean(selected_y) / mean(selected_mu)
     se <- sqrt(sum((selected_y - fc * selected_mu)^2) / sum(selected_mu)^2)
-    testthat::expect_equal(environment$component_effect(y, mu, treatment, 2L), c(fc, se))
+    testthat::expect_equal(environment$component_effect(y, mu, treatment - 1L, 2L), c(fc, se))
     a <- c(0.4, 1.1, -0.5, 0.2)
     w <- c(2, 3, 2, 4)
     D <- rbind(c(0.1, 0.2, 0.1, -0.2), c(0.2, 0.1, -0.1, 0.1))
     score <- function(index) sum(a[index]) /
         sqrt(sum(w[index]) - sum(rowSums(D[, index, drop = FALSE])^2))
-    testthat::expect_equal(environment$component_observed(a, w, D, treatment), score(treatment))
+    testthat::expect_equal(environment$component_observed(a, w, D, treatment - 1L), score(treatment))
     draws <- list(c(0L, 2L, 3L), c(3L, 1L), c(1L, 2L, 0L), c(2L, 0L))
     before <- serialize(list(a, w, D, treatment, draws), NULL)
     # Segment offsets are zero-based; cell indices in these banks are already
@@ -60,8 +60,8 @@ testthat::test_that("the staged component independently reproduces every frozen 
     for (name in names(inputs$cases)) {
         case <- inputs$cases[[name]]
         before <- serialize(case, NULL)
-        effect <- environment$component_effect(case$y, case$mu, case$trt_idxs, case$n_trt)
-        observed <- environment$component_observed(case$a, case$w, case$D, case$trt_idxs)
+        effect <- environment$component_effect(case$y, case$mu, case$trt_idxs - 1L, case$n_trt)
+        observed <- environment$component_observed(case$a, case$w, case$D, case$trt_idxs - 1L)
         args <- case[c("a", "w", "D", "draws", "n_trt", "use_all_cells", "B1", "B2", "B3",
                        "fit_parametric_curve", "side_code", "return_resampling_dist")]
         args$z_orig <- observed

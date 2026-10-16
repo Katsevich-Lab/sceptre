@@ -4,11 +4,12 @@
 using namespace Rcpp;
 
 // Keep the existing native helper signatures while ordinary numeric components
-// own the arithmetic. Observed R indices are converted inside observed_score;
+// own the arithmetic. Observed R indices are converted once at these adapters;
 // synthetic draw indices are already zero-based and are never converted again.
 double compute_observed_full_statistic_v2(NumericVector a, NumericVector w,
                                           NumericMatrix D, IntegerVector trt_idxs) {
-  return sceptre::inference::observed_score(a, w, D, trt_idxs);
+  return sceptre::inference::observed_score(a, w, D,
+    sceptre::inference::observed_positions_zero_based(trt_idxs));
 }
 
 std::vector<double> compute_null_full_statistics(const NumericVector& a,
@@ -40,9 +41,11 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int side_code) {
   // The compatibility boundary alone unwraps R's external pointer. Numeric
   // components receive a const bank reference with worker-local lifetime.
+  const IntegerVector observed_positions =
+    sceptre::inference::observed_positions_zero_based(trt_idxs);
   sceptre::inference::EffectEstimate effect =
-    sceptre::inference::estimate_effect(y, mu, trt_idxs, n_trt);
-  double z_orig = sceptre::inference::observed_score(a, w, D, trt_idxs);
+    sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
+  double z_orig = sceptre::inference::observed_score(a, w, D, observed_positions);
   XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
   sceptre::inference::TailResult tail = sceptre::inference::evaluate_staged_tail(
     z_orig, a, w, D, n_trt, use_all_cells, *draws, B1, B2, B3,

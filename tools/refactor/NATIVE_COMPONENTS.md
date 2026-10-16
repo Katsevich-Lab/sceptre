@@ -6,7 +6,7 @@ ordinary private components declared in `src/inference.h`:
 
 | Owner | Responsibility |
 | --- | --- |
-| `inference_scores.cpp` | Effect estimate, observed score, and a requested segment of null scores. Observed treatment positions are one-based; draw-bank positions are already zero-based. |
+| `inference_scores.cpp` | Effect estimate, observed score, and a requested segment of null scores. Observed treatment and draw-bank positions are zero-based; compatibility adapters convert observed R positions once. |
 | `inference_tail.cpp` | Existing empirical and skew-normal calculations, including fit checks and in-place ordering of an owned null-score vector. |
 | `inference_stages.cpp` | Existing stage threshold, segment offsets, fallback decisions, and conversion to the legacy return record. |
 | `shared_low_level_functions.cpp` | Sparse nonzero loading used by pairwise QC, separate from inference. |
