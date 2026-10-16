@@ -7,7 +7,21 @@
 #include <unordered_set>
 #include "shared_low_level_functions.h"
 #include "pair_eligibility.h"
+#include "sampling_safety.h"
 using namespace Rcpp;
+
+namespace {
+void check_group_size(int n_nt_grnas, int group_size) {
+  if (n_nt_grnas < 1 || group_size < 1 || group_size > n_nt_grnas)
+    stop("Calibration group size must be between 1 and the active NT group count.");
+}
+
+void positive_integer(double value, const char* name) {
+  if (!std::isfinite(value) || value < 1 || value != std::floor(value) ||
+      value > std::numeric_limits<int>::max())
+    stop("%s must be a positive integer within native capacity.", name);
+}
+}
 
 
 std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uniform_real_distribution<double>& distribution) {
@@ -29,6 +43,16 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
 // [[Rcpp::export]]
 IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups,
                                      int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat) {
+  check_group_size(n_nt_grnas, calibration_group_size);
+  positive_integer(n_calibration_pairs, "n_calibration_pairs");
+  positive_integer(n_genes, "n_genes");
+  positive_integer(N_POSSIBLE_GROUPS_THRESHOLD, "Group threshold");
+  if (!std::isfinite(p_hat) || p_hat <= 0 || p_hat > 1)
+    stop("Cannot sample calibration groups: the empirical candidate rate p_hat must be finite and in (0, 1].");
+  const double represented_groups = R::choose(n_nt_grnas, calibration_group_size);
+  if (std::isnan(n_possible_groups) || n_possible_groups < 1 ||
+      n_possible_groups != represented_groups)
+    stop("n_possible_groups must equal the represented combination count.");
   // 0. initialize set to store sampled vectors
   std::unordered_set<std::vector<int>, boost::hash<std::vector<int>>> H;
   std::vector<int> sample;
@@ -39,9 +63,12 @@ IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibr
   std::uniform_real_distribution<double> distribution(0, 1);
 
   // 2. estimate the number of grna groups to generate
-  int n_grna_groups = ceil((MULT_FACTOR * n_calibration_pairs)/(p_hat * n_genes));
-  n_grna_groups = std::max(n_grna_groups, N_POSSIBLE_GROUPS_THRESHOLD);
-  if ((double) n_grna_groups >= n_possible_groups) n_grna_groups = (int) n_possible_groups;
+  double selected_groups = ceil((MULT_FACTOR * n_calibration_pairs)/(p_hat * n_genes));
+  selected_groups = std::max(selected_groups, static_cast<double>(N_POSSIBLE_GROUPS_THRESHOLD));
+  selected_groups = std::min(selected_groups, n_possible_groups);
+  positive_integer(selected_groups, "Selected calibration group count");
+  const int n_grna_groups = static_cast<int>(selected_groups);
+  sceptre::sampling::matrix_extent(n_grna_groups, calibration_group_size);
 
   // 3. sample n_grna_groups grna groups via rejection sampling
   while (H.size() < n_grna_groups) {
@@ -65,6 +92,11 @@ IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibr
 
 // [[Rcpp::export]]
 IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_size, int n_possible_groups) {
+  check_group_size(n_nt_grnas, undercover_group_size);
+  sceptre::sampling::nonnegative(n_possible_groups, "n_possible_groups");
+  if (static_cast<double>(n_possible_groups) != R::choose(n_nt_grnas, undercover_group_size))
+    stop("n_possible_groups must equal the represented combination count.");
+  sceptre::sampling::matrix_extent(n_possible_groups, undercover_group_size);
   // initialize the IntegerMatrix out
   IntegerMatrix m(n_possible_groups, undercover_group_size);
 
@@ -99,9 +131,27 @@ void increment_matrix(IntegerMatrix m) {
 // [[Rcpp::export]]
 List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
                                 int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
+  positive_integer(n_genes, "n_genes");
+  positive_integer(n_calibration_pairs, "n_calibration_pairs");
+  sceptre::sampling::nonnegative(n_nonzero_trt_thresh, "Treatment count threshold");
+  sceptre::sampling::nonnegative(n_nonzero_cntrl_thresh, "Control count threshold");
+  if (n_nonzero_m.ncol() != n_genes || n_nonzero_tot.size() != n_genes)
+    stop("Calibration gene counts and totals must have matching gene dimensions.");
+  if (possible_groups_m.nrow() < 1 || possible_groups_m.ncol() < 1)
+    stop("Calibration group definitions must be nonempty.");
+  for (int row : possible_groups_m) {
+    if (row < 0 || row >= n_nonzero_m.nrow())
+      stop("Calibration group row is outside the zero-based count matrix range.");
+  }
+  for (int count : n_nonzero_m) sceptre::sampling::nonnegative(count, "Group nonzero count");
+  for (int count : n_nonzero_tot) sceptre::sampling::nonnegative(count, "Total nonzero count");
   // 0.1 define a few variables
   int n_grna_groups = possible_groups_m.nrow(), undercover_grp_size = possible_groups_m.ncol(), n_nonzero_trt, n_nonzero_cntrl;
-  int n_possible_pairs = n_grna_groups * n_genes;
+  const int64_t pair_count = static_cast<int64_t>(n_grna_groups) * n_genes;
+  if (pair_count > std::numeric_limits<int>::max() ||
+      static_cast<uint64_t>(pair_count) > std::vector<int>().max_size())
+    stop("Candidate pair count exceeds native integer allocation capacity.");
+  int n_possible_pairs = static_cast<int>(pair_count);
   double n_possible_pairs_doub = (double) n_possible_pairs;
 
   // 0.3 initialize the vector of sampled elements and elements that could be sampld
@@ -128,10 +178,15 @@ List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonze
     gene_idx = idx % n_genes;
 
     // check if the grna group-gene pair passes pairwise QC
-    n_nonzero_trt = 0;
+    int64_t treatment_count = 0;
     for (int k = 0; k < undercover_grp_size; k++) {
-      n_nonzero_trt += n_nonzero_m(possible_groups_m(grna_group_idx, k), gene_idx);
+      treatment_count += n_nonzero_m(possible_groups_m(grna_group_idx, k), gene_idx);
+      if (treatment_count > std::numeric_limits<int>::max())
+        stop("Calibration treatment count exceeds native integer capacity.");
     }
+    if (treatment_count > n_nonzero_tot[gene_idx])
+      stop("Calibration treatment count exceeds its total nonzero count.");
+    n_nonzero_trt = static_cast<int>(treatment_count);
     n_nonzero_cntrl = n_nonzero_tot[gene_idx] - n_nonzero_trt;
 
     // if n_nonzero_trt and n_nonzero_cntrl exceed the thresholds, append the grna_group_idx and gene_idx

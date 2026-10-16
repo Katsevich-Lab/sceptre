@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "inference.h"
+#include "sampling_safety.h"
 
 using namespace Rcpp;
 
@@ -8,6 +9,10 @@ using namespace Rcpp;
 // synthetic draw indices are already zero-based and are never converted again.
 double compute_observed_full_statistic_v2(NumericVector a, NumericVector w,
                                           NumericMatrix D, IntegerVector trt_idxs) {
+  sceptre::inference::check_score_dimensions(a, w, D);
+  for (int position : trt_idxs) {
+    if (position < 1 || position > a.size()) stop("Observed treatment position is outside the aligned cell range.");
+  }
   return sceptre::inference::observed_score(a, w, D,
     sceptre::inference::observed_positions_zero_based(trt_idxs));
 }
@@ -19,6 +24,7 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a,
                                                 bool use_all_cells,
                                                 SEXP synthetic_idxs) {
   XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
+  if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
   return sceptre::inference::null_score_segment(a, w, D, start_pos, B, n_trt,
                                                use_all_cells, *draws);
 }
@@ -41,12 +47,24 @@ SEXP run_low_level_test_full_v4(NumericVector y,
                                 int side_code) {
   // The compatibility boundary alone unwraps R's external pointer. Numeric
   // components receive a const bank reference with worker-local lifetime.
+  sceptre::inference::check_score_dimensions(a, w, D);
+  if (y.size() != a.size() || mu.size() != a.size())
+    stop("Response, fitted means and score arrays must have aligned cell dimensions.");
+  if (n_trt < 0 || trt_idxs.size() != n_trt)
+    stop("Observed n_trt must equal the observed treatment position count.");
+  for (int position : trt_idxs) {
+    if (position < 1 || position > a.size())
+      stop("Observed treatment position is outside the aligned cell range.");
+  }
+  sceptre::sampling::sum(sceptre::sampling::sum(B1, B2, "B1 + B2"), B3,
+                         "B1 + B2 + B3");
   const IntegerVector observed_positions =
     sceptre::inference::observed_positions_zero_based(trt_idxs);
   sceptre::inference::EffectEstimate effect =
     sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
   double z_orig = sceptre::inference::observed_score(a, w, D, observed_positions);
   XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
+  if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
   sceptre::inference::TailResult tail = sceptre::inference::evaluate_staged_tail(
     z_orig, a, w, D, n_trt, use_all_cells, *draws, B1, B2, B3,
     fit_parametric_curve, side_code);

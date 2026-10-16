@@ -1,5 +1,6 @@
 #include "inference.h"
 #include "shared_low_level_functions.h"
+#include "sampling_safety.h"
 
 namespace sceptre {
 namespace inference {
@@ -12,6 +13,8 @@ TailResult evaluate_staged_tail(double z_orig,
                                 const DrawBank& synthetic_idxs,
                                 int B1, int B2, int B3,
                                 bool fit_parametric_curve, int side_code) {
+  sceptre::sampling::sum(sceptre::sampling::sum(B1, B2, "B1 + B2"), B3,
+                         "B1 + B2 + B3");
   const double P_THRESH = 0.02;
   bool sn_fit_used = false;
   TailResult out;

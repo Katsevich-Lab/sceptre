@@ -1,14 +1,24 @@
 #include "inference.h"
 #include <cmath>
+#include "sampling_safety.h"
 
 using namespace Rcpp;
 
 namespace sceptre {
 namespace inference {
 
+void check_score_dimensions(const NumericVector& a, const NumericVector& w,
+                            const NumericMatrix& D) {
+  if (a.size() != w.size() || a.size() != D.ncol())
+    stop("Score arrays a/w and D columns must have aligned cell dimensions.");
+}
+
 IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
   IntegerVector zero_based(positions.size());
-  for (R_xlen_t i = 0; i < positions.size(); ++i) zero_based[i] = positions[i] - 1;
+  for (R_xlen_t i = 0; i < positions.size(); ++i) {
+    if (positions[i] < 1) stop("Observed treatment positions must be positive and not NA.");
+    zero_based[i] = positions[i] - 1;
+  }
   return zero_based;
 }
 
@@ -53,6 +63,11 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
 
 
 std::vector<double> null_score_segment(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, bool use_all_cells, const DrawBank& synthetic_idxs) {
+  check_score_dimensions(a, w, D);
+  sceptre::sampling::nonnegative(n_trt, "n_trt");
+  const int end_pos = sceptre::sampling::sum(start_pos, B, "Draw segment end");
+  if (static_cast<size_t>(end_pos) > synthetic_idxs.size())
+    stop("Selected draw segment exceeds the bank length.");
   // initialize variables
   const int* curr_vect;
   std::vector<double> out(B);
@@ -60,8 +75,12 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
   int D_nrow = D.nrow(), idx;
 
   // iterate over the B tests
-  for (int k = start_pos; k < B + start_pos; k ++) {
+  for (int k = start_pos; k < end_pos; k ++) {
+    if (synthetic_idxs[k].size() > static_cast<size_t>(std::numeric_limits<int>::max()))
+      stop("Draw row exceeds native integer capacity.");
     if (use_all_cells) n_trt = synthetic_idxs[k].size();
+    else if (synthetic_idxs[k].size() < static_cast<size_t>(n_trt))
+      stop("Selected draw row is shorter than the requested treatment prefix.");
     curr_vect = synthetic_idxs[k].data();
     lower_right = 0;
     inner_sum = 0;

@@ -81,6 +81,14 @@ get_synthetic_permutation_idxs <- function(
     calibration_group_size,
     n_cells
 ) {
+    check_native_scalar_count(B, "B")
+    check_native_scalar_count(n_cells, "n_cells")
+    if (calibration_check) {
+        check_native_scalar_count(calibration_group_size, "calibration_group_size", 1)
+        active_nt_count <- sum(lengths(grna_assignments$indiv_nt_grna_idxs) > 0L)
+        if (calibration_group_size > active_nt_count)
+            stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", active_nt_count, ").")
+    }
     if (calibration_check && !control_group_complement) {
         # 1. calibration check, nt cells (low MOI only)
         indiv_nt_sizes <- vapply(
@@ -89,7 +97,7 @@ get_synthetic_permutation_idxs <- function(
             FUN.VALUE = integer(1)
         ) |>
             sort(decreasing = TRUE)
-        M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+        M <- sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)]))
         n_control_cells <- length(grna_assignments$all_nt_idxs)
         out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
     } else if (calibration_check && control_group_complement) {
@@ -100,7 +108,9 @@ get_synthetic_permutation_idxs <- function(
             FUN.VALUE = integer(1)
         ) |>
             sort(decreasing = TRUE)
-        M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+        # Overlapping high-MOI memberships can sum beyond the cell count; any
+        # union used by calibration is bounded by the number of cells.
+        M <- min(sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)])), n_cells)
         out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
     } else if (!calibration_check && !control_group_complement) {
         # 3. discovery, nt cells (low MOI only)

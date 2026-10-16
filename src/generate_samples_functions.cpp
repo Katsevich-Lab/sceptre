@@ -1,6 +1,7 @@
 #include <boost/random.hpp>
 #include <Rcpp.h>
 #include <cmath>
+#include "sampling_safety.h"
 using namespace Rcpp;
 
 
@@ -28,8 +29,15 @@ void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_r
 //' @noRd
 // [[Rcpp::export]]
 SEXP fisher_yates_sampler(int n_tot, int M, int B) {
+  sceptre::sampling::nonnegative(n_tot, "n_tot");
+  sceptre::sampling::nonnegative(M, "M");
+  if (M > n_tot) stop("M must not exceed n_tot.");
+  sceptre::sampling::bank_extent(B, M);
+  Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
+    static_cast<std::vector<std::vector<int>>*>(nullptr), true);
   // initialize output vector, x vector shared across samples
-  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
+  std::unique_ptr<std::vector<std::vector<int>>> synth_idx_list(
+    new std::vector<std::vector<int>>(B));
   std::vector<int> x(n_tot);
 
   // initialize the random number generator
@@ -50,8 +58,7 @@ SEXP fisher_yates_sampler(int n_tot, int M, int B) {
     // store v within synth_idx_list
     (*synth_idx_list)[j] = v;
   }
-  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
-  return ptr;
+  return sceptre::sampling::register_bank(pointer, synth_idx_list);
 }
 
 
@@ -64,8 +71,15 @@ SEXP fisher_yates_sampler(int n_tot, int M, int B) {
 //' @noRd
 // [[Rcpp::export]]
 SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
+  if (N < 1 || m < 1 || M < m) stop("Hybrid sampling requires N >= 1 and 1 <= m <= M.");
+  sceptre::sampling::sum(N, M, "N + M");
+  sceptre::sampling::sum(M, 1, "M + 1");
+  sceptre::sampling::bank_extent(B, M);
+  Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
+    static_cast<std::vector<std::vector<int>>*>(nullptr), true);
   // initialize output vector
-  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
+  std::unique_ptr<std::vector<std::vector<int>>> synth_idx_list(
+    new std::vector<std::vector<int>>(B));
 
   // initialize x vector shared across samples; also initialize i_doub vector
   std::vector<int> x(N + m);
@@ -126,15 +140,32 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
     (*synth_idx_list)[j] = v;
   }
   // return a pointer to the synthetic idx list
-  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
-  return ptr;
+  return sceptre::sampling::register_bank(pointer, synth_idx_list);
+}
+
+
+namespace {
+void check_crt_request(const NumericVector& probabilities, int B) {
+  sceptre::sampling::nonnegative(B, "B");
+  if (probabilities.size() > std::numeric_limits<int>::max())
+    stop("CRT cell count exceeds native integer capacity.");
+  for (double probability : probabilities) {
+    if (!std::isfinite(probability) || probability < 0 || probability > 1)
+      stop("Fitted probabilities must be finite and in [0, 1].");
+  }
+  sceptre::sampling::bank_extent(B, static_cast<int>(probabilities.size()));
+}
 }
 
 
 // [[Rcpp::export]]
 SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
+  check_crt_request(fitted_probabilities, B);
+  Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
+    static_cast<std::vector<std::vector<int>>*>(nullptr), true);
   // initialize output list of vectors
-  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
+  std::unique_ptr<std::vector<std::vector<int>>> synth_idx_list(
+    new std::vector<std::vector<int>>(B));
 
   // initialize the random number generator
   boost::random::mt19937 generator(4);
@@ -150,15 +181,18 @@ SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
     }
     (*synth_idx_list)[i] = v;
   }
-  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
-  return ptr;
+  return sceptre::sampling::register_bank(pointer, synth_idx_list);
 }
 
 
 // [[Rcpp::export]]
 SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
+  check_crt_request(fitted_probabilities, B);
+  Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
+    static_cast<std::vector<std::vector<int>>*>(nullptr), true);
   // initialize output vector
-  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
+  std::unique_ptr<std::vector<std::vector<int>>> synth_idx_list(
+    new std::vector<std::vector<int>>(B));
 
   // initialize the random number generator
   boost::random::mt19937 generator(4);
@@ -180,6 +214,5 @@ SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
     for (int i = B - M; i < B; i ++) (*synth_idx_list)[x[i]].push_back(j);
   }
 
-  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
-  return ptr;
+  return sceptre::sampling::register_bank(pointer, synth_idx_list);
 }

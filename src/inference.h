@@ -13,6 +13,13 @@ namespace inference {
 
 typedef std::vector<std::vector<int>> DrawBank;
 
+// Adapters check aligned cell arrays and observed positions once. Draw-bank
+// producers establish coordinate validity: fixed-size consumers read only the
+// requested prefix, while CRT consumers read the complete current row.
+void check_score_dimensions(const Rcpp::NumericVector& a,
+                            const Rcpp::NumericVector& w,
+                            const Rcpp::NumericMatrix& D);
+
 Rcpp::IntegerVector observed_positions_zero_based(const Rcpp::IntegerVector& positions);
 
 struct EffectEstimate {

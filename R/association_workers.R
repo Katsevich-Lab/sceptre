@@ -139,7 +139,7 @@ crt_glm_factored_out <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = checked_resampling_total(B1, B2, B3)
     )
     if (is.null(response_idxs)) response_idxs <- match(response_ids, rownames(response_matrix))
     if (is.null(source_cells)) {
@@ -220,7 +220,7 @@ discovery_ntcells_crt <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = checked_resampling_total(B1, B2, B3)
     )
     if (is.null(response_idxs)) response_idxs <- match(response_ids, rownames(response_matrix))
     # loop over the response ids

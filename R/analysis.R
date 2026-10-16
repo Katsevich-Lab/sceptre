@@ -11,6 +11,7 @@ run_sceptre_analysis_high_level <- function(
     n_processors,
     log_dir
 ) {
+    total_resamples <- checked_resampling_total(sceptre_object@B1, sceptre_object@B2, sceptre_object@B3)
     context <- prepare_analysis_context(sceptre_object, analysis_type,
         pairs = response_grna_group_pairs |> dplyr::filter(pass_qc))
     # if running permutations, generate the permutation idxs
@@ -18,7 +19,7 @@ run_sceptre_analysis_high_level <- function(
         message("Generating permutation resamples.")
         synthetic_idxs <- get_synthetic_permutation_idxs(
             grna_assignments = sceptre_object@grna_assignments,
-            B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+            B = total_resamples,
             calibration_check = calibration_check,
             control_group_complement = sceptre_object@control_group_complement,
             calibration_group_size = sceptre_object@calibration_group_size,

@@ -522,16 +522,12 @@ run_qc_pt_2 <- function(sceptre_object) {
             (length(sceptre_object@n_ok_discovery_pairs) >= 1L ||
                 length(sceptre_object@n_ok_positive_control_pairs) >= 1L)
     ) {
-        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-        sceptre_object@B3 <- ceiling(
-            mult_fact *
-                max(
-                    sceptre_object@n_ok_discovery_pairs,
-                    sceptre_object@n_ok_positive_control_pairs
-                ) /
-                sceptre_object@multiple_testing_alpha
-        ) |>
-            as.integer()
+        sceptre_object@B3 <- compute_empirical_budget(
+            max(sceptre_object@n_ok_discovery_pairs,
+                sceptre_object@n_ok_positive_control_pairs),
+            sceptre_object@multiple_testing_alpha, sceptre_object@side_code,
+            sceptre_object@B1, sceptre_object@B2
+        )
     }
 
     # return

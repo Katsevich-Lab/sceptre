@@ -64,6 +64,7 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
 
 
 bool check_sn_tail(const std::vector<double>& y, double xi_hat, double omega_hat, double alpha_hat) {
+  // The owning fitter checks n >= 100 before this internal .99 quantile lookup.
   // define variables
   double n = y.size(), ratio, quantile, p, sn_tail_prob;
   double RATIO_THRESH = 2.0;
@@ -100,6 +101,8 @@ bool check_for_outliers (std::vector<double>& null_statistics, double mu, double
 }
 
 std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
+  if (null_statistics.size() < 100)
+    stop("Reached skew-normal fitting requires at least 100 null statistics.");
   // 0. define variables
   double p = -1.0;
   bool finite_params = true;

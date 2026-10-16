@@ -608,16 +608,55 @@ check_run_qc_inputs <- function(
 }
 
 
+#' Validate one numeric scalar before native integer conversion.
+#'
+#' Requires a finite integral value in [minimum, INT_MAX], without coercion;
+#' returns the input invisibly. Zero is valid for unused resampling segments.
+#' @noRd
+check_native_scalar_count <- function(value, name, minimum = 0) {
+    if (!is.numeric(value) || length(value) != 1L || is.na(value) ||
+        !is.finite(value) || value != floor(value) || value < minimum ||
+        value > .Machine$integer.max) {
+        stop("`", name, "` must be a finite integer between ", minimum,
+             " and ", .Machine$integer.max, ".")
+    }
+    invisible(value)
+}
+
+#' Return an integer bank size after checking three nonnegative scalar budgets.
+#' Sum in double before narrowing; fail rather than wrap or reduce a budget.
+#' @noRd
+checked_resampling_total <- function(B1, B2, B3) {
+    check_native_scalar_count(B1, "B1")
+    check_native_scalar_count(B2, "B2")
+    check_native_scalar_count(B3, "B3")
+    total <- sum(as.double(B1), as.double(B2), as.double(B3))
+    check_native_scalar_count(total, "B1 + B2 + B3")
+    as.integer(total)
+}
+
+#' Compute the existing empirical B3 and validate its complete bank size.
+#' Pair count is a nonnegative scalar integer; return one representable integer
+#' without changing the multiplier/ceiling rule or silently capping allocation.
+#' @noRd
+compute_empirical_budget <- function(n_pairs, alpha, side_code, B1, B2) {
+    check_native_scalar_count(n_pairs, "n_pairs")
+    multiplier <- if (side_code == 0L) 10 else 5
+    budget <- ceiling(multiplier * as.double(n_pairs) / alpha)
+    check_native_scalar_count(budget, "Derived B3")
+    checked_resampling_total(B1, B2, budget)
+    as.integer(budget)
+}
+
 check_calibration_check_inputs <- function(
     sceptre_object,
     n_calibration_pairs,
-    n_processors
+    n_processors,
+    calibration_group_size
 ) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
     control_group_complement <- sceptre_object@control_group_complement
-    n_nt_grnas <- grna_target_data_frame |>
-        dplyr::filter(grna_group == "non-targeting") |>
-        nrow()
+    # QC can remove every cell assigned to a guide while its metadata remains.
+    n_nt_grnas <- sum(lengths(sceptre_object@grna_assignments$indiv_nt_grna_idxs) > 0L)
     # 1. check number of gRNAS
     if (!control_group_complement) {
         if (n_nt_grnas < 2) {
@@ -633,8 +672,13 @@ check_calibration_check_inputs <- function(
         }
     }
     # 2. check number of calibration pairs
+    check_native_scalar_count(n_calibration_pairs, "n_calibration_pairs")
     if (n_calibration_pairs == 0L) {
         stop("Cannot run a calibration check on zero negative control pairs.")
+    }
+    check_native_scalar_count(calibration_group_size, "calibration_group_size", 1)
+    if (calibration_group_size > n_nt_grnas) {
+        stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", n_nt_grnas, ").")
     }
     # 3. check n_processors
     if (

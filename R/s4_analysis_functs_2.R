@@ -126,26 +126,21 @@ run_calibration_check_pt_1 <- function(
     if (is.null(n_calibration_pairs)) {
         n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
     }
-    if (
-        !is.null(n_calibration_pairs) &&
-            sceptre_object@resampling_approximation == "no_approximation"
-    ) {
-        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-        sceptre_object@B3 <- ceiling(
-            mult_fact *
-                n_calibration_pairs /
-                sceptre_object@multiple_testing_alpha
-        ) |>
-            as.integer()
-    }
-
     # 2. check inputs
     check_calibration_check_inputs(
         sceptre_object,
         n_calibration_pairs,
-        n_processors
+        n_processors,
+        calibration_group_size
     ) |>
         invisible()
+
+    if (sceptre_object@resampling_approximation == "no_approximation") {
+        sceptre_object@B3 <- compute_empirical_budget(
+            n_calibration_pairs, sceptre_object@multiple_testing_alpha,
+            sceptre_object@side_code, sceptre_object@B1, sceptre_object@B2
+        )
+    }
 
     # 3. construct the negative control pairs
     negative_control_pairs <- construct_negative_control_pairs_v2(
