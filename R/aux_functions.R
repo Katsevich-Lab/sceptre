@@ -2,7 +2,7 @@
 #'
 #' Retains column order; excludes response mito and optionally guide count
 #' covariates. Names matching n_umis/n_nonzero get log(x), or log(x+1) if any
-#' zero occurs. Other columns with at least 15 observed values are omitted.
+#' zero occurs. Other columns with at least 15 distinct values are omitted.
 #' Returns a formula for model.matrix; this is selection, not input validation.
 #' Does not modify covariates or draw random numbers.
 #' @noRd

@@ -1,8 +1,9 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; context cleanup integrated, native allocation follow-up open.**
+**Active, incomplete; count ownership repaired, resource qualification running.**
 Integration branch: `codex/refactor`, integration checkpoint
-`0b6ae38` includes the source-reviewed count/context units and B1 import correction.
+`20945f0` includes the reviewed count allocation remedy; later bounded legacy
+plot/validation/assignment units are also integrated. Final acceptance is open.
 Resource and combined installed-source acceptance remain open. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
@@ -69,9 +70,12 @@ CL2 (`ab477759`, integrated as `c84e85f`) passed 1,059 focused expectations.
 Its first source review closed, but a subsequent allocation-path audit found a
 material P2: raw R allocation errors can bypass newly owned C++ coordinate and
 scratch destructors. The explicit review amendment supersedes that part of the
-first closure. A narrow phase-order correction and controlled-error proof are
-under way; large resource trials are held. Fresh pre-correction release builds
-are retained separately, with no qualification relabeling or cost exception.
+first closure. The narrow phase-order remedy at `8841efa` (integrated as
+`20945f0`) has independent source closure, 1,065 installed expectations in 50
+blocks and 214 controlled error/success cases plus an unsafe-order negative
+control. The exact-source triplet resource study is now running. Fresh
+pre-correction release builds remain separately labeled; no cost exception is
+approved and initial large-setting memory crossings are preserved.
 The indexing-test handoff to CL3 is complete. CL3 (`627e7e4`) passed 1,006
 expectations in 52 tests against a fresh same-environment original oracle;
 independent source review closed and integration is complete. This does not

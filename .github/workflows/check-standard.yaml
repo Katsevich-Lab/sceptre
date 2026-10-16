@@ -65,13 +65,12 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install ondisc R package (macOS only)
+      - name: Prepare ondisc build dependencies (macOS only)
         if: ${{ matrix.config.os == 'macOS-latest' }}
         run: |
           Rscript -e "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
           Rscript -e "install.packages('BiocManager')"
           Rscript -e "BiocManager::install('Rhdf5lib', type = 'source')"
-          Rscript -e "remotes::install_github('timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c')"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -79,6 +78,19 @@ jobs:
             any::rcmdcheck
             any::pkgload
             any::digest
+
+      - name: Install verified ondisc source with pair-iteration bounds guard
+        shell: Rscript {0}
+        run: |
+          pin <- "589803edea2a66ad15e7f07186bee16c7739ab8c"
+          if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+          installed <- if (nzchar(system.file(package = "ondisc")))
+            utils::packageDescription("ondisc")$RemoteSha else NULL
+          if (!identical(installed, pin)) {
+            remotes::install_github(paste0("timothy-barry/ondisc@", pin),
+              dependencies = FALSE, upgrade = "never")
+          }
+          stopifnot(identical(utils::packageDescription("ondisc")$RemoteSha, pin))
 
       - name: Build verified original-package workflow reference
         run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
@@ -88,6 +100,9 @@ jobs:
 
       - name: Check draw-bank ownership at R error boundaries
         run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+
+      - name: Check count ownership at R and native error boundaries
+        run: Rscript --vanilla tools/refactor/test-count-ownership.R .
 
       - name: Check dispersion exception state and platform policy
         run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
@@ -99,6 +114,7 @@ jobs:
           name: native-boundaries-${{ matrix.config.os }}-${{ matrix.config.r }}
           path: |
             ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-count-ownership
             ${{ runner.temp }}/sceptre-dispersion-exceptions
 
       - uses: r-lib/actions/check-r-package@v2
@@ -133,6 +149,8 @@ jobs:
         run: Rscript --vanilla tools/refactor/test-native-components.R .
       - name: Check draw-bank ownership at R error boundaries
         run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+      - name: Check count ownership at R and native error boundaries
+        run: Rscript --vanilla tools/refactor/test-count-ownership.R .
       - name: Check dispersion exception state and platform policy
         run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
       - name: Retain native boundary evidence
@@ -142,6 +160,7 @@ jobs:
           name: native-boundaries-without-ondisc
           path: |
             ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-count-ownership
             ${{ runner.temp }}/sceptre-dispersion-exceptions
       - name: Require an ondisc-free environment and run package tests
         shell: Rscript {0}

@@ -48,6 +48,25 @@ edits these files concurrently. Root's contract-only import/QC/preparation/sourc
 doc unit is pinned at cacf390; native retirement may adopt those comments before
 its subsequent actual-caller name changes.
 
+The conditional B6/T11 experiment uses the existing clean attached worktree
+`refactor-execution-cleanup/sceptre`, branch `codex/refactor-vector-aggregation`
+from 7df5ad1. It owns only `collapse_grna_matrix`, independent vector-aggregation
+regressions and focused resource tooling. After the root's 228 exact
+source-evaluated characterization cases, ownership passed explicitly to
+rf2_storage for implementation/tests and resource qualification; root does not
+edit that worktree concurrently. The branch is not integrated until
+exact characterization and the representative allocation/RSS/time gate pass.
+The output remains a dense matrix and the backed capability is unchanged.
+
+Root owns the bounded B2/O1 pair-construction unit in
+`R/pair_constructor_functs.R`, `src/pair_construction_functs.cpp`, its new
+independent regressions and the generated binding for this one native function.
+Its distance predicate handles unsorted positions with wide subtraction and
+preserves supplied row order; trans exclusions use an owned local copy. No native
+sampler/inference names change in this unit. The count lane's current immutable
+resource sources are untouched; later native retirement adopts this binding
+checkpoint before regenerating the rest.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current

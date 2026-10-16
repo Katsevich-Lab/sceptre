@@ -1,0 +1,4 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-refactor-file-lifetimes.R","refactor-file-lifetimes","matrix metadata parsing preserves plain and gzip results",3,0,FALSE,FALSE,0,0.015,0.00199999999999999,0.0179999999999999,3
+"test-refactor-file-lifetimes.R","refactor-file-lifetimes","metadata read failure closes only the helper-owned connection",3,0,FALSE,FALSE,0,0.00900000000000001,0.001,0.01,3
+"test-refactor-file-lifetimes.R","refactor-file-lifetimes","pipeline vector writes preserve lines and close a failed write",6,0,FALSE,FALSE,0,0.00700000000000001,0.003,0.00900000000000001,6

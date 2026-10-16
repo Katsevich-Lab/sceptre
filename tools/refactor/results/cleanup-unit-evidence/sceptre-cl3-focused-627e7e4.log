@@ -1,0 +1,57 @@
+refactor-cache: .............
+refactor-context-execution: .....................................................................................................................
+refactor-fitting: .............
+refactor-indexing: ....................................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+                                file
+1              test-refactor-cache.R
+2              test-refactor-cache.R
+3              test-refactor-cache.R
+4  test-refactor-context-execution.R
+5  test-refactor-context-execution.R
+6  test-refactor-context-execution.R
+7  test-refactor-context-execution.R
+8  test-refactor-context-execution.R
+9  test-refactor-context-execution.R
+10           test-refactor-fitting.R
+11           test-refactor-fitting.R
+12          test-refactor-indexing.R
+13          test-refactor-indexing.R
+14          test-refactor-indexing.R
+15          test-refactor-indexing.R
+16          test-refactor-indexing.R
+                                                                             test
+1                       discovery calibration discovery preserves valid fit views
+2                changing the control view discards incompatible calibration fits
+3             actual design contrasts rather than formula text govern cache reuse
+4      NT intercept-only calibration and discovery preserve explicit matrix views
+5                   prepared integer partitions retain label and caller RNG order
+6             progress bytes and periodic maintenance retain independent cadences
+7                   public workflows retain fit, bank and row-read sharing scopes
+8              mixture keeps actual EM success, raw-count fallback and caller RNG
+9           mixture block traversal preserves progress files, assignments and RNG
+10              current fitters accept plain arrays without object or cache state
+11              score preparation declares and preserves one ordered numeric view
+12       noncontiguous cells preserve actual extraction and native QC coordinates
+13 observed native positions are one based and synthetic positions are zero based
+14        calibration unions and saved NT memberships retain their declared order
+15           canonical contexts compose source, analysis and fit coordinates once
+16                analysis-cell normalization preserves reordered requested cells
+   failed error warning skipped passed
+1       0 FALSE       0   FALSE      6
+2       0 FALSE       0   FALSE      3
+3       0 FALSE       0   FALSE      4
+4       0 FALSE       0   FALSE     32
+5       0 FALSE       0   FALSE      4
+6       0 FALSE       0   FALSE     10
+7       0 FALSE       0   FALSE     52
+8       0 FALSE       0   FALSE     10
+9       0 FALSE       0   FALSE      9
+10      0 FALSE       0   FALSE      6
+11      0 FALSE       0   FALSE      7
+12      0 FALSE       0   FALSE     15
+13      0 FALSE       0   FALSE      6
+14      0 FALSE       0   FALSE      5
+15      0 FALSE       0   FALSE     19
+16      0 FALSE       0   FALSE      7

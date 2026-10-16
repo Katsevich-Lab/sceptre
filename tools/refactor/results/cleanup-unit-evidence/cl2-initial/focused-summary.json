@@ -1,0 +1,11 @@
+{
+  "blocks": 48,
+  "checks": 1059,
+  "passed": 1059,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skipped": 0,
+  "package": "/private/tmp/sceptre-cl2-draft-icco6lgs/library/sceptre",
+  "ondisc": "1.3.5"
+}

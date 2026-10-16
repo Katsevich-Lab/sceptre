@@ -1,0 +1,42 @@
+/Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB --preclean -o 'sourceCpp_2.so' 'dispersion-instrumented.cpp' 
+using C++ compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using SDK: ‘MacOSX26.5.sdk’
+clang++ -arch arm64 -std=gnu++20 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/include" -I"/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BH/include" -I"/private/tmp/sceptre-dispersion-fault-proof-ef0c77b" -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2   -c dispersion-instrumented.cpp -o dispersion-instrumented.o
+clang++ -arch arm64 -std=gnu++20 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -L/Library/Frameworks/R.framework/Resources/lib -L/opt/R/arm64/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/lib -o sourceCpp_2.so dispersion-instrumented.o -F/Library/Frameworks/R.framework/.. -framework R
+$double_radix
+[1] 2
+
+$double_digits
+[1] 53
+
+$effective_precision
+[1] 53
+
+$evaluation_is_long_double
+[1] TRUE
+
+$evaluation_digits
+[1] 53
+
+$domain
+[1] 0
+
+$pole
+[1] 0
+
+$overflow
+[1] 0
+
+$underflow
+[1] 2
+
+$denorm
+[1] 2
+
+$throw_on_error
+[1] 0
+
+$ignore_error
+[1] 2
+
+Passed 107 exact original/candidate numerical cases and 14 paired controlled MLE/MM failure cases.

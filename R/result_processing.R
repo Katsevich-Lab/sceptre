@@ -71,7 +71,7 @@ pair_results_from_native <- function(
 #' Integrate guide rows using the configured existing result rule
 #'
 #' Union relabels groups as targets. Singleton/Bonferroni join the guide-target
-#' map, retaining its multiplicity, then sort by p-value/response. Discovery
+#' map, retaining its multiplicity, then sort by p-value/response. Non-calibration
 #' Bonferroni retains one minimum-p record per response/target and multiplies by
 #' passing-guide count, capped at one; all-failed groups keep maximum counts and
 #' missing p/effect. Calibration skips that collapse. No new correction occurs.

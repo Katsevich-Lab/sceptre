@@ -1,0 +1,79 @@
+refactor-import-coordinates: ...1234.56789.abcdef....g....................
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test-refactor-import-coordinates.R:29:5'): file CSC construction
+Expected `out@p` to be identical to `c(0L, 2L, 4L, 4L)`.
+Differences:
+  `actual`: 0 0 1 1
+`expected`: 0 2 4 4
+
+
+── 2. Failure ('test-refactor-import-coordinates.R:30:5'): file CSC construction
+Expected `out@i` to be identical to `c(0L, 1L, 0L, 1L)`.
+Differences:
+  `actual`: 1 1 0 0
+`expected`: 0 1 0 1
+
+
+── 3. Failure ('test-refactor-import-coordinates.R:31:5'): file CSC construction
+Expected `out@x` to be identical to `c(0, 1, 10, 11)`.
+Differences:
+  `actual`: 11.0 1.0 10.0  0.0
+`expected`:  0.0 1.0 10.0 11.0
+
+
+── 4. Failure ('test-refactor-import-coordinates.R:32:5'): file CSC construction
+Expected `tail(out@p, 1L)` to be identical to `nrow(dt)`.
+Differences:
+  `actual`: 1
+`expected`: 4
+
+
+── 5. Failure ('test-refactor-import-coordinates.R:41:5'): file CSC construction
+Expected `out@p` to be identical to `c(0L, 1L, 3L)`.
+Differences:
+  `actual`: 0 0 1
+`expected`: 0 1 3
+
+
+── 6. Failure ('test-refactor-import-coordinates.R:42:5'): file CSC construction
+Expected `out@i` to be identical to `c(1L, 0L, 2L)`.
+Differences:
+  `actual`: 0 1 2
+`expected`: 1 0 2
+
+
+── 7. Failure ('test-refactor-import-coordinates.R:43:5'): file CSC construction
+Expected `out@x` to be identical to `c(3, 2, 4)`.
+Differences:
+  `actual`: 2.0 3.0 4.0
+`expected`: 3.0 2.0 4.0
+
+
+── 8. Failure ('test-refactor-import-coordinates.R:44:5'): file CSC construction
+Expected `as.matrix(out)` to be identical to `matrix(c(0, 3, 0, 2, 0, 4), 3L, 2L)`.
+Differences:
+actual vs expected
+                [,1] [,2]
+  actual[1, ]      0    2
+- actual[2, ]      0    0
++ expected[2, ]    3    0
+- actual[3, ]      0    0
++ expected[3, ]    0    4
+
+
+── 9. Failure ('test-refactor-import-coordinates.R:53:5'): file CSC construction
+Expected `construct(dt, 2L, 2L)` to throw a error.
+
+── 10. Failure ('test-refactor-import-coordinates.R:59:13'): file CSC constructi
+Expected `construct(invalid, 2L, 2L)` to throw a error.
+  ... and 6 more
+
+
+Maximum number of 10 failures reached, some test results may be missing.
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+Error in utils::write.table(counts, "/private/tmp/sceptre-b1-import-probe/counts.csv",  : 
+  unimplemented type 'list' in 'EncodeElement'
+Calls: write.csv -> eval.parent -> eval -> eval -> <Anonymous>
+Execution halted

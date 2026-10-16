@@ -93,7 +93,13 @@ test_that("progress bytes and periodic maintenance retain independent cadences",
         file.create(file)
         for (i in positions) report(i, "id", 201L, TRUE, TRUE, file, feature, prefix)
         bytes <- readBin(file, "raw", n = file.info(file)$size)
-        expect_identical(bytes, charToRaw(paste0(paste0(expected, "\n"), collapse = "")))
+        expected_text <- paste0(paste0(expected, "\n"), collapse = "")
+        # Existing write(..., file = path) uses native text-file endings. Keep
+        # comparing raw bytes, including its extra newline, on both platforms.
+        if (.Platform$OS.type == "windows") {
+            expected_text <- gsub("\n", "\r\n", expected_text, fixed = TRUE)
+        }
+        expect_identical(bytes, charToRaw(expected_text))
         absent <- tempfile()
         for (i in positions) report(i, "id", 201L, FALSE, TRUE, absent, feature, prefix)
         expect_false(file.exists(absent))

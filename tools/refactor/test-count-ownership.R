@@ -2,9 +2,11 @@
 # Run separately: injected raw R errors intentionally bypass C++ unwinding.
 # No OOM, production hook, installed-package replacement, or changed owner scope.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2L) stop("Supply immutable candidate source and evidence output directory.")
+if (!length(args) || length(args) > 2L)
+    stop("Supply immutable candidate source and optionally an evidence output directory.")
 root <- normalizePath(args[[1L]], mustWork = TRUE)
-output <- args[[2L]]
+output <- if (length(args) == 2L) args[[2L]] else
+    file.path(Sys.getenv("RUNNER_TEMP", tempdir()), "sceptre-count-ownership")
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 output <- normalizePath(output, mustWork = TRUE)
 paths <- file.path(root, c("src/sparse_counts.cpp", "src/sparse_matrix_functs.cpp",
