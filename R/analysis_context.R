@@ -134,12 +134,13 @@ group_treatment_analysis <- function(index, group_id) {
 #' Compose one common or guide-specific fit-cell view
 #' @param index Prepared index context, with all positions one based.
 #' @param group_id One group ID, or `NULL` for the common view without treatment.
-#' @return List `fit_to_analysis`, `source_cells`, `trt_fit_pos`,
-#'   `control_fit_pos`, `n_trt`. Complement uses all analysis cells; NT calibration
+#' @return List `fit_to_analysis`, `source_cells`, `trt_fit_pos`, `n_trt`.
+#'   Complement uses all analysis cells; NT calibration
 #'   uses the ordered NT pool; NT discovery uses treatment then NT. `NULL` under
 #'   NT discovery gives all analysis cells so group workers can subset that view.
-#' @details Order/repetitions follow memberships; controls are remaining fit
-#'   positions. For analysis->source `c(2,4,5,8,11)`, treatment `c(2,3)` and NT
+#' @details Order/repetitions follow memberships; controls occupy the remaining
+#'   fit positions, without a separately materialized control map.
+#'   For analysis->source `c(2,4,5,8,11)`, treatment `c(2,3)` and NT
 #'   `c(4,1,5)`, NT discovery has source `c(4,5,8,2,11)` and treatment `1:2`.
 #'   Views are transient, constructed at their sharing scope, never a bank of all
 #'   guide-by-cell maps. No design, storage, fit, RNG or cache is changed.
@@ -163,7 +164,6 @@ make_fit_view <- function(index, group_id = NULL) {
         fit_to_analysis = fit_to_analysis,
         source_cells = index$analysis_to_source[fit_to_analysis],
         trt_fit_pos = trt_fit_pos,
-        control_fit_pos = setdiff(seq_along(fit_to_analysis), trt_fit_pos),
         n_trt = length(trt_fit_pos)
     )
 }

@@ -1,12 +1,15 @@
 # Score arrays share one ordered fit-cell view: y/mu/a/w are length n;
-# D is p by n, with design coefficients in rows and fit cells in columns.
+# D is p by n: rows are eigenbasis coordinates in eigen() order, with p equal
+# to the design coefficient count; columns retain the ordered fit-cell view.
 # Keep the legacy arithmetic/eigen decomposition order for numerical parity.
 #' Form the existing score denominator factor without changing eigensystem order
 #'
 #' @param Zt_wZ Numeric symmetric p-by-p design crossproduct.
 #' @param wZ Numeric n-by-p design multiplied rowwise by weights w, not sqrt(w).
 #' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the symmetric
-#'   eigendecomposition. Coefficient rows and fit-cell columns retain caller order.
+#'   eigendecomposition. Rows are eigenbasis coordinates in `eigen()` order,
+#'   with row count equal to the design coefficient count; columns retain the
+#'   fit-cell order in `wZ`.
 #' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced; existing
 #'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are untouched.
 #' @noRd

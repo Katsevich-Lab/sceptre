@@ -1,0 +1,2 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed","result"
+"test-refactor-plot-diagnostic-na.R","refactor-plot-diagnostic-na","diagnostic output amounts retain the same discovery plot family",35,0,FALSE,FALSE,0,0.884,0.024,0.912,35,

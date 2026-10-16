@@ -1,0 +1,7 @@
+refactor-plot-diagnostic-na: .............................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+Error in utils::write.table(counts, file.path(out, "source-plot-counts.csv"),  : 
+  unimplemented type 'list' in 'EncodeElement'
+Calls: <Anonymous> -> eval.parent -> eval -> eval -> <Anonymous>
+Execution halted
