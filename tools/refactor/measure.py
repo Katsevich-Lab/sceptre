@@ -95,9 +95,14 @@ def main():
         CPP_nesting=distribution(cpp_functions, "max_nesting_depth"))
     file_hashes = {row["path"]: row["sha256"] for row in rmetrics["files"] + cpp_files}
     scripts = {path.name: digest(path.read_bytes()) for path in [Path(__file__), rscript]}
+    # Include names at both the original and current source checkpoints. Removed
+    # functions are absent rather than replaced by a proxy or a synthetic score.
     selected_names = {"run_perm_test_in_memory", "run_crt_in_memory_v2", "run_sceptre_analysis_high_level",
         "discovery_ntcells_perm_test", "discovery_ntcells_crt", "run_low_level_test_full_v4",
-        "compute_null_full_statistics", "fit_and_evaluate_skew_normal"}
+        "compute_null_full_statistics", "fit_and_evaluate_skew_normal",
+        "run_permutation_analysis", "run_crt_analysis", "analyze_association_pairs",
+        "test_permutation_shared_fit", "test_permutation_group_fit",
+        "test_crt_shared_fit", "test_crt_group_fit", "run_association_test"}
     selected = [row for row in rmetrics["functions"] + cpp_functions if row["name"] in selected_names]
     source_hash = digest(json.dumps(file_hashes, sort_keys=True, separators=(",", ":")).encode())
     summary = dict(schema_version=1, source_commit_label=args.source_commit,
