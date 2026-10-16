@@ -1,0 +1,477 @@
+{
+  "schema_version": 1,
+  "rules_version": 1,
+  "scope": "Non-generated production R; matching lines, not expression counts. Candidate sites require responsibility review.",
+  "source_hashes": {
+    "R/assign_grna_functions.R": "d00dffc0679b60943fad50eed4d5e86f24830599bd5f477823fd25c8ffc292d6",
+    "R/association_testing_functions_v2.R": "2ad0203b3ce5324ecff89664150815c2c8cce813d5288eeb98b8d11f34972f7f",
+    "R/aux_functions.R": "c36dc3e0052a1e88e3ec2d950f81a1982d45894e1a4862f6b54e9e603e368eea",
+    "R/cellwise_qc_functs.R": "ff5f09bc8d9055faab41a60f570e8abe83eaab0384a66084471b5e8fc4b2e1cc",
+    "R/check_functions.R": "8a7b90b0bc85d478c51baaf1d17441c797389e88db20364c87fedd0e3d910d9d",
+    "R/data.R": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+    "R/getters_and_setters.R": "a6585eb117cdc76d7c64eac746b17a117a938a261d652742674b191d23653d70",
+    "R/import_functs.R": "c42e5138c112abc1c262d849da53c17ef848cd30162632e629ef73b5f197003b",
+    "R/medium_level_functs_v2.R": "87b57852413ad8757dc91f7061f772a2b3dcc368a7a3b1d9d4c9f3ac18cd40d4",
+    "R/mixture_model_functs.R": "f18fb2eb7ea229764c6f56e06e3bc23a84f9a54f96ec2a6ab90820d87a9cccdb",
+    "R/neg_control_functions.R": "6d9e306c23a08f9346f2f8cc0373743384bf8e6047d77c9915071639edd0034f",
+    "R/ondisc_functs.R": "b8992f796d50f6a6dba4e085bd8ac719053d3eb0f96d38f35812d96ffecb1dae",
+    "R/pair_constructor_functs.R": "8c49527b9d02c33273a5b337832947d7404c4e6b0c2ece62d05a869f5dcfb944",
+    "R/pairwise_qc_functs.R": "51048cf0da56e08667a32dd253f0440c01763c9dcdb4e72af924ebefd4793f32",
+    "R/plotting_functions.R": "aedf9f6581bcfcb8375182f3cfc74b808652a5a2312ce02539eccab1b4edcde2",
+    "R/precomputation_functions.R": "b4f1acee50fa823df0a9b3aabef37a7c13546d051bb40b41cb02a53a039b5a74",
+    "R/preprocessing_functions.R": "34bbbf5e65aae5246110ba53177a9208702469d3b553396ac58c520b4ac18639",
+    "R/qq_plot_helpers.R": "2eb9f857b5f5184d2d395240dfcf538a2486d29d10bd7b7921e957ec42a69799",
+    "R/s4_analysis_functs_1.R": "9c63a3f42345493535c9a1bca542f53ec10b5397099ced5744d68ffe3fe0536c",
+    "R/s4_analysis_functs_2.R": "8de85fad8df7d221409d593f88e4df8091c2781fc6be04fc32dc23dcb181efb8",
+    "R/s4_class.R": "6ddcfab89c185da8afab81cb1540422cae5703c8639562914e7c05f05b106d8b",
+    "R/s4_helpers.R": "b4075cb83cb511e2e509761f388382e7174d66e558685a1c826cac89e3f34ef3",
+    "R/sceptre.R": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+    "R/test_functs.R": "1d5087c7a3dfe5f55cc323700e5c8cabbfcbe1e9b63848548e7a464ee437a635"
+  },
+  "patterns": {
+    "private_ondisc_calls": "ondisc:::\\s*[A-Za-z_][A-Za-z_0-9]*",
+    "raw_storage_access_candidates": "@(h5_file|ptr|i|j|p|x)\\b",
+    "view_remapping_candidates": "cells_in_use\\[|all_nt_idxs\\[|\\[\\s*cells_in_use\\s*[,\\]]|\\[\\s*all_nt_idxs\\s*[,\\]]|combined_idxs\\s*<-|trt_idxs\\s*<-\\s*seq\\(",
+    "response_cache_reset_events": "@response_precomputations\\s*<-\\s*list\\(\\)",
+    "response_cache_writebacks": "@response_precomputations\\s*<-"
+  },
+  "counts": {
+    "private_ondisc_calls": {
+      "lines": 6,
+      "files": 4
+    },
+    "raw_storage_access_candidates": {
+      "lines": 51,
+      "files": 9
+    },
+    "view_remapping_candidates": {
+      "lines": 17,
+      "files": 4
+    },
+    "response_cache_reset_events": {
+      "lines": 3,
+      "files": 1
+    },
+    "response_cache_writebacks": {
+      "lines": 3,
+      "files": 1
+    }
+  },
+  "sites": {
+    "private_ondisc_calls": [
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 92,
+        "text": "ondisc:::threshold_count_matrix_cpp("
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 896,
+        "text": "response_matrix <- ondisc:::create_odm_from_r_matrix_internal("
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 901,
+        "text": "grna_matrix <- ondisc:::create_odm_from_r_matrix_internal("
+      },
+      {
+        "path": "R/neg_control_functions.R",
+        "line": 76,
+        "text": "n_nonzero_m <- ondisc:::compute_n_trt_cells_matrix_ondisc("
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 39,
+        "text": "out <- ondisc:::compute_n_ok_pairs_ondisc("
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 60,
+        "text": "out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc("
+      }
+    ],
+    "raw_storage_access_candidates": [
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 93,
+        "text": "file_name_in = grna_matrix@h5_file,"
+      },
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 94,
+        "text": "f_row_ptr = grna_matrix@ptr,"
+      },
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 112,
+        "text": "j = grna_matrix@j,"
+      },
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 113,
+        "text": "p = grna_matrix@p,"
+      },
+      {
+        "path": "R/assign_grna_functions.R",
+        "line": 114,
+        "text": "x = grna_matrix@x,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 196,
+        "text": "j = response_matrix@j,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 197,
+        "text": "p = response_matrix@p,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 198,
+        "text": "x = response_matrix@x,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 277,
+        "text": "j = response_matrix@j,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 278,
+        "text": "p = response_matrix@p,"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 279,
+        "text": "x = response_matrix@x,"
+      },
+      {
+        "path": "R/getters_and_setters.R",
+        "line": 120,
+        "text": "mat@j <- j"
+      },
+      {
+        "path": "R/getters_and_setters.R",
+        "line": 121,
+        "text": "mat@p <- p"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 862,
+        "text": "out@i <- dt$feature_idx"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 863,
+        "text": "out@p <- p"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 864,
+        "text": "out@x <- dt$x"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 340,
+        "text": "j = response_matrix@j,"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 341,
+        "text": "p = response_matrix@p,"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 342,
+        "text": "x = response_matrix@x,"
+      },
+      {
+        "path": "R/neg_control_functions.R",
+        "line": 77,
+        "text": "file_name_in = response_matrix@h5_file,"
+      },
+      {
+        "path": "R/neg_control_functions.R",
+        "line": 78,
+        "text": "f_row_ptr = response_matrix@ptr,"
+      },
+      {
+        "path": "R/neg_control_functions.R",
+        "line": 87,
+        "text": "j = response_matrix@j,"
+      },
+      {
+        "path": "R/neg_control_functions.R",
+        "line": 88,
+        "text": "p = response_matrix@p,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 40,
+        "text": "file_name_in = response_matrix@h5_file,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 41,
+        "text": "f_row_ptr = response_matrix@ptr,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 61,
+        "text": "file_name_in = response_matrix@h5_file,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 62,
+        "text": "f_row_ptr = response_matrix@ptr,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 81,
+        "text": "j = response_matrix@j,"
+      },
+      {
+        "path": "R/pairwise_qc_functs.R",
+        "line": 82,
+        "text": "p = response_matrix@p,"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 6,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@j))"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 10,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@i))"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 14,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@j))"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 30,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 31,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 34,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 35,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 37,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 38,
+        "text": "j <- convert_pointer_to_index_vector_v2(matrix_in@p)"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 40,
+        "text": "i <- convert_pointer_to_index_vector_v2(matrix_in@p)"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 41,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 45,
+        "text": "x <- matrix_in@x"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 62,
+        "text": "out@j <- dt$j"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 67,
+        "text": "out@i <- dt$i"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 69,
+        "text": "out@p <- p"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 70,
+        "text": "out@x <- dt$x"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 143,
+        "text": "i = matrix_in@i,"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 144,
+        "text": "p = matrix_in@p,"
+      },
+      {
+        "path": "R/preprocessing_functions.R",
+        "line": 145,
+        "text": "x = matrix_in@x,"
+      },
+      {
+        "path": "R/s4_helpers.R",
+        "line": 404,
+        "text": "j = mat@j,"
+      },
+      {
+        "path": "R/s4_helpers.R",
+        "line": 405,
+        "text": "p = mat@p,"
+      },
+      {
+        "path": "R/s4_helpers.R",
+        "line": 406,
+        "text": "x = mat@x,"
+      }
+    ],
+    "view_remapping_candidates": [
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 115,
+        "text": "combined_idxs <- c(idxs$trt_idxs, all_nt_idxs)"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 116,
+        "text": "trt_idxs <- seq(1L, n_trt)"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 201,
+        "text": ")[cells_in_use]"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 203,
+        "text": "expression_vector <- expression_vector[all_nt_idxs]"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 258,
+        "text": "combined_idxs <- c(idxs$trt_idxs, all_nt_idxs)"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 259,
+        "text": "trt_idxs <- seq(1L, n_trt)"
+      },
+      {
+        "path": "R/association_testing_functions_v2.R",
+        "line": 282,
+        "text": ")[cells_in_use]"
+      },
+      {
+        "path": "R/cellwise_qc_functs.R",
+        "line": 88,
+        "text": "v_log_sub <- v_log[cells_in_use] # subset step"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 90,
+        "text": "covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 92,
+        "text": "covariate_matrix <- covariate_matrix[all_nt_idxs, ]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 128,
+        "text": ")[cells_in_use]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 130,
+        "text": "expression_vector <- expression_vector[all_nt_idxs]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 304,
+        "text": "covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 306,
+        "text": "covariate_matrix <- covariate_matrix[all_nt_idxs, ]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 345,
+        "text": ")[cells_in_use]"
+      },
+      {
+        "path": "R/medium_level_functs_v2.R",
+        "line": 347,
+        "text": "expression_vector <- expression_vector[all_nt_idxs]"
+      },
+      {
+        "path": "R/plotting_functions.R",
+        "line": 1484,
+        "text": "y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]"
+      }
+    ],
+    "response_cache_reset_events": [
+      {
+        "path": "R/s4_analysis_functs_1.R",
+        "line": 180,
+        "text": "sceptre_object@response_precomputations <- list()"
+      },
+      {
+        "path": "R/s4_analysis_functs_1.R",
+        "line": 322,
+        "text": "sceptre_object@response_precomputations <- list()"
+      },
+      {
+        "path": "R/s4_analysis_functs_1.R",
+        "line": 501,
+        "text": "sceptre_object@response_precomputations <- list()"
+      }
+    ],
+    "response_cache_writebacks": [
+      {
+        "path": "R/s4_analysis_functs_2.R",
+        "line": 193,
+        "text": "sceptre_object@response_precomputations <- out$response_precomputations"
+      },
+      {
+        "path": "R/s4_analysis_functs_2.R",
+        "line": 309,
+        "text": "sceptre_object@response_precomputations <- out$response_precomputations"
+      },
+      {
+        "path": "R/s4_analysis_functs_2.R",
+        "line": 412,
+        "text": "sceptre_object@response_precomputations <- out$response_precomputations"
+      }
+    ]
+  },
+  "unmeasured": [
+    "semantic coordinate-conversion count",
+    "complete dynamic call graph",
+    "token/block clone coverage"
+  ]
+}
