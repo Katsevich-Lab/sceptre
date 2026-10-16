@@ -84,7 +84,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     show(x)
 
     # 1. print analysis status
-    funct_run_vect <- x@functs_called
+    funct_run_vect <- workflow_status(x@functs_called)
     get_mark <- function(bool) {
         ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
     }
@@ -358,42 +358,6 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
     p <- do.call(what = funct_to_call, args = args)
     return(p)
 })
-
-
-perform_status_check_and_update <- function(sceptre_object, curr_funct) {
-    rank_vector <- c(
-        import_data = 1L,
-        set_analysis_parameters = 2L,
-        assign_grnas = 3L,
-        run_qc = 4L,
-        run_power_check = 5L,
-        run_discovery_analysis = 5L,
-        run_calibration_check = 5L
-    )
-    functs_called <- sceptre_object@functs_called
-    curr_rank <- rank_vector[[curr_funct]]
-    direct_upstream_functs <- names(rank_vector)[rank_vector == curr_rank - 1L]
-    downstream_functs <- names(rank_vector)[rank_vector > curr_rank]
-    # verify that the direct upstream funct has been called
-    if (!all(functs_called[direct_upstream_functs])) {
-        stop(paste0(
-            "The function",
-            if (length(direct_upstream_functs) >= 2L) "s " else " ",
-            paste0("`", direct_upstream_functs, "()`", collapse = ", "),
-            " must be called before `",
-            curr_funct,
-            "()` is called."
-        ))
-    }
-    # set current funct to true
-    functs_called[curr_funct] <- TRUE
-    # set all downstream functions to false
-    functs_called[downstream_functs] <- FALSE
-    # update sceptre_object and return
-    sceptre_object@functs_called <- functs_called
-    sceptre_object@last_function_called <- curr_funct
-    return(sceptre_object)
-}
 
 
 load_row <- function(mat, id) {
