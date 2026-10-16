@@ -101,6 +101,99 @@ test_that("dynamic Makevars do not hide changes to referenced external flags", {
     })
 })
 
+test_that("developer selection invalidates compiler and runtime oracle caches", {
+    # Model a stable clang dispatcher with two developer backends. This never
+    # calls xcode-select or changes the host's selected developer directory.
+    mocks <- new.env(parent = environment(refactor_oracle_environment))
+    state <- new.env(parent = emptyenv())
+    state$developer <- "first"
+    state$probes <- 0L
+    mocks$refactor_oracle_file <- function(path, hash = TRUE) {
+        if (identical(path, "/var/db/xcode_select_link")) {
+            return(list(path = paste0("/mock/developer/", state$developer), exists = TRUE,
+                        size = 1, mtime = 1, ctime = 1))
+        }
+        list(path = path, exists = TRUE, size = 1, mtime = 1, ctime = 1)
+    }
+    mocks$refactor_oracle_makevars <- function() {
+        list(user = list(path = "", exists = FALSE), site = list(path = "", exists = FALSE))
+    }
+    mocks$Sys.which <- function(x) stats::setNames(rep("/mock/clang-dispatcher", length(x)), x)
+    mocks$system2 <- function(command, args, ...) {
+        if (identical(args, c("CMD", "config", "--all"))) {
+            return(c("CC = mockcc", "CXX = mockcxx", "CXX20 = mockcxx", "CPPFLAGS = -DFROZEN=1"))
+        }
+        stopifnot(identical(args, "--version"))
+        state$probes <- state$probes + 1L
+        paste("mock compiler backend", state$developer)
+    }
+    clone <- function(fun, environment) eval(call("function", formals(fun), body(fun)), environment)
+    toolchain_cache <- new.env(parent = mocks)
+    toolchain_cache$cached <- NULL
+    toolchain_cache$binary_state <- clone(get("binary_state", environment(refactor_oracle_toolchain)), toolchain_cache)
+    mocks$refactor_oracle_toolchain <- clone(refactor_oracle_toolchain, toolchain_cache)
+    mocks$refactor_oracle_environment <- clone(refactor_oracle_environment, mocks)
+    first <- mocks$refactor_oracle_environment()
+    probes <- state$probes
+    expect_gt(probes, 0L)
+    expect_identical(mocks$refactor_oracle_environment(), first)
+    expect_identical(state$probes, probes)
+
+    # Seed an already verified cache entry, then put its old environment in the
+    # on-disk manifest. A backend change must force readback and reject it.
+    directory <- tempfile("refactor-developer-oracle-")
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    frozen <- readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))
+    manifest <- list(schema_version = 1L, type = "sceptre-same-environment-reference",
+        source_commit = frozen$source_commit, source_verified_before_and_after = TRUE,
+        clean_native_rebuild = TRUE, fresh_process = TRUE,
+        debug_compile = identical(Sys.getenv("SCEPTRE_REFACTOR_ORACLE_DEBUG", "true"), "true"),
+        source_files = frozen$source_files, environment = first,
+        outputs_md5 = stats::setNames(rep("mock", length(refactor_oracle_output_files(!is.null(first$dependencies$ondisc)))),
+                                    refactor_oracle_output_files(!is.null(first$dependencies$ondisc))))
+    saveRDS(manifest, file.path(directory, "runtime-manifest.rds"))
+    runtime_cache <- new.env(parent = mocks)
+    runtime_cache$cached <- list(directory = normalizePath(directory, winslash = "/"), manifest = manifest)
+    runtime <- clone(refactor_runtime_oracle, runtime_cache)
+    withr::with_envvar(c(SCEPTRE_REFACTOR_ORACLE = directory), {
+        expect_identical(runtime()$manifest, manifest)
+        state$developer <- "second"
+        second <- mocks$refactor_oracle_environment()
+        expect_identical(first$toolchain$config, second$toolchain$config)
+        expect_identical(first$toolchain$binaries, second$toolchain$binaries)
+        expect_false(identical(first$toolchain$developer_selection, second$toolchain$developer_selection))
+        expect_false(identical(first$toolchain$compilers, second$toolchain$compilers))
+        expect_gt(state$probes, probes)
+        expect_error(runtime(), "different numerical environment")
+        probes <- state$probes
+        expect_identical(mocks$refactor_oracle_environment(), second)
+        expect_identical(state$probes, probes)
+        # Environment overrides must also re-probe the otherwise unchanged
+        # dispatcher, even when xcode-select's selection itself stays fixed.
+        withr::with_envvar(c(DEVELOPER_DIR = "/mock/override", SDKROOT = "/mock/sdk"), {
+            mocks$refactor_oracle_environment()
+            expect_gt(state$probes, probes)
+            expect_error(runtime(), "different numerical environment")
+        })
+    })
+})
+
+test_that("source byte verification identifies changed paths and MD5 values", {
+    directory <- tempfile("refactor-source-bytes-")
+    dir.create(file.path(directory, "R"), recursive = TRUE)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    file <- file.path(directory, "R", "test.R")
+    base::writeLines("original <- TRUE", file, useBytes = TRUE)
+    sources <- c("R/test.R" = "sha256-placeholder")
+    expected <- refactor_oracle_hashes(stats::setNames(file, names(sources)))
+    expect_true(refactor_oracle_verify_source(directory, sources, expected))
+    base::writeLines("changed <- TRUE", file, useBytes = TRUE)
+    actual <- unname(tools::md5sum(file))
+    expect_error(refactor_oracle_verify_source(directory, sources, expected),
+                 paste0("R/test.R: expected ", expected[[1L]], ", actual ", actual), fixed = TRUE)
+})
+
 test_that("stored-platform qualification checks its recorded compiler and RNG", {
     current <- refactor_oracle_environment()
     manifest <- list(R = current$R, platform = current$platform, external = current$external,

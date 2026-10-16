@@ -13,6 +13,9 @@ the frozen source manifest, rejects additional source files, forces a clean
 native rebuild, and rechecks source and input hashes after execution. Candidate
 code is never loaded in that reference process. No new random inputs or cases
 are generated.
+The clean compile uses the pinned Rcpp wrappers/registration without running
+attribute regeneration, which can rewrite source line endings on Windows.
+Source-byte mismatches report each affected path and its expected/actual hash.
 
 The temporary oracle includes workflows, cache sequences, continuation of the
 frozen saved object, edge observations, and the expanded permutation workflow.
@@ -28,6 +31,9 @@ user/site Makevars and R configuration inputs, and `RNGkind()`. Cached readback
 rechecks the live fingerprint and explicit debug mode before reuse. Batched
 compiler probes are reused only while flags, configuration hashes and compiler
 binary identity remain unchanged; RNG changes are checked on every readback.
+The fingerprint includes the macOS developer selection, and compiler versions
+are queried again when that selection, `DEVELOPER_DIR`, or `SDKROOT` changes,
+even if the compiler command still names the same dispatcher executable.
 User/site Makevars with includes or variable expansion are queried afresh so
 changes in untracked included files or externally supplied values cannot hide
 behind the compiler-query cache. Environment-field ordering uses fixed byte

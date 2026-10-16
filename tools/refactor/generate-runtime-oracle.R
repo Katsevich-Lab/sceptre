@@ -51,10 +51,21 @@ verify_source()
 debug_setting <- Sys.getenv("SCEPTRE_REFACTOR_ORACLE_DEBUG", "true")
 if (!debug_setting %in% c("true", "false")) stop("SCEPTRE_REFACTOR_ORACLE_DEBUG must be true or false.")
 debug <- identical(debug_setting, "true")
+# The pinned archive already contains its Rcpp registration/wrappers. Automatic
+# compileAttributes() rewrites those source files (including platform-specific
+# line endings), so compile their frozen bytes without regenerating them.
+pkgbuild::clean_dll(reference)
+pkgbuild::compile_dll(reference, force = TRUE, compile_attributes = FALSE,
+                      quiet = TRUE, debug = debug)
+verify_source()
 pkgload::load_all(reference, export_all = FALSE, helpers = FALSE, quiet = TRUE,
-                  compile = TRUE, recompile = TRUE, debug = debug)
+                  compile = FALSE, debug = debug)
 if (!identical(normalizePath(getNamespaceInfo("sceptre", "path"), winslash = "/"), reference)) {
     stop("Loaded package namespace is not the verified original source archive.")
+}
+dll <- getNamespaceInfo("sceptre", "DLLs")[["sceptre"]]
+if (is.null(dll) || !startsWith(normalizePath(dll[["path"]], winslash = "/", mustWork = TRUE), paste0(reference, "/"))) {
+    stop("Loaded native library is not from the cleanly compiled original source archive.")
 }
 verify_source()
 inputs <- readRDS(file.path(fixture, "inputs.rds"))

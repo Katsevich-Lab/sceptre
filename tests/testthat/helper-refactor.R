@@ -81,7 +81,8 @@ refactor_oracle_toolchain <- local({
         programs <- unique(c(vapply(command_tokens, `[[`, character(1), 1L),
                              tokens[!startsWith(tokens, "-") & nzchar(Sys.which(tokens))]))
         binaries <- binary_state(programs)
-        versions <- if (!is.null(cached) && identical(cached$programs, programs) &&
+        versions <- if (!is.null(cached) && identical(cached$key, key) &&
+                        identical(cached$programs, programs) &&
                         identical(cached$binaries, binaries)) cached$value$compilers else {
             stats::setNames(lapply(programs, function(program) {
                 version <- system2(program, "--version", stdout = TRUE, stderr = TRUE)
@@ -91,7 +92,8 @@ refactor_oracle_toolchain <- local({
         }
         value <- list(config = config, compilers = versions, binaries = binaries,
                       makevars = key$makevars, environment_flags = key$environment_flags,
-                      configuration_files = key$configuration_files)
+                      configuration_files = key$configuration_files,
+                      developer_selection = key$developer_selection)
         cached <<- list(key = key, programs = programs, binaries = binaries, value = value)
         value
     }
@@ -147,7 +149,14 @@ refactor_oracle_verify_source <- function(reference, source_files, source_md5) {
     if (!all(file.exists(files))) stop("Pinned runtime reference source files are missing.")
     actual <- refactor_oracle_hashes(stats::setNames(files, names(source_files)))
     if (!identical(names(source_md5), names(source_files)) || !identical(actual, source_md5)) {
-        stop("Runtime reference source differs from the immutable baseline source hashes.")
+        expected <- source_md5[names(actual)]
+        mismatched <- names(actual)[is.na(expected) | actual != expected]
+        detail <- vapply(mismatched, function(file) {
+            paste0(file, ": expected ", expected[[file]], ", actual ", actual[[file]])
+        }, character(1))
+        stop("Runtime reference source differs from the immutable baseline source hashes (MD5):\n",
+             paste(detail, collapse = "\n"),
+             if (!identical(names(source_md5), names(source_files))) "\nSource manifest names/order differ.")
     }
     for (directory in c("R", "src", "data")) {
         actual <- list.files(file.path(reference, directory), recursive = TRUE,
