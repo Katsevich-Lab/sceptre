@@ -41,7 +41,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         # Normalize that persisted representation before crossing the boundary.
         nt_groups <- lapply(nt_groups, function(group) controls[group])
     }
-    out <- storage_pair_counts(
+    out <- collect_pair_qc_metrics(
         store = response_matrix,
         pair_index = data.frame(response_idx = dt$response_idx, group_idx = dt$grna_idx),
         groups = grna_group_idxs, source_cells = cells_in_use,
@@ -83,8 +83,12 @@ compute_qc_metrics <- function(sceptre_object) {
                 data_frame_name
             ) |>
                 dplyr::mutate(
-                    pass_qc = (n_nonzero_trt >= n_nonzero_trt_thresh &
-                        n_nonzero_cntrl >= n_nonzero_cntrl_thresh)
+                    pass_qc = evaluate_pair_eligibility(
+                        list(n_nonzero_trt = n_nonzero_trt,
+                             n_nonzero_cntrl = n_nonzero_cntrl),
+                        list(n_nonzero_trt_thresh = n_nonzero_trt_thresh,
+                             n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh)
+                    )
                 )
             if (sceptre_object@grna_integration_strategy == "bonferroni") {
                 grna_target_data_frame <- sceptre_object@grna_target_data_frame |>

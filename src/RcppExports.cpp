@@ -203,6 +203,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// evaluate_pair_eligibility_cpp
+Rcpp::LogicalVector evaluate_pair_eligibility_cpp(Rcpp::IntegerVector treatment, Rcpp::IntegerVector control, int treatment_threshold, int control_threshold);
+RcppExport SEXP _sceptre_evaluate_pair_eligibility_cpp(SEXP treatmentSEXP, SEXP controlSEXP, SEXP treatment_thresholdSEXP, SEXP control_thresholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type treatment(treatmentSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type control(controlSEXP);
+    Rcpp::traits::input_parameter< int >::type treatment_threshold(treatment_thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type control_threshold(control_thresholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(evaluate_pair_eligibility_cpp(treatment, control, treatment_threshold, control_threshold));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_nt_nonzero_matrix_and_n_ok_pairs_v3
 List compute_nt_nonzero_matrix_and_n_ok_pairs_v3(IntegerVector j, IntegerVector p, int n_cells_orig, int n_cells_sub, List grna_group_idxs, List indiv_nt_grna_idxs, IntegerVector all_nt_idxs, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, bool control_group_complement, IntegerVector cells_in_use);
 RcppExport SEXP _sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP n_cells_subSEXP, SEXP grna_group_idxsSEXP, SEXP indiv_nt_grna_idxsSEXP, SEXP all_nt_idxsSEXP, SEXP to_analyze_response_idxsSEXP, SEXP to_analyze_grna_idxsSEXP, SEXP control_group_complementSEXP, SEXP cells_in_useSEXP) {
@@ -322,6 +336,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 7},
     {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
+    {"_sceptre_evaluate_pair_eligibility_cpp", (DL_FUNC) &_sceptre_evaluate_pair_eligibility_cpp, 4},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},

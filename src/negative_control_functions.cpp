@@ -6,6 +6,7 @@
 #include <boost/container_hash/hash.hpp>
 #include <unordered_set>
 #include "shared_low_level_functions.h"
+#include "pair_eligibility.h"
 using namespace Rcpp;
 
 
@@ -134,7 +135,7 @@ List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonze
     n_nonzero_cntrl = n_nonzero_tot[gene_idx] - n_nonzero_trt;
 
     // if n_nonzero_trt and n_nonzero_cntrl exceed the thresholds, append the grna_group_idx and gene_idx
-    if (n_nonzero_trt >= n_nonzero_trt_thresh && n_nonzero_cntrl >= n_nonzero_cntrl_thresh) {
+    if (legacy_pair_eligible(n_nonzero_trt, n_nonzero_cntrl, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)) {
       gene_idxs.push_back(gene_idx + 1);
       grna_group_idxs.push_back(grna_group_idx + 1);
       n_nonzero_trt_v.push_back(n_nonzero_trt);
