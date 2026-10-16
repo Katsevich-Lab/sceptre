@@ -1,0 +1,78 @@
+# These small explicit examples characterize the legacy kernels, including
+# representation semantics that are deliberately not normalized by the refactor.
+storage_test_matrix <- function(copies = 1L) {
+    mat <- Matrix::sparseMatrix(
+        i = rep(c(1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L), copies),
+        j = as.integer(unlist(lapply(seq_len(copies) - 1L, function(k) {
+            c(1L, 4L, 8L, 11L, 2L, 5L, 8L, 12L) + 12L * k
+        }))),
+        x = rep(c(0, 2.5, 3.8, 4.2, 2, 1.2, 0, 8), copies),
+        dims = c(2L, 12L * copies), repr = "R"
+    )
+    rownames(mat) <- c("r1", "r2")
+    mat
+}
+
+test_that("legacy storage retains stored-zero and fractional semantics", {
+    mat <- storage_test_matrix()
+    expect_identical(load_row(mat, "r1"), c(0, 0, 0, 2.5, 0, 0, 0, 3.8, 0, 0, 4.2, 0))
+    expect_identical(threshold_count_matrix(mat@j, mat@p, mat@x, 1L, 2.8), c(8L, 11L))
+    expect_identical(threshold_count_matrix(mat@j, mat@p, mat@x, 1L, 0), c(1L, 4L, 8L, 11L))
+    # A stored zero is counted by position, even though its loaded value is zero.
+    counts <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
+        mat@j, mat@p, 12L, 5L, list(c(2L, 3L)), list(4L, c(1L, 5L)),
+        integer(), c(1L, 2L), c(1L, 1L), TRUE, c(2L, 4L, 5L, 8L, 11L)
+    )
+    expect_identical(counts$n_nonzero_trt, c(1L, 1L))
+    expect_identical(counts$n_nonzero_cntrl, c(2L, 2L))
+    expect_identical(counts$n_nonzero_mat, matrix(c(1L, 1L, 1L, 1L), 2L))
+    expect_identical(counts$n_nonzero_tot, c(3L, 3L))
+})
+
+test_that("legacy group kernels consume disposable index vectors", {
+    mat <- storage_test_matrix()
+    groups <- list(c(2L, 3L), c(4L, 1L, 5L))
+    # The raw native entry point decrements its arguments in place. The storage
+    # adapter must own fresh vectors, rather than expose that to its callers.
+    out <- compute_n_trt_cells_matrix(mat@j, mat@p, 12L, 5L, 2L, groups,
+                                      c(2L, 4L, 5L, 8L, 11L))
+    expect_identical(out, matrix(c(1L, 2L, 1L, 2L), 2L))
+    expect_identical(groups, list(c(1L, 2L), c(3L, 0L, 4L)))
+})
+
+test_that("legacy matrix conversion agrees with the selected ondisc copy", {
+    skip_if_not_installed("ondisc")
+    mat <- storage_test_matrix()
+    for (input in list(mat, methods::as(mat, "CsparseMatrix"),
+                       methods::as(mat, "TsparseMatrix"), as.matrix(mat))) {
+        for (row_access in c(TRUE, FALSE)) {
+            expect_identical(set_matrix_accessibility(input, row_access),
+                             ondisc:::set_matrix_accessibility(input, row_access))
+        }
+    }
+})
+
+test_that("legacy backed storage coerces fractions and retains stored positions", {
+    skip_if_not_installed("ondisc")
+    directory <- tempfile("storage-reference-")
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    mat <- storage_test_matrix(200L) # exceed the legacy writer's chunk size
+    backed <- ondisc:::create_odm_from_r_matrix_internal(
+        mat, file.path(directory, "counts.odm"), integer_id = 1234L
+    )
+    expect_identical(backed@integer_id, 1234L)
+    expect_equal(as.numeric(backed[1L, ])[c(1L, 4L, 8L, 11L)], c(0, 2, 3, 4))
+    # The existing HDF5 threshold is integer-valued (2.8 becomes 2), whereas
+    # in-memory thresholding compares against the double supplied by the user.
+    expect_identical(ondisc:::threshold_count_matrix_cpp(
+        backed@h5_file, backed@ptr, 1L, 2.8
+    )[seq_len(3L)], c(4L, 8L, 11L))
+    groups <- list(c(2L, 3L), c(4L, 1L, 5L))
+    out <- ondisc:::compute_n_trt_cells_matrix_ondisc(
+        backed@h5_file, backed@ptr, ncol(mat), 5L, 2L, groups,
+        c(2L, 4L, 5L, 8L, 11L)
+    )
+    expect_identical(out, matrix(c(1L, 2L, 1L, 2L), 2L))
+    expect_identical(groups, list(c(1L, 2L), c(3L, 0L, 4L)))
+})
