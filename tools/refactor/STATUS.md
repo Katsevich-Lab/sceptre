@@ -79,10 +79,16 @@ all four large five-conversion timing gates pass. All four large settings exceed
 both memory gates (whole-process increases of 111–125 MiB), while small settings
 pass. The [unchanged complete experiment](results/triplet-experiment-8841efa/summary.md)
 is not resource acceptance. A source-static
-copy reduction at da6a079 passed 1,095 installed checks; its resource rerun is
-pending. Fresh
-pre-correction release builds remain separately labeled; no cost exception is
-approved and initial large-setting memory crossings are preserved.
+copy reduction at da6a079 passed 1,095 installed checks. The revised 909aa3a
+study completed: exactness and all meaningful timing gates pass; all small and
+logical memory gates pass. Two eight-million-entry numeric cases retain
+121.938/123.141 MiB whole-child increases and cross the generic gate. Eugene
+explicitly accepted these measured bounded correctness costs in
+[decision D2026-10-16-02](cleanup/decisions.md). The crossings remain failures
+under the original gate, with an accepted exception; no optimization/rerun is
+needed solely to make these unchanged cases green. Evidence and the separate
+dense-cost study are [retained in full](results/conversion-cost-909aa3a/README.md).
+Mechanism review and final integrated source/resource qualification still apply.
 The indexing-test handoff to CL3 is complete. CL3 (`627e7e4`) passed 1,006
 expectations in 52 tests against a fresh same-environment original oracle;
 independent source review closed and integration is complete. This does not
@@ -131,8 +137,10 @@ has a reproduced P2 disposition: use supported general conversion before
 sparsification to retain all supplied values, then measure its dense-input-only
 copy cost. Source bc53bc1 (integrated as 78636bc) has independent review and
 1,125 installed checks in 53 blocks, including the separate dense regressions.
-Its measured copy-cost disposition and revised triplet gate remain open; it is
-not folded into the qualified triplet-copy checkpoint.
+Its separate bounded dense-cost study passes all four OS memory gates; timing
+is explicitly inconclusive (8–75ms), and missing sampled-phase observations are
+counted rather than converted into passes. Independent cost review closed at
+909aa3a. It is not folded into the numeric-triplet exception.
 
 Hosted c47e7ae [passed all five jobs](results/ci-c47e7ae.json), including
 draw-bank ownership, count ownership and dispersion-policy probes in every

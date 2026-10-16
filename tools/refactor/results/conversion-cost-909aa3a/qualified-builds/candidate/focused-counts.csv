@@ -1,0 +1,54 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-refactor-calibration-safety.R","refactor-calibration-safety","native producers retain safe zero and endpoint domains",32,0,FALSE,FALSE,0,0.138,0.016,2.455,32
+"test-refactor-calibration-safety.R","refactor-calibration-safety","calibration combinations reject unsafe sizes and rates before allocation",17,0,FALSE,FALSE,0,0.0499999999999999,0.00199999999999999,0.0529999999999999,17
+"test-refactor-calibration-safety.R","refactor-calibration-safety","candidate calibration sampling checks dimensions counts and wide products",8,0,FALSE,FALSE,0,0.022,0.001,0.0229999999999997,8
+"test-refactor-calibration-safety.R","refactor-calibration-safety","R budget conversion is finite integral and checked before narrowing",13,0,FALSE,FALSE,0,0.024,0.002,0.0260000000000002,13
+"test-refactor-calibration-safety.R","refactor-calibration-safety","public calibration uses actual NT groups surviving cellwise QC",13,0,FALSE,FALSE,0,0.134,0.012,0.152,13
+"test-refactor-calibration-safety.R","refactor-calibration-safety","overlapping complement calibration bounds its union bank by cells",3,0,FALSE,FALSE,0,0.00900000000000001,0.006,0.0150000000000001,3
+"test-refactor-calibration-safety.R","refactor-calibration-safety","public high-MOI calibration accepts overlapping NT unions",4,0,FALSE,FALSE,0,0.105,0.00800000000000001,0.117,4
+"test-refactor-calibration-safety.R","refactor-calibration-safety","native adapter checks selected prefixes without restricting CRT cardinality",15,0,FALSE,FALSE,0,0.058,0.004,0.0630000000000002,15
+"test-refactor-contracts.R","refactor-contracts","reference provenance and every fixture digest are intact",6,0,FALSE,FALSE,0,0.0339999999999998,0.023,2.208,6
+"test-refactor-contracts.R","refactor-contracts","temporary runtime references reject unpinned stale and incomplete evidence",7,0,FALSE,FALSE,0,0.1,0.025,0.408,7
+"test-refactor-contracts.R","refactor-contracts","cached runtime evidence rejects live RNG flags and debug-mode changes",7,0,FALSE,FALSE,0,0.0359999999999998,0.022,4.554,7
+"test-refactor-contracts.R","refactor-contracts","toolchain caching observes edits to effective Makevars at the same path",2,0,FALSE,FALSE,0,0.01,0.011,4.392,2
+"test-refactor-contracts.R","refactor-contracts","numerical environment diagnostics identify fields without exposing values",2,0,FALSE,FALSE,0,0.00499999999999989,0.001,0.00600000000000023,2
+"test-refactor-contracts.R","refactor-contracts","dynamic Makevars do not hide changes to referenced external flags",1,0,FALSE,FALSE,0,0.00900000000000012,0.00900000000000001,4.331,1
+"test-refactor-contracts.R","refactor-contracts","developer selection invalidates compiler and runtime oracle caches",16,0,FALSE,FALSE,0,0.0310000000000001,0.00799999999999998,0.0390000000000015,16
+"test-refactor-contracts.R","refactor-contracts","source byte verification identifies changed paths and MD5 values",2,0,FALSE,FALSE,0,0.004,0.001,0.00600000000000023,2
+"test-refactor-contracts.R","refactor-contracts","stored-platform qualification checks its recorded compiler and RNG",3,0,FALSE,FALSE,0,0.02,0.011,2.354,3
+"test-refactor-contracts.R","refactor-contracts","refactor preserves the exact public API and existing S4 facade",1,0,FALSE,FALSE,0,0.00499999999999989,0.001,0.00600000000000023,1
+"test-refactor-contracts.R","refactor-contracts","supported scientific workflows reproduce the pinned baseline",425,0,FALSE,FALSE,0,2.525,0.181,2.8,425
+"test-refactor-contracts.R","refactor-contracts","ordered assignment remapping preserves source and fit views",5,0,FALSE,FALSE,0,0.00499999999999989,0.002,0.00700000000000145,5
+"test-refactor-contracts.R","refactor-contracts","repeated analyses and existing cache invalidation match baseline",8,0,FALSE,FALSE,0,0.499,0.012,0.589000000000002,8
+"test-refactor-contracts.R","refactor-contracts","baseline saved objects remain analyzable",1,0,FALSE,FALSE,0,0.0889999999999995,0.005,0.186,1
+"test-refactor-contracts.R","refactor-contracts","rejected requests and degenerate baseline behavior remain explicit",3,0,FALSE,FALSE,0,0.116000000000001,0.00700000000000001,0.201999999999998,3
+"test-refactor-contracts.R","refactor-contracts","serial and two-worker execution preserve pair identity and results",1,0,FALSE,FALSE,0,0.696000000000001,0.083,0.823,1
+"test-refactor-contracts.R","refactor-contracts","backed permutation workflows and independent reattachment match sparse",8,0,FALSE,FALSE,0,0.547000000000001,0.048,0.945,8
+"test-refactor-indexing.R","refactor-indexing","noncontiguous cells preserve actual extraction and native QC coordinates",15,0,FALSE,FALSE,0,0.016,0.006,0.0219999999999985,15
+"test-refactor-indexing.R","refactor-indexing","observed native positions are one based and synthetic positions are zero based",6,0,FALSE,FALSE,0,0.00599999999999934,0.002,0.00799999999999912,6
+"test-refactor-indexing.R","refactor-indexing","legacy calibration unions and overlapping NT remapping stay explicit",4,0,FALSE,FALSE,0,0.00400000000000045,0.00199999999999989,0.00600000000000023,4
+"test-refactor-indexing.R","refactor-indexing","canonical contexts compose source, analysis and fit coordinates once",19,0,FALSE,FALSE,0,0.0229999999999997,0.00800000000000001,0.0300000000000011,19
+"test-refactor-indexing.R","refactor-indexing","analysis-cell normalization preserves reordered requested cells",8,0,FALSE,FALSE,0,0.016,0.003,0.0189999999999984,8
+"test-refactor-native.R","refactor-native","prepared native cases preserve scores, stages, effects and distributions",188,0,FALSE,FALSE,0,0.19,0.063,0.254999999999999,188
+"test-refactor-native.R","refactor-native","native fallback uses its selected segment including zero B3",4,0,FALSE,FALSE,0,0.0140000000000002,0.002,0.0169999999999995,4
+"test-refactor-native.R","refactor-native","native distribution can be omitted without changing the inference",2,0,FALSE,FALSE,0,0.00999999999999979,0.001,0.0109999999999992,2
+"test-refactor-native.R","refactor-native","production samplers retain draw counts, ranges and membership laws",22,0,FALSE,FALSE,0,0.0510000000000002,0.01,0.0599999999999987,22
+"test-refactor-native.R","refactor-native","all platforms preserve exact draws against the frozen source oracle",6,0,FALSE,FALSE,0,0.0129999999999999,0.003,0.0159999999999982,6
+"test-refactor-native.R","refactor-native","sampler streams match the pinned platform and toolchain baseline",4,0,FALSE,FALSE,0,0.0129999999999999,0.003,0.23,4
+"test-refactor-native.R","refactor-native","test-only bank construction rejects invalid native indices",5,0,FALSE,FALSE,0,0.016,0.001,0.017000000000003,5
+"test-refactor-storage-boundaries.R","refactor-storage-boundaries","count boundaries materialize borrowed compact and coercible coordinates",4,0,FALSE,FALSE,0,0.00700000000000056,0.002,0.00799999999999912,4
+"test-refactor-storage-boundaries.R","refactor-storage-boundaries","mitochondrial boundary materializes rows before its owned compute scope",3,0,FALSE,FALSE,0,0.00300000000000011,0.001,0.00400000000000134,3
+"test-refactor-storage-dense.R","refactor-storage-dense","dense conversion preserves symmetric and near-symmetric entries",20,0,FALSE,FALSE,0,0.024,0.00700000000000001,0.0309999999999988,20
+"test-refactor-storage-dense.R","refactor-storage-dense","public dense import retains both triangles and correct cell totals",10,0,FALSE,FALSE,0,0.016,0.004,0.0199999999999996,10
+"test-refactor-storage-ownership.R","refactor-storage-ownership","canonical counts preserve repeated source and pair views without mutation",16,0,FALSE,FALSE,0,0.0150000000000006,0.005,0.0189999999999984,16
+"test-refactor-storage-ownership.R","refactor-storage-ownership","empty sparse count views preserve result dimensions",6,0,FALSE,FALSE,0,0.00899999999999945,0.002,0.0120000000000005,6
+"test-refactor-storage-ownership.R","refactor-storage-ownership","mitochondrial coordinates are owned and value summaries remain distinct",8,0,FALSE,FALSE,0,0.00800000000000001,0.003,0.0120000000000005,8
+"test-refactor-storage-ownership.R","refactor-storage-ownership","triplet conversion owns sorting and preserves stored entry semantics",43,0,FALSE,FALSE,0,0.0449999999999999,0.0139999999999999,0.0609999999999999,43
+"test-refactor-storage-ownership.R","refactor-storage-ownership","sorting preserves borrowed value bits and every source representation",30,0,FALSE,FALSE,0,0.0330000000000004,0.01,0.0429999999999993,30
+"test-refactor-storage.R","refactor-storage","legacy storage retains stored-zero and fractional semantics",7,0,FALSE,FALSE,0,0.00699999999999967,0.003,0.00899999999999679,7
+"test-refactor-storage.R","refactor-storage","owned sparse group coordinates remain unchanged across calls",3,0,FALSE,FALSE,0,0.00300000000000011,0.001,0.00400000000000134,3
+"test-refactor-storage.R","refactor-storage","legacy matrix conversion agrees with the selected ondisc copy",8,0,FALSE,FALSE,0,0.0170000000000003,0.003,0.0199999999999996,8
+"test-refactor-storage.R","refactor-storage","legacy backed storage coerces fractions and retains stored positions",5,0,FALSE,FALSE,0,0.00600000000000023,0.002,0.00900000000000034,5
+"test-refactor-storage.R","refactor-storage","storage reads preserve requested source order and repeated cells",6,0,FALSE,FALSE,0,0.00599999999999934,0.002,0.00799999999999912,6
+"test-refactor-storage.R","refactor-storage","sparse storage counts preserve requests and caller-owned indices",34,0,FALSE,FALSE,0,0.032,0.011,0.041999999999998,34
+"test-refactor-storage.R","refactor-storage","backed storage has the same ordered count and ownership contracts",36,0,FALSE,FALSE,0,0.0550000000000006,0.017,0.0719999999999992,36

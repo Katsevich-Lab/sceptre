@@ -1,0 +1,27 @@
+{
+  "builds": {
+    "original": {
+      "commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/source",
+      "library": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library",
+      "archive": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/source.tar",
+      "archive_sha256": "4f93c20315d66f03046ff97c36ba853e96ead6ffd675e0980c81ec53daa06048"
+    },
+    "candidate": {
+      "commit": "909aa3ad76ee21e7f9ab83a63c645bc0fb6a43c7",
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/source",
+      "library": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library",
+      "archive": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/source.tar",
+      "archive_sha256": "67b23c2c503d1ae950c7ca15dab29f241ba21f87ce048dbb76aa468e89c4b38c"
+    }
+  },
+  "environment": {
+    "R_LIBS": "/private/tmp/sceptre-rf0-ondisc-library",
+    "SCEPTRE_REFACTOR_ORACLE_DEBUG": "false",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1"
+  },
+  "status": "fresh immutable archives prepared; installs/tests/resources pending"
+}

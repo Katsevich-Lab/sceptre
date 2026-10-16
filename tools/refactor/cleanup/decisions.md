@@ -29,3 +29,34 @@ parsing directly to ondisc; this unit neither changes nor qualifies that
 external parser's duplicate/modality behavior. Independent source review
 requires this limit to remain explicit. A full-file in-memory preflight would
 violate the backed route's resource boundary and is not introduced here.
+
+## D2026-10-16-02: measured numeric-triplet ownership cost accepted
+
+Eugene explicitly replied **“I accept”** to the completed revised study's
+bounded correctness-cost disposition. The disclosed experiment compares
+original 21f9ea098b69c444a884a49bc254de711968e3b5 with candidate
+909aa3ad76ee21e7f9ab83a63c645bc0fb6a43c7. At eight million stored entries,
+numeric row/column conversion adds **121.938/123.141 MiB** whole-child peak RSS
+and crosses the generic memory gate; logical adds **61.891/58.188 MiB** and
+passes. Exact outputs, caller nonmutation and all meaningful timing gates pass.
+
+**Disposition: accepted bounded correctness-cost exception for those measured
+numeric-triplet cases. The generic gates remain crossed, not passed.** Preserve
+all initial/revised measurements. Stop optimization or reruns whose sole purpose
+is making these unchanged numeric cases green. No additional user confirmation
+is needed for the disclosed cost.
+
+The mechanism owns borrowed coordinates/values before in-place sorting, avoiding
+caller mutation. Constructor-proven fresh logical values are already reused.
+This is a source/fixture/platform-specific acceptance, not a universal bytes-per-
+entry allowance, proof of an algorithmic minimum, larger-input memory bound or
+waiver of unrelated regressions. Later source changes materially affecting this
+cost/behavior require delta assessment. Correctness, nonmutation, index safety,
+evidence/source consistency, independent mechanism review, the Linux aggregation
+precision repair and final integrated qualification remain required.
+
+Authoritative report SHA256:
+`9dfd92d6cf625b8889da8931f5f811488fef32b7a8a86cda98c9564db7db2868`.
+[Losslessly retained full study and separate dense-cost evidence](../results/conversion-cost-909aa3a/README.md).
+The original proposal and study's pre-acceptance wording are preserved; this
+entry supplies the subsequent human disposition without changing their bytes.

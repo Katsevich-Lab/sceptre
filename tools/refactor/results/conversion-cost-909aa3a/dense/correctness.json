@@ -1,0 +1,1286 @@
+[
+  {
+    "case": "1500000-dense",
+    "orientation": "row",
+    "results": {
+      "original": {
+        "mode": "correctness",
+        "orientation": "row",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/1500000-dense.rds",
+        "fixture_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.008442999998806044,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.008442999998806044,
+            "user_seconds": 0.008000000000000007,
+            "system_seconds": 0.0010000000000000009,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1616347,
+                  86.4,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1616347,
+                  86.4
+                ],
+                [
+                  4313525,
+                  33,
+                  10146329,
+                  77.5,
+                  1536,
+                  4313525,
+                  33
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "input_after_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "caller_unchanged": true,
+              "output_sha256": "7830aefca1860beb2d63480ea4a1723f4c307200b585c95b90e6800d0eb4d716",
+              "class": "dgRMatrix",
+              "stored": 150000,
+              "zeros": 0,
+              "fractions": 129897
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre/libs/sceptre.so",
+            "sha256": "8fdc8133508966f434b2821a3a94765d17f8af18acecf0d6409500e6c6ec77bd"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      },
+      "candidate": {
+        "mode": "correctness",
+        "orientation": "row",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/1500000-dense.rds",
+        "fixture_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.008824999997159466,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.008824999997159466,
+            "user_seconds": 0.008000000000000007,
+            "system_seconds": 0.0010000000000000009,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1616952,
+                  86.4,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1616952,
+                  86.4
+                ],
+                [
+                  4313956,
+                  33,
+                  10146329,
+                  77.5,
+                  1536,
+                  4313956,
+                  33
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "input_after_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "caller_unchanged": true,
+              "output_sha256": "7830aefca1860beb2d63480ea4a1723f4c307200b585c95b90e6800d0eb4d716",
+              "class": "dgRMatrix",
+              "stored": 150000,
+              "zeros": 0,
+              "fractions": 129897
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre/libs/sceptre.so",
+            "sha256": "77e35d91d2f7829b0e6c84ff99e45c589cc22947889b4d2633608745506c4398"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      }
+    },
+    "exact_output": {
+      "exact_class_dimensions_dimnames": true,
+      "exact_slots": [
+        true,
+        true,
+        true
+      ],
+      "stored": 150000,
+      "zeros": 0,
+      "fractions": 129897
+    }
+  },
+  {
+    "case": "1500000-dense",
+    "orientation": "column",
+    "results": {
+      "original": {
+        "mode": "correctness",
+        "orientation": "column",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/1500000-dense.rds",
+        "fixture_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.00898600000073202,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.00898600000073202,
+            "user_seconds": 0.008000000000000007,
+            "system_seconds": 0.0010000000000000009,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1616347,
+                  86.4,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1616347,
+                  86.4
+                ],
+                [
+                  4313525,
+                  33,
+                  10146329,
+                  77.5,
+                  1536,
+                  4313525,
+                  33
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "input_after_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "caller_unchanged": true,
+              "output_sha256": "a145d3d42d2c99970f30800b5a4f567f2d3c1b17c6e87d2fca8bbc6baf7f7127",
+              "class": "dgCMatrix",
+              "stored": 150000,
+              "zeros": 0,
+              "fractions": 129897
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre/libs/sceptre.so",
+            "sha256": "8fdc8133508966f434b2821a3a94765d17f8af18acecf0d6409500e6c6ec77bd"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      },
+      "candidate": {
+        "mode": "correctness",
+        "orientation": "column",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/1500000-dense.rds",
+        "fixture_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.009581000020261854,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.009581000020261854,
+            "user_seconds": 0.008000000000000007,
+            "system_seconds": 0.0010000000000000009,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1616952,
+                  86.4,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1616952,
+                  86.4
+                ],
+                [
+                  4313956,
+                  33,
+                  10146329,
+                  77.5,
+                  1536,
+                  4313956,
+                  33
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "input_after_sha256": "fe55fd52948f6f054123eb62b2a77a23cdcfbabaf077f9b09cb820c8dbe3c373",
+              "caller_unchanged": true,
+              "output_sha256": "a145d3d42d2c99970f30800b5a4f567f2d3c1b17c6e87d2fca8bbc6baf7f7127",
+              "class": "dgCMatrix",
+              "stored": 150000,
+              "zeros": 0,
+              "fractions": 129897
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre/libs/sceptre.so",
+            "sha256": "77e35d91d2f7829b0e6c84ff99e45c589cc22947889b4d2633608745506c4398"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      }
+    },
+    "exact_output": {
+      "exact_class_dimensions_dimnames": true,
+      "exact_slots": [
+        true,
+        true,
+        true
+      ],
+      "stored": 150000,
+      "zeros": 0,
+      "fractions": 129897
+    }
+  },
+  {
+    "case": "6e+06-dense",
+    "orientation": "row",
+    "results": {
+      "original": {
+        "mode": "correctness",
+        "orientation": "row",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/6e+06-dense.rds",
+        "fixture_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.019327000016346574,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.019327000016346574,
+            "user_seconds": 0.016999999999999904,
+            "system_seconds": 0.0020000000000000018,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1618769,
+                  86.5,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1618769,
+                  86.5
+                ],
+                [
+                  8818395,
+                  67.3,
+                  15266649,
+                  116.5,
+                  1536,
+                  8818395,
+                  67.3
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "input_after_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "caller_unchanged": true,
+              "output_sha256": "59cc6a113794f6cfc1141477514bc5372a26ce78208dfe69b0d73ae8f777e363",
+              "class": "dgRMatrix",
+              "stored": 600000,
+              "zeros": 0,
+              "fractions": 519587
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre/libs/sceptre.so",
+            "sha256": "8fdc8133508966f434b2821a3a94765d17f8af18acecf0d6409500e6c6ec77bd"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      },
+      "candidate": {
+        "mode": "correctness",
+        "orientation": "row",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/6e+06-dense.rds",
+        "fixture_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.07267399999545887,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.07267399999545887,
+            "user_seconds": 0.06699999999999995,
+            "system_seconds": 0.0050000000000000044,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1619374,
+                  86.5,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1619374,
+                  86.5
+                ],
+                [
+                  8818826,
+                  67.3,
+                  15267269,
+                  116.5,
+                  1536,
+                  8818826,
+                  67.3
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "input_after_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "caller_unchanged": true,
+              "output_sha256": "59cc6a113794f6cfc1141477514bc5372a26ce78208dfe69b0d73ae8f777e363",
+              "class": "dgRMatrix",
+              "stored": 600000,
+              "zeros": 0,
+              "fractions": 519587
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre/libs/sceptre.so",
+            "sha256": "77e35d91d2f7829b0e6c84ff99e45c589cc22947889b4d2633608745506c4398"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      }
+    },
+    "exact_output": {
+      "exact_class_dimensions_dimnames": true,
+      "exact_slots": [
+        true,
+        true,
+        true
+      ],
+      "stored": 600000,
+      "zeros": 0,
+      "fractions": 519587
+    }
+  },
+  {
+    "case": "6e+06-dense",
+    "orientation": "column",
+    "results": {
+      "original": {
+        "mode": "correctness",
+        "orientation": "column",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/6e+06-dense.rds",
+        "fixture_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.018064000003505498,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.018064000003505498,
+            "user_seconds": 0.016000000000000014,
+            "system_seconds": 0.0020000000000000018,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1618769,
+                  86.5,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1618769,
+                  86.5
+                ],
+                [
+                  8818395,
+                  67.3,
+                  15266649,
+                  116.5,
+                  1536,
+                  8818395,
+                  67.3
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "input_after_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "caller_unchanged": true,
+              "output_sha256": "c4b8d6796fde2186db813802823620a85b7310a2f87af8d1b7309e8db04a25bb",
+              "class": "dgCMatrix",
+              "stored": 600000,
+              "zeros": 0,
+              "fractions": 519587
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/library/sceptre/libs/sceptre.so",
+            "sha256": "8fdc8133508966f434b2821a3a94765d17f8af18acecf0d6409500e6c6ec77bd"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      },
+      "candidate": {
+        "mode": "correctness",
+        "orientation": "column",
+        "fixture": "/private/tmp/sceptre-dense-cost-909aa3a/fixtures/6e+06-dense.rds",
+        "fixture_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+        "package": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre",
+        "repetitions": 1,
+        "elapsed_seconds": 0.06676600000355393,
+        "intervals": [
+          {
+            "elapsed_seconds": 0.06676600000355393,
+            "user_seconds": 0.06299999999999994,
+            "system_seconds": 0.0040000000000000036,
+            "pre_gc": {
+              "rows": [
+                "Ncells",
+                "Vcells"
+              ],
+              "columns": [
+                "used",
+                "(Mb)",
+                "gc trigger",
+                "(Mb)",
+                "limit (Mb)",
+                "max used",
+                "(Mb)"
+              ],
+              "values": [
+                [
+                  1619374,
+                  86.5,
+                  2998642,
+                  160.20000000000002,
+                  "NA",
+                  1619374,
+                  86.5
+                ],
+                [
+                  8818826,
+                  67.3,
+                  15267269,
+                  116.5,
+                  1536,
+                  8818826,
+                  67.3
+                ]
+              ]
+            },
+            "post_gc": {},
+            "correctness": {
+              "input_before_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "input_after_sha256": "bcf1112415e300564205479388ab7d0638ba43fe2f767e0dcb11d9dcda55141e",
+              "caller_unchanged": true,
+              "output_sha256": "c4b8d6796fde2186db813802823620a85b7310a2f87af8d1b7309e8db04a25bb",
+              "class": "dgCMatrix",
+              "stored": 600000,
+              "zeros": 0,
+              "fractions": 519587
+            }
+          }
+        ],
+        "threads": [
+          "1",
+          "1",
+          "1",
+          "1"
+        ],
+        "data_table_threads": 1,
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "dependencies": [
+          {
+            "name": "Matrix",
+            "version": "1.7.5",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+          },
+          {
+            "name": "data.table",
+            "version": "1.18.4",
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+          },
+          {
+            "name": "Rcpp",
+            "version": "1.1.1.1.1",
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+          }
+        ],
+        "dependency_dll_sha256": {
+          "base": {},
+          "methods": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/methods/libs/methods.so",
+            "sha256": "cbdbfc663cd9f462fda673989bce71d82968f6af840602b147441d82d86d6186"
+          },
+          "utils": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/utils/libs/utils.so",
+            "sha256": "d9153eb476509a27260da42c190d714a4ba1151cd944508de412f36e3fb2f66c"
+          },
+          "grDevices": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grDevices/libs/grDevices.so",
+            "sha256": "e8f4b2e0ee45e1f2e21a453dfbb1b2f3b7de9fe357a68fdf207dacbcc8c48be8"
+          },
+          "graphics": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/graphics/libs/graphics.so",
+            "sha256": "799097425fe0f2fe68302abd33fd4f67333bb1ba52acfcbe83a004f04e085cc9"
+          },
+          "stats": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/stats/libs/stats.so",
+            "sha256": "d760e752f2b151b30f7ea0818c681f491fdc3509ea7c6b13a92c68d4518d87ac"
+          },
+          "triplet-clock": {
+            "path": "/private/tmp/sceptre-dense-cost-909aa3a/triplet-clock.so",
+            "sha256": "47fc791c7f1b36e85c62b05295b6c5e4a8f83a19c7d0326cd395f476baea338e"
+          },
+          "data_table": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/libs/data_table.so",
+            "sha256": "fe12a02fc27d799c4dd29b6a291f6575c27825f2b5c6a178828bc97da0501dfe"
+          },
+          "grid": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/libs/grid.so",
+            "sha256": "4ea74364ecaeed177c0ec0b70fad6d89760df2201d05e651316a0a02300ea92a"
+          },
+          "lattice": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/libs/lattice.so",
+            "sha256": "0bc0196b9b29a0dc95aefceb1e44756226747ab7012f39bfa68b4b1d10ab4400"
+          },
+          "Matrix": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/libs/Matrix.so",
+            "sha256": "96fa140f0b5bb904e2292126a8a9af3c82cf88934e367b28b787caa31979cf38"
+          },
+          "Rcpp": {
+            "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/libs/Rcpp.so",
+            "sha256": "5fbd1a80a811b3d9dc0435805d8ee72cab1eb63a7636ea2597e217538eec4a2f"
+          },
+          "tools": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/libs/tools.so",
+            "sha256": "19aa734cbce62f73cbecca8dee5c98c06faf9728e92e600caefd0516d507a8eb"
+          },
+          "sceptre": {
+            "path": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/library/sceptre/libs/sceptre.so",
+            "sha256": "77e35d91d2f7829b0e6c84ff99e45c589cc22947889b4d2633608745506c4398"
+          },
+          "jsonlite": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite/libs/jsonlite.so",
+            "sha256": "09efa84a649d3b3d2d4d3af838e80e73f6f03773454b165abcc241a53d4701bc"
+          },
+          "digest": {
+            "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/libs/digest.so",
+            "sha256": "dc152e89b5cc9b55109fa9f04d59133f397e80e81c10384b9a9914e0c304806d"
+          }
+        },
+        "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      }
+    },
+    "exact_output": {
+      "exact_class_dimensions_dimnames": true,
+      "exact_slots": [
+        true,
+        true,
+        true
+      ],
+      "stored": 600000,
+      "zeros": 0,
+      "fractions": 519587
+    }
+  }
+]

@@ -1,0 +1,54 @@
+$symmetric
+$symmetric$expected
+   c1 c2
+c1  1  2
+c2  2  3
+
+$symmetric$constructor_class
+[1] "dsTMatrix"
+attr(,"package")
+[1] "Matrix"
+
+$symmetric$public
+   c1 c2
+c1  1  2
+c2  2  3
+
+$symmetric$public_exact
+[1] TRUE
+
+$symmetric$expected_column_totals
+c1 c2 
+ 3  5 
+
+$symmetric$actual_import_totals
+[1] 3 5
+
+
+$near_symmetric
+$near_symmetric$expected
+   c1 c2
+c1  1  2
+c2  2  3
+
+$near_symmetric$constructor_class
+[1] "dsTMatrix"
+attr(,"package")
+[1] "Matrix"
+
+$near_symmetric$public
+   c1 c2
+c1  1  2
+c2  2  3
+
+$near_symmetric$public_exact
+[1] TRUE
+
+$near_symmetric$expected_column_totals
+c1 c2 
+ 3  5 
+
+$near_symmetric$actual_import_totals
+[1] 3 5
+
+

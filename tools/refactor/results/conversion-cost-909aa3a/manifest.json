@@ -1,0 +1,389 @@
+{
+  "scope": "Small durable evidence staging only; complete raw experimental RDS fixtures/outputs and immutable source archives/libraries remain at recorded original /private/tmp paths. Large files have not been deleted or replaced. Resource exception proposal is not acceptance.",
+  "files": [
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/qualification-summary.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/qualification-summary.json",
+      "bytes": 29451,
+      "sha256": "cfde52ff46575c8cd68d361f25b81e51ddc5761342d260bd24d13815178b564e"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/preparation.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/preparation.json",
+      "bytes": 1204,
+      "sha256": "d600e04073fbd18b10bfa1424bef4aee9e3f1bfb3ea3c534591029830acef51e"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/build.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/original/build.json",
+      "bytes": 4697,
+      "sha256": "fba4a6dfdbc8c1c9e308b7b114499fffb71c035da12b63dc224453f67963383a"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/original/install.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/original/install.log",
+      "bytes": 6025,
+      "sha256": "608637fbeb0b5da054b41d526de03c86e2a84ac77a84bda040fb3c076b69eafb"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/build.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/build.json",
+      "bytes": 5862,
+      "sha256": "689917a72610658f33cd94f579cbc8db734d33bc561f267ba015d50296208bb6"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/install.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/install.log",
+      "bytes": 7292,
+      "sha256": "e0a0c50925039fa267d71b334b23fd647267d23b87b32ce1d12e31bb850a518e"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/focused.R",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/focused.R",
+      "bytes": 1276,
+      "sha256": "59c8a3fc3d65b41fdc4509de2f2c5454c1a14a163b9a9ce0b8b2c1917acd73b2"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/focused.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/focused.log",
+      "bytes": 1547,
+      "sha256": "34e3621ba954197d53dd615600162ecd540bfacca2af8ac01ad0a8db6cc3a16a"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/focused-results.rds",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/focused-results.rds",
+      "bytes": 234382,
+      "sha256": "bd45f038e2e076b38d429677f8169533e83a075782e714fa95d47d3d5ba5769e"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/focused-counts.csv",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/focused-counts.csv",
+      "bytes": 9648,
+      "sha256": "87888c35981a94196445de5b369fc9f9671e5c54c2bda8418f8d9b0f8deb2dc4"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/focused-summary.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/focused-summary.json",
+      "bytes": 226,
+      "sha256": "70465a10e7968f29f15198517715765f7c3ab39de92c367a03474004ec4539ae"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/dense-reproduction.rds",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/dense-reproduction.rds",
+      "bytes": 14847,
+      "sha256": "0f170f257352b567606f0a9bb6a2de18f740cd612d75712111583130565d620b"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-dense-final-909aa3a/candidate/dense-reproduction.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/qualified-builds/candidate/dense-reproduction.log",
+      "bytes": 647,
+      "sha256": "f8beef68e10c9c3895d822b8e7d05396ce2d8c3ffb043c3524228e0abd09f948"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/summary.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/summary.json",
+      "bytes": 790540,
+      "sha256": "317013eb9518dcbf80e38edd00c5ba5c67f2a5b5a24e3bf598e18e9eb00116ca"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/summary.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/summary.md",
+      "bytes": 1315,
+      "sha256": "705043116e084ccf19f1092851421001dc0e289aea55238e3bbbdaf953db6bf7"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/plan.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/plan.json",
+      "bytes": 36130,
+      "sha256": "74da190af915285a69bb53dacde59be505170cb028e576fbdd3eaa7f9af72002"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/correctness.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/correctness.json",
+      "bytes": 52725,
+      "sha256": "d165efec6f8b1d3949d28e988a859c2a967760db9af8ba26985e7f2420d47ef0"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/prepare-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/prepare-host-memory.json",
+      "bytes": 2004,
+      "sha256": "953ca6e435b0eeaaf4228875e526dbb7e1ed45620cfe6f7122db6f71e669b1ac"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/measure-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/measure-host-memory.json",
+      "bytes": 2004,
+      "sha256": "15791cf33340109d1ffafb60c6c6034b53fb2aa82fa624d25957b3ccf52e53bf"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/correctness-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/correctness-host-memory.json",
+      "bytes": 2004,
+      "sha256": "9efb443f1712f5caa0ffdf89e9e456f956d02daff89b6eb9497fd5102d93e8a7"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/1500000-dense-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/1500000-dense-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 19363,
+      "sha256": "90966c986af0d79dc90ed86a82d5567eaec2ae2f789857de9eeee66eefb28ab2"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/6e+06-dense-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/6e+06-dense-row-original-r0-b1.json.rprofmem",
+      "bytes": 21174,
+      "sha256": "f83a7b0a1ff4294c1899acf30ce9622d5303b5caf84f1b810555c9cbeb9b863d"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/6e+06-dense-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/6e+06-dense-column-original-r0-b1.json.rprofmem",
+      "bytes": 19945,
+      "sha256": "d7ab6f7102989458fc0e64764066f81fed33042a50095adeb1ff8a52094cf80b"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/1500000-dense-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/1500000-dense-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 20593,
+      "sha256": "e3a9b0a0f8265df71a227da0366d7958467048ab9197b24ee4927327aa186789"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/6e+06-dense-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/6e+06-dense-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 19367,
+      "sha256": "64a143d912b4b90ed606b3268a793ff3b2c8412b9320c99881f8912d360a4e63"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/1500000-dense-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/1500000-dense-column-original-r0-b1.json.rprofmem",
+      "bytes": 19941,
+      "sha256": "6f852dd02f26eb3de8b11151abeb62d576c6b9d83a94aa9d4a2b0ca11e3d6301"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/6e+06-dense-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/6e+06-dense-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 20596,
+      "sha256": "0b78d20c6d3de0472bd3bd7bf2219f0a3a0f981abebf55fe755fe84904d7d974"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a/profile/1500000-dense-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/allocation-traces/1500000-dense-row-original-r0-b1.json.rprofmem",
+      "bytes": 21171,
+      "sha256": "dd4730520fe8670083bc1a09fceb34a389f23e2b15dc463b7f4e89b3f76965b7"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a-prepare.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/logs/sceptre-dense-cost-909aa3a-prepare.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a-correctness.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/logs/sceptre-dense-cost-909aa3a-correctness.log",
+      "bytes": 272,
+      "sha256": "6538b1cba094c8bfa60258c70be3cabeae29bf0890ad2cfabd1f799258a815dc"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-909aa3a-measure.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/dense/logs/sceptre-dense-cost-909aa3a-measure.log",
+      "bytes": 1632,
+      "sha256": "1d0e7ee37fdfc92c73f3ad4abf3a71b8ebfe31d9831063e477e5f184e45d1209"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/summary.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/summary.json",
+      "bytes": 3170545,
+      "sha256": "9dfd92d6cf625b8889da8931f5f811488fef32b7a8a86cda98c9564db7db2868"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/summary.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/summary.md",
+      "bytes": 2112,
+      "sha256": "94c86dd374a7982d9a19ece06a32a0fb3b99b19995246e1a2dbd7ebc5bbf5001"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/plan.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/plan.json",
+      "bytes": 39529,
+      "sha256": "eb51e84ab405c1ad441940f3861f305bec51763d746ca328be849ae3542445cd"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/correctness.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/correctness.json",
+      "bytes": 105798,
+      "sha256": "6d8d5e152cb4f32d8abcb63ee1e607de639b13e809454425cf131e3563952185"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/prepare-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/prepare-host-memory.json",
+      "bytes": 2004,
+      "sha256": "7a4959bef12c004c1ce2dbc1a4719ed2ceb7128d0e01d905a73e4a564fd1a43a"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/measure-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/measure-host-memory.json",
+      "bytes": 2004,
+      "sha256": "de11930f9de85baef298e2fed555eb3461f9480d06b85e6756bcdac22db08b95"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/correctness-host-memory.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/correctness-host-memory.json",
+      "bytes": 2004,
+      "sha256": "596f4e0d1f150e7f8ef7dfbb2630ea433154eab49b1c1c95a591a7d158eccd12"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/large-case-scaling-check.json",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/large-case-scaling-check.json",
+      "bytes": 15298,
+      "sha256": "6c37ae3c3f395e73a784bedc4cfb98ce817471e711c913b7770b10311b50e711"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/correctness-cost-proposal.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/correctness-cost-proposal.md",
+      "bytes": 6442,
+      "sha256": "d2d37c1790ab32c8baac7f75de2c3b2847af6551d69cc929a9145eb4f0866047"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-logical-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-logical-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 18759,
+      "sha256": "82cf5376c056168d3562cb11966c6a35c1d27c4d0b725d1bbc71bcf9be4f3613"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-numeric-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-numeric-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 18782,
+      "sha256": "21143251a9b9910e06ed91dbba8ff9db1a7cdf5e3d454d791b6a06825c5c5474"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-logical-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-logical-row-original-r0-b1.json.rprofmem",
+      "bytes": 18623,
+      "sha256": "7f945fe7aaf31a8b580e8f954540de8857a02fdbc19f5c8320332aa9bb6d6999"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-numeric-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-numeric-column-original-r0-b1.json.rprofmem",
+      "bytes": 18606,
+      "sha256": "87f0a6eab255a106ea8c8e1b92b58fd6b7db1978137887d0d5e08ca2523c3bd5"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-logical-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-logical-column-original-r0-b1.json.rprofmem",
+      "bytes": 18624,
+      "sha256": "697560f0d72538984ff918aaded25c2b5051a66035eac45ab481ee2c72923b8e"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-numeric-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-numeric-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 18787,
+      "sha256": "ef78ff4eb737c761bb4d0a9ec0c0d643cf5592b95cde005c6436f6f06f1aa536"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-numeric-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-numeric-row-original-r0-b1.json.rprofmem",
+      "bytes": 18603,
+      "sha256": "acd13cd257d97bc60c932dfbaaa069033fc8a23c2e4f6775ade2991c94d5c736"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-numeric-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-numeric-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 18786,
+      "sha256": "de60f25aecc48b6dab184305800da80e9c147028c4af67539b575fbb94e5c64b"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-logical-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-logical-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 18764,
+      "sha256": "70fa4127753a3a2078e227b391fcfb4c8c8b241f72aa57e3c281a0fdb7eaa55d"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-numeric-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-numeric-column-original-r0-b1.json.rprofmem",
+      "bytes": 18604,
+      "sha256": "95651c58b3ab74010e91f4c235f48e8392ad36f4994de8c507b8c67dfeb9b972"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-logical-column-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-logical-column-original-r0-b1.json.rprofmem",
+      "bytes": 18627,
+      "sha256": "bdf39244c802416013a4052aff1b5eea793440a2b9d06ce3185325b0da0a1444"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-numeric-row-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-numeric-row-candidate-r0-b1.json.rprofmem",
+      "bytes": 18781,
+      "sha256": "0d7300d8bf15ff68411569846dec930007ef3de886a28832674548743b89ed52"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/1000000-logical-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/1000000-logical-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 18760,
+      "sha256": "5148050ee0a31cb0816fd3cbb8bd1c276c77540a613cb3c4bd3b42baecb7d954"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-logical-column-candidate-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-logical-column-candidate-r0-b1.json.rprofmem",
+      "bytes": 18765,
+      "sha256": "ff3c3ce96a6c105a987ad6771f563cc93f113f3f52ea2d0659f46356c4c001ff"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-logical-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-logical-row-original-r0-b1.json.rprofmem",
+      "bytes": 18626,
+      "sha256": "3c50aadc251561034fa4c6ec22439d909347e2441a53d03cd28fecf8c86dac47"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a/profile/8000000-numeric-row-original-r0-b1.json.rprofmem",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/allocation-traces/8000000-numeric-row-original-r0-b1.json.rprofmem",
+      "bytes": 18605,
+      "sha256": "75be013c16fde9047f9069aec76bd0d0027f1c62ffcf9f8bfe1960faa56cc443"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a-prepare.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/logs/sceptre-triplet-qualified-909aa3a-prepare.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a-correctness.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/logs/sceptre-triplet-qualified-909aa3a-correctness.log",
+      "bytes": 592,
+      "sha256": "23af7f3fd07f3487e530cc9e5532bf085959ed898f97bef2ebd5274af94fa284"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-qualified-909aa3a-measure.log",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/triplet/logs/sceptre-triplet-qualified-909aa3a-measure.log",
+      "bytes": 4736,
+      "sha256": "d1dc748385eb88789d2b7d81d99de0497fa6e5d3ad291dfa70ee6c11e86c2335"
+    },
+    {
+      "source": "/private/tmp/sceptre-cl2-allocation-closure-8841efa.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/reviews/sceptre-cl2-allocation-closure-8841efa.md",
+      "bytes": 6742,
+      "sha256": "1feeaddfcc400b0364630cf62dde81aa5603e4c1e5e853769fc21ed555f8e27a"
+    },
+    {
+      "source": "/private/tmp/sceptre-triplet-columns-senior-review-da6a079.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/reviews/sceptre-triplet-columns-senior-review-da6a079.md",
+      "bytes": 2974,
+      "sha256": "3b674e2c3b5e7c881c1aed06fe116eeba313b5a3407db04ac380b13fc3c28e1e"
+    },
+    {
+      "source": "/private/tmp/sceptre-symmetric-dense-disposition.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/reviews/sceptre-symmetric-dense-disposition.md",
+      "bytes": 4638,
+      "sha256": "4a5ae27cac0c85afb2d535c99f5da33f1a2b41e79232f28113ae2a4790e2d24e"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-general-source-review-bc53bc1.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/reviews/sceptre-dense-general-source-review-bc53bc1.md",
+      "bytes": 1961,
+      "sha256": "5f7fad2eff443a4a8ce3fec0bf6a5c4efc7712db8084a6ef0cb8b7d6c4bfe144"
+    },
+    {
+      "source": "/private/tmp/sceptre-dense-cost-senior-review-909aa3a.md",
+      "staged": "/private/tmp/sceptre-cl2-final-evidence-909aa3a/reviews/sceptre-dense-cost-senior-review-909aa3a.md",
+      "bytes": 8265,
+      "sha256": "48bd6c91fb598b343b56e710288358d3ecaa51301e024d48ccd2f33c45c0d5ed"
+    }
+  ]
+}
