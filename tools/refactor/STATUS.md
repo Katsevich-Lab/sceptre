@@ -1,9 +1,38 @@
-# RF0 status — October 16, 2026
+# Refactor status — October 16, 2026
 
-RF0 is the baseline and characterization stage. Structural refactoring has not
-started. The accepted implementation scope remains identical sceptre API and no
-new functionality. This checkpoint is local to `codex/refactor`; it has not
-been pushed, merged or released.
+RF0 is the frozen baseline and characterization checkpoint. Implementation is
+under way on `codex/refactor`, which is published for hosted CI. The accepted
+scope remains identical sceptre API and no new functionality. Nothing has been
+merged to main or released.
+
+## Implementation progress
+
+- RF1: workflow prerequisites/transitions have one owner, retaining the saved
+  flags and sibling analyses. Deeper 12-cell source/analysis/fit/native boundary
+  tests passed against the untouched reference before migration. Index/context
+  implementation is in an isolated worker worktree.
+- RF2/RF3: the selected route is a private sceptre storage adapter, with no new
+  ondisc API or release prerequisite. Storage extraction is in a second worktree.
+- RF5: current response-cache invalidation and facade writeback have a single
+  module owner. Actual design matrices (including contrasts) and control views
+  govern validity. PR 233 remains open with changes requested at its unchanged
+  head `3f1ff0650078b382662ee70b72ea5c72fa15b031` (verified October 16); its new
+  guide cache is deferred and is not being recreated here.
+- RF7: native inference extraction is in a third isolated worktree.
+- The full refactor goal is active. Routine implementation/test failures are
+  resolved autonomously; important unresolved design choices or unexpected
+  blockers are the stopping conditions. Main merge/release remain separate.
+
+### Bounded cache correctness correction
+
+An untouched-baseline experiment confirmed that NT-only calibration followed by
+changing to complement controls retains four incompatible response fits and
+produces warm/cold result differences. The cache-validity contract in section 9
+requires clearing those fits. The refactor now invalidates on control-view or
+actual-design changes, without changing the API or adding cache capabilities.
+Regression tests check that correction, contrast changes with identical formula
+text, and discovery→calibration→discovery warm/cold parity in three workflows.
+The frozen supported-workflow, cache, saved-object and API fixtures still pass.
 
 ## Source and environment
 
@@ -24,7 +53,7 @@ been pushed, merged or released.
 
 - Before RF0 test additions, the unchanged package passed 2,578 assertions in
   56 test blocks with no failures, warnings or skips (installed ondisc 1.2.0).
-- Source checks show no changes to production `R/`, `src/`, `DESCRIPTION` or
+- At RF0, source checks showed no changes to production `R/`, `src/`, `DESCRIPTION` or
   `NAMESPACE`. The S4 facade retains its existing 56 slots.
 - Versioned public API, workflow, ordered-index, cache, saved-object, native and
   sparse/backed fixtures are generated from verified baseline source. The
@@ -66,7 +95,9 @@ been pushed, merged or released.
   runnable baseline harness, not acceptance of realistic performance gates.
 
 See `results/tests-summary.json`, `results/benchmark-reference.json` and the
-pipeline reports for machine-readable evidence. Hosted CI has not run.
+pipeline reports for machine-readable RF0 evidence. Hosted CI run
+[38917674952](https://github.com/Katsevich-Lab/sceptre/actions/runs/38917674952)
+is running against the published RF0 checkpoint; no hosted success is claimed yet.
 
 The maintainability baseline is frozen in `MAINTAINABILITY.md` and
 `results/maintainability-baseline/`: fixed change-tracing exercises and a seven-
@@ -100,8 +131,8 @@ the explicitly outstanding hosted/runtime/resource gates complete.
 
 ## Gates that remain distinct
 
-- Hosted Linux/macOS/Windows CI and the new explicit ondisc-free lane have not
-  run until the branch is published. The backed lane must fail when ondisc is
+- Hosted Linux/macOS/Windows CI and the explicit ondisc-free lane are running;
+  their final results remain a gate. The backed lane must fail when ondisc is
   missing, not silently skip.
 - Full Nextflow/nf-test and the historical 0.10.2 containers have not run. The
   current profiles contain NULL placeholder inputs, local Docker has no running

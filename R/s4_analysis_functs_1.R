@@ -135,8 +135,13 @@ set_analysis_parameters <- function(
         invisible()
 
     # 3. determine whether to reset response precomputations
-    reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
-        identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
+    design <- convert_covariate_df_to_design_matrix(
+        covariate_data_frame = sceptre_object@covariate_data_frame,
+        formula_object = formula_object
+    )
+    reset_response_precomps <- response_cache_parameters_changed(
+        sceptre_object, design, control_group == "complement"
+    )
 
     # 4. update uncached fields of the sceptre object
     side_code <- which(side == c("left", "both", "right")) - 2L
@@ -167,18 +172,15 @@ set_analysis_parameters <- function(
     sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
     sceptre_object@multiple_testing_method <- multiple_testing_method
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
-    sceptre_object@covariate_matrix <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = sceptre_object@covariate_data_frame,
-        formula_object = formula_object
-    )
+    sceptre_object@covariate_matrix <- design
 
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
 
     # 6. update cached fields
-    if (reset_response_precomps) {
-        sceptre_object@response_precomputations <- list()
-    }
+    sceptre_object <- invalidate_response_cache(
+        sceptre_object, "parameters", reset_response_precomps
+    )
 
     # return
     return(sceptre_object)
@@ -312,15 +314,10 @@ assign_grnas <- function(
         invisible()
 
     # 3. determine whether to reset response precomputations
-    reset_response_precomps <- sceptre_object@low_moi &&
-        (!identical(sceptre_object@grna_assignment_method, method) ||
-            !identical(
-                sceptre_object@grna_assignment_hyperparameters,
-                hyperparameters
-            ))
-    if (reset_response_precomps) {
-        sceptre_object@response_precomputations <- list()
-    }
+    sceptre_object <- invalidate_response_cache(
+        sceptre_object, "assignments",
+        response_cache_assignments_changed(sceptre_object, method, hyperparameters)
+    )
 
     # 4. update uncached fields
     sceptre_object@grna_assignment_method <- method
@@ -497,9 +494,10 @@ run_qc_pt_1 <- function(
     }
 
     # 6. determine whether to reset response precomputation
-    if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
-        sceptre_object@response_precomputations <- list()
-    }
+    sceptre_object <- invalidate_response_cache(
+        sceptre_object, "analysis_cells",
+        !identical(current_cells_in_use, sceptre_object@cells_in_use)
+    )
 
     # 7. update the grna assignments given the cellwise qc
     sceptre_object <- update_grna_assignments_given_qc(sceptre_object)

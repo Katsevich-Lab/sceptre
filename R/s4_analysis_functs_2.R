@@ -190,7 +190,7 @@ run_calibration_check_pt_2 <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
     return(sceptre_object)
 }
 
@@ -306,7 +306,7 @@ run_power_check <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
     return(sceptre_object)
 }
 
@@ -409,7 +409,7 @@ run_discovery_analysis <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
     return(sceptre_object)
 }
 
