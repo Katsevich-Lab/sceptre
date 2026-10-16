@@ -11,9 +11,11 @@
 ^Meta$
 ^\.claude$
 ^\.git$
+^\.gitattributes$
 ^air\.toml$
 ^ROADMAP\.md$
 ^REFACTOR_SPEC\.md$
+^tools/refactor$
 ^CONTRIBUTING\.md$
 ^CODE_OF_CONDUCT\.md$
 ^GOVERNANCE\.md$

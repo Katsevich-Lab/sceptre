@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "source_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "generated_at": "2026-10-16 14:23:33 UTC",
+  "reference_source_verified": true,
+  "clean_native_rebuild": true,
+  "source_files": {
+    "DESCRIPTION": "8646065bf650c302d2851ea7f6366340ccbbef99c6c077053a91a044bb236599",
+    "NAMESPACE": "098043a6ccf2135f3c47f5ba78c069cd3243ee8b9d2383fa549dc25a6421f89d",
+    "R/RcppExports.R": "655fb097dc9a6f6bc8bd4eb18ce7cff5d0eaaf184eccf1ea223c9de0fb026b18",
+    "R/assign_grna_functions.R": "d00dffc0679b60943fad50eed4d5e86f24830599bd5f477823fd25c8ffc292d6",
+    "R/association_testing_functions_v2.R": "2ad0203b3ce5324ecff89664150815c2c8cce813d5288eeb98b8d11f34972f7f",
+    "R/aux_functions.R": "c36dc3e0052a1e88e3ec2d950f81a1982d45894e1a4862f6b54e9e603e368eea",
+    "R/cellwise_qc_functs.R": "ff5f09bc8d9055faab41a60f570e8abe83eaab0384a66084471b5e8fc4b2e1cc",
+    "R/check_functions.R": "8a7b90b0bc85d478c51baaf1d17441c797389e88db20364c87fedd0e3d910d9d",
+    "R/data.R": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+    "R/getters_and_setters.R": "a6585eb117cdc76d7c64eac746b17a117a938a261d652742674b191d23653d70",
+    "R/import_functs.R": "c42e5138c112abc1c262d849da53c17ef848cd30162632e629ef73b5f197003b",
+    "R/medium_level_functs_v2.R": "87b57852413ad8757dc91f7061f772a2b3dcc368a7a3b1d9d4c9f3ac18cd40d4",
+    "R/mixture_model_functs.R": "f18fb2eb7ea229764c6f56e06e3bc23a84f9a54f96ec2a6ab90820d87a9cccdb",
+    "R/neg_control_functions.R": "6d9e306c23a08f9346f2f8cc0373743384bf8e6047d77c9915071639edd0034f",
+    "R/ondisc_functs.R": "b8992f796d50f6a6dba4e085bd8ac719053d3eb0f96d38f35812d96ffecb1dae",
+    "R/pair_constructor_functs.R": "8c49527b9d02c33273a5b337832947d7404c4e6b0c2ece62d05a869f5dcfb944",
+    "R/pairwise_qc_functs.R": "51048cf0da56e08667a32dd253f0440c01763c9dcdb4e72af924ebefd4793f32",
+    "R/plotting_functions.R": "aedf9f6581bcfcb8375182f3cfc74b808652a5a2312ce02539eccab1b4edcde2",
+    "R/precomputation_functions.R": "b4f1acee50fa823df0a9b3aabef37a7c13546d051bb40b41cb02a53a039b5a74",
+    "R/preprocessing_functions.R": "34bbbf5e65aae5246110ba53177a9208702469d3b553396ac58c520b4ac18639",
+    "R/qq_plot_helpers.R": "2eb9f857b5f5184d2d395240dfcf538a2486d29d10bd7b7921e957ec42a69799",
+    "R/s4_analysis_functs_1.R": "9c63a3f42345493535c9a1bca542f53ec10b5397099ced5744d68ffe3fe0536c",
+    "R/s4_analysis_functs_2.R": "8de85fad8df7d221409d593f88e4df8091c2781fc6be04fc32dc23dcb181efb8",
+    "R/s4_class.R": "6ddcfab89c185da8afab81cb1540422cae5703c8639562914e7c05f05b106d8b",
+    "R/s4_helpers.R": "b4075cb83cb511e2e509761f388382e7174d66e558685a1c826cac89e3f34ef3",
+    "R/sceptre.R": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+    "R/test_functs.R": "1d5087c7a3dfe5f55cc323700e5c8cabbfcbe1e9b63848548e7a464ee437a635",
+    "data/gene_position_data_frame_grch37.rda": "e3bbe4e3f67539d9cf95a8afb2ccc5fff04fc6a50aa2c015c6cf2601dca19976",
+    "data/gene_position_data_frame_grch38.rda": "2a96dfa8910245fd55e22c347645c779b1e01c5a747ca71dc25420468b414e63",
+    "data/grna_target_data_frame_highmoi.rda": "3c31b5825a1351e3e0711d248896d69ee50b118320458989f8a4ce2dd1edebbf",
+    "data/highmoi_example_data.rda": "b5b03970815151481566de9f549ac6163c5165e4f28054bf3fdec9255db30c0f",
+    "data/lowmoi_example_data.rda": "c8dc7db81f2b47e3e58d24b9a4f6d022ccb17cd9fd844074c3ec66420c519958",
+    "src/RcppExports.cpp": "ed8a0017b691b8b21dc604003f4808ab25f4f7dc42f919d172bdec50b45db020",
+    "src/check_functions.cpp": "7bcbd3fe405269b7735740cd88f5fe5ecd4eb5ae093b8ce1159e199029e08642",
+    "src/compute_nb_size_param_functions.cpp": "4add3e36820f9af6b794b715862c0981f44cb51f11750cf5107d39c2cd4ee776",
+    "src/generate_samples_functions.cpp": "deb2dee4338f5779588408f4d80caa9a42d64e1df5e2a5c519c8361dd1c06cfd",
+    "src/low_level_full_test.cpp": "83896d2c0df3a5a98c99d0c6dc6dd77e764fe5af7d9f71df34377c7a42d95571",
+    "src/mixture_functs.cpp": "493e67387f2efbfc21c536d1c4cd63927ada925e5d69d473dbd2f429e8a5100a",
+    "src/negative_control_functions.cpp": "33226feb18ce71deb1194fd34a5a5fb41d369cbae991b7554fb328b6cb9a2629",
+    "src/pair_construction_functs.cpp": "58c1b59e87cd712a8e0e7d75db6247a80c5d2ec83395f3e3341c1dcb164f6f38",
+    "src/pairwise_qc.cpp": "bab7f126aa5380d92c0a8ef3360702eba2d1e0ee159e48b2ccc2664067da9b01",
+    "src/shared_low_level_functions.cpp": "63286b8a45b257b214c308d9eaab3e74c88d4959e3fb654760cf821c53d2f99c",
+    "src/shared_low_level_functions.h": "b93df833941b44f419ebf2f37b4172662e273025767deb7d3cbb5308f9d0cacd",
+    "src/sparse_matrix_functs.cpp": "8cc0756786776168eac979d0eac5d62b0a9c0b8b949fba093c1dfdea0ee6debc"
+  },
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "os": ["Darwin", "25.6.0", "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050", "WHA-STGPK4DX-ML", "arm64", "ekatsevi", "ekatsevi", "ekatsevi"],
+  "external": ["1.2.12", "1.0.8, 13-Jul-2019", "5.8.3", "1.25", "1.5.7", "10.47 2025-10-21", "78.1", "TRE 0.8.0 R_fixes (BSD)", "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib", "5.2", "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"],
+  "dependencies": {
+    "BH": {
+      "version": "1.90.0.1",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BH"
+    },
+    "data.table": {
+      "version": "1.18.4",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table"
+    },
+    "dplyr": {
+      "version": "1.2.1",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/dplyr"
+    },
+    "Matrix": {
+      "version": "1.7.5",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix"
+    },
+    "ondisc": {
+      "version": "1.3.5",
+      "path": "/private/tmp/sceptre-rf0-ondisc-library/ondisc"
+    },
+    "pkgload": {
+      "version": "1.5.2",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/pkgload"
+    },
+    "Rcpp": {
+      "version": "1.1.1.1.1",
+      "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp"
+    },
+    "sceptre": {
+      "version": "0.99.0",
+      "path": "/private/tmp/sceptre-rf0-reference.alV0I3"
+    },
+    "testthat": {
+      "version": "3.3.2",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/testthat"
+    },
+    "withr": {
+      "version": "3.0.2",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/withr"
+    }
+  },
+  "RNGkind": ["Mersenne-Twister", "Inversion", "Rejection"],
+  "input_seed": 20261016,
+  "workflow_seed": 271828,
+  "native_rng": "Boost MT19937(4); production sampler families/draw order unchanged",
+  "indices": {
+    "public_and_R": "1-based",
+    "native_draw_arrays": "0-based"
+  },
+  "comparison": {
+    "floating_tolerance": 1e-08,
+    "exact": ["API/formals/methods/slots", "memberships/order", "budgets", "QC/significance/stage decisions"]
+  },
+  "resource_validation": "Small characterization fixtures only; realistic performance and process-tree RSS gates outstanding",
+  "artifacts_sha256": {
+    "api.json": "15635c149df82faa3fae8cef69f11eb75c05d43110a062539a71a9a4ce568371",
+    "api.rds": "2f693904bbff7308cda124df07e514f578890c1fa5742bbfb7ab253735e0377f",
+    "backed-discovery.rds": "b22f242c580323ebe56c111f153ed41d90998b905b73b19371c3bc6709f80e14",
+    "backed-inputs.rds": "9207274e6d33585dc31b5187f06b560b7c7124699c8b811924fcb3bd8ef2f826",
+    "backed-metadata.rds": "a432182d6a3d54b75627494af93d67b1fc513a8a0bfaa7ded9c4dd623c3c4f75",
+    "backed-workflow.rds": "9ee5cff5e0c86f8eac837f935c706d9bb4176e5004fa164e6f788a2a761a5dff",
+    "cache.rds": "c1aa24abf86a05f3469e9d1de06e11fa87c085bbf4992f9265ccd6159b3c3779",
+    "cases.rds": "7a3832d88c4f84c0d86330e39e1d21c7d70ce33755916e5403ee1c40374a4fc6",
+    "covariates.tsv": "de32a9b1982e479c365a6f0a6e32590db7d8d8e8b7677cd4ea8a134b201517a9",
+    "edges.rds": "07c94bac873a491634cccbbd12c5a6a3520faab4f82479c9626511f3170cabb2",
+    "high-guide-counts.tsv": "0a7dc0b6001db0d274f0a94abd8a06fb006191c9458c1032fb35e2d46429ba11",
+    "indexing.rds": "750cc0cc487e676ab68c217012ddde18da7c2a4d12a6b3f036639e444c756164",
+    "inputs.rds": "55d01efe7b8e5737528b0f0b54585edb470a273579547fda97531c02e2f27c00",
+    "low-guide-counts.tsv": "cefabd23da6f56072a9a9b68b82c0aae4cb429c5a600726695370832330b977e",
+    "native-bridge.cpp": "ffe5d50bcfa829e9d8e75f24fee8875fc5d3fe0de7a18d0a625301ea00ba678b",
+    "native-draws.tsv": "b4e0aebe806271a1dfe93704030d419be36896c449f2fc6f2fe3059b0d2db8ea",
+    "native-expected.rds": "f8dad9d57c288e6058d4b70b58cc008f2d4c9133d978e1bdcd5332654b612fb3",
+    "native-inputs.rds": "52f9e680f58c9a1e7496c19e6aa7c058b01388100b3eab72d8eedc7d14e96ce6",
+    "native-sampler-reference.inc": "deb2dee4338f5779588408f4d80caa9a42d64e1df5e2a5c519c8361dd1c06cfd",
+    "response-counts.tsv": "767f8e65d4a1b09ebf689ee82bafb2fcbd605ee29e78cfd3ad1d6915fd1c2e50",
+    "saved-object-result.rds": "b3b443f1c93e009f71c5acc64cbce24502c2cae6259ef40a7d54d65d343667e3",
+    "saved-object.rds": "c6b6fc377e85a064a994ce20bead6d6f0931f0a4345abf6df79eb8b1eb1d70c5",
+    "workflows.rds": "1bf826cabb07a5895b210a8fa698d0ef48dfb469710b9f693f0edc99411d90be"
+  },
+  "artifacts_md5": ["c63d592eaa64c808906f399a909900c7", "986d5fd431cf4ddfce0fbe666399076f", "bb68f3d737277cb261879b8b6bb2631a", "91392e4d63b1d5bb85797a102c1d88ba", "cd96da868520463de107ca4d166a2801", "8067bc393ce24d768ac4895b665ba4f1", "fed7aa7404ef71fc5dd0b54327b69667", "33fea5c0ef6b070824a56010aa29ec95", "34f611e06c46ad20bff3d41056a6d7a1", "29fc298db1f3c0902ab17702d9324ffd", "9039da04b6931bf633fb9c39e4d0bbc8", "ed8da25e0bdf2b820d1eae55618320ca", "ca3a99d2136a21257e971a86f1a67d82", "aa95bb10eb9b80b771587c9c7f6d8611", "b8054e4704beb94454f28dd7ce26270d", "c536ddd433d53e1ee53932cf0a42502e", "8d44a8ff1823bc33359f158074addae6", "229f9dae8428de6e5ee26e57291a5b24", "8fafe6f59ce2b3b2275eef12a911aec6", "f1564a3154d8e9c980242aae16702885", "03340b9eb60fd9544fed8cc1af30d2cb", "786632b9789391394a292671471de385", "380fe6ef9b7b4f633d0028d46afbebff"]
+}

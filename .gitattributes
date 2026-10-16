@@ -1,0 +1,2 @@
+# Reference fixture digests and the frozen Git blob must retain exact bytes.
+tests/testthat/fixtures/refactor/** -text
