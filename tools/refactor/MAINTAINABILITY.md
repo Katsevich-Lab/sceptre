@@ -121,3 +121,46 @@ add calls; temporary compatibility wrappers can add lines; splitting functions
 can raise summed cyclomatic complexity because each function contributes one.
 Record any worsening with its benefit and, if temporary, removal stage. Final
 acceptance requires overall architectural improvement and retained behavior.
+
+## RF9 source walkthrough
+
+The coordinator repeated the four fixed source-tracing questions on the
+integrated refactor, checked actual callers and removed routes, and had an
+independent senior engineer review the source. This is a source/design exercise,
+not a timed comprehension study or an implementation of any deferred method.
+No human timing, cognitive-complexity or clone-coverage result is claimed.
+
+| Fixed exercise | Refactored ownership and concrete change path | Removed coordination burden |
+| --- | --- | --- |
+| Change the legacy eligibility rule consistently with calibration | `src/pair_eligibility.h` owns both valid-count policy and missing-value compatibility; its R vector boundary and the unchanged candidate sampler call it. Measurements live separately in `R/pair_qc.R`/storage. | Discovery and calibration no longer maintain independent threshold predicates. A selected future policy needing new inputs still requires explicitly defining and passing them. |
+| Trace response fitting before adding an output-compatible fitter | `R/fitting.R` owns response/assignment fits; `R/score_preparation.R` owns derived arrays. Workers consume explicit fit views and call these modules. | The numerical implementation is independent of storage, S4 state, scheduling and caches. NT fits retain their correct guide-specific view. No speculative batch/fitter registry was added. |
+| Change response-row/grouped-nonzero storage | `R/storage.R` owns reads, thresholds, pair/group kernels, backing creation and reopening. Actual assignment/QC/calibration/CRT consumers call it. | Three direct CRT CSR reads and backend branches in statistical consumers are gone. Sparse/HDF5 kernels remain legitimate separate implementations. |
+| Decide response-cache validity after supported mutations | `R/fit_cache.R` owns invalidation tests, resets, lookups/merges and facade writeback; setters provide the actual change event. | Three reset implementations and three direct writebacks become calls to one owner. Control-view and actual-design/contrast changes now conservatively clear incompatible fits. |
+
+The seven-operation denominator remains fixed. Current fit, assignment, score,
+eligibility, staged inference, finalization and row-read operations can all be
+tested without an entire `sceptre_object`. The latter three interfaces that
+previously imposed additional burdens are now `evaluate_pair_eligibility()`
+(plain aligned measurements/options), native `evaluate_staged_tail()` (explicit
+arrays and a const ordinary draw bank) and `finalize_association_result()`
+(tables and settings). The legacy Rcpp entrypoint still accepts its pointer for
+compatibility; the new private component test does not require one. Thus seven
+of seven now have facade-independent explicit-input component boundaries,
+compared with five of seven facade-independent and four of seven ordinary-input
+entries at baseline. This is still an interface inventory, not complete coverage
+of all numerical states.
+
+The before/after dependency map is described in `ARCHITECTURE.md`. Public S4
+wrappers now prepare one transient context, dispatch to separate permutation and
+CRT plans, and commit returned results/cache values. Results no longer obtain
+statistical settings from the S4 object except in thin compatibility adapters.
+Storage never applies QC policy, fitting never reads a store or chooses a work
+plan, and native inference never loads an S4 object or serialized handle.
+
+Deletion and migration checks found no production callers of the removed legacy
+index factory/discovery helper. Legacy fitting/result names retained for
+compatibility delegate to the new owners; they do not retain alternate numerical
+paths. The old combined native inference body and old storage/indexing branches
+were replaced, rather than left alongside an unused new abstraction. New
+function/module counts can increase as these responsibilities become explicit;
+the final metric report must retain that cost along with any complexity gains.
