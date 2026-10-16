@@ -4,6 +4,9 @@ using namespace Rcpp;
 #include <algorithm>
 
 
+// Relative log-likelihood change used by EM's existing stopping rule. Either
+// negative-infinite likelihood gives 1; zero denominators and other nonfinite
+// cases keep their ordinary floating-point result, rather than a new fallback.
 double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
   double tol;
   if (curr_log_lik == -std::numeric_limits<double>::infinity() || prev_log_lik == -std::numeric_limits<double>::infinity()) {
@@ -15,6 +18,14 @@ double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
 }
 
 
+// Fit each supplied paired (pi, perturbation) start in its original order.
+// The R caller supplies aligned count/Poisson-mean/log-factorial cell vectors
+// and equal-length starting vectors. Inputs are read only; this routine has no
+// RNG or file effects. Keep the existing update arithmetic, probability floor,
+// label flip, 3/50 iteration bounds and likelihood-based winner selection.
+// Return cell-order posterior probabilities, the zero-based winning start,
+// convergence flag and likelihood. With no converged winner these remain
+// zeros/start 0/FALSE/-Inf; obtain_em_assignments owns raw-count fallback.
 // [[Rcpp::export]]
 List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_guesses, NumericVector g,
                              NumericVector g_mus_pert0, NumericVector log_g_factorial) {
