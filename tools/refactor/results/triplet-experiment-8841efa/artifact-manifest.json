@@ -1,11 +1,6 @@
 {
   "scope": "Completed initial experiment with four large memory crossings; no resource acceptance or exception. Large fixtures, returned sparse objects and allocation traces remain external with hashes in the complete summary/plan.",
   "files": {
-    "summary.json": {
-      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/summary.json",
-      "sha256": "ceeb98227660dc20c4a6da3d47c298355b473bcd94081f3bf1fe7de3dd502f34",
-      "bytes": 3164423
-    },
     "summary.md": {
       "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/summary.md",
       "sha256": "9f8c3dbd663cce536b30034a57d6ef02d004f985e3f56c302830f90e0cc212b8",
@@ -55,6 +50,14 @@
       "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/clock-build.log",
       "sha256": "628ef8123fcc1b6f6365b773bb2d57f9751f90435b394fc388f448ea780a104a",
       "bytes": 839
+    },
+    "summary.json.gz": {
+      "origin": "/private/tmp/sceptre-triplet-qualified-8841efa/summary.json",
+      "sha256": "e59f3a81ad72f78fb42b041a85c6b3db34ac510eae8fe1815d7a023cfd9813dc",
+      "bytes": 267378,
+      "compression": "gzip, mtime=0; exact original bytes preserved",
+      "uncompressed_sha256": "ceeb98227660dc20c4a6da3d47c298355b473bcd94081f3bf1fe7de3dd502f34",
+      "uncompressed_bytes": 3164423
     }
   }
 }
