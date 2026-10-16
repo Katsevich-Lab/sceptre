@@ -1,0 +1,15 @@
+{
+  "status": "INVALIDATED; excluded from acceptance",
+  "reason": "Old reference installation reused pre-existing objects (make: Nothing to be done), so its native optimization was unverified and differed from clean release behavior. Rebuilt original from a new Git archive and required --preclean compilation of every native source, matching release flags, and frozen DLL fingerprints. Earlier timings cannot establish a refactor speedup.",
+  "reference_source": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_source": "28df3907f43311efc70908d50b7636c7e6e89db8",
+  "old_library": "/private/tmp/sceptre-rf0-reference-library",
+  "old_native_sha256": "7c9a2618d38596f03d08dd45e6bd53ef5d65d026a1264b21cc37bf83dd875c70",
+  "retained_original_results": "/private/tmp/sceptre-resource-reference/summary.json",
+  "retained_partial_candidate_results": "/private/tmp/sceptre-resource-candidate",
+  "reference_completed_processes": 80,
+  "candidate_completed_processes": 56,
+  "scientific_observation": "Selected exact-hash differences in compact case were within frozen tolerance1e-8 (p_value relative difference1.1e-13); no expectations regenerated.",
+  "new_gate_rejects_old_install": true,
+  "new_gate_rejection_reason": "install log does not prove fresh compilation of every native source"
+}

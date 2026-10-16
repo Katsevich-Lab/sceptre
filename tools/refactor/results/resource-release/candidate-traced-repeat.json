@@ -1,0 +1,1252 @@
+{
+  "schema_version": 1,
+  "label": "candidate",
+  "source_commit": "28df3907f43311efc70908d50b7636c7e6e89db8",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "poll_interval_seconds": 0.1,
+  "memory_scope": "analysis-only sampled main/fork descendant RSS; aggregate overcounts shared pages; sampled peaks are lower bounds",
+  "dense_budget_scope": "declared256MiB response-assay materialization budget; not an enforced OS memory limit and not a claim that512MiB cannot fit the Mac",
+  "data_manifest": {
+    "schema_version": 1,
+    "generator": "resource-data.R",
+    "R": "R version 4.6.0 (2026-04-24)",
+    "cases": [
+      {
+        "name": "compact_perm",
+        "path": "compact_perm.rds",
+        "sha256": "3b5935b4ffe57c1a9ba84c80e6daf9cafd38be41b995cce5587b478f73026f73",
+        "recipe": {
+          "kind": "RF0 compact synthetic",
+          "cells": 1280,
+          "responses": 8,
+          "source": "backed-inputs.rds",
+          "source_sha256": "9207274e6d33585dc31b5187f06b560b7c7124699c8b811924fcb3bd8ef2f826"
+        },
+        "parameters": {
+          "moi": "low",
+          "mechanism": "permutations",
+          "control": "complement",
+          "backed": false,
+          "assignment_threshold": 40,
+          "formula": "~batch + z",
+          "requested_pairs": 5
+        }
+      },
+      {
+        "name": "papalexi_perm",
+        "path": "papalexi_perm.rds",
+        "sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+        "recipe": {
+          "kind": "actual Papalexi2021 example counts from installed sceptredata; downsampled genes",
+          "cells": 20729,
+          "responses": 299,
+          "sceptredata_version": "0.99.0",
+          "response_nonzero": 1390126,
+          "source": "sceptredata::lowmoi_example_data"
+        },
+        "parameters": {
+          "moi": "low",
+          "mechanism": "permutations",
+          "control": "complement",
+          "backed": false,
+          "assignment_threshold": 5,
+          "formula": "~log(response_n_umis) + log(response_n_nonzero) + bio_rep",
+          "requested_pairs": 288
+        }
+      },
+      {
+        "name": "sparse_difficult_perm",
+        "path": "sparse_difficult_perm.rds",
+        "sha256": "97671afb321998ae7199cb48a23c0ed214bdc23ca75b9363639bcfe603ce8256",
+        "recipe": {
+          "kind": "deterministic synthetic; not actual Replogle data",
+          "seed": 20261016,
+          "cells": 12000,
+          "responses": 768,
+          "active_responses": 96,
+          "response_nonzero": 441257,
+          "response_density": 0.0479,
+          "dense_response_bytes": 73728000,
+          "declared_dense_assay_budget_bytes": null,
+          "budget_is_os_enforced": false,
+          "dispersion_sizes": [
+            0.1,
+            0.15,
+            0.3,
+            1
+          ],
+          "difficult": "Every16th active response expressed only in batch1; near-collinear z/z_near covariates",
+          "design_condition_number": 266.81,
+          "guide_assignment": "balanced singleton memberships"
+        },
+        "parameters": {
+          "moi": "low",
+          "mechanism": "permutations",
+          "control": "complement",
+          "backed": false,
+          "assignment_threshold": 40,
+          "formula": "~batch + z + z_near",
+          "requested_pairs": 768
+        }
+      },
+      {
+        "name": "shared_crt",
+        "path": "shared_crt.rds",
+        "sha256": "52fde59631a84497dfd902d6fd11920696271ca2bf6af1d79c015785b46c07ac",
+        "recipe": {
+          "kind": "deterministic synthetic; not actual Replogle data",
+          "seed": 20261016,
+          "cells": 12000,
+          "responses": 192,
+          "active_responses": 64,
+          "response_nonzero": 282706,
+          "response_density": 0.1227,
+          "dense_response_bytes": 18432000,
+          "declared_dense_assay_budget_bytes": null,
+          "budget_is_os_enforced": false,
+          "dispersion_sizes": [
+            0.1,
+            0.15,
+            0.3,
+            1
+          ],
+          "difficult": "overdispersed negative-binomial counts",
+          "design_condition_number": 4.74,
+          "guide_assignment": "overlapping logistic memberships"
+        },
+        "parameters": {
+          "moi": "high",
+          "mechanism": "crt",
+          "control": "complement",
+          "backed": false,
+          "assignment_threshold": 40,
+          "formula": "~batch + z",
+          "requested_pairs": 512
+        }
+      },
+      {
+        "name": "backed_perm_512mib",
+        "path": "backed_perm_512mib.rds",
+        "sha256": "aec346233939b3e10f0ecd279f5606a6d9b3364156930c3a226d441d43a41e84",
+        "recipe": {
+          "kind": "deterministic synthetic; not actual Replogle data",
+          "seed": 20261016,
+          "cells": 16384,
+          "responses": 4096,
+          "active_responses": 128,
+          "response_nonzero": 1385358,
+          "response_density": 0.0206,
+          "dense_response_bytes": 536870912,
+          "declared_dense_assay_budget_bytes": 268435456,
+          "budget_is_os_enforced": false,
+          "dispersion_sizes": [
+            0.1,
+            0.15,
+            0.3,
+            1
+          ],
+          "difficult": "overdispersed negative-binomial counts",
+          "design_condition_number": 4.7375,
+          "guide_assignment": "balanced singleton memberships"
+        },
+        "parameters": {
+          "moi": "low",
+          "mechanism": "permutations",
+          "control": "complement",
+          "backed": true,
+          "assignment_threshold": 40,
+          "formula": "~batch + z",
+          "requested_pairs": 1024
+        }
+      }
+    ]
+  },
+  "build_provenance": {
+    "schema_version": 1,
+    "source_commit": "28df3907f43311efc70908d50b7636c7e6e89db8",
+    "library": "/private/tmp/sceptre-refactor-qualified-library",
+    "source": "/private/tmp/sceptre-refactor-qualified-source",
+    "source_file_git_blobs": {
+      "DESCRIPTION": "f45462122a17f8af39e0e0e32d9e8c03c8af07e2",
+      "NAMESPACE": "00c44063f4940de4d9de6d669e1e6dae84da3f99",
+      "R/RcppExports.R": "7ac71968242637d25d18774414b5979d855ef5b2",
+      "R/analysis.R": "64d0e4de1373fa09a24143f47d83c26976b01883",
+      "R/analysis_context.R": "3028a4b3ed518d4d850b5eff7e14798db91374b6",
+      "R/assign_grna_functions.R": "3b1309046ea493a55909adace3773b321f46e0ad",
+      "R/association_execution.R": "1e36b35b768b9a353485f00e82e891d36bd2a635",
+      "R/association_workers.R": "19801557411f1fecc44214dfa95610b8d6d7fce6",
+      "R/aux_functions.R": "b7469b6c65a35c451a45d5ce67850bd13328ac51",
+      "R/cellwise_qc_functs.R": "e7dc4757471fa55735221517f7515dfef0eec649",
+      "R/check_functions.R": "361138d2511cda4b4e9e56a32e4a153fff5f7546",
+      "R/data.R": "abfba6416986486937e7446941985b92eea0f613",
+      "R/execution.R": "22fc9f5947e0a7f376ea97858082db0ca75e57fa",
+      "R/fit_cache.R": "8d127301ada5a4cd7605c5bf4230ca52364c41ef",
+      "R/fitting.R": "e2662aee29da64f336a3d8445d3ef20a2085d209",
+      "R/getters_and_setters.R": "9ce12c9c87edc07ad5279985c5683e43bde27b29",
+      "R/import_functs.R": "78d1e90f145b8b50a7aaebd4febb2be10bed9a36",
+      "R/mixture_model_functs.R": "2f9d292037a13c9a1405c5b9d6523dedbc5753f1",
+      "R/neg_control_functions.R": "05da625d8d03616e377cc5f1adad747b6d43e17b",
+      "R/ondisc_functs.R": "e7b8e645fa1a5ddca9d08b2c7340a1b9dc8246e6",
+      "R/pair_constructor_functs.R": "364be511086c6594e460b74ed96612762c2beefb",
+      "R/pair_qc.R": "156d4ca02d7fbe0828f2e42664f0e19147d0098e",
+      "R/pairwise_qc_functs.R": "f76518e5d2ac560df6e9ac27429587e6f059677a",
+      "R/plotting_functions.R": "7aec9c45b7e14a1db15d0c44bbc2d410384fac61",
+      "R/precomputation_functions.R": "97ea887b1478ae9749dde0244b665626826a7e8f",
+      "R/preprocessing_functions.R": "d319215de675a5fa8d1ca2f36f37fc3a2d9f83c3",
+      "R/qq_plot_helpers.R": "f90c3e9fcfea4c19522efc907395caace5c226a9",
+      "R/result_processing.R": "07ebd9bc25659a44fda47f1b1ae4e7e4ee35315b",
+      "R/s4_analysis_functs_1.R": "deba62baaf8e6ae549a5f238bf5eafdb27d64203",
+      "R/s4_analysis_functs_2.R": "a5cc401b6d9e082564f05df4fa9b434f0b0ab16e",
+      "R/s4_class.R": "b15b958c09469764576cf6c91bc27a83e8376ac0",
+      "R/s4_helpers.R": "8d64856b6f7b091e979540092cc7be2b194b6d2b",
+      "R/sceptre.R": "17e176a8614abb51981810b4b6c0da8b691ba894",
+      "R/score_preparation.R": "41971d78e72bf8b7a58839cab361a3f1d9a16f79",
+      "R/storage.R": "f121a07c3d0ddd186b635418dae64327199aaca4",
+      "R/test_functs.R": "f2d7597c06f82fe18ea2fc6720c98f6bb58644a1",
+      "R/workflow_state.R": "4abe3e91cdb4b81cc8c511419ab31035cdd51129",
+      "src/RcppExports.cpp": "cc3b398b6a2d7787e159831c6d786965ca637909",
+      "src/check_functions.cpp": "0a099044cdd3b55f5ae312474a89a61bf048087f",
+      "src/compute_nb_size_param_functions.cpp": "b26f25e9c8c42b29460cc33db8a18fb4e7b5b229",
+      "src/generate_samples_functions.cpp": "5a839ba737db9d6ef0e5e031adb7486d3692ff91",
+      "src/inference.h": "3f1945c19dbe9a5eb9d8e5760cde992b885d661f",
+      "src/inference_scores.cpp": "6b6ce78fd938919036222c29795f93bf5b49cb76",
+      "src/inference_stages.cpp": "3a4a95e9b2e749fbdfc54dacf67a5378fe463520",
+      "src/inference_tail.cpp": "68438dbcd9291917918393d9f8545c33a098b296",
+      "src/low_level_full_test.cpp": "a1e7e87ce46bb7d09c71eb58dc1f5fa8f8f2201f",
+      "src/mixture_functs.cpp": "a8ec370acccf2ee3fec9aabbc716f082e8d6a479",
+      "src/negative_control_functions.cpp": "b20e6a8ac2dcfe4fabaa8bbacb2112b32d7f3f6e",
+      "src/pair_construction_functs.cpp": "5a3e0de8a0d3ab2cc73f65248ce51112b5306e13",
+      "src/pair_eligibility.cpp": "3c3e2382d046caf3cd3ed496cc1e3ce12ef0c034",
+      "src/pair_eligibility.h": "757206d310fce2898c7e82045476e0be498438ec",
+      "src/pairwise_qc.cpp": "ac8285bcd50c76f4a6d05ee308b9233da44623bb",
+      "src/shared_low_level_functions.cpp": "9b78fcb5c778566dab2ab662f8f15db8bde44683",
+      "src/shared_low_level_functions.h": "6b97d75c31df9a884271839368292157d13917c2",
+      "src/sparse_matrix_functs.cpp": "e503788069237c3b2d2ced31e0d190ad58cb673c"
+    },
+    "compiler": "using C++ compiler: \u2018Apple clang version 21.0.0 (clang-2100.1.1.101)\u2019",
+    "sdk": "using SDK: \u2018MacOSX26.5.sdk\u2019",
+    "native_compile_prefix": [
+      "clang++",
+      "-arch",
+      "arm64",
+      "-std=gnu++20",
+      "-I/Library/Frameworks/R.framework/Resources/include",
+      "-DNDEBUG",
+      "-I/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/include",
+      "-I/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BH/include",
+      "-I/opt/R/arm64/include",
+      "-I/opt/homebrew/opt/openssl@3/include",
+      "-I/opt/homebrew/include",
+      "-fPIC",
+      "-falign-functions=64",
+      "-Wall",
+      "-g",
+      "-O2"
+    ],
+    "native_compiled_sources": [
+      "RcppExports.cpp",
+      "check_functions.cpp",
+      "compute_nb_size_param_functions.cpp",
+      "generate_samples_functions.cpp",
+      "inference_scores.cpp",
+      "inference_stages.cpp",
+      "inference_tail.cpp",
+      "low_level_full_test.cpp",
+      "mixture_functs.cpp",
+      "negative_control_functions.cpp",
+      "pair_construction_functs.cpp",
+      "pair_eligibility.cpp",
+      "pairwise_qc.cpp",
+      "shared_low_level_functions.cpp",
+      "sparse_matrix_functs.cpp"
+    ],
+    "verified_clean_release_build": true,
+    "native_dll_sha256": "afa69951c678af87a2ec30344fe4cb1e093d28af9c710623140e6212c20a27bf",
+    "native_dll_bytes": 387064,
+    "install_log_sha256": "6b89b4f1d5108a26ffe110f0d9942fbd73fe3249c8584b8bff7c274821886c53",
+    "note": "All tracked production source files match the commit; every native source was compiled in this successful install with the recorded release flags. Source archives and libraries remain immutable during trials."
+  },
+  "samples": [
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "elapsed_seconds": 1.584,
+      "user_self_seconds": 0.229,
+      "system_self_seconds": 0.037,
+      "user_children_seconds": 2.404,
+      "system_children_seconds": 0.109,
+      "cells_in_use": 16781,
+      "requested_pairs": 288,
+      "passing_pairs": 225,
+      "result_rows": 288,
+      "B": [
+        499,
+        4999,
+        24999
+      ],
+      "fits_before": null,
+      "fits_after": [
+        "ACOT11",
+        "SERTAD1",
+        "COQ10A",
+        "FN1",
+        "RP5-1092A3.4",
+        "GRAP",
+        "ITGB1BP1",
+        "PAK1",
+        "PCBP3",
+        "RP11-228B15.4",
+        "FUZ",
+        "ZNF699",
+        "CCDC144A",
+        "SPATA9",
+        "DUSP15",
+        "COCH",
+        "OSGEP",
+        "SCAPER",
+        "MARCKSL1",
+        "RMRP",
+        "MZT1",
+        "HNRNPUL2",
+        "SMAD6",
+        "HEXIM1",
+        "SLC35E2B",
+        "ANTXR1",
+        "SLC8B1",
+        "CTD-2369P2.2",
+        "APOBEC3G",
+        "TMEM175",
+        "RDX",
+        "TMEM168",
+        "CTD-2196E14.4",
+        "LRRC3",
+        "AGAP10",
+        "CHEK2",
+        "C10orf11",
+        "RP11-140K17.3",
+        "SRXN1",
+        "IFT46",
+        "HERC1",
+        "C1orf74",
+        "CLDN23",
+        "MAPK11",
+        "CIT",
+        "N6AMT2",
+        "PSMB9",
+        "DTNBP1"
+      ],
+      "preparation_warnings": [],
+      "warm_warnings": [],
+      "analysis_warnings": [],
+      "scientific_sha256": "33843ac66ccbf2b08960aeb226d52380606878c6d1caa2db68f84afab870e9d1",
+      "input_sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+      "recipe": {
+        "kind": "actual Papalexi2021 example counts from installed sceptredata; downsampled genes",
+        "cells": 20729,
+        "responses": 299,
+        "sceptredata_version": "0.99.0",
+        "response_nonzero": 1390126,
+        "source": "sceptredata::lowmoi_example_data"
+      },
+      "package_path": "/private/tmp/sceptre-refactor-qualified-library/sceptre",
+      "package_version": "0.99.0",
+      "ondisc_version": "1.3.5",
+      "R": "R version 4.6.0 (2026-04-24)",
+      "external": [
+        "1.2.12",
+        "1.0.8, 13-Jul-2019",
+        "5.8.3",
+        "1.25",
+        "1.5.7",
+        "10.47 2025-10-21",
+        "78.1",
+        "TRE 0.8.0 R_fixes (BSD)",
+        "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib",
+        "5.2",
+        "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      ],
+      "platform": "aarch64-apple-darwin23",
+      "threads": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "sampled_main_peak_rss_bytes": 485556224,
+      "sampled_worker_peak_rss_bytes": 289374208,
+      "sampled_aggregate_tree_peak_rss_bytes": 1060077568,
+      "max_concurrent_fork_workers": 2,
+      "analysis_samples": 11,
+      "process_peak_samples": {
+        "74850": 485556224,
+        "74864": 285360128,
+        "74863": 289374208
+      },
+      "memory_observation": "sampled lower bound; shared pages overcounted in aggregate",
+      "analysis_rss_timeline": [
+        {
+          "unix_seconds": 1792164625.1772401,
+          "seconds_from_first_sample": 6.249999999763389e-07,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74850": 325124096
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164625.325032,
+          "seconds_from_first_sample": 0.14779216699999997,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74850": 464502784
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164625.4743621,
+          "seconds_from_first_sample": 0.297120375,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 144506880,
+            "74850": 485556224,
+            "74863": 144998400
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164625.6245089,
+          "seconds_from_first_sample": 0.44726599999999994,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 177684480,
+            "74850": 485556224,
+            "74863": 178159616
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164625.772607,
+          "seconds_from_first_sample": 0.5953614169999999,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 178585600,
+            "74850": 485556224,
+            "74863": 178814976
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164625.9228,
+          "seconds_from_first_sample": 0.7455529999999999,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 179388416,
+            "74850": 485556224,
+            "74863": 178962432
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164626.072854,
+          "seconds_from_first_sample": 0.8956051250000001,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 179535872,
+            "74850": 485556224,
+            "74863": 179077120
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164626.222275,
+          "seconds_from_first_sample": 1.045024708,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 179781632,
+            "74850": 485556224,
+            "74863": 181075968
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164626.373518,
+          "seconds_from_first_sample": 1.1962663749999998,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 180944896,
+            "74850": 485556224,
+            "74863": 271220736
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164626.522052,
+          "seconds_from_first_sample": 1.3447985419999997,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 285147136,
+            "74850": 485556224,
+            "74863": 289374208
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164626.671168,
+          "seconds_from_first_sample": 1.4939126249999999,
+          "main_pid": 74850,
+          "rss_bytes_by_pid": {
+            "74864": 285360128,
+            "74850": 485556224
+          },
+          "fork_workers": 1
+        }
+      ],
+      "fresh_process_wall_seconds": 2.892903708,
+      "repetition": 0,
+      "warmup": true
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "elapsed_seconds": 1.613,
+      "user_self_seconds": 0.226,
+      "system_self_seconds": 0.035,
+      "user_children_seconds": 2.443,
+      "system_children_seconds": 0.142,
+      "cells_in_use": 16781,
+      "requested_pairs": 288,
+      "passing_pairs": 225,
+      "result_rows": 288,
+      "B": [
+        499,
+        4999,
+        24999
+      ],
+      "fits_before": null,
+      "fits_after": [
+        "ACOT11",
+        "SERTAD1",
+        "COQ10A",
+        "FN1",
+        "RP5-1092A3.4",
+        "GRAP",
+        "ITGB1BP1",
+        "PAK1",
+        "PCBP3",
+        "RP11-228B15.4",
+        "FUZ",
+        "ZNF699",
+        "CCDC144A",
+        "SPATA9",
+        "DUSP15",
+        "COCH",
+        "OSGEP",
+        "SCAPER",
+        "MARCKSL1",
+        "RMRP",
+        "MZT1",
+        "HNRNPUL2",
+        "SMAD6",
+        "HEXIM1",
+        "SLC35E2B",
+        "ANTXR1",
+        "SLC8B1",
+        "CTD-2369P2.2",
+        "APOBEC3G",
+        "TMEM175",
+        "RDX",
+        "TMEM168",
+        "CTD-2196E14.4",
+        "LRRC3",
+        "AGAP10",
+        "CHEK2",
+        "C10orf11",
+        "RP11-140K17.3",
+        "SRXN1",
+        "IFT46",
+        "HERC1",
+        "C1orf74",
+        "CLDN23",
+        "MAPK11",
+        "CIT",
+        "N6AMT2",
+        "PSMB9",
+        "DTNBP1"
+      ],
+      "preparation_warnings": [],
+      "warm_warnings": [],
+      "analysis_warnings": [],
+      "scientific_sha256": "33843ac66ccbf2b08960aeb226d52380606878c6d1caa2db68f84afab870e9d1",
+      "input_sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+      "recipe": {
+        "kind": "actual Papalexi2021 example counts from installed sceptredata; downsampled genes",
+        "cells": 20729,
+        "responses": 299,
+        "sceptredata_version": "0.99.0",
+        "response_nonzero": 1390126,
+        "source": "sceptredata::lowmoi_example_data"
+      },
+      "package_path": "/private/tmp/sceptre-refactor-qualified-library/sceptre",
+      "package_version": "0.99.0",
+      "ondisc_version": "1.3.5",
+      "R": "R version 4.6.0 (2026-04-24)",
+      "external": [
+        "1.2.12",
+        "1.0.8, 13-Jul-2019",
+        "5.8.3",
+        "1.25",
+        "1.5.7",
+        "10.47 2025-10-21",
+        "78.1",
+        "TRE 0.8.0 R_fixes (BSD)",
+        "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib",
+        "5.2",
+        "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      ],
+      "platform": "aarch64-apple-darwin23",
+      "threads": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "sampled_main_peak_rss_bytes": 498581504,
+      "sampled_worker_peak_rss_bytes": 300449792,
+      "sampled_aggregate_tree_peak_rss_bytes": 1095090176,
+      "max_concurrent_fork_workers": 2,
+      "analysis_samples": 11,
+      "process_peak_samples": {
+        "74878": 498581504,
+        "74893": 300449792,
+        "74894": 296501248
+      },
+      "memory_observation": "sampled lower bound; shared pages overcounted in aggregate",
+      "analysis_rss_timeline": [
+        {
+          "unix_seconds": 1792164628.079393,
+          "seconds_from_first_sample": 2.4170000001433323e-06,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 338214912
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164628.22507,
+          "seconds_from_first_sample": 0.14567854199999974,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 473202688
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164628.3745449,
+          "seconds_from_first_sample": 0.2951514580000003,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 144719872,
+            "74894": 143130624
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164628.5231419,
+          "seconds_from_first_sample": 0.4437470000000001,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 177766400,
+            "74894": 177389568
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164628.67295,
+          "seconds_from_first_sample": 0.5935534169999999,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 178339840,
+            "74894": 178601984
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164628.8220658,
+          "seconds_from_first_sample": 0.7426670829999997,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 178520064,
+            "74894": 179388416
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164628.971333,
+          "seconds_from_first_sample": 0.8919332500000001,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 178618368,
+            "74894": 179552256
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164629.121734,
+          "seconds_from_first_sample": 1.04233275,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 183468032,
+            "74894": 180060160
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164629.285215,
+          "seconds_from_first_sample": 1.2058122500000001,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 257032192,
+            "74894": 182534144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164629.444781,
+          "seconds_from_first_sample": 1.3653760000000004,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74893": 300449792,
+            "74894": 296058880
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164629.587059,
+          "seconds_from_first_sample": 1.5076520420000001,
+          "main_pid": 74878,
+          "rss_bytes_by_pid": {
+            "74878": 498581504,
+            "74894": 296501248
+          },
+          "fork_workers": 1
+        }
+      ],
+      "fresh_process_wall_seconds": 2.918353458,
+      "repetition": 1,
+      "warmup": false
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "elapsed_seconds": 1.599,
+      "user_self_seconds": 0.229,
+      "system_self_seconds": 0.04,
+      "user_children_seconds": 2.429,
+      "system_children_seconds": 0.119,
+      "cells_in_use": 16781,
+      "requested_pairs": 288,
+      "passing_pairs": 225,
+      "result_rows": 288,
+      "B": [
+        499,
+        4999,
+        24999
+      ],
+      "fits_before": null,
+      "fits_after": [
+        "ACOT11",
+        "SERTAD1",
+        "COQ10A",
+        "FN1",
+        "RP5-1092A3.4",
+        "GRAP",
+        "ITGB1BP1",
+        "PAK1",
+        "PCBP3",
+        "RP11-228B15.4",
+        "FUZ",
+        "ZNF699",
+        "CCDC144A",
+        "SPATA9",
+        "DUSP15",
+        "COCH",
+        "OSGEP",
+        "SCAPER",
+        "MARCKSL1",
+        "RMRP",
+        "MZT1",
+        "HNRNPUL2",
+        "SMAD6",
+        "HEXIM1",
+        "SLC35E2B",
+        "ANTXR1",
+        "SLC8B1",
+        "CTD-2369P2.2",
+        "APOBEC3G",
+        "TMEM175",
+        "RDX",
+        "TMEM168",
+        "CTD-2196E14.4",
+        "LRRC3",
+        "AGAP10",
+        "CHEK2",
+        "C10orf11",
+        "RP11-140K17.3",
+        "SRXN1",
+        "IFT46",
+        "HERC1",
+        "C1orf74",
+        "CLDN23",
+        "MAPK11",
+        "CIT",
+        "N6AMT2",
+        "PSMB9",
+        "DTNBP1"
+      ],
+      "preparation_warnings": [],
+      "warm_warnings": [],
+      "analysis_warnings": [],
+      "scientific_sha256": "33843ac66ccbf2b08960aeb226d52380606878c6d1caa2db68f84afab870e9d1",
+      "input_sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+      "recipe": {
+        "kind": "actual Papalexi2021 example counts from installed sceptredata; downsampled genes",
+        "cells": 20729,
+        "responses": 299,
+        "sceptredata_version": "0.99.0",
+        "response_nonzero": 1390126,
+        "source": "sceptredata::lowmoi_example_data"
+      },
+      "package_path": "/private/tmp/sceptre-refactor-qualified-library/sceptre",
+      "package_version": "0.99.0",
+      "ondisc_version": "1.3.5",
+      "R": "R version 4.6.0 (2026-04-24)",
+      "external": [
+        "1.2.12",
+        "1.0.8, 13-Jul-2019",
+        "5.8.3",
+        "1.25",
+        "1.5.7",
+        "10.47 2025-10-21",
+        "78.1",
+        "TRE 0.8.0 R_fixes (BSD)",
+        "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib",
+        "5.2",
+        "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      ],
+      "platform": "aarch64-apple-darwin23",
+      "threads": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "sampled_main_peak_rss_bytes": 485638144,
+      "sampled_worker_peak_rss_bytes": 289603584,
+      "sampled_aggregate_tree_peak_rss_bytes": 1060896768,
+      "max_concurrent_fork_workers": 2,
+      "analysis_samples": 11,
+      "process_peak_samples": {
+        "74963": 485638144,
+        "74976": 289603584,
+        "74977": 285868032
+      },
+      "memory_observation": "sampled lower bound; shared pages overcounted in aggregate",
+      "analysis_rss_timeline": [
+        {
+          "unix_seconds": 1792164631.098943,
+          "seconds_from_first_sample": 3.2499999997881446e-06,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74963": 366067712
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164631.2457652,
+          "seconds_from_first_sample": 0.14682416700000012,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74963": 485539840
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164631.3907452,
+          "seconds_from_first_sample": 0.2918017920000002,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 150323200,
+            "74977": 150716416,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164631.5400891,
+          "seconds_from_first_sample": 0.44114420899999995,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 177668096,
+            "74977": 177684480,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164631.688571,
+          "seconds_from_first_sample": 0.5896247499999996,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 178290688,
+            "74977": 178634752,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164631.833112,
+          "seconds_from_first_sample": 0.7341639999999998,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 178487296,
+            "74977": 179109888,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164631.979106,
+          "seconds_from_first_sample": 0.8801561669999991,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 179912704,
+            "74977": 179290112,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164632.129109,
+          "seconds_from_first_sample": 1.0301578340000006,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 183517184,
+            "74977": 179568640,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164632.278823,
+          "seconds_from_first_sample": 1.1798698749999996,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 274153472,
+            "74977": 213663744,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164632.423585,
+          "seconds_from_first_sample": 1.3246300840000007,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74976": 289603584,
+            "74977": 285655040,
+            "74963": 485638144
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164632.570484,
+          "seconds_from_first_sample": 1.471527709,
+          "main_pid": 74963,
+          "rss_bytes_by_pid": {
+            "74977": 285868032,
+            "74963": 485638144
+          },
+          "fork_workers": 1
+        }
+      ],
+      "fresh_process_wall_seconds": 2.877581374999999,
+      "repetition": 2,
+      "warmup": false
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "elapsed_seconds": 1.593,
+      "user_self_seconds": 0.228,
+      "system_self_seconds": 0.036,
+      "user_children_seconds": 2.423,
+      "system_children_seconds": 0.116,
+      "cells_in_use": 16781,
+      "requested_pairs": 288,
+      "passing_pairs": 225,
+      "result_rows": 288,
+      "B": [
+        499,
+        4999,
+        24999
+      ],
+      "fits_before": null,
+      "fits_after": [
+        "ACOT11",
+        "SERTAD1",
+        "COQ10A",
+        "FN1",
+        "RP5-1092A3.4",
+        "GRAP",
+        "ITGB1BP1",
+        "PAK1",
+        "PCBP3",
+        "RP11-228B15.4",
+        "FUZ",
+        "ZNF699",
+        "CCDC144A",
+        "SPATA9",
+        "DUSP15",
+        "COCH",
+        "OSGEP",
+        "SCAPER",
+        "MARCKSL1",
+        "RMRP",
+        "MZT1",
+        "HNRNPUL2",
+        "SMAD6",
+        "HEXIM1",
+        "SLC35E2B",
+        "ANTXR1",
+        "SLC8B1",
+        "CTD-2369P2.2",
+        "APOBEC3G",
+        "TMEM175",
+        "RDX",
+        "TMEM168",
+        "CTD-2196E14.4",
+        "LRRC3",
+        "AGAP10",
+        "CHEK2",
+        "C10orf11",
+        "RP11-140K17.3",
+        "SRXN1",
+        "IFT46",
+        "HERC1",
+        "C1orf74",
+        "CLDN23",
+        "MAPK11",
+        "CIT",
+        "N6AMT2",
+        "PSMB9",
+        "DTNBP1"
+      ],
+      "preparation_warnings": [],
+      "warm_warnings": [],
+      "analysis_warnings": [],
+      "scientific_sha256": "33843ac66ccbf2b08960aeb226d52380606878c6d1caa2db68f84afab870e9d1",
+      "input_sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+      "recipe": {
+        "kind": "actual Papalexi2021 example counts from installed sceptredata; downsampled genes",
+        "cells": 20729,
+        "responses": 299,
+        "sceptredata_version": "0.99.0",
+        "response_nonzero": 1390126,
+        "source": "sceptredata::lowmoi_example_data"
+      },
+      "package_path": "/private/tmp/sceptre-refactor-qualified-library/sceptre",
+      "package_version": "0.99.0",
+      "ondisc_version": "1.3.5",
+      "R": "R version 4.6.0 (2026-04-24)",
+      "external": [
+        "1.2.12",
+        "1.0.8, 13-Jul-2019",
+        "5.8.3",
+        "1.25",
+        "1.5.7",
+        "10.47 2025-10-21",
+        "78.1",
+        "TRE 0.8.0 R_fixes (BSD)",
+        "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib",
+        "5.2",
+        "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+      ],
+      "platform": "aarch64-apple-darwin23",
+      "threads": [
+        "1",
+        "1",
+        "1",
+        "1"
+      ],
+      "sampled_main_peak_rss_bytes": 485556224,
+      "sampled_worker_peak_rss_bytes": 290291712,
+      "sampled_aggregate_tree_peak_rss_bytes": 1063452672,
+      "max_concurrent_fork_workers": 2,
+      "analysis_samples": 11,
+      "process_peak_samples": {
+        "74989": 485556224,
+        "75005": 290291712,
+        "75006": 287834112
+      },
+      "memory_observation": "sampled lower bound; shared pages overcounted in aggregate",
+      "analysis_rss_timeline": [
+        {
+          "unix_seconds": 1792164633.8661602,
+          "seconds_from_first_sample": 8.75000001343551e-07,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 324927488
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164634.009332,
+          "seconds_from_first_sample": 0.143172250000001,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 442105856
+          },
+          "fork_workers": 0
+        },
+        {
+          "unix_seconds": 1792164634.162961,
+          "seconds_from_first_sample": 0.2967991250000015,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 79642624,
+            "75006": 79773696
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164634.30991,
+          "seconds_from_first_sample": 0.4437463749999999,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 177324032,
+            "75006": 176537600
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164634.463422,
+          "seconds_from_first_sample": 0.5972575420000013,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 178044928,
+            "75006": 177831936
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164634.610046,
+          "seconds_from_first_sample": 0.7438795420000002,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 179208192,
+            "75006": 181108736
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164634.7600288,
+          "seconds_from_first_sample": 0.893860042,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 179290112,
+            "75006": 181272576
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164634.908618,
+          "seconds_from_first_sample": 1.042448125,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 184172544,
+            "75006": 181485568
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164635.058989,
+          "seconds_from_first_sample": 1.192819334000001,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 248070144,
+            "75006": 181862400
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164635.2044318,
+          "seconds_from_first_sample": 1.3382584170000005,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 290291712,
+            "75006": 287604736
+          },
+          "fork_workers": 2
+        },
+        {
+          "unix_seconds": 1792164635.3522382,
+          "seconds_from_first_sample": 1.4860624590000011,
+          "main_pid": 74989,
+          "rss_bytes_by_pid": {
+            "74989": 485556224,
+            "75005": 0,
+            "75006": 287834112
+          },
+          "fork_workers": 2
+        }
+      ],
+      "fresh_process_wall_seconds": 2.8844119999999993,
+      "repetition": 3,
+      "warmup": false
+    }
+  ],
+  "summary": [
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "median_elapsed_seconds": 1.599,
+      "input_sha256": "2e5a3b28d10a7536c1519182dd6ff80742eedd355f198506e008393435f7f364",
+      "scientific_sha256": [
+        "33843ac66ccbf2b08960aeb226d52380606878c6d1caa2db68f84afab870e9d1"
+      ],
+      "B": [
+        499,
+        4999,
+        24999
+      ],
+      "passing_pairs": 225,
+      "min_analysis_samples": 11,
+      "max_concurrent_fork_workers": 2,
+      "sampled_main_peak_rss_bytes": 498581504,
+      "sampled_worker_peak_rss_bytes": 300449792,
+      "sampled_aggregate_tree_peak_rss_bytes": 1095090176,
+      "timing_use": "review against10percent median elapsed budget"
+    }
+  ]
+}

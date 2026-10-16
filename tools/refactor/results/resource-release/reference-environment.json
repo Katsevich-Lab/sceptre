@@ -1,0 +1,122 @@
+{
+  "R": "R version 4.6.0 (2026-04-24)",
+  "external": ["1.2.12", "1.0.8, 13-Jul-2019", "5.8.3", "1.25", "1.5.7", "10.47 2025-10-21", "78.1", "TRE 0.8.0 R_fixes (BSD)", "Apple or GNU libiconv 1.11 /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libR.dylib", "5.2", "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"],
+  "platform": "aarch64-apple-darwin23",
+  "packages": {
+    "sceptre": {
+      "version": "0.99.0",
+      "path": "/private/tmp/sceptre-resource-reference-release-library/sceptre",
+      "description_md5": "1e40c6e76837b8c0de341bbac5f26045",
+      "binary_md5": {
+        "sceptre.so": "729aec970aef350b328b6e3e07c0d34d"
+      }
+    },
+    "ondisc": {
+      "version": "1.3.5",
+      "path": "/private/tmp/sceptre-rf0-ondisc-library/ondisc",
+      "description_md5": "59fc4c6bcb4a8b7b4477f50c3e2fde6d",
+      "binary_md5": {
+        "ondisc.so": "1959d12130422367b9ec06d7ce138c51"
+      }
+    },
+    "Matrix": {
+      "version": "1.7.5",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix",
+      "description_md5": "af722f25afd77dae28cd4f587d77a3bf",
+      "binary_md5": {
+        "Matrix.so": "2a1a30b9cfc5edfa6c53ec9c32c183c8",
+        "Matrix.so.1": "860acb43da2258a68089e7f627c58755"
+      }
+    },
+    "Rcpp": {
+      "version": "1.1.1.1.1",
+      "path": "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp",
+      "description_md5": "1e7e0b7294e522eeac940d9836f1b17b",
+      "binary_md5": {
+        "Rcpp.so": "5abd0b79fc2b6b6c92268a6e76a3e75a",
+        "Rcpp.so.1": "3bd5641fa4eb0739a2450da16ff38ae2"
+      }
+    },
+    "BH": {
+      "version": "1.90.0.1",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BH",
+      "description_md5": "8caa91f4f526bab9f69b1529e8428adf",
+      "binary_md5": {}
+    },
+    "data.table": {
+      "version": "1.18.4",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table",
+      "description_md5": "6f8c2d931dee8011a7e2af306c8d0a7c",
+      "binary_md5": {
+        "data_table.so": "a0e88a3d66fbd9f2c7d59a9125e15463",
+        "data_table.so.1": "51a2e37e2bace2ef59e0fa8f9308e5a5"
+      }
+    },
+    "dplyr": {
+      "version": "1.2.1",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/dplyr",
+      "description_md5": "0892b808a6d43d8b9a8c7a66ac4ae98b",
+      "binary_md5": {
+        "dplyr.so": "5c932cae1dd6549f0797f257bbffa691",
+        "dplyr.so.1": "594ee4a8ff857a517a6186cbedb2f202"
+      }
+    },
+    "parallelly": {
+      "version": "1.47.0",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/parallelly",
+      "description_md5": "8095205f8c80607fcb65728c53db42b0",
+      "binary_md5": {
+        "parallelly.so": "778625fa96f774e224c3704ab3fb034c",
+        "parallelly.so.1": "22946362a679da39f3305b3226f34ba3"
+      }
+    },
+    "withr": {
+      "version": "3.0.2",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/withr",
+      "description_md5": "b28a74994263fdd30fb4d482dbc37925",
+      "binary_md5": {}
+    },
+    "jsonlite": {
+      "version": "2.0.0",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/jsonlite",
+      "description_md5": "90a1d2d451aba76f315bb05f26ac9b00",
+      "binary_md5": {
+        "jsonlite.so": "6f48839a1ef12e5974118c13171a8c20",
+        "jsonlite.so.1": "69e7ec151d3cccde1f24d4a33b77d041"
+      }
+    },
+    "digest": {
+      "version": "0.6.39",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest",
+      "description_md5": "b32c21e5e27aae49bccf418e2b233ae1",
+      "binary_md5": {
+        "digest.so": "9472000fa61b274446f9dd6760ae0b46",
+        "digest.so.1": "62916b1db2b1a812dd94cf88d2a73f16"
+      }
+    },
+    "sceptredata": {
+      "version": "0.99.0",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/sceptredata",
+      "description_md5": "bbef0991b933524aa5f44a0f646a4cd1",
+      "binary_md5": {}
+    },
+    "MASS": {
+      "version": "7.3.65",
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/MASS",
+      "description_md5": "169d2267461bdfa906b8991758545ca3",
+      "binary_md5": {
+        "MASS.so": "22cde4db37a6212d78064b492137de8c",
+        "MASS.so.1": "5cef8b79cb5e16c2619da76fc0dfccc4"
+      }
+    },
+    "stats": {
+      "version": "4.6.0",
+      "path": "/Library/Frameworks/R.framework/Resources/library/stats",
+      "description_md5": "c7e5d26571abfa93f61514ed602685ea",
+      "binary_md5": {
+        "stats.so": "ac15560545db511ee22fa143de636fde"
+      }
+    }
+  },
+  "note": "Dependency resolution for the frozen package library; package source commits are recorded in the run plan. Sceptre code/path differs deliberately."
+}

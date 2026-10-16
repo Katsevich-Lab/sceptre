@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "reference_source_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_source_commit": "28df3907f43311efc70908d50b7636c7e6e89db8",
+  "dependency_provenance": {
+    "exact": true,
+    "packages": [
+      "BH",
+      "MASS",
+      "Matrix",
+      "Rcpp",
+      "data.table",
+      "digest",
+      "dplyr",
+      "jsonlite",
+      "ondisc",
+      "parallelly",
+      "sceptredata",
+      "stats",
+      "withr"
+    ],
+    "reference": "/private/tmp/sceptre-resource-release-diagnostics/reference-environment.json",
+    "candidate": "/private/tmp/sceptre-resource-release-diagnostics/candidate-environment.json"
+  },
+  "build_configuration_exact": true,
+  "comparison": [
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.596,
+      "candidate_median_seconds": 1.599,
+      "elapsed_ratio": 1.0018796992481203,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 484491264,
+          "candidate_bytes": 498581504,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 304267264,
+          "candidate_bytes": 300449792,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 1079934976,
+          "candidate_bytes": 1095090176,
+          "permitted_increase_bytes": 107993497.60000001,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    }
+  ],
+  "interpretation": "Initial review thresholds, not proof of speedup. Sampled peaks are lower bounds; aggregate RSS counts shared pages repeatedly. Exact output hash differences require numerical/identity investigation, never automatic snapshot replacement."
+}
