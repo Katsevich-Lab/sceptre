@@ -1140,6 +1140,9 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
     # stored-position conversion is not the aggregation count contract.
     if (methods::is(grna_matrix, "sparseMatrix")) {
         grna_matrix <- methods::as(grna_matrix, "RsparseMatrix")
+    } else {
+        # Keep the original non-sparse coercion/dispatch behavior.
+        grna_matrix <- as.matrix(grna_matrix)
     }
     n_cells <- ncol(grna_matrix)
     grna_matrix_collapsed <- vapply(

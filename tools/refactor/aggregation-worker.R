@@ -89,7 +89,14 @@ environment <- list(R = R.version.string, platform = R.version$platform,
     data_table_threads = data.table::getDTthreads(),
     dependencies = stats::setNames(lapply(dependencies, function(package) {
         if (!requireNamespace(package, quietly = TRUE)) return(NULL)
-        list(version = as.character(packageVersion(package)), path = find.package(package))
+        path <- find.package(package)
+        binaries <- list.files(file.path(path, "libs"), pattern = "\\.(so|dylib|dll)$",
+                               recursive = TRUE, full.names = TRUE)
+        list(version = as.character(packageVersion(package)), path = path,
+             DESCRIPTION_sha256 = digest::digest(file = file.path(path, "DESCRIPTION"), algo = "sha256"),
+             binary_sha256 = stats::setNames(lapply(binaries, function(binary)
+                 digest::digest(file = binary, algo = "sha256")),
+                 substring(binaries, nchar(path) + 2L)))
     }), dependencies))
 result <- list(schema_version = 1L, mode = mode, iterations = iterations,
     input_sha256 = digest::digest(file = args[2L], algo = "sha256"), input_object_sha256 = input_hash,

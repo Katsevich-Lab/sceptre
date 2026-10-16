@@ -82,10 +82,13 @@ def trial(worker, library, fixture, stem, mode, iterations, environment):
 
 def summarize(rows):
     measured = [row for row in rows if not row["warmup"]]
+    active = [row["memory"]["sampled_active_peak_rss_bytes"] for row in measured
+              if row["memory"]["sampled_active_peak_rss_bytes"] is not None]
     return dict(median_elapsed_seconds=statistics.median(row["elapsed_seconds"] for row in measured),
                 max_os_peak_rss_bytes=max(row["memory"]["os_max_rss_bytes"] for row in measured),
                 median_os_peak_rss_bytes=statistics.median(row["memory"]["os_max_rss_bytes"] for row in measured),
-                max_sampled_active_peak_rss_bytes=max((row["memory"]["sampled_active_peak_rss_bytes"] or 0) for row in measured),
+                max_sampled_active_peak_rss_bytes=max(active, default=None),
+                min_active_samples=min(sum(sample["phase"] == "aggregation_start" for sample in row["memory"]["samples"]) for row in measured),
                 measured_trials=len(measured))
 
 
@@ -163,18 +166,22 @@ def main():
         for label, library in libraries.items():
             stem = args.output/f"{name}-{label}-profile"
             profile[label] = trial(worker, library, fixture, stem, "profile", 1, environment)
-        elapsed_ratio = timing["candidate"]["median_elapsed_seconds"] / timing["reference"]["median_elapsed_seconds"]
+        denominator = timing["reference"]["median_elapsed_seconds"]
+        elapsed_ratio = timing["candidate"]["median_elapsed_seconds"] / denominator if denominator else None
         meaningful = min(row["median_elapsed_seconds"] for row in timing.values()) >= 1
         reference_peak = single["reference"]["max_os_peak_rss_bytes"]
         candidate_peak = single["candidate"]["max_os_peak_rss_bytes"]
         crossing = candidate_peak-reference_peak > max(.10*reference_peak,64*1024**2)
         active_ref = single["reference"]["max_sampled_active_peak_rss_bytes"]
         active_candidate = single["candidate"]["max_sampled_active_peak_rss_bytes"]
-        active_crossing = active_candidate-active_ref > max(.10*active_ref,64*1024**2)
+        active_observed = all(single[label]["min_active_samples"] > 0 for label in libraries)
+        active_crossing = active_observed and active_candidate-active_ref > max(.10*active_ref,64*1024**2)
         conclusion = dict(case=name, exact_output_bytes=True, environment_equal=True,
             single=single, timing=timing, timing_source=timing_source,
             elapsed_ratio=elapsed_ratio, timing_gate="pass" if meaningful and elapsed_ratio<=1.10 else "fail" if meaningful else "inconclusive (<1s)",
-            memory_gate="fail" if crossing or active_crossing else "pass", profiles=profile)
+            memory_gate="fail" if crossing or active_crossing else "pass",
+            sampled_active_gate=("fail" if active_crossing else "pass") if active_observed else "inconclusive (one or more short trials had no active sample; OS maximum remains measured)",
+            profiles=profile)
         conclusions.append(conclusion)
         (args.output/"summary.json").write_text(json.dumps(dict(plan=plan, trials=results, cases=conclusions),indent=2)+"\n")
         if crossing or active_crossing or (meaningful and elapsed_ratio>1.10):
