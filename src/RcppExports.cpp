@@ -201,7 +201,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sparse_pair_counts
-List sparse_pair_counts(IntegerVector j, IntegerVector p, int n_cells_orig, std::vector<std::vector<int>> grna_group_idxs, std::vector<std::vector<int>> nt_groups_analysis, std::vector<int> to_analyze_response_idxs, std::vector<int> to_analyze_grna_idxs, bool control_group_complement, std::vector<int> cells_in_use);
+List sparse_pair_counts(IntegerVector j, IntegerVector p, int n_cells_orig, List grna_group_idxs, List nt_groups_analysis, IntegerVector to_analyze_response_idxs, IntegerVector to_analyze_grna_idxs, bool control_group_complement, IntegerVector cells_in_use);
 RcppExport SEXP _sceptre_sparse_pair_counts(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP grna_group_idxsSEXP, SEXP nt_groups_analysisSEXP, SEXP to_analyze_response_idxsSEXP, SEXP to_analyze_grna_idxsSEXP, SEXP control_group_complementSEXP, SEXP cells_in_useSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -209,18 +209,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type grna_group_idxs(grna_group_idxsSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type nt_groups_analysis(nt_groups_analysisSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type to_analyze_response_idxs(to_analyze_response_idxsSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type to_analyze_grna_idxs(to_analyze_grna_idxsSEXP);
+    Rcpp::traits::input_parameter< List >::type grna_group_idxs(grna_group_idxsSEXP);
+    Rcpp::traits::input_parameter< List >::type nt_groups_analysis(nt_groups_analysisSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_response_idxs(to_analyze_response_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type to_analyze_grna_idxs(to_analyze_grna_idxsSEXP);
     Rcpp::traits::input_parameter< bool >::type control_group_complement(control_group_complementSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type cells_in_use(cells_in_useSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_pair_counts(j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use));
     return rcpp_result_gen;
 END_RCPP
 }
 // sparse_group_counts
-IntegerMatrix sparse_group_counts(IntegerVector j, IntegerVector p, int n_cells_orig, std::vector<std::vector<int>> groups, std::vector<int> cells_in_use);
+IntegerMatrix sparse_group_counts(IntegerVector j, IntegerVector p, int n_cells_orig, List groups, IntegerVector cells_in_use);
 RcppExport SEXP _sceptre_sparse_group_counts(SEXP jSEXP, SEXP pSEXP, SEXP n_cells_origSEXP, SEXP groupsSEXP, SEXP cells_in_useSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -228,8 +228,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells_orig(n_cells_origSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::vector<int>> >::type groups(groupsSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type cells_in_use(cells_in_useSEXP);
+    Rcpp::traits::input_parameter< List >::type groups(groupsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
     rcpp_result_gen = Rcpp::wrap(sparse_group_counts(j, p, n_cells_orig, groups, cells_in_use));
     return rcpp_result_gen;
 END_RCPP
@@ -262,7 +262,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_cell_covariates_cpp
-List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, std::vector<int> mt_gene_idxs, bool compute_p_mito, bool compute_max_feature);
+List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature);
 RcppExport SEXP _sceptre_compute_cell_covariates_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_genesSEXP, SEXP n_cellsSEXP, SEXP mt_gene_idxsSEXP, SEXP compute_p_mitoSEXP, SEXP compute_max_featureSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -272,7 +272,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type mt_gene_idxs(mt_gene_idxsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type mt_gene_idxs(mt_gene_idxsSEXP);
     Rcpp::traits::input_parameter< bool >::type compute_p_mito(compute_p_mitoSEXP);
     Rcpp::traits::input_parameter< bool >::type compute_max_feature(compute_max_featureSEXP);
     rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_cpp(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature));

@@ -37,61 +37,70 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 
 
 // Column summaries load values (not stored-position counts): nonzero means
-// value > 0.5. mt_gene_idxs arrives R one-based and is an owned Rcpp conversion;
-// only active mitochondrial summaries convert/use it. Source i/p/x and every R
-// input remain unchanged. Preserve first-maximum ties and zero-total ratios.
+// value > 0.5. Active mitochondrial indices are copied from R one-based rows
+// only after all R allocation/materialization, including the named result.
+// The native compute scope uses cached pointers and ends before return. Source
+// i/p/x and all R inputs remain unchanged; preserve ties and zero-total ratios.
 // [[Rcpp::export]]
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
-                                 int n_cells, std::vector<int> mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
+                                 int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);
   NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes), frac_umis_max_feature(n_cells);
-  List out;
-
-  int n_nonzero_count, curr_max_feature;
-  double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature;
-  if (compute_p_mito) for (int& position : mt_gene_idxs) {
-    if (position < 1 || position > n_genes) stop("Mitochondrial row is outside the one-based feature range.");
-    --position;
+  List out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito,
+                          Named("max_feature") = max_feature, Named("frac_umis_max_feature") = frac_umis_max_feature);
+  const int* mt_rows = nullptr;
+  R_xlen_t n_mt = 0;
+  if (compute_p_mito) {
+    mt_rows = INTEGER(mt_gene_idxs);
+    n_mt = mt_gene_idxs.size();
+    for (R_xlen_t row = 0; row < n_mt; ++row)
+      if (mt_rows[row] < 1 || mt_rows[row] > n_genes)
+        stop("Mitochondrial row is outside the one-based feature range.");
   }
-
-  for (int k = 0; k < n_cells; k ++) {
-    curr_max_feature = 0;
-    umi_count_curr_max_feature = 0;
-    n_umi_count = 0;
-    n_nonzero_count = 0;
-    load_sparse_vector(i, p, x, k, n_genes, y);
-    for (int r = 0; r < n_genes; r ++) {
-      n_umi_count += y[r];
-      if (y[r] > 0.5) n_nonzero_count ++;
-    }
-
-    // compute p mito
-    if (compute_p_mito) {
-      n_umi_count_mito = 0;
-      for (int r = 0; r < mt_gene_idxs.size(); r ++) n_umi_count_mito += y[mt_gene_idxs[r]];
-      p_mito[k] = n_umi_count_mito/n_umi_count;
-    }
-
-    // compute max feature, fraction expressed
-    if (compute_max_feature) {
-      curr_max_feature = 0;
-      umi_count_curr_max_feature = 0;
+  const int* indices = INTEGER(i);
+  const int* pointers = INTEGER(p);
+  const double* values = REAL(x);
+  int* nonzero_data = INTEGER(n_nonzero);
+  int* max_feature_data = INTEGER(max_feature);
+  double* umi_data = REAL(n_umi);
+  double* mito_data = REAL(p_mito);
+  double* loaded = REAL(y);
+  double* fraction_data = REAL(frac_umis_max_feature);
+  {
+    std::vector<int> owned_mt(n_mt);
+    for (R_xlen_t row = 0; row < n_mt; ++row) owned_mt[row] = mt_rows[row] - 1;
+    for (int k = 0; k < n_cells; k ++) {
+      int curr_max_feature = 0, n_nonzero_count = 0;
+      double umi_count_curr_max_feature = 0, n_umi_count = 0;
+      for (int row = 0; row < n_genes; ++row) loaded[row] = 0;
+      for (int entry = pointers[k]; entry < pointers[k + 1]; ++entry)
+        loaded[indices[entry]] = values[entry];
       for (int r = 0; r < n_genes; r ++) {
-        if (y[r] > umi_count_curr_max_feature) {
-          curr_max_feature = r;
-          umi_count_curr_max_feature = y[r];
-        }
+        n_umi_count += loaded[r];
+        if (loaded[r] > 0.5) n_nonzero_count ++;
       }
-      max_feature[k] = curr_max_feature;
-      frac_umis_max_feature[k] = umi_count_curr_max_feature/n_umi_count;
+
+      if (compute_p_mito) {
+        double n_umi_count_mito = 0;
+        for (int row : owned_mt) n_umi_count_mito += loaded[row];
+        mito_data[k] = n_umi_count_mito/n_umi_count;
+      }
+
+      if (compute_max_feature) {
+        for (int r = 0; r < n_genes; r ++) {
+          if (loaded[r] > umi_count_curr_max_feature) {
+            curr_max_feature = r;
+            umi_count_curr_max_feature = loaded[r];
+          }
+        }
+        max_feature_data[k] = curr_max_feature;
+        fraction_data[k] = umi_count_curr_max_feature/n_umi_count;
+      }
+
+      nonzero_data[k] = n_nonzero_count;
+      umi_data[k] = n_umi_count;
     }
-
-    n_nonzero[k] = n_nonzero_count;
-    n_umi[k] = n_umi_count;
   }
-
-  out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito,
-                     Named("max_feature") = max_feature, Named("frac_umis_max_feature") = frac_umis_max_feature);
   return out;
 }
 
