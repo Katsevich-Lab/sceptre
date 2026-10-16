@@ -1,3 +1,12 @@
+# sceptre (development version)
+
+- Internal analysis code now has shared cell-coordinate and storage boundaries,
+  separate fitting, score, QC policy, inference and result-processing modules,
+  and common worker utilities. The public API and saved S4 layout are unchanged.
+- Response fits are invalidated when the actual design or control-cell view
+  changes. This prevents NT-only calibration fits from being reused for a later
+  complement-control analysis and preserves agreement with a fresh fit.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.
