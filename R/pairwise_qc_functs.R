@@ -15,17 +15,14 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         dplyr::mutate(positive_control_pairs, discovery = FALSE)
     )
 
-    # 2. map each response id and grna group to its index
+    # Resolve the same source/analysis coordinates used by association workers.
+    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
+        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
+        FALSE, control_group_complement, sceptre_object@low_moi)
     dt <- data.table::data.table(
-        response_idx = match(
-            x = response_grna_group_pairs$response_id,
-            table = rownames(response_matrix)
-        ),
+        response_idx = index$pair_rows$response_idx,
         response_id = response_grna_group_pairs$response_id,
-        grna_idx = match(
-            x = response_grna_group_pairs$grna_group,
-            table = names(grna_group_idxs)
-        ),
+        grna_idx = index$pair_rows$group_idx,
         grna_group = response_grna_group_pairs$grna_group,
         discovery = response_grna_group_pairs$discovery
     ) |>
@@ -33,14 +30,9 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     controls <- if (control_group_complement) {
         "complement"
     } else {
-        grna_assignments$all_nt_idxs
+        index$nt_to_analysis
     }
-    nt_groups <- grna_assignments$indiv_nt_grna_idxs
-    if (!control_group_complement) {
-        # Legacy objects store NT memberships relative to the ordered NT view.
-        # Normalize that persisted representation before crossing the boundary.
-        nt_groups <- lapply(nt_groups, function(group) controls[group])
-    }
+    nt_groups <- index$nt_groups_analysis
     out <- collect_pair_qc_metrics(
         store = response_matrix,
         pair_index = data.frame(response_idx = dt$response_idx, group_idx = dt$grna_idx),
