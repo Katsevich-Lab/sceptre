@@ -64,9 +64,9 @@ borrowed and duplicated with `data.table::copy`; dense-to-triplet columns,
 expanded pointer coordinates and replacement logical-one values are fresh and
 can be sorted directly. This avoids arithmetic copying and refcount heuristics.
 For Matrix 1.7.5 the installed dense method calls `R_matrix_as_sparse`; the
-[versioned source](https://github.com/cran/Matrix/blob/1.7-5/src/coerce.c#L1495)
+[versioned source](https://github.com/cran/Matrix/blob/1.7-5/src/coerce.c#L1577)
 calls `dense_as_sparse`, which allocates triplet coordinates and values
-(lines 1864, 1870, 1912). The inspected source SHA256 is
+(raw source lines 1969, 1975, 2019). The inspected source SHA256 is
 `67805fdd88ccdf06a4c1d888d55df3dec92031d27b20d5410a23cec39ab657b3`.
 Independent small tests cover dense/compressed/logical caller aliases and
 bitwise negative-zero/NaN-payload preservation. Allocation profiles separately
