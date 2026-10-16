@@ -5,6 +5,131 @@ refactor_fixture_dir <- function() {
 
 refactor_private <- function(name) getFromNamespace(name, "sceptre")
 
+# Runtime references never supply inputs or API/mapping expectations. They run
+# the immutable inputs through the original package in this numerical setting.
+refactor_oracle_environment <- function() {
+    packages <- c("BH", "data.table", "dplyr", "Matrix", "Rcpp", "withr", "ondisc")
+    list(
+        R = R.version.string, platform = R.version$platform,
+        external = extSoftVersion(), lapack = La_version(),
+        dependencies = stats::setNames(lapply(packages, function(package) {
+            if (requireNamespace(package, quietly = TRUE)) as.character(utils::packageVersion(package)) else NULL
+        }), packages),
+        threads = Sys.getenv(c("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"))
+    )
+}
+
+refactor_frozen_environment <- function(manifest = readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))) {
+    current <- refactor_oracle_environment()
+    packages <- setdiff(names(current$dependencies), "ondisc")
+    identical(current$R, manifest$R) && identical(current$platform, manifest$platform) &&
+        identical(current$external, manifest$external) &&
+        all(vapply(packages, function(package) {
+            identical(current$dependencies[[package]], manifest$dependencies[[package]]$version)
+        }, logical(1)))
+}
+
+refactor_oracle_input_files <- function() {
+    c("inputs.rds", "cases.rds", "backed-inputs.rds", "saved-object.rds")
+}
+
+refactor_oracle_output_files <- function(backed) {
+    c("workflows.rds", "cache.rds", "edges.rds", "saved-object-result.rds",
+      "backed-workflow.rds", "backed-discovery.rds",
+      if (backed) c("backed-metadata.rds", "backed-observations.rds"))
+}
+
+refactor_oracle_hashes <- function(files) {
+    stats::setNames(unname(tools::md5sum(files)), names(files))
+}
+
+refactor_oracle_verify_source <- function(reference, source_files, source_md5) {
+    files <- file.path(reference, names(source_files))
+    if (!all(file.exists(files))) stop("Pinned runtime reference source files are missing.")
+    actual <- refactor_oracle_hashes(stats::setNames(files, names(source_files)))
+    if (!identical(names(source_md5), names(source_files)) || !identical(actual, source_md5)) {
+        stop("Runtime reference source differs from the immutable baseline source hashes.")
+    }
+    for (directory in c("R", "src", "data")) {
+        actual <- list.files(file.path(reference, directory), recursive = TRUE,
+                             all.files = TRUE, no.. = TRUE)
+        actual <- actual[!grepl("\\.(o|so|dll|dylib|d)$", actual)]
+        expected <- substring(names(source_files)[startsWith(names(source_files), paste0(directory, "/"))],
+                              nchar(directory) + 2L)
+        if (!setequal(actual, expected)) stop("Unexpected runtime reference source files under ", directory)
+    }
+    invisible(TRUE)
+}
+
+refactor_runtime_oracle <- local({
+    cached <- NULL
+    function() {
+        directory <- Sys.getenv("SCEPTRE_REFACTOR_ORACLE")
+        if (!nzchar(directory)) {
+            if (identical(Sys.getenv("CI"), "true") || !refactor_frozen_environment()) {
+                stop("A verified same-environment pinned reference is required. Run tools/refactor/generate-runtime-oracle.R and set SCEPTRE_REFACTOR_ORACLE.")
+            }
+            return(NULL)
+        }
+        directory <- normalizePath(directory, winslash = "/", mustWork = TRUE)
+        if (!is.null(cached) && identical(cached$directory, directory)) return(cached)
+        manifest_path <- file.path(directory, "runtime-manifest.rds")
+        if (!file.exists(manifest_path)) stop("Runtime oracle manifest is missing.")
+        oracle <- readRDS(manifest_path)
+        frozen <- readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))
+        required <- refactor_oracle_output_files(!is.null(refactor_oracle_environment()$dependencies$ondisc))
+        if (!identical(oracle$schema_version, 1L) ||
+            !identical(oracle$type, "sceptre-same-environment-reference") ||
+            !identical(oracle$source_commit, "21f9ea098b69c444a884a49bc254de711968e3b5") ||
+            !isTRUE(oracle$source_verified_before_and_after) || !isTRUE(oracle$clean_native_rebuild) ||
+            !isTRUE(oracle$fresh_process) ||
+            !identical(oracle$debug_compile, identical(Sys.getenv("SCEPTRE_REFACTOR_ORACLE_DEBUG", "true"), "true")) ||
+            !identical(oracle$source_files, frozen$source_files) ||
+            !identical(oracle$environment, refactor_oracle_environment()) ||
+            !identical(sort(names(oracle$outputs_md5)), sort(required))) {
+            stop("Runtime oracle is unpinned, incomplete, or from a different numerical environment.")
+        }
+        inputs <- refactor_oracle_input_files()
+        expected_inputs <- frozen$artifacts_md5[inputs]
+        actual_inputs <- refactor_oracle_hashes(stats::setNames(file.path(refactor_fixture_dir(), inputs), inputs))
+        if (!identical(oracle$inputs_md5, expected_inputs) || !identical(actual_inputs, expected_inputs)) {
+            stop("Runtime oracle inputs differ from immutable fixture inputs.")
+        }
+        helper <- file.path(refactor_fixture_dir(), "..", "..", "helper-refactor.R")
+        if (!identical(oracle$harness_md5, unname(refactor_oracle_hashes(helper)))) {
+            stop("Runtime oracle observation harness differs from the tested harness.")
+        }
+        refactor_oracle_verify_source(oracle$reference_source, oracle$source_files, oracle$source_md5)
+        outputs <- stats::setNames(file.path(directory, required), required)
+        if (!all(file.exists(outputs)) || !identical(refactor_oracle_hashes(outputs), oracle$outputs_md5[required])) {
+            stop("Runtime oracle output files are missing or their hashes differ.")
+        }
+        cached <<- list(directory = directory, manifest = oracle)
+        cached
+    }
+})
+
+refactor_expected <- function(file) {
+    oracle <- refactor_runtime_oracle()
+    frozen <- file.path(refactor_fixture_dir(), file)
+    if (is.null(oracle)) return(readRDS(frozen))
+    if (!file %in% names(oracle$manifest$outputs_md5)) stop("File is not a runtime scientific expectation: ", file)
+    expected <- readRDS(file.path(oracle$directory, file))
+    # Retain the stored Mac scientific checks when its recorded numerical
+    # setting and debug compile mode apply. Other platforms still require the
+    # original source's exact decisions and the unchanged floating tolerance.
+    backed_metadata_matches <- file != "backed-metadata.rds" || identical(
+        refactor_oracle_environment()$dependencies$ondisc,
+        readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))$dependencies$ondisc$version
+    )
+    if (refactor_frozen_environment() && isTRUE(oracle$manifest$debug_compile) && backed_metadata_matches &&
+        file != "backed-observations.rds") {
+        testthat::expect_equal(expected, readRDS(frozen), tolerance = 1e-8,
+                               info = paste("stored platform reference", file))
+    }
+    expected
+}
+
 refactor_api <- function() {
     ns <- asNamespace("sceptre")
     # R/Matrix synthesize .__T__ method-table bindings; these are not user API.
@@ -252,7 +377,7 @@ refactor_edge_observations <- function(inputs, case) {
             refactor_observe(sceptre::run_discovery_analysis(object, print_progress = FALSE))
         }),
         intercept_only_nt = outcome({
-            object <- refactor_prepare(inputs, refactor_case_definitions()$low_nt_perm)
+            object <- refactor_prepare(inputs, readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_nt_perm)
             object <- sceptre::set_analysis_parameters(object, discovery_pairs = inputs$discovery_pairs,
                 formula_object = stats::as.formula("~ 1", env = baseenv()), control_group = "nt_cells",
                 resampling_mechanism = "permutations")

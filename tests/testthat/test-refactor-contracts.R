@@ -6,6 +6,40 @@ test_that("reference provenance and every fixture digest are intact", {
     files <- file.path(refactor_fixture_dir(), names(manifest$artifacts_md5))
     expect_true(all(file.exists(files)))
     expect_identical(unname(tools::md5sum(files)), unname(manifest$artifacts_md5))
+    # CI and differing numerical environments must supply a verified original
+    # package run, never expectations regenerated from the candidate package.
+    oracle <- refactor_runtime_oracle()
+    if (!is.null(oracle)) expect_identical(oracle$manifest$source_commit, manifest$source_commit)
+})
+
+test_that("temporary runtime references reject unpinned stale and incomplete evidence", {
+    oracle <- refactor_runtime_oracle()
+    if (is.null(oracle)) {
+        expect_true(refactor_frozen_environment())
+    } else {
+        reject <- function(manifest, message) {
+            directory <- tempfile("refactor-invalid-oracle-")
+            dir.create(directory)
+            on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+            saveRDS(manifest, file.path(directory, "runtime-manifest.rds"))
+            withr::with_envvar(c(SCEPTRE_REFACTOR_ORACLE = directory), {
+                expect_error(refactor_runtime_oracle(), message)
+            })
+        }
+        changed <- oracle$manifest
+        changed$source_commit <- strrep("0", 40L)
+        reject(changed, "unpinned")
+        changed <- oracle$manifest
+        changed$inputs_md5[[1L]] <- strrep("0", 32L)
+        reject(changed, "immutable fixture inputs")
+        changed <- oracle$manifest
+        changed$harness_md5 <- strrep("0", 32L)
+        reject(changed, "observation harness differs")
+        changed <- oracle$manifest
+        changed$source_md5[[1L]] <- strrep("0", 32L)
+        reject(changed, "source differs")
+        reject(oracle$manifest, "output files are missing")
+    }
 })
 
 test_that("refactor preserves the exact public API and existing S4 facade", {
@@ -16,10 +50,11 @@ test_that("refactor preserves the exact public API and existing S4 facade", {
 test_that("supported scientific workflows reproduce the pinned baseline", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     cases <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))
-    expected <- readRDS(file.path(refactor_fixture_dir(), "workflows.rds"))
+    expected <- refactor_expected("workflows.rds")
     for (name in names(cases)) {
         actual <- refactor_run_case(inputs, cases[[name]])
-        # Fitted/floating fields allow the declared cross-toolchain tolerance.
+        # Candidate and original run in the same numerical environment. The
+        # declared tolerance and exact identities/decisions remain unchanged.
         expect_equal(actual, expected[[name]], tolerance = 1e-8, info = name)
         for (stage in c("prepared", "calibrated", "final")) {
             a <- actual$value[[stage]]
@@ -54,7 +89,7 @@ test_that("repeated analyses and existing cache invalidation match baseline", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     cases <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))
     actual <- refactor_cache_observations(inputs, cases$low_complement_perm)
-    expected <- readRDS(file.path(refactor_fixture_dir(), "cache.rds"))
+    expected <- refactor_expected("cache.rds")
     expect_equal(actual, expected, tolerance = 1e-8)
     expect_equal(actual$value$warm$discovery_result, actual$value$cold$discovery_result, tolerance = 1e-8)
     expect_equal(actual$value$cleared$discovery_result, actual$value$cold$discovery_result, tolerance = 1e-8)
@@ -69,14 +104,15 @@ test_that("baseline saved objects remain analyzable", {
     object <- readRDS(file.path(refactor_fixture_dir(), "saved-object.rds"))
     result <- refactor_capture(sceptre::run_discovery_analysis(object, print_progress = FALSE, output_amount = 2L))
     actual <- list(value = refactor_observe(result$value), warnings = result$warnings)
-    expect_equal(actual, readRDS(file.path(refactor_fixture_dir(), "saved-object-result.rds")), tolerance = 1e-8)
+    expect_equal(actual, refactor_expected("saved-object-result.rds"), tolerance = 1e-8)
 })
 
 test_that("rejected requests and degenerate baseline behavior remain explicit", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_complement_perm
     actual <- refactor_edge_observations(inputs, case)
-    expect_equal(actual, readRDS(file.path(refactor_fixture_dir(), "edges.rds")), tolerance = 1e-8)
+    expect_equal(actual, refactor_expected("edges.rds"), tolerance = 1e-8)
+    expect_identical(actual, readRDS(file.path(refactor_fixture_dir(), "edges.rds")))
     expect_match(actual$duplicate_requests$error, "duplicate rows", fixed = TRUE)
 })
 
@@ -108,10 +144,13 @@ test_that("backed permutation workflows and independent reattachment match spars
     directory <- tempfile("refactor-ondisc-")
     on.exit(unlink(directory, recursive = TRUE), add = TRUE)
     actual <- refactor_run_case(inputs, cases$high_perm, backed = TRUE, directory = directory)
-    expected <- readRDS(file.path(refactor_fixture_dir(), "backed-workflow.rds"))
+    expected <- refactor_expected("backed-workflow.rds")
+    if (!is.null(refactor_runtime_oracle())) {
+        expect_equal(actual, refactor_expected("backed-observations.rds"), tolerance = 1e-8)
+    }
     # Backed import generates backing-file IDs using R's RNG. Scientific parity
     # does not require that import to consume the same draws as sparse import.
-    backend_metadata <- readRDS(file.path(refactor_fixture_dir(), "backed-metadata.rds"))
+    backend_metadata <- refactor_expected("backed-metadata.rds")
     if (identical(as.character(packageVersion("ondisc")), backend_metadata$ondisc_version)) {
         expect_identical(actual$warnings, backend_metadata$warnings)
         expect_identical(actual$value$rng_after, backend_metadata$rng_after)
@@ -131,7 +170,7 @@ test_that("backed permutation workflows and independent reattachment match spars
     }))
     expect_equal(unname(reopened_counts), unname(inputs$response_matrix))
     continued <- refactor_capture(sceptre::run_discovery_analysis(reopened, print_progress = FALSE, output_amount = 3L))
-    discovery_only <- readRDS(file.path(refactor_fixture_dir(), "backed-discovery.rds"))
+    discovery_only <- refactor_expected("backed-discovery.rds")
     expect_equal(refactor_observe(continued$value)$discovery_result, discovery_only$value$discovery_result, tolerance = 1e-8)
 
     other <- tempfile("refactor-ondisc-other-")

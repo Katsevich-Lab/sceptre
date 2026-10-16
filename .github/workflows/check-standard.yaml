@@ -26,6 +26,11 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SCEPTRE_REQUIRE_ONDISC: ${{ matrix.config.os == 'macOS-latest' && 'true' || 'false' }}
+      SCEPTRE_REFACTOR_ORACLE_DEBUG: 'false'
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      VECLIB_MAXIMUM_THREADS: 1
 
     steps:
       - uses: actions/checkout@v2
@@ -70,12 +75,27 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            any::pkgload
+            any::digest
+
+      - name: Build verified original-package workflow reference
+        run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
+
+      - name: Check independent private native components
+        run: Rscript --vanilla tools/refactor/test-native-components.R .
 
       - uses: r-lib/actions/check-r-package@v2
 
   in-memory-without-ondisc:
     runs-on: ubuntu-latest
+    env:
+      SCEPTRE_REFACTOR_ORACLE_DEBUG: 'true'
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      VECLIB_MAXIMUM_THREADS: 1
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v2
@@ -91,6 +111,11 @@ jobs:
             any::pkgload
             any::R.utils
             any::MASS
+            any::digest
+      - name: Build verified original-package reference without ondisc
+        run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
+      - name: Check independent private native components
+        run: Rscript --vanilla tools/refactor/test-native-components.R .
       - name: Require an ondisc-free environment and run package tests
         shell: Rscript {0}
         run: |
