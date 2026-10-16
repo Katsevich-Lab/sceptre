@@ -87,8 +87,13 @@ Git attributes preserve fixture bytes across checkout line-ending settings.
 The source ondisc lane uses 1.3.5 from upstream
 `589803edea2a66ad15e7f07186bee16c7739ab8c` (same source tree as the local
 `4d9d75e18f21d11b6da6a54cb03d4424fcf16fe4`). Installed ondisc 1.2.0 was
-separately observed to emit bounds warnings; dependency versions must not be
-silently interchanged in reference/candidate comparisons.
+separately observed to emit bounds warnings. CRAN's 1.3.5 source retains an
+unbounded final-pair loop that the pinned upstream source guards; its Windows
+binary emitted bounds warnings in the earlier hosted run. Version
+1.3.5 alone therefore does not identify the qualified implementation. All four
+standard hosted jobs install and verify the exact source pin; the no-ondisc lane
+remains separate. Dependency sources must not be silently interchanged in
+reference/candidate comparisons or their warnings suppressed by SCEPTRE.
 
 ## Package tests and CI
 
