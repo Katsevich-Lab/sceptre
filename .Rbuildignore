@@ -13,6 +13,7 @@
 ^\.git$
 ^air\.toml$
 ^ROADMAP\.md$
+^REFACTOR_SPEC\.md$
 ^CONTRIBUTING\.md$
 ^CODE_OF_CONDUCT\.md$
 ^GOVERNANCE\.md$
