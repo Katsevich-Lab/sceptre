@@ -63,7 +63,8 @@ run_perm_test_in_memory <- function(
     parallel,
     n_processors,
     log_dir,
-    analysis_type
+    analysis_type,
+    context = NULL
 ) {
     # 0. define several variables
     subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -74,9 +75,11 @@ run_perm_test_in_memory <- function(
         NA
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
-    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
-        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
-        calibration_check, control_group_complement, low_moi)
+    index <- if (is.null(context)) {
+        prepare_index_context(cells_in_use, ncol(response_matrix),
+            grna_assignments, response_grna_group_pairs, rownames(response_matrix),
+            calibration_check, control_group_complement, low_moi)
+    } else context$index
     get_idx_f <- prepared_index_factory(index)
     common_view <- make_fit_view(index)
     response_ids <- unique(response_grna_group_pairs$response_id)
@@ -93,18 +96,7 @@ run_perm_test_in_memory <- function(
 
     # 2. define function to loop subset of response IDs
     analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
-        if (parallel && print_progress) {
-            f_name <- paste0(
-                get_log_dir(log_dir),
-                analysis_type,
-                "_",
-                proc_id,
-                ".out"
-            )
-            file.create(f_name) |> invisible()
-        } else {
-            f_name <- NULL
-        }
+        f_name <- analysis_log_file(analysis_type, proc_id, parallel, print_progress, log_dir)
         precomp_out_list <- list()
         result_out_list <- vector(
             mode = "list",
@@ -192,7 +184,7 @@ run_perm_test_in_memory <- function(
         }
 
         # prepare output
-        ret_pass_qc <- data.table::rbindlist(result_out_list, fill = TRUE)
+        ret_pass_qc <- bind_analysis_results(result_out_list)
         return(list(
             ret_pass_qc = ret_pass_qc,
             precomp_out_list = precomp_out_list
@@ -207,36 +199,13 @@ run_perm_test_in_memory <- function(
     )
 
     # 4. run the analysis
-    if (!parallel) {
-        res <- lapply(partitioned_response_ids, analyze_given_response_ids)
-    } else {
-        message("Running ", analysis_type, " in parallel.")
-        log_file_pattern <- paste0(analysis_type, "_*.out")
-        if (print_progress) {
-            message(
-                "Change directories to ",
-                crayon::blue(get_log_dir(log_dir)),
-                " and view the files ",
-                crayon::blue(log_file_pattern),
-                " for progress updates."
-            )
-        }
-        res <- parallel::mclapply(
-            seq_along(partitioned_response_ids),
-            function(proc_id) {
-                analyze_given_response_ids(
-                    partitioned_response_ids[[proc_id]],
-                    proc_id
-                )
-            },
-            mc.cores = length(partitioned_response_ids)
-        )
-        message(crayon::green(" \u2713"))
-    }
+    if (parallel) announce_parallel_analysis(analysis_type, print_progress, log_dir)
+    res <- execute_analysis_blocks(partitioned_response_ids, analyze_given_response_ids, parallel)
+    if (parallel) message(crayon::green(" \u2713"))
 
     # 5. combine and sort result
     result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
-        data.table::rbindlist(fill = TRUE)
+        bind_analysis_results()
     precomp_out_list <- lapply(res, function(chunk) {
         chunk[["precomp_out_list"]]
     }) |>
@@ -273,7 +242,8 @@ run_crt_in_memory_v2 <- function(
     parallel,
     n_processors,
     log_dir,
-    analysis_type
+    analysis_type,
+    context = NULL
 ) {
     # 0. define several variables
     subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -284,9 +254,11 @@ run_crt_in_memory_v2 <- function(
         NA
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
-    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
-        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
-        calibration_check, control_group_complement, low_moi)
+    index <- if (is.null(context)) {
+        prepare_index_context(cells_in_use, ncol(response_matrix),
+            grna_assignments, response_grna_group_pairs, rownames(response_matrix),
+            calibration_check, control_group_complement, low_moi)
+    } else context$index
     get_idx_f <- prepared_index_factory(index)
     common_view <- make_fit_view(index)
     response_ids <- unique(response_grna_group_pairs$response_id)
@@ -306,18 +278,7 @@ run_crt_in_memory_v2 <- function(
         curr_response_ids,
         proc_id = NULL
     ) {
-        if (parallel && print_progress) {
-            f_name <- paste0(
-                get_log_dir(log_dir),
-                analysis_type,
-                "_",
-                proc_id,
-                ".out"
-            )
-            file.create(f_name) |> invisible()
-        } else {
-            f_name <- NULL
-        }
+        f_name <- analysis_log_file(analysis_type, proc_id, parallel, print_progress, log_dir)
         precomp_out_list <- list()
 
         curr_response_idxs <- match(curr_response_ids, index$response_ids)
@@ -358,49 +319,20 @@ run_crt_in_memory_v2 <- function(
             parallel = parallel,
             n_processors = n_processors
         )
-        if (!parallel) {
-            res <- lapply(
-                partitioned_response_ids,
-                run_precomp_on_given_responses
-            )
-        } else {
-            message("Running ", analysis_type, " in parallel.")
-            log_file_pattern <- paste0(analysis_type, "_*.out")
-            if (print_progress) {
-                message(
-                    "Change directories to ",
-                    crayon::blue(get_log_dir(log_dir)),
-                    " and view the files ",
-                    crayon::blue(log_file_pattern),
-                    " for progress updates."
-                )
-            }
-            res <- parallel::mclapply(
-                seq_along(partitioned_response_ids),
-                function(proc_id) {
-                    run_precomp_on_given_responses(
-                        partitioned_response_ids[[proc_id]],
-                        proc_id
-                    )
-                },
-                mc.cores = length(partitioned_response_ids)
-            )
-        }
+        if (parallel) announce_parallel_analysis(analysis_type, print_progress, log_dir)
+        res <- execute_analysis_blocks(partitioned_response_ids, run_precomp_on_given_responses, parallel)
         precomp_out_list <- purrr::flatten(res)
         response_precomputations <- merge_response_fits(response_precomputations, precomp_out_list)
     }
 
     # 6. define the function to analyze the pairs
-    perform_association_analysis <- function(curr_grna_groups, proc_id) {
+    perform_association_analysis <- function(curr_grna_groups, proc_id = NULL) {
         result_out_list <- vector(
             mode = "list",
             length = length(curr_grna_groups)
         )
-        f_name <- if (parallel && print_progress) {
-            paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
-        } else {
-            NULL
-        }
+        f_name <- analysis_log_file(analysis_type, proc_id, parallel, print_progress,
+            log_dir, initialize = FALSE)
 
         for (grna_group_idx in seq_along(curr_grna_groups)) {
             curr_grna_group <- get_id_from_idx(
@@ -465,7 +397,7 @@ run_crt_in_memory_v2 <- function(
             )
         }
         # 9. prepare output
-        ret_pass_qc <- data.table::rbindlist(result_out_list, fill = TRUE)
+        bind_analysis_results(result_out_list)
     }
 
     # 10. perform the association analyses
@@ -475,22 +407,9 @@ run_crt_in_memory_v2 <- function(
         parallel = parallel,
         n_processors = n_processors
     )
-    if (!parallel) {
-        res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
-    } else {
-        res <- parallel::mclapply(
-            seq_along(partitioned_grna_group_ids),
-            function(proc_id) {
-                perform_association_analysis(
-                    partitioned_grna_group_ids[[proc_id]],
-                    proc_id
-                )
-            },
-            mc.cores = length(partitioned_grna_group_ids)
-        )
-        message(crayon::green(" \u2713"))
-    }
-    result <- res |> data.table::rbindlist(fill = TRUE)
+    res <- execute_analysis_blocks(partitioned_grna_group_ids, perform_association_analysis, parallel)
+    if (parallel) message(crayon::green(" \u2713"))
+    result <- bind_analysis_results(res)
 
     return(list(
         result = result,
