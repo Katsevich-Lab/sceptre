@@ -22,6 +22,16 @@ ondisc; the dedicated in-memory lane remains dependency free.
 
 Tests require pinned and complete provenance, matching numerical dependencies,
 source/input/harness/output integrity, and the current platform/BLAS setting.
+The fingerprint also records effective R compiler/preprocessor/linker flags,
+compiler executable identity/version, build environment flags, MD5s of effective
+user/site Makevars and R configuration inputs, and `RNGkind()`. Cached readback
+rechecks the live fingerprint and explicit debug mode before reuse. Batched
+compiler probes are reused only while flags, configuration hashes and compiler
+binary identity remain unchanged; RNG changes are checked on every readback.
+User/site Makevars with includes or variable expansion are queried afresh so
+changes in untracked included files or externally supplied values cannot hide
+behind the compiler-query cache. Environment-field ordering uses fixed byte
+order, independent of the test runner's reproducible-output locale.
 The developer generator records SHA256 plus MD5; package-test readback uses
 base R's MD5 support without additional package dependencies. A missing,
 incomplete, stale, or unpinned oracle fails CI. A temporary oracle supplies only
@@ -33,6 +43,8 @@ QC/significance decisions and stages. API, slot/formal inventories, index maps,
 edge errors, and the independent frozen native sampler oracle keep their
 portable fixed checks. The stored Mac scientific outputs are additionally
 checked whenever their recorded numerical environment and debug build apply.
+That qualification includes the compiler command/version recorded in the
+native fixture and the workflow manifest's RNG kind.
 
 The full package-check lanes compile the original with `debug = FALSE`, matching
 normal package installation. The `test_local()` lane uses `debug = TRUE` on both
@@ -53,3 +65,5 @@ verified source archive available for the test readback. CI's
 `prepare-runtime-oracle.R` fetches and archives the exact original commit into
 the runner's persistent temporary directory and exports the oracle path to
 later steps.
+The archive command disables checkout line-ending conversion locally, and
+source verification still checks the actual pinned bytes without normalization.

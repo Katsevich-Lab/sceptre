@@ -38,8 +38,82 @@ test_that("temporary runtime references reject unpinned stale and incomplete evi
         changed <- oracle$manifest
         changed$source_md5[[1L]] <- strrep("0", 32L)
         reject(changed, "source differs")
+        changed <- oracle$manifest
+        changed$environment$toolchain$config[["CXXFLAGS"]] <- "changed-compiler-flags"
+        reject(changed, "different numerical environment")
+        changed <- oracle$manifest
+        changed$environment$RNGkind <- "changed-rng-kind"
+        reject(changed, "different numerical environment")
         reject(oracle$manifest, "output files are missing")
     }
+})
+
+test_that("cached runtime evidence rejects live RNG flags and debug-mode changes", {
+    oracle <- refactor_runtime_oracle()
+    if (is.null(oracle)) {
+        expect_true(refactor_frozen_environment())
+    } else {
+        # Prime the real directory cache before each change. A directory-only
+        # cache incorrectly accepts every one of these stale references.
+        expect_identical(refactor_runtime_oracle()$manifest, oracle$manifest)
+        original_kind <- RNGkind()
+        kind <- if (RNGkind()[[1L]] == "L'Ecuyer-CMRG") "Mersenne-Twister" else "L'Ecuyer-CMRG"
+        withr::with_preserve_seed({
+            tryCatch(withr::with_seed(2718L, {
+                expect_error(refactor_runtime_oracle(), "different numerical environment")
+            }, .rng_kind = kind), finally = do.call(RNGkind, as.list(original_kind)))
+        })
+        expect_identical(refactor_runtime_oracle()$manifest, oracle$manifest)
+        withr::with_envvar(c(PKG_CPPFLAGS = paste(Sys.getenv("PKG_CPPFLAGS"), "-DSCEPTRE_STALE_ORACLE=1")), {
+            expect_error(refactor_runtime_oracle(), "different numerical environment")
+        })
+        expect_identical(refactor_runtime_oracle()$manifest, oracle$manifest)
+        withr::with_envvar(c(SCEPTRE_REFACTOR_ORACLE_DEBUG = if (oracle$manifest$debug_compile) "false" else "true"), {
+            expect_error(refactor_runtime_oracle(), "different numerical environment")
+        })
+        expect_identical(refactor_runtime_oracle()$manifest, oracle$manifest)
+    }
+})
+
+test_that("toolchain caching observes edits to effective Makevars at the same path", {
+    makevars <- tempfile("refactor-Makevars-")
+    on.exit(unlink(makevars), add = TRUE)
+    writeLines("CXXFLAGS += -DSCEPTRE_REFERENCE_FIRST=1", makevars)
+    withr::with_envvar(c(R_MAKEVARS_USER = makevars), {
+        first <- refactor_oracle_toolchain()
+        writeLines("CXXFLAGS += -DSCEPTRE_REFERENCE_SECOND=1", makevars)
+        second <- refactor_oracle_toolchain()
+        expect_false(identical(first$makevars$user$md5, second$makevars$user$md5))
+        expect_false(identical(first$config[["CXXFLAGS"]], second$config[["CXXFLAGS"]]))
+    })
+})
+
+test_that("dynamic Makevars do not hide changes to referenced external flags", {
+    makevars <- tempfile("refactor-dynamic-Makevars-")
+    on.exit(unlink(makevars), add = TRUE)
+    writeLines("CXXFLAGS += $(SCEPTRE_REFERENCE_EXTERNAL_FLAGS)", makevars)
+    withr::with_envvar(c(R_MAKEVARS_USER = makevars, SCEPTRE_REFERENCE_EXTERNAL_FLAGS = "-DFIRST=1"), {
+        first <- refactor_oracle_toolchain()
+        withr::with_envvar(c(SCEPTRE_REFERENCE_EXTERNAL_FLAGS = "-DSECOND=1"), {
+            second <- refactor_oracle_toolchain()
+            expect_false(identical(first$config[["CXXFLAGS"]], second$config[["CXXFLAGS"]]))
+        })
+    })
+})
+
+test_that("stored-platform qualification checks its recorded compiler and RNG", {
+    current <- refactor_oracle_environment()
+    manifest <- list(R = current$R, platform = current$platform, external = current$external,
+        RNGkind = current$RNGkind, dependencies = lapply(current$dependencies, function(version) list(version = version)))
+    compiler <- unname(current$toolchain$config[["CXX"]])
+    program <- scan(text = compiler, what = "", quiet = TRUE, comment.char = "")[[1L]]
+    native <- list(compiler = compiler, compiler_version = current$toolchain$compilers[[program]])
+    expect_true(refactor_frozen_environment(manifest, native))
+    native$compiler_version <- "different recorded compiler"
+    expect_false(refactor_frozen_environment(manifest, native))
+    native$compiler_version <- current$toolchain$compilers[[program]]
+    manifest$RNGkind <- "different recorded RNG"
+    expect_false(refactor_frozen_environment(manifest, native))
 })
 
 test_that("refactor preserves the exact public API and existing S4 facade", {

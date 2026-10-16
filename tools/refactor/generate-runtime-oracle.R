@@ -36,8 +36,15 @@ source_paths <- stats::setNames(file.path(reference, names(manifest$source_files
 source_md5 <- refactor_oracle_hashes(source_paths)
 verify_source <- function() {
     refactor_oracle_verify_source(reference, manifest$source_files, source_md5)
-    if (!identical(sha256(source_paths), unlist(manifest$source_files, use.names = TRUE))) {
-        stop("Runtime reference differs from immutable pinned source SHA256 hashes.")
+    actual <- sha256(source_paths)
+    expected <- unlist(manifest$source_files, use.names = TRUE)
+    if (!identical(actual, expected)) {
+        mismatched <- names(expected)[is.na(actual) | actual != expected]
+        detail <- vapply(mismatched, function(file) {
+            paste0(file, ": expected ", expected[[file]], ", actual ", actual[[file]])
+        }, character(1))
+        stop("Runtime reference differs from immutable pinned source SHA256 hashes:\n",
+             paste(detail, collapse = "\n"))
     }
 }
 verify_source()

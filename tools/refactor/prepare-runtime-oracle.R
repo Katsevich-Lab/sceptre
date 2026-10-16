@@ -19,7 +19,8 @@ git <- function(arguments) {
 }
 git(c("fetch", "--no-tags", "origin", baseline))
 archive <- file.path(root, "original.tar")
-git(c("archive", "--format=tar", paste0("--output=", shQuote(archive)), baseline))
+git(c("-c", "core.autocrlf=false", "-c", "core.eol=lf", "archive", "--format=tar",
+      paste0("--output=", shQuote(archive)), baseline))
 utils::untar(archive, exdir = reference)
 status <- system2(file.path(R.home("bin"), "Rscript"), c(
     "--vanilla", shQuote(file.path(repo, "tools/refactor/generate-runtime-oracle.R")),

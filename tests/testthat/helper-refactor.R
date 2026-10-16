@@ -7,10 +7,101 @@ refactor_private <- function(name) getFromNamespace(name, "sceptre")
 
 # Runtime references never supply inputs or API/mapping expectations. They run
 # the immutable inputs through the original package in this numerical setting.
+refactor_oracle_file <- function(path, hash = TRUE) {
+    exists <- length(path) == 1L && nzchar(path) && file.exists(path)
+    if (!exists) return(list(path = path, exists = FALSE))
+    path <- normalizePath(path.expand(path), winslash = "/", mustWork = TRUE)
+    if (hash) return(list(path = path, exists = TRUE, md5 = unname(tools::md5sum(path))))
+    info <- file.info(path)
+    list(path = path, exists = TRUE, size = info$size,
+         mtime = as.numeric(info$mtime), ctime = as.numeric(info$ctime))
+}
+
+refactor_oracle_makevars <- function() {
+    personal <- path.expand("~/.R")
+    fallback <- if (.Platform$OS.type == "windows") {
+        file.path(personal, c("Makevars.ucrt", "Makevars.win64", "Makevars.win", "Makevars"))
+    } else file.path(personal, c(paste0("Makevars-", R.version$platform), "Makevars"))
+    candidates <- c(Sys.getenv("R_MAKEVARS_USER"), fallback)
+    candidates <- candidates[nzchar(candidates) & file.exists(path.expand(candidates))]
+    user <- if (length(candidates)) candidates[[1L]] else ""
+    site <- Sys.getenv("R_MAKEVARS_SITE", unset = NA_character_)
+    if (is.na(site)) site <- file.path(R.home("etc"), "Makevars.site")
+    list(user = refactor_oracle_file(user), site = refactor_oracle_file(site))
+}
+
+refactor_oracle_toolchain <- local({
+    cached <- NULL
+    binary_state <- function(programs) lapply(programs, function(program) {
+        found <- unname(Sys.which(program))
+        refactor_oracle_file(if (nzchar(found)) found else program, hash = FALSE)
+    })
+    function() {
+        variables <- c("CC", "CXX", "CXX11", "CXX14", "CXX17", "CXX20", "CXX23", "CXX26",
+            "CFLAGS", "CXXFLAGS", "CXX11FLAGS", "CXX14FLAGS", "CXX17FLAGS", "CXX20FLAGS", "CXX23FLAGS", "CXX26FLAGS",
+            "CPPFLAGS", "LDFLAGS", "PKG_CPPFLAGS", "PKG_CXXFLAGS", "PKG_LIBS", "SHLIB_CXXFLAGS", "SHLIB_CXXLDFLAGS",
+            "MAKE", "MAKEFLAGS", "MFLAGS", "R_MAKEVARS_USER", "R_MAKEVARS_SITE", "R_ARCH", "R_PLATFORM",
+            "PATH", "BINPREF", "RTOOLS40_HOME", "RTOOLS42_HOME", "R_CUSTOM_TOOLS_PATH", "R_CUSTOM_TOOLS_SOFT",
+            "CPATH", "CPLUS_INCLUDE_PATH", "C_INCLUDE_PATH", "COMPILER_PATH", "GCC_EXEC_PREFIX", "LIBRARY_PATH",
+            "SDKROOT", "DEVELOPER_DIR", "MACOSX_DEPLOYMENT_TARGET")
+        present <- names(Sys.getenv())
+        variables <- sort(unique(c(variables, present[grepl(
+            "^(CXX|CC$|CPP|SHLIB|DYLIB|LTO|PKG_.*FLAGS|PKG_LIBS|CFLAGS|LDFLAGS|RTOOLS[0-9]+_HOME)", present
+        )])), method = "radix")
+        configuration_files <- c(file.path(R.home("etc"), c("Makeconf", "Renviron")),
+            file.path(R.home("bin"), c("R", "config")),
+            file.path(R.home("share"), "make", c("vars.mk", "shlib.mk")))
+        key <- list(environment_flags = Sys.getenv(variables, unset = NA_character_),
+            makevars = refactor_oracle_makevars(),
+            configuration_files = lapply(configuration_files, refactor_oracle_file),
+            developer_selection = refactor_oracle_file("/var/db/xcode_select_link", hash = FALSE))
+        dynamic_makevars <- any(vapply(key$makevars, function(file) {
+            file$exists && any(grepl("[$]|^[[:space:]]*(-?include|sinclude)[[:space:]]",
+                                     readLines(file$path, warn = FALSE)))
+        }, logical(1)))
+        if (!dynamic_makevars && !is.null(cached) && identical(cached$key, key) &&
+            identical(cached$binaries, binary_state(cached$programs))) return(cached$value)
+
+        # One batched query includes effective user/site Makevars. Cache only
+        # while its live input hashes, flags, PATH and compiler binaries agree.
+        output <- system2(file.path(R.home("bin"), "R"), c("CMD", "config", "--all"),
+                          stdout = TRUE, stderr = TRUE)
+        if (!is.null(attr(output, "status"))) stop("Cannot fingerprint the active R compiler configuration.")
+        output <- output[grepl("^[A-Z0-9_]+[[:space:]]*=", output)]
+        keys <- sub("[[:space:]]*=.*$", "", output)
+        values <- sub("^[^=]+=[[:space:]]*", "", output)
+        config <- stats::setNames(values, keys)
+        config <- config[grepl("^(CC|CXX|CPP|CFLAGS|CPIC|SHLIB|DYLIB|LDFLAGS|BLAS_LIBS|LAPACK_LIBS|LTO|MAKE|AR$|NM$|RANLIB$)", names(config))]
+        commands <- config[grepl("^(CC|CXX[0-9]*|SHLIB_CXX[0-9]*LD)$", names(config))]
+        commands <- commands[nzchar(commands)]
+        command_tokens <- lapply(commands, function(command) {
+            scan(text = command, what = "", quiet = TRUE, comment.char = "")
+        })
+        tokens <- unique(unlist(command_tokens))
+        programs <- unique(c(vapply(command_tokens, `[[`, character(1), 1L),
+                             tokens[!startsWith(tokens, "-") & nzchar(Sys.which(tokens))]))
+        binaries <- binary_state(programs)
+        versions <- if (!is.null(cached) && identical(cached$programs, programs) &&
+                        identical(cached$binaries, binaries)) cached$value$compilers else {
+            stats::setNames(lapply(programs, function(program) {
+                version <- system2(program, "--version", stdout = TRUE, stderr = TRUE)
+                if (!is.null(attr(version, "status"))) stop("Cannot fingerprint compiler version: ", program)
+                paste(version, collapse = " ")
+            }), programs)
+        }
+        value <- list(config = config, compilers = versions, binaries = binaries,
+                      makevars = key$makevars, environment_flags = key$environment_flags,
+                      configuration_files = key$configuration_files)
+        cached <<- list(key = key, programs = programs, binaries = binaries, value = value)
+        value
+    }
+})
+
 refactor_oracle_environment <- function() {
     packages <- c("BH", "data.table", "dplyr", "Matrix", "Rcpp", "withr", "ondisc")
     list(
         R = R.version.string, platform = R.version$platform,
+        toolchain = refactor_oracle_toolchain(), RNGkind = RNGkind(),
         external = extSoftVersion(), lapack = La_version(),
         dependencies = stats::setNames(lapply(packages, function(package) {
             if (requireNamespace(package, quietly = TRUE)) as.character(utils::packageVersion(package)) else NULL
@@ -19,11 +110,19 @@ refactor_oracle_environment <- function() {
     )
 }
 
-refactor_frozen_environment <- function(manifest = readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))) {
+refactor_frozen_environment <- function(
+    manifest = readRDS(file.path(refactor_fixture_dir(), "manifest.rds")),
+    native = readRDS(file.path(refactor_fixture_dir(), "native-expected.rds"))$provenance$platform
+) {
     current <- refactor_oracle_environment()
+    command <- unname(current$toolchain$config[["CXX"]])
+    program <- scan(text = command, what = "", quiet = TRUE, comment.char = "")[[1L]]
+    compiler_matches <- identical(command, native$compiler) &&
+        identical(current$toolchain$compilers[[program]], native$compiler_version)
     packages <- setdiff(names(current$dependencies), "ondisc")
     identical(current$R, manifest$R) && identical(current$platform, manifest$platform) &&
-        identical(current$external, manifest$external) &&
+        identical(current$external, manifest$external) && compiler_matches &&
+        identical(current$RNGkind, manifest$RNGkind) &&
         all(vapply(packages, function(package) {
             identical(current$dependencies[[package]], manifest$dependencies[[package]]$version)
         }, logical(1)))
@@ -72,20 +171,24 @@ refactor_runtime_oracle <- local({
             return(NULL)
         }
         directory <- normalizePath(directory, winslash = "/", mustWork = TRUE)
-        if (!is.null(cached) && identical(cached$directory, directory)) return(cached)
+        current <- refactor_oracle_environment()
+        debug <- identical(Sys.getenv("SCEPTRE_REFACTOR_ORACLE_DEBUG", "true"), "true")
+        if (!is.null(cached) && identical(cached$directory, directory) &&
+            identical(cached$manifest$environment, current) &&
+            identical(cached$manifest$debug_compile, debug)) return(cached)
         manifest_path <- file.path(directory, "runtime-manifest.rds")
         if (!file.exists(manifest_path)) stop("Runtime oracle manifest is missing.")
         oracle <- readRDS(manifest_path)
         frozen <- readRDS(file.path(refactor_fixture_dir(), "manifest.rds"))
-        required <- refactor_oracle_output_files(!is.null(refactor_oracle_environment()$dependencies$ondisc))
+        required <- refactor_oracle_output_files(!is.null(current$dependencies$ondisc))
         if (!identical(oracle$schema_version, 1L) ||
             !identical(oracle$type, "sceptre-same-environment-reference") ||
             !identical(oracle$source_commit, "21f9ea098b69c444a884a49bc254de711968e3b5") ||
             !isTRUE(oracle$source_verified_before_and_after) || !isTRUE(oracle$clean_native_rebuild) ||
             !isTRUE(oracle$fresh_process) ||
-            !identical(oracle$debug_compile, identical(Sys.getenv("SCEPTRE_REFACTOR_ORACLE_DEBUG", "true"), "true")) ||
+            !identical(oracle$debug_compile, debug) ||
             !identical(oracle$source_files, frozen$source_files) ||
-            !identical(oracle$environment, refactor_oracle_environment()) ||
+            !identical(oracle$environment, current) ||
             !identical(sort(names(oracle$outputs_md5)), sort(required))) {
             stop("Runtime oracle is unpinned, incomplete, or from a different numerical environment.")
         }
