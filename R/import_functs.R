@@ -1128,14 +1128,19 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 #'   and their vector groups by `vector_id`.
 #' @return Dense numeric vector-by-cell matrix in first-seen vector order and
 #'   original cell order. Metadata repetitions contribute repeated row selections.
-#'   Materializes the full input as a dense matrix before summing.
+#'   Sparse row preparation and per-vector sums retain Matrix's numeric/logical
+#'   duplicate semantics. Vector-by-cell assembly/output and its existing transpose
+#'   workspace are dense; the full sparse input is not. Inputs remain unchanged;
+#'   there are no RNG or file effects.
 #' @noRd
 collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
-    # temporary function; we may rewrite this function to improve its
-    # speed and memory efficiency if multiguide vector data become more
-    # prevalent.
     vector_ids <- grna_target_data_frame$vector_id |> unique()
-    grna_matrix <- as.matrix(grna_matrix)
+    # Prepare row access once, including valid triplet duplicate normalization.
+    # Matrix keeps logical FALSE at zero here; the storage adapter's distinct
+    # stored-position conversion is not the aggregation count contract.
+    if (methods::is(grna_matrix, "sparseMatrix")) {
+        grna_matrix <- methods::as(grna_matrix, "RsparseMatrix")
+    }
     n_cells <- ncol(grna_matrix)
     grna_matrix_collapsed <- vapply(
         vector_ids,
