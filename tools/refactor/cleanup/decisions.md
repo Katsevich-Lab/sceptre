@@ -79,3 +79,29 @@ executable diagnostics or unrelated code to meet a line limit. Audit parsed
 expressions with narrowly normalized single-expression braces and inspect
 meaningful deltas. The combined new source pin still requires qualification;
 earlier resource measurements remain evidence for their measured pin.
+
+## D2026-10-16-04: measured Papalexi cold serial workflow RSS cost accepted
+
+Eugene explicitly selected **“Accept this bounded cost and finish (Recommended)”**
+after disclosure of the final 0a9f9d8 cold serial Papalexi sampled peak RSS:
+original **504.96875 MiB**, final **667.265625 MiB**, increase **162.296875 MiB**.
+The preceding complete 2ab3f5a batch showed about **83.5 MiB** increase. Exact
+scientific/configuration checks and meaningful timing pass. These are maxima
+across three measured fresh children per role, with a separate warm-up; the
+generic memory gate remains crossed.
+
+**Disposition: separate bounded accepted workflow memory exception.** Finish
+the refactor and retain further preparation/heap-history investigation as
+follow-up. This does not extend D2026-10-16-02's eight-million-entry conversion
+acceptance or establish an unavoidable cost, universal per-entry allowance,
+larger-input bound or waiver of other regressions.
+
+The completed final diagnostic compared production storage with an isolated
+unsafe borrowed-triplet variant, loading/byte-compiling both controls alike.
+Paired RSS differences were -15.30/+2.55/+6.14 MiB; separate Rprofmem profiles
+showed 47.39 MiB extra preparation allocation traffic and essentially unchanged
+retained state. It does **not** establish that triplet copies cause the
+original-versus-final workflow RSS difference. The unsafe variant restores
+caller mutation and is not an acceptable production remedy. Original
+measurements, controls, raw profiles and independent interpretation remain
+retained in the [final evidence](../results/final-0a9f9d8/README.md).

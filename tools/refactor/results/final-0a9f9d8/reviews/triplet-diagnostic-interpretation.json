@@ -1,0 +1,54 @@
+{
+  "reviewer": "/root/whole_package_review",
+  "driver_sha256": "92d8ff659109fb2a01deb62ac220fb05c2fb05a4206e37fc98c9e0c931576df2",
+  "comparison_sha256": "96e0e0e6c62d4565723df0091170567fb14fa048b4031584365c446fe2f092f3",
+  "actual_comparison_sha256": "391e753ca608d08d7daec98bb8ed2c1208d6d3a144bfd15d6c6f49e1bc63d325",
+  "pins": {
+    "reference": "21f9ea098b69c444a884a49bc254de711968e3b5",
+    "candidate": "0a9f9d879db6a52e3daef237daa1711b9d542976"
+  },
+  "guard_rechecks": {
+    "all_scientific_input_configuration_fields_equal_to_final_anchor": true,
+    "before_after_dependency_environment_equal": true,
+    "all_preparation_profiles_recounted_and_hash_verified": true
+  },
+  "measured_pairs": 3,
+  "warmups_excluded_per_role": 1,
+  "analysis_samples_range_measured": [
+    17,
+    18
+  ],
+  "production_minus_borrowed_RSS_bytes": [
+    -16039936,
+    2670592,
+    6438912
+  ],
+  "median_delta_bytes": 2670592,
+  "role_max_RSS_bytes": {
+    "production": 598228992,
+    "borrowed_T_diagnostic": 611106816
+  },
+  "allocation_traffic_delta_bytes": 49690416,
+  "storage_traffic_delta_bytes": 49706792,
+  "extra_large_vector_allocations": {
+    "11121056": 2,
+    "5560552": 4,
+    "1301496": 2,
+    "650776": 4
+  },
+  "sum_extra_large_vector_allocations_bytes": 49690416,
+  "profile_hashes": {
+    "production": "ced313be10425aeaf6ace26f3a69cf3507dd0ba53a448fefe786bdaa05eb0f55",
+    "borrowed_T_diagnostic": "1f8cfa1651440263982f85651ab1eb0f3efa1bbc5ecef18cb54d663e4192bb09"
+  },
+  "all_56_slot_sizes_identical": true,
+  "retained_slot_size_sum_bytes_each": 22534280,
+  "actual_acceptance_main_RSS": {
+    "metric": "sampled_main_peak_rss_bytes",
+    "reference_bytes": 529498112,
+    "candidate_bytes": 699678720,
+    "permitted_increase_bytes": 67108864,
+    "gate": "review required"
+  },
+  "interpretation": "Extra preparation allocation traffic established for unsafe borrowed-path intervention; cause of actual final +162.296875MiB analysis RSS crossing not established. No new runtime jobs by reviewer."
+}

@@ -1,5 +1,10 @@
 # Internal refactor verification
 
+Final source 0a9f9d8 is qualified. See [final acceptance](FINAL_ACCEPTANCE.md)
+for the explicit source/coverage map and two bounded accepted memory costs,
+and [retained evidence](results/final-0a9f9d8/README.md) for restoration.
+Earlier checkpoint results below remain historical.
+
 This directory contains developer-only characterization and qualification tooling. It is excluded from
 the package tarball. `REFACTOR_SPEC.md` defines the accepted scope; live stage
 results and remaining gates are summarized in `STATUS.md` here.
@@ -111,7 +116,7 @@ reference/candidate comparisons or their warnings suppressed by SCEPTRE.
 ```sh
 R CMD INSTALL --preclean --library=/path/to/fresh-candidate-library .
 R_LIBS=/path/to/fresh-candidate-library SCEPTRE_REQUIRE_ONDISC=true \
-  Rscript --vanilla -e 'library(sceptre); testthat::test_dir("tests/testthat", stop_on_failure=TRUE)'
+  Rscript --vanilla -e 'library(sceptre); testthat::test_dir("tests/testthat", package="sceptre", load_package="installed", stop_on_failure=TRUE)'
 ```
 
 `SCEPTRE_REQUIRE_ONDISC=true` makes a missing backed dependency a failure. The

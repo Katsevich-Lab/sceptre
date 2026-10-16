@@ -1,5 +1,11 @@
 # Refactor resource verification
 
+The final [acceptance report](FINAL_ACCEPTANCE.md#resources-and-explicit-dispositions)
+and [raw evidence](results/final-0a9f9d8/README.md) supersede earlier checkpoint
+acceptance claims below. Final coverage is the complete 160-process matrix at
+2ab3f5a plus 48 targeted actual 0a9f9d8 processes and reviewed Air source carry.
+Two bounded memory exceptions remain explicit; thresholds were not relaxed.
+
 The original `benchmark.py` retains the RF0 small-screen serial diagnostic.
 `resource-data.R`, `resource-benchmark.py` and `resource-worker.R` add explicit
 review workloads without changing production methods or fixture expectations.

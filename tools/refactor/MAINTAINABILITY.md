@@ -1,11 +1,74 @@
 # Maintainability scorecard
 
-Freeze this baseline before RF1. Compatibility remains a hard gate. This
+The baseline below was frozen before RF1. Compatibility remains a hard gate. This
 scorecard supplies several independent engineering observations; it does not
 combine them into one score or demand a decrease in every number at every stage.
 Production R and handwritten C++ are measured separately, excluding generated
 Rcpp wrappers, tests and the frozen test oracle. Analyzer versions and rules are
 pinned in the result files.
+
+## Final frozen-source qualification
+
+The independent qualification of `0a9f9d879db6a52e3daef237daa1711b9d542976`
+uses the actual post-Air R/source bytes, the four fixed source traces and every
+matching site. All archived R/src Git blobs were verified against this pin
+before measurement and the handwritten source hashes rechecked afterward.
+Cyclocomp 1.1.2 and Lizard 1.24.1 retain the established versions and rules.
+Frozen baseline detailed measurements are reused unchanged from their prior
+byte-for-byte reproduction; all 35 baseline handwritten source hashes were
+verified again. The [review and raw evidence](results/final-0a9f9d8/maintainability/REVIEW.md)
+retain source hashes, exact commands, analyzer versions and limitations.
+
+| Within-language measure | Original 21f9ea0 | Final 0a9f9d8 |
+| --- | ---: | ---: |
+| R exclusive function units | 184 | 221 |
+| R named top-level owners | 122 | 160 |
+| R exclusive complexity maximum / p90 / p95 | 49 / 9.70 / 13.85 | 44 / 9.00 / 15.00 |
+| R inclusive named-owner complexity p95 | 22.75 | 19.25 |
+| R AST control-depth maximum | 7 | 7 |
+| C++ functions including header methods | 43 | 64 |
+| C++ complexity maximum / p90 / p95 | 17 / 8.80 / 13.60 | 19 / 10.70 / 15.85 |
+| Raw Lizard `nd` maximum | 5 | 11 |
+
+The complexity distributions are unchanged from 32b2076. Results against the
+original are mixed: driver ownership/locality improves, while explicit native
+validation and lifetime safety add maintenance surface. R driver exclusive/
+inclusive scores change from 7/15 to 3/7 for permutations and 9/23 to 4/11 for
+CRT. The higher R p95 and native scores remain visible. Lizard `nd` is a
+formatting/condition-sensitive heuristic; retained analyzer probes show why its
+maximum cannot be read as a literal count of nested blocks. No
+cognitive-complexity or human comprehension-time claim follows.
+
+LOC supplies context only. R physical lines / noncomment token-bearing lines
+are 8662/6086 originally, 9383/5732 at 32b2076 and 10193/6276 finally. The latter
+increase reflects Air layout and comment wrapping without a complexity change.
+These are counts of lines containing tokens, not token counts. Native physical
+lines / Lizard `nloc` are 1211/849 originally and 1925/1260 finally (1923/1259
+at 32b2076); the final small increase is the reviewed D-pointer cache/comment.
+Neither LOC nor compatibility establishes broad source quality.
+
+The unchanged narrow scanners find six private ondisc calls in one file versus
+four files, 35 raw-representation matching lines in two files versus 51 in nine,
+and one remapping spelling candidate versus 17. Every match is classified:
+33 final raw-slot lines belong to the adapter and two construct a fresh owned
+assignment matrix in the getter; the remaining remapping is a legitimate plot
+subset. At 32b2076 the same raw-slot pattern matched 26 lines (24 adapter plus
+two getter lines). Its occurrence count remains 40 at both checkpoints: Air
+split matching lines without adding representation operations. These are
+matching-line diagnostics, not counts of violations or all semantic conversions.
+Cache reset/commit each have one implementation owner; three event callers and
+three successful commit callers remain.
+
+All seven fixed operations have facade-independent implementations; six have
+direct ordinary-input private production R entrypoints. Staged inference is a
+private C++ component taking Rcpp arrays and a const C++ draw bank. Its production
+Rcpp entry still accepts an external pointer. Preparing a bank from ordinary R
+draw lists in the test-only bridge does not create an ordinary-R production
+entrypoint. The actual component qualification exercised 112 expectations in
+three tests across all 17 frozen domains at the fresh -O2 worker source later
+integrated as 2ab3f5a. Relevant source/header/bridge/runner bytes are verified
+identical to 0a9f9d8; no new component runtime ran during the metric refresh.
+This is scoped interface/component evidence, not exhaustive state coverage.
 
 ## Change locality and rule ownership
 
@@ -144,11 +207,14 @@ previously imposed additional burdens are now `evaluate_pair_eligibility()`
 (plain aligned measurements/options), native `evaluate_staged_tail()` (explicit
 arrays and a const ordinary draw bank) and `finalize_association_result()`
 (tables and settings). The legacy Rcpp entrypoint still accepts its pointer for
-compatibility; the new private component test does not require one. Thus seven
-of seven now have facade-independent explicit-input component boundaries,
-compared with five of seven facade-independent and four of seven ordinary-input
-entries at baseline. This is still an interface inventory, not complete coverage
-of all numerical states.
+compatibility; the test bridge constructs a C++ bank from ordinary R draw lists.
+Seven of seven now have facade-independent component implementations, compared
+with five of seven at baseline. Six of seven are directly callable ordinary-input
+production R entries, compared with four of seven at baseline. Staged inference
+is a real private C++ boundary taking Rcpp arrays and a const C++ draw bank; its
+production Rcpp entry still requires an external pointer. Bridge preparation is
+not a new pointer-free production R API. This remains an interface/test inventory,
+not complete coverage of all numerical states.
 
 The before/after dependency map is described in `ARCHITECTURE.md`. Public S4
 wrappers now prepare one transient context, dispatch to separate permutation and

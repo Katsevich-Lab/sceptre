@@ -1,5 +1,11 @@
 # Source cleanup addendum: inventory and review checkpoint
 
+Current outcome: bounded implementation and final qualification are complete
+at production checkpoint 0a9f9d8, with two explicit bounded memory acceptances.
+See [FINAL_ACCEPTANCE.md](FINAL_ACCEPTANCE.md) and [STATUS.md](STATUS.md).
+The source-specific plan and original approval record below remain historical;
+its references to pending work describe the reviewed planning checkpoint.
+
 Status: **independently approved for bounded implementation**. The complete
 reviewed target is preserved at commit 08e02601b356c3cf6f64bffd074072f6d2eb59de;
 this status/review record update changes no target decisions. Source inspected: c7d62502757f2a17741e2ef18b9e4d006bf063dc,

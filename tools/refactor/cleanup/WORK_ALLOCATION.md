@@ -1,5 +1,10 @@
 # Cleanup worker ownership and integration
 
+Current outcome: implementation lanes have finished. Production source is
+frozen at 0a9f9d8; only evidence/developer documentation follow. See
+[final acceptance](../FINAL_ACCEPTANCE.md). The allocation/handoffs below are the
+historical execution record, not current outstanding assignments.
+
 Recorded after independent plan approval, October 16, 2026. This is an execution
 allocation under the approved CL units, not a new approval gate. The root
 coordinator owns integration, decisions, acceptance, final evidence and PR 234.

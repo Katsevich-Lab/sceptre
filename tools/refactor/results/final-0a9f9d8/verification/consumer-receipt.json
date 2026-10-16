@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+  "reference_pin": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "original_reexecuted": false,
+  "archive": "/private/tmp/sceptre-final-consumers-0a9f9d8-additive.tar.xz",
+  "archive_bytes": 1065520,
+  "archive_sha256": "bc1d0db1928f44021d9c583b9a4ecf59e6a414280b44bd921e492fe032fafe97",
+  "manifest": "/private/tmp/sceptre-final-consumers-0a9f9d8-additive-content/manifest.json",
+  "manifest_sha256": "087a70f69735ead5567e616ac60a5132a30ce249bf9d96a93df821d184dc088a",
+  "restore_tool_sha256": "7f42be5ec427cb0019e1e3ddbab11246f43c64d9ec95b8bce34192d2a1cb6ef0",
+  "base_manifest_sha256": "ca71cc66ad9d4635378be43693b823d071771cf13601132d183dfea39bd37603",
+  "base_was_extracted_from_verified_dict256_archive": true,
+  "verification": [
+    {
+      "mode": "restore",
+      "exit_status": 0,
+      "result": {
+        "verified": true,
+        "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+        "reference_pin": "21f9ea098b69c444a884a49bc254de711968e3b5",
+        "original_reexecuted": false,
+        "files_verified": 1149,
+        "base_manifest_sha256": "ca71cc66ad9d4635378be43693b823d071771cf13601132d183dfea39bd37603",
+        "required_base_blobs_verified": 295,
+        "new_blobs_verified": 161,
+        "original_result_objects_verified": 7,
+        "file_bytes_modes_mtimes_preserved": true,
+        "independent_files_without_hardlinks": true
+      }
+    },
+    {
+      "mode": "verify-only",
+      "exit_status": 0,
+      "result": {
+        "verified": true,
+        "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+        "reference_pin": "21f9ea098b69c444a884a49bc254de711968e3b5",
+        "original_reexecuted": false,
+        "files_verified": 1149,
+        "base_manifest_sha256": "ca71cc66ad9d4635378be43693b823d071771cf13601132d183dfea39bd37603",
+        "required_base_blobs_verified": 295,
+        "new_blobs_verified": 161,
+        "original_result_objects_verified": 7,
+        "file_bytes_modes_mtimes_preserved": true,
+        "independent_files_without_hardlinks": true
+      }
+    }
+  ],
+  "wrong_base_rejected": true,
+  "wrong_base_exit": 1,
+  "completed_at_utc": "2026-10-16T19:24:32.794145+00:00"
+}

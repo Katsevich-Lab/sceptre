@@ -1,0 +1,789 @@
+{
+  "schema_version": 1,
+  "reference_source_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_source_commit": "2ab3f5a2cf3d9f19242cbe8c419ada913aa721a8",
+  "dependency_provenance": {
+    "exact": true,
+    "packages": [
+      "BH",
+      "MASS",
+      "Matrix",
+      "Rcpp",
+      "data.table",
+      "digest",
+      "dplyr",
+      "jsonlite",
+      "ondisc",
+      "parallelly",
+      "sceptredata",
+      "stats",
+      "withr"
+    ],
+    "reference": "/private/tmp/sceptre-final-2ab3f5a/resources/reference-environment.json",
+    "candidate": "/private/tmp/sceptre-final-2ab3f5a/resources/candidate-environment.json"
+  },
+  "build_configuration_exact": true,
+  "comparison": [
+    {
+      "case": "compact_perm",
+      "cache": "cold",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.134,
+      "candidate_median_seconds": 0.132,
+      "elapsed_ratio": 0.9850746268656716,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 320012288,
+          "candidate_bytes": 314884096,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 320012288,
+          "candidate_bytes": 314884096,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "compact_perm",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.15,
+      "candidate_median_seconds": 0.137,
+      "elapsed_ratio": 0.9133333333333334,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 315572224,
+          "candidate_bytes": 295862272,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "missing samples"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 315572224,
+          "candidate_bytes": 295862272,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "incomplete fork sampling"
+    },
+    {
+      "case": "compact_perm",
+      "cache": "warm",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.11,
+      "candidate_median_seconds": 0.111,
+      "elapsed_ratio": 1.009090909090909,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 318701568,
+          "candidate_bytes": 321191936,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 318701568,
+          "candidate_bytes": 321191936,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "compact_perm",
+      "cache": "warm",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.109,
+      "candidate_median_seconds": 0.11,
+      "elapsed_ratio": 1.0091743119266054,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 313278464,
+          "candidate_bytes": 313147392,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "missing samples"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 313278464,
+          "candidate_bytes": 313147392,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "incomplete fork sampling"
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 2.798,
+      "candidate_median_seconds": 2.538,
+      "elapsed_ratio": 0.9070764832022873,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 602669056,
+          "candidate_bytes": 690208768,
+          "permitted_increase_bytes": 67108864,
+          "gate": "review required"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 32768,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 602669056,
+          "candidate_bytes": 690241536,
+          "permitted_increase_bytes": 67108864,
+          "gate": "review required"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.613,
+      "candidate_median_seconds": 1.548,
+      "elapsed_ratio": 0.9597024178549287,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 484573184,
+          "candidate_bytes": 523567104,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 361218048,
+          "candidate_bytes": 314720256,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 1175601152,
+          "candidate_bytes": 1150271488,
+          "permitted_increase_bytes": 117560115.2,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "warm",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.209,
+      "candidate_median_seconds": 1.138,
+      "elapsed_ratio": 0.9412737799834573,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 565231616,
+          "candidate_bytes": 546422784,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 565231616,
+          "candidate_bytes": 546422784,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "papalexi_perm",
+      "cache": "warm",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.811,
+      "candidate_median_seconds": 0.769,
+      "elapsed_ratio": 0.9482120838471023,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 455163904,
+          "candidate_bytes": 462979072,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 196788224,
+          "candidate_bytes": 192102400,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 811876352,
+          "candidate_bytes": 845742080,
+          "permitted_increase_bytes": 81187635.2,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "sparse_difficult_perm",
+      "cache": "cold",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 2.418,
+      "candidate_median_seconds": 2.739,
+      "elapsed_ratio": 1.1327543424317617,
+      "elapsed_gate": "review required",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 393822208,
+          "candidate_bytes": 409862144,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 393822208,
+          "candidate_bytes": 409862144,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "sparse_difficult_perm",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.362,
+      "candidate_median_seconds": 1.347,
+      "elapsed_ratio": 0.9889867841409691,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 307249152,
+          "candidate_bytes": 308051968,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 262668288,
+          "candidate_bytes": 288751616,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 826982400,
+          "candidate_bytes": 879919104,
+          "permitted_increase_bytes": 82698240.0,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "sparse_difficult_perm",
+      "cache": "warm",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.43,
+      "candidate_median_seconds": 0.409,
+      "elapsed_ratio": 0.9511627906976744,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 367951872,
+          "candidate_bytes": 414105600,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 367951872,
+          "candidate_bytes": 414105600,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "sparse_difficult_perm",
+      "cache": "warm",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.308,
+      "candidate_median_seconds": 0.283,
+      "elapsed_ratio": 0.9188311688311688,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 308051968,
+          "candidate_bytes": 314884096,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 146898944,
+          "candidate_bytes": 160841728,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 600768512,
+          "candidate_bytes": 621969408,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "shared_crt",
+      "cache": "cold",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 2.352,
+      "candidate_median_seconds": 2.255,
+      "elapsed_ratio": 0.9587585034013606,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 418775040,
+          "candidate_bytes": 373407744,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 418775040,
+          "candidate_bytes": 373407744,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "shared_crt",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.361,
+      "candidate_median_seconds": 1.629,
+      "elapsed_ratio": 1.1969140337986774,
+      "elapsed_gate": "review required",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 277430272,
+          "candidate_bytes": 289243136,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 261406720,
+          "candidate_bytes": 316424192,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 783646720,
+          "candidate_bytes": 908066816,
+          "permitted_increase_bytes": 78364672.0,
+          "gate": "review required"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "shared_crt",
+      "cache": "warm",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.196,
+      "candidate_median_seconds": 1.113,
+      "elapsed_ratio": 0.9306020066889632,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 429490176,
+          "candidate_bytes": 439517184,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 429490176,
+          "candidate_bytes": 439517184,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "shared_crt",
+      "cache": "warm",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.692,
+      "candidate_median_seconds": 0.66,
+      "elapsed_ratio": 0.9537572254335261,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 271712256,
+          "candidate_bytes": 286785536,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 212467712,
+          "candidate_bytes": 197230592,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 694484992,
+          "candidate_bytes": 673169408,
+          "permitted_increase_bytes": 69448499.2,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "backed_perm_512mib",
+      "cache": "cold",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 3.457,
+      "candidate_median_seconds": 3.343,
+      "elapsed_ratio": 0.9670234307202777,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 539623424,
+          "candidate_bytes": 534675456,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 539623424,
+          "candidate_bytes": 534675456,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "backed_perm_512mib",
+      "cache": "cold",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 1.894,
+      "candidate_median_seconds": 1.883,
+      "elapsed_ratio": 0.9941921858500529,
+      "elapsed_gate": "pass",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 385318912,
+          "candidate_bytes": 404422656,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 376881152,
+          "candidate_bytes": 393641984,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 1110654976,
+          "candidate_bytes": 1190690816,
+          "permitted_increase_bytes": 111065497.60000001,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    },
+    {
+      "case": "backed_perm_512mib",
+      "cache": "warm",
+      "workers": 1,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.477,
+      "candidate_median_seconds": 0.432,
+      "elapsed_ratio": 0.9056603773584906,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 414973952,
+          "candidate_bytes": 512278528,
+          "permitted_increase_bytes": 67108864,
+          "gate": "review required"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 0,
+          "candidate_bytes": 0,
+          "permitted_increase_bytes": 67108864,
+          "gate": "not applicable: serial"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 414973952,
+          "candidate_bytes": 512278528,
+          "permitted_increase_bytes": 67108864,
+          "gate": "review required"
+        }
+      ],
+      "fork_observation": "serial"
+    },
+    {
+      "case": "backed_perm_512mib",
+      "cache": "warm",
+      "workers": 2,
+      "warning_lists_exact": true,
+      "within_run_configuration_consistency": true,
+      "environment_exact": true,
+      "scientific_hash_exact": true,
+      "within_run_scientific_determinism": true,
+      "reference_median_seconds": 0.33,
+      "candidate_median_seconds": 0.304,
+      "elapsed_ratio": 0.9212121212121211,
+      "elapsed_gate": "diagnostic only: reference median under1second",
+      "memory": [
+        {
+          "metric": "sampled_main_peak_rss_bytes",
+          "reference_bytes": 383877120,
+          "candidate_bytes": 400408576,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_worker_peak_rss_bytes",
+          "reference_bytes": 172425216,
+          "candidate_bytes": 185384960,
+          "permitted_increase_bytes": 67108864,
+          "gate": "pass"
+        },
+        {
+          "metric": "sampled_aggregate_tree_peak_rss_bytes",
+          "reference_bytes": 716439552,
+          "candidate_bytes": 767950848,
+          "permitted_increase_bytes": 71643955.2,
+          "gate": "pass"
+        }
+      ],
+      "fork_observation": "observed2workers"
+    }
+  ],
+  "interpretation": "Initial review thresholds, not proof of speedup. Sampled peaks are lower bounds; aggregate RSS counts shared pages repeatedly. Exact output hash differences require numerical/identity investigation, never automatic snapshot replacement."
+}

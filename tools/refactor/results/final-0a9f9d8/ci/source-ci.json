@@ -1,0 +1,300 @@
+{
+  "source_commit": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+  "run_id": 38954047191,
+  "run_attempt": 1,
+  "run_url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191",
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "expected_jobs": 6,
+  "collected_utc": "2026-10-16T19:36:30.212558+00:00",
+  "run_command": [
+    "gh",
+    "api",
+    "repos/Katsevich-Lab/sceptre/actions/runs/38954047191"
+  ],
+  "jobs_command": [
+    "gh",
+    "api",
+    "repos/Katsevich-Lab/sceptre/actions/runs/38954047191/jobs?per_page=100"
+  ],
+  "after_command": [
+    "gh",
+    "api",
+    "repos/Katsevich-Lab/sceptre/actions/runs/38954047191"
+  ],
+  "jobs": [
+    {
+      "name": "in-memory-without-ondisc",
+      "id": 117152312703,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152312703",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152312703"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152312703/logs"
+      ],
+      "log_bytes": 624192,
+      "log_sha256": "4dc915f0bb9cb02df3d22d66a8ec81e7678c75eefb42aacd9aa3c517ab426009"
+    },
+    {
+      "name": "R-format",
+      "id": 117152313030,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152313030",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313030"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313030/logs"
+      ],
+      "log_bytes": 11736,
+      "log_sha256": "22b6997168c8353aa2467690b397c8e0e84afebe09607ad4bf67a6f320e24114"
+    },
+    {
+      "name": "ubuntu-latest (release)",
+      "id": 117152313093,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152313093",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313093"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313093/logs"
+      ],
+      "log_bytes": 854574,
+      "log_sha256": "49752d6d87b6a9da5ea19ffa789d91beffbb887553ce23d38c284fe63134ad58"
+    },
+    {
+      "name": "ubuntu-latest (oldrel-1)",
+      "id": 117152313164,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152313164",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313164"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313164/logs"
+      ],
+      "log_bytes": 843839,
+      "log_sha256": "37e9dab702ec47f82ff7aa652f4192159981838e820a665cae54208ebbd27762"
+    },
+    {
+      "name": "windows-latest (release)",
+      "id": 117152313215,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152313215",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313215"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313215/logs"
+      ],
+      "log_bytes": 737330,
+      "log_sha256": "e16a2b290fb7f5452398682c59a3752ba7bd1633944c04bcae1ed29f1b40cb18"
+    },
+    {
+      "name": "macOS-latest (release)",
+      "id": 117152313306,
+      "url": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38954047191/job/117152313306",
+      "status": "completed",
+      "conclusion": "success",
+      "metadata_command": [
+        "gh",
+        "api",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313306"
+      ],
+      "log_command": [
+        "gh",
+        "api",
+        "--allow-escape-sequences",
+        "repos/Katsevich-Lab/sceptre/actions/jobs/117152313306/logs"
+      ],
+      "log_bytes": 811300,
+      "log_sha256": "83e4356b1c288f6ef3f4b8541fc80d8944f8e5bee12efaface6487341e98b8c4"
+    }
+  ],
+  "files": [
+    {
+      "path": "117152312703.json",
+      "bytes": 3618,
+      "sha256": "38d35610717afb9dc96f38232a5b2c1b688d0207ea30ac1b626a03760b977e6d"
+    },
+    {
+      "path": "117152312703.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152312703.log",
+      "bytes": 624192,
+      "sha256": "4dc915f0bb9cb02df3d22d66a8ec81e7678c75eefb42aacd9aa3c517ab426009"
+    },
+    {
+      "path": "117152312703.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313030.json",
+      "bytes": 1877,
+      "sha256": "a6809a5bd90e6c58d9af5a6e15f49d82b2488462b87219915500ea2dca964952"
+    },
+    {
+      "path": "117152313030.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313030.log",
+      "bytes": 11736,
+      "sha256": "22b6997168c8353aa2467690b397c8e0e84afebe09607ad4bf67a6f320e24114"
+    },
+    {
+      "path": "117152313030.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313093.json",
+      "bytes": 4328,
+      "sha256": "55a27b727eaf7c8652081956d0b41c142ddb76908ea69ec6c9d3b0de7ce7cc97"
+    },
+    {
+      "path": "117152313093.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313093.log",
+      "bytes": 854574,
+      "sha256": "49752d6d87b6a9da5ea19ffa789d91beffbb887553ce23d38c284fe63134ad58"
+    },
+    {
+      "path": "117152313093.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313164.json",
+      "bytes": 4329,
+      "sha256": "2e208fefff7027c8f16ebfc03236d596304ef735e4394bcd2c1981861d4e7385"
+    },
+    {
+      "path": "117152313164.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313164.log",
+      "bytes": 843839,
+      "sha256": "37e9dab702ec47f82ff7aa652f4192159981838e820a665cae54208ebbd27762"
+    },
+    {
+      "path": "117152313164.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313215.json",
+      "bytes": 4330,
+      "sha256": "5300ae3cd752eeac3cc0be72c7f0dd907c6ff49ea46c9e0aadf07ad52e574675"
+    },
+    {
+      "path": "117152313215.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313215.log",
+      "bytes": 737330,
+      "sha256": "e16a2b290fb7f5452398682c59a3752ba7bd1633944c04bcae1ed29f1b40cb18"
+    },
+    {
+      "path": "117152313215.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313306.json",
+      "bytes": 4326,
+      "sha256": "79c294f9061ec5ac26a1b19a9015da7a5a624e167c57785a20d0307cad2f8fbd"
+    },
+    {
+      "path": "117152313306.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "117152313306.log",
+      "bytes": 811300,
+      "sha256": "83e4356b1c288f6ef3f4b8541fc80d8944f8e5bee12efaface6487341e98b8c4"
+    },
+    {
+      "path": "117152313306.log.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "jobs.json",
+      "bytes": 22840,
+      "sha256": "1a8526cb9eea007a421403a7222ffdd03766a692a50f94f6ddb264f2183b325d"
+    },
+    {
+      "path": "jobs.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run-after.json",
+      "bytes": 13069,
+      "sha256": "c413c584a5f6d1d651f3f64b8355772bc5cc561ef4573ab1bc9984f2d9412884"
+    },
+    {
+      "path": "run-after.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "run.json",
+      "bytes": 13069,
+      "sha256": "c413c584a5f6d1d651f3f64b8355772bc5cc561ef4573ab1bc9984f2d9412884"
+    },
+    {
+      "path": "run.json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "scope": "Raw completed GitHub metadata and job logs; no local tests or builds."
+}

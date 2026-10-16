@@ -1,5 +1,10 @@
 # Cleanup behavior dispositions
 
+Current outcome: the adopted bounded corrections are implemented and qualified
+at production checkpoint 0a9f9d8. See [final acceptance](../FINAL_ACCEPTANCE.md)
+and [explicit user decisions](decisions.md); named deferred policies remain
+future work. The original source-specific planning ledger follows unchanged.
+
 Status: **planning decisions; implementation and qualification pending**.
 These decisions amend the open dispositions in [CLEANUP_PLAN.md](../CLEANUP_PLAN.md).
 They do not modify the original [L01–L20 findings](legacy-findings.json), their

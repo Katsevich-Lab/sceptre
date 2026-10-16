@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+  "reference_pin": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "archive": "/private/tmp/sceptre-final-qualification-0a9f9d8-additive.tar.xz",
+  "archive_bytes": 7239068,
+  "archive_sha256": "8f96b58244fd2b1268264165021a04433f69c7c0665c251f1391f048145c36df",
+  "manifest": "/private/tmp/sceptre-final-qualification-0a9f9d8-content/manifest.json",
+  "manifest_sha256": "fbbce506e2cfd6288af11d164dcc34e351bf911331ebcb8543972b32388c3b4e",
+  "control_manifest_sha256": "dac81e378d242d878f3395ded9a0a4bf2216b8f60cfd911cf8c9b4a2b42b86c2",
+  "restore_tool_sha256": "9375cf9260a1b288c630530d60d39399a10cea722be9017d04454ab2d67ecc8a",
+  "exclusions_sha256": "e66a51ddd3b8081722db9bac8ba412c15bda1e27a3e4eb1b9ed57f6bfa932ac6",
+  "payload_file_count": 2139,
+  "new_blob_count": 461,
+  "new_blob_bytes": 26474547,
+  "store_path_counts": {
+    "historical": 1212,
+    "final": 500,
+    "consumer": 427
+  },
+  "dependencies": {
+    "consumer": {
+      "control_manifest_sha256": "fefee3035f08a08af5e9ff43a9588d37c74f8ea6f319b7a74c3d576be4fa8522",
+      "manifest_sha256": "087a70f69735ead5567e616ac60a5132a30ce249bf9d96a93df821d184dc088a"
+    },
+    "historical": {
+      "control_manifest_sha256": "b0ef938e06e817e6040ed7901bc9b3ad579a2e73899499482fecbc477c806e34",
+      "manifest_sha256": "ca71cc66ad9d4635378be43693b823d071771cf13601132d183dfea39bd37603"
+    }
+  },
+  "dependencies_from_actual_verified_archives": true,
+  "verification": [
+    {
+      "mode": "restore",
+      "exit_status": 0,
+      "result": {
+        "verified": true,
+        "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+        "files_verified": 2139,
+        "required_blob_counts": {
+          "historical": 477,
+          "consumer": 161,
+          "final": 461
+        },
+        "consumer_paths_unchanged": 1149,
+        "nested_payloads_verified": {
+          "bioc0a": 67,
+          "maintainability": 137,
+          "final0a/ci-final": 30
+        },
+        "file_bytes_modes_mtimes_preserved": true,
+        "independent_files_without_hardlinks": true,
+        "ci_status": "Final six-job CI success, network failure, original false-clear quiet receipt plus explicit erratum, final quiet-end, maintguide update, and resource decision D2026-10-16-04 retained."
+      }
+    },
+    {
+      "mode": "verify-only",
+      "exit_status": 0,
+      "result": {
+        "verified": true,
+        "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+        "files_verified": 2139,
+        "required_blob_counts": {
+          "historical": 477,
+          "consumer": 161,
+          "final": 461
+        },
+        "consumer_paths_unchanged": 1149,
+        "nested_payloads_verified": {
+          "bioc0a": 67,
+          "maintainability": 137,
+          "final0a/ci-final": 30
+        },
+        "file_bytes_modes_mtimes_preserved": true,
+        "independent_files_without_hardlinks": true,
+        "ci_status": "Final six-job CI success, network failure, original false-clear quiet receipt plus explicit erratum, final quiet-end, maintguide update, and resource decision D2026-10-16-04 retained."
+      }
+    }
+  ],
+  "wrong_dependency_controls": [
+    {
+      "dependency": "historical",
+      "exit_status": 1,
+      "rejected_before_destination_created": true
+    },
+    {
+      "dependency": "consumer",
+      "exit_status": 1,
+      "rejected_before_destination_created": true
+    }
+  ],
+  "no_new_R_build_benchmark_consumer_or_source_edits": true,
+  "top_level_controls": [
+    "manifest.json",
+    "exclusions.json",
+    "README.md",
+    "restore.py",
+    "assemble.py",
+    "supplement.py",
+    "supplement-history.json",
+    "control-manifest.json"
+  ],
+  "completed_at_utc": "2026-10-16T19:38:58.776025+00:00"
+}

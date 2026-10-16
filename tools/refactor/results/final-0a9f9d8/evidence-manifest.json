@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "production_pin": "0a9f9d879db6a52e3daef237daa1711b9d542976",
+  "scope": "Every ordinary file in this directory except this manifest; component archive/restore manifests preserve raw payload metadata.",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 7061,
+      "sha256": "e0b75cec6b811baafa120293372fed1f6a7e1885b78eac5ad3705757240a19e5"
+    },
+    {
+      "path": "acceptance.json",
+      "bytes": 12452,
+      "sha256": "d26ff3a42804d14579f9c93cefab8b6d094bb5f04a4497fefe8d3b5977c11a62"
+    },
+    {
+      "path": "bioccheck/qualification-report.md",
+      "bytes": 3781,
+      "sha256": "1f5cb26e749ded40891b9e3ab9dfec5873fc4688fba3e48ef9ebd5c6d5c11c63"
+    },
+    {
+      "path": "ci/source-ci.json",
+      "bytes": 9242,
+      "sha256": "0c9842ca64ad0feaccd4dd5894decceb48392453d6c4c2b2f5c21da376655c12"
+    },
+    {
+      "path": "consumer-additive.tar.xz",
+      "bytes": 1065520,
+      "sha256": "bc1d0db1928f44021d9c583b9a4ecf59e6a414280b44bd921e492fe032fafe97"
+    },
+    {
+      "path": "consumers/acceptance-summary.json",
+      "bytes": 4348,
+      "sha256": "e9fa9c006c313842b5bccd523d2b705e22dffe94f5f37b4c554339ba16b3a87e"
+    },
+    {
+      "path": "final-additive.tar.xz",
+      "bytes": 7239068,
+      "sha256": "8f96b58244fd2b1268264165021a04433f69c7c0665c251f1391f048145c36df"
+    },
+    {
+      "path": "historical-evidence.tar.xz",
+      "bytes": 53283280,
+      "sha256": "7f4a2eaaacf43113e472bfb9dc8926e379f0a8eab60f36b70360781cff5e055e"
+    },
+    {
+      "path": "installed-summary.json",
+      "bytes": 1908,
+      "sha256": "5e055c41b0e4118f5c507df1a45fe232d46e866c35687978b82bfbba3f35472d"
+    },
+    {
+      "path": "maintainability/REVIEW.md",
+      "bytes": 11304,
+      "sha256": "3d961996a389c32ab71c2b7912d22edc41110dc39bbcef4cf4fba743a37ad402"
+    },
+    {
+      "path": "production-freeze.json",
+      "bytes": 46594,
+      "sha256": "7711cced8cf261f647aedeb18f622a88a856a9ae79c191de4708cbf746b07ded"
+    },
+    {
+      "path": "resources/full-2ab-comparison.json",
+      "bytes": 25566,
+      "sha256": "74de3f4d132e35411623b05bcdc3b08fc74c16c14024db6b5e932499e756dcf6"
+    },
+    {
+      "path": "resources/targeted-comparison.json",
+      "bytes": 8272,
+      "sha256": "391e753ca608d08d7daec98bb8ed2c1208d6d3a144bfd15d6c6f49e1bc63d325"
+    },
+    {
+      "path": "reviews/air-independent.md",
+      "bytes": 9640,
+      "sha256": "739cb05cc672115371c45b82a2fa8c9b83f9843f5414d7291257945876394468"
+    },
+    {
+      "path": "reviews/air-resource-source-proof.json",
+      "bytes": 237660,
+      "sha256": "d4e3898c2c516b1170c3c6a27f0db1f233b03ce02b24b4fc7d754f09d4f57175"
+    },
+    {
+      "path": "reviews/final-report-accuracy.json",
+      "bytes": 4195,
+      "sha256": "4ebd2c142605d59d9a940768dfd9a8544288861fc451801af1bf0288a41be26c"
+    },
+    {
+      "path": "reviews/final-report-accuracy.md",
+      "bytes": 4331,
+      "sha256": "709e29c7566cd4fd8461528bf16ad56935c2b076657c75a54ff15b4dd7b2cff9"
+    },
+    {
+      "path": "reviews/score-loop-cost-review.md",
+      "bytes": 8838,
+      "sha256": "2cf1798bf6f245eb1e8d8bdc297d5bf63fa0bb6bd2f501b83594b7d150dc8113"
+    },
+    {
+      "path": "reviews/triplet-diagnostic-interpretation.json",
+      "bytes": 2021,
+      "sha256": "022d5e8ece84e1cb07d5b891772a443c1dc33efb7246a18c48fbe36edd562254"
+    },
+    {
+      "path": "reviews/triplet-diagnostic-interpretation.md",
+      "bytes": 5193,
+      "sha256": "04223fbcb763007860c2366f42c0ba9d9809e274704c81dc7528b14d808a2e71"
+    },
+    {
+      "path": "reviews/triplet-diagnostic-source-review.md",
+      "bytes": 3806,
+      "sha256": "335b0411118216934387b9c7783b344ee5345060a3637034e2bcbdaba15bf2cc"
+    },
+    {
+      "path": "verification/consumer-receipt.json",
+      "bytes": 2254,
+      "sha256": "233e26e11aebaeca5d9cac7c90bf4672384f922f6815c3efc53ed291a8a08471"
+    },
+    {
+      "path": "verification/final-receipt.json",
+      "bytes": 3800,
+      "sha256": "3ef76289706f44f9804a25f21db2dc2b6b30771d8ea1e18d3e82284288162fd1"
+    },
+    {
+      "path": "verification/historical-receipt.json",
+      "bytes": 2986,
+      "sha256": "4a3a1ea6e2bd3db8aac9d39897f6c041b1f5424e89013af1fdbdacc780eb9bfd"
+    }
+  ]
+}
