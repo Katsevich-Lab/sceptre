@@ -58,6 +58,8 @@ test_that("production samplers retain draw counts, ranges and membership laws", 
     for (name in names(inputs$samplers)) {
         config <- inputs$samplers[[name]]
         draws <- refactor_native_sample(config, bridge)
+        expect_identical(refactor_native_sample(config, bridge), draws,
+                         info = paste(name, "repeated-call determinism"))
         expect_identical(length(draws), config$args$B, info = name)
         expect_true(all(vapply(draws, function(draw) is.integer(draw) && !anyNA(draw) &&
                                    !anyDuplicated(draw), logical(1))), info = name)
@@ -76,6 +78,24 @@ test_that("production samplers retain draw counts, ranges and membership laws", 
         }
     }
     expect_identical(.Random.seed, state)
+})
+
+test_that("all platforms preserve exact draws against the frozen source oracle", {
+    fixture <- test_path("fixtures", "refactor")
+    inputs <- readRDS(file.path(fixture, "native-inputs.rds"))
+    bridge <- refactor_native_bridge(file.path(fixture, "native-bridge.cpp"))
+    reference <- refactor_native_reference()
+    expect_identical(reference$commit, "21f9ea098b69c444a884a49bc254de711968e3b5")
+    expect_identical(bridge$refactor_native_git_blob(file.path(fixture, "native-sampler-reference.inc")),
+                     reference$git_blob)
+    for (name in names(inputs$samplers)) {
+        config <- inputs$samplers[[name]]
+        # The reference is the immutable baseline compiled with this test's BH
+        # and compiler. It is independent of candidate package source and does
+        # not assume that different platforms share a single stored stream.
+        frozen <- bridge$refactor_native_reference_sample(config$function_name, config$args)
+        expect_identical(refactor_native_sample(config, bridge), frozen, info = name)
+    }
 })
 
 test_that("sampler streams match the pinned platform and toolchain baseline", {

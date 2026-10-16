@@ -6,8 +6,9 @@ refactor_native_bridge <- local({
     compiled <- NULL
     function(path) {
         if (is.null(compiled)) {
-            compiled <- new.env(parent = baseenv())
-            Rcpp::sourceCpp(path, env = compiled, rebuild = FALSE, showOutput = FALSE)
+            environment <- new.env(parent = baseenv())
+            Rcpp::sourceCpp(path, env = environment, rebuild = FALSE, showOutput = FALSE)
+            compiled <<- environment
         }
         compiled
     }
@@ -49,4 +50,13 @@ refactor_native_sample <- function(config, bridge) {
     pointer <- do.call(refactor_native_function(config$function_name), config$args)
     # Materialize the entire requested bank before taking a diagnostic prefix.
     bridge$refactor_native_materialize(pointer)
+}
+
+refactor_native_reference <- function() {
+    list(
+        commit = "21f9ea098b69c444a884a49bc254de711968e3b5",
+        source = "src/generate_samples_functions.cpp",
+        git_blob = "5a839ba737db9d6ef0e5e031adb7486d3692ff91",
+        sha256 = "deb2dee4338f5779588408f4d80caa9a42d64e1df5e2a5c519c8361dd1c06cfd"
+    )
 }
