@@ -1,14 +1,15 @@
-# RF0 characterization checkpoint
+# Internal refactor verification
 
-This directory contains developer-only baseline tooling. It is excluded from
+This directory contains developer-only characterization and qualification tooling. It is excluded from
 the package tarball. `REFACTOR_SPEC.md` defines the accepted scope; live stage
 results and remaining gates are summarized in `STATUS.md` here.
 
 The source baseline is sceptre commit
 `21f9ea098b69c444a884a49bc254de711968e3b5` (0.99.0). PR 233 is excluded.
 The integration branch is `codex/refactor`; workers use separate branches and
-worktrees. Production R/C++ code, exports, defaults and the S4 layout are
-unchanged in RF0. The first structural unit follows the RF0 review checkpoint.
+worktrees. RF0 froze the original production behavior before RF1–RF9 changed
+internal ownership. Public exports, defaults and the S4 layout remain unchanged.
+See [ARCHITECTURE.md](../../ARCHITECTURE.md) for the resulting module boundaries.
 
 The quantitative [maintainability scorecard](MAINTAINABILITY.md) freezes source
 complexity, ownership/site inventories and repeatable change-tracing questions
@@ -103,6 +104,14 @@ action's [documented inputs](https://github.com/r-lib/actions/blob/v2/setup-r-de
 support the explicit hard-dependency selection. Hosted results must be checked
 after publication; editing workflow YAML is not evidence of successful CI.
 
+The hosted lanes build the verified original in a separate process with the
+same numerical environment as the candidate. This accommodates pre-existing
+cross-platform fit differences without changing fixtures or tolerances.
+[RUNTIME_ORACLE.md](RUNTIME_ORACLE.md) documents source-byte verification,
+toolchain/RNG fingerprints and debug versus release pairing. A missing or stale
+reference is a CI failure. Public API, ordering, decisions and exact native
+sampler checks retain their independent fixed contracts.
+
 ## Downstream stage smoke tests
 
 `consumer-inventory.json` pins 11 pipeline scripts, their private calls, slots,
@@ -125,15 +134,20 @@ keeps exit statuses, warnings, hashes, arguments and artifact checks; the RDS
 comparison payload preserves result types/order and relevant pruned/cache state.
 Compare the two `comparison.rds` files with `all.equal(..., tolerance=1e-8)` and
 require exact identities/decisions separately. Standard gather correction and
-nuclear raw Parquet shards are distinct contracts. Nuclear smoke currently uses
-the trial branch with fixed pod maps; it does not cover every nuclear branch.
+nuclear raw Parquet shards are distinct contracts. The expanded harness runs
+30 stages, including both nuclear trial/nontrial branches and zero-passing
+shards. [CONSUMER_COVERAGE.md](CONSUMER_COVERAGE.md) records exact coverage.
 
-These are stage tests. The pipeline's current test profiles contain NULL
-placeholder inputs, Docker has no running daemon locally, and nf-test is absent.
-Full Nextflow and historical 0.10.2-container execution remain separate gates.
+`pipeline-nextflow.R` uses the same arguments to execute the complete standard
+and nuclear workflows through the actual local Nextflow executor. Its explicit
+qualification profile disables containers and arrays and fixes the original
+unseeded pod sampler's startup seed. Historical 0.10.2 containers, the archived
+default array configuration and nf-test/hosted executor profiles remain
+separate qualifications. `book-smoke.R LIB BOOK_CHECKOUT OUT` runs selected
+unchanged book cells without a knitr cache and preserves failed prerequisites.
 Known pipeline behavior (unused nuclear threshold arguments, Parquet bytes under
 the optional `.rds` suffix, discovery gather saving NULL) is preserved and
-recorded rather than repaired in RF0.
+recorded rather than repaired by the refactor.
 
 ## Resource harness
 
@@ -142,10 +156,12 @@ python3 tools/refactor/benchmark.py /path/to/package-library \
   tests/testthat/fixtures/refactor /path/to/output --repetitions 3
 ```
 
-The harness fixes common BLAS/thread controls, runs one warm-up and at least
+This original compact harness fixes common BLAS/thread controls, runs one warm-up and at least
 three measured fresh processes for each cold/warm case, and records elapsed
 analysis time plus serial-process peak RSS. Choose dependency libraries through
 the process environment, consistently for both builds. The synthetic screen is
-diagnostic only. Realistic difficult-fit data, a backed workload exceeding an
-explicit dense-memory budget and fork-worker/process-tree RSS are still required
-before making resource-regression or scalability claims.
+diagnostic only. [RESOURCE_BENCHMARKS.md](RESOURCE_BENCHMARKS.md) describes the
+separate actual Papalexi, difficult synthetic, sharing-sensitive CRT and backed
+workloads, including sampled individual-worker/process-tree RSS and matched
+clean release builds. Reports distinguish bounded resource acceptance from
+unmeasured full-transcriptome or true out-of-RAM scalability.
