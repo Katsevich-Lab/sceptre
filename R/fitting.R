@@ -13,7 +13,7 @@
 #'   propagate and missing coefficients produce the existing covariate error.
 #'   Does not mutate inputs, cache results, access storage, or use RNG/files.
 #' @noRd
-fit_response_current <- function(expressions, covariate_matrix) {
+fit_response <- function(expressions, covariate_matrix) {
     pois_fit <- stats::glm.fit(
         y = expressions,
         x = covariate_matrix,
@@ -40,22 +40,15 @@ fit_response_current <- function(expressions, covariate_matrix) {
     return(result)
 }
 
-#' Fit the existing binary assignment model on one aligned cell view
-#'
-#' @param trt_idxs Valid R 1-based design-row positions of treated cells, not source
-#'   columns. Repetitions set the same binary indicator entry to one.
-#' @param covariate_matrix Numeric n-by-p design in the selected fit-cell order.
-#' @param return_fitted_values Logical; return probabilities rather than coefficients.
-#' @return Numeric vector of n fitted probabilities in fit-cell order, or p
-#'   coefficients in design-column order. Uses binomial `glm.fit` with existing
-#'   warnings and coefficient behavior; no additional convergence checks occur.
-#' @details Does not mutate inputs, persist a cache, access storage, or use RNG/files.
+#' Fit assignment probabilities on one aligned fit-cell view
+#' @param trt_idxs Valid one-based fit-row positions, not source columns;
+#'   repeated positions set the same binary indicator entry to one.
+#' @param covariate_matrix Numeric n-by-p matrix in selected fit-cell order.
+#' @return Numeric n-vector of binomial glm.fit probabilities in that order.
+#'   Existing warnings/coefficient/convergence behavior is retained; no extra
+#'   convergence check, input mutation, cache, storage, RNG or files are used.
 #' @noRd
-fit_assignment_current <- function(
-    trt_idxs,
-    covariate_matrix,
-    return_fitted_values
-) {
+fit_assignment_probabilities <- function(trt_idxs, covariate_matrix) {
     indicator <- integer(length = nrow(covariate_matrix))
     indicator[trt_idxs] <- 1L
     logistic_fit <- stats::glm.fit(
@@ -63,10 +56,5 @@ fit_assignment_current <- function(
         x = covariate_matrix,
         family = stats::binomial()
     )
-    if (return_fitted_values) {
-        out <- logistic_fit$fitted.values
-    } else {
-        out <- logistic_fit$coefficients
-    }
-    return(out)
+    logistic_fit$fitted.values
 }

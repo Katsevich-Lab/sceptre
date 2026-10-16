@@ -5,10 +5,11 @@
 #' Detect supported parameter changes that invalidate response fits
 #'
 #' @param object Existing sceptre S4 facade.
-#' @param design Proposed design matrix in analysis-cell order.
+#' @param design Proposed full source-row design matrix, before fit-view slicing.
 #' @param complement Proposed scalar logical control-group flag.
 #' @return Scalar logical from strict `identical` comparisons, including design
-#'   attributes and order. Does not mutate the object or inspect numerical fits.
+#'   attributes and source-row order. Full-matrix comparison is conservative even
+#'   outside the current fit view. Does not mutate the object or inspect fits.
 #' @noRd
 response_cache_parameters_changed <- function(object, design, complement) {
     !identical(object@covariate_matrix, design) ||

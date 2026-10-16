@@ -19,40 +19,24 @@ compute_D_matrix <- function(Zt_wZ, wZ) {
 }
 
 
-#' Prepare ephemeral score arrays on the nuisance fit's cell view
-#'
+#' Prepare the current score arrays on the nuisance fit's ordered cell view
 #' @param expression_vector Numeric response vector of length n.
-#' @param covariate_matrix Numeric n-by-p design aligned with the response and fit.
-#' @param fit Compact response record with p `fitted_coefs` in design-column order
-#'   and scalar `theta`, computed for this same fit-cell view.
-#' @param full_test_stat Logical; select the full or legacy reduced score arrays.
-#' @return Full mode: list `mu`, `w`, `a` (length n), `D` (p by n). Reduced mode:
-#'   list `mu`, `a`, `b` (length n), preserving the compatibility wrapper's formulas.
-#' @details Keeps the existing arithmetic and numerical warnings. Does not refit,
-#'   mutate inputs, persist fitted vectors, resample, or access storage/RNG/files.
+#' @param covariate_matrix Numeric n-by-p matrix aligned with response and fit.
+#' @param fit Compact record with p fitted_coefs in design-column order and
+#'   scalar theta, computed for this same fit-cell view.
+#' @return List mu, w, a (length n) and D (p by n), preserving the existing full
+#'   statistic formulas and numerical warnings. Does not refit, mutate input,
+#'   persist fitted vectors, resample or access storage/RNG/files.
 #' @noRd
-prepare_score_current <- function(
-    expression_vector,
-    covariate_matrix,
-    fit,
-    full_test_stat = TRUE
-) {
+prepare_score_components <- function(expression_vector, covariate_matrix, fit) {
     fitted_coefs <- fit$fitted_coefs
     theta <- fit$theta
     mu <- exp(as.numeric(covariate_matrix %*% fitted_coefs))
-    if (full_test_stat) {
-        denom <- 1 + mu / theta
-        w <- mu / denom
-        a <- (expression_vector - mu) / denom
-        wZ <- w * covariate_matrix
-        Zt_wZ <- t(covariate_matrix) %*% wZ
-        D <- compute_D_matrix(Zt_wZ, wZ)
-        out <- list(mu = mu, w = w, a = a, D = D)
-    } else {
-        a <- expression_vector -
-            (expression_vector * mu + theta * mu) / (theta + mu)
-        b <- (theta * mu) / (theta + mu)
-        out <- list(mu = mu, a = a, b = b)
-    }
-    return(out)
+    denom <- 1 + mu / theta
+    w <- mu / denom
+    a <- (expression_vector - mu) / denom
+    wZ <- w * covariate_matrix
+    Zt_wZ <- t(covariate_matrix) %*% wZ
+    D <- compute_D_matrix(Zt_wZ, wZ)
+    list(mu = mu, w = w, a = a, D = D)
 }

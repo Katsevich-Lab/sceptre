@@ -58,9 +58,8 @@ test_that("observed native positions are one based and synthetic positions are z
     for (view in list(list(y = c(1, 0, 1, 0, 1), trt = c(1L, 2L)),
                       list(y = c(1, 0, 1), trt = c(2L, 3L)))) {
         n <- length(view$y)
-        pieces <- refactor_private("compute_precomputation_pieces")(
-            view$y, matrix(1, n, 1L), fitted_coefs = 0, theta = 2,
-            full_test_stat = TRUE
+        pieces <- refactor_private("prepare_score_components")(
+            view$y, matrix(1, n, 1L), list(fitted_coefs = 0, theta = 2)
         )
         # Identical observed/synthetic memberships exercise the two distinct
         # bases in the production entry point, without relying on a sampler.
@@ -81,16 +80,19 @@ test_that("observed native positions are one based and synthetic positions are z
     }
 })
 
-test_that("legacy calibration unions and overlapping NT remapping stay explicit", {
-    get_indices <- refactor_private("get_idx_vector_calibration_check")
-    groups <- list(a = c(4L, 1L), b = c(1L, 5L))
-    expect_identical(get_indices("a&b", groups, TRUE)$trt_idxs, c(4L, 1L, 1L, 5L))
-    expect_identical(get_indices("a&b", groups, FALSE)$trt_idxs, c(4L, 1L, 5L))
-    # The persisted legacy schema uses cumulative group lengths even when the
-    # NT union overlaps. Characterize it here rather than silently repairing it.
-    mapped <- refactor_private("update_indiv_grna_assignments_for_nt_cells")(groups)
+test_that("calibration unions and saved NT memberships retain their declared order", {
+    membership <- refactor_private("calibration_group_membership")
+    overlapping <- list(a = c(4L, 1L), b = c(1L, 5L))
+    expect_identical(membership("a&b", overlapping, TRUE), c(4L, 1L, 1L, 5L))
+    expect_identical(membership("a&b", overlapping, FALSE), c(4L, 1L, 5L))
+    # Supported low-MOI groups are disjoint after QC; saved memberships index
+    # the first-occurrence NT pool, whose order need not be analysis order.
+    groups <- list(a = c(4L, 1L), b = 5L)
+    mapped <- refactor_private("encode_nt_fit_assignments")(groups)
     expect_identical(mapped$all_nt_idxs, c(4L, 1L, 5L))
-    expect_identical(mapped$indiv_nt_grna_idxs, list(a = 1:2, b = 3:4))
+    expect_identical(mapped$indiv_nt_grna_idxs, list(a = 1:2, b = 3L))
+    expect_identical(lapply(mapped$indiv_nt_grna_idxs,
+        function(x) mapped$all_nt_idxs[x]), groups)
 })
 
 test_that("canonical contexts compose source, analysis and fit coordinates once", {
@@ -131,7 +133,7 @@ test_that("canonical contexts compose source, analysis and fit coordinates once"
     expect_identical(nt_view$source_cells, c(8L, 2L, 11L))
     expect_identical(nt_view$trt_fit_pos, c(2L, 3L))
     expect_identical(nt_view$source_cells[nt_view$control_fit_pos], 8L)
-    expect_identical(refactor_private("prepared_index_factory")(calibration)("ntB"),
+    expect_identical(refactor_private("make_treatment_index_lookup")(calibration)("ntB"),
                      list(trt_idxs = c(2L, 3L), n_trt = 2L))
     expect_identical(view_for(index, "A"), view)
     expect_identical(serialize(list(object, pairs), NULL), before)
@@ -148,5 +150,4 @@ test_that("analysis-cell normalization preserves reordered requested cells", {
     expect_error(make_map(c(0L, 4L), 12L), "unique integer")
     expect_error(make_map(c(4, 4.5), 12L), "unique integer")
     expect_error(make_map(c(4L, NA_integer_), 12L), "unique integer")
-    expect_identical(refactor_private("native_observed_positions")(c(2L, 5L)), c(2L, 5L))
 })

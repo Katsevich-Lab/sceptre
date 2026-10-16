@@ -1,264 +1,144 @@
-# workhorse function 1. permutations, glm factored out
-perm_test_glm_factored_out <- function(
-    synthetic_idxs,
-    B1,
-    B2,
-    B3,
-    fit_parametric_curve,
-    output_amount,
-    grna_groups,
-    expression_vector,
-    pieces_precomp,
-    get_idx_f,
-    side_code
-) {
-    result_list_inner <- vector(mode = "list", length = length(grna_groups))
-    for (i in seq_along(grna_groups)) {
-        curr_grna_group <- grna_groups[i]
-        idxs <- get_idx_f(curr_grna_group)
-        result <- run_low_level_test_full_v4(
-            y = expression_vector,
-            mu = pieces_precomp$mu,
-            a = pieces_precomp$a,
-            w = pieces_precomp$w,
-            D = pieces_precomp$D,
-            trt_idxs = native_observed_positions(idxs$trt_idxs),
-            use_all_cells = FALSE,
-            n_trt = idxs$n_trt,
-            synthetic_idxs = synthetic_idxs,
-            B1 = B1,
-            B2 = B2,
-            B3 = B3,
-            fit_parametric_curve = fit_parametric_curve,
+#' Test guide groups against one shared permutation response fit.
+#'
+#' @param expression Numeric response in the common fit-view cell order.
+#' @param score Full score components aligned to expression and the common design.
+#' @param treatment_lookup Prepared lookup returning one-based fit-local treatment
+#'   positions and their count for a guide-group ID.
+#' @param groups Character guide-group IDs in request order, including repeats.
+#' @param synthetic_idxs One complete shared permutation bank; native draws are
+#'   zero-based, whereas observed positions enter native inference one-based.
+#' @param test_options Checked stage budgets, side code and approximation flag.
+#' @param output_amount Existing public output level (3 retains resampling values).
+#' @return Native result lists in group order. Does not read storage, fit models,
+#'   draw resamples, mutate inputs, or update the response cache.
+#' @noRd
+test_permutation_shared_fit <- function(expression, score, treatment_lookup,
+                                        groups, synthetic_idxs, test_options,
+                                        output_amount) {
+    results <- vector("list", length(groups))
+    for (i in seq_along(groups)) {
+        treatment <- treatment_lookup(groups[i])
+        results[[i]] <- run_low_level_test_full_v4(
+            y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
+            trt_idxs = treatment$trt_idxs, use_all_cells = FALSE,
+            n_trt = treatment$n_trt, synthetic_idxs = synthetic_idxs,
+            B1 = test_options$B1, B2 = test_options$B2, B3 = test_options$B3,
+            fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = side_code
+            side_code = test_options$side_code
         )
-        result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    results
 }
 
-
-# workhorse function 2: permutations, glm run inside
-discovery_ntcells_perm_test <- function(
-    synthetic_idxs,
-    B1,
-    B2,
-    B3,
-    fit_parametric_curve,
-    output_amount,
-    covariate_matrix,
-    all_nt_idxs,
-    grna_group_idxs,
-    grna_groups,
-    expression_vector,
-    side_code,
-    index = NULL
-) {
-    if (is.null(index)) {
-        index <- list(analysis_to_source = seq_along(expression_vector),
-            nt_to_analysis = all_nt_idxs, groups_analysis = grna_group_idxs,
-            calibration_check = FALSE, control_group_complement = FALSE)
-    }
-    result_list_inner <- vector(mode = "list", length = length(grna_groups))
-    for (i in seq_along(grna_groups)) {
-        curr_grna_group <- grna_groups[i]
-        view <- make_fit_view(index, curr_grna_group)
-        n_trt <- view$n_trt
-        trt_idxs <- view$trt_fit_pos
-
-        # 1. get the expression vector and covariate matrix
-        curr_expression_vector <- expression_vector[view$fit_to_analysis]
-        curr_covariate_matrix <- covariate_matrix[view$fit_to_analysis, ]
-
-        # 2. perform the response precomputation
-        response_precomp <- fit_response_current(
-            expressions = curr_expression_vector,
-            covariate_matrix = curr_covariate_matrix
-        )
-        # 3. get the precomp pieces
-        precomp_pieces <- prepare_score_current(
-            expression_vector = curr_expression_vector,
-            covariate_matrix = curr_covariate_matrix,
-            fit = response_precomp,
-            full_test_stat = TRUE
-        )
-        # 4. run the association test
-        result <- run_low_level_test_full_v4(
-            y = curr_expression_vector,
-            mu = precomp_pieces$mu,
-            a = precomp_pieces$a,
-            w = precomp_pieces$w,
-            D = precomp_pieces$D,
-            n_trt = n_trt,
-            use_all_cells = FALSE,
-            trt_idxs = native_observed_positions(trt_idxs),
-            synthetic_idxs = synthetic_idxs,
-            B1 = B1,
-            B2 = B2,
-            B3 = B3,
-            fit_parametric_curve = fit_parametric_curve,
+#' Fit and test each treatment-plus-NT permutation view of one response.
+#'
+#' @param expression Numeric response in analysis-cell order.
+#' @param design Matrix in that same common analysis-cell order, including when
+#'   it has only an intercept column.
+#' @param index Prepared coordinate context for NT-only discovery.
+#' @param groups Character requested groups in their existing order.
+#' @param synthetic_idxs Complete shared hybrid bank; inference consumes the
+#'   existing treatment-count prefix for each fit view.
+#' @param test_options,output_amount Checked test settings and output level.
+#' @return Native results in group order. Fits one response per group and keeps
+#'   those guide-specific fits out of the shared response cache. No input mutation
+#'   or RNG draws; each view retains treatment-first, then NT order and repeats.
+#' @noRd
+test_permutation_group_fit <- function(expression, design, index, groups,
+                                       synthetic_idxs, test_options,
+                                       output_amount) {
+    results <- vector("list", length(groups))
+    for (i in seq_along(groups)) {
+        view <- make_fit_view(index, groups[i])
+        group_expression <- expression[view$fit_to_analysis]
+        group_design <- design[view$fit_to_analysis, , drop = FALSE]
+        fit <- fit_response(group_expression, group_design)
+        score <- prepare_score_components(group_expression, group_design, fit)
+        results[[i]] <- run_low_level_test_full_v4(
+            y = group_expression, mu = score$mu, a = score$a, w = score$w,
+            D = score$D, trt_idxs = view$trt_fit_pos, use_all_cells = FALSE,
+            n_trt = view$n_trt, synthetic_idxs = synthetic_idxs,
+            B1 = test_options$B1, B2 = test_options$B2, B3 = test_options$B3,
+            fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = side_code
+            side_code = test_options$side_code
         )
-        result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    results
 }
 
-
-# workhorse function 3: crt, glm factored out
-crt_glm_factored_out <- function(
-    B1,
-    B2,
-    B3,
-    fit_parametric_curve,
-    output_amount,
-    response_ids,
-    response_precomputations,
-    covariate_matrix,
-    get_idx_f,
-    curr_grna_group,
-    subset_to_nt_cells,
-    all_nt_idxs,
-    response_matrix,
-    side_code,
-    cells_in_use,
-    response_idxs = NULL,
-    source_cells = NULL
-) {
-    result_list_inner <- vector(mode = "list", length = length(response_ids))
-    # precomputation on grna
-    idxs <- get_idx_f(curr_grna_group)
-    trt_idxs <- idxs$trt_idxs
-    n_trt <- idxs$n_trt
-    fitted_probabilities <- fit_assignment_current(
-        trt_idxs = trt_idxs,
-        covariate_matrix = covariate_matrix,
-        return_fitted_values = TRUE
-    )
-    synthetic_idxs <- crt_index_sampler_fast(
-        fitted_probabilities = fitted_probabilities,
-        B = checked_resampling_total(B1, B2, B3)
-    )
-    if (is.null(response_idxs)) response_idxs <- match(response_ids, rownames(response_matrix))
-    if (is.null(source_cells)) {
-        source_cells <- legacy_fit_source_cells(cells_in_use, all_nt_idxs, subset_to_nt_cells)
-    }
-    # loop over genes
-    for (i in seq_along(response_ids)) {
-        curr_response_id <- response_ids[i]
-        # load gene expressions
-        expression_vector <- storage_read_response(response_matrix, response_idxs[i], source_cells)
-        # compute the precomputation pieces
-        pieces_precomp <- prepare_score_current(
-            expression_vector = expression_vector,
-            covariate_matrix = covariate_matrix,
-            fit = lookup_response_fit(response_precomputations, curr_response_id),
-            full_test_stat = TRUE
-        )
-        # run the association test
-        result <- run_low_level_test_full_v4(
-            y = expression_vector,
-            mu = pieces_precomp$mu,
-            a = pieces_precomp$a,
-            w = pieces_precomp$w,
-            D = pieces_precomp$D,
-            trt_idxs = native_observed_positions(trt_idxs),
-            n_trt = n_trt,
-            use_all_cells = TRUE,
-            synthetic_idxs = synthetic_idxs,
-            B1 = B1,
-            B2 = B2,
-            B3 = B3,
-            fit_parametric_curve = fit_parametric_curve,
+#' Test requested responses with a shared CRT assignment fit for one guide.
+#'
+#' @param response_store Row-readable response matrix or storage adapter.
+#' @param response_rows One-based source response rows in request order.
+#' @param response_ids Corresponding cache keys in that same order.
+#' @param design Common fit-view matrix; rows align to source_cells.
+#' @param source_cells One-based source-cell positions, ordered and repeatable.
+#' @param treatment One-based fit-local observed positions and their count.
+#' @param response_fits Complete compatible compact response-fit cache.
+#' @param test_options,output_amount Checked test settings and output level.
+#' @return Native results in response order. Fits the assignment model and draws
+#'   one full B1+B2+B3 bank before reading responses. Reads each requested row,
+#'   reuses cached response fits, and never inserts fits or mutates inputs.
+#' @noRd
+test_crt_shared_fit <- function(response_store, response_rows, response_ids,
+                                design, source_cells, treatment, response_fits,
+                                test_options, output_amount) {
+    probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
+    synthetic_idxs <- crt_index_sampler_fast(probabilities,
+                                             B = test_options$total_resamples)
+    results <- vector("list", length(response_rows))
+    for (i in seq_along(response_rows)) {
+        expression <- storage_read_response(response_store, response_rows[i], source_cells)
+        score <- prepare_score_components(expression, design,
+            lookup_response_fit(response_fits, response_ids[i]))
+        results[[i]] <- run_low_level_test_full_v4(
+            y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
+            trt_idxs = treatment$trt_idxs, use_all_cells = TRUE,
+            n_trt = treatment$n_trt, synthetic_idxs = synthetic_idxs,
+            B1 = test_options$B1, B2 = test_options$B2, B3 = test_options$B3,
+            fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = side_code
+            side_code = test_options$side_code
         )
-        result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    results
 }
 
-# workhorse function 4: crt, glm run inside
-discovery_ntcells_crt <- function(
-    B1,
-    B2,
-    B3,
-    fit_parametric_curve,
-    output_amount,
-    get_idx_f,
-    response_ids,
-    covariate_matrix,
-    curr_grna_group,
-    all_nt_idxs,
-    response_matrix,
-    side_code,
-    cells_in_use,
-    response_idxs = NULL,
-    index = NULL
-) {
-    result_list_inner <- vector(mode = "list", length = length(response_ids))
-    # initialize the idxs
-    if (is.null(index)) {
-        idxs <- get_idx_f(curr_grna_group)
-        index <- list(analysis_to_source = cells_in_use,
-            nt_to_analysis = all_nt_idxs,
-            groups_analysis = stats::setNames(list(idxs$trt_idxs), curr_grna_group),
-            calibration_check = FALSE, control_group_complement = FALSE)
-    }
-    view <- make_fit_view(index, curr_grna_group)
-    n_trt <- view$n_trt
-    trt_idxs <- view$trt_fit_pos
-    # subset the covariate matrix for this gRNA
-    curr_covariate_matrix <- covariate_matrix[view$fit_to_analysis, ]
-    # perform the grna precomputation
-    fitted_probabilities <- fit_assignment_current(
-        trt_idxs = trt_idxs,
-        covariate_matrix = curr_covariate_matrix,
-        return_fitted_values = TRUE
-    )
-    synthetic_idxs <- crt_index_sampler_fast(
-        fitted_probabilities = fitted_probabilities,
-        B = checked_resampling_total(B1, B2, B3)
-    )
-    if (is.null(response_idxs)) response_idxs <- match(response_ids, rownames(response_matrix))
-    # loop over the response ids
-    for (i in seq_along(response_ids)) {
-        curr_response_id <- response_ids[i]
-        # load gene expressions
-        curr_expression_vector <- storage_read_response(response_matrix, response_idxs[i], view$source_cells)
-        # perform the response precomputation
-        response_precomp <- fit_response_current(
-            expressions = curr_expression_vector,
-            covariate_matrix = curr_covariate_matrix
-        )
-        # get the precomp pieces
-        pieces_precomp <- prepare_score_current(
-            expression_vector = curr_expression_vector,
-            covariate_matrix = curr_covariate_matrix,
-            fit = response_precomp,
-            full_test_stat = TRUE
-        )
-        # run the association test
-        result <- run_low_level_test_full_v4(
-            y = curr_expression_vector,
-            mu = pieces_precomp$mu,
-            a = pieces_precomp$a,
-            w = pieces_precomp$w,
-            D = pieces_precomp$D,
-            trt_idxs = native_observed_positions(trt_idxs),
-            n_trt = n_trt,
-            use_all_cells = TRUE,
-            synthetic_idxs = synthetic_idxs,
-            B1 = B1,
-            B2 = B2,
-            B3 = B3,
-            fit_parametric_curve = fit_parametric_curve,
+#' Fit and test requested responses in one treatment-plus-NT CRT view.
+#'
+#' @param response_store Row-readable response storage.
+#' @param response_rows One-based source response rows in request order.
+#' @param design Common matrix in analysis-cell order.
+#' @param fit_view Prepared guide view: fit_to_analysis selects design rows,
+#'   source_cells selects storage cells, and trt_fit_pos is one-based fit-local.
+#' @param test_options,output_amount Checked test settings and output level.
+#' @return Native results in response order. Fits one assignment and draws one
+#'   full bank per guide, then reads and fits every response in the ordered view.
+#'   Guide-specific response fits are not cached. Does not mutate caller inputs.
+#' @noRd
+test_crt_group_fit <- function(response_store, response_rows, design, fit_view,
+                               test_options, output_amount) {
+    group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
+    probabilities <- fit_assignment_probabilities(fit_view$trt_fit_pos, group_design)
+    synthetic_idxs <- crt_index_sampler_fast(probabilities,
+                                             B = test_options$total_resamples)
+    results <- vector("list", length(response_rows))
+    for (i in seq_along(response_rows)) {
+        expression <- storage_read_response(response_store, response_rows[i],
+                                            fit_view$source_cells)
+        fit <- fit_response(expression, group_design)
+        score <- prepare_score_components(expression, group_design, fit)
+        results[[i]] <- run_low_level_test_full_v4(
+            y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
+            trt_idxs = fit_view$trt_fit_pos, use_all_cells = TRUE,
+            n_trt = fit_view$n_trt, synthetic_idxs = synthetic_idxs,
+            B1 = test_options$B1, B2 = test_options$B2, B3 = test_options$B3,
+            fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = side_code
+            side_code = test_options$side_code
         )
-        result_list_inner[[i]] <- result
     }
-    return(result_list_inner)
+    results
 }

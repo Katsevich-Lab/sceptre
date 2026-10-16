@@ -1,3 +1,15 @@
+#' Assign guides using the existing covariate-adjusted count mixture.
+#'
+#' @param grna_matrix Supported row-readable guide-by-source-cell counts.
+#' @param cell_covariate_data_frame Covariates in the same source-cell order.
+#' @param grna_assignment_hyperparameters Existing EM, formula and threshold options.
+#' @param print_progress,parallel,n_processors,log_dir Worker/reporting options.
+#' @param grna_ids Ordered guide IDs to process, retained as output names.
+#' @return Named lists of one-based source-cell assignments, in serial or existing
+#'   seeded block order. Reads guide rows, may create progress files and runs GC
+#'   every 200 block items. Fixed starting guesses preserve caller RNG; active
+#'   count/nonconvergence fallback and formula-error context remain unchanged.
+#' @noRd
 assign_grnas_to_cells_mixture <- function(
     grna_matrix,
     cell_covariate_data_frame,
@@ -50,38 +62,28 @@ assign_grnas_to_cells_mixture <- function(
         make_row_accessible = TRUE
     )
 
-    # 3. define the function to perform assignments for a set of grnas
-    analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
-        if (parallel && print_progress) {
-            f_name <- paste0(
-                get_log_dir(log_dir),
-                "assign_grnas_",
-                proc_id,
-                ".out"
-            )
-            file.create(f_name) |> invisible()
-        } else {
-            f_name <- NULL
-        }
+    #' Assign one ordered block of guide IDs.
+    #' @param curr_grna_ids Character guide IDs; proc_id selects the worker log.
+    #' @return Named assignment list. Reports then collects garbage before each
+    #'   row read; the shared design and fixed guesses are read-only captures.
+    #' @noRd
+    assign_guide_block <- function(curr_grna_ids, proc_id = NULL) {
+        f_name <- analysis_log_file("assign_grnas", proc_id, parallel,
+                                    print_progress, log_dir)
         initial_assignment_list <- lapply(
             seq_along(curr_grna_ids),
             function(i) {
-                grna_id <- get_id_from_idx(
-                    response_idx = i,
-                    print_progress = print_progress,
-                    response_ids = curr_grna_ids,
-                    feature = "gRNA",
-                    str = "Performing gRNA-to-cell assignments for ",
-                    parallel = parallel,
-                    f_name = f_name
-                )
+                grna_id <- as.character(curr_grna_ids[i])
+                report_worker_progress(i, grna_id, length(curr_grna_ids),
+                    print_progress, parallel, f_name, feature = "gRNA",
+                    prefix = "Performing gRNA-to-cell assignments for ")
+                collect_worker_garbage(i)
                 g <- load_row(grna_matrix, grna_id)
                 assignments <- obtain_em_assignments(
                     pi_guesses = starting_guesses$pi_guesses,
                     g_pert_guesses = starting_guesses$g_pert_guesses,
                     g = g,
                     covariate_matrix = covariate_matrix,
-                    use_glm = TRUE,
                     n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,
                     backup_threshold = grna_assignment_hyperparameters$backup_threshold,
                     probability_threshold = grna_assignment_hyperparameters$probability_threshold
@@ -94,7 +96,7 @@ assign_grnas_to_cells_mixture <- function(
 
     # 4. run the analysis
     if (!parallel) {
-        initial_assignment_list <- analyze_given_grna_ids(grna_ids)
+        initial_assignment_list <- assign_guide_block(grna_ids)
     } else {
         message("Running gRNA assignments in parallel.")
         if (print_progress) {
@@ -114,7 +116,7 @@ assign_grnas_to_cells_mixture <- function(
         res <- parallel::mclapply(
             seq_along(grna_ids_partitioned),
             function(proc_id) {
-                analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id)
+                assign_guide_block(grna_ids_partitioned[[proc_id]], proc_id)
             },
             mc.cores = length(grna_ids_partitioned)
         )
@@ -126,12 +128,23 @@ assign_grnas_to_cells_mixture <- function(
 }
 
 
+#' Assign one guide using EM or the existing raw-count fallback.
+#'
+#' @param pi_guesses,g_pert_guesses Numeric starting values in matched order.
+#' @param g Numeric counts in source-cell order.
+#' @param covariate_matrix Matrix aligned to g, including one-column designs.
+#' @param n_nonzero_cells_cutoff Minimum count of cells with g >= 1 for EM.
+#' @param backup_threshold Raw-count fallback threshold.
+#' @param probability_threshold Posterior threshold on an accepted EM fit.
+#' @return Increasing one-based cell positions. Uses the existing Poisson
+#'   initialization and native EM; expected initialization warnings are muffled.
+#'   Low counts or unsuccessful EM retain raw-count thresholding. No input mutation.
+#' @noRd
 obtain_em_assignments <- function(
     pi_guesses,
     g_pert_guesses,
     g,
     covariate_matrix,
-    use_glm,
     n_nonzero_cells_cutoff,
     backup_threshold,
     probability_threshold
@@ -140,22 +153,12 @@ obtain_em_assignments <- function(
     n_nonzero <- sum(g >= 1)
     if (n_nonzero >= n_nonzero_cells_cutoff) {
         # 1. estimate the conditional means
-        if (use_glm) {
-            # Initial Poisson fit to get conditional means; convergence and
-            # boundary warnings here are expected and benign because the EM
-            # algorithm below corrects/refines the fit. Muffle warnings via
-            # withCallingHandlers (functionally equivalent to suppressWarnings,
-            # but does not trip the BiocCheck "Avoid 'suppressWarnings'" note).
-            pois_fit <- withCallingHandlers(
-                stats::glm.fit(
-                    y = g,
-                    x = covariate_matrix,
-                    family = stats::poisson()
-                ),
-                warning = function(w) invokeRestart("muffleWarning")
-            )
-            g_mus_pert0 <- pois_fit$fitted.values
-        }
+        # Initial Poisson warnings are expected; native EM refines this fit.
+        pois_fit <- withCallingHandlers(
+            stats::glm.fit(y = g, x = covariate_matrix, family = stats::poisson()),
+            warning = function(w) invokeRestart("muffleWarning")
+        )
+        g_mus_pert0 <- pois_fit$fitted.values
         # 2. compute log(g!)
         log_g_factorial <- lgamma(g + 1)
         # 3. run the em algorithm
@@ -184,6 +187,13 @@ obtain_em_assignments <- function(
 }
 
 
+#' Generate the existing deterministic mixture starting guesses.
+#'
+#' @param n_em_rep Number of paired guesses.
+#' @param pi_guess_range,g_pert_guess_range Numeric uniform bounds.
+#' @return Lists pi_guesses and g_pert_guesses, drawn in that order under seed 4.
+#'   with_seed restores the caller's RNG state, including its absence.
+#' @noRd
 get_random_starting_guesses <- function(
     n_em_rep = 5,
     pi_guess_range = c(1e-5, 0.1),

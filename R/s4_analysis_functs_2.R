@@ -167,10 +167,9 @@ run_calibration_check_pt_2 <- function(
 ) {
     # 5. run the sceptre analysis (high-level function call)
     response_grna_group_pairs <- sceptre_object@negative_control_pairs
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = TRUE,
         analysis_type = "calibration_check",
         output_amount = output_amount,
         print_progress = print_progress,
@@ -270,10 +269,9 @@ run_power_check <- function(
         invisible()
 
     # 3.  run the sceptre analysis (high-level function call)
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = FALSE,
         analysis_type = "power_check",
         output_amount = output_amount,
         print_progress = print_progress,
@@ -373,10 +371,9 @@ run_discovery_analysis <- function(
         invisible()
 
     # 3.  run the sceptre analysis (high-level function call)
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = FALSE,
         analysis_type = "discovery_analysis",
         output_amount = output_amount,
         print_progress = print_progress,

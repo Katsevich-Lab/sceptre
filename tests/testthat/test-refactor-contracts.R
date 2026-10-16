@@ -290,8 +290,15 @@ test_that("rejected requests and degenerate baseline behavior remain explicit", 
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_complement_perm
     actual <- refactor_edge_observations(inputs, case)
-    expect_equal(actual, refactor_expected("edges.rds"), tolerance = 1e-8)
-    expect_identical(actual, readRDS(file.path(refactor_fixture_dir(), "edges.rds")))
+    # B3 explicitly supersedes only the old NT intercept-only dimension error.
+    # Keep the historical artifact and original-source edge capture unchanged.
+    unchanged <- setdiff(names(actual), "intercept_only_nt")
+    expect_equal(actual[unchanged], refactor_expected("edges.rds")[unchanged], tolerance = 1e-8)
+    historical <- readRDS(file.path(refactor_fixture_dir(), "edges.rds"))
+    expect_identical(actual[unchanged], historical[unchanged])
+    expect_match(historical$intercept_only_nt$error, "non-conformable arguments", fixed = TRUE)
+    expect_null(actual$intercept_only_nt$error)
+    expect_true(is.list(actual$intercept_only_nt$value))
     expect_match(actual$duplicate_requests$error, "duplicate rows", fixed = TRUE)
 })
 

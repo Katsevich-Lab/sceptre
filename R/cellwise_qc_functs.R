@@ -75,6 +75,12 @@ determine_cells_to_retain <- function(
 }
 
 
+#' Reindex raw guide memberships after cell QC and retain the saved NT schema
+#' @param sceptre_object Facade with source-cell raw assignments and retained cells.
+#' @return Facade with QC assignments: unique analysis-order treatment/NT members,
+#'   empty NT guides removed, and NT-local groups for NT controls. Only that slot
+#'   is replaced; caller retains the return. No fits, RNG or files are used.
+#' @noRd
 update_grna_assignments_given_qc <- function(sceptre_object) {
     # 0. define several varaibles
     cells_in_use <- sceptre_object@cells_in_use
@@ -108,7 +114,7 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     # 3. if using the NT cells, update indiv gRNA indices so that they are
     # relative to all NTs
     if (!sceptre_object@control_group_complement) {
-        l <- update_indiv_grna_assignments_for_nt_cells(
+        l <- encode_nt_fit_assignments(
             grna_assignments$indiv_nt_grna_idxs
         )
         grna_assignments$indiv_nt_grna_idxs <- l$indiv_nt_grna_idxs
@@ -118,9 +124,4 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     # 4. update the sceptre_object and return
     sceptre_object@grna_assignments <- grna_assignments
     return(sceptre_object)
-}
-
-
-update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
-    legacy_nt_fit_assignments(indiv_nt_grna_idxs)
 }
