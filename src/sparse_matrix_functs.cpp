@@ -36,16 +36,23 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 }
 
 
+// Column summaries load values (not stored-position counts): nonzero means
+// value > 0.5. mt_gene_idxs arrives R one-based and is an owned Rcpp conversion;
+// only active mitochondrial summaries convert/use it. Source i/p/x and every R
+// input remain unchanged. Preserve first-maximum ties and zero-total ratios.
 // [[Rcpp::export]]
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
-                                 int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
+                                 int n_cells, std::vector<int> mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);
   NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes), frac_umis_max_feature(n_cells);
   List out;
 
   int n_nonzero_count, curr_max_feature;
   double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature;
-  for (int k = 0; k < mt_gene_idxs.size(); k ++) mt_gene_idxs[k] --;
+  if (compute_p_mito) for (int& position : mt_gene_idxs) {
+    if (position < 1 || position > n_genes) stop("Mitochondrial row is outside the one-based feature range.");
+    --position;
+  }
 
   for (int k = 0; k < n_cells; k ++) {
     curr_max_feature = 0;

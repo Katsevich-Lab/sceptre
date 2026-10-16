@@ -55,11 +55,11 @@ storage_threshold_row <- function(store, feature_idx, threshold) {
     }
 }
 
-#' Own disposable copies of indices passed to native kernels
+#' Own disposable copies of indices passed to external ondisc kernels
 #'
 #' @param groups List of index vectors; coordinates are unchanged here.
 #' @return List of freshly allocated integer vectors, retaining names, order and
-#'   repetitions. The copy protects callers from legacy kernels that decrement
+#'   repetitions. The copy protects callers from ondisc kernels that decrement
 #'   indices in place; integer coercion alone can alias an existing vector.
 #' @noRd
 storage_owned_groups <- function(groups) {
@@ -75,8 +75,8 @@ storage_owned_groups <- function(groups) {
 #'   the ordered analysis view `source_cells`, not original source columns.
 #' @param source_cells Valid R 1-based source-column indices defining that view.
 #' @param controls Either `"complement"` or R 1-based analysis positions of NT cells.
-#' @param nt_groups Optional list of NT groups in analysis coordinates. For NT
-#'   controls these must partition `controls`, as supplied by the low-MOI caller.
+#' @param nt_groups Optional list of NT groups in analysis coordinates. The
+#'   low-MOI caller supplies its current NT groups; no union/deduplication occurs.
 #'   `NULL` requests pair counts without retaining the all-response summary.
 #' @param nuclear Logical; backed storage skips the summary and scans requested
 #'   response rows only. Sparse storage retains its fused scan when summarizing.
@@ -87,9 +87,9 @@ storage_owned_groups <- function(groups) {
 #' @details Counts refer to stored column positions, including explicit zeros,
 #'   rather than positive loaded values. Complement totals use the analysis view;
 #'   NT totals sum the group counts, so overlapping groups would count repeatedly.
-#'   The adapter sorts requests for the scan and restores order, owns mutable
-#'   native input vectors, and performs no RNG draws or file writes. Callers own
-#'   index/range validation and the NT-partition invariant; no deduplication occurs.
+#'   The adapter sorts requests for the scan and restores order. Sparse kernels
+#'   own coordinate conversion; only ondisc gets localized NT groups and disposable
+#'   R copies for its mutating private interface. No RNG draws or file writes.
 #' @noRd
 storage_pair_counts <- function(
     store, pair_index, groups, source_cells, controls,
@@ -101,15 +101,15 @@ storage_pair_counts <- function(
     if (is.null(nt_groups)) {
         nt_groups <- if (complement) list() else list(all_nt_idxs)
     }
-    if (!complement) {
-        nt_groups <- lapply(nt_groups, function(group) match(group, all_nt_idxs))
-    }
     scan_order <- order(pair_index$response_idx, method = "radix")
     response_idxs <- as.integer(pair_index$response_idx[scan_order])
     group_idxs <- as.integer(pair_index$group_idx[scan_order])
-    groups <- storage_owned_groups(groups)
-    nt_groups <- storage_owned_groups(nt_groups)
     if (methods::is(store, "odm")) {
+        if (!complement) {
+            nt_groups <- lapply(nt_groups, function(group) match(group, all_nt_idxs))
+        }
+        groups <- storage_owned_groups(groups)
+        nt_groups <- storage_owned_groups(nt_groups)
         common <- list(
             file_name_in = store@h5_file, f_row_ptr = store@ptr,
             n_genes = nrow(store), n_cells_orig = ncol(store),
@@ -129,10 +129,9 @@ storage_pair_counts <- function(
                            c(common, list(indiv_nt_grna_idxs = nt_groups)))
         }
     } else {
-        out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
+        out <- sparse_pair_counts(
             j = store@j, p = store@p, n_cells_orig = ncol(store),
-            n_cells_sub = length(source_cells), grna_group_idxs = groups,
-            indiv_nt_grna_idxs = nt_groups, all_nt_idxs = all_nt_idxs,
+            grna_group_idxs = groups, nt_groups_analysis = nt_groups,
             to_analyze_response_idxs = response_idxs,
             to_analyze_grna_idxs = group_idxs,
             control_group_complement = complement, cells_in_use = source_cells
@@ -154,14 +153,14 @@ storage_pair_counts <- function(
 #' @param response_idxs Valid R 1-based source-row indices in requested order.
 #' @return Integer matrix with `length(groups)` rows and `length(response_idxs)`
 #'   columns. Request order, repetitions, and zero/one-sized dimensions are kept.
-#' @details The legacy calibration kernel scans all responses, then this boundary
+#' @details The group kernel scans all responses, then this boundary
 #'   selects columns. Counts use stored positions, including explicit zeros.
-#'   Disposable group copies protect callers from native in-place decrements;
-#'   inputs, RNG state, and backing files are otherwise unchanged.
+#'   Sparse kernels own base conversion; only ondisc requires disposable R copies.
+#'   Inputs, RNG state, and backing files are otherwise unchanged.
 #' @noRd
 storage_group_counts <- function(store, response_idxs, groups, source_cells) {
-    groups <- storage_owned_groups(groups)
     if (methods::is(store, "odm")) {
+        groups <- storage_owned_groups(groups)
         out <- ondisc:::compute_n_trt_cells_matrix_ondisc(
             file_name_in = store@h5_file, f_row_ptr = store@ptr,
             n_cells_orig = ncol(store), n_cells_sub = length(source_cells),
@@ -169,10 +168,9 @@ storage_group_counts <- function(store, response_idxs, groups, source_cells) {
             cells_in_use = source_cells
         )
     } else {
-        out <- compute_n_trt_cells_matrix(
+        out <- sparse_group_counts(
             j = store@j, p = store@p, n_cells_orig = ncol(store),
-            n_cells_sub = length(source_cells), n_genes = nrow(store),
-            nt_grna_group_idxs = groups, cells_in_use = source_cells
+            groups = groups, cells_in_use = source_cells
         )
     }
     out[, response_idxs, drop = FALSE]
@@ -238,8 +236,8 @@ storage_reopen_backed_pair <- function(response_file, grna_file, integer_id) {
 #'   The latter is deliberately a native zero-based row index, with first maximum
 #'   winning ties. Disabled optional summaries retain native zero-filled vectors;
 #'   zero-total ratios retain native non-finite results when computed.
-#' @details Owns a mitochondrial-index copy because the native kernel decrements
-#'   it in place. Does not convert storage, mutate caller inputs, or use RNG/files.
+#' @details The native kernel owns mitochondrial-index conversion. Does not
+#'   convert storage, mutate caller inputs, or use RNG/files.
 #' @noRd
 storage_cell_covariates <- function(
     store, mt_gene_idxs, compute_p_mito, compute_max_feature
@@ -247,7 +245,7 @@ storage_cell_covariates <- function(
     compute_cell_covariates_cpp(
         i = store@i, p = store@p, x = store@x,
         n_genes = nrow(store), n_cells = ncol(store),
-        mt_gene_idxs = as.integer(mt_gene_idxs) + 0L,
+        mt_gene_idxs = mt_gene_idxs,
         compute_p_mito = compute_p_mito,
         compute_max_feature = compute_max_feature
     )
@@ -262,9 +260,10 @@ storage_cell_covariates <- function(
 #'   A numeric sparse input already in the requested orientation is returned as-is.
 #' @details Sparse numeric values, including stored zeros and fractions, are kept;
 #'   stored logical entries become one, including explicitly stored `FALSE`.
-#'   Triplet duplicates are not normalized here. Legacy triplet sorting can reorder
-#'   the caller's slot vectors by reference; this is not a nonmutating conversion.
-#'   No dense assay realization, RNG draws, or file writes occur. The local copy
+#'   Triplet duplicates are not normalized here. Sorting owns coordinate/value
+#'   vectors and leaves caller inputs unchanged. This incurs sparse ownership
+#'   copies and sorting workspace; it never realizes a full dense assay.
+#'   No RNG draws or file writes occur. The local conversion
 #'   keeps in-memory workflows independent of the optional ondisc dependency.
 #' @noRd
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
@@ -303,24 +302,18 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
             j <- matrix_in@j
         } else if (methods::is(matrix_in, "dgCMatrix")) {
             i <- matrix_in@i
-            j <- convert_pointer_to_index_vector_v2(matrix_in@p)
+            j <- sparse_pointer_to_indices(matrix_in@p)
         } else if (methods::is(matrix_in, "dgRMatrix")) {
-            i <- convert_pointer_to_index_vector_v2(matrix_in@p)
+            i <- sparse_pointer_to_indices(matrix_in@p)
             j <- matrix_in@j
         } else {
             stop("Class not recognized.")
         }
         x <- matrix_in@x
 
-        # perform the sorting operation
-        sort_in_place <- methods::is(matrix_in, "matrix") ||
-            methods::is(matrix_in, "dgTMatrix")
-        if (sort_in_place) {
-            l <- list(i = i, j = j, x = x)
-            dt <- data.table::setDT(l) # assign by reference
-        } else {
-            dt <- data.table::data.table(i = i, j = j, x = x) # deep copy
-        }
+        # Triplet slots can alias caller vectors. The constructor gives sorting
+        # its own columns; no in-place ordering is applied to source slots.
+        dt <- data.table::data.table(i = i, j = j, x = x)
 
         # finally, initialize the output
         if (make_row_accessible) {
@@ -351,7 +344,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
 #' @return Zero-based coordinate vector of length `tail(p, 1)`, with empty runs
 #'   omitted. Does not mutate `p` or change entry order.
 #' @noRd
-convert_pointer_to_index_vector_v2 <- function(p) {
+sparse_pointer_to_indices <- function(p) {
     l <- diff(p)
     rep(x = seq(0, length(l) - 1L), times = l)
 }

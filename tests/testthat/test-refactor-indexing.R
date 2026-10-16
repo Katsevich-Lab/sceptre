@@ -37,11 +37,11 @@ test_that("noncontiguous cells preserve actual extraction and native QC coordina
     expect_identical(sum(discovery_y[3:5] != 0), 2L)
     expect_identical(sum(calibration_y[calibration] != 0), 1L)
     expect_identical(sum(calibration_y[-calibration] != 0), 1L)
-    native <- refactor_private("compute_nt_nonzero_matrix_and_n_ok_pairs_v3")(
+    native <- refactor_private("sparse_pair_counts")(
         j = screen$store@j, p = screen$store@p, n_cells_orig = 12L,
-        n_cells_sub = 5L, grna_group_idxs = groups$grna_group_idxs,
-        indiv_nt_grna_idxs = groups$indiv_nt_grna_idxs,
-        all_nt_idxs = groups$all_nt_idxs, to_analyze_response_idxs = 1L,
+        grna_group_idxs = groups$grna_group_idxs,
+        nt_groups_analysis = lapply(groups$indiv_nt_grna_idxs, function(local) groups$all_nt_idxs[local]),
+        to_analyze_response_idxs = 1L,
         to_analyze_grna_idxs = 1L, control_group_complement = FALSE,
         cells_in_use = object@cells_in_use
     )

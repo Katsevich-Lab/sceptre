@@ -1,17 +1,5 @@
 # These small explicit examples characterize the legacy kernels, including
 # representation semantics that are deliberately not normalized by the refactor.
-storage_test_matrix <- function(copies = 1L) {
-    mat <- Matrix::sparseMatrix(
-        i = rep(c(1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L), copies),
-        j = as.integer(unlist(lapply(seq_len(copies) - 1L, function(k) {
-            c(1L, 4L, 8L, 11L, 2L, 5L, 8L, 12L) + 12L * k
-        }))),
-        x = rep(c(0, 2.5, 3.8, 4.2, 2, 1.2, 0, 8), copies),
-        dims = c(2L, 12L * copies), repr = "R"
-    )
-    rownames(mat) <- c("r1", "r2")
-    mat
-}
 
 test_that("legacy storage retains stored-zero and fractional semantics", {
     mat <- storage_test_matrix()
@@ -19,9 +7,9 @@ test_that("legacy storage retains stored-zero and fractional semantics", {
     expect_identical(threshold_count_matrix(mat@j, mat@p, mat@x, 1L, 2.8), c(8L, 11L))
     expect_identical(threshold_count_matrix(mat@j, mat@p, mat@x, 1L, 0), c(1L, 4L, 8L, 11L))
     # A stored zero is counted by position, even though its loaded value is zero.
-    counts <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
-        mat@j, mat@p, 12L, 5L, list(c(2L, 3L)), list(4L, c(1L, 5L)),
-        integer(), c(1L, 2L), c(1L, 1L), TRUE, c(2L, 4L, 5L, 8L, 11L)
+    counts <- sparse_pair_counts(
+        mat@j, mat@p, 12L, list(c(2L, 3L)), list(4L, c(1L, 5L)),
+        c(1L, 2L), c(1L, 1L), TRUE, c(2L, 4L, 5L, 8L, 11L)
     )
     expect_identical(counts$n_nonzero_trt, c(1L, 1L))
     expect_identical(counts$n_nonzero_cntrl, c(2L, 2L))
@@ -29,15 +17,16 @@ test_that("legacy storage retains stored-zero and fractional semantics", {
     expect_identical(counts$n_nonzero_tot, c(3L, 3L))
 })
 
-test_that("legacy group kernels consume disposable index vectors", {
+test_that("owned sparse group coordinates remain unchanged across calls", {
     mat <- storage_test_matrix()
     groups <- list(c(2L, 3L), c(4L, 1L, 5L))
-    # The raw native entry point decrements its arguments in place. The storage
-    # adapter must own fresh vectors, rather than expose that to its callers.
-    out <- compute_n_trt_cells_matrix(mat@j, mat@p, 12L, 5L, 2L, groups,
+    before <- serialize(groups, NULL)
+    out <- sparse_group_counts(mat@j, mat@p, 12L, groups,
                                       c(2L, 4L, 5L, 8L, 11L))
     expect_identical(out, matrix(c(1L, 2L, 1L, 2L), 2L))
-    expect_identical(groups, list(c(1L, 2L), c(3L, 0L, 4L)))
+    expect_identical(serialize(groups, NULL), before)
+    expect_identical(sparse_group_counts(mat@j, mat@p, 12L, groups,
+        c(2L, 4L, 5L, 8L, 11L)), out)
 })
 
 test_that("legacy matrix conversion agrees with the selected ondisc copy", {
