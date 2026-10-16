@@ -7,7 +7,7 @@
 #' pair constructor function for screens that aim to map noncoding regulatory
 #' elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 #' *cis*. `construct_cis_pairs()` assumes that the columns `chr`, `start`, and
-#' `stop` are present in the `grna_target_data_frame`, giving the chromosome,
+#' `end` are present in the `grna_target_data_frame`, giving the chromosome,
 #' start position, and end position, respectively, of the region that each gRNA
 #' targets. `construct_cis_pairs()` takes several arguments: `sceptre_object`
 #' (required), `distance_threshold` (optional), `positive_control_pairs`
@@ -136,7 +136,9 @@ construct_cis_pairs <- function(
             ]
             min_posit <- min(x$start)
             max_posit <- max(x$end)
-            midpoint <- as.integer(floor((min_posit + max_posit) / 2))
+            # Integer genomic endpoints may sum beyond INT_MAX even though the
+            # midpoint is representable. Widen before addition, then floor.
+            midpoint <- as.integer(floor((as.double(min_posit) + as.double(max_posit)) / 2))
             paired_responses <- response_ids[compute_genes_within_distance(
                 midpoint,
                 response_posits,
@@ -269,6 +271,9 @@ construct_trans_pairs <- function(
     )
     data.table::setDT(out_pairs)
     if (pairs_to_exclude == "pc_pairs") {
+        # setDT operates by reference. Exclusion preparation owns its table,
+        # including when a caller supplies an existing data.table.
+        positive_control_pairs <- data.table::copy(positive_control_pairs)
         data.table::setDT(positive_control_pairs)
         if (nrow(positive_control_pairs) >= 1) {
             out_pairs <- data.table::fsetdiff(out_pairs, positive_control_pairs)

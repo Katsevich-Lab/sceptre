@@ -174,7 +174,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // compute_genes_within_distance
-std::vector<int> compute_genes_within_distance(int midpoint, IntegerVector gene_tss_posits, int distance_threshold);
+IntegerVector compute_genes_within_distance(int midpoint, IntegerVector gene_tss_posits, int distance_threshold);
 RcppExport SEXP _sceptre_compute_genes_within_distance(SEXP midpointSEXP, SEXP gene_tss_positsSEXP, SEXP distance_thresholdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
