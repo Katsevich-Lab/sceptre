@@ -145,7 +145,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sample_calibration_pairs
-List sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh);
+SEXP sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh);
 RcppExport SEXP _sceptre_sample_calibration_pairs(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

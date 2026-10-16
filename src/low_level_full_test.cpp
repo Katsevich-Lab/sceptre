@@ -1,12 +1,13 @@
 #include <Rcpp.h>
 #include "inference.h"
 #include "sampling_safety.h"
+#include "result_lifetime.h"
 
 using namespace Rcpp;
 
 
 // Sole Rcpp association boundary. y/mu/a/w have n ordered fit cells and D is
-// nuisance-columns x n; observed trt_idxs are R one-based positions and n_trt
+// eigenbasis-rows x n (eigen() order); observed trt_idxs are R one-based positions and n_trt
 // is their observed cardinality. Validate dimensions/positions/budget arithmetic
 // before converting observed positions exactly once. Empty/degenerate numeric
 // fits retain their existing NaN/Inf arithmetic rather than a new fallback.
@@ -43,16 +44,33 @@ SEXP run_association_test(NumericVector y,
   }
   sceptre::sampling::sum(sceptre::sampling::sum(B1, B2, "B1 + B2"), B3,
                          "B1 + B2 + B3");
-  const IntegerVector observed_positions =
-    sceptre::inference::observed_positions_zero_based(trt_idxs);
-  sceptre::inference::EffectEstimate effect =
-    sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
-  double z_orig = sceptre::inference::observed_score(a, w, D, observed_positions);
-  XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
-  if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
-  sceptre::inference::TailResult tail = sceptre::inference::evaluate_staged_tail(
-    z_orig, a, w, D, n_trt, use_all_cells, *draws, B1, B2, B3,
-    fit_parametric_curve, side_code);
-  return sceptre::inference::association_result_record(effect, z_orig, tail,
-                                                       return_resampling_dist);
+  SEXP continuation;
+  sceptre::inference::EffectEstimate effect;
+  double z_orig;
+  sceptre::inference::TailResult* owned_tail;
+  {
+    sceptre::ResultContinuation token;
+    const sceptre::inference::DrawBank* bank;
+    {
+      // Finish owned Rcpp temporaries before allocating the native tail.
+      const IntegerVector observed_positions =
+        sceptre::inference::observed_positions_zero_based(trt_idxs);
+      effect = sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
+      z_orig = sceptre::inference::observed_score(a, w, D, observed_positions);
+      XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
+      if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
+      bank = draws.get();
+    }
+    std::unique_ptr<sceptre::inference::TailResult> tail(new sceptre::inference::TailResult);
+    *tail = sceptre::inference::evaluate_staged_tail(
+      z_orig, a, w, D, n_trt, use_all_cells, *bank, B1, B2, B3,
+      fit_parametric_curve, side_code);
+    owned_tail = tail.release();
+    continuation = token.release();
+  }
+  // No R operation or surviving compute owner in this transfer window.
+  SEXP out = sceptre::inference::association_result_record(
+    effect, z_orig, owned_tail, return_resampling_dist, continuation);
+  UNPROTECT(1);
+  return out;
 }

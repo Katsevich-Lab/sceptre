@@ -35,19 +35,19 @@ not apply here.
 
 ## First repaired-source resource attempt
 
-At source 9631ef2 the fresh installed original/candidate replay passed all228
-outputs, and focused installed tests passed595 checks in17 blocks with no
+At source 9631ef2 the fresh installed original/candidate replay passed all 228
+outputs, and focused installed tests passed 595 checks in 17 blocks with no
 failure/error/warning/skip. Independent source review closed. The first renewed
 resource attempt is preserved at
 `/private/tmp/sceptre-b6-precision-9631ef2-resource-run1` with its complete log.
-The large numeric setting passed timing/RSS (ratio0.913; original/candidate OS
-peak1426.8125/664.765625MiB). The medium numeric triplet setting passed RSS but
-crossed the10% timing gate:20-call medians2.086/2.399s, ratio1.150. The harness
+The large numeric setting passed timing/RSS (ratio 0.913; original/candidate OS
+peak 1426.8125/664.765625MiB). The medium numeric triplet setting passed RSS but
+crossed the 10% timing gate: 20-call medians 2.086/2.399s, ratio 1.150. The harness
 stopped as declared; logical/actual-data settings were not reached. No exception
 was accepted, and none of these trials are discarded or relabeled.
 
 Source inspection identified avoidable overhead: even a whole selected guide
-group already within the2^20-element target allocated another output vector,
+group already within the 2^20-element target allocated another output vector,
 column sequence and sparse column subset. Such groups now directly execute the
 same dense `Matrix::colSums(as.matrix(counts))`; only larger groups use column
 blocks. Dimensions multiply in double. Complete row order/precision and the

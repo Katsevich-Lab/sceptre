@@ -59,29 +59,68 @@ TailResult evaluate_staged_tail(double z_orig,
   return out;
 }
 
-// Wrap numeric components into the real R result schema p/z_orig/fc/se/stage/
-// sn_params, optionally resampling_dist. Copy only the selected owned segment;
-// never serialize/copy a bank pointer. No numeric transformation or mutation.
-Rcpp::List association_result_record(const EffectEstimate& effect, double z_orig,
-                               const TailResult& tail,
-                               bool return_resampling_dist) {
-  Rcpp::NumericVector sn_params = Rcpp::NumericVector::create(
-    tail.sn_params[0], tail.sn_params[1], tail.sn_params[2]);
-  if (return_resampling_dist) {
-    return Rcpp::List::create(Rcpp::Named("p") = tail.p,
-                              Rcpp::Named("z_orig") = z_orig,
-                              Rcpp::Named("fc") = effect.fold_change,
-                              Rcpp::Named("se") = effect.standard_error,
-                              Rcpp::Named("stage") = tail.stage,
-                              Rcpp::Named("sn_params") = sn_params,
-                              Rcpp::Named("resampling_dist") = tail.null_statistics);
+namespace {
+// A trivial stack context survives R's protected leaf; it owns no destructor.
+// Only tail has native storage, deleted by the registered cleanup below.
+struct AssociationRecord {
+  EffectEstimate effect;
+  double z_orig;
+  TailResult* tail;
+  bool return_resampling_dist;
+};
+
+// Exact reached-segment conversion, without Rcpp precious objects or native
+// allocation/C++ throws. Do not allocate unused B2/B3 capacity for a stage1
+// return. The caller registered cleanup before this leaf can allocate/error.
+SEXP association_record_leaf(void* data) {
+  const AssociationRecord* record = static_cast<AssociationRecord*>(data);
+  const TailResult* tail = record->tail;
+  const int fields = record->return_resampling_dist ? 7 : 6;
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, fields));
+  SEXP names = PROTECT(Rf_allocVector(STRSXP, fields));
+  const char* labels[] = {"p", "z_orig", "fc", "se", "stage", "sn_params", "resampling_dist"};
+  const double scalars[] = {tail->p, record->z_orig, record->effect.fold_change,
+                            record->effect.standard_error};
+  for (int field = 0; field < fields; ++field)
+    SET_STRING_ELT(names, field, Rf_mkChar(labels[field]));
+  for (int field = 0; field < 4; ++field) {
+    SET_VECTOR_ELT(out, field, Rf_allocVector(REALSXP, 1));
+    REAL(VECTOR_ELT(out, field))[0] = scalars[field];
   }
-  return Rcpp::List::create(Rcpp::Named("p") = tail.p,
-                            Rcpp::Named("z_orig") = z_orig,
-                            Rcpp::Named("fc") = effect.fold_change,
-                            Rcpp::Named("se") = effect.standard_error,
-                            Rcpp::Named("stage") = tail.stage,
-                            Rcpp::Named("sn_params") = sn_params);
+  SET_VECTOR_ELT(out, 4, Rf_allocVector(INTSXP, 1));
+  INTEGER(VECTOR_ELT(out, 4))[0] = tail->stage;
+  SET_VECTOR_ELT(out, 5, Rf_allocVector(REALSXP, 3));
+  double* sn_params = REAL(VECTOR_ELT(out, 5));
+  for (int i = 0; i < 3; ++i) sn_params[i] = tail->sn_params[i];
+  if (record->return_resampling_dist) {
+    const R_xlen_t size = tail->null_statistics.size();
+    SET_VECTOR_ELT(out, 6, Rf_allocVector(REALSXP, size));
+    double* target = REAL(VECTOR_ELT(out, 6));
+    for (R_xlen_t i = 0; i < size; ++i) target[i] = tail->null_statistics[i];
+  }
+  Rf_setAttrib(out, R_NamesSymbol, names);
+  UNPROTECT(2);
+  return out;
+}
+
+// Runs exactly once after conversion or before R resumes its original jump.
+// Destruction is allocation-free/noexcept, including an empty selected segment.
+void delete_association_tail(void* data, Rboolean) noexcept {
+  AssociationRecord* record = static_cast<AssociationRecord*>(data);
+  delete record->tail;
+  record->tail = nullptr;
+}
+} // namespace
+
+// Preserve p/z/effect/SE/stage/SN and optional selected distribution, consuming
+// native ownership at an exact-size R-only leaf. A precreated nonNULL protected
+// token installs R's cleanup context without an allocating transfer window.
+SEXP association_result_record(const EffectEstimate& effect, double z_orig,
+                               TailResult* tail, bool return_resampling_dist,
+                               SEXP continuation) {
+  AssociationRecord record = {effect, z_orig, tail, return_resampling_dist};
+  return R_UnwindProtect(association_record_leaf, &record,
+                         delete_association_tail, &record, continuation);
 }
 
 } // namespace inference

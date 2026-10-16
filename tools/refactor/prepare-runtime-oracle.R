@@ -28,6 +28,11 @@ status <- system2(file.path(R.home("bin"), "Rscript"), c(
 ))
 if (!identical(status, 0L)) stop("The separate-process original-package oracle failed.")
 output <- normalizePath(output, winslash = "/", mustWork = TRUE)
+reference <- normalizePath(reference, winslash = "/", mustWork = TRUE)
 env_file <- Sys.getenv("GITHUB_ENV")
-if (nzchar(env_file)) cat("SCEPTRE_REFACTOR_ORACLE=", output, "\n", sep = "", file = env_file, append = TRUE)
+if (nzchar(env_file)) {
+    cat("SCEPTRE_REFACTOR_ORACLE=", output, "\n", sep = "", file = env_file, append = TRUE)
+    cat("SCEPTRE_REFACTOR_ORIGINAL_SOURCE=", reference, "\n", sep = "", file = env_file, append = TRUE)
+}
 cat("SCEPTRE_REFACTOR_ORACLE=", output, "\n", sep = "")
+cat("SCEPTRE_REFACTOR_ORIGINAL_SOURCE=", reference, "\n", sep = "")

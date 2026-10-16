@@ -20,7 +20,7 @@ backed CRT, or plugin framework is introduced by this work.
 | Cache validity and updates | `R/fit_cache.R` | Supported mutation events, keyed compact fits, facade writeback |
 | Distinct association plans | `R/association_execution.R`, `R/association_workers.R` | Response traversal for permutation; guide traversal for CRT |
 | Worker mechanics | `R/execution.R` | Partition dispatch, progress/logs and result binding |
-| Native inference | `src/inference_scores.cpp`, `src/inference_tail.cpp`, `src/inference_stages.cpp` | Explicit arrays/draw-bank references; legacy wrapper in `src/low_level_full_test.cpp` |
+| Native inference | `src/inference_scores.cpp`, `src/inference_tail.cpp`, `src/inference_stages.cpp` | Explicit arrays/draw-bank references; checked Rcpp entry in `src/low_level_full_test.cpp` |
 | Results and finalization | `R/result_processing.R` | Native records to raw tables, failed-QC rows, guide integration and family correction |
 
 ```mermaid
@@ -51,13 +51,13 @@ responses. NT-control discovery retains guide-specific response fits.
 Canonical transient group memberships use analysis positions. Persisted legacy
 NT-local assignments are normalized once by `prepare_index_context()`.
 
-`make_fit_view()` supplies ordered source columns and local treatment/control
-positions. Response extraction and design subsetting use the same view. Raw
+`make_fit_view()` supplies ordered source columns and local treatment positions.
+Response extraction and design subsetting use the same view. Raw
 source memberships are normalized in analysis order, preserving the old mask
 semantics rather than the order of the raw vector. Request-row maps preserve
 identity independently of response-sorted count scans and execution traversal.
 
-Storage takes R 1-based source positions. The legacy Rcpp inference entrypoint
+Storage takes R 1-based source positions. The Rcpp `run_association_test()` entry
 also accepts R 1-based observed treatment positions, converts them once, and
 calls private components using zero-based positions. Synthetic draw banks are
 already zero-based and never pass through that conversion.
@@ -76,6 +76,17 @@ context selects its common design once, and guide-specific NT fits select their
 own aligned rows from that view. Cache identity checks the actual source design
 and fit-cell scope; changing a fitted response's name alone cannot establish
 that an old coefficient/dispersion record is reusable.
+Score vectors share that fit-cell order. `D` has one column per fit cell and
+one row per eigencomponent in `eigen()` order; its row count equals the number
+of design coefficients, but its rows are not original coefficient coordinates.
+
+Native count kernels and calibration-group construction allocate their R
+outputs before native compute owners. Calibration-pair and association returns
+instead protect an R continuation before computation, then transfer the exact
+selected native result into a raw R conversion leaf with cleanup on success or
+R error. Compute owners end before that leaf; it allocates the actual accepted
+rows/selected null segment, with no unused-stage buffer or bank copy. The
+controlled ownership probes qualify those declared payload/scratch boundaries.
 
 The private ondisc route is deliberate: backing pointers, identity-preserving
 construction, reattachment and private kernels are confined to `storage.R`.
@@ -86,13 +97,17 @@ Dense import forces general shape before sparsification so both triangles and
 near-symmetric values survive; the supported coercion can add one dense input
 copy. Sparse conversion owns columns before sorting, reusing only constructor-
 owned columns. In-memory vector aggregation prepares sparse row access and
-keeps existing dense vector-by-cell output/transpose workspace; it does not
-materialize the complete sparse guide input. File-coordinate duplicates are
+sums each selected guide group in dense column blocks using the original
+platform's dense accumulator. Blocks target 2^20 elements; one complete selected
+column is the minimum and can exceed that target. Existing dense vector-by-cell
+output/transpose workspace is additional. The complete sparse guide input is
+not materialized densely. File-coordinate duplicates are
 rejected by the owned Cell Ranger/Parse constructors; the external ondisc file
 parser remains a separate boundary.
 Response access materializes one complete source row before selecting a cell
-view. Regular QC can request a fused NT summary; nuclear/pod QC omits that
-all-response summary and counts its requested response block. These are concrete
+view. Sparse QC computes the all-response NT summary. Backed regular QC can
+request a fused NT summary; the actual backed nuclear/pod path omits that
+summary and counts its requested response block. These are concrete
 I/O and allocation boundaries, not promises of arbitrary out-of-core scalability.
 
 ## Where to make a later change
@@ -136,9 +151,13 @@ are characterized rather than silently normalized.
 including `se_fold_change`. `assemble_pair_results()` restores failed-QC rows
 and the output ordering. `integrate_guides()` and
 `finalize_association_result()` take plain tables and explicit settings; neither
-needs an S4 object. Finalized standard analyses integrate and correct the complete
-family after collection. Nuclear pipeline shards remain raw Parquet without a
+needs an S4 object. Standard calibration/discovery integrate and correct the
+complete family after collection; power analysis applies grouping alone.
+Nuclear pipeline shards remain raw Parquet without a
 global correction or significance column.
+Stage-1 and empirical-tail diagnostics, and padded null-draw columns, can be
+missing in valid results. Discovery plotting selects complete p-value, effect
+and significance fields; optional diagnostic missingness does not remove rows.
 
 Private pipeline names such as QC/calibration part functions and result
 processors remain compatibility entrypoints. Unconsumed precomputation/table
@@ -158,7 +177,7 @@ the transient context, filters the eligible family and dispatches its plan.
 `run_permutation_analysis()` visits responses, whereas `run_crt_analysis()` first
 prepares response fits and then visits guides. The four functions in
 `association_workers.R` express shared versus guide-specific fits explicitly.
-They use storage reads and aligned fit/score inputs, then call the Rcpp boundary
+They use storage reads and aligned fit/score inputs, then call `run_association_test()`
 in `low_level_full_test.cpp`; score/effect arithmetic and selected tail segments
 belong to the inference components, not the facade. Result assembly restores
 failed-QC requests before complete-family guide integration/correction, or

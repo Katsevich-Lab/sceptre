@@ -1,12 +1,48 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; bounded cleanup and resource qualification continue.**
+**Active, incomplete; closing known findings before one combined source freeze.**
 Integration branch: `codex/refactor`. The count allocation remedy, bounded legacy
 units, pair/getter cleanup, sparse vector aggregation and separate dense-entry
-repair are integrated. Native retirement and final acceptance remain open.
+repair are integrated. Native retirement is source-reviewed and integrated;
+the native return-lifetime repair is integrated. Final combined acceptance remains open.
 Resource and combined installed-source acceptance remain open. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
+
+## Bounded finish
+
+The fresh independent whole-package review is retained at
+[cc01683](cleanup/implementation-reviews/sceptre-whole-package-review-cc01683.md),
+with per-file/flow coverage and its bounded reproduction. It endorses the R
+responsibility split without a larger framework, but identifies the inherited
+diagnostic-NA plotting and native return-allocation lifetime defects. The
+separate [B8/B9 dispositions](cleanup/behavior-dispositions.md) bound those fixes.
+The plotting/view unit passes 99 focused plotting and 88 contract checks, with
+independent source review closed. The native fix passes 959 controlled cases
+(12 successes, 858 raw R errors, 89 native allocation errors), a separate safe
+negative control, and 112 component expectations. Scoped source/probe review
+closed; the [complete native evidence](results/native-result-lifetime-6dbd1d0/README.md)
+retains every attempt and the recovered transformed source. Global/pre-leaf
+Rcpp precious-object cleanup is outside this declared native-buffer guarantee.
+
+Finish these known findings and the already prepared contract/view corrections,
+then select one explicit immutable production checkpoint. Further nonblocking
+improvements go to follow-up work; reopen production only for a required gate
+failure or material finding. No percentage estimate describes the remaining time.
+
+The final acceptance record must bind the same checkpoint to all rows below.
+Earlier passing counts remain historical evidence, not a combined qualification.
+
+| Required final gate | Evidence needed |
+| --- | --- |
+| Immutable source/build | Archive, source blobs, fresh native compilation, DLL and matched original toolchain/dependencies |
+| Installed package and native components | Full suite with required backed coverage, API/saved/workflow/index/cache/RNG contracts, independent original oracle and full active sampler banks |
+| Native error ownership | Count, draw, dispersion and new result-return controlled probes; explicit scope and negative controls |
+| Actual consumers | All 30 script stages; standard/nuclear Nextflow under the disclosed shared arrival plan; selected book cells with the known baseline failure retained |
+| Resources | Fresh complete-workflow comparison and call/allocation diagnostics; source-invariant carry-forward of separately qualified B6 and accepted triplet/dense paths, with material deltas reassessed |
+| Maintainability/review | Current measurements with fixed denominators, four repeated source traces, complete architecture/native-contract review and fresh independent follow-up |
+| Bioconductor checks | Actual paired BiocCheck on original/frozen candidate with matched supported R/Bioc/checker versions; full logs and inherited/new/submission-only dispositions |
+| Hosted checks | All five jobs successful on the final code-bearing checkpoint; retained failed runs remain visible |
 
 ## Current checkpoint and next dependency
 
@@ -109,8 +145,15 @@ The repair keeps sparse row preparation but sums complete selected rows in
 bounded dense column blocks, preserving the current platform's original
 accumulator. Tests now execute the frozen original on the same platform,
 including all 28 immutable fixtures and 200 seeded duplicate/rounding cases.
-Fresh installed, hosted and resource qualification of the repair is required;
-see [the superseding amendment](cleanup/aggregation-precision-amendment.md).
+The optimized 783a250 build passes 613 installed checks and 228 exact original
+comparisons. Its complete 80-child resource study passes four exact-output/RSS
+pairs and all three meaningful timing gates; actual-data timing remains
+inconclusive below one second. Independent source/resource review closed.
+[All passing and failed attempts](results/aggregation-qualified-783a250/README.md)
+and [the superseding amendment](cleanup/aggregation-precision-amendment.md)
+remain preserved. Hosted 3d9fafc numerical tests pass in all five lanes; standard
+checks fail only the new tests' undeclared digest dependency, corrected in
+Suggests at e933db5. Final combined installed/hosted qualification remains open.
 Dense output/transpose workspace, metadata multiplicity and backed capability
 are unchanged.
 Dispersion taxonomy has 107 exact

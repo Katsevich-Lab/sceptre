@@ -1,0 +1,1529 @@
+{
+  "review_pin": "cc016835fddaa5dec9a87c9bead61914153433b0",
+  "baseline": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "created_at": "2026-10-16T17:49:36.383972+00:00",
+  "source_archive": "/private/tmp/sceptre-whole-review-cc01683",
+  "source_authority": "every archived source byte matched git show at immutable review pin",
+  "files": [
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "01a8ba663bd6a45fde8f114aaf43812649e3bd8051305acf05e779ae6da52d9f",
+      "git_blob": "592e5cf7a548c155a263637dea6071ce3ae402eb",
+      "line_count": 193,
+      "kind": "handwritten",
+      "review_level": "full declaration/document read",
+      "functions": []
+    },
+    {
+      "path": "DESCRIPTION",
+      "sha256": "e7ed22cbaacdd83c74668d5849e725a02a0a3fe2580b9277f8b3edcc2bda972d",
+      "git_blob": "f45462122a17f8af39e0e0e32d9e8c03c8af07e2",
+      "line_count": 62,
+      "kind": "handwritten",
+      "review_level": "full declaration/document read",
+      "functions": []
+    },
+    {
+      "path": "NAMESPACE",
+      "sha256": "098043a6ccf2135f3c47f5ba78c069cd3243ee8b9d2383fa549dc25a6421f89d",
+      "git_blob": "00c44063f4940de4d9de6d669e1e6dae84da3f99",
+      "line_count": 35,
+      "kind": "handwritten",
+      "review_level": "full declaration/document read",
+      "functions": []
+    },
+    {
+      "path": "R/RcppExports.R",
+      "sha256": "38941dba2ff7500d8dd5d4991bf30d4c0ededac8a1dbd9d6c98ccfc7a2c40e75",
+      "git_blob": "9e323f62d402c2b21d1904811293ebe9455c21a7",
+      "line_count": 100,
+      "kind": "generated",
+      "review_level": "registration/signature and adapter boundary inspected; no regeneration or exhaustive generated-code audit",
+      "functions": [
+        {
+          "name": "estimate_theta",
+          "line": 4
+        },
+        {
+          "name": "fisher_yates_sampler",
+          "line": 14
+        },
+        {
+          "name": "hybrid_fisher_iwor_sampler",
+          "line": 25
+        },
+        {
+          "name": "crt_index_sampler",
+          "line": 29
+        },
+        {
+          "name": "crt_index_sampler_fast",
+          "line": 33
+        },
+        {
+          "name": "run_low_level_test_full_v4",
+          "line": 37
+        },
+        {
+          "name": "run_reduced_em_algo_cpp",
+          "line": 41
+        },
+        {
+          "name": "sample_combinations_v2",
+          "line": 45
+        },
+        {
+          "name": "iterate_over_combinations",
+          "line": 49
+        },
+        {
+          "name": "increment_matrix",
+          "line": 53
+        },
+        {
+          "name": "sample_undercover_pairs_v2",
+          "line": 57
+        },
+        {
+          "name": "compute_genes_within_distance",
+          "line": 61
+        },
+        {
+          "name": "evaluate_pair_eligibility_cpp",
+          "line": 65
+        },
+        {
+          "name": "sparse_pair_counts",
+          "line": 69
+        },
+        {
+          "name": "sparse_group_counts",
+          "line": 73
+        },
+        {
+          "name": "load_csr_row",
+          "line": 77
+        },
+        {
+          "name": "obtain_pointer_vector",
+          "line": 81
+        },
+        {
+          "name": "compute_cell_covariates_cpp",
+          "line": 85
+        },
+        {
+          "name": "compute_n_grnas_per_cell_vector",
+          "line": 89
+        },
+        {
+          "name": "increment_vector",
+          "line": 93
+        },
+        {
+          "name": "threshold_count_matrix",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "path": "R/analysis.R",
+      "sha256": "05de77ba0b217b64d755a10f8eceee60bc472f029dbb1b0ea4e1e0a0a93b2497",
+      "git_blob": "271e06ae56f0da080e1537365b28c0990bf3da56",
+      "line_count": 41,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "analyze_association_pairs",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "R/analysis_context.R",
+      "sha256": "c24034bbc966a1bdd7f49df99dee4f58973279a0e324e7baeee2a839f1a456b7",
+      "git_blob": "4df9c260f39085b72a93a3bc41396def6775f1db",
+      "line_count": 222,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "prepare_cell_map",
+          "line": 11
+        },
+        {
+          "name": "source_membership_to_analysis",
+          "line": 27
+        },
+        {
+          "name": "encode_nt_fit_assignments",
+          "line": 40
+        },
+        {
+          "name": "calibration_group_membership",
+          "line": 54
+        },
+        {
+          "name": "resolve_pair_rows",
+          "line": 68
+        },
+        {
+          "name": "prepare_index_context",
+          "line": 88
+        },
+        {
+          "name": "group_treatment_analysis",
+          "line": 126
+        },
+        {
+          "name": "make_fit_view",
+          "line": 147
+        },
+        {
+          "name": "make_treatment_index_lookup",
+          "line": 180
+        },
+        {
+          "name": "prepare_analysis_context",
+          "line": 202
+        }
+      ]
+    },
+    {
+      "path": "R/assign_grna_functions.R",
+      "sha256": "d9ce47de1d9ba371ef366deda9c26744d6616d220273b3e19c0f32c688a5f48c",
+      "git_blob": "e4bfc3ad040aa6085b9c75597ba69237d452a2e5",
+      "line_count": 277,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "assign_grnas_to_cells",
+          "line": 13
+        },
+        {
+          "name": "assign_grnas_to_cells_thresholding",
+          "line": 102
+        },
+        {
+          "name": "assign_grnas_to_cells_maximum",
+          "line": 133
+        },
+        {
+          "name": "process_initial_assignment_list",
+          "line": 172
+        },
+        {
+          "name": "determine_grnas_in_use",
+          "line": 248
+        }
+      ]
+    },
+    {
+      "path": "R/association_execution.R",
+      "sha256": "8915709e29869860bae5b6562b965318063a33c1dfdf161369d62e07ca022451",
+      "git_blob": "7cd455d3fe70e24311050c6cf059b04fa60c070e",
+      "line_count": 167,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "run_permutation_analysis",
+          "line": 13
+        },
+        {
+          "name": "analyze_response_block",
+          "line": 23
+        },
+        {
+          "name": "run_crt_analysis",
+          "line": 84
+        },
+        {
+          "name": "prepare_response_block",
+          "line": 94
+        },
+        {
+          "name": "analyze_guide_block",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "path": "R/association_workers.R",
+      "sha256": "dc9f8e5722463734e717c49dfa91af8035deb93aaeb179e2bb970c336dcdc58b",
+      "git_blob": "cc00230018ca300dd4cf964e5cf6d444c6c92faa",
+      "line_count": 144,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "test_permutation_shared_fit",
+          "line": 15
+        },
+        {
+          "name": "test_permutation_group_fit",
+          "line": 48
+        },
+        {
+          "name": "test_crt_shared_fit",
+          "line": 85
+        },
+        {
+          "name": "test_crt_group_fit",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "path": "R/aux_functions.R",
+      "sha256": "e19d9dbc78f091f0e71347aae299c9a0228e8f6526210a01c5bb744abc653dc6",
+      "git_blob": "7c9b1408e3e0a2b1a309488f0e39c26eee148001",
+      "line_count": 169,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "auto_construct_formula_object",
+          "line": 9
+        },
+        {
+          "name": "auto_compute_cell_covariates",
+          "line": 65
+        },
+        {
+          "name": "partition_response_ids",
+          "line": 109
+        },
+        {
+          "name": "get_log_dir",
+          "line": 163
+        }
+      ]
+    },
+    {
+      "path": "R/cellwise_qc_functs.R",
+      "sha256": "97f7dd7c715f54472c5eccfe1e7b7d3883aea68bb6c5cd2c4cf6fbbb827862ff",
+      "git_blob": "f1ea15df2e9493a31fa9c65548e20ff6c51d028d",
+      "line_count": 139,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "determine_cells_to_retain",
+          "line": 13
+        },
+        {
+          "name": "exclude_cells_by_clipping_counts",
+          "line": 25
+        },
+        {
+          "name": "update_grna_assignments_given_qc",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "path": "R/check_functions.R",
+      "sha256": "3b021705dcf19128b263e871fe65ee75bd45ed0a8630b238b859367560731f34",
+      "git_blob": "76a51b1cbb91fceb6f38cdcdbf2d2e7d0d7de0db",
+      "line_count": 823,
+      "kind": "handwritten",
+      "review_level": "all executable bodies read; internal contracts and relevant public help inspected; public examples selectively skimmed",
+      "functions": [
+        {
+          "name": "check_import_data_inputs",
+          "line": 12
+        },
+        {
+          "name": "check_matrix_class",
+          "line": 70
+        },
+        {
+          "name": "check_set_analysis_parameters",
+          "line": 254
+        },
+        {
+          "name": "check_parallel_supported",
+          "line": 442
+        },
+        {
+          "name": "check_processor_count",
+          "line": 463
+        },
+        {
+          "name": "check_assign_grna_inputs",
+          "line": 485
+        },
+        {
+          "name": "check_run_qc_inputs",
+          "line": 625
+        },
+        {
+          "name": "check_native_scalar_count",
+          "line": 676
+        },
+        {
+          "name": "checked_resampling_total",
+          "line": 689
+        },
+        {
+          "name": "compute_empirical_budget",
+          "line": 702
+        },
+        {
+          "name": "check_calibration_check_inputs",
+          "line": 721
+        },
+        {
+          "name": "check_discovery_analysis_inputs",
+          "line": 770
+        }
+      ]
+    },
+    {
+      "path": "R/data.R",
+      "sha256": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+      "git_blob": "abfba6416986486937e7446941985b92eea0f613",
+      "line_count": 69,
+      "kind": "handwritten",
+      "review_level": "all runtime declarations read; public dataset/package help and examples selectively inspected",
+      "functions": []
+    },
+    {
+      "path": "R/execution.R",
+      "sha256": "679d96e3f20e8be9178cdc4de1e3de3dd7503d941a49db8687c93fe4c4981235",
+      "git_blob": "7cc4277b54ed9ac9324768a7a8f417a6f8d64fee",
+      "line_count": 94,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "analysis_log_file",
+          "line": 11
+        },
+        {
+          "name": "announce_parallel_analysis",
+          "line": 23
+        },
+        {
+          "name": "execute_analysis_blocks",
+          "line": 43
+        },
+        {
+          "name": "bind_analysis_results",
+          "line": 57
+        },
+        {
+          "name": "report_worker_progress",
+          "line": 71
+        },
+        {
+          "name": "collect_worker_garbage",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "path": "R/fit_cache.R",
+      "sha256": "9decdf97b39ec9da539bf806cd4064ff033c60e0109254064cf0cb6173ce22a1",
+      "git_blob": "d47339ad32781a63d1fe731b9ca8d082e8ce9b99",
+      "line_count": 86,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "response_cache_parameters_changed",
+          "line": 14
+        },
+        {
+          "name": "response_cache_assignments_changed",
+          "line": 28
+        },
+        {
+          "name": "invalidate_response_cache",
+          "line": 43
+        },
+        {
+          "name": "lookup_response_fit",
+          "line": 58
+        },
+        {
+          "name": "merge_response_fits",
+          "line": 69
+        },
+        {
+          "name": "commit_response_fits",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "path": "R/fitting.R",
+      "sha256": "0b6935e9439ff9e32f4699ad1968c0fdd8180d7c87f955b255b226fe77208993",
+      "git_blob": "b9685028096377202a472561ee34d4f0d3378c26",
+      "line_count": 60,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "fit_response",
+          "line": 16
+        },
+        {
+          "name": "fit_assignment_probabilities",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "path": "R/getters_and_setters.R",
+      "sha256": "26647c51ce4c9b855c08e9d3bd01f5308239a384555ef26a3134259c1aa59f41",
+      "git_blob": "fe0cccbe5a3024a96ba69c0bc691fec68f88c192",
+      "line_count": 159,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "get_response_matrix",
+          "line": 37
+        },
+        {
+          "name": "get_grna_matrix",
+          "line": 45
+        },
+        {
+          "name": "get_cell_covariates",
+          "line": 53
+        },
+        {
+          "name": "get_grna_assignments",
+          "line": 108
+        },
+        {
+          "name": "set_response_matrix",
+          "line": 146
+        },
+        {
+          "name": "set_grna_matrix",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "path": "R/import_functs.R",
+      "sha256": "655408c18017122a203660108bafbed5e75ef4dc631b3a0fb9431b5abc4dca75",
+      "git_blob": "2ebf019e0cec6bad3fb9107f98a24887886488b5",
+      "line_count": 1160,
+      "kind": "handwritten",
+      "review_level": "all executable bodies read; internal contracts and relevant public help inspected; public examples selectively skimmed",
+      "functions": [
+        {
+          "name": "import_data",
+          "line": 70
+        },
+        {
+          "name": "import_data_memory",
+          "line": 118
+        },
+        {
+          "name": "import_data_use_ondisc",
+          "line": 174
+        },
+        {
+          "name": "import_data_from_cellranger",
+          "line": 301
+        },
+        {
+          "name": "import_data_from_cellranger_memory",
+          "line": 340
+        },
+        {
+          "name": "import_data_from_cellranger_use_ondisc",
+          "line": 628
+        },
+        {
+          "name": "import_data_from_parse",
+          "line": 748
+        },
+        {
+          "name": "load_matrix",
+          "line": 780
+        },
+        {
+          "name": "init_sceptre_object",
+          "line": 852
+        },
+        {
+          "name": "create_csc_matrix",
+          "line": 899
+        },
+        {
+          "name": "get_mtx_metadata",
+          "line": 933
+        },
+        {
+          "name": "write_matrices_to_disk",
+          "line": 960
+        },
+        {
+          "name": "prepare_directory_to_write",
+          "line": 980
+        },
+        {
+          "name": "prepare_ondisc_file_path",
+          "line": 1012
+        },
+        {
+          "name": "check_path_has_no_tilde",
+          "line": 1039
+        },
+        {
+          "name": "process_covariates_and_matrices",
+          "line": 1066
+        },
+        {
+          "name": "collapse_grna_target_data_frame",
+          "line": 1106
+        },
+        {
+          "name": "collapse_grna_matrix",
+          "line": 1136
+        }
+      ]
+    },
+    {
+      "path": "R/mixture_model_functs.R",
+      "sha256": "d3d05730b8912169063dcfb0ffea94056ab188fd276b355470537b5ec5605ff8",
+      "git_blob": "25d5b73b3b20c3000e11d56c4e3f92bbada82096",
+      "line_count": 215,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "assign_grnas_to_cells_mixture",
+          "line": 13
+        },
+        {
+          "name": "assign_guide_block",
+          "line": 70
+        },
+        {
+          "name": "obtain_em_assignments",
+          "line": 143
+        },
+        {
+          "name": "get_random_starting_guesses",
+          "line": 197
+        }
+      ]
+    },
+    {
+      "path": "R/neg_control_functions.R",
+      "sha256": "f4fe402cc769cb8d823cf31f18a1b86c2c2a57f664a78aa20c19fce8cb6717dd",
+      "git_blob": "c774cefe889fe2d5032a207ca74aae9b9f8a05f0",
+      "line_count": 167,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "construct_negative_control_pairs_v2",
+          "line": 13
+        },
+        {
+          "name": "compute_calibration_group_size",
+          "line": 141
+        },
+        {
+          "name": "get_undercover_group_names",
+          "line": 163
+        }
+      ]
+    },
+    {
+      "path": "R/ondisc_functs.R",
+      "sha256": "5c6579aac2477259e2209cc0da68ccce839971abab96df08015f83decc19704d",
+      "git_blob": "e8b02d37c29d2fcea079e33523913633197c7398",
+      "line_count": 122,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "read_ondisc_backed_sceptre_object",
+          "line": 54
+        },
+        {
+          "name": "write_ondisc_backed_sceptre_object",
+          "line": 84
+        },
+        {
+          "name": "get_id_vect",
+          "line": 102
+        },
+        {
+          "name": "write_vector",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "path": "R/pair_constructor_functs.R",
+      "sha256": "95135d4871d73b90e53bba1f1f06cb3ae4210ddadc17155c2198ef7c685b7971",
+      "git_blob": "406cfa023c1769be89df79a7bc4e5d8673b6f9d9",
+      "line_count": 332,
+      "kind": "handwritten",
+      "review_level": "all executable bodies read; internal contracts and relevant public help inspected; public examples selectively skimmed",
+      "functions": [
+        {
+          "name": "construct_cis_pairs",
+          "line": 58
+        },
+        {
+          "name": "construct_trans_pairs",
+          "line": 240
+        },
+        {
+          "name": "construct_positive_control_pairs",
+          "line": 320
+        }
+      ]
+    },
+    {
+      "path": "R/pair_qc.R",
+      "sha256": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+      "git_blob": "944baf3ecc6b0f7186961bb658588c0d36af26d8",
+      "line_count": 34,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "collect_pair_qc_metrics",
+          "line": 11
+        },
+        {
+          "name": "evaluate_pair_eligibility",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "R/pairwise_qc_functs.R",
+      "sha256": "27f9ecb236ef0b56dbd2ebc880bc847201bd31b3d15fa1d91ad6eb516cc4a5e8",
+      "git_blob": "2b0024eb1992d9d9679c6b257e70db69d4ff619f",
+      "line_count": 127,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "compute_pairwise_qc_information",
+          "line": 10
+        },
+        {
+          "name": "compute_qc_metrics",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "path": "R/plotting_functions.R",
+      "sha256": "66b1547678d785da9d14ed2fd784ac8d5ed42bb88059a73742bb65c8de98bcfa",
+      "git_blob": "5a10901b0cff23df191ad10b24fb7fd9810348a2",
+      "line_count": 1658,
+      "kind": "handwritten",
+      "review_level": "all executable bodies read; internal contracts and relevant public help inspected; public examples selectively skimmed",
+      "functions": [
+        {
+          "name": "get_my_theme",
+          "line": 5
+        },
+        {
+          "name": "plot_grna_count_distributions",
+          "line": 69
+        },
+        {
+          "name": "grna_expressions_to_binned_factor",
+          "line": 118
+        },
+        {
+          "name": "plot_assign_grnas",
+          "line": 285
+        },
+        {
+          "name": "plot_run_calibration_check",
+          "line": 536
+        },
+        {
+          "name": "compare_calibration_and_discovery_results",
+          "line": 659
+        },
+        {
+          "name": "make_volcano_plot",
+          "line": 745
+        },
+        {
+          "name": "plot_run_discovery_analysis",
+          "line": 858
+        },
+        {
+          "name": "plot_covariates",
+          "line": 1014
+        },
+        {
+          "name": "make_histogram",
+          "line": 1032
+        },
+        {
+          "name": "plot_run_qc",
+          "line": 1162
+        },
+        {
+          "name": "plot_cellwise_qc",
+          "line": 1197
+        },
+        {
+          "name": "plot_pairwise_qc",
+          "line": 1245
+        },
+        {
+          "name": "plot_run_power_check",
+          "line": 1359
+        },
+        {
+          "name": "downsample_result_data_frame",
+          "line": 1432
+        },
+        {
+          "name": "plot_response_grna_target_pair",
+          "line": 1490
+        }
+      ]
+    },
+    {
+      "path": "R/preprocessing_functions.R",
+      "sha256": "0658ba6fa9737ade671633bef93cda547e6b693dec6ed69845b6d0ae0806eca1",
+      "git_blob": "4cf410069e223f5c4a9ccc878f9a1ec7d577078d",
+      "line_count": 243,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "convert_covariate_df_to_design_matrix",
+          "line": 9
+        },
+        {
+          "name": "compute_cell_covariates",
+          "line": 54
+        },
+        {
+          "name": "get_synthetic_permutation_idxs",
+          "line": 117
+        },
+        {
+          "name": "update_dfs_based_on_grouping_strategy",
+          "line": 196
+        },
+        {
+          "name": "update_targeting_pairs",
+          "line": 209
+        }
+      ]
+    },
+    {
+      "path": "R/qq_plot_helpers.R",
+      "sha256": "348fc17cde0864bea749054fa755324d7f1b24dd746395cd6eb8c6b19ec7d568",
+      "git_blob": "c50c023cfd162bab8eff687c0403b7c658e4abd9",
+      "line_count": 267,
+      "kind": "handwritten",
+      "review_level": "all executable bodies read; internal contracts and relevant public help inspected; public examples selectively skimmed",
+      "functions": [
+        {
+          "name": "stat_qq_band",
+          "line": 111
+        },
+        {
+          "name": "stat_qq_points",
+          "line": 212
+        },
+        {
+          "name": "revlog_trans",
+          "line": 253
+        },
+        {
+          "name": "trans",
+          "line": 254
+        },
+        {
+          "name": "inv",
+          "line": 257
+        }
+      ]
+    },
+    {
+      "path": "R/result_processing.R",
+      "sha256": "5d94e22022669ba12af53b7dd221d05c3149ca367b857625f1807e8072b21185",
+      "git_blob": "6a185802f85ed5904985db2b4019b8533979525f",
+      "line_count": 206,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "pair_results_from_native",
+          "line": 10
+        },
+        {
+          "name": "integrate_guides",
+          "line": 79
+        },
+        {
+          "name": "assemble_pair_results",
+          "line": 144
+        },
+        {
+          "name": "finalize_association_result",
+          "line": 159
+        },
+        {
+          "name": "process_calibration_result",
+          "line": 179
+        },
+        {
+          "name": "process_discovery_result",
+          "line": 190
+        },
+        {
+          "name": "apply_grouping_to_result",
+          "line": 202
+        }
+      ]
+    },
+    {
+      "path": "R/s4_analysis_functs_1.R",
+      "sha256": "52df97f69fe6f5a9b9876ac4bbccb92fab7c03df88b1ad31d8d8ce1c73b8d3d1",
+      "git_blob": "9ad69698b642079a3ae2b13064bc76f2bd83e2a0",
+      "line_count": 554,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "set_analysis_parameters",
+          "line": 67
+        },
+        {
+          "name": "assign_grnas",
+          "line": 255
+        },
+        {
+          "name": "run_qc",
+          "line": 406
+        },
+        {
+          "name": "run_qc_pt_1",
+          "line": 440
+        },
+        {
+          "name": "run_qc_pt_2",
+          "line": 527
+        }
+      ]
+    },
+    {
+      "path": "R/s4_analysis_functs_2.R",
+      "sha256": "026e88e022d7a93e09ddb34d813524d121cdeafab3851d2bc86f45f120c55868",
+      "git_blob": "7bb75f68f43a3f3e86ca772d5fb3937f6ea2730f",
+      "line_count": 678,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "run_calibration_check",
+          "line": 60
+        },
+        {
+          "name": "run_calibration_check_pt_1",
+          "line": 101
+        },
+        {
+          "name": "run_calibration_check_pt_2",
+          "line": 181
+        },
+        {
+          "name": "run_power_check",
+          "line": 252
+        },
+        {
+          "name": "run_discovery_analysis",
+          "line": 354
+        },
+        {
+          "name": "get_result",
+          "line": 470
+        },
+        {
+          "name": "write_outputs_to_directory",
+          "line": 547
+        },
+        {
+          "name": "skip_assign_grnas_and_run_qc",
+          "line": 650
+        }
+      ]
+    },
+    {
+      "path": "R/s4_class.R",
+      "sha256": "3f66cd9c563e6e51ef1b0e838831b404bc52f08545494f48b11ea026f6539998",
+      "git_blob": "7c4a8df1cc14b91890d709bdc5ec945b668fbe48",
+      "line_count": 77,
+      "kind": "handwritten",
+      "review_level": "full declaration/document read",
+      "functions": []
+    },
+    {
+      "path": "R/s4_helpers.R",
+      "sha256": "29a31262d8cae42b7dc48fd29d42897c58ba23a9a098be1c8db40a07a5d5d770",
+      "git_blob": "ec940e0bc2a0d8c8012e9430e6e46ca9c9a9854e",
+      "line_count": 375,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "get_mark",
+          "line": 88
+        },
+        {
+          "name": "load_row",
+          "line": 371
+        }
+      ]
+    },
+    {
+      "path": "R/sceptre.R",
+      "sha256": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+      "git_blob": "17e176a8614abb51981810b4b6c0da8b691ba894",
+      "line_count": 183,
+      "kind": "handwritten",
+      "review_level": "all runtime declarations read; public dataset/package help and examples selectively inspected",
+      "functions": []
+    },
+    {
+      "path": "R/score_preparation.R",
+      "sha256": "9d7d9088c452bb7a28e71290184916aec990734464fe3d905c3d8a1c08b64bb1",
+      "git_blob": "e4820e30af3c8d51bc5c51bcb645b011aeb40630",
+      "line_count": 42,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "compute_D_matrix",
+          "line": 13
+        },
+        {
+          "name": "prepare_score_components",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "path": "R/storage.R",
+      "sha256": "f5d33db927292a1f562f2128c5fd37e699b6be93fc4c43a952acefcafa7f1398",
+      "git_blob": "95677316512711459cf122348238c2a419071b6a",
+      "line_count": 367,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "storage_response_index",
+          "line": 12
+        },
+        {
+          "name": "storage_read_response",
+          "line": 26
+        },
+        {
+          "name": "storage_threshold_row",
+          "line": 46
+        },
+        {
+          "name": "storage_owned_groups",
+          "line": 65
+        },
+        {
+          "name": "storage_pair_counts",
+          "line": 94
+        },
+        {
+          "name": "storage_group_counts",
+          "line": 161
+        },
+        {
+          "name": "storage_create_backed_pair",
+          "line": 190
+        },
+        {
+          "name": "storage_reopen_backed_pair",
+          "line": 217
+        },
+        {
+          "name": "storage_cell_covariates",
+          "line": 242
+        },
+        {
+          "name": "set_matrix_accessibility",
+          "line": 271
+        },
+        {
+          "name": "sparse_pointer_to_indices",
+          "line": 363
+        }
+      ]
+    },
+    {
+      "path": "R/workflow_state.R",
+      "sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "git_blob": "8b7d41f87b1af103105f31d7da4a7ff2202d8ad4",
+      "line_count": 82,
+      "kind": "handwritten",
+      "review_level": "full source body/contract read and representative-flow trace",
+      "functions": [
+        {
+          "name": "workflow_steps",
+          "line": 9
+        },
+        {
+          "name": "workflow_initial_state",
+          "line": 20
+        },
+        {
+          "name": "workflow_transition",
+          "line": 36
+        },
+        {
+          "name": "workflow_status",
+          "line": 60
+        },
+        {
+          "name": "perform_status_check_and_update",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "path": "src/RcppExports.cpp",
+      "sha256": "4582541709c7da2df03bd0e512ac054cc2ed7ed7b1e933b9d8068a3532b2b513",
+      "git_blob": "1a7866c51dd339964166db26ccff6e24ac15bf65",
+      "line_count": 349,
+      "kind": "generated",
+      "review_level": "registration/signature and adapter boundary inspected; no regeneration or exhaustive generated-code audit",
+      "functions": []
+    },
+    {
+      "path": "src/check_functions.cpp",
+      "sha256": "7bcbd3fe405269b7735740cd88f5fe5ecd4eb5ae093b8ce1159e199029e08642",
+      "git_blob": "0a099044cdd3b55f5ae312474a89a61bf048087f",
+      "line_count": 56,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/compute_nb_size_param_functions.cpp",
+      "sha256": "69eb74805365148f5a57c8ae1a1801732c4e6a6c6d3ae71ee0d1c21ea1c70628",
+      "git_blob": "664c0ca8175b385082d90e5e095208c40312c951",
+      "line_count": 123,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/generate_samples_functions.cpp",
+      "sha256": "23946d7a8a4721befef2f43c3670e33bc8d8b3485caaaaa23058319e10eb8642",
+      "git_blob": "d2351dab834c91e4d01aba79b1b2181ba3401dfc",
+      "line_count": 218,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/inference.h",
+      "sha256": "71d284f711106435d62f9602872719476142f24d94a5ce3d880d29d86c533d66",
+      "git_blob": "6af012adbd6d525ce768e815ba9ea39e94f4512d",
+      "line_count": 71,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/inference_scores.cpp",
+      "sha256": "a05d3e221d37dcc05f83e4e403dc3a6ed7bc8a3536aa22fd67f877b458d3b0b0",
+      "git_blob": "fd0e2d3bfc2f0f86340d875ba21281281f86bead",
+      "line_count": 120,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/inference_stages.cpp",
+      "sha256": "b447907d979ff90f1be75fd26fc1d93389973c8eb7e20c60f68d68bcdd16c5a4",
+      "git_blob": "f81611c6a3192ee530e43e6e8126f26bb28a34fa",
+      "line_count": 77,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/inference_tail.cpp",
+      "sha256": "150551141185ea20e0e74f1b1c7595bf0683fa6c0b67f3b23e4bae17cb9206bd",
+      "git_blob": "682b39e909ec48a1d36ad6343486a8d00b4b4b42",
+      "line_count": 161,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/low_level_full_test.cpp",
+      "sha256": "6a8819d33dc43266abd6bf86aaef1fec68cc4fdeea0761e88d70e003ecbd087d",
+      "git_blob": "b3a15d46c41c2c61595c3bb0b2c194217650188f",
+      "line_count": 73,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/mixture_functs.cpp",
+      "sha256": "bfd1badf8121a4873d5c3236ae5eb8a56b5967ccf6a15c19147d3e7614fac248",
+      "git_blob": "aba75eec0f8296222c9b9d551db28a0c487d0af6",
+      "line_count": 123,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/negative_control_functions.cpp",
+      "sha256": "7991bacbb68a6b607485e65539505bf3ca04219869c6f9f46804c553a3c63bcb",
+      "git_blob": "2f5b541607b59b619812445e5ee7bfea581c4c31",
+      "line_count": 207,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/pair_construction_functs.cpp",
+      "sha256": "e6431b8a18ed986ee5f0a2c5e97ed05bc2a3729313960be00b974b76e8668038",
+      "git_blob": "db4b0e113a1ee9b574fe63b96c76076d1b198a36",
+      "line_count": 33,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/pair_eligibility.cpp",
+      "sha256": "312ea5ac46c850633c8eef7519bacca59bb7de1445771c415b4691ad52071fa0",
+      "git_blob": "3c3e2382d046caf3cd3ed496cc1e3ce12ef0c034",
+      "line_count": 15,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/pair_eligibility.h",
+      "sha256": "5e679c8d207a8bc74d867e458fbc6d55e3b4829a2bf94ec4e014e5617b17e2b8",
+      "git_blob": "757206d310fce2898c7e82045476e0be498438ec",
+      "line_count": 25,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/sampling_safety.h",
+      "sha256": "0c801b9aa1ca7e90866109eab38851ae2c5e764300d3d1b02a8d9593afd879bd",
+      "git_blob": "302227265f7a564c7db9ada6eb43ba6c93d5a41f",
+      "line_count": 57,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/shared_low_level_functions.h",
+      "sha256": "1c93487d71a73a11698b5a1a15ad8a16848c62456ed767511462fc3dfa31f879",
+      "git_blob": "b27eccf5418abb4bf4623be6c6fea91a61e93da3",
+      "line_count": 29,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/sparse_counts.cpp",
+      "sha256": "60ac8650625c04e26b434e7b1447094bc9f40d3f584bc51d2e0e6744cff16711",
+      "git_blob": "28747e11487989cef8a96a918c8dfcaf0a67143d",
+      "line_count": 196,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    },
+    {
+      "path": "src/sparse_matrix_functs.cpp",
+      "sha256": "a6368ee588f2f2c0b8f3fab54fc468bb5a1dfe93d972754a958944a5de255e99",
+      "git_blob": "a03dac5f9428190edcfb7caf7f0689ccecaf8511",
+      "line_count": 160,
+      "kind": "handwritten",
+      "review_level": "all executable bodies and source comments read; source reasoning only",
+      "functions": []
+    }
+  ],
+  "consumer_scripts": [
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/assign_grnas.R",
+      "sha256": "27cb57844b57b21c3484fc2e86371368b0f17ae4f6159a84f61e7ee6634a01c2",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/output_grna_info.R",
+      "sha256": "f5d1eff787a25c457d218fa2bfef89abba94883f67b379690f3f5e03dfbd0251",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/prepare_association_analyses.R",
+      "sha256": "7c0c9aaca7b194a80fdea6d370dc7c7052ca40d0a33fffd3ec6c78b13324d43e",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/prepare_association_analysis_nuclear.R",
+      "sha256": "11a605f390b7c509059d04c9ce979e0d9f778a02308ef06761c4559b7e1d1be9",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/process_association_analysis_results.R",
+      "sha256": "c1628b30a60b7572ac9188806c34e959825fd7017c7e4614b403e4703e9384bf",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/process_grna_assignments.R",
+      "sha256": "1ed407b0a87754a6083858437b37b4802accf06408df808fb1973441026566f0",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/run_association_analysis.R",
+      "sha256": "27baf0f368b4c194a024e580a2ca67f3eb566edb8bdce4c954bd5bb4f1443260",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/run_association_analysis_nuclear.R",
+      "sha256": "12306dffb1242eeb21462830be8832502a89d13ef83bd7350fcab4c8502d3cd3",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/run_qc.R",
+      "sha256": "2ffbb5b05f345ab32c4a7bc1ede122e37edac91dc1fc1027b193254ef6ea92a2",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/run_qc_nuclear.R",
+      "sha256": "295d25dd7c51e653e08633cd7134509f1693e4e47d92f13a42f0b00ec670ca81",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    },
+    {
+      "repo": "sceptre-pipeline",
+      "revision": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+      "path": "bin/set_analysis_parameters.R",
+      "sha256": "57b95053891145d172f7f929c6bce2768a2f9732ad6eab678904bdff5c490544",
+      "review_level": "full pinned script read and relevant private/public call trace; not executed"
+    }
+  ],
+  "dependency_headers": [
+    {
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Rcpp/include/Rcpp/vector/Vector.h",
+      "sha256": "9da784c28970aefee8e0f8904486b4f2b9ce2e1bff48d08047ab7c9aef5011ca",
+      "review_level": "allocation/wrapping/unwind-relevant lines inspected; installed dependency evidence, not bundled pin"
+    },
+    {
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Rcpp/include/Rcpp/internal/wrap.h",
+      "sha256": "b5d1287429777ab1ab7f60f49b7c0ca340aa168297a9520ea3435aba0230faf7",
+      "review_level": "allocation/wrapping/unwind-relevant lines inspected; installed dependency evidence, not bundled pin"
+    },
+    {
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Rcpp/include/Rcpp/macros/macros.h",
+      "sha256": "93c4d6e0520ee3975f970e726cc0685eee9597d80ef7b7e3372aa67d34ee4b9a",
+      "review_level": "allocation/wrapping/unwind-relevant lines inspected; installed dependency evidence, not bundled pin"
+    },
+    {
+      "path": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Rcpp/include/Rcpp/unwindProtect.h",
+      "sha256": "f278400619765a48c99adade90cf448cb3f7f2da9daac13c0b0884924c728fd1",
+      "review_level": "allocation/wrapping/unwind-relevant lines inspected; installed dependency evidence, not bundled pin"
+    }
+  ],
+  "executed_evidence": [
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/baseline-low_level_full_test.cpp",
+      "sha256": "83896d2c0df3a5a98c99d0c6dc6dd77e764fe5af7d9f71df34377c7a42d95571"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/baseline-negative_control_functions.cpp",
+      "sha256": "33226feb18ce71deb1194fd34a5a5fb41d369cbae991b7554fb328b6cb9a2629"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/baseline-plotting_functions.R",
+      "sha256": "aedf9f6581bcfcb8375182f3cfc74b808652a5a2312ce02539eccab1b4edcde2"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/baseline-qq_plot_helpers.R",
+      "sha256": "2eb9f857b5f5184d2d395240dfcf538a2486d29d10bd7b7921e957ec42a69799"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro-attempt1.log",
+      "sha256": "3ec46b11d54b6d8d02d3a1c1d3d2b0979d6ef28c6222961f4f9e84bab1833523"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro-attempt2.log",
+      "sha256": "d3fac7f4c348d1fa5e5aa087fe7df42a02a11393e94124ade3167d0ef22b1948"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro.R",
+      "sha256": "bc48cab01143cba048890aa31e43da5f83d0764ac471269306c6bafe7d744ac0"
+    },
+    {
+      "path": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro.log",
+      "sha256": "75db93618aad8faeeff98fe8e0375217bc0c114f4eade681638217e077265816"
+    }
+  ],
+  "execution_scope": "only bounded source-evaluated plotting reproduction at parent authorization; no package build/install, test suite, native fault injection, scientific analysis, benchmark or fixture generation",
+  "live_context_scope": {
+    "readyz": "sandbox initially failed, narrow escalated retry succeeded",
+    "queries": [
+      {
+        "query": "sceptre refactor",
+        "results": 0
+      },
+      {
+        "query": "sceptre",
+        "results": 25,
+        "scope": "project snippets only; search result window; no whole-vault knowledge claim"
+      }
+    ]
+  },
+  "limitations": [
+    "Post-pin changes excluded, including CL4 dc093d2 (only peer reviewer report noted).",
+    "Handwritten executable source reviewed; exhaustive generated binding audit, man pages and every vignette/example not performed.",
+    "Original expected artifacts were not regenerated, read/written as new authority, or changed.",
+    "Existing reports were read after independent source traces; their tests were not rerun.",
+    "No claim of whole-package absence of bugs or final scientific/resource/consumer/CI acceptance."
+  ],
+  "representative_flows": [
+    {
+      "name": "direct in-memory import and vector aggregation",
+      "coverage": "source trace; known cross-platform B6 regression supplied by coordinator; no analysis run",
+      "path": [
+        "R/import_functs.R:70-162",
+        "R/import_functs.R:1060-1160",
+        "R/preprocessing_functions.R:54-91",
+        "R/storage.R:242-353",
+        "src/sparse_matrix_functs.cpp:45-104"
+      ]
+    },
+    {
+      "name": "supported setter/assignment/QC/cache transition",
+      "coverage": "source trace and existing cache/index test inspection; no rerun",
+      "path": [
+        "R/s4_analysis_functs_1.R:68-201",
+        "R/s4_analysis_functs_1.R:275-343",
+        "R/s4_analysis_functs_1.R:423-554",
+        "R/assign_grna_functions.R",
+        "R/cellwise_qc_functs.R",
+        "R/pairwise_qc_functs.R",
+        "R/fit_cache.R",
+        "R/workflow_state.R"
+      ]
+    },
+    {
+      "name": "low-MOI NT discovery permutation",
+      "coverage": "source trace; independently composed nonmonotone source/analysis/NT/fit example; existing numerical coordinate test read",
+      "path": [
+        "R/s4_analysis_functs_2.R:375-442",
+        "R/analysis.R:13-41",
+        "R/analysis_context.R:88-222",
+        "R/association_execution.R:13-71",
+        "R/association_workers.R:48-69",
+        "R/fitting.R:16-40",
+        "R/score_preparation.R:31-42",
+        "src/low_level_full_test.cpp:33-73",
+        "src/inference_scores.cpp:25-111",
+        "src/inference_stages.cpp:8-73",
+        "R/result_processing.R"
+      ]
+    },
+    {
+      "name": "complement permutation shared response fit",
+      "coverage": "source trace and cache contract inspection",
+      "path": [
+        "R/association_execution.R:13-71",
+        "R/association_workers.R:15-32",
+        "R/preprocessing_functions.R:118-184",
+        "R/fit_cache.R:58-86",
+        "R/result_processing.R:144-194"
+      ]
+    },
+    {
+      "name": "CRT response prepass then per-guide bank and fit sharing",
+      "coverage": "source trace of both shared and guide-specific NT cases; no CRT execution",
+      "path": [
+        "R/association_execution.R:84-167",
+        "R/association_workers.R:85-144",
+        "R/fitting.R:51-60",
+        "src/generate_samples_functions.cpp:189-218",
+        "src/inference_scores.cpp:65-111"
+      ]
+    },
+    {
+      "name": "calibration candidate and native return ownership",
+      "coverage": "all source bodies, original source comparison and installed Rcpp allocation paths inspected; no fault injection",
+      "path": [
+        "R/s4_analysis_functs_2.R:111-221",
+        "R/neg_control_functions.R:13-130",
+        "src/negative_control_functions.cpp:26-207",
+        "src/sampling_safety.h",
+        "src/inference_stages.cpp:54-73"
+      ]
+    },
+    {
+      "name": "backed standard gather and nuclear raw shards",
+      "coverage": "all11 pinned pipeline scripts read; private-entry/source-reattachment/finalization trace; historical controlled consumer report read; no execution",
+      "path": [
+        "R/storage.R:94-227",
+        "R/ondisc_functs.R:54-122",
+        "R/s4_analysis_functs_1.R:449-554",
+        "R/result_processing.R:159-206",
+        "sceptre-pipeline@38dc760/bin/*.R"
+      ]
+    },
+    {
+      "name": "diagnostic discovery plotting",
+      "coverage": "source-evaluated tiny same-input original/candidate reproduction with actual plotting and QQ helpers; text-panel-only build; no scientific run",
+      "path": [
+        "R/result_processing.R:32-66",
+        "src/inference_stages.cpp:21-38",
+        "R/plotting_functions.R:858-955"
+      ],
+      "script": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro.R",
+      "log": "/private/tmp/sceptre-whole-review-cc01683-evidence/plot-diagnostic-na-repro.log"
+    }
+  ]
+}

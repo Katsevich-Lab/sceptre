@@ -49,7 +49,8 @@ EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, 
 
 
 // Studentized efficient score: sum(a[T]) / sqrt(sum(w[T])-||sum(D[,T])||^2).
-// D is nuisance-columns x fit-cells, T is zero-based and already validated by
+// D is eigenbasis-rows (eigen() order) x fit-cells; its row count equals the
+// design coefficient count. T is zero-based and already validated by
 // the owning boundary. Preserve summation order, including repeated positions;
 // no clamping/new fallback for a zero or negative studentizer. Inputs read only.
 double observed_score(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, const IntegerVector& trt_idxs) {
@@ -82,9 +83,10 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
 // current row, whose length can differ from observed n_trt or be zero. Producers
 // establish coordinate validity; check only selected row lengths/segment bounds,
 // never a hybrid suffix that belongs to a larger fit. The complete bank remains
-// const and reusable across responses/stages. No draws, input mutation or RNG.
+// const and reusable across responses/stages. The owning entry checks aligned
+// shapes before native ownership; do not repeat D.ncol()/its Rcpp protection
+// inside this compute-only scope. No draws, input mutation or RNG.
 std::vector<double> null_score_segment(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, bool use_all_cells, const DrawBank& synthetic_idxs) {
-  check_score_dimensions(a, w, D);
   sceptre::sampling::nonnegative(n_trt, "n_trt");
   const int end_pos = sceptre::sampling::sum(start_pos, B, "Draw segment end");
   if (static_cast<size_t>(end_pos) > synthetic_idxs.size())

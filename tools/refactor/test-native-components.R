@@ -8,7 +8,7 @@ stopifnot(file.exists(file.path(root, "src", "inference.h")))
 environment <- new.env(parent = globalenv())
 bridge <- tempfile("sceptre-native-components-", fileext = ".cpp")
 modules <- c(SCORES = "inference_scores.cpp", TAIL = "inference_tail.cpp",
-             STAGES = "inference_stages.cpp")
+             STAGES = "inference_stages.cpp", LIFETIME = "result_lifetime.h")
 prefix <- sprintf("#define SCEPTRE_COMPONENT_%s %s", names(modules),
                   vapply(file.path(root, "src", modules), encodeString,
                          character(1), quote = '"'))

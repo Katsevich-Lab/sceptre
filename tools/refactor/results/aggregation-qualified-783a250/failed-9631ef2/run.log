@@ -1,0 +1,30 @@
+large_numeric_C reference single r0: 1.303s
+large_numeric_C candidate single r0: 1.277s
+large_numeric_C candidate single r1: 1.273s
+large_numeric_C reference single r1: 1.282s
+large_numeric_C reference single r2: 1.394s
+large_numeric_C candidate single r2: 1.264s
+large_numeric_C candidate single r3: 1.382s
+large_numeric_C reference single r3: 1.859s
+medium_numeric_T_repeats reference single r0: 0.310s
+medium_numeric_T_repeats candidate single r0: 0.273s
+medium_numeric_T_repeats candidate single r1: 0.277s
+medium_numeric_T_repeats reference single r1: 0.397s
+medium_numeric_T_repeats reference single r2: 0.316s
+medium_numeric_T_repeats candidate single r2: 0.268s
+medium_numeric_T_repeats candidate single r3: 0.273s
+medium_numeric_T_repeats reference single r3: 0.338s
+medium_numeric_T_repeats reference batch20 r0: 3.176s
+medium_numeric_T_repeats candidate batch20 r0: 2.558s
+medium_numeric_T_repeats candidate batch20 r1: 2.887s
+medium_numeric_T_repeats reference batch20 r1: 2.131s
+medium_numeric_T_repeats reference batch20 r2: 2.070s
+medium_numeric_T_repeats candidate batch20 r2: 2.399s
+medium_numeric_T_repeats candidate batch20 r3: 2.307s
+medium_numeric_T_repeats reference batch20 r3: 2.086s
+Traceback (most recent call last):
+  File "/Users/ekatsevi/code/research/sceptre/tools/refactor/aggregation-benchmark.py", line 195, in <module>
+    main()
+  File "/Users/ekatsevi/code/research/sceptre/tools/refactor/aggregation-benchmark.py", line 188, in main
+    raise RuntimeError(f"Declared gate crossed: {name}; investigate and seek explicit review, do not hide original trials.")
+RuntimeError: Declared gate crossed: medium_numeric_T_repeats; investigate and seek explicit review, do not hide original trials.

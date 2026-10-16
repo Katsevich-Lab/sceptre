@@ -1,0 +1,4 @@
+Error in stat_qq_points(ymin = 1e-08, size = point_size, alpha = transparency) : 
+  could not find function "stat_qq_points"
+Calls: <Anonymous> -> compare_calibration_and_discovery_results
+Execution halted

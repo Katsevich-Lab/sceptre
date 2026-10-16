@@ -37,50 +37,50 @@ ordered result values/classes, facade flags, assignment memberships, cell views,
 pair tables and cache contents. A report containing failed or blocked stages is
 incomplete even if two incomplete payloads happen to compare equal.
 
-The untouched sceptre source `21f9ea098b69c444a884a49bc254de711968e3b5`, installed
-with source ondisc 1.3.5, passed all 30 stages on October 16, 2026. Its report is
-`/private/tmp/sceptre-rf8-expanded-reference-final/report.json`. The installed
-refactor candidate built from `f4aaab4` also passed all 30 stages, with an exactly
-equal complete comparison payload, preserving decisions, schema and ordering.
-Its report is `/private/tmp/sceptre-rf8-expanded-candidate-final/report.json`.
+The latest completed paired qualification in this guide is original
+`21f9ea098b69c444a884a49bc254de711968e3b5` versus candidate
+`28df3907f43311efc70908d50b7636c7e6e89db8`, using verified fresh matched-O2
+installs and source ondisc 1.3.5. Both pass all 30 stages with exactly equal
+complete ordered comparison payloads. This is an earlier source checkpoint,
+not qualification of later cleanup. [Complete evidence](results/consumer-qualified-28df390/README.md).
 
 ## Actual Nextflow execution
 
 `pipeline-nextflow.R` archives the pinned pipeline revision without changing its
-sources, prepares real backed inputs, and executes the complete standard and
-nuclear workflows using the local executor. It retains archive/source hashes,
-the complete runtime configuration, task logs and R-process package provenance.
-It checks standard gathered results/global correction and nuclear raw shards,
-then opens and collects the actual Arrow dataset across all shards.
+sources and runs complete standard/nuclear workflows using real backed inputs,
+an isolated local executor and fresh task startup profiles. It records source,
+configuration, logs, installed package paths and result payloads, then reads the
+actual Arrow dataset across every emitted nuclear shard. The four arguments are
+package library, pinned pipeline checkout, frozen fixture directory and new
+output directory.
 
-```sh
-R_LIBS=/path/to/selected-ondisc-library \
-Rscript --vanilla tools/refactor/pipeline-nextflow.R \
-  /path/to/sceptre-library /path/to/pinned/sceptre-pipeline \
-  tests/testthat/fixtures/refactor /new/output-directory
-```
+The paired 28df390 study retains three distinct runtime controls:
 
-This is an explicit local qualification environment: Nextflow 25.10.4, Java 17,
-source ondisc 1.3.5, disabled containers/conda and job arrays, and two concurrent
-tasks. The archived default `array = { params.array_size }` is rejected by this
-Nextflow version; static arrays are unsupported by the local executor. The
-external qualification config therefore overrides that exact selector with
-`array=null`. This does not qualify the unmodified default array configuration,
-historical containers, nf-test or hosted scheduler profiles.
+| Configuration | Execution | Ordered comparison |
+| --- | --- | --- |
+| Two concurrent tasks, fixed seed 271828 | Both workflows complete for both builds | Fails: baseline factor levels/tied rows depend on worker arrival; all five raw worker payloads are exact |
+| queueSize=1/maxForks=1, fixed seed | Both workflows complete | Fails: serialization alone does not impose input emission order |
+| Same serialized plan plus `fair=true` | Both workflows complete | Passes exactly, including identities/classes/order and global correction |
 
-The original nuclear pod planner calls `sample()` without a seed. Independent
-unseeded workflow runs correctly produced different pod assignments and could
-not be compared by shard filename. The qualification startup profile now fixes
-seed 271828 in every R task, preserving a shared work plan before comparing
-reference and candidate. No output sorting is used to conceal a changed plan.
+No published result is sorted or modified to conceal either failed control.
+For exact final qualification use the unchanged arrival-controlled runner in
+`results/consumer-qualified-28df390/runners/pipeline-nextflow-arrival-controlled.R`,
+with its adjacent `consumer-inventory.json`, and fresh output directories. It
+makes the complete source pin, package path, work plan and emitted data
+reviewable. The generic two-task runner remains a separate control.
 
-Reference and candidate each execute all standard and nuclear tasks; paired
-reports and payloads are under
-`/private/tmp/sceptre-rf8-nextflow-{reference,candidate}-seeded/`. The response-to-pod
-maps are identical and the complete ordered comparison payloads are exactly
-equal (also passing the predeclared `1e-8` floating-point tolerance). Each lane
-records 34 R-process provenance files for each of its two successful workflows;
-the nuclear dataset readback contains all 32 emitted rows.
+The qualified runtime is Nextflow 25.10.4/Java 17, source ondisc 1.3.5, one CPU/task,
+containers/conda disabled, cached offline plugin and `array=null` for the exact
+archived process selector. The default dynamic array closure is rejected by
+this Nextflow version and local execution does not support job arrays. Each R
+task starts with seed 271828 because the original response-pod planner samples
+without a seed. Actual paired pod maps and arrival plans must compare equal;
+independently unseeded runs are not comparable by shard name.
+
+This qualifies the explicit local plan. It does not qualify uncontrolled gather
+order, unmodified arrays, historical containers, nf-test or hosted scheduler
+profiles. [All successful and failed controls](results/consumer-qualified-28df390/qualification-comparison.json)
+remain tied to their original source. Final cleanup requires a fresh paired run.
 
 ## Uncached book cells
 
@@ -99,7 +99,9 @@ installed `sceptredata` example contains two `barcodes.tsv.gz` files, each only
 and `fread()` rejects their empty contents. Reports retain that failure and
 return nonzero; these are not described as successful whole-book runs.
 
-Paired reports are `/private/tmp/sceptre-rf8-book-{reference,candidate}-final/`.
+The matched-O2 28df390 reports and exact payloads are retained in
+`results/consumer-qualified-28df390/`; these supersede the earlier build claims
+without claiming the known failed cell passed.
 Valid example barcodes, complete cis/trans/singleton cells, whole-book rendering,
 external rd7 data, historical containers and hosted executor profiles remain
 separate gates.

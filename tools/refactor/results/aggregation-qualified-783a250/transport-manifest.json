@@ -1,0 +1,354 @@
+[
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/summary.json",
+    "retained": "passing-experiment/summary.json.gz",
+    "bytes": 245702,
+    "sha256": "9c707176db3b31a065c870cf233447726df116ffcd33c2a5996e92d0653a08d1",
+    "original_bytes": 3141614,
+    "original_sha256": "24de5f3f87703bcdb6cbb7db7d8f0b242f9ae97914b5ba0d53840b6df4103e3c"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/plan.json",
+    "retained": "passing-experiment/plan.json",
+    "bytes": 15361,
+    "sha256": "54f21ce35810187bbe7fcf75fd052ab811590c0b7a4a376af7608174fec50596",
+    "original_bytes": 15361,
+    "original_sha256": "54f21ce35810187bbe7fcf75fd052ab811590c0b7a4a376af7608174fec50596"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1.log",
+    "retained": "passing-experiment/run.log",
+    "bytes": 3128,
+    "sha256": "4fc7c58f54d26d76d81b8fc6dc827d3a301b5e23708162160202d524e14da9f0",
+    "original_bytes": 3128,
+    "original_sha256": "4fc7c58f54d26d76d81b8fc6dc827d3a301b5e23708162160202d524e14da9f0"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/medium_numeric_T_repeats-reference-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/medium_numeric_T_repeats-reference-profile.json.Rprofmem.gz",
+    "bytes": 13192,
+    "sha256": "5a92456c16554e98eee44807be8d590b36e2b18afd2a5da58eb734527ca92011",
+    "original_bytes": 1040737,
+    "original_sha256": "282196355b172ceb6be85e6bef2cca0fef907307b36344e2fda4531d515d4e37"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/medium_logical_C-reference-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/medium_logical_C-reference-profile.json.Rprofmem",
+    "bytes": 61519,
+    "sha256": "5aa6edc5c8acae415b2010d33630eaf781712be0f543734b2f4d74e991856142",
+    "original_bytes": 61519,
+    "original_sha256": "5aa6edc5c8acae415b2010d33630eaf781712be0f543734b2f4d74e991856142"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/medium_numeric_T_repeats-candidate-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/medium_numeric_T_repeats-candidate-profile.json.Rprofmem",
+    "bytes": 92603,
+    "sha256": "4ebfe79c8344ecd26992263e3f291d95851578f24378142ef94465dd40d0ac17",
+    "original_bytes": 92603,
+    "original_sha256": "4ebfe79c8344ecd26992263e3f291d95851578f24378142ef94465dd40d0ac17"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/medium_logical_C-candidate-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/medium_logical_C-candidate-profile.json.Rprofmem.gz",
+    "bytes": 2907,
+    "sha256": "08f1fe3d34e58c7e6523d0dd182bba821fa96e83700f689240271275b7e96284",
+    "original_bytes": 110837,
+    "original_sha256": "ddb5bf764bbb228fe901e1496ada91333ab160df9b4570ecfcd5ec8304cb34a3"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/actual_papalexi_guides-candidate-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/actual_papalexi_guides-candidate-profile.json.Rprofmem",
+    "bytes": 57097,
+    "sha256": "72dd13e38dfae3a494a507c739bd3e2fe7a5d6e69214f939f4e81b43fc516fe2",
+    "original_bytes": 57097,
+    "original_sha256": "72dd13e38dfae3a494a507c739bd3e2fe7a5d6e69214f939f4e81b43fc516fe2"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/large_numeric_C-reference-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/large_numeric_C-reference-profile.json.Rprofmem.gz",
+    "bytes": 23503,
+    "sha256": "7348e8eaa1a880124c032efbad16290ec1bc05395b1141767ff77ed44f8640c9",
+    "original_bytes": 1769909,
+    "original_sha256": "f768ccef7ac0b5b77f63e01df98eec665b4aae2006ec80f97a9e88c342484075"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/actual_papalexi_guides-reference-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/actual_papalexi_guides-reference-profile.json.Rprofmem",
+    "bytes": 54673,
+    "sha256": "8524c541a8bcd4cc51077d8e6cc0ccb90518603edafdcbbf7f485aaac89df2d4",
+    "original_bytes": 54673,
+    "original_sha256": "8524c541a8bcd4cc51077d8e6cc0ccb90518603edafdcbbf7f485aaac89df2d4"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-resource-run1/large_numeric_C-candidate-profile.json.Rprofmem",
+    "retained": "passing-experiment/allocation-traces/large_numeric_C-candidate-profile.json.Rprofmem.gz",
+    "bytes": 13838,
+    "sha256": "db2306de742ba25d6d075dd97e74e99c46333cf9cf16f6502877bb0c0510860e",
+    "original_bytes": 1197372,
+    "original_sha256": "219f650d76dca3f25dd6c9a823674dd5e47cb9ffdd022064538bf196761f5380"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/summary.json",
+    "retained": "failed-9631ef2/summary.json.gz",
+    "bytes": 72473,
+    "sha256": "ddf7dee77be99f7776089cb1c1b5b0dc1197a78342eb3a26641971dd47e7ea4d",
+    "original_bytes": 836567,
+    "original_sha256": "b34ea54d7f1bd74edbc8e5eb2fb211bdd60a23079c71ca457c988b005f6e0a28"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/plan.json",
+    "retained": "failed-9631ef2/plan.json",
+    "bytes": 15579,
+    "sha256": "3f84d9170a08a2b485e45606c1b29981693c2f3e721ce0c4aefe74e495f5953f",
+    "original_bytes": 15579,
+    "original_sha256": "3f84d9170a08a2b485e45606c1b29981693c2f3e721ce0c4aefe74e495f5953f"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1.log",
+    "retained": "failed-9631ef2/run.log",
+    "bytes": 1725,
+    "sha256": "8ceb1b06f26725f1487d147be1897a5639935654ebddca2d40be8838179ba9b6",
+    "original_bytes": 1725,
+    "original_sha256": "8ceb1b06f26725f1487d147be1897a5639935654ebddca2d40be8838179ba9b6"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/medium_numeric_T_repeats-reference-profile.json.Rprofmem",
+    "retained": "failed-9631ef2/allocation-traces/medium_numeric_T_repeats-reference-profile.json.Rprofmem.gz",
+    "bytes": 13192,
+    "sha256": "5a92456c16554e98eee44807be8d590b36e2b18afd2a5da58eb734527ca92011",
+    "original_bytes": 1040737,
+    "original_sha256": "282196355b172ceb6be85e6bef2cca0fef907307b36344e2fda4531d515d4e37"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/medium_numeric_T_repeats-candidate-profile.json.Rprofmem",
+    "retained": "failed-9631ef2/allocation-traces/medium_numeric_T_repeats-candidate-profile.json.Rprofmem",
+    "bytes": 86393,
+    "sha256": "c031e2ea80657b002b1d9b9510714347af5577d0aa76ec41819820af7177cbc1",
+    "original_bytes": 86393,
+    "original_sha256": "c031e2ea80657b002b1d9b9510714347af5577d0aa76ec41819820af7177cbc1"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/large_numeric_C-reference-profile.json.Rprofmem",
+    "retained": "failed-9631ef2/allocation-traces/large_numeric_C-reference-profile.json.Rprofmem.gz",
+    "bytes": 23503,
+    "sha256": "7348e8eaa1a880124c032efbad16290ec1bc05395b1141767ff77ed44f8640c9",
+    "original_bytes": 1769909,
+    "original_sha256": "f768ccef7ac0b5b77f63e01df98eec665b4aae2006ec80f97a9e88c342484075"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-resource-run1/large_numeric_C-candidate-profile.json.Rprofmem",
+    "retained": "failed-9631ef2/allocation-traces/large_numeric_C-candidate-profile.json.Rprofmem.gz",
+    "bytes": 15852,
+    "sha256": "c38e7d88726eab073eef795e5bb5c4113bbd1c9a989682aa5fa7fd8c93f4d79d",
+    "original_bytes": 1512089,
+    "original_sha256": "5e3160ad96be7a0fa859c3f8b4827601a218e15309a5f43d08af7a084ee15fa5"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-attempt2/reference/build.json",
+    "retained": "builds/reference/build.json",
+    "bytes": 4711,
+    "sha256": "1e77ac063e0426120de2fda28b3dfa3a5efb26108e350f6f871a9e502c8d93b5",
+    "original_bytes": 4711,
+    "original_sha256": "1e77ac063e0426120de2fda28b3dfa3a5efb26108e350f6f871a9e502c8d93b5"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-attempt2/reference/install.log",
+    "retained": "builds/reference/install.log",
+    "bytes": 6023,
+    "sha256": "caf60ae6a02736c82c28952f1e76f6cf93badcbf79d0fbb7a134605c599fd6dc",
+    "original_bytes": 6023,
+    "original_sha256": "caf60ae6a02736c82c28952f1e76f6cf93badcbf79d0fbb7a134605c599fd6dc"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250/candidate/build.json",
+    "retained": "builds/candidate/build.json",
+    "bytes": 5521,
+    "sha256": "a8e0bf3629671cecdd3b02488b37e9a39342ca177b4576f60ea8b3440cf7652b",
+    "original_bytes": 5521,
+    "original_sha256": "a8e0bf3629671cecdd3b02488b37e9a39342ca177b4576f60ea8b3440cf7652b"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250/candidate/install.log",
+    "retained": "builds/candidate/install.log",
+    "bytes": 6850,
+    "sha256": "9ad3c8236b1d5f9665ce0f4a2178773b4ab967616dbb7e55952eb1aac7025fc4",
+    "original_bytes": 6850,
+    "original_sha256": "9ad3c8236b1d5f9665ce0f4a2178773b4ab967616dbb7e55952eb1aac7025fc4"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250/installed-tests.log",
+    "retained": "installed/installed-tests.log",
+    "bytes": 4129,
+    "sha256": "5ab157c9314077db7c5d59409d1b91424c94b53817c3cfd39f132800cb082f20",
+    "original_bytes": 4129,
+    "original_sha256": "5ab157c9314077db7c5d59409d1b91424c94b53817c3cfd39f132800cb082f20"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250/installed-results.rds",
+    "retained": "installed/installed-results.rds",
+    "bytes": 72625,
+    "sha256": "d8b0f56245331a3a64e632aa3a9602233854f55cf8c11c0e9dcefdc5d6b57fe7",
+    "original_bytes": 72625,
+    "original_sha256": "d8b0f56245331a3a64e632aa3a9602233854f55cf8c11c0e9dcefdc5d6b57fe7"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250/replay-candidate.rds",
+    "retained": "installed/replay-candidate.rds",
+    "bytes": 4707,
+    "sha256": "488de0947d76fc850f193384f041e8b0d118d336da8d29c3ef9359a99d7451b6",
+    "original_bytes": 4707,
+    "original_sha256": "488de0947d76fc850f193384f041e8b0d118d336da8d29c3ef9359a99d7451b6"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-attempt2/replay-reference.rds",
+    "retained": "installed/replay-reference.rds",
+    "bytes": 4720,
+    "sha256": "899224fef9fff4404534a8064c8e378a9572d95c3008d32ddf861ad4a788ea8b",
+    "original_bytes": 4720,
+    "original_sha256": "899224fef9fff4404534a8064c8e378a9572d95c3008d32ddf861ad4a788ea8b"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-9631ef2-attempt2/data/manifest.json",
+    "retained": "input-manifest.json",
+    "bytes": 3395,
+    "sha256": "91e4c68683225615d560b62c3e694e7c95a995c949370b79584ddc10309d6506",
+    "original_bytes": 3395,
+    "original_sha256": "91e4c68683225615d560b62c3e694e7c95a995c949370b79584ddc10309d6506"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test.R",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test.R",
+    "bytes": 782,
+    "sha256": "c2dbb320e1d589956dc775949aae8eda307d33c6d2013fe552710a615c9696cf",
+    "original_bytes": 782,
+    "original_sha256": "c2dbb320e1d589956dc775949aae8eda307d33c6d2013fe552710a615c9696cf"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test.log",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test.log",
+    "bytes": 4608,
+    "sha256": "15324e17ac5845f41d4b14311f099b078e76faba095377045f3e123233725de4",
+    "original_bytes": 4608,
+    "original_sha256": "15324e17ac5845f41d4b14311f099b078e76faba095377045f3e123233725de4"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test.rds",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test.rds",
+    "bytes": 27281,
+    "sha256": "4f483395594caf2c82e79bce8d832ca71879029985e9689af6a1889fd87bf8ff",
+    "original_bytes": 27281,
+    "original_sha256": "4f483395594caf2c82e79bce8d832ca71879029985e9689af6a1889fd87bf8ff"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-attempt2.R",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-attempt2.R",
+    "bytes": 834,
+    "sha256": "343b11c219a6dcbf8f4e6ee85e525539d13e8bfa2b22e61024397a40178d4a30",
+    "original_bytes": 834,
+    "original_sha256": "343b11c219a6dcbf8f4e6ee85e525539d13e8bfa2b22e61024397a40178d4a30"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-attempt2.log",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-attempt2.log",
+    "bytes": 1470,
+    "sha256": "04c0c6852b6efbd09f39a4d8d5a9a3e15ece87ed28cb0da6d020faf1a39ab826",
+    "original_bytes": 1470,
+    "original_sha256": "04c0c6852b6efbd09f39a4d8d5a9a3e15ece87ed28cb0da6d020faf1a39ab826"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-attempt2.rds",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-attempt2.rds",
+    "bytes": 27016,
+    "sha256": "73dd4d6697bacdd03fa0dd5ccd49794b63ca03726b4690ef2987c6b3e77c91af",
+    "original_bytes": 27016,
+    "original_sha256": "73dd4d6697bacdd03fa0dd5ccd49794b63ca03726b4690ef2987c6b3e77c91af"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-fastpath.R",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-fastpath.R",
+    "bytes": 834,
+    "sha256": "e57e6d474050dd5eac8bbd7b96fba89149f4e944440e1cb9e109deb900ab76dd",
+    "original_bytes": 834,
+    "original_sha256": "e57e6d474050dd5eac8bbd7b96fba89149f4e944440e1cb9e109deb900ab76dd"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-fastpath.log",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-fastpath.log",
+    "bytes": 1504,
+    "sha256": "61d43d53e179ac214a24eda417ec9dcb50afc77964c140194d8b616e29b6d052",
+    "original_bytes": 1504,
+    "original_sha256": "61d43d53e179ac214a24eda417ec9dcb50afc77964c140194d8b616e29b6d052"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-source-test-fastpath.rds",
+    "retained": "preparation-and-runners/sceptre-b6-precision-source-test-fastpath.rds",
+    "bytes": 27003,
+    "sha256": "573cd21cc9b6451225d59b679fd806a9b132180e85fd711455b43e93b95a6715",
+    "original_bytes": 27003,
+    "original_sha256": "573cd21cc9b6451225d59b679fd806a9b132180e85fd711455b43e93b95a6715"
+  },
+  {
+    "source": "/private/tmp/sceptre-build-b6-precision.py",
+    "retained": "preparation-and-runners/sceptre-build-b6-precision.py",
+    "bytes": 1435,
+    "sha256": "024918469d0e4cf028ac6b4112ea46d0d038f4889dc047a0516e9c44afad0533",
+    "original_bytes": 1435,
+    "original_sha256": "024918469d0e4cf028ac6b4112ea46d0d038f4889dc047a0516e9c44afad0533"
+  },
+  {
+    "source": "/private/tmp/sceptre-build-b6-precision-attempt2.py",
+    "retained": "preparation-and-runners/sceptre-build-b6-precision-attempt2.py",
+    "bytes": 1542,
+    "sha256": "b010a7b71728d06d7e3172e523905b9b88660c6e649156bac8f083af02eb5871",
+    "original_bytes": 1542,
+    "original_sha256": "b010a7b71728d06d7e3172e523905b9b88660c6e649156bac8f083af02eb5871"
+  },
+  {
+    "source": "/private/tmp/sceptre-build-b6-fastpath-783a250.py",
+    "retained": "preparation-and-runners/sceptre-build-b6-fastpath-783a250.py",
+    "bytes": 1532,
+    "sha256": "c8b23027cd97eac82afe983bd51b752c7718eb5de14d7e33fa2e43e9d10c8961",
+    "original_bytes": 1532,
+    "original_sha256": "c8b23027cd97eac82afe983bd51b752c7718eb5de14d7e33fa2e43e9d10c8961"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-precision-installed.R",
+    "retained": "preparation-and-runners/sceptre-b6-precision-installed.R",
+    "bytes": 1132,
+    "sha256": "54c4d03b3ca9ea32ec8113f2e9c7725a25562f1cb732bc2d4971faa4826b7c06",
+    "original_bytes": 1132,
+    "original_sha256": "54c4d03b3ca9ea32ec8113f2e9c7725a25562f1cb732bc2d4971faa4826b7c06"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-783a250-installed.R",
+    "retained": "preparation-and-runners/sceptre-b6-fastpath-783a250-installed.R",
+    "bytes": 1128,
+    "sha256": "066e72a816664f8f7955413dffdf860350a7a03ad6f4ed1f97890b12b83ad8cc",
+    "original_bytes": 1128,
+    "original_sha256": "066e72a816664f8f7955413dffdf860350a7a03ad6f4ed1f97890b12b83ad8cc"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-fastpath-senior-review-783a250.md",
+    "retained": "reviews/sceptre-b6-fastpath-senior-review-783a250.md",
+    "bytes": 1870,
+    "sha256": "e0dc9d2f372d631b959b5b9f917f0ac4bcdb92082ac5caea5ab53d95a35473c3",
+    "original_bytes": 1870,
+    "original_sha256": "e0dc9d2f372d631b959b5b9f917f0ac4bcdb92082ac5caea5ab53d95a35473c3"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-resource-senior-review-783a250.md",
+    "retained": "reviews/sceptre-b6-resource-senior-review-783a250.md",
+    "bytes": 6404,
+    "sha256": "e74f8038fb27ad851b9e50cdfa374680fce4d5bdc8b46f72707aa00513ccb2ad",
+    "original_bytes": 6404,
+    "original_sha256": "e74f8038fb27ad851b9e50cdfa374680fce4d5bdc8b46f72707aa00513ccb2ad"
+  },
+  {
+    "source": "/private/tmp/sceptre-b6-resource-independent-checks-783a250.json",
+    "retained": "reviews/sceptre-b6-resource-independent-checks-783a250.json",
+    "bytes": 1351,
+    "sha256": "48f609a973195ba6035a13de5bc78b039bf6fd6b7dd155edf7ba211b881ab305",
+    "original_bytes": 1351,
+    "original_sha256": "48f609a973195ba6035a13de5bc78b039bf6fd6b7dd155edf7ba211b881ab305"
+  }
+]

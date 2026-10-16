@@ -184,3 +184,42 @@ scientific fallback, guide/target interpretation or backend capability, stop
 that dependent work with the exact conflicting contracts and a concrete choice
 for Eugene; continue independent adopted work. No such new method or feature
 is selected here.
+
+## B8–B9 — fresh whole-package review findings
+
+Independent full-source review of cc016835fddaa5dec9a87c9bead61914153433b0 is
+preserved in [the report](implementation-reviews/sceptre-whole-package-review-cc01683.md)
+and its per-file/flow coverage manifest. These additions do not rewrite the
+original signed cleanup plan or claim that its earlier limited reviews covered
+these findings.
+
+**B8 — native return lifetime (material P2, inherited).** Calibration group/pair
+containers and inference's selected null vector remain live across raw R return
+allocation/preservation. The installed Rcpp wrapping path does not automatically
+protect C++ destructors from R longjmp. Adopt a narrow lifetime repair with
+independent design/source review and safe controlled candidate-source raw-R-
+error/native-allocation/success tests plus an intentionally unsafe negative
+control. Preserve exact loop/RNG/draw order, return schema, selected/reversed
+null segment, reached-stage budgets and exception propagation. Do not introduce
+large eager pair/tail capacity merely to move allocation earlier. No real OOM,
+catch-all numerical fallback or general ownership framework is authorized here.
+Existing CL2/native-bank closure remains scoped to its specifically tested
+boundaries; it does not imply this finding already resolved.
+
+**B9 — discovery plotting optional missing diagnostics (material P2, inherited).**
+The actual original and cc01683 plotting source both show two valid result rows
+and one significant call at output amount 1, but zero rows/calls at amounts 2/3,
+because whole-table `na.omit()` requires optional tail/padding fields to exist.
+Adopt the bounded consumer correction: determine row completeness from the
+actual required plotting fields (`p_value`, `log_2_fold_change`, `significant`),
+then retain the same valid scientific family despite missing optional fields.
+Missing primary plotting values remain excluded. Stored results, significance,
+family correction, sampling/RNG and public formals/defaults remain unchanged.
+Independently compare QQ/volcano/text-family data across amounts 1/2/3, including
+stage-1/empirical-tail missingness and null padding; verify caller nonmutation.
+Do not regenerate scientific fixtures or add a new significance definition.
+
+The same review's P3 changes are ordinary bounded cleanup: remove unconsumed
+transient `control_fit_pos`, describe D rows as eigencoordinates rather than
+original coefficients, and qualify actual backed nuclear/power guide behavior.
+No saved-schema field or future feature follows from those corrections.

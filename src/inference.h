@@ -57,7 +57,8 @@ double observed_score(const Rcpp::NumericVector& a,
                       const Rcpp::IntegerVector& trt_idxs);
 
 // B ordered null scores from the bank segment [start_pos,start_pos+B).
-// Fixed n_trt prefix unless use_all_cells selects the entire CRT row.
+// Fixed n_trt prefix unless use_all_cells selects the entire CRT row. Caller
+// validates aligned score shapes before native result ownership begins.
 std::vector<double> null_score_segment(const Rcpp::NumericVector& a,
                                        const Rcpp::NumericVector& w,
                                        const Rcpp::NumericMatrix& D,
@@ -88,10 +89,14 @@ TailResult evaluate_staged_tail(double z_orig,
                                 int B1, int B2, int B3,
                                 bool fit_parametric_curve, int side_code);
 
-// Preserve the actual p/z/effect/SE/stage/SN schema and optional last segment.
-Rcpp::List association_result_record(const EffectEstimate& effect, double z_orig,
-                                      const TailResult& tail,
-                                      bool return_resampling_dist);
+// Consume a raw owned tail only after its compute/unique_ptr scope has ended.
+// continuation is already PROTECTed before native ownership; the raw-C-API leaf
+// copies the exact selected segment/schema, then deletes tail on success or R
+// jump. No R operation may intervene between ownership release and this call.
+// Caller UNPROTECTs its continuation once after the returned SEXP is available.
+SEXP association_result_record(const EffectEstimate& effect, double z_orig,
+                               TailResult* tail, bool return_resampling_dist,
+                               SEXP continuation);
 
 } // namespace inference
 } // namespace sceptre
