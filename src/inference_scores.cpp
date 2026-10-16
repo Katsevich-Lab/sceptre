@@ -93,6 +93,8 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
     stop("Selected draw segment exceeds the bank length.");
   // initialize variables
   const int* curr_vect;
+  // begin() returns Rcpp's cached pointer without allocation or materialization.
+  const double* D_data = D.begin();
   std::vector<double> out(B);
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
   int D_nrow = D.nrow(), idx;
@@ -112,7 +114,7 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
     for (int i = 0; i < D_nrow; i ++) {
       inner_sum = 0;
       for (int j = 0; j < n_trt; j ++) {
-        inner_sum += D(i, curr_vect[j]);
+        inner_sum += D_data[i + static_cast<R_xlen_t>(D_nrow) * curr_vect[j]];
       }
       lower_right += inner_sum * inner_sum;
     }
