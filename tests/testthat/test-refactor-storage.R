@@ -56,6 +56,8 @@ test_that("legacy backed storage coerces fractions and retains stored positions"
     skip_if_not_installed("ondisc")
     directory <- tempfile("storage-reference-")
     dir.create(directory)
+    # ondisc's legacy tilde expander misreads Windows RUNNER~1 short names.
+    directory <- normalizePath(directory, winslash = "/", mustWork = TRUE)
     on.exit(unlink(directory, recursive = TRUE), add = TRUE)
     mat <- storage_test_matrix(200L) # exceed the legacy writer's chunk size
     backed <- ondisc:::create_odm_from_r_matrix_internal(
@@ -148,6 +150,7 @@ test_that("backed storage has the same ordered count and ownership contracts", {
     skip_if_not_installed("ondisc")
     directory <- tempfile("storage-adapter-")
     dir.create(directory)
+    directory <- normalizePath(directory, winslash = "/", mustWork = TRUE)
     on.exit(unlink(directory, recursive = TRUE), add = TRUE)
     mat <- storage_test_matrix(200L)
     set.seed(79)

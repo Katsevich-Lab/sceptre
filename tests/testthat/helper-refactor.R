@@ -90,8 +90,13 @@ refactor_oracle_toolchain <- local({
                 paste(version, collapse = " ")
             }), programs)
         }
+        # PATH selects the queried binaries and invalidates this query cache.
+        # R CMD check may prepend its own directories without changing any
+        # selected compiler. Compare resolved binaries/configuration, not that
+        # incidental transport path, when qualifying numerical equivalence.
+        numerical_flags <- key$environment_flags[names(key$environment_flags) != "PATH"]
         value <- list(config = config, compilers = versions, binaries = binaries,
-                      makevars = key$makevars, environment_flags = key$environment_flags,
+                      makevars = key$makevars, environment_flags = numerical_flags,
                       configuration_files = key$configuration_files,
                       developer_selection = key$developer_selection)
         cached <<- list(key = key, programs = programs, binaries = binaries, value = value)
@@ -110,6 +115,21 @@ refactor_oracle_environment <- function() {
         }), packages),
         threads = Sys.getenv(c("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"))
     )
+}
+
+# Report field names only; environment values can contain private local paths.
+refactor_oracle_environment_differences <- function(expected, actual, path = "environment") {
+    if (identical(expected, actual)) return(character())
+    named <- function(x) is.list(x) || (!is.null(names(x)) && is.atomic(x))
+    if (named(expected) && named(actual) &&
+        !is.null(names(expected)) && !is.null(names(actual))) {
+        keys <- union(names(expected), names(actual))
+        field <- function(x, key) if (key %in% names(x)) x[[key]] else NULL
+        return(unlist(lapply(keys, function(key) {
+            refactor_oracle_environment_differences(field(expected, key), field(actual, key), paste0(path, ".", key))
+        }), use.names = FALSE))
+    }
+    path
 }
 
 refactor_frozen_environment <- function(
@@ -199,7 +219,9 @@ refactor_runtime_oracle <- local({
             !identical(oracle$source_files, frozen$source_files) ||
             !identical(oracle$environment, current) ||
             !identical(sort(names(oracle$outputs_md5)), sort(required))) {
-            stop("Runtime oracle is unpinned, incomplete, or from a different numerical environment.")
+            fields <- refactor_oracle_environment_differences(oracle$environment, current)
+            stop("Runtime oracle is unpinned, incomplete, or from a different numerical environment.",
+                 if (length(fields)) paste0(" Differing fields: ", paste(fields, collapse = ", ")) else "")
         }
         inputs <- refactor_oracle_input_files()
         expected_inputs <- frozen$artifacts_md5[inputs]

@@ -88,6 +88,14 @@ test_that("toolchain caching observes edits to effective Makevars at the same pa
     })
 })
 
+test_that("numerical environment diagnostics identify fields without exposing values", {
+    expected <- list(toolchain = list(environment_flags = c(CXXFLAGS = "private-value")), RNGkind = "old")
+    actual <- list(toolchain = list(environment_flags = c(CXXFLAGS = "different-value", CC = "new")), RNGkind = "new")
+    expect_identical(refactor_oracle_environment_differences(expected, actual),
+        c("environment.toolchain.environment_flags.CXXFLAGS", "environment.toolchain.environment_flags.CC", "environment.RNGkind"))
+    expect_identical(refactor_oracle_environment_differences(expected, expected), character())
+})
+
 test_that("dynamic Makevars do not hide changes to referenced external flags", {
     makevars <- tempfile("refactor-dynamic-Makevars-")
     on.exit(unlink(makevars), add = TRUE)
@@ -138,6 +146,10 @@ test_that("developer selection invalidates compiler and runtime oracle caches", 
     expect_gt(probes, 0L)
     expect_identical(mocks$refactor_oracle_environment(), first)
     expect_identical(state$probes, probes)
+    withr::with_envvar(c(PATH = paste(Sys.getenv("PATH"), "unused-reference-path", sep = .Platform$path.sep)), {
+        expect_identical(mocks$refactor_oracle_environment(), first)
+        expect_gt(state$probes, probes)
+    })
 
     # Seed an already verified cache entry, then put its old environment in the
     # on-disk manifest. A backend change must force readback and reject it.
