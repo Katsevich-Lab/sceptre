@@ -89,6 +89,18 @@ jobs:
       - name: Check draw-bank ownership at R error boundaries
         run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
 
+      - name: Check dispersion exception state and platform policy
+        run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
+
+      - name: Retain native boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-boundaries-${{ matrix.config.os }}-${{ matrix.config.r }}
+          path: |
+            ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-dispersion-exceptions
+
       - uses: r-lib/actions/check-r-package@v2
 
   in-memory-without-ondisc:
@@ -121,6 +133,16 @@ jobs:
         run: Rscript --vanilla tools/refactor/test-native-components.R .
       - name: Check draw-bank ownership at R error boundaries
         run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+      - name: Check dispersion exception state and platform policy
+        run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
+      - name: Retain native boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-boundaries-without-ondisc
+          path: |
+            ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-dispersion-exceptions
       - name: Require an ondisc-free environment and run package tests
         shell: Rscript {0}
         run: |

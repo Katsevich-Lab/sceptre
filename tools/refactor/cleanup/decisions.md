@@ -22,3 +22,10 @@ guide-metadata multiplicity in the existing in-memory vector aggregation path.
 Those are separate contracts being characterized under B6/T11. Add independent
 file-import rejection and unchanged ordinary-input regressions; never run the
 invalid old CSC layout through downstream native kernels.
+
+Implementation boundary: B1 repairs SCEPTRE's owned in-memory Cell Ranger and
+Parse constructors. The `use_ondisc=TRUE` Cell Ranger route delegates file
+parsing directly to ondisc; this unit neither changes nor qualifies that
+external parser's duplicate/modality behavior. Independent source review
+requires this limit to remain explicit. A full-file in-memory preflight would
+violate the backed route's resource boundary and is not introduced here.

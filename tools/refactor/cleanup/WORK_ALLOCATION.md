@@ -28,6 +28,13 @@ does not expand the two worker lanes; it requires source review and focused
 regressions before acceptance. B6 aggregation and broader import contracts remain
 separate gated work.
 
+Root owns the bounded B5 dispersion unit: `src/compute_nb_size_param_functions.cpp`
+and the new test-only exception/policy probe and CI step. The executed taxonomy
+and independent review support only domain/overflow catches at the existing
+whole-estimator try boundary. Controlled MLE/MM-state and unrelated-failure
+proof precede acceptance; no production callback, arithmetic or fallback change
+is authorized by this allocation. The native retirement lane excludes this file.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current

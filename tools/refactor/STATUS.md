@@ -1,8 +1,9 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; safety qualified, count/context cleanup under way.**
+**Active, incomplete; safety qualified, count cleanup integrated, context under review.**
 Integration branch: `codex/refactor`, current safe production checkpoint
-`489ca7c` (production identical to qualified safety commit `5ac0fca`). Nothing has been merged to main
+`c84e85f` includes the source-reviewed count unit and the B1 import correction.
+Resource and combined installed-source acceptance remain open. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
 
@@ -43,13 +44,13 @@ Safe retained work:
 
 - c7d6250 adds 28 core contracts with unchanged production expressions; text
   review found a source-design-order description that still needs correction.
-- The canonical sparse-count/nonmutating triplet WIP is preserved in a stash
-  and `codex/refactor-canonical-counts-checkpoint` at tree `8f1b8f4`. It is not
-  integrated or qualified as one combined unit.
+- The original canonical-count WIP remains recoverable at tree `8f1b8f4`; its
+  reworked coherent implementation is now integrated as `c84e85f` below.
 - A 39-function legacy contract draft is isolated at a2e66f0; pointer naming at
   13ff940. Neither is accepted merely because parsed code is unchanged.
-- Driver/worker cleanup is a proposal only. No temporary compatibility aliases
-  should be added for private names with no actual consumer.
+- Driver/worker implementation `627e7e4` is in independent source review after
+  focused immutable qualification; it is not yet integrated. No temporary
+  compatibility aliases were added for private names with no actual consumer.
 
 ## CL1 safety integrated
 
@@ -64,10 +65,20 @@ external pointer precedes native allocation; only nonallocating ownership
 transfer follows. Independent source review closed the finding. Failed stale-
 oracle and reporter-setup attempts remain identified separately.
 
-CL2 native/count ownership and the coupled CL3 context/execution migration now
-have separate worktree/file owners. The indexing test has an explicit sequential
-handoff; no shared production file has concurrent writers. B1 repeated-file
-coordinates will be rejected per Eugene's recorded choice. B6 characterization
+CL2 (`ab477759`, integrated as `c84e85f`) passed 1,059 focused expectations and
+independent source review with no remaining P0/P1/material P2. Its matched
+triplet resource protocol remains open; no ownership-cost exception is approved.
+The indexing-test handoff to CL3 is complete. CL3 (`627e7e4`) passed 1,006
+expectations in 52 tests against a fresh same-environment original oracle;
+source review and integration remain pending.
+
+B1 (`226a5b4`) has 46 candidate-source import regressions and independent source
+review. Its owned in-memory Cell Ranger/Parse constructors preserve sorted
+coordinates/zeros/IDs, map actual modality rows and reject repeated coordinates
+per Eugene's choice. Installed-source qualification is pending; sparse sorting
+workspace is unmeasured. The externally delegated ondisc file parser is unchanged
+and unqualified for this policy. See the explicit boundary in decisions.md.
+B6 characterization
 has 28 exact helper and 200 exact rounding matches, plus public import probes;
 resource qualification remains required. Dispersion taxonomy has 107 exact
 original-state comparisons and a source-reviewed two-type narrowing path;

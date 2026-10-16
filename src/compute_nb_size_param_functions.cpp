@@ -4,6 +4,7 @@
 #include <boost/math/special_functions/digamma.hpp>
 #include <boost/math/special_functions/trigamma.hpp>
 #include <math.h>
+#include <stdexcept>
 using namespace Rcpp;
 
 
@@ -65,6 +66,12 @@ std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, i
 }
 
 
+// Aligned response/mean vectors and the existing degrees-of-freedom, iteration
+// and tolerance controls produce (estimate, method): 1 MLE, 2 MM, 3 pilot.
+// Keep the whole MLE/MM try boundary and assignment order: a numerical failure
+// during MM retains the already committed MLE state. Only the reached Boost
+// domain/overflow failures are suppressed; allocation/system failures propagate.
+// Pilot computation and result allocation remain outside this boundary.
 // [[Rcpp::export]]
 List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   // first, attempt to estimate theta via MLE
@@ -86,6 +93,7 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
       }
     }
     // return both the estimate and method indicator
-  } catch (...) {}
+  } catch (const std::domain_error&) {
+  } catch (const std::overflow_error&) {}
   return(List::create(estimate, method));
 }
