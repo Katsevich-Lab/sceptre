@@ -15,6 +15,18 @@ complexity, ownership/site inventories and repeatable change-tracing questions
 before structural work. Metrics and their limitations are separate from the
 compatibility gates.
 
+## Integration checkpoints
+
+Commit each coherent change together with its relevant tests and fixtures.
+During active coding, aim for a recoverable checkpoint about every 15–30
+minutes when a logical unit is ready; this is a guideline, not a timer or an
+industry-standard interval. Run targeted checks before each integration commit
+and broader checks at stage boundaries. Commit a stable checkpoint before a
+handoff or major restructuring. Keep expectations, generators and integrity
+manifests together whenever separating them would break intermediate commits.
+Do not commit incomplete or unrelated work just to meet the interval. Separate
+measurement/CI/documentation units when they are independently reviewable.
+
 ## Reference fixtures
 
 Fixtures are committed under `tests/testthat/fixtures/refactor`. Tests load
