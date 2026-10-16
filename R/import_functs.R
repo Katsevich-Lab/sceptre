@@ -1175,6 +1175,11 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
 #' @noRd
 sum_sparse_vector_rows <- function(counts) {
     n_cells <- ncol(counts)
+    # Most vectors contain only a few guides and already fit the block target.
+    # Avoid another sparse column subset and numeric output copy in that case.
+    if (as.double(nrow(counts)) * n_cells <= 2^20) {
+        return(Matrix::colSums(as.matrix(counts)))
+    }
     sums <- numeric(n_cells)
     names(sums) <- colnames(counts)
     if (n_cells == 0L) return(sums)
