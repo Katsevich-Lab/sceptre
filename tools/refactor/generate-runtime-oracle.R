@@ -64,7 +64,10 @@ if (!identical(normalizePath(getNamespaceInfo("sceptre", "path"), winslash = "/"
     stop("Loaded package namespace is not the verified original source archive.")
 }
 dll <- getNamespaceInfo("sceptre", "DLLs")[["sceptre"]]
-if (is.null(dll) || !startsWith(normalizePath(dll[["path"]], winslash = "/", mustWork = TRUE), paste0(reference, "/"))) {
+compiled_dll <- file.path(reference, "src", paste0("sceptre", .Platform$dynlib.ext))
+# pkgload loads a temporary copy, so check its bytes against the fresh build.
+if (is.null(dll) || !file.exists(compiled_dll) ||
+    !identical(unname(tools::md5sum(dll[["path"]])), unname(tools::md5sum(compiled_dll)))) {
     stop("Loaded native library is not from the cleanly compiled original source archive.")
 }
 verify_source()
