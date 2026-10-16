@@ -1,4 +1,4 @@
-# show method
+# Basic display uses source-store dimensions and the facade's workflow state.
 setMethod("show", signature = signature("sceptre_object"), function(object) {
     # 0. determine the functions that have been run
     funct_run_vect <- object@functs_called
@@ -308,8 +308,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' `plot()` is "generic" in the sense that it dispatches a specific plotting
 #' function based on the pipeline function that was most recently called on the
-#' `sceptre_object`. For example, if `run_assign_grnas()` is the most recently
-#' called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`.
+#' `sceptre_object`. For example, if `assign_grnas()` is the most recently
+#' called pipeline function, then `plot()` dispatches `plot_assign_grnas()`.
 #' Similarly, if `run_power_check()` is the most recently called pipeline
 #' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
 #' can pass arguments to the function dispatched by `plot()` as named arguments
@@ -319,8 +319,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' @param y ignored argument
 #' @param ... arguments passed to the plotting function dispatched by `plot()`
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is set to \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{TRUE})
 #'
 #' @export
 #' @examples
@@ -360,6 +360,14 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 })
 
 
+#' Read one full source-cell row by its feature ID
+#'
+#' @param mat Row-accessible `dgRMatrix` or ondisc `odm` with unique row IDs.
+#' @param id Scalar feature ID present in `rownames(mat)`.
+#' @return Dense numeric vector in source-column order, without changing the
+#'   store. Other classes return `NULL`; callers prepare row
+#'   accessibility before using this helper for mixture fitting or plotting.
+#' @noRd
 load_row <- function(mat, id) {
     if (methods::is(mat, "odm") || methods::is(mat, "dgRMatrix")) {
         storage_read_response(mat, storage_response_index(mat, id))

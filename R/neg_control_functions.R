@@ -1,3 +1,15 @@
+#' Sample QC-eligible negative controls from combinations of NT guides
+#'
+#' @param sceptre_object Post-QC object with NT memberships, `M_matrix` and
+#'   `n_nonzero_tot_vector` aligned to guide order and all response rows.
+#' @param n_calibration_pairs Positive requested number of distinct pairs.
+#' @param calibration_group_size Positive number of NT guides per group, no
+#'   greater than the available number of NT guides.
+#' @return Data frame in native sampling order, with `response_id`, ampersand-
+#'   joined `grna_group`, treatment/control counts and `pass_qc = TRUE`.
+#'   May return fewer pairs than requested with a message; errors if none qualify.
+#'   Native samplers use fixed seeds and do not consume R random draws.
+#' @noRd
 construct_negative_control_pairs_v2 <- function(
     sceptre_object,
     n_calibration_pairs,
@@ -15,13 +27,11 @@ construct_negative_control_pairs_v2 <- function(
     cells_in_use <- sceptre_object@cells_in_use
     discovery_pairs_with_info <- sceptre_object@discovery_pairs_with_info
 
-    # 1. set a few variables
     N_POSSIBLE_GROUPS_THRESHOLD <- 100L
     nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
     n_nt_grnas <- length(nt_grna_names)
     n_genes <- nrow(response_matrix)
 
-    # 2. compute the number of possible groups; compute the possible groups
     n_possible_groups <- choose(n_nt_grnas, calibration_group_size)
     if (n_possible_groups <= N_POSSIBLE_GROUPS_THRESHOLD) {
         # iterate over the entire set of combinations
@@ -49,7 +59,6 @@ construct_negative_control_pairs_v2 <- function(
         )
     }
 
-    # 3. sample WOR from the set of undercover pairs
     calculate_ess_using_m_matrix <- sceptre_object@low_moi ||
         calibration_group_size == 1L
     if (calculate_ess_using_m_matrix) {
@@ -90,7 +99,6 @@ construct_negative_control_pairs_v2 <- function(
         )
     }
 
-    # 4. construct the data frame of negative control pairs
     if (length(samp$response_idxs) == 0L) {
         stop("No negative control pair passes pairwise QC.")
     }
@@ -109,8 +117,6 @@ construct_negative_control_pairs_v2 <- function(
     )
     message(crayon::green(" \u2713"))
 
-    # 5. check the number of rows of df, and issue a warning if less than the
-    # required amount
     if (nrow(df) < n_calibration_pairs) {
         note_text <- paste0(
             "Note: Unable to generate the number of negative control pairs (",
@@ -125,6 +131,13 @@ construct_negative_control_pairs_v2 <- function(
 }
 
 
+#' Choose the default calibration group size from integration metadata
+#'
+#' @param grna_target_data_frame Guide metadata with `grna_group` already set;
+#'   the caller needs a nonempty targeting-group distribution for a finite result.
+#' @return Integer rounded median targeting-group size, capped by the number of
+#'   NT metadata rows. No minimum or empty-target fallback is imposed here.
+#' @noRd
 compute_calibration_group_size <- function(grna_target_data_frame) {
     median_group_size <- grna_target_data_frame |>
         dplyr::filter(grna_group != "non-targeting") |>
@@ -140,6 +153,13 @@ compute_calibration_group_size <- function(grna_target_data_frame) {
 }
 
 
+#' Encode NT combinations as calibration group IDs
+#'
+#' @param possible_groups_m Integer matrix, one combination per row, containing
+#'   one-based positions in `nt_grna_names` after the native increment step.
+#' @param nt_grna_names Character NT guide IDs in assignment-list order.
+#' @return Character vector of ampersand-joined IDs in matrix row/member order.
+#' @noRd
 get_undercover_group_names <- function(possible_groups_m, nt_grna_names) {
     apply(X = possible_groups_m, MARGIN = 1, FUN = function(r) {
         paste0(nt_grna_names[r], collapse = "&")

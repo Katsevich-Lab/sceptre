@@ -1,3 +1,11 @@
+#' Build a finite, full-rank cell design without dropping rows
+#'
+#' @param covariate_data_frame Data frame with one row per source cell.
+#' @param formula_object Formula passed to `model.matrix()`, including its
+#'   intercept/contrast choices.
+#' @return Numeric cell-by-design-column matrix in input row order. Errors on
+#'   dropped rows, nonfinite entries or rank deficiency; does not modify inputs.
+#' @noRd
 convert_covariate_df_to_design_matrix <- function(
     covariate_data_frame,
     formula_object
@@ -33,6 +41,16 @@ convert_covariate_df_to_design_matrix <- function(
 }
 
 
+#' Compute import-time cell summaries from in-memory count columns
+#'
+#' @param matrix_in Feature-by-cell R count matrix, converted to column access.
+#' @param feature_names Character response labels aligned with rows; an empty
+#'   vector disables mitochondrial summaries even when requested.
+#' @param compute_p_mito,compute_max_feature Logical flags for optional summaries.
+#' @return Data frame in column order with `n_nonzero` (values greater than 0.5)
+#'   and `n_umis`, plus requested mito/max-feature columns. Max-feature ties take
+#'   the first row; zero-total fractions retain native division results (NaN).
+#' @noRd
 compute_cell_covariates <- function(
     matrix_in,
     feature_names,
@@ -73,6 +91,19 @@ compute_cell_covariates <- function(
 }
 
 
+#' Generate the native permutation bank for one prepared analysis
+#'
+#' @param grna_assignments Post-QC named memberships in the saved analysis/NT-local
+#'   representation; empty targeting groups are ignored for NT-control size ranges.
+#' @param B Integer total draw budget, normally `B1 + B2 + B3`.
+#' @param calibration_check,control_group_complement Logical analysis/view flags.
+#' @param calibration_group_size Number of NT guides pooled per calibration group.
+#' @param n_cells Number of retained analysis cells, used for complement controls.
+#' @return External pointer owning a native bank of zero-based indices. Its
+#'   interpretation is specific to the selected Fisher-Yates/hybrid fit view;
+#'   these are not source-cell IDs. Samplers use fixed native seeds without
+#'   consuming R random draws; the pointer must not be persisted in saved objects.
+#' @noRd
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
     B,
@@ -90,7 +121,6 @@ get_synthetic_permutation_idxs <- function(
             stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", active_nt_count, ").")
     }
     if (calibration_check && !control_group_complement) {
-        # 1. calibration check, nt cells (low MOI only)
         indiv_nt_sizes <- vapply(
             grna_assignments$indiv_nt_grna_idxs,
             length,
@@ -101,7 +131,6 @@ get_synthetic_permutation_idxs <- function(
         n_control_cells <- length(grna_assignments$all_nt_idxs)
         out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
     } else if (calibration_check && control_group_complement) {
-        # 2. calibration check, complement (low and high MOI)
         indiv_nt_sizes <- vapply(
             grna_assignments$indiv_nt_grna_idxs,
             length,
@@ -113,7 +142,6 @@ get_synthetic_permutation_idxs <- function(
         M <- min(sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)])), n_cells)
         out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
     } else if (!calibration_check && !control_group_complement) {
-        # 3. discovery, nt cells (low MOI only)
         grna_group_sizes <- vapply(
             grna_assignments$grna_group_idxs,
             length,
@@ -129,7 +157,6 @@ get_synthetic_permutation_idxs <- function(
             B = B
         )
     } else if (!calibration_check && control_group_complement) {
-        # 4. discovery, complement (low and high MOI)
         max_cells_per_grna_group <- vapply(
             grna_assignments$grna_group_idxs,
             length,
@@ -147,6 +174,15 @@ get_synthetic_permutation_idxs <- function(
 }
 
 
+#' Add integration-specific group IDs to metadata and requested pair tables
+#'
+#' @param sceptre_object Parameterized object with guide/target metadata and pair
+#'   tables whose rows may repeat.
+#' @return Updated object. Union uses target IDs without expanding rows; singleton
+#'   and Bonferroni expand each pair through a many-to-many target/guide join.
+#'   Guide order follows metadata, repeated pair requests are retained, and NT
+#'   guides keep the reserved `non-targeting` group label.
+#' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
     grouping_strategy <- sceptre_object@grna_integration_strategy
     if (grouping_strategy == "union") {

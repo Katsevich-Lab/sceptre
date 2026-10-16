@@ -133,11 +133,22 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     return(mat)
 }
 
+#' Replace the response payload within the existing saved-object wrapper
+#'
+#' Returns the updated facade, keeping its one-element list slot. The payload
+#' may be an in-memory/backed store or the empty list used for portable saves;
+#' no validation, reading, conversion or other slot changes occur here.
+#' @noRd
 set_response_matrix <- function(sceptre_object, response_matrix) {
     sceptre_object@response_matrix[[1]] <- response_matrix
     return(sceptre_object)
 }
 
+#' Replace the guide payload within the existing saved-object wrapper
+#'
+#' Same storage/saved-object contract as set_response_matrix; the one-element
+#' list is a persisted compatibility boundary. Returns the updated facade.
+#' @noRd
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
     sceptre_object@grna_matrix[[1]] <- grna_matrix
     return(sceptre_object)

@@ -102,6 +102,19 @@ import_data <- function(
 }
 
 # memory
+#' Import aligned in-memory counts and initialize the saved S4 facade
+#'
+#' @param response_matrix,grna_matrix Feature-by-source-cell count matrices with
+#'   unique feature IDs; cell columns and any supplied cell names must align.
+#' @param grna_target_data_frame Guide/target metadata; `vector_id`, when present,
+#'   groups guide rows for count summation before covariates are computed.
+#' @param moi Character `"low"` or `"high"`.
+#' @param extra_covariates Data frame in source-cell order, or an empty data frame.
+#' @param response_names Character feature labels aligned with response rows,
+#'   or `NA_character_` to use response row names for mitochondrial identification.
+#' @return Initialized `sceptre_object` with row-accessible sparse counts and
+#'   source-ordered covariates. Validation/conversion can allocate new matrices.
+#' @noRd
 import_data_memory <- function(
     response_matrix,
     grna_matrix,
@@ -148,7 +161,16 @@ import_data_memory <- function(
     )
 }
 
-# 1. ondisc
+#' Import R counts through the existing backed-store construction path
+#'
+#' @param response_matrix,grna_matrix,grna_target_data_frame,moi,extra_covariates,response_names
+#'   Aligned import inputs as for `import_data_memory()`; guide rows are written
+#'   as supplied, without `vector_id` aggregation in this path.
+#' @param directory_to_write Single output directory, created if necessary.
+#' @return Initialized object with backed matrices sharing a newly sampled
+#'   `integer_id`. Writes `response.odm` and `grna.odm`, advancing the R RNG for
+#'   the ID and following the existing ondisc construction/RNG order.
+#' @noRd
 import_data_use_ondisc <- function(
     response_matrix,
     grna_matrix,
@@ -303,21 +325,30 @@ import_data_from_cellranger <- function(
     }
 }
 
-# 1. memory
+#' Read Cell Ranger batches into aligned in-memory modalities
+#'
+#' @param directories Character paths in batch order, with matching feature
+#'   tables and coordinate Matrix Market counts. Each modality follows its
+#'   feature-file row order, even when modalities are interleaved; unique
+#'   coordinates may be unsorted. Repeated coordinates fail before CSC use.
+#' @param moi,grna_target_data_frame,extra_covariates Inputs to `import_data_memory()`;
+#'   extra covariates follow concatenated batch/cell order.
+#' @return Initialized object in input-directory/column order. Barcode files must
+#'   be present for all batches or none; retained barcodes are batch-prefixed for
+#'   multiple inputs. Adds/replaces the `batch` covariate and emits progress.
+#' @noRd
 import_data_from_cellranger_memory <- function(
     directories,
     moi,
     grna_target_data_frame,
     extra_covariates
 ) {
-    # 1. check that directories exist
     for (curr_directory in directories) {
         if (!dir.exists(curr_directory)) {
             stop("The directory ", curr_directory, " does not exist.")
         }
     }
 
-    # 2. create the vector of matrix, features, and barcode files
     input_files <- lapply(X = directories, function(curr_directory) {
         fs <- list.files(curr_directory)
         grep_strs <- c("*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
@@ -369,7 +400,6 @@ import_data_from_cellranger_memory <- function(
     }) |>
         stats::setNames(NULL)
 
-    # 3. obtain the barcodes, features, and matrix fp vectors
     feature_fps <- vapply(
         X = input_files,
         FUN = function(i) i[["features"]],
@@ -403,7 +433,6 @@ import_data_from_cellranger_memory <- function(
         NULL
     }
 
-    # 4. obtain the feature data frame; determine the ids of each feature
     feature_df <- data.table::fread(
         file = feature_fps[1],
         colClasses = c("character", "character", "character"),
@@ -421,7 +450,6 @@ import_data_from_cellranger_memory <- function(
         which(feature_df$modality == modality)
     })
 
-    # 5. loop over directories, loading the matrix corresponding to each
     out_list <- vector(mode = "list", length = length(directories))
     n_cells_per_matrix <- vector(mode = "integer", length = length(directories))
     for (i in seq_along(directories)) {
@@ -521,7 +549,6 @@ import_data_from_cellranger_memory <- function(
         message(crayon::green(" \u2713"))
     }
 
-    # 6. combine the matrices via do.call cbind
     message("Combining matrices across directories.")
     out_mats <- lapply(modalities, function(modality) {
         l <- lapply(out_list, function(mat) mat[[modality]])
@@ -532,7 +559,6 @@ import_data_from_cellranger_memory <- function(
     gc() |> invisible()
     message(crayon::green(" \u2713"))
 
-    # 7. collect metadata pieces
     cell_ids <- if (retain_cell_barcodes) {
         unlist(cell_barcodes, use.names = FALSE)
     } else {
@@ -560,7 +586,6 @@ import_data_from_cellranger_memory <- function(
     }
     gene_names <- feature_df$feature_name[modality_idxs[["Gene Expression"]]]
 
-    # 8. set up the extra covariates
     batch <- if (length(directories) >= 2L) {
         rep(paste0("b", seq_along(n_cells_per_matrix)), n_cells_per_matrix) |>
             factor()
@@ -573,7 +598,6 @@ import_data_from_cellranger_memory <- function(
         extra_covariates$batch <- batch
     }
 
-    # 9. initialize the sceptre object
     message("Creating the sceptre object.")
     sceptre_object <- import_data_memory(
         response_matrix = out_mats[["Gene Expression"]],
@@ -589,7 +613,18 @@ import_data_from_cellranger_memory <- function(
 }
 
 
-# 2. disk
+#' Read Cell Ranger batches through ondisc and initialize the S4 facade
+#'
+#' @param directories Character paths passed in order to the ondisc importer.
+#' @param moi,grna_target_data_frame,extra_covariates Import metadata/covariates;
+#'   extra covariates must follow the ondisc importer's returned cell order.
+#' @param directory_to_write Single output directory, created if necessary.
+#' @return Object with backed gene/gRNA modalities and their shared import ID.
+#'   ondisc writes backing files and computes cell covariates; `vector_id`
+#'   aggregation is delegated to it and then reflected in guide metadata.
+#'   Coordinate validation/duplicate behavior belongs to the external parser;
+#'   the owned in-memory CSC policy does not qualify this route.
+#' @noRd
 import_data_from_cellranger_use_ondisc <- function(
     directories,
     moi,
@@ -597,10 +632,8 @@ import_data_from_cellranger_use_ondisc <- function(
     extra_covariates,
     directory_to_write
 ) {
-    # 0. check that directory_to_write has been supplied
     directory_to_write <- prepare_directory_to_write(directory_to_write)
 
-    # 1. call the corresponding ondisc function
     vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
     out <- ondisc::create_odm_from_cellranger(
         directories_to_load = directories,
@@ -613,14 +646,12 @@ import_data_from_cellranger_use_ondisc <- function(
         }
     )
 
-    # 1.5. update grna_target_data_frame, if vector supplied
     if (vector_supplied) {
         grna_target_data_frame <- collapse_grna_target_data_frame(
             grna_target_data_frame
         )
     }
 
-    # 2. check data imports
     check_import_data_inputs(
         out$gene,
         out$grna,
@@ -630,7 +661,6 @@ import_data_from_cellranger_use_ondisc <- function(
     ) |>
         invisible()
 
-    # 3. process the cellwise covariates
     covariate_df <- out$cellwise_covariates
     colnames(covariate_df) <- gsub(
         pattern = "gene",
@@ -642,7 +672,6 @@ import_data_from_cellranger_use_ondisc <- function(
         covariate_df <- cbind(extra_covariates, covariate_df)
     }
 
-    # 4. initialize the sceptre_object
     sceptre_object <- init_sceptre_object(
         response_matrix = out$gene,
         grna_matrix = out$grna,
@@ -651,7 +680,6 @@ import_data_from_cellranger_use_ondisc <- function(
         grna_target_data_frame = grna_target_data_frame
     )
 
-    # 5. add integer id
     sceptre_object@integer_id <- out$gene@integer_id
     return(sceptre_object)
 }
@@ -726,7 +754,6 @@ import_data_from_parse <- function(
     grna_target_data_frame,
     extra_covariates = data.frame()
 ) {
-    # 1. check that files exist
     fps <- c(
         gene_mat_fp = gene_mat_fp,
         grna_mat_fp = grna_mat_fp,
@@ -746,7 +773,6 @@ import_data_from_parse <- function(
         }
     }
 
-    # 2. load the gene.mtx and grna.mtx data
     load_matrix <- function(mat_fp) {
         matrix_metadata <- get_mtx_metadata(
             mat_fp,
@@ -775,7 +801,6 @@ import_data_from_parse <- function(
     gene_mat <- load_matrix(gene_mat_fp)
     grna_mat <- load_matrix(grna_mat_fp)
 
-    # 3. load the gene ids; update rownames of gene mat
     gene_feature_df <- data.table::fread(
         file = all_genes_fp,
         colClasses = c("character", "character", "character"),
@@ -785,7 +810,6 @@ import_data_from_parse <- function(
     rownames(gene_mat) <- gene_feature_df$feature_id[seq(1L, nrow(gene_mat))]
     gene_names <- gene_feature_df$feature_name[seq(1L, nrow(gene_mat))]
 
-    # 4. load the grna ids; update rownames of grna mat
     grna_feature_df <- data.table::fread(
         file = all_grnas_fp,
         colClasses = c("character", "character", "character"),
@@ -794,7 +818,6 @@ import_data_from_parse <- function(
     )
     rownames(grna_mat) <- grna_feature_df$feature_name
 
-    # 5. create the sceptre_object
     sceptre_object <- import_data_memory(
         response_matrix = gene_mat,
         grna_matrix = grna_mat,
@@ -810,6 +833,18 @@ import_data_from_parse <- function(
 ##################
 # HELPER FUNCTIONS
 ##################
+#' Initialize persistent S4 slots without changing source-cell order
+#'
+#' @param response_matrix,grna_matrix Aligned feature-by-cell stores (row-accessible
+#'   sparse matrices or ondisc objects), already validated by the import path.
+#' @param covariate_data_frame Source-cell-ordered data frame with computed guide
+#'   maximum/fraction columns, moved into `import_grna_assignment_info`.
+#' @param moi Character `"low"` or `"high"`.
+#' @param grna_target_data_frame Guide metadata; IDs/targets are coerced to character
+#'   while row order and additional columns are preserved.
+#' @return New `sceptre_object` with the legacy slot layout and initial workflow
+#'   flags. Stores supplied matrices without reordering or eagerly reading them.
+#' @noRd
 init_sceptre_object <- function(
     response_matrix,
     grna_matrix,
@@ -838,7 +873,6 @@ init_sceptre_object <- function(
             grna_id = as.character(grna_id),
             grna_target = as.character(grna_target)
         )
-    # 5. initialize flags
     sceptre_object@elements_to_analyze <- NA_character_
     sceptre_object@nf_pipeline <- FALSE
     sceptre_object@nuclear <- FALSE
@@ -911,6 +945,14 @@ get_mtx_metadata <- function(
 }
 
 
+#' Write the two imported modalities under a common backing identity
+#'
+#' @param response_matrix,grna_matrix Aligned feature-by-cell count matrices.
+#' @param directory_to_write Output directory accepted by `prepare_directory_to_write()`.
+#' @param integer_id Integer identity shared by the saved object and both stores.
+#' @return The `storage_create_backed_pair()` list of response/gRNA handles after
+#'   writing `response.odm` and `grna.odm` in that order.
+#' @noRd
 write_matrices_to_disk <- function(
     response_matrix,
     grna_matrix,
@@ -924,6 +966,13 @@ write_matrices_to_disk <- function(
 }
 
 
+#' Create and canonicalize an ondisc output directory
+#'
+#' @param directory_to_write Nonmissing scalar character path; a leading home
+#'   abbreviation is expanded before recursive directory creation.
+#' @return Existing absolute path using forward slashes, with embedded tildes
+#'   rejected before it reaches ondisc's legacy path expansion.
+#' @noRd
 prepare_directory_to_write <- function(directory_to_write) {
     if (is.null(directory_to_write)) {
         stop("`directory_to_write` must be supplied.")
@@ -949,6 +998,13 @@ prepare_directory_to_write <- function(directory_to_write) {
 }
 
 
+#' Canonicalize an existing object or backing-file path
+#'
+#' @param file_path Nonmissing scalar character path that must already exist.
+#' @param arg_name Character argument label used in validation errors.
+#' @return Absolute path using forward slashes, with home expansion applied and
+#'   remaining tildes rejected; does not open or modify the file.
+#' @noRd
 prepare_ondisc_file_path <- function(file_path, arg_name) {
     if (is.null(file_path)) {
         stop(arg_name, " must be supplied.")
@@ -970,6 +1026,12 @@ prepare_ondisc_file_path <- function(file_path, arg_name) {
 }
 
 
+#' Reject embedded tildes before invoking ondisc's legacy path handling
+#'
+#' @param file_path Canonical character path with leading home expansion complete.
+#' @param arg_name Character argument label used in the error.
+#' @return `NULL` on success; errors if any tilde remains. Does not access files.
+#' @noRd
 check_path_has_no_tilde <- function(file_path, arg_name) {
     if (grepl("~", file_path, fixed = TRUE)) {
         stop(
@@ -988,6 +1050,15 @@ check_path_has_no_tilde <- function(file_path, arg_name) {
 }
 
 
+#' Compute aligned cell covariates and prepare row-accessible R matrices
+#'
+#' @param response_matrix,grna_matrix In-memory feature-by-cell count matrices.
+#' @param extra_covariates Empty data frame or covariates in the same cell order.
+#' @param response_names Aligned response labels, or `NA_character_` for row names.
+#' @return List with `covariate_data_frame`, `response_matrix`, and `grna_matrix`.
+#'   Dimensions, feature IDs and cell order are retained; count storage may be
+#'   converted. This runs before the backed import writes its matrices to disk.
+#' @noRd
 process_covariates_and_matrices <- function(
     response_matrix,
     grna_matrix,
@@ -1020,6 +1091,14 @@ process_covariates_and_matrices <- function(
 }
 
 
+#' Replace guide metadata rows by their vector identities
+#'
+#' @param grna_target_data_frame Data frame with `grna_id`, `vector_id`, and
+#'   `grna_target`; every vector must map to exactly one target.
+#' @return Metadata with `vector_id` renamed to `grna_id` and original guide IDs
+#'   removed. Deduplicates complete remaining rows in first-seen order, so differing
+#'   additional annotations can retain repeated vector IDs.
+#' @noRd
 collapse_grna_target_data_frame <- function(grna_target_data_frame) {
     vector_nested_within_target <- (grna_target_data_frame |>
         dplyr::group_by(vector_id) |>
@@ -1038,6 +1117,15 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 }
 
 
+#' Sum guide counts within each vector for the in-memory import path
+#'
+#' @param grna_matrix Guide-by-cell count matrix with named guide rows.
+#' @param grna_target_data_frame Metadata identifying matrix rows by `grna_id`
+#'   and their vector groups by `vector_id`.
+#' @return Dense numeric vector-by-cell matrix in first-seen vector order and
+#'   original cell order. Metadata repetitions contribute repeated row selections.
+#'   Materializes the full input as a dense matrix before summing.
+#' @noRd
 collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
     # temporary function; we may rewrite this function to improve its
     # speed and memory efficiency if multiguide vector data become more

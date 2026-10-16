@@ -1,8 +1,8 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; safety qualified, count cleanup integrated, context under review.**
-Integration branch: `codex/refactor`, current safe production checkpoint
-`c84e85f` includes the source-reviewed count unit and the B1 import correction.
+**Active, incomplete; context cleanup integrated, native allocation follow-up open.**
+Integration branch: `codex/refactor`, integration checkpoint
+`0b6ae38` includes the source-reviewed count/context units and B1 import correction.
 Resource and combined installed-source acceptance remain open. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
@@ -42,14 +42,14 @@ without changing formerly safe draws. The unsafe baseline was not executed.
 
 Safe retained work:
 
-- c7d6250 adds 28 core contracts with unchanged production expressions; text
-  review found a source-design-order description that still needs correction.
+- c7d6250 adds 28 core contracts with unchanged production expressions; CL3
+  corrected the source-design-order description found inaccurate in text review.
 - The original canonical-count WIP remains recoverable at tree `8f1b8f4`; its
   reworked coherent implementation is now integrated as `c84e85f` below.
 - A 39-function legacy contract draft is isolated at a2e66f0; pointer naming at
   13ff940. Neither is accepted merely because parsed code is unchanged.
-- Driver/worker implementation `627e7e4` is in independent source review after
-  focused immutable qualification; it is not yet integrated. No temporary
+- Driver/worker implementation `627e7e4` is integrated as `0b6ae38` after
+  focused immutable qualification and independent source review. No temporary
   compatibility aliases were added for private names with no actual consumer.
 
 ## CL1 safety integrated
@@ -65,12 +65,17 @@ external pointer precedes native allocation; only nonallocating ownership
 transfer follows. Independent source review closed the finding. Failed stale-
 oracle and reporter-setup attempts remain identified separately.
 
-CL2 (`ab477759`, integrated as `c84e85f`) passed 1,059 focused expectations and
-independent source review with no remaining P0/P1/material P2. Its matched
-triplet resource protocol remains open; no ownership-cost exception is approved.
+CL2 (`ab477759`, integrated as `c84e85f`) passed 1,059 focused expectations.
+Its first source review closed, but a subsequent allocation-path audit found a
+material P2: raw R allocation errors can bypass newly owned C++ coordinate and
+scratch destructors. The explicit review amendment supersedes that part of the
+first closure. A narrow phase-order correction and controlled-error proof are
+under way; large resource trials are held. Fresh pre-correction release builds
+are retained separately, with no qualification relabeling or cost exception.
 The indexing-test handoff to CL3 is complete. CL3 (`627e7e4`) passed 1,006
 expectations in 52 tests against a fresh same-environment original oracle;
-source review and integration remain pending.
+independent source review closed and integration is complete. This does not
+qualify the combined final source or downstream consumers/resources.
 
 B1 (`226a5b4`) has 46 candidate-source import regressions and independent source
 review. Its owned in-memory Cell Ranger/Parse constructors preserve sorted
@@ -81,8 +86,12 @@ and unqualified for this policy. See the explicit boundary in decisions.md.
 B6 characterization
 has 28 exact helper and 200 exact rounding matches, plus public import probes;
 resource qualification remains required. Dispersion taxonomy has 107 exact
-original-state comparisons and a source-reviewed two-type narrowing path;
-controlled failure propagation and platform facts remain required.
+original-state comparisons. The two-type narrowing at `ef0c77b` passed 107
+actual-source numerical comparisons and 14 paired controlled MLE/MM failure
+cases, including partial-state and unrelated failure propagation, plus
+independent source/proof review. Installed-package and hosted platform-policy
+evidence remain required. File-lifetime `abf7245` has 12 source-evaluated
+regressions and independent review; installed-source qualification is pending.
 
 ## Completed qualification, pinned to earlier source
 

@@ -1,3 +1,12 @@
+#' Measure pair sparsity while retaining the saved QC slot layout
+#'
+#' @param sceptre_object Cellwise-QC object with source-cell `cells_in_use`,
+#'   post-QC group memberships and discovery/positive-control pair tables.
+#' @return Updated object with pair tables sorted by source response row, keeping
+#'   repeated requests. Counts refer to stored sparse positions, including explicit
+#'   zeros. `M_matrix` has NT-guide rows and all-response columns; totals use the
+#'   configured control view. The nuclear backed path leaves NT summaries empty.
+#' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
     # extract basic information from sceptre_object
     cells_in_use <- sceptre_object@cells_in_use
@@ -8,8 +17,6 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     control_group_complement <- sceptre_object@control_group_complement
     grna_group_idxs <- grna_assignments$grna_group_idxs
 
-    # 1. construct the entire set of response pairs by combining discovery pairs
-    # and pc pairs
     response_grna_group_pairs <- rbind(
         dplyr::mutate(discovery_pairs, discovery = TRUE),
         dplyr::mutate(positive_control_pairs, discovery = FALSE)
@@ -58,6 +65,15 @@ compute_pairwise_qc_information <- function(sceptre_object) {
 }
 
 
+#' Apply pair eligibility thresholds and count retained hypotheses
+#'
+#' @param sceptre_object Object whose QC tables contain aligned treatment/control
+#'   counts and whose threshold slots and integration strategy have been set.
+#' @return Updated object with `pass_qc` in existing row order and retained-pair
+#'   counts. Bonferroni counts distinct response/target groups with any passing
+#'   guide; other strategies count passing rows, including repeated requests.
+#'   Empty tables and their existing count slots are left unchanged.
+#' @noRd
 compute_qc_metrics <- function(sceptre_object) {
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh

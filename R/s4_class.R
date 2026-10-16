@@ -1,11 +1,6 @@
-# class union
 #' @import Matrix
-# setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix",
-# "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix"))
-# setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix",
-# "dgTMatrix"))
-
-# sceptre object class
+# The 56 slots and one-element matrix payload wrappers are persisted by users
+# and pipeline parts. Internal contexts are transient; this schema stays stable.
 setClass(
     "sceptre_object",
     slots = list(

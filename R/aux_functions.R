@@ -1,3 +1,11 @@
+#' Choose the existing default formula from source-cell covariates
+#'
+#' Retains column order; excludes response mito and optionally guide count
+#' covariates. Names matching n_umis/n_nonzero get log(x), or log(x+1) if any
+#' zero occurs. Other columns with at least 15 observed values are omitted.
+#' Returns a formula for model.matrix; this is selection, not input validation.
+#' Does not modify covariates or draw random numbers.
+#' @noRd
 auto_construct_formula_object <- function(
     cell_covariates,
     include_grna_covariates
@@ -47,6 +55,13 @@ auto_construct_formula_object <- function(
 }
 
 
+#' Combine import summaries and extra covariates in source-cell order
+#'
+#' Aligned feature-by-cell response/guide counts and response labels produce a
+#' data frame with prefixed response/guide summaries, followed by supplied extra
+#' covariates. Response column IDs become row names when available. Converts
+#' sparse orientation for column scans; does not create a backed store or use RNG.
+#' @noRd
 auto_compute_cell_covariates <- function(
     response_matrix,
     grna_matrix,
@@ -84,6 +99,13 @@ auto_compute_cell_covariates <- function(
 }
 
 
+#' Partition ordered labels or canonical row indices for existing fork workers
+#'
+#' Returns an ordered list of blocks. Parallel work with at least twice the
+#' requested worker count uses the existing seed-4 shuffle and cut; smaller or
+#' serial work retains one input-order block. "auto" uses the preferred core
+#' fraction once. withr restores caller RNG/options; no worker is launched here.
+#' @noRd
 partition_response_ids <- function(response_ids, parallel, n_processors) {
     groups_set <- FALSE
     if (parallel) {
@@ -133,6 +155,11 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
 }
 
 
+#' Resolve the existing worker-log subdirectory, creating it if needed
+#'
+#' A scalar base path yields base/sceptre_logs/ with a trailing slash. Directory
+#' creation is recursive; no log file is opened and no random state is changed.
+#' @noRd
 get_log_dir <- function(log_dir) {
     log_dir <- paste0(log_dir, "/sceptre_logs/")
     if (!dir.exists(log_dir)) {

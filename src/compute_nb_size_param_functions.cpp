@@ -8,6 +8,9 @@
 using namespace Rcpp;
 
 
+// Negative-binomial size score for aligned response/mean vectors at trial th.
+// Uses the existing Boost double special-function policy; domain/overflow can
+// throw to the estimator's numerical boundary. Inputs are read only, no RNG.
 double nb_score(double th, NumericVector mu, NumericVector y) {
   double sum = 0;
   for (int i = 0; i < mu.size(); i ++) {
@@ -17,6 +20,8 @@ double nb_score(double th, NumericVector mu, NumericVector y) {
 }
 
 
+// Matching observed information at th, with the same alignment/error contract
+// as nb_score. Keep summation and special-function order for numerical parity.
 double nb_info(double th, NumericVector mu, NumericVector y) {
  double sum = 0;
   for (int i = 0; i < mu.size(); i ++) {
@@ -26,6 +31,8 @@ double nb_info(double th, NumericVector mu, NumericVector y) {
 }
 
 
+// Existing moment pilot n / sum((y/mu - 1)^2); zero/nonfinite arithmetic is
+// retained. The estimator evaluates this before its MLE/MM try boundary.
 double nb_theta_pilot_est(NumericVector y, NumericVector mu) {
   double n = (double) y.size();
   double denom = Rcpp::sum((y/mu - 1) * (y/mu - 1));
@@ -33,6 +40,9 @@ double nb_theta_pilot_est(NumericVector y, NumericVector mu) {
 }
 
 
+// Moment iteration from the supplied pilot and degrees of freedom. Returns
+// {last theta, warning flag}; negative/nonfinite theta or reaching limit warns.
+// Arithmetic/convergence rules are retained; the caller decides pilot fallback.
 std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   int it = 0;
   double del = 1;
@@ -49,6 +59,9 @@ std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, do
 }
 
 
+// Score/information iteration from the supplied pilot, returning {theta, warning}
+// with the same warning convention as MM. Numeric exceptions propagate to the
+// estimator; no response/mean mutation, random draws or file effects occur.
 std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, double eps) {
   int it = 0;
   double del = 1;
