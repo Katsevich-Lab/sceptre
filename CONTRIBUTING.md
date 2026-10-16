@@ -21,6 +21,11 @@ promote a sufficiently scoped proposal to an issue for implementation tracking.
 
 ### Code, tests, and documentation
 
+For internal ownership, cell-coordinate conventions, numerical boundaries and
+component compatibility, see [Internal architecture](ARCHITECTURE.md).
+The refactor [verification guide](tools/refactor/README.md) describes the frozen
+compatibility fixtures and downstream/resource checks.
+
 - Keep changes focused on a single problem or feature.
 - Add or update tests for behavior changes and bug fixes.
 - Follow the existing R style. The repository's `air.toml` file records the formatting configuration.

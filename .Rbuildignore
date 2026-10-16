@@ -15,6 +15,7 @@
 ^air\.toml$
 ^ROADMAP\.md$
 ^REFACTOR_SPEC\.md$
+^ARCHITECTURE\.md$
 ^tools/refactor$
 ^CONTRIBUTING\.md$
 ^CODE_OF_CONDUCT\.md$
