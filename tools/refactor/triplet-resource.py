@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Approved paired triplet conversion protocol; one bounded child at a time.
+"""Approved paired conversion protocols; one bounded child at a time.
 
 Preparation and measurement require an explicitly confirmed quiet window. OS
 maximum RSS is authoritative; 20 ms process samples are phase lower bounds.
@@ -123,6 +123,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("phase", choices=["prepare", "correctness", "measure", "summarize"])
     parser.add_argument("output", type=Path)
+    parser.add_argument("--recipe", choices=["triplet", "dense"], default="triplet")
     parser.add_argument("--original-library", type=Path, required=True)
     parser.add_argument("--candidate-library", type=Path, required=True)
     parser.add_argument("--original-build", type=Path, required=True)
@@ -136,6 +137,9 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     tool = Path(__file__).resolve().parent
+    protocol = tool / ("DENSE_CONVERSION_COST.md" if args.recipe == "dense" else "cleanup/triplet-resource-plan.md")
+    generator = tool / ("dense-conversion-data.R" if args.recipe == "dense" else "triplet-resource-data.R")
+    expected_settings = 4 if args.recipe == "dense" else 8
     env = os.environ.copy()
     for name in ["OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"]:
         env[name] = "1"
@@ -171,10 +175,10 @@ def main():
         with (output / "clock-build.log").open("w") as log:
             subprocess.run(["R", "CMD", "SHLIB", "-o", str(clock), str(clock_source)],
                            env=env, cwd=output, stdout=log, stderr=log, check=True)
-        execute(["Rscript", "--vanilla", str(tool / "triplet-resource-data.R"), str(output / "fixtures")],
+        execute(["Rscript", "--vanilla", str(generator), str(output / "fixtures")],
                 env, output / "fixture-preparation")
-        plan = dict(protocol_sha256=sha(tool / "cleanup/triplet-resource-plan.md"),
-            tool_sha256={p.name: sha(p) for p in [Path(__file__), tool / "triplet-resource-data.R",
+        plan = dict(recipe=args.recipe, protocol_sha256=sha(protocol),
+            tool_sha256={p.name: sha(p) for p in [Path(__file__), generator,
                 tool / "triplet-resource-worker.R", tool / "triplet-resource-compare.R", tool / "triplet-clock.c"]},
             clock_sha256=sha(clock), builds=builds, source_archives=archives, environment={name: env.get(name) for name in
                 ["R_LIBS", "R_MAX_VSIZE", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"]},
@@ -185,7 +189,7 @@ def main():
         copies.mkdir()
         for name in plan["tool_sha256"]:
             (copies / name).write_bytes((tool / name).read_bytes())
-        (copies / "triplet-resource-plan.md").write_bytes((tool / "cleanup/triplet-resource-plan.md").read_bytes())
+        (copies / protocol.name).write_bytes(protocol.read_bytes())
         plan["installed_package_sha256"] = {label: {
             str(path.relative_to(libraries[label])): sha(path)
             for path in sorted((libraries[label] / "sceptre").rglob("*")) if path.is_file()}
@@ -193,13 +197,16 @@ def main():
         (output / "plan.json").write_text(json.dumps(plan, indent=2) + "\n")
         return
     plan = json.loads((output / "plan.json").read_text())
-    if plan["builds"] != builds or plan["source_archives"] != archives or sha(clock) != plan["clock_sha256"]:
+    if (plan["recipe"] != args.recipe or plan["protocol_sha256"] != sha(protocol) or
+        plan["builds"] != builds or plan["source_archives"] != archives or sha(clock) != plan["clock_sha256"]):
         raise RuntimeError("Prepared source/library/clock provenance changed.")
     for name, expected in plan["tool_sha256"].items():
         if sha(tool / name) != expected:
             raise RuntimeError("Prepared resource tool changed: " + name)
     fixtures = plan["fixture_manifest"]["fixtures"]
     cases = [(name, orientation) for name in fixtures for orientation in ["row", "column"]]
+    if len(cases) != expected_settings:
+        raise RuntimeError("Fixture count differs from the declared recipe.")
     def child(label, case, orientation, mode, repetition, batch=1):
         if fixtures[case]["nnz"] == 8000000:
             scaling = []
@@ -227,6 +234,8 @@ def main():
         phase = Path(str(stem) + ".phase.json")
         command = ["Rscript", "--vanilla", str(tool / "triplet-resource-worker.R"),
             str(libraries[label]), str(fixture), orientation, mode, str(stem) + ".json", str(phase), str(clock), str(batch)]
+        if args.recipe == "dense":
+            command.append(str(fixtures[case]["nnz"]))
         execute(command, env, stem, phase)
         print(stem.name, flush=True)
         return json.loads(Path(str(stem) + ".json").read_text())
@@ -252,7 +261,7 @@ def main():
                     child(label, case, orientation, "performance", repetition)
             for label in builds:
                 child(label, case, orientation, "profile", 0)
-            if fixtures[case]["nnz"] == 8000000:
+            if args.recipe == "triplet" and fixtures[case]["nnz"] == 8000000:
                 medians = [statistics.median(json.loads((output / "performance" /
                     f"{case}-{orientation}-{name}-r{r}-b1.json").read_text())["elapsed_seconds"] for r in range(1, 5)) for name in builds]
                 if min(medians) < 1:
@@ -299,9 +308,19 @@ def main():
                         summary["memory_gates"][metric] = dict(original=old, candidate=new,
                             delta_bytes=new-old if old is not None and new is not None else None,
                             delta_bytes_per_stored_entry=(new-old) / fixtures[case]["nnz"] if old is not None and new is not None else None,
+                            delta_bytes_per_dense_input_element=(new-old) / fixtures[case]["elements"] if old is not None and new is not None and args.recipe == "dense" else None,
                             allowed_increase=max(0.1 * old, 64 * 1024**2) if old is not None else None,
                             passed=new <= old + max(0.1 * old, 64 * 1024**2) if old is not None and new is not None else None)
                 summaries.append(summary)
+        if args.recipe == "triplet":
+            for case, orientation in cases:
+                single = next(row for row in summaries if row["case"] == case and
+                              row["orientation"] == orientation and row["batch"] == 1)
+                short_large = fixtures[case]["nnz"] == 8000000 and any(
+                    row["median_elapsed_seconds"] < 1 for row in single["builds"].values())
+                if short_large and not any(row["case"] == case and row["orientation"] == orientation and
+                                           row["batch"] == 5 for row in summaries):
+                    raise RuntimeError("Required short-case timing batches are incomplete.")
         profiles = []
         for path in sorted((output / "profile").glob("*-r0-b1.json")):
             record = json.loads(path.read_text())
@@ -335,32 +354,56 @@ def main():
                 allocation_trace=str(allocation_path), allocation_trace_sha256=sha(allocation_path),
                 recorded_R_allocation_bytes=sum(allocations), max_recorded_R_allocation_bytes=max(allocations, default=0),
                 recorded_R_allocation_bytes_per_entry=sum(allocations) / nnz,
+                dense_input_elements=fixtures[Path(record["fixture"]).stem].get("elements"),
+                recorded_R_allocation_bytes_per_dense_input_element=sum(allocations) / fixtures[Path(record["fixture"]).stem]["elements"] if args.recipe == "dense" else None,
                 net_conversion_rss_increment_bytes=peak-pre if peak is not None and pre is not None else None,
                 net_conversion_rss_increment_bytes_per_entry=(peak-pre) / nnz if peak is not None and pre is not None else None,
                 sorting_table_and_sort_windows=phase_windows,
                 allocation_limit="Rprofmem totals are allocation traffic, not peak live workspace; native allocations may be absent."))
-        if len(profiles) != 16:
+        if len(profiles) != 2 * expected_settings:
             raise RuntimeError("Incomplete allocation profiles; qualification remains incomplete.")
         counts = dict(warmups=sum(row["warmup"] for row in trials),
             measured_single_conversions=sum(not row["warmup"] and row["batch"] == 1 for row in trials),
             measured_batch_children=sum(row["batch"] == 5 for row in trials), profiles=len(profiles))
         correctness = json.loads((output / "correctness.json").read_text())
-        if counts["warmups"] != 16 or counts["measured_single_conversions"] != 64 or len(correctness) != 8:
+        if (counts["warmups"] != 2 * expected_settings or
+            counts["measured_single_conversions"] != 8 * expected_settings or
+            len(correctness) != expected_settings or
+            (args.recipe == "dense" and counts["measured_batch_children"] != 0)):
             raise RuntimeError("Incomplete warmups, single-conversion trials or correctness cases; qualification remains incomplete.")
         crossings = [dict(case=row["case"], orientation=row["orientation"], batch=row["batch"],
             timing_gate=row["timing_gate"], memory_gates=row["memory_gates"]) for row in summaries if
             row["timing_gate"]["passed"] is False or any(gate["passed"] is False for gate in row["memory_gates"].values())]
+        dense_costs = []
+        if args.recipe == "dense":
+            for case, orientation in cases:
+                paired = {label: next(profile for profile in profiles if
+                    Path(profile["result"]["fixture"]).stem == case and
+                    profile["result"]["orientation"] == orientation and
+                    Path(profile["result"]["package"]).parent.resolve() == libraries[label])
+                    for label in builds}
+                old, new = [paired[label] for label in builds]
+                delta = new["recorded_R_allocation_bytes"] - old["recorded_R_allocation_bytes"]
+                dense_costs.append(dict(case=case, orientation=orientation,
+                    input_elements=fixtures[case]["elements"], input_payload_bytes=fixtures[case]["input_payload_bytes"],
+                    original_recorded_R_allocation_bytes=old["recorded_R_allocation_bytes"],
+                    candidate_recorded_R_allocation_bytes=new["recorded_R_allocation_bytes"],
+                    delta_recorded_R_allocation_bytes=delta,
+                    delta_recorded_R_allocation_bytes_per_input_element=delta / fixtures[case]["elements"],
+                    original_max_recorded_R_allocation_bytes=old["max_recorded_R_allocation_bytes"],
+                    candidate_max_recorded_R_allocation_bytes=new["max_recorded_R_allocation_bytes"],
+                    limit="Profile allocation traffic is not peak live workspace; OS and sampled phase gates remain separately reported."))
         report = dict(protocol=plan, timing_threshold_seconds=1, summaries=summaries, all_timing_trials=trials,
             measurement_status="completed; gate crossings require investigation or an explicit reviewed exception" if crossings else
                 "completed; interpret inconclusive short timing gates separately",
             gate_crossings=crossings, accepted_correctness_cost_exception=None,
             counts=counts, correctness=correctness,
-            profiles=profiles,
+            profiles=profiles, dense_cost_characterization=dense_costs,
             limits=["Phase RSS is sampled, not an exact allocator peak.",
                     "Conversion peak minus pre-conversion RSS is a net increment, not isolated sorting allocation.",
                     "Passing this focused gate does not waive integrated workflow/resource/consumer gates."])
         (output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")
-        lines = ["# Triplet conversion resource measurements", "",
+        lines = ["# " + ("Dense general-conversion cost" if args.recipe == "dense" else "Triplet conversion resource measurements"), "",
             "Acceptance remains subject to the approved gate/exception review. Short timing gates are inconclusive.", "",
             "Original: `" + builds["original"]["source_commit"] + "`; candidate: `" + builds["candidate"]["source_commit"] + "`.",
             "Counts: " + ", ".join(f"{key}={value}" for key, value in counts.items()) + ".", "",

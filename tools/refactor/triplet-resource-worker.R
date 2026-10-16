@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 8L) stop("Supply library fixture orientation mode result phase clock repetitions.")
+if (!(length(args) %in% c(8L, 9L))) stop("Supply library fixture orientation mode result phase clock repetitions [dense stored count].")
 library <- normalizePath(args[[1L]], mustWork = TRUE)
 .libPaths(c(library, .libPaths()))
 fixture <- args[[2L]]
@@ -55,6 +55,7 @@ gc_record <- function(value) {
 for (iteration in seq_len(repetitions)) {
     triplet_resource_mark("load_start")
     input <- readRDS(fixture)
+    input_stored <- if (length(args) == 9L) as.double(args[[9L]]) else length(input@x)
     before_hash <- if (mode == "correctness") stream_hash(input) else NULL
     triplet_resource_mark("input_ready_pre_gc")
     pre_gc <- gc(reset = TRUE)
@@ -72,7 +73,7 @@ for (iteration in seq_len(repetitions)) {
     triplet_resource_mark("conversion_end")
     if (mode == "profile") Rprofmem(NULL)
     Sys.sleep(0.06)
-    stopifnot(identical(dim(output), dim(input)), length(output@x) == length(input@x))
+    stopifnot(identical(dim(output), dim(input)), length(output@x) == input_stored)
     # Input and output remain live through the conversion-end/RSS marker.
     # Expensive hashes/serialization happen only in untimed correctness children.
     correctness <- if (mode == "correctness") {
