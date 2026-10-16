@@ -1,0 +1,6 @@
+{
+  "nextflow_exact": true,
+  "nextflow_tolerance_1e8": true,
+  "pod_maps_identical": true,
+  "completed_book_cells_exact": true
+}
