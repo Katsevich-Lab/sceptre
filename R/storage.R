@@ -262,7 +262,9 @@ storage_cell_covariates <- function(
 #'   stored logical entries become one, including explicitly stored `FALSE`.
 #'   Triplet duplicates are not normalized here. Sorting owns coordinate/value
 #'   vectors and leaves caller inputs unchanged. This incurs sparse ownership
-#'   copies and sorting workspace; it never realizes a full dense assay.
+#'   copies and sorting workspace. Dense inputs are first coerced to general
+#'   structure, retaining both triangles and near-symmetric entries; this may
+#'   add one dense value copy. Sparse/backed inputs are not densified.
 #'   No RNG draws or file writes occur. The local conversion
 #'   keeps in-memory workflows independent of the optional ondisc dependency.
 #' @noRd
@@ -300,7 +302,11 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
             i <- matrix_in@i
             j <- matrix_in@j
         } else if (methods::is(matrix_in, "matrix")) {
-            matrix_in <- methods::as(matrix_in, "TsparseMatrix")
+            # Auto-detecting symmetric structure would store only one triangle;
+            # a general output must retain every original dense entry instead.
+            matrix_in <- methods::as(
+                methods::as(matrix_in, "generalMatrix"), "TsparseMatrix"
+            )
             i <- matrix_in@i
             j <- matrix_in@j
             owns_i <- owns_j <- owns_x <- TRUE
