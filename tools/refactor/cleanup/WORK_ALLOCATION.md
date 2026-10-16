@@ -35,6 +35,11 @@ whole-estimator try boundary. Controlled MLE/MM-state and unrelated-failure
 proof precede acceptance; no production callback, arithmetic or fallback change
 is authorized by this allocation. The native retirement lane excludes this file.
 
+Root also owns B5/T7 connection lifetimes in `get_mtx_metadata` and `write_vector`
+(`R/import_functs.R`, `R/ondisc_functs.R`) and a dedicated file-lifetime regression
+file. Only unconditional helper-owned cleanup is changed; parser formats, normal
+file contents and caller-owned connections retain their existing behavior.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current

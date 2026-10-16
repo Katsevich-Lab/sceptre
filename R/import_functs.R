@@ -885,18 +885,25 @@ create_csc_matrix <- function(dt, n_cells, n_features) {
 }
 
 
+#' Read the first noncomment Matrix Market dimension line
+#'
+#' Returns three integer dimensions named in `col_id` order and `n_to_skip`,
+#' counting comment/header/dimension lines. Retains the existing space-separated
+#' parser for plain/gzip files. Owns its read connection and closes it on error
+#' as well as success; this helper does not redesign malformed-file validation.
+#' @noRd
 get_mtx_metadata <- function(
     mtx_file,
     col_id = c("n_features", "n_cells", "n_nonzero")
 ) {
     con <- file(mtx_file, "r")
+    on.exit(close(con), add = TRUE)
     n_to_skip <- 0L
     while (TRUE) {
         n_to_skip <- n_to_skip + 1L
         line <- readLines(con, n = 1)
         if (substr(line, 0, 1) != "%") break()
     }
-    close(con)
     metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
     out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
     names(out) <- c(col_id, "n_to_skip")
