@@ -422,6 +422,25 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 }
 
 
+#' Apply the existing processor-option check at its caller's validation position.
+#' @param n_processors Existing user option: exactly "auto" or numeric >= 2.
+#' @return NULL on success; retains the existing message and predicate, including
+#'   its nonintegral/nonfinite acceptance and malformed-input errors. No coercion,
+#'   scheduling, mutation, RNG or I/O. Callers retain their prior validation order.
+#' @noRd
+check_processor_count <- function(n_processors) {
+    if (
+        !(identical(n_processors, "auto") ||
+            (is.numeric(n_processors) && n_processors >= 2))
+    ) {
+        stop(
+            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
+        )
+    }
+    NULL
+}
+
+
 check_assign_grna_inputs <- function(
     sceptre_object,
     assignment_method,
@@ -521,7 +540,7 @@ check_assign_grna_inputs <- function(
         if (
             length(g_pert_guess_range) != 2 ||
                 any(g_pert_guess_range < 0) ||
-                any(pi_guess_range > 20) ||
+                any(g_pert_guess_range > 20) ||
                 g_pert_guess_range[2] <= g_pert_guess_range[1]
         ) {
             stop(
@@ -549,14 +568,7 @@ check_assign_grna_inputs <- function(
     }
 
     # 3. check n_processors argument
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
+    check_processor_count(n_processors)
 
     return(NULL)
 }
@@ -681,14 +693,7 @@ check_calibration_check_inputs <- function(
         stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", n_nt_grnas, ").")
     }
     # 3. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
+    check_processor_count(n_processors)
     return(NULL)
 }
 
@@ -697,7 +702,6 @@ check_discovery_analysis_inputs <- function(
     response_grna_group_pairs,
     control_group_complement,
     grna_target_data_frame,
-    calibration_check_run,
     pc_analysis,
     calibration_result,
     n_ok_pairs,
@@ -744,14 +748,7 @@ check_discovery_analysis_inputs <- function(
     }
 
     # 5. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
+    check_processor_count(n_processors)
 
     return(NULL)
 }

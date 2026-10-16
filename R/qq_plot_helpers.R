@@ -27,7 +27,8 @@ StatQQBand <- ggplot2::ggproto(
             } else {
                 data |>
                     dplyr::select(y, PANEL, group) |> # remove attributes like color, shape, etc.
-                    dplyr::filter(group == min(group)) # keep only one of the groups to plot
+                    # Each panel has its own group IDs; preserve its first band.
+                    dplyr::filter(group == stats::ave(group, PANEL, FUN = min))
             }
         } else {
             data

@@ -115,7 +115,7 @@ plot_grna_count_distributions <- function(
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
         bin_upper_bounds <- 0:max_single_bin
         bin_labels <- as.character(bin_upper_bounds)
-        if (max_expression_count > 10) {
+        if (max_expression_count > max_single_bin) {
             # now we need to add exp growing bins, w/ more complex labels
             # this next section relies on the fact that the upper bounds are
             # going to be at locations
@@ -731,7 +731,7 @@ make_volcano_plot <- function(
     out <- ggplot2::ggplot(
         data = discovery_result |>
             dplyr::mutate(
-                reject = p_value < p_thresh,
+                reject = significant,
                 p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
                 log_2_fold_change = ifelse(
                     log_2_fold_change > x_limits[2],
@@ -1145,10 +1145,9 @@ plot_run_qc <- function(
     if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
         p_b <- plot_pairwise_qc(
             sceptre_object,
-            downsample_pairs = 10000L,
-            point_size = 0.55,
-            transparency = 0.8,
-            return_indiv_plots = FALSE
+            downsample_pairs = downsample_pairs,
+            point_size = point_size,
+            transparency = transparency
         )
         # combine the plots
         if (return_indiv_plots) {
@@ -1195,7 +1194,6 @@ plot_cellwise_qc <- function(sceptre_object) {
         ggplot2::xlab("Filter") +
         ggplot2::ylab("Percent cells removed") +
         ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
-        get_my_theme() +
         ggplot2::theme(
             legend.position = "none",
             axis.title.x = ggplot2::element_blank()
@@ -1208,8 +1206,7 @@ plot_pairwise_qc <- function(
     sceptre_object,
     downsample_pairs = 10000L,
     point_size = 0.55,
-    transparency = 0.8,
-    return_indiv_plots = FALSE
+    transparency = 0.8
 ) {
     my_cols <- c("mediumseagreen", "indianred2")
     my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
