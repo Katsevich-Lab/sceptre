@@ -30,14 +30,14 @@ points in the plot}
 \item{transparency}{(optional; default \code{0.8}) the transparency of the
 individual points in the plot}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE},
-then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
-single \code{cowplot} object is returned.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{TRUE},
+return the individual panels as a list; if \code{FALSE}, return one combined
+\code{cowplot} object.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if
-\code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-panels (if \code{return_indiv_plots} is set to \code{FALSE})
+\code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+panels (if \code{return_indiv_plots} is \code{TRUE})
 }
 \description{
 \code{plot_assign_grnas()} plots the outcome of the gRNA-to-cell assignment step.

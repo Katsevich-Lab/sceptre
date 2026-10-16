@@ -26,14 +26,15 @@ points in the plot}
 \item{transparency}{(optional; default \code{0.8}) the transparency of the
 individual points in the plot}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE}
-then a list of \code{ggplot} is returned; if \code{TRUE} then a single
-\code{cowplot} object is returned.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{TRUE},
+return the individual panels as a list; if \code{FALSE}, return one combined
+\code{cowplot} object.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if
-\code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-panels (if \code{return_indiv_plots} is set to \code{FALSE})
+\code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+panels (if \code{return_indiv_plots} is \code{TRUE}). If no discovery
+pairs are present, returns the single cellwise plot for either setting.
 }
 \description{
 \code{plot_run_qc()} creates a visualization of the outcome of the QC step. The

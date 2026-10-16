@@ -83,13 +83,13 @@ set_analysis_parameters <- function(
     multiple_testing_method = "BH",
     multiple_testing_alpha = 0.1
 ) {
-    # 0. verify that function called in correct order
+    # verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "set_analysis_parameters"
     )
 
-    # 1. handle default arguments
+    # handle default arguments
     if (!sceptre_object@low_moi) {
         control_group <- "complement"
         if (resampling_mechanism == "default") resampling_mechanism <- "crt"
@@ -117,7 +117,7 @@ set_analysis_parameters <- function(
         B3 <- 0L # to be updated in the run_qc step
     }
 
-    # 2. check inputs
+    # check inputs
     check_set_analysis_parameters(
         sceptre_object = sceptre_object,
         formula_object = formula_object,
@@ -134,7 +134,7 @@ set_analysis_parameters <- function(
     ) |>
         invisible()
 
-    # 3. determine whether to reset response precomputations
+    # determine whether to reset response precomputations
     design <- convert_covariate_df_to_design_matrix(
         covariate_data_frame = sceptre_object@covariate_data_frame,
         formula_object = formula_object
@@ -143,7 +143,7 @@ set_analysis_parameters <- function(
         sceptre_object, design, control_group == "complement"
     )
 
-    # 4. update uncached fields of the sceptre object
+    # update uncached fields of the sceptre object
     side_code <- which(side == c("left", "both", "right")) - 2L
     control_group_complement <- control_group == "complement"
     run_permutations <- resampling_mechanism == "permutations"
@@ -174,10 +174,10 @@ set_analysis_parameters <- function(
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
     sceptre_object@covariate_matrix <- design
 
-    # 5. modify the grna target df and response grna target dfs
+    # modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
 
-    # 6. update cached fields
+    # update cached fields
     sceptre_object <- invalidate_response_cache(
         sceptre_object, "parameters", reset_response_precomps
     )
@@ -261,14 +261,14 @@ assign_grnas <- function(
     log_dir = tempdir(),
     ...
 ) {
-    # 0. verify that function called in correct order
+    # verify that function called in correct order
     check_parallel_supported(parallel) |> invisible()
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "assign_grnas"
     )
 
-    # 1. handle the default arguments
+    # handle the default arguments
     if (identical(method, "default")) {
         method <- if (sceptre_object@low_moi) "maximum" else "mixture"
     }
@@ -304,7 +304,7 @@ assign_grnas <- function(
     }
     hyperparameters <- hyperparameters_default
 
-    # 2. check inputs
+    # check inputs
     check_assign_grna_inputs(
         sceptre_object,
         method,
@@ -313,17 +313,17 @@ assign_grnas <- function(
     ) |>
         invisible()
 
-    # 3. determine whether to reset response precomputations
+    # determine whether to reset response precomputations
     sceptre_object <- invalidate_response_cache(
         sceptre_object, "assignments",
         response_cache_assignments_changed(sceptre_object, method, hyperparameters)
     )
 
-    # 4. update uncached fields
+    # update uncached fields
     sceptre_object@grna_assignment_method <- method
     sceptre_object@grna_assignment_hyperparameters <- hyperparameters
 
-    # 5. assign the grnas
+    # assign the grnas
     sceptre_object <- assign_grnas_to_cells(
         sceptre_object,
         print_progress,
@@ -425,6 +425,18 @@ run_qc <- function(
 }
 
 
+#' Prepare the cellwise QC phase shared by standard and nuclear pipeline work.
+#' @param sceptre_object Assigned facade with raw source-cell memberships/covariates.
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Existing pairwise cutoffs.
+#' @param response_n_umis_range,response_n_nonzero_range Source-count percentile bounds.
+#' @param p_mito_threshold Mitochondrial fraction cutoff when that covariate exists.
+#' @param additional_cells_to_remove One-based source-cell positions to exclude.
+#' @return Facade with QC status, thresholds, removal metrics, ordered retained
+#'   source cells and assignments reindexed to analysis/NT-local coordinates. Clears
+#'   response fits exactly when retained source cells change; preserves full-source
+#'   design. Existing high-removal warning/empty-cell error remain. No RNG/files.
+#'   Kept separate for the real nuclear pipeline preparation/QC contract.
+#' @noRd
 run_qc_pt_1 <- function(
     sceptre_object,
     n_nonzero_trt_thresh = 7L,
@@ -435,10 +447,10 @@ run_qc_pt_1 <- function(
     additional_cells_to_remove = integer()
 ) {
     # cellwise start
-    # 1. verify that function called in correct order
+    # verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
 
-    # 2. check inputs
+    # check inputs
     check_run_qc_inputs(
         n_nonzero_trt_thresh,
         n_nonzero_cntrl_thresh,
@@ -448,21 +460,21 @@ run_qc_pt_1 <- function(
     ) |>
         invisible()
 
-    # 2.5 update fields of sceptre_object
+    # 5 update fields of sceptre_object
     sceptre_object@cellwise_qc_thresholds <- list(
         response_n_umis_range = response_n_umis_range,
         response_n_nonzero_range = response_n_nonzero_range,
         p_mito_threshold = p_mito_threshold
     )
 
-    # 3. obtain previous cells_in_use for caching purposes
+    # obtain previous cells_in_use for caching purposes
     current_cells_in_use <- sceptre_object@cells_in_use
 
-    # 4. update uncached fields of the sceptre object
+    # update uncached fields of the sceptre object
     sceptre_object@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
     sceptre_object@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
 
-    # 5. determine the cells to retain after cellwise qc
+    # determine the cells to retain after cellwise qc
     sceptre_object <- determine_cells_to_retain(
         sceptre_object,
         response_n_umis_range,
@@ -493,25 +505,32 @@ run_qc_pt_1 <- function(
         )
     }
 
-    # 6. determine whether to reset response precomputation
+    # determine whether to reset response precomputation
     sceptre_object <- invalidate_response_cache(
         sceptre_object, "analysis_cells",
         !identical(current_cells_in_use, sceptre_object@cells_in_use)
     )
 
-    # 7. update the grna assignments given the cellwise qc
+    # update the grna assignments given the cellwise qc
     sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
     return(sceptre_object)
 }
 
 
+#' Complete pairwise QC and the existing empirical resampling budget update.
+#' @param sceptre_object Cellwise-QC facade with current analysis assignments.
+#' @return Facade with pair counts/eligibility, NT summary matrix, passing-family
+#'   sizes and checked B3 under no_approximation. Uses storage-backed count scans
+#'   without adding an inference method or creating draw banks. No RNG/file writes.
+#'   This separate stage is also called by real nuclear pipeline pod work.
+#' @noRd
 run_qc_pt_2 <- function(sceptre_object) {
     # pairwise start
-    # 8. compute (i) the NT M matrix, (ii), n nonzero total vector, (iii)
+    # compute (i) the NT M matrix, (ii), n nonzero total vector, (iii)
     # n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
     sceptre_object <- compute_pairwise_qc_information(sceptre_object)
 
-    # 9. compute the number of discovery pairs and (if applicable) pc pairs
+    # compute the number of discovery pairs and (if applicable) pc pairs
     # passing qc
     sceptre_object <- compute_qc_metrics(sceptre_object)
 

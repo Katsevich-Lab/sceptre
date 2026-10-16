@@ -1,3 +1,14 @@
+#' Check the existing import schema without changing matrix representations.
+#' @param response_matrix,grna_matrix Feature-by-source-cell stores with supported
+#'   numeric response and numeric/logical guide classes, or initialized odm stores.
+#' @param grna_target_data_frame Guide-ID/target metadata; repeats/order are not
+#'   normalized here. Supplied guide IDs must occur in guide row names.
+#' @param moi Existing low/high label.
+#' @param extra_covariates Optional source-cell rows, in supplied barcode order.
+#' @return NULL or the existing ordered validation error. Checks classes, IDs,
+#'   dimensions, supplied barcode equality and covariate/metadata fields; does not
+#'   inspect all count values, reorder cells, mutate inputs, draw RNG or write files.
+#' @noRd
 check_import_data_inputs <- function(
     response_matrix,
     grna_matrix,
@@ -5,7 +16,7 @@ check_import_data_inputs <- function(
     moi,
     extra_covariates
 ) {
-    # 1. check column names of grna_target_data_frame
+    # check column names of grna_target_data_frame
     colnames_present <- all(
         c("grna_id", "grna_target") %in% colnames(grna_target_data_frame)
     )
@@ -15,7 +26,7 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 2. verify that the row names are unique for both response and grna
+    # verify that the row names are unique for both response and grna
     # modalities
     response_ids <- rownames(response_matrix)
     grna_ids <- rownames(grna_matrix)
@@ -26,7 +37,7 @@ check_import_data_inputs <- function(
         stop("The rownames of the `grna_matrix` must be unique.")
     }
 
-    # 5. ensure that the ampersand symbol (&) is absent from the grna ids;
+    # ensure that the ampersand symbol (&) is absent from the grna ids;
     # ensure that no gRNA is named "non-targeting"
     problematic_grna_ids <- grep(pattern = "&", x = grna_ids)
     if (length(problematic_grna_ids) >= 1) {
@@ -41,7 +52,7 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 6. check that the ids in the grna group data frame are a subset of the ids
+    # check that the ids in the grna group data frame are a subset of the ids
     # in the grna matrix
     if (!all(grna_target_data_frame$grna_id %in% rownames(grna_matrix))) {
         stop(
@@ -50,7 +61,12 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 7. check type of input matrices
+    # check type of input matrices
+    #' Check one matrix against the supplied supported-class list.
+    #' @param input_matrix Store; input_matrix_name supplies existing error text.
+    #' @param allowed_matrix_classes Character class names, tested without coercion.
+    #' @return NULL invisibly on success or an error; no data/order changes.
+    #' @noRd
     check_matrix_class <- function(
         input_matrix,
         input_matrix_name,
@@ -92,7 +108,7 @@ check_import_data_inputs <- function(
         )
     )
 
-    # 8. check for agreement in number of cells
+    # check for agreement in number of cells
     check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
     if (nrow(extra_covariates) >= 1L) {
         check_ncells <- check_ncells &&
@@ -104,7 +120,7 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 9. if cell barcodes are provided for at least two of `response_matrix`,
+    # if cell barcodes are provided for at least two of `response_matrix`,
     # `grna_matrix`, and `extra_covariates`,
     # then they must be identical and in the same order
     barcode_list <- list(
@@ -151,7 +167,7 @@ check_import_data_inputs <- function(
         }
     }
 
-    # 10. check that column names of extra_covariates are not already taken
+    # check that column names of extra_covariates are not already taken
     reserved_covariate_names <- c(
         "response_n_nonzero",
         "response_n_umis",
@@ -166,7 +182,7 @@ check_import_data_inputs <- function(
         )
     }
 
-    # 11. verify that the types of the extra covariates are acceptable; if
+    # verify that the types of the extra covariates are acceptable; if
     # factor, check correctness of factor
     for (extra_covariate_name in extra_covariate_names) {
         v <- extra_covariates[, extra_covariate_name]
@@ -192,12 +208,12 @@ check_import_data_inputs <- function(
         }
     }
 
-    # 12. verify that moi is specified
+    # verify that moi is specified
     if (!(moi %in% c("low", "high"))) {
         stop("`moi` should be either `low` or `high`.")
     }
 
-    # 13. fail if extra_covariates has NA or inifinite values
+    # fail if extra_covariates has NA or inifinite values
     if (any(is.na(extra_covariates))) {
         stop("`extra_covariates` has NA values that need to be removed.")
     }
@@ -212,7 +228,7 @@ check_import_data_inputs <- function(
         stop("`extra_covariates` has infinite values that need to be removed.")
     }
 
-    # 14. Fail if grna_target_data_frame has NA values in grna_id or grna_target
+    # Fail if grna_target_data_frame has NA values in grna_id or grna_target
     # columns
     if (any(is.na(grna_target_data_frame[, c("grna_id", "grna_target")]))) {
         stop(
@@ -224,6 +240,17 @@ check_import_data_inputs <- function(
 }
 
 
+#' Validate resolved analysis choices against the imported facade.
+#' @param sceptre_object Imported facade containing source stores and covariates.
+#' @param formula_object Resolved formula; offsets are unsupported.
+#' @param response_grna_target_pairs_list Named discovery/positive-control tables.
+#' @param control_group,resampling_mechanism,side,low_moi Resolved view/test choices.
+#' @param grna_integration_strategy,resampling_approximation Existing method labels.
+#' @return NULL or an error in existing evaluation order. Pair IDs and duplicate
+#'   complete rows are checked without normalization. Missing pair columns still
+#'   reach the existing NA-column access first. Backed matrices retain their
+#'   permutation restriction. Does not construct a design, mutate data or use RNG.
+#' @noRd
 check_set_analysis_parameters <- function(
     sceptre_object,
     formula_object,
@@ -239,13 +266,13 @@ check_set_analysis_parameters <- function(
     covariate_data_frame <- sceptre_object@covariate_data_frame
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
-    # 1. if response_grna_target_pairs has been supplied, check its
+    # if response_grna_target_pairs has been supplied, check its
     # characteristics
     for (idx in seq_along(response_grna_target_pairs_list)) {
         response_grna_target_pairs <- response_grna_target_pairs_list[[idx]]
         if (nrow(response_grna_target_pairs) >= 1L) {
             df_name <- names(response_grna_target_pairs_list)[idx]
-            # 0. ensure no NA
+            # ensure no NA
             if (
                 any(is.na(response_grna_target_pairs[, c(
                     "grna_target",
@@ -323,12 +350,12 @@ check_set_analysis_parameters <- function(
         }
     }
 
-    # 2. check that there are no offsets in the formula object
+    # check that there are no offsets in the formula object
     if (grepl("offset", as.character(formula_object)[2])) {
         stop("Offsets are not currently supported in formula objects.")
     }
 
-    # 3. check that the variables in the formula object are a subset of the
+    # check that the variables in the formula object are a subset of the
     # column names of the covariate data frame
     formula_object_vars <- all.vars(formula_object)
     check_var <- formula_object_vars %in% colnames(covariate_data_frame)
@@ -339,14 +366,14 @@ check_set_analysis_parameters <- function(
         ))
     }
 
-    # 4. verify that control group is either nt_cells, complement, or default
+    # verify that control group is either nt_cells, complement, or default
     if (!control_group %in% c("nt_cells", "complement", "default")) {
         stop(
             "`control_group` should set to `nt_cells`, `complement`, or `default`."
         )
     }
 
-    # 5. verify that resampling_mechanism is one of "permutations", "crt", or
+    # verify that resampling_mechanism is one of "permutations", "crt", or
     # "default"
     if (!(resampling_mechanism %in% c("permutations", "crt", "default"))) {
         stop(
@@ -354,12 +381,12 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 6. verify that the moi is consistent with the control group
+    # verify that the moi is consistent with the control group
     if (!low_moi && control_group == "nt_cells") {
         stop("The control group cannot be the NT cells in high MOI.")
     }
 
-    # 7. verify that, if the control_group is NT cells, there are NT gRNAs
+    # verify that, if the control_group is NT cells, there are NT gRNAs
     # present
     if (control_group == "nt_cells") {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
@@ -370,12 +397,12 @@ check_set_analysis_parameters <- function(
         }
     }
 
-    # 8. verify that "side" is among "both", "left", or "right"
+    # verify that "side" is among "both", "left", or "right"
     if (!(side %in% c("both", "left", "right"))) {
         stop("`side` must be one of 'both', 'left', or 'right'.")
     }
 
-    # 9. verify that "grna_integration_strategy" is union or singleton
+    # verify that "grna_integration_strategy" is union or singleton
     if (
         !(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))
     ) {
@@ -384,7 +411,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 10. if using a backing .odm file, verify that resampling mechanism is
+    # if using a backing .odm file, verify that resampling mechanism is
     # permutations
     if (
         methods::is(get_response_matrix(sceptre_object), "odm") &&
@@ -395,7 +422,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 11. verify resampling_approximation acceptable
+    # verify resampling_approximation acceptable
     if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
         stop(
             "`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'."
@@ -406,6 +433,12 @@ check_set_analysis_parameters <- function(
 }
 
 
+#' Validate the logical parallel switch and the existing fork-platform boundary.
+#' @param parallel Single nonmissing logical value.
+#' @param os_type OS type string; explicit argument permits deterministic tests.
+#' @return NULL, or the existing malformed-switch/Windows-fork error. No workers,
+#'   platform configuration, caller state or files are changed.
+#' @noRd
 check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
     if (!is.logical(parallel) || length(parallel) != 1L || is.na(parallel)) {
         stop("`parallel` should be a single logical value.")
@@ -424,7 +457,7 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 #' Apply the existing processor-option check at its caller's validation position.
 #' @param n_processors Existing user option: exactly "auto" or numeric >= 2.
 #' @return NULL on success; retains the existing message and predicate, including
-#'   its nonintegral/nonfinite acceptance and malformed-input errors. No coercion,
+#'   accepted fractional values/Inf and malformed-input errors. No coercion,
 #'   scheduling, mutation, RNG or I/O. Callers retain their prior validation order.
 #' @noRd
 check_processor_count <- function(n_processors) {
@@ -440,6 +473,15 @@ check_processor_count <- function(n_processors) {
 }
 
 
+#' Check assignment options before dispatching or changing stored hyperparameters.
+#' @param sceptre_object Facade supplying the MOI flag.
+#' @param assignment_method Resolved maximum, thresholding or mixture method.
+#' @param hyperparameters Complete method-specific named list, with defaults merged.
+#' @param n_processors Processor option, checked after method/hyperparameter checks.
+#' @return NULL or existing method/range/schema errors in their original order.
+#'   The perturbation range uses its documented [0,20] bound; other scalar/NA/type
+#'   behavior is unchanged. No coercion, fitting, assignment mutation, RNG or I/O.
+#' @noRd
 check_assign_grna_inputs <- function(
     sceptre_object,
     assignment_method,
@@ -452,12 +494,12 @@ check_assign_grna_inputs <- function(
         )
     }
 
-    # 1. check that assignment method is OK for high MOI
+    # check that assignment method is OK for high MOI
     if (!sceptre_object@low_moi && assignment_method == "maximum") {
         stop("`assignment_method` cannot be `maximum` in high-MOI.")
     }
 
-    # 2. check the hyperparameters
+    # check the hyperparameters
     hyperparam_names <- names(hyperparameters)
     # i. maximum option
     if (assignment_method == "maximum") {
@@ -566,13 +608,20 @@ check_assign_grna_inputs <- function(
         }
     }
 
-    # 3. check n_processors argument
+    # check n_processors argument
     check_processor_count(n_processors)
 
     return(NULL)
 }
 
 
+#' Apply the current QC threshold/range and nonempty-assignment checks.
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pairwise cutoffs.
+#' @param response_n_umis_range,response_n_nonzero_range Ordered percentile pairs.
+#' @param initial_grna_assignment_list Named source-cell memberships.
+#' @return NULL or the existing ordered errors. Does not validate every public QC
+#'   argument, change thresholds/memberships, count pairs, draw RNG or access files.
+#' @noRd
 check_run_qc_inputs <- function(
     n_nonzero_trt_thresh,
     n_nonzero_cntrl_thresh,
@@ -659,6 +708,16 @@ compute_empirical_budget <- function(n_pairs, alpha, side_code, B1, B2) {
     as.integer(budget)
 }
 
+#' Validate calibration sizes against active post-QC NT assignment groups.
+#' @param sceptre_object QC facade; active NT groups come from its assignment list,
+#'   independently of metadata rows for guides that lost every cell during QC.
+#' @param n_calibration_pairs Positive representable integer request count.
+#' @param n_processors Existing processor option, checked last.
+#' @param calibration_group_size Positive representable integer at most the active
+#'   NT guide count. NT controls require two active guides; complement requires one.
+#' @return NULL or the existing ordered errors; no clamping, pair construction,
+#'   random draws, facade changes or file effects.
+#' @noRd
 check_calibration_check_inputs <- function(
     sceptre_object,
     n_calibration_pairs,
@@ -668,7 +727,7 @@ check_calibration_check_inputs <- function(
     control_group_complement <- sceptre_object@control_group_complement
     # QC can remove every cell assigned to a guide while its metadata remains.
     n_nt_grnas <- sum(lengths(sceptre_object@grna_assignments$indiv_nt_grna_idxs) > 0L)
-    # 1. check number of gRNAS
+    # check number of gRNAS
     if (!control_group_complement) {
         if (n_nt_grnas < 2) {
             stop(
@@ -682,7 +741,7 @@ check_calibration_check_inputs <- function(
             )
         }
     }
-    # 2. check number of calibration pairs
+    # check number of calibration pairs
     check_native_scalar_count(n_calibration_pairs, "n_calibration_pairs")
     if (n_calibration_pairs == 0L) {
         stop("Cannot run a calibration check on zero negative control pairs.")
@@ -691,12 +750,23 @@ check_calibration_check_inputs <- function(
     if (calibration_group_size > n_nt_grnas) {
         stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", n_nt_grnas, ").")
     }
-    # 3. check n_processors
+    # check n_processors
     check_processor_count(n_processors)
     return(NULL)
 }
 
 
+#' Check an eligible discovery/power family before association execution.
+#' @param response_grna_group_pairs Prepared requested pair table, including QC.
+#' @param control_group_complement Logical selected control view.
+#' @param grna_target_data_frame Metadata used for the existing NT-presence check.
+#' @param pc_analysis Logical: positive-control power check versus discovery.
+#' @param calibration_result Existing result table; empty emits the advisory message.
+#' @param n_ok_pairs Number passing QC; zero stops after the calibration advisory.
+#' @param n_processors Existing processor option, checked last.
+#' @return NULL or existing errors/messages in family, NT, calibration, QC then
+#'   processor order. No pair filtering/reordering, state writes, fitting or RNG.
+#' @noRd
 check_discovery_analysis_inputs <- function(
     response_grna_group_pairs,
     control_group_complement,
@@ -706,7 +776,7 @@ check_discovery_analysis_inputs <- function(
     n_ok_pairs,
     n_processors
 ) {
-    # 1. check that positive control pairs are available
+    # check that positive control pairs are available
     if (nrow(response_grna_group_pairs) == 0L) {
         stop(
             if (pc_analysis) "Positive control" else "Discovery",
@@ -718,7 +788,7 @@ check_discovery_analysis_inputs <- function(
         )
     }
 
-    # 2. check that negative control gRNAs are present (if the control group is
+    # check that negative control gRNAs are present (if the control group is
     # the nt cells)
     if (!control_group_complement) {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_group
@@ -731,7 +801,7 @@ check_discovery_analysis_inputs <- function(
         }
     }
 
-    # 3. check for the presence of a calibration result
+    # check for the presence of a calibration result
     if (nrow(calibration_result) == 0L) {
         warn_text <- paste0(
             "The calibration check (`run_calibration_check()`) should be run before the ",
@@ -741,12 +811,12 @@ check_discovery_analysis_inputs <- function(
         message(crayon::red(warn_text))
     }
 
-    # 4. check that at least one pair passes qc
+    # check that at least one pair passes qc
     if (n_ok_pairs == 0L) {
         stop("Zero pairs pass pairwise QC. Cannot run analysis.")
     }
 
-    # 5. check n_processors
+    # check n_processors
     check_processor_count(n_processors)
 
     return(NULL)
