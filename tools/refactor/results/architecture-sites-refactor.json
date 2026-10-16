@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "rules_version": 1,
+  "scope": "Non-generated production R; matching lines, not expression counts. Candidate sites require responsibility review.",
+  "source_hashes": {
+    "R/analysis.R": "40f4c56fe458244adb2dd3dfc1fc1cafc3968e6aca32f373bec6a7a532ee1a85",
+    "R/analysis_context.R": "fc9d1b71075851de82da255c7e9ba856139ee06b37aec6db949fd6ed7046088e",
+    "R/assign_grna_functions.R": "0bd63996a72253858e0b20e6617a87986c20f1188acd9641804b89601baf52a0",
+    "R/association_execution.R": "5ea356290cda420c019cda00965cdfd960697efb61db485ead941d3d6f93e2c8",
+    "R/association_workers.R": "fd5cbdedc974653511e8aa682e8860def13d2354ca0640db4d9f377b12e1a02f",
+    "R/aux_functions.R": "4b1ca637f648058e6d8516f10db8822e195b69d30a3538dfa93accc6359a2d35",
+    "R/cellwise_qc_functs.R": "ef714a37b79c54c34e39d7ecd21bffadee443789ad2079b9ef1d4daa239c46b5",
+    "R/check_functions.R": "8a7b90b0bc85d478c51baaf1d17441c797389e88db20364c87fedd0e3d910d9d",
+    "R/data.R": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+    "R/execution.R": "826b25fa0ad13cb85a11295456565163b3f41642de4bff5d782f792ac5ffebea",
+    "R/fit_cache.R": "629e0a7f8b6625d7bf161d4ace5eec116fb13b2b81438590b688e0ef60a34905",
+    "R/fitting.R": "3f396b2a8356434223fac0fa24536d273109df6a98ceefbfaf455e8f6c2af40f",
+    "R/getters_and_setters.R": "a6585eb117cdc76d7c64eac746b17a117a938a261d652742674b191d23653d70",
+    "R/import_functs.R": "069737f0b32969198f1a6d31b36b72d70790fb28a52e1516a701da5ad1b5a911",
+    "R/mixture_model_functs.R": "f18fb2eb7ea229764c6f56e06e3bc23a84f9a54f96ec2a6ab90820d87a9cccdb",
+    "R/neg_control_functions.R": "6c2dd49a3d973b913e71e044cfd40151d1092c31a65104beba615e007195534f",
+    "R/ondisc_functs.R": "0b027c8ed9089d5d3be0b7c642e7c587cf1f56506e10080e55a8b5f627a600f5",
+    "R/pair_constructor_functs.R": "8c49527b9d02c33273a5b337832947d7404c4e6b0c2ece62d05a869f5dcfb944",
+    "R/pair_qc.R": "e91a60ff1b7ce32f140ee1f6ad1fde46bda3e38387fc4bf68bbb33e2ce0cb898",
+    "R/pairwise_qc_functs.R": "21e0426e0e4c5a97c2061bbdec469586cf9d07339977e6b177e60a3cdb1c41d7",
+    "R/plotting_functions.R": "aedf9f6581bcfcb8375182f3cfc74b808652a5a2312ce02539eccab1b4edcde2",
+    "R/precomputation_functions.R": "ab5923e482adf963da55b9a1bd23459239763c940d5891500aaad1f1088ee5ec",
+    "R/preprocessing_functions.R": "d158e2d484855e8052d4e50a573e64171edf5e2cc2491b20b564d485eb7b7def",
+    "R/qq_plot_helpers.R": "2eb9f857b5f5184d2d395240dfcf538a2486d29d10bd7b7921e957ec42a69799",
+    "R/result_processing.R": "a52659f59e6ac771a4d9bddb956cb8e67ea7f3efbe758815714cb07393d9216a",
+    "R/s4_analysis_functs_1.R": "d98d4ded3903026832e2fcc0844ca9788d7401d5900b748344c4d8b0fc338322",
+    "R/s4_analysis_functs_2.R": "794f1dab9fe9fb61c3c526c63734185edd00b6c0526835897c2968bfd64f0941",
+    "R/s4_class.R": "6ddcfab89c185da8afab81cb1540422cae5703c8639562914e7c05f05b106d8b",
+    "R/s4_helpers.R": "80804132d8ba7f2da70bb872e781182dcb7fe39ee3433734b13b3186004df2ee",
+    "R/sceptre.R": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+    "R/score_preparation.R": "db5ff3c1b16f6c6eb612605ff00de00f9ef012ff7a10cf5cd24f0daaac07cb60",
+    "R/storage.R": "214eaeab0418f07c95118b8fb2a3577ea217fbd3ca0ed6aefa04fe40674941bd",
+    "R/test_functs.R": "1d5087c7a3dfe5f55cc323700e5c8cabbfcbe1e9b63848548e7a464ee437a635",
+    "R/workflow_state.R": "25399b47fcd0f20617503f5ef05043e0130d8d76aa032591837da812b4e9a993"
+  },
+  "patterns": {
+    "private_ondisc_calls": "ondisc:::\\s*[A-Za-z_][A-Za-z_0-9]*",
+    "raw_storage_access_candidates": "@(h5_file|ptr|i|j|p|x)\\b",
+    "view_remapping_candidates": "cells_in_use\\[|all_nt_idxs\\[|\\[\\s*cells_in_use\\s*[,\\]]|\\[\\s*all_nt_idxs\\s*[,\\]]|combined_idxs\\s*<-|trt_idxs\\s*<-\\s*seq\\(",
+    "response_cache_reset_events": "@response_precomputations\\s*<-\\s*list\\(\\)",
+    "response_cache_writebacks": "@response_precomputations\\s*<-"
+  },
+  "counts": {
+    "private_ondisc_calls": {
+      "lines": 6,
+      "files": 1
+    },
+    "raw_storage_access_candidates": {
+      "lines": 29,
+      "files": 3
+    },
+    "view_remapping_candidates": {
+      "lines": 1,
+      "files": 1
+    },
+    "response_cache_reset_events": {
+      "lines": 1,
+      "files": 1
+    },
+    "response_cache_writebacks": {
+      "lines": 1,
+      "files": 1
+    }
+  },
+  "sites": {
+    "private_ondisc_calls": [
+      {
+        "path": "R/storage.R",
+        "line": 20,
+        "text": "ondisc:::threshold_count_matrix_cpp("
+      },
+      {
+        "path": "R/storage.R",
+        "line": 69,
+        "text": "out <- do.call(ondisc:::compute_n_ok_pairs_ondisc, c(common, list("
+      },
+      {
+        "path": "R/storage.R",
+        "line": 75,
+        "text": "out <- do.call(ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 104,
+        "text": "out <- ondisc:::compute_n_trt_cells_matrix_ondisc("
+      },
+      {
+        "path": "R/storage.R",
+        "line": 125,
+        "text": "response_matrix <- ondisc:::create_odm_from_r_matrix_internal("
+      },
+      {
+        "path": "R/storage.R",
+        "line": 130,
+        "text": "grna_matrix <- ondisc:::create_odm_from_r_matrix_internal("
+      }
+    ],
+    "raw_storage_access_candidates": [
+      {
+        "path": "R/getters_and_setters.R",
+        "line": 120,
+        "text": "mat@j <- j"
+      },
+      {
+        "path": "R/getters_and_setters.R",
+        "line": 121,
+        "text": "mat@p <- p"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 854,
+        "text": "out@i <- dt$feature_idx"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 855,
+        "text": "out@p <- p"
+      },
+      {
+        "path": "R/import_functs.R",
+        "line": 856,
+        "text": "out@x <- dt$x"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 13,
+        "text": "load_csr_row(store@j, store@p, store@x, response_idx, ncol(store))"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 21,
+        "text": "file_name_in = store@h5_file, f_row_ptr = store@ptr,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 25,
+        "text": "threshold_count_matrix(store@j, store@p, store@x, feature_idx,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 61,
+        "text": "file_name_in = store@h5_file, f_row_ptr = store@ptr,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 80,
+        "text": "j = store@j, p = store@p, n_cells_orig = ncol(store),"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 105,
+        "text": "file_name_in = store@h5_file, f_row_ptr = store@ptr,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 112,
+        "text": "j = store@j, p = store@p, n_cells_orig = ncol(store),"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 154,
+        "text": "i = store@i, p = store@p, x = store@x,"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 170,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@j))"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 174,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@i))"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 178,
+        "text": "matrix_in@x <- rep(1.0, length(matrix_in@j))"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 194,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 195,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 198,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 199,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 201,
+        "text": "i <- matrix_in@i"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 202,
+        "text": "j <- convert_pointer_to_index_vector_v2(matrix_in@p)"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 204,
+        "text": "i <- convert_pointer_to_index_vector_v2(matrix_in@p)"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 205,
+        "text": "j <- matrix_in@j"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 209,
+        "text": "x <- matrix_in@x"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 226,
+        "text": "out@j <- dt$j"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 231,
+        "text": "out@i <- dt$i"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 233,
+        "text": "out@p <- p"
+      },
+      {
+        "path": "R/storage.R",
+        "line": 234,
+        "text": "out@x <- dt$x"
+      }
+    ],
+    "view_remapping_candidates": [
+      {
+        "path": "R/plotting_functions.R",
+        "line": 1484,
+        "text": "y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]"
+      }
+    ],
+    "response_cache_reset_events": [
+      {
+        "path": "R/fit_cache.R",
+        "line": 20,
+        "text": "if (changed) object@response_precomputations <- list()"
+      }
+    ],
+    "response_cache_writebacks": [
+      {
+        "path": "R/fit_cache.R",
+        "line": 33,
+        "text": "object@response_precomputations <- cache"
+      }
+    ]
+  },
+  "unmeasured": [
+    "semantic coordinate-conversion count",
+    "complete dynamic call graph",
+    "token/block clone coverage"
+  ]
+}

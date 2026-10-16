@@ -164,3 +164,42 @@ paths. The old combined native inference body and old storage/indexing branches
 were replaced, rather than left alongside an unused new abstraction. New
 function/module counts can increase as these responsibilities become explicit;
 the final metric report must retain that cost along with any complexity gains.
+
+## Final source measurements
+
+The final production source was measured with the same pinned analyzers and
+rules as RF0. Detailed results and per-file hashes are in
+`results/maintainability-refactor/`; the handwritten-source SHA256 is
+`1c55411ee3e352056834972d78ec23d5bac557729f203a1bf2a22679ccd2d36d`.
+The commit label is `90664a7`, whose production R/native files are identical to
+`28df390`. Documentation and validation-tool changes do not enter this metric.
+
+| Within-language metric | Original | Refactored |
+| --- | ---: | ---: |
+| R exclusive function units | 184 | 226 |
+| R exclusive complexity, maximum / p90 / p95 | 49 / 9.70 / 13.85 | 49 / 9.00 / 13.00 |
+| R named top-level owners | 122 | 164 |
+| R inclusive named-owner complexity, p95 | 22.75 | 16.85 |
+| R control nesting, maximum | 7 | 7 |
+| Handwritten C++ functions | 43 | 52 |
+| C++ complexity, maximum / p90 / p95 | 17 / 8.80 / 13.60 | 17 / 8.00 / 11.80 |
+| C++ nesting, maximum | 5 | 5 |
+
+Permutation driver exclusive/inclusive complexity changes from 7/15 to 10/14;
+CRT changes from 9/23 to 11/18. The outer drivers gain explicit compatibility
+guards/context handling while nested orchestration becomes smaller. Maxima and
+maximum nesting remain unchanged; the refactor does not claim every function
+was simplified. More named functions and compatibility delegates are a cost of
+the explicit boundaries. The ownership/caller migrations and seven-operation
+testability walkthrough above establish the architectural improvement; static
+complexity alone does not establish readability or comprehension time.
+
+The identical site scanner now records six private ondisc calls in one file
+(previously four), 29 raw-storage candidate lines in three files (previously
+51/nine), one narrow view-remapping candidate in one file (previously 17/four),
+one cache-reset owner and one facade-writeback owner (previously three each).
+`results/architecture-sites-refactor.json` retains every matching line. The
+remaining raw-storage candidates are the adapter and legitimate import/output
+construction, not statistical consumers. These deliberately narrow patterns are
+not a complete coordinate or dependency inventory. Cognitive complexity, clone
+coverage, human timing and a complete dynamic call graph remain unmeasured.
