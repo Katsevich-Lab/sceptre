@@ -157,22 +157,25 @@ statistical settings from the S4 object except in thin compatibility adapters.
 Storage never applies QC policy, fitting never reads a store or chooses a work
 plan, and native inference never loads an S4 object or serialized handle.
 
-Deletion and migration checks found no production callers of the removed legacy
-index factory/discovery helper. Legacy fitting/result names retained for
-compatibility delegate to the new owners; they do not retain alternate numerical
-paths. The old combined native inference body and old storage/indexing branches
+Deletion and migration checks found no production callers of the removed
+precomputation/table aliases or optional worker reconstruction routes. The lean
+`make_treatment_index_lookup()` remains an actual canonical-index consumer;
+real pipeline result adapters also remain. The old combined native inference
+body and old storage/indexing branches
 were replaced, rather than left alongside an unused new abstraction. New
 function/module counts can increase as these responsibilities become explicit;
 the final metric report must retain that cost along with any complexity gains.
 
-## Final source measurements
+## RF9 checkpoint measurements before the reviewed cleanup
 
-The final production source was measured with the same pinned analyzers and
+The 90664a7 production checkpoint was measured with the same pinned analyzers and
 rules as RF0. Detailed results and per-file hashes are in
 `results/maintainability-refactor/`; the handwritten-source SHA256 is
 `1c55411ee3e352056834972d78ec23d5bac557729f203a1bf2a22679ccd2d36d`.
 The commit label is `90664a7`, whose production R/native files are identical to
-`28df390`. Documentation and validation-tool changes do not enter this metric.
+`28df390`. Subsequent cleanup and native retirement require a fresh final-source
+measurement; these numbers remain historical. Documentation and validation-tool
+changes do not enter this metric.
 
 | Within-language metric | Original | Refactored |
 | --- | ---: | ---: |

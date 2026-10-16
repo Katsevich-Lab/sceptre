@@ -12,7 +12,7 @@ backed CRT, or plugin framework is introduced by this work.
 | --- | --- | --- |
 | Public workflow and saved state | `R/s4_analysis_functs_1.R`, `R/s4_analysis_functs_2.R`, `R/workflow_state.R` | Validate supported requests, enforce prerequisites, commit successful outputs |
 | Facade to numerical inputs | `R/analysis.R`, `R/analysis_context.R` | Ordinary transient lists and explicit ordered cell/request maps |
-| Sparse/backed operations | `R/storage.R` and existing native count kernels | R 1-based source columns; no statistical policy |
+| Sparse/backed operations | `R/storage.R`, `src/sparse_counts.cpp`, `src/sparse_matrix_functs.cpp` | R 1-based source columns; representation operations with declared count conventions |
 | QC measurements and eligibility | `R/pair_qc.R`, `src/pair_eligibility.h` | Aligned counts and the existing shared threshold predicate |
 | Calibration candidate construction | `R/neg_control_functions.R`, `src/negative_control_functions.cpp` | Existing candidate stream, RNG and acceptance rule |
 | Current numerical fitting | `R/fitting.R` | Response/design or treatment/design arrays to compact fits/probabilities |
@@ -82,6 +82,14 @@ construction, reattachment and private kernels are confined to `storage.R`.
 In-memory workflows do not need ondisc. Import-format parsers and construction
 of the exported assignment matrix retain their format/output-specific sparse
 construction code. Existing HDF5 and sparse native scans remain separate.
+Dense import forces general shape before sparsification so both triangles and
+near-symmetric values survive; the supported coercion can add one dense input
+copy. Sparse conversion owns columns before sorting, reusing only constructor-
+owned columns. In-memory vector aggregation prepares sparse row access and
+keeps existing dense vector-by-cell output/transpose workspace; it does not
+materialize the complete sparse guide input. File-coordinate duplicates are
+rejected by the owned Cell Ranger/Parse constructors; the external ondisc file
+parser remains a separate boundary.
 Response access materializes one complete source row before selecting a cell
 view. Regular QC can request a fused NT summary; nuclear/pod QC omits that
 all-response summary and counts its requested response block. These are concrete

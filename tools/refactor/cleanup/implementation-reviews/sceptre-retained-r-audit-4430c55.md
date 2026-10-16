@@ -89,3 +89,7 @@ This readback covers these two owning mathematical comments, not all native file
 
 - `src/compute_nb_size_param_functions.cpp`: `69eb74805365148f5a57c8ae1a1801732c4e6a6c6d3ae71ee0d1c21ea1c70628`
 - `src/mixture_functs.cpp`: `216af4e9cb91f3aaba547df81661b61aad4351c2281c191607eea87720c635dc`
+
+## Mixture wording closure
+
+Exact commit `88a613afe3dce3670437b72bd547106769f3660d` resolves the remaining inline comment nit: it now states any nonfinite posterior or none above 1e-100, explicitly separate from the likelihood density floor. The winner comment also correctly limits initialized-record fallback to **no winner**, rather than a later failed start after an earlier winner. Independently checked the exact diff and unchanged noncomment expressions. `src/mixture_functs.cpp` SHA256 is `bfd1badf8121a4873d5c3236ae5eb8a56b5967ccf6a15c19147d3e7614fac248`. No remaining finding from this bounded mathematical-comment review. No numerical test was needed or run for unchanged expressions.

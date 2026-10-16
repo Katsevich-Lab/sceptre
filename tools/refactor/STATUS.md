@@ -1,9 +1,9 @@
 # Refactor status — October 16, 2026
 
 **Active, incomplete; bounded cleanup and resource qualification continue.**
-Integration branch: `codex/refactor`, integration checkpoint
-`20945f0` includes the reviewed count allocation remedy; later bounded legacy
-plot/validation/assignment units are also integrated. Final acceptance is open.
+Integration branch: `codex/refactor`. The count allocation remedy, bounded legacy
+units, pair/getter cleanup, sparse vector aggregation and separate dense-entry
+repair are integrated. Native retirement and final acceptance remain open.
 Resource and combined installed-source acceptance remain open. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
@@ -97,14 +97,21 @@ and unqualified for this policy. See the explicit boundary in decisions.md.
 B6 characterization
 has 28 exact helper and 200 exact rounding matches, plus public import probes.
 The sparse-input candidate 88ed37c passed all 228 installed comparisons and 134
-focused checks; the separately scheduled representative resource gate remains
-required. Dense output, metadata multiplicity and backed capability are unchanged.
+focused checks. Its complete 80-child experiment passed four exact output/RSS
+pairs and three meaningful timing gates; actual Papalexi timing remains
+explicitly inconclusive below one second. Primary 20-call medians were
+20.912 versus 12.353 seconds, and max measured single-process RSS was
+1,374.14 versus 613.61 MiB. The reviewed unit is integrated as 06fb0ea/52265b8;
+[full retained evidence](results/vector-aggregation-88ed37c/README.md) does not
+replace final combined qualification. Dense output/transpose workspace,
+metadata multiplicity and backed capability are unchanged.
 Dispersion taxonomy has 107 exact
 original-state comparisons. The two-type narrowing at `ef0c77b` passed 107
 actual-source numerical comparisons and 14 paired controlled MLE/MM failure
 cases, including partial-state and unrelated failure propagation, plus
-independent source/proof review. Installed-package and hosted platform-policy
-evidence remain required. File-lifetime `abf7245` has 12 source-evaluated
+independent source/proof review. All five hosted native policy probes passed at
+c47e7ae; final combined installed-source evidence remains required.
+File-lifetime `abf7245` has 12 source-evaluated
 regressions and independent review; installed-source qualification is pending.
 
 B2/O1 at 2f40f4f has 61 independent candidate-source checks and six exact complete
@@ -120,7 +127,18 @@ are complete: theme, layer data and appearance settings match in both MOI
 fixtures. A separate newly found dense symmetric/near-symmetric conversion loss
 has a reproduced P2 disposition: use supported general conversion before
 sparsification to retain all supplied values, then measure its dense-input-only
-copy cost. It is not folded into the qualified triplet-copy checkpoint.
+copy cost. Source bc53bc1 (integrated as 78636bc) has independent review and
+1,125 installed checks in 53 blocks, including the separate dense regressions.
+Its measured copy-cost disposition and revised triplet gate remain open; it is
+not folded into the qualified triplet-copy checkpoint.
+
+Hosted c47e7ae [passed all five jobs](results/ci-c47e7ae.json), including
+draw-bank ownership, count ownership and dispersion-policy probes in every
+lane. Windows progress-byte expectations preserve CRLF; all four standard jobs
+use the verified corrected ondisc source pin. This is a prior checkpoint,
+not qualification of the newer combined source. The retained-R source/contract
+audit closed at 750b1b5, with exact mixture prose closure at 88a613a; native
+retirement, full native documentation and final architecture review remain open.
 
 ## Completed qualification, pinned to earlier source
 

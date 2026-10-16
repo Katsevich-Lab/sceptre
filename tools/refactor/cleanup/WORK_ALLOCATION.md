@@ -10,15 +10,16 @@ not increase simultaneous writers merely to occupy slots.
 
 | Lane | Worker/worktree | Current ownership and handoff |
 | --- | --- | --- |
-| Native/count core | rf0_fixture_audit; refactor-ci-oracle/sceptre; codex/refactor-canonical-counts from 489ca7c | CL2: R/storage.R, canonical count/loader native files, relocated group-count block, mitochondrial coordinate ownership, generated bindings and storage/index/ownership tests. CL1 calibration/sampler/inference semantics remain unchanged. Owns test-refactor-indexing.R until explicit handoff. |
-| Context/execution | rf2_storage; refactor-rf2-storage/sceptre; codex/refactor-context-execution from 489ca7c | CL3: analysis/context, both drivers/four workers, fitting/score, execution/mixture, three S4 caller migrations, NT-encoder caller and fit-cache source-order contract. Owns obsolete precomputation-file deletion once actual tests migrate; new context tests and the explicit intercept-only assertion repair. Does not touch storage/native/bindings/imports/plots. |
+| Storage/resource closure | rf0_fixture_audit; refactor-ci-oracle/sceptre; codex/refactor-canonical-counts | Dense general-before-sparse repair, storage ownership regressions, dense/triplet resource tooling and immutable release measurements. CL2 native work is integrated; this lane explicitly released all planned CL4 native/binding/probe ownership and has no retirement WIP. |
+| Native closure | rf2_storage; refactor-rf2-storage/sceptre; codex/refactor-native-closure from d3746f6 | Entire coupled CL4 private-name/dead-code/header retirement, real R worker/calibration callers, generated bindings, current native/safety/component/ownership tests and useful contracts across every retained native implementation/header except root-owned mixture/dispersion. No R/import_functs.R, R/storage.R, storage-ownership tests, resource tools/results or workflow YAML edits. Source preparation only during the resource lane's quiet window. |
 | Independent review | rf0_senior_review, read-only against pinned commits | Review actual source clarity, callers, deletions, indexing/ownership, guards, retained complexity and evidence. Green tests/metrics alone do not establish acceptance. Reviewer owns review artifacts, not implementation. |
 | Integration/acceptance | root; integration checkout codex/refactor | Read/review diffs and real contracts, merge coherent tested commits, resolve routine conflicts, own current CI/evidence/decision records and later global tool/name migrations, publish/check CI and qualify final immutable source. |
 
 The count lane released `test-refactor-indexing.R` at
 ab4777591cb31906f1c154c1825f0a6bed8c7c6a after its first immutable focused
 qualification. The context lane adopts that commit before migrating the real
-index/fitting aliases and tests. Count resource acceptance remains open.
+index/fitting aliases and tests; that CL3 migration is complete. Count resource
+acceptance remains open.
 
 Root additionally owns the bounded B1 import repair in `R/import_functs.R` and a
 new `test-refactor-import-coordinates.R`: stable complete CSC construction,
@@ -82,10 +83,9 @@ indexing-test migration as a separate patch until the count lane's coherent
 commit releases that file, then rebases/adopts the count change and completes
 its own caller/test migration atomically. No broken aliases are accepted.
 
-The count lane coordinates a quiet resource window before large triplet trials;
-the context lane may keep editing but suspends competing heavy tests/builds then.
-No sampler/inference private renames happen in either current unit: later
-retirement jointly updates native definitions, actual R callers, current tests,
+The resource lane coordinates a quiet window for dense/triplet trials; the
+native closure lane may edit source but suspends competing heavy tests/builds.
+CL4 now jointly updates native definitions, actual R callers, current tests,
 ownership probes and tool selectors without aliases. Each implementer documents
 functions changed in their owned files. The earlier B1/B6 characterization is
 complete and saved with its exact original-source evidence; import/aggregation
