@@ -1,0 +1,32 @@
+case_count 107 all_original_exact TRUE 
+
+               none   std::domain_error std::overflow_error 
+                 11                  61                  35 
+[[1]]
+                  x             digamma            trigamma 
+                "0" "std::domain_error" "std::domain_error" 
+
+[[2]]
+                     x                digamma               trigamma 
+"2.2250738585072e-308"                 "none"  "std::overflow_error" 
+
+[[3]]
+                      x                 digamma                trigamma 
+"4.94065645841247e-324"   "std::overflow_error"   "std::overflow_error" 
+
+[[4]]
+                      x                 digamma                trigamma 
+"9.99999999999997e-311"   "std::overflow_error"   "std::overflow_error" 
+
+[[5]]
+       x  digamma trigamma 
+     "1"   "none"   "none" 
+
+[[6]]
+                    x               digamma              trigamma 
+                "Inf" "std::overflow_error"                "none" 
+
+[[7]]
+       x  digamma trigamma 
+   "NaN"   "none"   "none" 
+

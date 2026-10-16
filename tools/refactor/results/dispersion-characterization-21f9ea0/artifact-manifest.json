@@ -1,0 +1,17 @@
+{
+  "scope": "Read-only original-source numerical exception characterization; production unchanged",
+  "excludes_self": true,
+  "sha256": {
+    "original.cpp": "4add3e36820f9af6b794b715862c0981f44cb51f11750cf5107d39c2cd4ee776",
+    "instrumented.inc": "7321a095bec46a3111169cf1a6fa9363aa1355d5b81726db1692272434db7565",
+    "probe.cpp": "c337b3707188533483373714cdcf551a854c810d080083c2c4a391506b76bd2d",
+    "run.R": "d54ef4840f07d97c0f23c0f83d285f7069c69bb9a9a6c512c1d72b84b7600b02",
+    "report.md": "d78c67c37a8d507acdb11fdec3025fbac82d762356f9f558e900c2bf67490d99",
+    "report.json": "127f4d5b72ec94da1dfe700449615b9f8f60bad98802ce738ebeab33203587f6",
+    "report.rds": "0d30f0ba5612e920a136e9f6236e2fef5469b6d4811c4b58de274db7835e6f2f",
+    "preparation.json": "f459bd6571e499b11a8ffec7f68b6e51fa915869affb515ba2c7cc977b66c4d8",
+    "run.log": "c5fadfd49748aa038949ff979842995d3d2320f84ed8b5baf72416c2ca4a51d1",
+    "failed-initial-loader.log": "0a06b6f1d34de86bdb8b2b86a107fcd47537ea013c063b3700257a8696ee899e",
+    "senior-taxonomy-review.md": "dc8dfd16b2e1c4647825379638be4dc2eb73fdf8fe5dda76369e3e5d906d7147"
+  }
+}

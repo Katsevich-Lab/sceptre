@@ -1,0 +1,10 @@
+.libPaths(c('/private/tmp/sceptre-cl1-final-pt2wn9_o/library', .libPaths()))
+stopifnot(identical(as.character(packageVersion('ondisc')), '1.3.5'))
+root <- '/private/tmp/sceptre-cl1-final-pt2wn9_o/source'
+results <- testthat::test_dir(file.path(root, 'tests/testthat'), filter = '^refactor-(calibration-safety|native|qc)$', package = 'sceptre', load_package = 'installed', reporter = 'summary', stop_on_failure = FALSE, stop_on_warning = FALSE)
+saveRDS(results, '/private/tmp/sceptre-cl1-final-pt2wn9_o/focused-results.rds')
+counts <- as.data.frame(results)
+write.csv(counts[, setdiff(names(counts), 'result')], '/private/tmp/sceptre-cl1-final-pt2wn9_o/focused-counts.csv', row.names = FALSE)
+summary <- list(checks=sum(counts$nb), passed=sum(counts$passed), failed=sum(counts$failed), errors=sum(counts$error), warnings=sum(counts$warning), skipped=sum(counts$skipped), package=find.package('sceptre'), ondisc=as.character(packageVersion('ondisc')))
+jsonlite::write_json(summary, '/private/tmp/sceptre-cl1-final-pt2wn9_o/focused-summary.json', pretty=TRUE, auto_unbox=TRUE)
+stopifnot(summary$failed == 0L, summary$errors == 0L, summary$warnings == 0L)

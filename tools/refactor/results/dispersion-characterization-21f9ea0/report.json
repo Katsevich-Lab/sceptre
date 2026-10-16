@@ -1,0 +1,1582 @@
+{
+  "source_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "probe_note": "Entry renamed/export suppressed and catch instrumented only; arithmetic/control flow unchanged. Special function probes are diagnostics, not new production fallbacks.",
+  "RNGkind": ["Mersenne-Twister", "Inversion", "Rejection"],
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "BH": "1.90.0.1",
+  "Rcpp": "1.1.1.1.1",
+  "original_library": "/private/tmp/sceptre-resource-reference-release-library/sceptre",
+  "cases": {
+    "ordinary": {
+      "input": {
+        "y": [0, 1, 5],
+        "mu": [1, 1, 1]
+      },
+      "result": [
+        0.61106441996940575,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "exact_means": {
+      "input": {
+        "y": [1, 2, 3],
+        "mu": [1, 2, 3]
+      },
+      "result": [
+        null,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::digamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "all_zero_response": {
+      "input": {
+        "y": [0, 0, 0],
+        "mu": [1, 1, 1]
+      },
+      "result": [
+        1,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::digamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "zero_means": {
+      "input": {
+        "y": [1, 1, 1],
+        "mu": [0, 0, 0]
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "tiny_means": {
+      "input": {
+        "y": [1, 2, 3],
+        "mu": [9.9999999999999955e-201, 9.9999999999999955e-201, 9.9999999999999955e-201]
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "huge_response": {
+      "input": {
+        "y": [1, 2, 1.0000000000000006e+300],
+        "mu": [1, 1, 1]
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "tiny_response": {
+      "input": {
+        "y": [9.9999999999999936e-301, 1.9999999999999987e-300, 2.9999999999999983e-300],
+        "mu": [1, 1, 1]
+      },
+      "result": [
+        1,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::digamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_1": {
+      "input": {
+        "y": [14, 11, 19, 3, 5, 9, 18, 16],
+        "mu": [1.1894466427987215e-160, 4.229810524123891e-115, 7.2581640988750789e-55, 2.8578325850444992e+43, 3.3671600540748246e+177, 3.0239227773996771e+31, 1.0276799026154742e+84, 1.1371649074783178e-153],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_2": {
+      "input": {
+        "y": [5, 3, 9, 19, 2, 0, 0, 3],
+        "mu": [5.6928821607460338e-157, 1.4900056755799421e-109, 1.8930975681374457e+90, 8.3226476712758354e+97, 7.5802875653220914e-17, 4.7482550008557279e-162, 5.3940500861053227e-155, 3.2717493865470571e+198],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_3": {
+      "input": {
+        "y": [2, 16, 6, 6, 9, 19, 15, 6],
+        "mu": [8.0551092612562786e+121, 3.6276894928621439e-173, 4.9339877844478881e+135, 3.220644520001676e-105, 0.00013290930767000149, 1.0093770823062124e+98, 1.2246453167691026e-82, 7.7487356241202927e+148],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_4": {
+      "input": {
+        "y": [6, 15, 1, 4, 7, 19, 7, 15],
+        "mu": [8.0580001660887563e+24, 9.7961397208076311e+197, 8.5873093728154143e-64, 1.4759545169814079e+124, 6.7773478453526464e-85, 2.6752116483376612e-159, 9.8883648376675917e+26, 4.4758175983192287e-54],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_5": {
+      "input": {
+        "y": [15, 4, 10, 12, 7, 1, 11, 3],
+        "mu": [1.1828643433014711e+21, 1.2838730529766527e+125, 1.1873502186597781e+116, 1.4735171309095762e-17, 1.8144332156341444e+45, 5.6745679410345151e+30, 2.2884421837028418e-174, 2.0667590301029758e+117],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_6": {
+      "input": {
+        "y": [17, 17, 10, 16, 13, 12, 2, 17],
+        "mu": [1.9805425678738745e+163, 2.5280639630659984e+134, 31978859549830.863, 8.9079870612215778e+81, 200923.37337382865, 5.750458504045241e+195, 1.0916712004378065e+141, 2.0886577205057322e-128],
+        "dfr": 6
+      },
+      "result": [
+        1.2076099857240696e-257,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_7": {
+      "input": {
+        "y": [12, 5, 12, 3, 6, 10, 6, 5],
+        "mu": [1.0102999780397752e+145, 5.9572873181323185e+65, 5.8938502019345706e+28, 0.00010535518353811702, 4.1413742999015555e-06, 4.0396497207054135e-175, 1.054098309211296e+162, 1.8775696953653311e-35],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_8": {
+      "input": {
+        "y": [19, 15, 4, 9, 9, 19, 18, 13],
+        "mu": [6.1395332182018687e-133, 4.7527613397655889e-110, 1.0662724792181492e+152, 2.9966319348784016e+170, 2.9769805282339927, 1.9357684469666961e+75, 7.5737103064019494e+166, 1.064959125238412e+70],
+        "dfr": 6
+      },
+      "result": [
+        8.3532117756020369e-267,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_9": {
+      "input": {
+        "y": [9, 19, 16, 6, 2, 4, 10, 11],
+        "mu": [2.0109886404811345e+21, 3.381178200011754e-71, 2.3018677740088985e+65, 12.775063551202576, 2.0132899137616601e+174, 1.3383175460406564e-74, 1.8409915580531875e+75, 3.4135421866013336e-21],
+        "dfr": 6
+      },
+      "result": [
+        1.7910875228371055e-148,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_10": {
+      "input": {
+        "y": [13, 17, 8, 5, 5, 13, 19, 5],
+        "mu": [2.9054436229222067e+184, 1.9491022476149267e+106, 3.1313854957601719e-48, 5.8539419352842137e-69, 2.835451260084755e-78, 4.4997822235513362e+153, 4.7584358702602215e-32, 5.0662279539880083e-36],
+        "dfr": 6
+      },
+      "result": [
+        2.5727308314611919e-156,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_11": {
+      "input": {
+        "y": [3, 7, 18, 8, 13, 1, 9, 14],
+        "mu": [2.0881964322933618e-178, 5.5411659679602057e-161, 1.7560082277232728e-20, 3.4302655657556984e-112, 2.9331991195945033e+89, 7.2280043916647191e+42, 3.1724250725976739e-112, 7.5883643681923775e-167],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_12": {
+      "input": {
+        "y": [9, 15, 4, 9, 9, 16, 9, 17],
+        "mu": [4.7108926691851904e+43, 1.7859746899300909e-131, 2.4891989120665972e-15, 1.5428246753245155e+84, 2.9535128849196042e+116, 1.4176441558190677e+76, 8.2800571692052015e+188, 1.514108775551167e+188],
+        "dfr": 6
+      },
+      "result": [
+        1.134117544202981e-263,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_13": {
+      "input": {
+        "y": [4, 13, 8, 6, 1, 8, 1, 19],
+        "mu": [3.4791392020102331e-26, 6.0599720509046012e-43, 1.0521366555175825e-33, 4.8902802906087077e+80, 2.5381451943123926e-131, 1.2724337259412078e-90, 0.0012247044179751305, 2.4184353368362269e+162],
+        "dfr": 6
+      },
+      "result": [
+        5.1537448219288748e-261,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_14": {
+      "input": {
+        "y": [2, 7, 17, 0, 11, 14, 4, 11],
+        "mu": [1.676956542890734e+106, 1.4064956842388223e-100, 6.042663938811537e-173, 1.0956349884034484e+28, 7.3376150078903219e+195, 5.4796978468918337e+97, 6.4184046434207754e-110, 2.7740650374354296e+168],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_15": {
+      "input": {
+        "y": [10, 18, 10, 14, 5, 12, 15, 5],
+        "mu": [4.3901358120803275e+102, 2.6262824636712085e+161, 3.8514627391746603e-117, 1.6708616873836293e-85, 1.2564244160583141e-61, 1.7527107472134035e-187, 1.144724305821223e+66, 6.091648214010457e-183],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_16": {
+      "input": {
+        "y": [3, 2, 4, 5, 10, 7, 8, 11],
+        "mu": [4.0959146282726929e+68, 1.9910938469376671, 5.3940551294364794e-194, 1.0492228380428361e-40, 4.2636653375254932e-11, 81314856414956.219, 6.4567293566053133e+138, 1.5257727540891485e+57],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_17": {
+      "input": {
+        "y": [0, 7, 9, 4, 8, 8, 4, 11],
+        "mu": [2.572613942870299e-183, 3.017893946892291e-130, 7.0467495507585283e+130, 6.9345879182727198e-144, 3.5053471604654952e-154, 1948354.2157106248, 1.6519982385896303e-196, 1.2562346303994122e-80],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_18": {
+      "input": {
+        "y": [12, 14, 4, 13, 0, 8, 7, 3],
+        "mu": [8.0947654369307347e-142, 5.4672433396572417e-133, 3.7013842545762511e-116, 1.6399966333554955e-132, 3.1305813720297312e+113, 1.4039383667597803e+181, 3.4286132989924247e+120, 1.8817717188711608e-96],
+        "dfr": 6
+      },
+      "result": [
+        3.6402904154960243e-284,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_19": {
+      "input": {
+        "y": [8, 12, 9, 19, 3, 12, 16, 7],
+        "mu": [2.9319331459603753e-94, 2.6179823378382708e+190, 6.8904350528089701e+130, 2.3049509782830958e-22, 1.3218354243067335e-47, 1.8455939358403419e-05, 5.0666119987554594e-63, 7.1484741863459663e-196],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_20": {
+      "input": {
+        "y": [18, 8, 0, 19, 12, 7, 10, 18],
+        "mu": [1.4096545990803795e+156, 1.3523066302233011e+100, 8.6117666175034234e+160, 4.9650670789114571e+158, 6.6802479516662359e+92, 3.7772748110809438e+59, 2.990356591242801e-90, 8.7575032140802059e-152],
+        "dfr": 6
+      },
+      "result": [
+        1.893675618385806e-304,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_21": {
+      "input": {
+        "y": [16, 13, 0, 2, 1, 19, 1, 14],
+        "mu": [1.1161560209854493e+53, 2.2053850200557035e-137, 8.5157506424396407e-178, 1.0463706818518028e-38, 1.4750487253582232e-194, 2.507824670171561e+22, 5.1330858478419706e-89, 2.4702037289261869e+79],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_22": {
+      "input": {
+        "y": [16, 10, 10, 16, 17, 8, 9, 1],
+        "mu": [1.2227716309099847e+110, 2.3869222897431147e-186, 9.5295424559322043e-92, 9.9461957210428467e-102, 3.1445238069407938e+142, 1.1127811961185713e-80, 1.8983565063189903e+60, 7.1852170571003635e-118],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_23": {
+      "input": {
+        "y": [19, 12, 4, 15, 11, 6, 11, 11],
+        "mu": [1.100268575782221e-50, 3.0295884252806312e+140, 4.0941676150461173e-97, 5.4026727344409532e-65, 1.2895098389385193e+101, 2.9584476805703779e-96, 3.0889687717539244e+110, 1.6392505050260524e-111],
+        "dfr": 6
+      },
+      "result": [
+        1.7766229542004416e-223,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_24": {
+      "input": {
+        "y": [14, 1, 19, 14, 9, 5, 11, 6],
+        "mu": [3.4266399299482269e-177, 9.2763150654684651e+124, 6.0577364913733197e+172, 4.0424399401826966e+155, 1.4142184501646897e-140, 7.9373336978694374e+163, 1.7022023209687872e-36, 7.725774159744362e+147],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_25": {
+      "input": {
+        "y": [10, 16, 17, 6, 17, 3, 4, 0],
+        "mu": [1.006709436319832e+196, 1.1859664156488015e+24, 4.0937115156292996e+101, 2.5664322368758387e+28, 1.057454130508799e+78, 1.1616137405186834e+137, 0.86385910562525159, 0.11853297580341747],
+        "dfr": 6
+      },
+      "result": [
+        0.39643813830133717,
+        3
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_26": {
+      "input": {
+        "y": [9, 8, 3, 13, 10, 7, 18, 16],
+        "mu": [4.1022720522137126e-175, 7.5623246589894033e-36, 1.4922166835853971e+147, 1.3667262157142806e+128, 5.4219287157246448e+44, 5.4505287621786913e-86, 2.1221722540788205e-168, 1.4840755464666683e-162],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_27": {
+      "input": {
+        "y": [2, 11, 10, 6, 6, 5, 7, 16],
+        "mu": [1.1068876939276434e+36, 1.2683223829619579e+175, 2.5684808937896722e+170, 1.1897817816460104e-38, 6.6656185663046088e+106, 1.4319942987997755e-41, 4.3379303300607693e-198, 1.3228110485074341e+59],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_28": {
+      "input": {
+        "y": [14, 12, 1, 17, 0, 4, 1, 5],
+        "mu": [1.3997456635337185e+85, 3.6978352265159609e-181, 2.6111712569320823e-194, 1.9898210166188826e+79, 2.2014816490561098e+54, 1.6338319711181597e-08, 1.7666423483050948e-122, 1.2286953546742736e-129],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_29": {
+      "input": {
+        "y": [18, 5, 2, 19, 0, 13, 19, 12],
+        "mu": [9.5418009169924455e-145, 2.6018469965758464e-137, 4.682762439526279e-74, 3.3895056755031677e-62, 2.4420816747162002e-22, 5.9863396272023679e+23, 9.4324623597489057e+87, 4.5461080440514376e-117],
+        "dfr": 6
+      },
+      "result": [
+        2.2480485120868606e-290,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_30": {
+      "input": {
+        "y": [1, 18, 1, 2, 16, 16, 9, 7],
+        "mu": [44320246272549.156, 1.2918770277310878e-72, 1.9542240781549259e-10, 8.0822402670299208e-71, 3.8234615451014428e+23, 5.5598644864749005e+50, 1.0153272416937369e-20, 1.7760466308676709e-141],
+        "dfr": 6
+      },
+      "result": [
+        5.1499455265573967e-283,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_31": {
+      "input": {
+        "y": [4, 5, 19, 16, 6, 1, 11, 16],
+        "mu": [3.3309983479161261e+183, 2.9557700243633144e+52, 3.9196837383597208e+115, 8.826818818523373e+65, 8.4705276754016363e+151, 5.0137615716723673e+74, 4.1883648257197649e-75, 9.0551352539026964e-05],
+        "dfr": 6
+      },
+      "result": [
+        2.3196561868861566e-150,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_32": {
+      "input": {
+        "y": [13, 7, 16, 17, 2, 13, 0, 12],
+        "mu": [3.4564015386537834e-30, 6.8231473075091436e-21, 2.3910294488312487e-32, 9.4389725006214618e+198, 1.4386016419199802e-74, 3.8149076655360084e+124, 8.2254820706499396e+53, 2.0467798432618207e+184],
+        "dfr": 6
+      },
+      "result": [
+        8.278298736539451e-148,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_33": {
+      "input": {
+        "y": [13, 16, 1, 12, 4, 6, 18, 6],
+        "mu": [2.2666342742936675e+78, 1.8082564413984674e-06, 3.7755081873584945e-189, 1.2650466188930879e+177, 167638.74554616865, 6.1278728760116937e-96, 1.2468053476818728e-151, 7.296585702770732e+33],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_34": {
+      "input": {
+        "y": [6, 3, 11, 17, 6, 1, 4, 11],
+        "mu": [8.4945024349966419e+147, 1.3368434544713229e-161, 2.1562026620146315e-19, 3.539193283516784e-66, 1.4215239955060971e+68, 2.8973405389568391e+157, 1.6115795025861948e-69, 1.0951334495535789e-84],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_35": {
+      "input": {
+        "y": [2, 9, 9, 5, 18, 16, 19, 16],
+        "mu": [2.264963554314694e-95, 6.2646725577661448e-159, 1.5138319286687404e-59, 8.4192294499323577e+41, 2.5664578616921179e+34, 5.3618463485900874e+161, 5.2342327936917339e-82, 5.9310668584548838e-106],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_36": {
+      "input": {
+        "y": [10, 12, 18, 12, 5, 5, 1, 6],
+        "mu": [2.4593468777590482e-148, 1.9800146466285054e+197, 1.0743855371683476e-65, 4.2929510738689005e-134, 3.5038364408112626e-95, 9.9656144205508702e+92, 6.4872544639714978e+88, 3.7487546105261975e+63],
+        "dfr": 6
+      },
+      "result": [
+        4.8387096521145429e-297,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_37": {
+      "input": {
+        "y": [0, 12, 8, 13, 8, 11, 8, 8],
+        "mu": [9.3934154454436054e+62, 6.4095946136512621e+95, 3.589910930850265e+156, 2.8545726983393493e+65, 6.3031291656455405e-10, 4.4041215542040512e+81, 1.7488429718706311e-21, 3.7891954604296782e-105],
+        "dfr": 6
+      },
+      "result": [
+        1.7947502796676102e-210,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_38": {
+      "input": {
+        "y": [13, 11, 5, 7, 15, 8, 15, 5],
+        "mu": [2.2460252575010813e+117, 1.8711955645927544e+169, 1.2137260471084048e-41, 5.3468106115913918e+40, 7.7479512192503685e+65, 8.4037572322700647e-140, 2.3586414266784103e-183, 1.8685829978674953e+137],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_39": {
+      "input": {
+        "y": [6, 1, 10, 0, 6, 14, 1, 2],
+        "mu": [2.8943624681460967e-78, 5.5373824141231115e+73, 7.2604106290145346e-18, 4.7980026314186339e-151, 4.456609926686309e+183, 1.5073691281682994e+181, 1.4027054469813393e-65, 5.173570460867617e+172],
+        "dfr": 6
+      },
+      "result": [
+        1.86162979933617e-156,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_40": {
+      "input": {
+        "y": [15, 10, 5, 8, 14, 6, 16, 2],
+        "mu": [1.7252747244737042e+45, 2.0937808627461061e+55, 1.0814655886193885e-86, 8.8163257074390726e-115, 8.4402104543609736e+131, 2.000048462473533e-104, 7.1682193661400528e-199, 9.6538970162198493e+82],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_41": {
+      "input": {
+        "y": [13, 13, 11, 0, 12, 7, 0, 8],
+        "mu": [5.2432897160964577e-144, 9.3456886346400571e-194, 9.0099275353554603e-12, 2.4567346886647826e+188, 0.33115169746359335, 2.4196634117144204e-77, 8.2643288010613817e-52, 2.4103701069021169e+109],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_42": {
+      "input": {
+        "y": [13, 1, 17, 10, 8, 2, 9, 6],
+        "mu": [2.3051126349481786e+182, 1.9614593490792891e-06, 6.9636933088628394e-32, 606279367.6187402, 1.3101890553554731e-187, 6.4931441310460242e-90, 1.0554092233381001e-41, 5.4622548947274897e+91],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_43": {
+      "input": {
+        "y": [19, 11, 7, 7, 12, 8, 11, 15],
+        "mu": [7.2540468299604451e-05, 1.0491441988024227e+183, 2.0301786095710746e+159, 9.2732857597623837e+191, 5.5047352457259166e-08, 4.4254758696890088e+119, 6.2656392014660832e+114, 7.7678434409433375e+94],
+        "dfr": 6
+      },
+      "result": [
+        3.3668962876913991e-16,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_44": {
+      "input": {
+        "y": [7, 17, 11, 2, 18, 8, 3, 4],
+        "mu": [7.1002437956095113e-96, 2.5050274628869705e-98, 3.0291928480045479e-177, 3.4566145980038139e+89, 2.5570161013161556e+122, 5.2328484512692329e+120, 2.6731885426168322e-118, 9.4609904216385047e-77],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_45": {
+      "input": {
+        "y": [11, 18, 13, 6, 12, 19, 14, 11],
+        "mu": [9.4568163512904397e-07, 2.9757130920395388e-26, 3.705395877602502e-84, 4.6394988912036526e-157, 6.76828483603404e-39, 1.4463170214982132e-80, 5.2437444869355609e+125, 1.8266766708524845e-133],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_46": {
+      "input": {
+        "y": [11, 14, 15, 1, 6, 11, 19, 18],
+        "mu": [8.8200046314049728e+83, 2.3291365298641868e+147, 1.2205195310497679e-75, 1.0061177778970454e-198, 2.7880826842597885e-75, 8.6320499033912786e-33, 1.8288958356759282e+39, 1.6322253057917286e+25],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_47": {
+      "input": {
+        "y": [18, 14, 8, 7, 4, 13, 14, 5],
+        "mu": [1.9460518971364059e-158, 1.5883762710063907e-65, 2.2788316507438155e+121, 5.0670491420522968e-81, 3.1834790317459367e+179, 6.0229969766261978e-48, 2.8358259641402024e-158, 1.0918666005987468e+26],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_48": {
+      "input": {
+        "y": [2, 11, 11, 6, 18, 10, 13, 15],
+        "mu": [6.0338132983744969e-64, 1.3526013787888005e-197, 1.1189591344746398e+126, 3.7882561765214547e+37, 7.0186248808732636e+175, 8.0160645867197805e-44, 4.5037522571072466e-57, 6.59137406687946e+140],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_49": {
+      "input": {
+        "y": [14, 6, 18, 9, 6, 0, 9, 11],
+        "mu": [1.4173699075708777e-69, 214651507.08016294, 4.9086055162836314e+194, 1.1181094689598707e-127, 2.6059624280532103e-125, 9.6144009573942368e+83, 1.2249394223314789e+94, 6.2570074627622669e+54],
+        "dfr": 6
+      },
+      "result": [
+        1.2347244997605106e-255,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_50": {
+      "input": {
+        "y": [4, 18, 14, 4, 12, 13, 15, 1],
+        "mu": [1.5191514017206409e+77, 2.8247350114049105e-143, 3.5299208854894917e-190, 5.2617456362056564e-145, 2.4608485750748282e-71, 1.4464711148981463e+50, 3.0802639336990585e+71, 3.6955998832664959e-57],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_51": {
+      "input": {
+        "y": [14, 19, 11, 4, 14, 7, 3, 4],
+        "mu": [2.2176692228569405e-122, 438125085770.93219, 1.205915313365021e-115, 1.3705514271936933e-177, 3.2813161609960755e-71, 1.3296152169138609e+81, 1.0185918978914866e+193, 3.1012162437081265e+95],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_52": {
+      "input": {
+        "y": [15, 1, 3, 18, 16, 9, 2, 7],
+        "mu": [1.3700024115537967e-13, 9.4607545085534301e+195, 5.4206644909721114e+150, 3.980178554341301e+139, 2.8423767386249399e-23, 1.4996679804724962e+120, 2.9227735636370822e-69, 3.3129466775165427e-142],
+        "dfr": 6
+      },
+      "result": [
+        1.7919372551947593e-284,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_53": {
+      "input": {
+        "y": [12, 3, 10, 11, 16, 5, 18, 2],
+        "mu": [2.7962064322586269e-40, 7.2013886487487554e-162, 3.1418238814927624e+157, 1.2850149935658312e-16, 8.8150135659883368e+77, 1.8575225444047225e-41, 3.3722373185381834e-49, 6.2524735554946405e-20],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_54": {
+      "input": {
+        "y": [18, 15, 5, 17, 7, 4, 16, 18],
+        "mu": [2.4078587435660961e+197, 4.0714154166778394e-194, 6.590067625647491e+29, 2.8142676824411116e-197, 9.5942915725378111e+36, 0.084991374202449579, 2.4264508541230458e-25, 4.7357646688058797e-38],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_55": {
+      "input": {
+        "y": [18, 13, 1, 18, 15, 3, 6, 12],
+        "mu": [7.4823827168331527e+191, 1.323568335424488e-82, 1.600342934245415e-150, 8.336474678068673e+110, 3.8874767824535203e+163, 1.329019988874451e-23, 2.8379757832818363e-153, 2.5437090535071042e+69],
+        "dfr": 6
+      },
+      "result": [
+        1.7898012984280302e-306,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_56": {
+      "input": {
+        "y": [19, 12, 16, 8, 5, 16, 8, 0],
+        "mu": [1.4928588919865736e-180, 5.2945064840897091e+121, 1.4009323837400058e+144, 2.7757786665196879e+65, 2.836807921168542e+36, 2.8389732420824128e-60, 6.5572096610771648e+199, 5.7453810782415495e+71],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_57": {
+      "input": {
+        "y": [9, 15, 8, 14, 9, 15, 1, 4],
+        "mu": [3.143626216699214e-86, 7.0030721504840367e+149, 1.2001619162806873e+132, 2.4379064575107411e+55, 9.5540588382782841e-94, 1.0844323997350576e+105, 3.3816988450790554e+154, 7.0967873957043472e+194],
+        "dfr": 6
+      },
+      "result": [
+        9.0153126207687235e-188,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_58": {
+      "input": {
+        "y": [4, 17, 1, 13, 1, 10, 15, 6],
+        "mu": [324613468389.24829, 1.2198072460052625e-70, 6.5476251956647441e+20, 1.8673947151035837e-153, 1.3161681171083195e+104, 4.1617311767192139e-180, 1.9880462292881116e+92, 6.4638328921041487e+90],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_59": {
+      "input": {
+        "y": [5, 4, 18, 18, 1, 7, 12, 11],
+        "mu": [77137.560187727271, 1.5118665881143776e-30, 1.4143519446690907e+176, 4.8095645438502119e-120, 1.9500346386915194e+151, 1.0604589189414414e+62, 3.5798693429342992e+27, 6.1269447772790883e+47],
+        "dfr": 6
+      },
+      "result": [
+        5.7115829880150857e-241,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_60": {
+      "input": {
+        "y": [11, 4, 2, 16, 17, 4, 7, 11],
+        "mu": [2.9826394799082309e+163, 2.5831628351168294e-142, 1.1808144036288676e-52, 8.2358457271002278e-54, 7.0433732645394762e+75, 3.7565148465978443e-88, 2.0882724706568049e-48, 9.3334979794847245e-166],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_61": {
+      "input": {
+        "y": [19, 4, 17, 2, 6, 10, 12, 15],
+        "mu": [9.0123700830441671e+163, 6.1383676184108396e-148, 5.507720547841229e-59, 6.4354684807980995e-06, 4.0442051908219569e+93, 7.1908281889957544e-198, 4.3135227744068108e-178, 1.4710935368031955e+138],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_62": {
+      "input": {
+        "y": [0, 17, 1, 19, 3, 11, 5, 10],
+        "mu": [2.2384627615896496e-34, 8.3919326861953234e+160, 1.4666796243005006e-76, 1.3812681465656668e-173, 1.1839746030985989e+63, 2.5894082948708746e-54, 3.5554913980865777e-49, 1.9991869702300547e-183],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_63": {
+      "input": {
+        "y": [3, 6, 18, 18, 7, 16, 13, 8],
+        "mu": [1.0740726120744393e-30, 4.3045805926591831e-165, 9.1421463054591043e+112, 1.434141760848293e+118, 9.790384648195735e+86, 3.9246991483832478e+36, 1.193885013923235e-94, 3.0666402209904019e+182],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_64": {
+      "input": {
+        "y": [2, 6, 7, 0, 6, 12, 3, 3],
+        "mu": [3.4788317395311002e-38, 2.1621622629201043e-119, 1.4058851411247837e-118, 1.1381866878918839e+63, 1.5094859071799798e+44, 2.754402528051239e-118, 8.1104207099885579e-25, 7.931753588118406e+90],
+        "dfr": 6
+      },
+      "result": [
+        9.8300137051657249e-239,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_65": {
+      "input": {
+        "y": [15, 2, 12, 4, 19, 11, 19, 16],
+        "mu": [1.708957433326133e+197, 4.6218827105169443e+105, 8449.0254352286083, 7.2993006143504196e-66, 4.993511556411449e+46, 9.735941730599832e-190, 1.5579394994333318e+170, 0.00026280213906416711],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_66": {
+      "input": {
+        "y": [5, 12, 9, 0, 14, 14, 14, 19],
+        "mu": [4.8364761577517844e+72, 6.6480741545717173e+48, 2.167154081920316e+116, 1.8759592974577458e-71, 3.7343492728213789e-92, 1.7302689848875944e+81, 0.034737322409542949, 4.0008883017510408e-135],
+        "dfr": 6
+      },
+      "result": [
+        3.5472813746456129e-271,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_67": {
+      "input": {
+        "y": [16, 1, 0, 16, 13, 17, 3, 19],
+        "mu": [3.2820547792594618e+35, 1.1163606299789385e-96, 5.8016022817000934e-78, 7.3818405241357418e-146, 1.0191422677112667e-186, 6.3398795046280149e-105, 9.1233863876237608e+78, 8.3049543632528718e+156],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_68": {
+      "input": {
+        "y": [18, 7, 19, 19, 3, 12, 1, 12],
+        "mu": [6.7243615109749084e+52, 4.8102620181842804e+150, 6.7815985933343287e+149, 5.000610440039308e-69, 4.2697733163588772e-30, 3.7874163740468307e-76, 6.7328014962787257e+155, 6.0787803279777334e+179],
+        "dfr": 6
+      },
+      "result": [
+        1.5938358655997593e-152,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_69": {
+      "input": {
+        "y": [12, 17, 9, 8, 2, 4, 11, 9],
+        "mu": [2.3144589699212266e-94, 1.032693085410267e+36, 7.0539360835869581e+133, 3.9974476738748476e+23, 1.1688381057945096e+142, 4.7189396085541692e-89, 1.0705496998610983e+146, 0.0031813093101368596],
+        "dfr": 6
+      },
+      "result": [
+        2.9759557352413933e-189,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_70": {
+      "input": {
+        "y": [6, 3, 7, 5, 14, 0, 7, 19],
+        "mu": [4.6476615979295619e+113, 3.6567979103387821e-173, 7.4835104218080857e-58, 1.208141242795119e+70, 4.0726329368380123e-141, 8.0057100832474976e+187, 1.0593808613848907e-113, 4.1997237390383217e+156],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_71": {
+      "input": {
+        "y": [10, 0, 8, 4, 0, 7, 0, 12],
+        "mu": [7.6832490517230438e+83, 4.9799353450087572e-23, 1.949455886652243e-94, 8.0089122511111761e-129, 3.6483939696044154e+86, 4.5953300171298817e+173, 7.8895740799765604e+124, 1.5289013561356333e+19],
+        "dfr": 6
+      },
+      "result": [
+        3.2071337722999347e-257,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_72": {
+      "input": {
+        "y": [7, 18, 7, 7, 0, 9, 10, 13],
+        "mu": [1.6379376484246178e-06, 1.1860409350701471e-51, 6.9037377006833707e+63, 2.0098048555520223e-63, 1.0508661324821811e-10, 1.729896938517635e+101, 43.415134842429211, 2.8200692622030102e+27],
+        "dfr": 6
+      },
+      "result": [
+        1.3189601820083217e-126,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_73": {
+      "input": {
+        "y": [9, 13, 16, 15, 11, 17, 12, 14],
+        "mu": [1.8863569666372967e-87, 1.2134369653834964e+154, 1.1089712805407611e-121, 1.093737345662763e+135, 2.0718748786375355e+173, 1.4180648782865632e+123, 3.8120456945348733e+106, 3.125828451083104e-128],
+        "dfr": 6
+      },
+      "result": [
+        3.9880830635100344e-257,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_74": {
+      "input": {
+        "y": [16, 8, 5, 8, 17, 6, 14, 17],
+        "mu": [2.4379386201772824e+57, 6.8057856307724328e-72, 2.1980561589322839e+23, 6.015615455854982e-100, 9.8302038734770408e-29, 1.7180866980918705e+178, 2.2856323934835942e+43, 6.8460060006529627e+144],
+        "dfr": 6
+      },
+      "result": [
+        4.5234536640901677e-200,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_75": {
+      "input": {
+        "y": [6, 8, 12, 6, 8, 0, 9, 1],
+        "mu": [6.8727640319539211e-18, 2.6737152294381453e-200, 2.573550254867902e-195, 2.3648663584986006e-16, 599126.2637693343, 1.6104365413124979e-134, 1.0068820976792598e-182, 3.2270828962815916e-17],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_76": {
+      "input": {
+        "y": [12, 3, 11, 11, 18, 3, 0, 6],
+        "mu": [1.7423419298057319e-146, 1.0047298831573447e+190, 7.7831172010508561e-115, 5.0396402197699802e+31, 5.4402095184617855e-11, 2.7514510318916314e-24, 2.2805145369547319e-60, 4.5460808252068635e+41],
+        "dfr": 6
+      },
+      "result": [
+        1.6865307779773123e-293,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_77": {
+      "input": {
+        "y": [13, 10, 16, 13, 9, 10, 15, 11],
+        "mu": [209209758944.50739, 2.994354173898263e-43, 5.1724578061463189e-103, 5.2261512584197344e-151, 7274.4039637172373, 7.7974696954662686e+188, 5.221574756483146e-183, 5.4827176349281747e+109],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_78": {
+      "input": {
+        "y": [18, 1, 17, 9, 7, 7, 2, 3],
+        "mu": [2.8223936191717607e-181, 2.1244329019609274e+41, 321349034.4563871, 1.0677257866288081e+179, 1.3523662313757966e-73, 8.0086851359970015e+147, 5.4139043197278011e+109, 6.4568387973434751e-183],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_79": {
+      "input": {
+        "y": [3, 19, 9, 9, 13, 4, 3, 13],
+        "mu": [8.8512833596441337e-138, 4.9353340431474126e+80, 1.2262909942170983e+163, 7.5966635073697768e-72, 3.947512182493251e-40, 5.0294708820327987e-68, 7.2449518775776736e+142, 4.8791806309629544e-48],
+        "dfr": 6
+      },
+      "result": [
+        6.9640192989078352e-275,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_80": {
+      "input": {
+        "y": [13, 3, 18, 15, 15, 17, 3, 7],
+        "mu": [5.2871015404559333e-185, 1.5188209461118838e+104, 3.3336885753984594e-78, 3.4733153467244107e+180, 1.6344983789124619e-94, 3.6921854578202877e-72, 0.17654868474012173, 2.1338030667070182e+51],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_81": {
+      "input": {
+        "y": [14, 2, 3, 14, 19, 9, 7, 14],
+        "mu": [3.9550728122567746e+169, 2.7932602168770158e-61, 9.7026862629511697e+54, 1.3204526886250104e+193, 3.3171583676532382e-44, 3.2762146150851945e+165, 9.4504219022478656e-152, 6.1042756105655921e-147],
+        "dfr": 6
+      },
+      "result": [
+        1.4581301884875423e-303,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_82": {
+      "input": {
+        "y": [2, 10, 9, 7, 11, 4, 2, 15],
+        "mu": [1.0203737093501551e-41, 3.5576492269302584e-200, 4.6713895475361766e+160, 1.1269854502062487e+85, 3.9700686623167927e-199, 1.7444236996497039e+61, 5.9866355109760265e+171, 8.2760011635154479e-146],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_83": {
+      "input": {
+        "y": [15, 11, 0, 11, 12, 9, 5, 7],
+        "mu": [6.3526682342551328e-47, 0.0012288876523666229, 1.0770152247591881e-35, 5.8497577487129532e+153, 9.0013698550163771e-136, 2.5222869084142537e+69, 4.1509506546784807e+125, 2.3193263490481174e-38],
+        "dfr": 6
+      },
+      "result": [
+        4.5013699592665304e-272,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_84": {
+      "input": {
+        "y": [3, 16, 15, 18, 10, 2, 6, 16],
+        "mu": [9.6466633648601219e-37, 2.8631450724452743e+141, 1.0417793488973523e+110, 3.0617103656244004e+184, 6.0715297498271104e-15, 3.962430319734965e-55, 7.7437606315775493e+181, 8.3730287609665507e-47],
+        "dfr": 6
+      },
+      "result": [
+        6.2803416155019657e-109,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_85": {
+      "input": {
+        "y": [17, 1, 16, 10, 1, 9, 1, 19],
+        "mu": [2.4793525827965593e+91, 1.5568491367776958e+40, 1.9913447732842925e+89, 1.1029495714534148e+38, 2.3316789480704701e-09, 2.2097224873606516e-97, 1.0759438334997531e+49, 1.7734503507975036e-121],
+        "dfr": 6
+      },
+      "result": [
+        6.9698086354432997e-244,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_86": {
+      "input": {
+        "y": [16, 17, 11, 17, 14, 5, 7, 7],
+        "mu": [1.2048818328566902e+98, 9.3979590299689922e-134, 7.2704539719207504e-77, 5.8016759343260447e-58, 1.4545912787065891e-154, 6.4222370636618766e+46, 9.6346005068412731e+154, 2.4420890064162844e-197],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_87": {
+      "input": {
+        "y": [6, 2, 7, 19, 11, 6, 13, 7],
+        "mu": [1.4453803827356706e+132, 7.4053425794828161e-125, 6.588988758911375e-19, 7.9349816469685153e+109, 4.2762235687916367e-52, 1.0239779922596164e-153, 5.9082243638560823e-76, 6.4762596132202891e-170],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_88": {
+      "input": {
+        "y": [5, 3, 13, 12, 7, 11, 2, 7],
+        "mu": [2.810328585337627e-07, 1.0066767606853664e-190, 2.9880272121375271e+97, 5.100958368579467e+37, 2.8631436971147354e+42, 9.1660719751716267e-163, 5.982261290429525e-27, 9.0136111663516995e-75],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_89": {
+      "input": {
+        "y": [2, 7, 6, 10, 14, 18, 15, 13],
+        "mu": [7.0737983281204422e+137, 8.3399510779780713e+105, 77272568973.458878, 4.3197845480597572e-180, 9.3297830144576065e-60, 9.8789828118955381e-101, 1.2252192842525589e+147, 3.1000748724659081e+89],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_90": {
+      "input": {
+        "y": [19, 17, 0, 4, 7, 10, 17, 10],
+        "mu": [2.9078208123603869e-86, 1.3543843708819248e-51, 6.8990202800994811e-139, 4.2398618770272573e+43, 7.8933833519151288e+70, 1.6108758449518423e-171, 5.4664689389602294e+61, 3.9115482103381369e-190],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_91": {
+      "input": {
+        "y": [1, 15, 2, 12, 13, 3, 12, 0],
+        "mu": [4.1105205916525729e-200, 7.3981875427694233e+74, 4.2949867857270956e+117, 1.2281967267170358e-09, 6.5921993687153967e+74, 5.5411098816618707e-106, 1.3655619117344808e-121, 5.3671109716638437e-199],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_92": {
+      "input": {
+        "y": [6, 6, 1, 5, 18, 8, 11, 2],
+        "mu": [7.0555550194811517e-105, 2.9254779650489594e+111, 1.031379979309475e-109, 1.1487285278688416e-27, 6.5254964032034186e-06, 1.3107983369202872e-133, 5.032274412307288e+121, 1.8499085060942046e+196],
+        "dfr": 6
+      },
+      "result": [
+        2.1477403500912387e-267,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_93": {
+      "input": {
+        "y": [13, 8, 0, 6, 9, 3, 1, 0],
+        "mu": [2.7129789616203875e-69, 1.6374635470400872e-152, 1.1572729355280812e+168, 1.9486583249933275e+86, 1.2024983978741841e-166, 8.673245857177484e+59, 1.4259583372718197e-169, 5.5017329205390112e-37],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_94": {
+      "input": {
+        "y": [5, 6, 19, 13, 4, 12, 18, 10],
+        "mu": [2.6988941316603202e+105, 1.5762448929070652e+124, 3.5132711553774904e+94, 1.4929256354416126e+43, 2.3873897077597584e-53, 6.7541787632983748e-06, 3.0667862436332604e-39, 1.0081907103868213e-64],
+        "dfr": 6
+      },
+      "result": [
+        1.6263176136164536e-129,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_95": {
+      "input": {
+        "y": [4, 1, 2, 8, 12, 3, 11, 8],
+        "mu": [1.5559912902662809e+70, 1.0177550012031165e-53, 5.4013965516666678e+46, 5.422882217836743e+44, 5.1695694824285211e+54, 3.9567208645248789e-34, 2.7660288918089518e+32, 1.2008087138204182e-49],
+        "dfr": 6
+      },
+      "result": [
+        1.6573196260107802e-105,
+        1
+      ],
+      "type": "none",
+      "message": "",
+      "original_exact": true
+    },
+    "bounded_grid_96": {
+      "input": {
+        "y": [1, 15, 13, 10, 4, 4, 0, 12],
+        "mu": [1.6944986607709759e-27, 6.8657831016444404e+32, 4.5055790842863654e-145, 6.6554987844192778e-152, 1.5248052857693479e+177, 3.939541514241564e+32, 1.0858236769603369e+64, 5.3883372174861287e-49],
+        "dfr": 6
+      },
+      "result": [
+        3.5436531255523875e-304,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_97": {
+      "input": {
+        "y": [14, 15, 17, 7, 18, 11, 14, 16],
+        "mu": [1.6925673686343217e-190, 9.3398385504377321e-161, 7.520284563269945e-87, 1.4064252164668101e+111, 5.0809819106416465e-84, 4.932512253150894e+184, 5.1432789937934967e-176, 3.7961836282211713e+82],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_98": {
+      "input": {
+        "y": [11, 2, 4, 6, 16, 13, 0, 4],
+        "mu": [1.7280850729635232e+104, 3.1404256530329606e+181, 1.4690856763088004e+84, 2.9649077052115596e-56, 5.6844335955637151e-142, 5.7534031482232139e+23, 7.7572977227987115e+107, 1.6734064911427046e+78],
+        "dfr": 6
+      },
+      "result": [
+        1.0097745406991697e-284,
+        3
+      ],
+      "type": "std::overflow_error",
+      "message": "Error in function boost::math::trigamma<double>(double): numeric overflow",
+      "original_exact": true
+    },
+    "bounded_grid_99": {
+      "input": {
+        "y": [10, 15, 12, 2, 10, 17, 12, 11],
+        "mu": [1.1671462111795544e+154, 6.2298892156364531e-198, 1.6926062496261288e-103, 7.0659069374550173e-96, 6.5634344239595038e-58, 2.4995212184079604e+91, 1.1800498265368777e-17, 5.5788739832099876e-119],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    },
+    "bounded_grid_100": {
+      "input": {
+        "y": [16, 3, 0, 1, 10, 11, 4, 7],
+        "mu": [2.7649267811768752e+167, 2.5893290679440291e+103, 2.6135438225219638e+72, 6.4245324669976539e-139, 2.1778120264327166e-168, 7.793307408757813e+50, 2.4726865360218567e-182, 5.5572515169040761e+167],
+        "dfr": 6
+      },
+      "result": [
+        0,
+        3
+      ],
+      "type": "std::domain_error",
+      "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0",
+      "original_exact": true
+    }
+  },
+  "special": [
+    {
+      "x": 0,
+      "digamma": {
+        "type": "std::domain_error",
+        "message": "Error in function boost::math::digamma<long double>(long double): Evaluation of function at pole 0"
+      },
+      "trigamma": {
+        "type": "std::domain_error",
+        "message": "Error in function boost::math::trigamma<long double>(long double): Evaluation of function at pole 1"
+      }
+    },
+    {
+      "x": 2.2250738585072014e-308,
+      "digamma": {
+        "result": -4.4942328371557898e+307,
+        "type": "none"
+      },
+      "trigamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::trigamma<double>(double): numeric overflow"
+      }
+    },
+    {
+      "x": 4.9406564584124654e-324,
+      "digamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::digamma<double>(double): numeric overflow"
+      },
+      "trigamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::trigamma<double>(double): numeric overflow"
+      }
+    },
+    {
+      "x": 9.9999999999999694e-311,
+      "digamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::digamma<double>(double): numeric overflow"
+      },
+      "trigamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::trigamma<double>(double): numeric overflow"
+      }
+    },
+    {
+      "x": 1,
+      "digamma": {
+        "result": -0.57721566490153287,
+        "type": "none"
+      },
+      "trigamma": {
+        "result": 1.6449340668482264,
+        "type": "none"
+      }
+    },
+    {
+      "x": null,
+      "digamma": {
+        "type": "std::overflow_error",
+        "message": "Error in function boost::math::digamma<double>(double): numeric overflow"
+      },
+      "trigamma": {
+        "result": 0,
+        "type": "none"
+      }
+    },
+    {
+      "x": null,
+      "digamma": {
+        "result": null,
+        "type": "none"
+      },
+      "trigamma": {
+        "result": null,
+        "type": "none"
+      }
+    }
+  ]
+}

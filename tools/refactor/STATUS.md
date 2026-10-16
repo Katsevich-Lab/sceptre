@@ -1,8 +1,8 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; cleanup plan independently approved, CL1 safety first.**
+**Active, incomplete; safety qualified, count/context cleanup under way.**
 Integration branch: `codex/refactor`, current safe production checkpoint
-`c7d62502757f2a17741e2ef18b9e4d006bf063dc`. Nothing has been merged to main
+`489ca7c` (production identical to qualified safety commit `5ac0fca`). Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
 is the review surface, not a readiness declaration.
 
@@ -31,14 +31,13 @@ bounded implementation with no remaining P0/P1/material P2 planning gaps. The
 complete reviewed artifact bytes are preserved at 08e0260. Exact post-QC native
 bounds, context/factory/intercept consistency, symbol/sampler dispositions,
 behavior ledger and measured ownership-cost requirements are now settled.
-CL1 safety proceeds before broad restructuring; the review does not qualify
-new code or approve a resource exception.
+CL1 preceded broad restructuring and is now qualified locally below. The plan
+review did not itself qualify code or approve a resource exception.
 
-A separate source-derived P1 affects high-MOI complement calibration: summed
-NT-group sizes can exceed the cell universe and reach out-of-bounds Fisher–Yates
-access. The first implementation unit will cap that valid upper bound and add
-precise allocation/index prerequisites without changing formerly safe draws.
-The unsafe baseline case has not been executed.
+The audit also identified a high-MOI complement-calibration P1: summed NT-group
+sizes could exceed the cell universe and reach out-of-bounds Fisher–Yates access.
+CL1 caps that upper bound and checks precise allocation/index prerequisites
+without changing formerly safe draws. The unsafe baseline was not executed.
 
 Safe retained work:
 
@@ -51,6 +50,28 @@ Safe retained work:
   13ff940. Neither is accepted merely because parsed code is unchanged.
 - Driver/worker cleanup is a proposal only. No temporary compatibility aliases
   should be added for private names with no actual consumer.
+
+## CL1 safety integrated
+
+Reviewed safety commit 5ac0fca is integrated as 489ca7c. Its exact immutable
+release build passed 3,631 installed checks in 110 blocks, 344 focused checks,
+112 native component checks and 12 controlled R-boundary ownership cases, with
+zero failures/errors/warnings/skips. The fresh same-environment original oracle
+preserves all frozen workflow/API/cache/saved/serial-fork/backed cases. See
+[qualification and provenance](results/qualification-cl1-5ac0fca/qualification-summary.json).
+The initial late-registration P2 was corrected: a protected finalizing NULL
+external pointer precedes native allocation; only nonallocating ownership
+transfer follows. Independent source review closed the finding. Failed stale-
+oracle and reporter-setup attempts remain identified separately.
+
+CL2 native/count ownership and the coupled CL3 context/execution migration now
+have separate worktree/file owners. The indexing test has an explicit sequential
+handoff; no shared production file has concurrent writers. B1 repeated-file
+coordinates will be rejected per Eugene's recorded choice. B6 characterization
+has 28 exact helper and 200 exact rounding matches, plus public import probes;
+resource qualification remains required. Dispersion taxonomy has 107 exact
+original-state comparisons and a source-reviewed two-type narrowing path;
+controlled failure propagation and platform facts remain required.
 
 ## Completed qualification, pinned to earlier source
 
@@ -116,7 +137,7 @@ exception review if the general gate is exceeded.
 
 ## Remaining completion criteria
 
-1. Implement the independently approved CL1–CL6 units, starting with safety;
+1. Finish the independently approved CL2–CL6 units after accepted CL1 safety;
    keep conditional characterization/resource gates and named deferrals explicit.
 2. Complete actual caller migrations, remove unused modes/helpers/fallbacks,
    correct coordinate and ownership debt and review contracts against code.

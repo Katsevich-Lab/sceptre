@@ -10,19 +10,27 @@ not increase simultaneous writers merely to occupy slots.
 
 | Lane | Worker/worktree | Current ownership and handoff |
 | --- | --- | --- |
-| Native/core | rf0_fixture_audit; refactor-ci-oracle/sceptre; branch codex/refactor-calibration-safety from 6a43fa5 | CL1 only first: calibration validation/derived budgets/permutation preparation, sampler/calibration native safety, actual inference boundary/stage/tail safety, focused new regressions. Count/group kernel restructuring is excluded from this initial unit. No broad private renames yet. |
-| Independent contract preparation | rf2_storage; refactor-rf2-storage/sceptre | B1 import/duplicate and B6 in-memory aggregation characterization against immutable original libraries; no production changes while CL1 is pending. Small safe probes only, with no invalid native layouts or competing heavy resource jobs. The repeated-file-coordinate choice is recorded in decisions.md. |
-| Independent review | rf0_senior_review, read-only against pinned commits | Review actual source clarity, callers, deletions, indexing/ownership, guards, retained complexity and evidence. Green tests/metrics alone do not establish acceptance. The reviewer owns review artifacts, not implementation. |
-| Integration/acceptance | root; integration checkout codex/refactor | Read/review each diff, check real contracts, merge coherent tested commits, resolve routine conflicts, regenerate joint bindings where needed, publish/check CI and qualify the final immutable source. |
+| Native/count core | rf0_fixture_audit; refactor-ci-oracle/sceptre; codex/refactor-canonical-counts from 489ca7c | CL2: R/storage.R, canonical count/loader native files, relocated group-count block, mitochondrial coordinate ownership, generated bindings and storage/index/ownership tests. CL1 calibration/sampler/inference semantics remain unchanged. Owns test-refactor-indexing.R until explicit handoff. |
+| Context/execution | rf2_storage; refactor-rf2-storage/sceptre; codex/refactor-context-execution from 489ca7c | CL3: analysis/context, both drivers/four workers, fitting/score, execution/mixture, three S4 caller migrations, NT-encoder caller and fit-cache source-order contract. Owns obsolete precomputation-file deletion once actual tests migrate; new context tests and the explicit intercept-only assertion repair. Does not touch storage/native/bindings/imports/plots. |
+| Independent review | rf0_senior_review, read-only against pinned commits | Review actual source clarity, callers, deletions, indexing/ownership, guards, retained complexity and evidence. Green tests/metrics alone do not establish acceptance. Reviewer owns review artifacts, not implementation. |
+| Integration/acceptance | root; integration checkout codex/refactor | Read/review diffs and real contracts, merge coherent tested commits, resolve routine conflicts, own current CI/evidence/decision records and later global tool/name migrations, publish/check CI and qualify final immutable source. |
 
-CL1 must pass implementation review and focused compatibility/safety gates before
-broad CL2–CL6 restructuring. After that handoff, the native/core lane can own
-canonical counts/index ownership and native retirement. The second implementation
-lane can own the tightly coupled context/driver/worker migration or an independent
-import/aggregation unit, depending on finished prerequisites. The coordinator
-records concrete file ownership at each dispatch; one lane owns each coupled
-migration atomically. No simultaneous edits to shared context/storage/fitting,
-Rcpp bindings or facade callers.
+CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
+immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
+controlled ownership cases). That prerequisite is complete. The two current
+lanes now work on disjoint production files. The context lane prepares its
+indexing-test migration as a separate patch until the count lane's coherent
+commit releases that file, then rebases/adopts the count change and completes
+its own caller/test migration atomically. No broken aliases are accepted.
+
+The count lane coordinates a quiet resource window before large triplet trials;
+the context lane may keep editing but suspends competing heavy tests/builds then.
+No sampler/inference private renames happen in either current unit: later
+retirement jointly updates native definitions, actual R callers, current tests,
+ownership probes and tool selectors without aliases. Each implementer documents
+functions changed in their owned files. The earlier B1/B6 characterization is
+complete and saved with its exact original-source evidence; import/aggregation
+implementation follows its own scope and resource gates after this handoff.
 
 ## Working rules and handoff
 

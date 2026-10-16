@@ -86,6 +86,9 @@ jobs:
       - name: Check independent private native components
         run: Rscript --vanilla tools/refactor/test-native-components.R .
 
+      - name: Check draw-bank ownership at R error boundaries
+        run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+
       - uses: r-lib/actions/check-r-package@v2
 
   in-memory-without-ondisc:
@@ -116,6 +119,8 @@ jobs:
         run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
       - name: Check independent private native components
         run: Rscript --vanilla tools/refactor/test-native-components.R .
+      - name: Check draw-bank ownership at R error boundaries
+        run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
       - name: Require an ondisc-free environment and run package tests
         shell: Rscript {0}
         run: |

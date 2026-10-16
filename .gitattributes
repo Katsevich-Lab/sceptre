@@ -2,3 +2,7 @@
 tests/testthat/fixtures/refactor/** -text
 # The runtime observation harness has a byte-level cross-process integrity check.
 tests/testthat/helper-refactor.R text eol=lf
+# Captured qualification evidence is hash-pinned, including original source.
+tools/refactor/results/** -text
+# Preserve raw console output rather than trimming its recorded bytes.
+tools/refactor/results/**/*.log -whitespace

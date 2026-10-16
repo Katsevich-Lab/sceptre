@@ -2,9 +2,11 @@
 # Run separately from package tests: controlled R errors intentionally bypass
 # C++ unwinding. No OOM, production hook, or installed sampler replacement.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2L) stop("Supply immutable candidate source and evidence output directory.")
+if (!length(args) || length(args) > 2L)
+    stop("Supply immutable candidate source and optionally an evidence output directory.")
 root <- normalizePath(args[[1L]], mustWork = TRUE)
-output <- args[[2L]]
+output <- if (length(args) == 2L) args[[2L]] else
+    file.path(Sys.getenv("RUNNER_TEMP", tempdir()), "sceptre-sampling-ownership")
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 source <- file.path(root, "src/generate_samples_functions.cpp")
 probe <- file.path(root, "tools/refactor/sampling-ownership.cpp")

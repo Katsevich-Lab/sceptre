@@ -1,0 +1,22 @@
+{
+  "21f9ea098b69c444a884a49bc254de711968e3b5:R/import_functs.R": {
+    "file": "/private/tmp/sceptre-import-aggregation-characterization-6a43fa5/original-import_functs.R",
+    "sha256": "c42e5138c112abc1c262d849da53c17ef848cd30162632e629ef73b5f197003b"
+  },
+  "21f9ea098b69c444a884a49bc254de711968e3b5:R/check_functions.R": {
+    "file": "/private/tmp/sceptre-import-aggregation-characterization-6a43fa5/original-check_functions.R",
+    "sha256": "8a7b90b0bc85d478c51baaf1d17441c797389e88db20364c87fedd0e3d910d9d"
+  },
+  "21f9ea098b69c444a884a49bc254de711968e3b5:src/sparse_matrix_functs.cpp": {
+    "file": "/private/tmp/sceptre-import-aggregation-characterization-6a43fa5/original-sparse_matrix_functs.cpp",
+    "sha256": "8cc0756786776168eac979d0eac5d62b0a9c0b8b949fba093c1dfdea0ee6debc"
+  },
+  "6a43fa5b2d32109a67e42138d3d845a6e5a2805a:tools/refactor/cleanup/behavior-dispositions.md": {
+    "file": "/private/tmp/sceptre-import-aggregation-characterization-6a43fa5/plan-behavior-dispositions.md",
+    "sha256": "35bc47f7ec85656102aa634114e57aacd3ec8ee362dc507d58be7ccf4b811ed0"
+  },
+  "6a43fa5b2d32109a67e42138d3d845a6e5a2805a:tools/refactor/cleanup/senior-review-amendment.md": {
+    "file": "/private/tmp/sceptre-import-aggregation-characterization-6a43fa5/plan-senior-review-amendment.md",
+    "sha256": "614bbc3e617421cb4df98ae47fd1b1ed49f3db3ab2493adefea7672d2fa36476"
+  }
+}
