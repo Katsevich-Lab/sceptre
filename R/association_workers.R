@@ -1,45 +1,3 @@
-# helper function 0: get_idx_vector function factory
-get_idx_vector_factory <- function(
-    calibration_check,
-    indiv_nt_grna_idxs,
-    grna_group_idxs,
-    low_moi
-) {
-    f <- function(curr_grna_group) {
-        if (calibration_check) {
-            get_idx_vector_calibration_check(
-                curr_grna_group,
-                indiv_nt_grna_idxs,
-                low_moi
-            )
-        } else {
-            get_idx_vector_discovery_analysis(curr_grna_group, grna_group_idxs)
-        }
-    }
-    return(f)
-}
-
-# helper function 1. calibration check complement set
-get_idx_vector_calibration_check <- function(
-    curr_grna_group,
-    indiv_nt_grna_idxs,
-    low_moi
-) {
-    trt_idxs <- calibration_group_membership(curr_grna_group, indiv_nt_grna_idxs, low_moi)
-    return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
-}
-
-
-# helper function 2: discovery analysis
-get_idx_vector_discovery_analysis <- function(
-    curr_grna_group,
-    grna_group_idxs
-) {
-    trt_idxs <- grna_group_idxs[[curr_grna_group]]
-    return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
-}
-
-
 # workhorse function 1. permutations, glm factored out
 perm_test_glm_factored_out <- function(
     synthetic_idxs,
@@ -166,7 +124,8 @@ crt_glm_factored_out <- function(
     response_matrix,
     side_code,
     cells_in_use,
-    response_idxs = NULL
+    response_idxs = NULL,
+    source_cells = NULL
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # precomputation on grna
@@ -183,7 +142,9 @@ crt_glm_factored_out <- function(
         B = B1 + B2 + B3
     )
     if (is.null(response_idxs)) response_idxs <- match(response_ids, rownames(response_matrix))
-    source_cells <- if (subset_to_nt_cells) cells_in_use[all_nt_idxs] else cells_in_use
+    if (is.null(source_cells)) {
+        source_cells <- legacy_fit_source_cells(cells_in_use, all_nt_idxs, subset_to_nt_cells)
+    }
     # loop over genes
     for (i in seq_along(response_ids)) {
         curr_response_id <- response_ids[i]

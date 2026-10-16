@@ -369,7 +369,8 @@ run_crt_in_memory_v2 <- function(
                     response_matrix,
                     side_code,
                     cells_in_use,
-                    response_idxs = response_idxs
+                    response_idxs = response_idxs,
+                    source_cells = common_view$source_cells
                 )
             } else {
                 curr_response_result <- discovery_ntcells_crt(

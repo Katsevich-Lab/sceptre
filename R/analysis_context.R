@@ -149,3 +149,19 @@ prepare_analysis_context <- function(object, analysis, pairs = NULL) {
 # observed indices. Synthetic banks already contain zero-based indices and do
 # not pass through this adapter.
 native_observed_positions <- function(trt_fit_pos) as.integer(trt_fit_pos)
+
+# Historical NT-union entry point retained for characterization/component use.
+get_idx_vector_calibration_check <- function(
+    curr_grna_group,
+    indiv_nt_grna_idxs,
+    low_moi
+) {
+    trt_idxs <- calibration_group_membership(curr_grna_group, indiv_nt_grna_idxs, low_moi)
+    return(list(trt_idxs = trt_idxs, n_trt = length(trt_idxs)))
+}
+
+# Compatibility path for older direct worker callers. Current plans supply
+# make_fit_view()'s composed source map, shared with their design matrix.
+legacy_fit_source_cells <- function(analysis_to_source, nt_to_analysis, nt_only) {
+    if (nt_only) analysis_to_source[nt_to_analysis] else analysis_to_source
+}
