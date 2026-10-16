@@ -1,7 +1,8 @@
 # Source cleanup addendum: inventory and review checkpoint
 
-Status: draft for independent senior review; **further cleanup implementation is
-paused**. Source inspected: c7d62502757f2a17741e2ef18b9e4d006bf063dc,
+Status: **independently approved for bounded implementation**. The complete
+reviewed target is preserved at commit 08e02601b356c3cf6f64bffd074072f6d2eb59de;
+this status/review record update changes no target decisions. Source inspected: c7d62502757f2a17741e2ef18b9e4d006bf063dc,
 October 16, 2026. This addendum supplements REFACTOR_SPEC.md; it does not
 declare the current source pristine or the refactor complete.
 
@@ -268,4 +269,12 @@ P1 post-QC NT cardinality plus precise guard/crosswalk/scope/resource amendments
 The original signed/hash-pinned review is retained in
 [senior-review-initial.md](cleanup/senior-review-initial.md). Sections 4–5 and
 the companion crosswalk/disposition/resource plans address those requests.
-**Amendment review pending; cleanup implementation remains paused.**
+Amendment review: **approved for bounded implementation**, no remaining P0/P1
+or material P2 plan gaps. [Signed review](cleanup/senior-review-amendment.md)
+records all 15 reviewed artifact hashes and the exact fixed-prefix/hybrid/CRT
+bank semantics. The reviewed central-plan bytes are preserved at commit
+08e02601b356c3cf6f64bffd074072f6d2eb59de (SHA256
+51d5af061342e01895a656507c95fe489e9bb3e9d269ae1902b6976af1d854f6).
+This administrative update records the outcome without changing reviewed
+scope or implementation decisions. CL1 now proceeds before broad restructuring;
+implementation review, conditional evidence and final qualification remain open.

@@ -1,6 +1,6 @@
 # Refactor status — October 16, 2026
 
-**Active, incomplete; further cleanup implementation paused for plan review.**
+**Active, incomplete; cleanup plan independently approved, CL1 safety first.**
 Integration branch: `codex/refactor`, current safe production checkpoint
 `c7d62502757f2a17741e2ef18b9e4d006bf063dc`. Nothing has been merged to main
 or released. Draft [PR 234](https://github.com/Katsevich-Lab/sceptre/pull/234)
@@ -25,12 +25,14 @@ modules, 14 native implementations and three headers, with source hashes and
 per-function evidence. Generated bindings are separate. Static inventory and
 contracts are not proof of comprehension or absence of bugs.
 
-Independent senior review of the first draft requested amendments. No P0;
-the blocking P1 is a calibration-group bound against **post-QC active NT groups**,
-not guide metadata. Exact per-entrypoint safety rules, context/factory/intercept
-consistency, private-symbol/sampler dispositions, behavior ledger and measured
-ownership-copy resource requirements are being incorporated before re-review.
-No further cleanup implementation resumes until that plan review is recorded.
+Independent senior review requested and then verified the plan amendments.
+The [signed amendment review](cleanup/senior-review-amendment.md) approves the
+bounded implementation with no remaining P0/P1/material P2 planning gaps. The
+complete reviewed artifact bytes are preserved at 08e0260. Exact post-QC native
+bounds, context/factory/intercept consistency, symbol/sampler dispositions,
+behavior ledger and measured ownership-cost requirements are now settled.
+CL1 safety proceeds before broad restructuring; the review does not qualify
+new code or approve a resource exception.
 
 A separate source-derived P1 affects high-MOI complement calibration: summed
 NT-group sizes can exceed the cell universe and reach out-of-bounds Fisher–Yates
@@ -114,8 +116,8 @@ exception review if the general gate is exceeded.
 
 ## Remaining completion criteria
 
-1. Resolve and independently approve the cleanup addendum and exact findings/
-   symbol/behavior dispositions; then implement coherent reviewed CL1–CL6 units.
+1. Implement the independently approved CL1–CL6 units, starting with safety;
+   keep conditional characterization/resource gates and named deferrals explicit.
 2. Complete actual caller migrations, remove unused modes/helpers/fallbacks,
    correct coordinate and ownership debt and review contracts against code.
 3. Requalify a final immutable build: installed suite/native checks, paired
