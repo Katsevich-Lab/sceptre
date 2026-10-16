@@ -2,9 +2,12 @@
 #'
 #' @param sceptre_object Cellwise-QC object with source-cell `cells_in_use`,
 #'   post-QC group memberships and discovery/positive-control pair tables.
-#' @return Updated object with pair tables sorted by source response row, keeping
-#'   repeated requests. Counts refer to stored sparse positions, including explicit
-#'   zeros. `M_matrix` has NT-guide rows and all-response columns; totals use the
+#' @return Updated object with pair tables sorted by source response row,
+#'   keeping
+#'   repeated requests. Counts refer to stored sparse positions, including
+#'   explicit
+#'   zeros. `M_matrix` has NT-guide rows and all-response columns; totals use
+#'   the
 #'   configured control view. The nuclear backed path leaves NT summaries empty.
 #' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
@@ -23,9 +26,16 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     )
 
     # Resolve the same source/analysis coordinates used by association workers.
-    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
-        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
-        FALSE, control_group_complement, sceptre_object@low_moi)
+    index <- prepare_index_context(
+        cells_in_use,
+        ncol(response_matrix),
+        grna_assignments,
+        response_grna_group_pairs,
+        rownames(response_matrix),
+        FALSE,
+        control_group_complement,
+        sceptre_object@low_moi
+    )
     dt <- data.table::data.table(
         response_idx = index$pair_rows$response_idx,
         response_id = response_grna_group_pairs$response_id,
@@ -42,9 +52,14 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     nt_groups <- index$nt_groups_analysis
     out <- collect_pair_qc_metrics(
         store = response_matrix,
-        pair_index = data.frame(response_idx = dt$response_idx, group_idx = dt$grna_idx),
-        groups = grna_group_idxs, source_cells = cells_in_use,
-        controls = controls, nt_groups = nt_groups,
+        pair_index = data.frame(
+            response_idx = dt$response_idx,
+            group_idx = dt$grna_idx
+        ),
+        groups = grna_group_idxs,
+        source_cells = cells_in_use,
+        controls = controls,
+        nt_groups = nt_groups,
         nuclear = sceptre_object@nuclear
     )
 
@@ -67,7 +82,8 @@ compute_pairwise_qc_information <- function(sceptre_object) {
 
 #' Apply pair eligibility thresholds and count retained hypotheses
 #'
-#' @param sceptre_object Object whose QC tables contain aligned treatment/control
+#' @param sceptre_object Object whose QC tables contain aligned
+#'   treatment/control
 #'   counts and whose threshold slots and integration strategy have been set.
 #' @return Updated object with `pass_qc` in existing row order and retained-pair
 #'   counts. Bonferroni counts distinct response/target groups with any passing
@@ -92,10 +108,14 @@ compute_qc_metrics <- function(sceptre_object) {
             ) |>
                 dplyr::mutate(
                     pass_qc = evaluate_pair_eligibility(
-                        list(n_nonzero_trt = n_nonzero_trt,
-                             n_nonzero_cntrl = n_nonzero_cntrl),
-                        list(n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-                             n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh)
+                        list(
+                            n_nonzero_trt = n_nonzero_trt,
+                            n_nonzero_cntrl = n_nonzero_cntrl
+                        ),
+                        list(
+                            n_nonzero_trt_thresh = n_nonzero_trt_thresh,
+                            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+                        )
                     )
                 )
             if (sceptre_object@grna_integration_strategy == "bonferroni") {

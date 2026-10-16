@@ -2,10 +2,12 @@
 #'
 #' @param grna_matrix Supported row-readable guide-by-source-cell counts.
 #' @param cell_covariate_data_frame Covariates in the same source-cell order.
-#' @param grna_assignment_hyperparameters Existing EM, formula and threshold options.
+#' @param grna_assignment_hyperparameters Existing EM, formula and threshold
+#'   options.
 #' @param print_progress,parallel,n_processors,log_dir Worker/reporting options.
 #' @param grna_ids Ordered guide IDs to process, retained as output names.
-#' @return Named lists of one-based source-cell assignments, in serial or existing
+#' @return Named lists of one-based source-cell assignments, in serial or
+#'   existing
 #'   seeded block order. Reads guide rows, may create progress files and runs GC
 #'   every 200 block items. Fixed starting guesses preserve caller RNG; active
 #'   count/nonconvergence fallback and formula-error context remain unchanged.
@@ -68,15 +70,27 @@ assign_grnas_to_cells_mixture <- function(
     #'   row read; the shared design and fixed guesses are read-only captures.
     #' @noRd
     assign_guide_block <- function(curr_grna_ids, proc_id = NULL) {
-        f_name <- analysis_log_file("assign_grnas", proc_id, parallel,
-                                    print_progress, log_dir)
+        f_name <- analysis_log_file(
+            "assign_grnas",
+            proc_id,
+            parallel,
+            print_progress,
+            log_dir
+        )
         initial_assignment_list <- lapply(
             seq_along(curr_grna_ids),
             function(i) {
                 grna_id <- as.character(curr_grna_ids[i])
-                report_worker_progress(i, grna_id, length(curr_grna_ids),
-                    print_progress, parallel, f_name, feature = "gRNA",
-                    prefix = "Performing gRNA-to-cell assignments for ")
+                report_worker_progress(
+                    i,
+                    grna_id,
+                    length(curr_grna_ids),
+                    print_progress,
+                    parallel,
+                    f_name,
+                    feature = "gRNA",
+                    prefix = "Performing gRNA-to-cell assignments for "
+                )
                 collect_worker_garbage(i)
                 g <- load_row(grna_matrix, grna_id)
                 assignments <- obtain_em_assignments(
@@ -138,7 +152,8 @@ assign_grnas_to_cells_mixture <- function(
 #' @param probability_threshold Posterior threshold on an accepted EM fit.
 #' @return Increasing one-based cell positions. Uses the existing Poisson
 #'   initialization and native EM; expected initialization warnings are muffled.
-#'   Low counts or unsuccessful EM retain raw-count thresholding. No input mutation.
+#'   Low counts or unsuccessful EM retain raw-count thresholding. No input
+#'   mutation.
 #' @noRd
 obtain_em_assignments <- function(
     pi_guesses,
@@ -155,7 +170,11 @@ obtain_em_assignments <- function(
         # 1. estimate the conditional means
         # Initial Poisson warnings are expected; native EM refines this fit.
         pois_fit <- withCallingHandlers(
-            stats::glm.fit(y = g, x = covariate_matrix, family = stats::poisson()),
+            stats::glm.fit(
+                y = g,
+                x = covariate_matrix,
+                family = stats::poisson()
+            ),
             warning = function(w) invokeRestart("muffleWarning")
         )
         g_mus_pert0 <- pois_fit$fitted.values
@@ -191,7 +210,8 @@ obtain_em_assignments <- function(
 #'
 #' @param n_em_rep Number of paired guesses.
 #' @param pi_guess_range,g_pert_guess_range Numeric uniform bounds.
-#' @return Lists pi_guesses and g_pert_guesses, drawn in that order under seed 4.
+#' @return Lists pi_guesses and g_pert_guesses, drawn in that order under seed
+#'   4.
 #'   with_seed restores the caller's RNG state, including its absence.
 #' @noRd
 get_random_starting_guesses <- function(

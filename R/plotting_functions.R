@@ -1,6 +1,7 @@
 #' Supply the shared plotting theme.
 #' @param element_text_size Numeric plot-title text size.
-#' @return ggplot2 theme with existing line/grid/title defaults; no state effects.
+#' @return ggplot2 theme with existing line/grid/title defaults; no state
+#'   effects.
 #' @noRd
 get_my_theme <- function(element_text_size = 11) {
     ggplot2::theme_bw() +
@@ -108,12 +109,15 @@ plot_grna_count_distributions <- function(
     ) |>
         dplyr::filter(grna_expressions < 10000)
 
-    #' Build the current single-count/exponential upper bounds and display labels.
+    #' Build the current single-count/exponential upper bounds and display
+    #' labels.
     #' @param grna_expressions Finite source-cell counts for one selected guide,
     #'   already restricted to values below 10000 by the outer plot.
-    #' @return Data frame of bin_upper_bounds and bin_labels in their existing order.
+    #' @return Data frame of bin_upper_bounds and bin_labels in their existing
+    #'   order.
     #'   Uses outer rounded threshold; expands only above max(10, threshold-1).
-    #'   This retains the existing label convention; it does not change counts/RNG.
+    #'   This retains the existing label convention; it does not change
+    #'   counts/RNG.
     #' @noRd
     grna_expressions_to_binned_factor <- function(grna_expressions) {
         max_expression_count <- max(grna_expressions)
@@ -648,12 +652,16 @@ plot_run_calibration_check <- function(
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
 #' Build bulk/tail QQ comparisons from already processed result tables.
-#' @param calibration_result,discovery_result Tables with p_value in their row order.
+#' @param calibration_result,discovery_result Tables with p_value in their row
+#'   order.
 #'   Overlaid groups must have equal per-panel sizes for the existing QQ band.
-#' @param p_thresh Existing discovery display threshold, or NA for no threshold line.
-#' @param transform_scale,include_legend,include_y_axis_text Logical display options.
+#' @param p_thresh Existing discovery display threshold, or NA for no threshold
+#'   line.
+#' @param transform_scale,include_legend,include_y_axis_text Logical display
+#'   options.
 #' @param point_size,transparency Existing point appearance settings.
-#' @return ggplot with fixed-seed grid-sampled QQ points/bands. Does not recalculate
+#' @return ggplot with fixed-seed grid-sampled QQ points/bands. Does not
+#'   recalculate
 #'   significance, mutate results or consume caller RNG.
 #' @noRd
 compare_calibration_and_discovery_results <- function(
@@ -734,13 +742,16 @@ compare_calibration_and_discovery_results <- function(
 }
 
 
-#' Plot effects and p-values using the result family's existing significance flags.
-#' @param discovery_result Table with p_value, log_2_fold_change and significant.
+#' Plot effects and p-values using the result family's existing significance
+#' flags.
+#' @param discovery_result Table with p_value, log_2_fold_change and
+#'   significant.
 #' @param p_thresh Existing threshold used only for the horizontal display line.
 #' @param x_limits Effect clipping bounds; displayed p-values clip below 1e-12.
 #' @param transparency,point_size Existing point appearance settings.
 #' @return ggplot; reject colors preserve significant exactly, including ties.
-#'   Clipping changes display data only. No input mutation, new testing rule or RNG.
+#'   Clipping changes display data only. No input mutation, new testing rule or
+#'   RNG.
 #' @noRd
 make_volcano_plot <- function(
     discovery_result,
@@ -871,10 +882,13 @@ plot_run_discovery_analysis <- function(
     # tests. Exclude only rows missing the scientific fields these plots use.
     discovery_result <- sceptre_object@discovery_result
     discovery_result <- discovery_result[
-        stats::complete.cases(discovery_result$p_value,
-                              discovery_result$log_2_fold_change,
-                              discovery_result$significant),
-        , drop = FALSE
+        stats::complete.cases(
+            discovery_result$p_value,
+            discovery_result$log_2_fold_change,
+            discovery_result$significant
+        ),
+        ,
+        drop = FALSE
     ]
     calibration_result <- sceptre_object@calibration_result
     discovery_set <- discovery_result |> dplyr::filter(significant)
@@ -1032,9 +1046,12 @@ plot_covariates <- function(
     }
     covariate_data_frame <- sceptre_object@covariate_data_frame
     #' Show one source-cell covariate and its already selected cutoff lines.
-    #' @param v Numeric source-cell values; curr_range is percentile or raw cutoffs.
-    #' @param plot_tit Display title; use_quantile chooses existing quantile lookup.
-    #' @return ggplot histogram; does not subset retained cells or change QC/RNG.
+    #' @param v Numeric source-cell values; curr_range is percentile or raw
+    #'   cutoffs.
+    #' @param plot_tit Display title; use_quantile chooses existing quantile
+    #'   lookup.
+    #' @return ggplot histogram; does not subset retained cells or change
+    #'   QC/RNG.
     #' @noRd
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
@@ -1197,9 +1214,12 @@ plot_run_qc <- function(
 }
 
 #' Show existing overlapping source-cell QC removal percentages.
-#' @param sceptre_object QC facade with six positionally ordered removal metrics.
-#' @return Single ggplot; denominator is original source-cell count, and high MOI
-#'   omits the empty/multiple-guide bar. Reads stored metrics, not fresh QC; no RNG.
+#' @param sceptre_object QC facade with six positionally ordered removal
+#'   metrics.
+#' @return Single ggplot; denominator is original source-cell count, and high
+#'   MOI
+#'   omits the empty/multiple-guide bar. Reads stored metrics, not fresh QC; no
+#'   RNG.
 #' @noRd
 plot_cellwise_qc <- function(sceptre_object) {
     cell_removal_metrics <- sceptre_object@cell_removal_metrics
@@ -1244,10 +1264,14 @@ plot_cellwise_qc <- function(sceptre_object) {
 
 #' Show stored discovery-pair counts and existing pairwise eligibility.
 #' @param sceptre_object QC facade with discovery_pairs_with_info and cutoffs.
-#' @param downsample_pairs Existing global row-sample limit for this QC scatterplot.
-#' @param point_size,transparency Point appearance settings, forwarded by plot_run_qc.
-#' @return Single ggplot. Seed-4 row sampling retains duplicate pair rows as separate
-#'   observations and restores caller RNG. Does not recompute counts/QC or mutate data.
+#' @param downsample_pairs Existing global row-sample limit for this QC
+#'   scatterplot.
+#' @param point_size,transparency Point appearance settings, forwarded by
+#'   plot_run_qc.
+#' @return Single ggplot. Seed-4 row sampling retains duplicate pair rows as
+#'   separate
+#'   observations and restores caller RNG. Does not recompute counts/QC or
+#'   mutate data.
 #' @noRd
 plot_pairwise_qc <- function(
     sceptre_object,
@@ -1430,11 +1454,15 @@ plot_run_power_check <- function(
 
 
 #' Retain the existing deterministic per-p-value-bin result sampling.
-#' @param result_df Table with p_value; row identities/multiplicity are retained.
-#' @param downsample_pairs Maximum sampled within each existing power-of-ten bin,
+#' @param result_df Table with p_value; row identities/multiplicity are
+#'   retained.
+#' @param downsample_pairs Maximum sampled within each existing power-of-ten
+#'   bin,
 #'   not a global row cap.
-#' @return Grouped tibble (grouped by bin), in existing group/sample order. Seed 4
-#'   restores caller RNG; does not ungroup, normalize results or change inference.
+#' @return Grouped tibble (grouped by bin), in existing group/sample order. Seed
+#'   4
+#'   restores caller RNG; does not ungroup, normalize results or change
+#'   inference.
 #' @noRd
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
     withr::with_seed(4, {

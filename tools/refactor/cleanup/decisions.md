@@ -60,3 +60,22 @@ Authoritative report SHA256:
 [Losslessly retained full study and separate dense-cost evidence](../results/conversion-cost-909aa3a/README.md).
 The original proposal and study's pre-acceptance wording are preserved; this
 entry supplies the subsequent human disposition without changing their bytes.
+
+## D2026-10-16-03: Air formatting authorized
+
+Eugene explicitly selected Air as the single formatter and authorized applying
+it. Retain the existing four-space indentation and preferred width of 80,
+pin Air 0.9.0 in the formatting CI check, and wrap overlong prose comments and
+documentation separately where useful. Width is a preference, not a guarantee;
+BiocCheck remains a distinct checker.
+
+This supersedes the earlier nonblocking style deferral only for this formatting
+unit. Scope is handwritten `R/`, formatting configuration/contributor guidance,
+a scoped CI check and this authorization record. Preserve literal values,
+formals, help meaning and mathematical behavior. Generated bindings, immutable
+fixtures, reference/tooling/results and tests are not recursively formatted.
+Intentional long code/example/URL/string lines may remain; do not rewrite
+executable diagnostics or unrelated code to meet a line limit. Audit parsed
+expressions with narrowly normalized single-expression braces and inspect
+meaningful deltas. The combined new source pin still requires qualification;
+earlier resource measurements remain evidence for their measured pin.

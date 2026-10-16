@@ -8,6 +8,16 @@ on:
 name: R-CMD-check
 
 jobs:
+  R-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: posit-dev/setup-air@v1
+        with:
+          version: '0.9.0'
+      - name: Check handwritten R formatting
+        run: air format --check R
+
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 

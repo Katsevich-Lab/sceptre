@@ -3,11 +3,15 @@
 ###########################################
 #' Dispatch guide assignment and preserve the pipeline pod boundary.
 #' @param sceptre_object Facade with resolved assignment method/hyperparameters.
-#' @param print_progress,parallel,n_processors,log_dir Existing mixture worker options.
-#' @return Facade with initial source-cell memberships and maximum-method exclusion
+#' @param print_progress,parallel,n_processors,log_dir Existing mixture worker
+#'   options.
+#' @return Facade with initial source-cell memberships and maximum-method
+#'   exclusion
 #'   cells. Standard execution also pools/groups memberships; nf_pipeline uses
-#'   elements_to_analyze and defers pooling until gathered assignments are processed.
-#'   Warns if all assignments are empty. Reads storage; mixture may log and run GC.
+#'   elements_to_analyze and defers pooling until gathered assignments are
+#'   processed.
+#'   Warns if all assignments are empty. Reads storage; mixture may log and run
+#'   GC.
 #'   Assignment/source order and existing RNG behavior are retained.
 #' @noRd
 assign_grnas_to_cells <- function(
@@ -96,7 +100,8 @@ assign_grnas_to_cells <- function(
 #' @param grna_assign_threshold Existing scalar count cutoff.
 #' @param grna_ids Requested guide IDs in output order.
 #' @return Named list of one-based source-cell positions in stored-column order.
-#'   Retains sparse double versus backed integer-coercion semantics at the storage
+#'   Retains sparse double versus backed integer-coercion semantics at the
+#'   storage
 #'   boundary; does not pool guides, mutate the caller or draw randomness.
 #' @noRd
 assign_grnas_to_cells_thresholding <- function(
@@ -104,10 +109,14 @@ assign_grnas_to_cells_thresholding <- function(
     grna_assign_threshold,
     grna_ids
 ) {
-    grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+    grna_matrix <- set_matrix_accessibility(
+        grna_matrix,
+        make_row_accessible = TRUE
+    )
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
         storage_threshold_row(
-            grna_matrix, storage_response_index(grna_matrix, grna_id),
+            grna_matrix,
+            storage_response_index(grna_matrix, grna_id),
             grna_assign_threshold
         )
     }) |>
@@ -126,8 +135,10 @@ assign_grnas_to_cells_thresholding <- function(
 #' @param grna_n_umis Source-cell guide totals.
 #' @param min_grna_n_umis_threshold Cells below this total are flagged.
 #' @param grna_ids Guide IDs in output order.
-#' @return Named one-based source-cell memberships and union of ambiguous/low-total
-#'   positions. A flagged cell remains in the initial maximum membership; later QC
+#' @return Named one-based source-cell memberships and union of
+#'   ambiguous/low-total
+#'   positions. A flagged cell remains in the initial maximum membership; later
+#'   QC
 #'   applies exclusions. No matrix scan, input mutation, RNG or files.
 #' @noRd
 assign_grnas_to_cells_maximum <- function(
@@ -161,11 +172,14 @@ assign_grnas_to_cells_maximum <- function(
 # AUXILLIARY FUNCTIONS
 ######################
 #' Pool source-cell assignments and prepare the saved raw-assignment schema.
-#' @param sceptre_object Facade with gathered initial assignments and guide metadata.
+#' @param sceptre_object Facade with gathered initial assignments and guide
+#'   metadata.
 #' @return Facade with grna_assignments_raw and mean_cells_per_grna; nonmaximum
 #'   methods also count guides per source cell and low-MOI empty/multiple cells.
-#'   Target groups retain first-seen metadata order and first-occurrence OR union;
-#'   individual NT guides retain their initial named membership order. No QC view
+#'   Target groups retain first-seen metadata order and first-occurrence OR
+#'   union;
+#'   individual NT guides retain their initial named membership order. No QC
+#'   view
 #'   conversion occurs. This separate boundary is used after real pipeline pods.
 #'   Does not mutate input memberships, sample, fit models or write files.
 #' @noRd
@@ -236,14 +250,21 @@ process_initial_assignment_list <- function(sceptre_object) {
 }
 
 
-#' Select guide IDs in metadata order for standard or restricted/trial execution.
-#' @param sceptre_object Facade containing metadata, pair targets and nuclear flag.
-#' @param restricted_grnas Logical; FALSE retains all metadata rows. TRUE retains
-#'   requested pair targets plus NT, or nuclear trial targets sampled from at most
+#' Select guide IDs in metadata order for standard or restricted/trial
+#' execution.
+#' @param sceptre_object Facade containing metadata, pair targets and nuclear
+#'   flag.
+#' @param restricted_grnas Logical; FALSE retains all metadata rows. TRUE
+#'   retains
+#'   requested pair targets plus NT, or nuclear trial targets sampled from at
+#'   most
 #'   30 targeting metadata rows (not 30 distinct targets), plus NT.
-#' @return Guide IDs in original metadata order, preserving metadata multiplicity.
-#'   Nuclear sampling uses seed 4 and restores caller RNG. Retained because actual
-#'   pipeline output_grna_info passes trial through this restricted-mode boundary.
+#' @return Guide IDs in original metadata order, preserving metadata
+#'   multiplicity.
+#'   Nuclear sampling uses seed 4 and restores caller RNG. Retained because
+#'   actual
+#'   pipeline output_grna_info passes trial through this restricted-mode
+#'   boundary.
 #' @noRd
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame

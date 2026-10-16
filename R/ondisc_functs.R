@@ -71,9 +71,14 @@ read_ondisc_backed_sceptre_object <- function(
     )
     sceptre_object <- readRDS(sceptre_object_fp)
     matrices <- storage_reopen_backed_pair(
-        response_odm_file_fp, grna_odm_file_fp, sceptre_object@integer_id
+        response_odm_file_fp,
+        grna_odm_file_fp,
+        sceptre_object@integer_id
     )
-    sceptre_object <- set_response_matrix(sceptre_object, matrices$response_matrix)
+    sceptre_object <- set_response_matrix(
+        sceptre_object,
+        matrices$response_matrix
+    )
     sceptre_object <- set_grna_matrix(sceptre_object, matrices$grna_matrix)
     return(sceptre_object)
 }

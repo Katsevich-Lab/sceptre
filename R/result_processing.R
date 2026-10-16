@@ -71,7 +71,8 @@ pair_results_from_native <- function(
 #' Integrate guide rows using the configured existing result rule
 #'
 #' Union relabels groups as targets. Singleton/Bonferroni join the guide-target
-#' map, retaining its multiplicity, then sort by p-value/response. Non-calibration
+#' map, retaining its multiplicity, then sort by p-value/response.
+#' Non-calibration
 #' Bonferroni retains one minimum-p record per response/target and multiplies by
 #' passing-guide count, capped at one; all-failed groups keep maximum counts and
 #' missing p/effect. Calibration skips that collapse. No new correction occurs.
@@ -143,27 +144,39 @@ integrate_guides <- function(
 #' @noRd
 assemble_pair_results <- function(raw_result, requested_pairs) {
     result <- data.table::rbindlist(
-        list(raw_result, requested_pairs |> dplyr::filter(!pass_qc)), fill = TRUE
+        list(raw_result, requested_pairs |> dplyr::filter(!pass_qc)),
+        fill = TRUE
     )
     data.table::setorderv(result, c("p_value", "response_id"), na.last = TRUE)
     result
 }
 
-#' Integrate the complete result family and assign its existing significance flag
+#' Integrate the complete result family and assign its existing significance
+#' flag
 #'
 #' Uses p.adjust with the facade's method and strict adjusted-p < alpha after
 #' guide integration. Resolve alpha outside the table mask: amount 2/3 carries
 #' a separate skew-normal shape column with the same name. Real pipeline callers
 #' invoke this after gathering the full family, rather than per raw shard.
 #' @noRd
-finalize_association_result <- function(result, integration_strategy, target_map,
-                                        correction_method, alpha,
-                                        is_calibration_check = FALSE) {
-    result <- integrate_guides(result, integration_strategy, target_map,
-                                       is_calibration_check)
+finalize_association_result <- function(
+    result,
+    integration_strategy,
+    target_map,
+    correction_method,
+    alpha,
+    is_calibration_check = FALSE
+) {
+    result <- integrate_guides(
+        result,
+        integration_strategy,
+        target_map,
+        is_calibration_check
+    )
     # Output amount 2/3 already has a skew-normal shape column named alpha.
     # Resolve correction settings outside the table's data mask.
-    significant <- stats::p.adjust(result$p_value, method = correction_method) < alpha
+    significant <- stats::p.adjust(result$p_value, method = correction_method) <
+        alpha
     dplyr::mutate(result, significant = !!significant)
 }
 
@@ -172,14 +185,20 @@ finalize_association_result <- function(result, integration_strategy, target_map
 # Nuclear raw shards retain their separate existing script-level contract.
 #' Finalize a gathered calibration family using facade settings
 #'
-#' Retains the direct Nextflow private-name contract and skips the non-calibration
+#' Retains the direct Nextflow private-name contract and skips the
+#' non-calibration
 #' Bonferroni collapse used by power/discovery. Returns the finalized table;
 #' does not update facade slots.
 #' @noRd
 process_calibration_result <- function(result, sceptre_object) {
-    finalize_association_result(result, sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame, sceptre_object@multiple_testing_method,
-        sceptre_object@multiple_testing_alpha, TRUE)
+    finalize_association_result(
+        result,
+        sceptre_object@grna_integration_strategy,
+        sceptre_object@grna_target_data_frame,
+        sceptre_object@multiple_testing_method,
+        sceptre_object@multiple_testing_alpha,
+        TRUE
+    )
 }
 
 #' Finalize a gathered discovery family using facade settings
@@ -188,9 +207,13 @@ process_calibration_result <- function(result, sceptre_object) {
 #' table without changing facade slots or recomputing tests.
 #' @noRd
 process_discovery_result <- function(result, sceptre_object) {
-    finalize_association_result(result, sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame, sceptre_object@multiple_testing_method,
-        sceptre_object@multiple_testing_alpha)
+    finalize_association_result(
+        result,
+        sceptre_object@grna_integration_strategy,
+        sceptre_object@grna_target_data_frame,
+        sceptre_object@multiple_testing_method,
+        sceptre_object@multiple_testing_alpha
+    )
 }
 
 #' Apply guide grouping alone at the actual pipeline boundary
@@ -199,8 +222,15 @@ process_discovery_result <- function(result, sceptre_object) {
 #' flag. This adapter deliberately does not assign complete-family significance;
 #' existing nuclear scripts retain their separate raw-shard processing contract.
 #' @noRd
-apply_grouping_to_result <- function(result, sceptre_object,
-                                     is_calibration_check = FALSE) {
-    integrate_guides(result, sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame, is_calibration_check)
+apply_grouping_to_result <- function(
+    result,
+    sceptre_object,
+    is_calibration_check = FALSE
+) {
+    integrate_guides(
+        result,
+        sceptre_object@grna_integration_strategy,
+        sceptre_object@grna_target_data_frame,
+        is_calibration_check
+    )
 }

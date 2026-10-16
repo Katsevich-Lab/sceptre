@@ -6,12 +6,15 @@ StatQQBand <- ggplot2::ggproto(
     #' Select one equal-sized QQ group per panel before band computation.
     #' @param data Transformed y, PANEL and ggplot-assigned group IDs.
     #' @param params Existing ggplot stat parameters.
-    #' @return Input rows for the minimum group separately in each panel, retaining
-    #'   row order; errors on unequal group sizes within a panel. No sampling/RNG.
+    #' @return Input rows for the minimum group separately in each panel,
+    #'   retaining
+    #'   row order; errors on unequal group sizes within a panel. No
+    #'   sampling/RNG.
     #' @noRd
     setup_data = function(data, params) {
         if ("group" %in% names(data)) {
-            # Require equal group sizes within each panel before selecting a band.
+            # Require equal group sizes within each panel before selecting a
+            # band.
             max_unique_pts_per_group <- data |>
                 dplyr::group_by(PANEL, group) |>
                 dplyr::summarise(pts_per_group = dplyr::n()) |>
@@ -38,9 +41,11 @@ StatQQBand <- ggplot2::ggproto(
     },
     #' Calculate the existing pointwise order-statistic QQ band for one group.
     #' @param data,scales Transformed y and panel scales; y is inverted first.
-    #' @param distribution,max_pts_to_plot,ci_level Quantile family, grid resolution
+    #' @param distribution,max_pts_to_plot,ci_level Quantile family, grid
+    #'   resolution
     #'   and pointwise confidence. Rank ties use first occurrence.
-    #' @return Transformed x/y/ymin/ymax rows, one per occupied x/y grid cell under
+    #' @return Transformed x/y/ymin/ymax rows, one per occupied x/y grid cell
+    #'   under
     #'   seed 4. Restores caller RNG; no global point cap or new band method.
     #' @noRd
     compute_group = function(
@@ -102,8 +107,10 @@ StatQQBand <- ggplot2::ggproto(
 #' @inheritParams ggplot2::stat_identity
 #' @param distribution The distribution with respect to which to make QQ plot
 #' (e.g. \code{"unif"}, \code{"norm"}, etc.); default \code{"unif"}
-#' @param max_pts_to_plot Number of intervals per axis for deterministic x/y-grid
-#' downsampling; at most one point is kept per occupied grid cell, not a global cap.
+#' @param max_pts_to_plot Number of intervals per axis for deterministic
+#'   x/y-grid
+#' downsampling; at most one point is kept per occupied grid cell, not a global
+#' cap.
 #' @param ci_level The pointwise confidence level for the QQ plot; default 0.95
 #' @return A ggplot layer using the existing per-panel pointwise beta bands,
 #' inverse/forward scales, first-occurrence ranks and restored seed-4 RNG.
@@ -144,9 +151,12 @@ StatQQPoints <- ggplot2::ggproto(
     ggplot2::Stat,
     required_aes = c("y"),
     #' Calculate existing QQ points for one group in its panel scales.
-    #' @param data,scales Transformed y and panel scales; ranks use inverse-scale y.
-    #' @param distribution,max_pts_to_plot Quantile family and occupied-grid resolution.
-    #' @param ymin,ymax Inverse-scale display clipping bounds, applied after ranking.
+    #' @param data,scales Transformed y and panel scales; ranks use
+    #'   inverse-scale y.
+    #' @param distribution,max_pts_to_plot Quantile family and occupied-grid
+    #'   resolution.
+    #' @param ymin,ymax Inverse-scale display clipping bounds, applied after
+    #'   ranking.
     #' @return Transformed x/y rows sampled per occupied grid cell with seed 4;
     #'   first-occurrence tie ranks and caller RNG are preserved.
     #' @noRd
@@ -200,13 +210,16 @@ StatQQPoints <- ggplot2::ggproto(
 #' @inheritParams ggplot2::stat_identity
 #' @param distribution The distribution with respect to which to make QQ plot
 #' (e.g. \code{"unif"}, \code{"norm"}, etc.); default \code{"unif"}
-#' @param max_pts_to_plot Number of intervals per axis for deterministic x/y-grid
-#' downsampling; at most one point is kept per occupied grid cell, not a global cap.
+#' @param max_pts_to_plot Number of intervals per axis for deterministic
+#'   x/y-grid
+#' downsampling; at most one point is kept per occupied grid cell, not a global
+#' cap.
 #' @param ymin Samples with value less than \code{ymin} will be truncated at
 #' \code{ymin} for plotting.
 #' @param ymax Samples with value greater than \code{ymax} will be truncated at
 #' \code{ymax} for plotting.
-#' @return A ggplot point layer preserving inverse-scale ranks, display clipping,
+#' @return A ggplot point layer preserving inverse-scale ranks, display
+#'   clipping,
 #' occupied-grid sampling and caller RNG.
 #' @noRd
 stat_qq_points <- function(
@@ -247,7 +260,8 @@ stat_qq_points <- function(
 #' e).
 #'
 #' @return A scale transformation with -log(x, base), inverse base^(-x), log
-#' breaks and the existing positive domain. The two local transform closures share
+#' breaks and the existing positive domain. The two local transform closures
+#' share
 #' this contract; no validation, mutation, sampling or files are involved.
 #' @noRd
 revlog_trans <- function(base = exp(1)) {

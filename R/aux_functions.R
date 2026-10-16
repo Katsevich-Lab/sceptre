@@ -60,7 +60,8 @@ auto_construct_formula_object <- function(
 #' Aligned feature-by-cell response/guide counts and response labels produce a
 #' data frame with prefixed response/guide summaries, followed by supplied extra
 #' covariates. Response column IDs become row names when available. Converts
-#' sparse orientation for column scans; does not create a backed store or use RNG.
+#' sparse orientation for column scans; does not create a backed store or use
+#' RNG.
 #' @noRd
 auto_compute_cell_covariates <- function(
     response_matrix,

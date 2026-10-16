@@ -7,7 +7,8 @@
 #'   greater than the available number of NT guides.
 #' @return Data frame in native sampling order, with `response_id`, ampersand-
 #'   joined `grna_group`, treatment/control counts and `pass_qc = TRUE`.
-#'   May return fewer pairs than requested with a message; errors if none qualify.
+#'   May return fewer pairs than requested with a message; errors if none
+#'   qualify.
 #'   Native samplers use fixed seeds and do not consume R random draws.
 #' @noRd
 construct_negative_control_pairs <- function(
@@ -80,7 +81,10 @@ construct_negative_control_pairs <- function(
             }
         )
         n_nonzero_m <- storage_group_counts(
-            response_matrix, seq_len(n_genes), nt_grna_group_idxs, cells_in_use
+            response_matrix,
+            seq_len(n_genes),
+            nt_grna_group_idxs,
+            cells_in_use
         )
         dummy_possibly_groups_m <- matrix(
             seq_along(nt_grna_group_idxs) - 1L,
@@ -132,7 +136,8 @@ construct_negative_control_pairs <- function(
 #' Choose the default calibration group size from integration metadata
 #'
 #' @param grna_target_data_frame Guide metadata with `grna_group` already set;
-#'   the caller needs a nonempty targeting-group distribution for a finite result.
+#'   the caller needs a nonempty targeting-group distribution for a finite
+#'   result.
 #' @return Integer rounded median targeting-group size, capped by the number of
 #'   NT metadata rows. No minimum or empty-target fallback is imposed here.
 #' @noRd

@@ -140,7 +140,9 @@ set_analysis_parameters <- function(
         formula_object = formula_object
     )
     reset_response_precomps <- response_cache_parameters_changed(
-        sceptre_object, design, control_group == "complement"
+        sceptre_object,
+        design,
+        control_group == "complement"
     )
 
     # update uncached fields of the sceptre object
@@ -179,7 +181,9 @@ set_analysis_parameters <- function(
 
     # update cached fields
     sceptre_object <- invalidate_response_cache(
-        sceptre_object, "parameters", reset_response_precomps
+        sceptre_object,
+        "parameters",
+        reset_response_precomps
     )
 
     # return
@@ -315,8 +319,13 @@ assign_grnas <- function(
 
     # determine whether to reset response precomputations
     sceptre_object <- invalidate_response_cache(
-        sceptre_object, "assignments",
-        response_cache_assignments_changed(sceptre_object, method, hyperparameters)
+        sceptre_object,
+        "assignments",
+        response_cache_assignments_changed(
+            sceptre_object,
+            method,
+            hyperparameters
+        )
     )
 
     # update uncached fields
@@ -426,15 +435,21 @@ run_qc <- function(
 
 
 #' Prepare the cellwise QC phase shared by standard and nuclear pipeline work.
-#' @param sceptre_object Assigned facade with raw source-cell memberships/covariates.
+#' @param sceptre_object Assigned facade with raw source-cell
+#'   memberships/covariates.
 #' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Existing pairwise cutoffs.
-#' @param response_n_umis_range,response_n_nonzero_range Source-count percentile bounds.
-#' @param p_mito_threshold Mitochondrial fraction cutoff when that covariate exists.
+#' @param response_n_umis_range,response_n_nonzero_range Source-count percentile
+#'   bounds.
+#' @param p_mito_threshold Mitochondrial fraction cutoff when that covariate
+#'   exists.
 #' @param additional_cells_to_remove One-based source-cell positions to exclude.
 #' @return Facade with QC status, thresholds, removal metrics, ordered retained
-#'   source cells and assignments reindexed to analysis/NT-local coordinates. Clears
-#'   response fits exactly when retained source cells change; preserves full-source
-#'   design. Existing high-removal warning/empty-cell error remain. No RNG/files.
+#'   source cells and assignments reindexed to analysis/NT-local coordinates.
+#'   Clears
+#'   response fits exactly when retained source cells change; preserves
+#'   full-source
+#'   design. Existing high-removal warning/empty-cell error remain. No
+#'   RNG/files.
 #'   Kept separate for the real nuclear pipeline preparation/QC contract.
 #' @noRd
 run_qc_pt_1 <- function(
@@ -507,7 +522,8 @@ run_qc_pt_1 <- function(
 
     # determine whether to reset response precomputation
     sceptre_object <- invalidate_response_cache(
-        sceptre_object, "analysis_cells",
+        sceptre_object,
+        "analysis_cells",
         !identical(current_cells_in_use, sceptre_object@cells_in_use)
     )
 
@@ -519,9 +535,12 @@ run_qc_pt_1 <- function(
 
 #' Complete pairwise QC and the existing empirical resampling budget update.
 #' @param sceptre_object Cellwise-QC facade with current analysis assignments.
-#' @return Facade with pair counts/eligibility, NT summary matrix, passing-family
-#'   sizes and checked B3 under no_approximation. Uses storage-backed count scans
-#'   without adding an inference method or creating draw banks. No RNG/file writes.
+#' @return Facade with pair counts/eligibility, NT summary matrix,
+#'   passing-family
+#'   sizes and checked B3 under no_approximation. Uses storage-backed count
+#'   scans
+#'   without adding an inference method or creating draw banks. No RNG/file
+#'   writes.
 #'   This separate stage is also called by real nuclear pipeline pod work.
 #' @noRd
 run_qc_pt_2 <- function(sceptre_object) {
@@ -542,10 +561,14 @@ run_qc_pt_2 <- function(sceptre_object) {
                 length(sceptre_object@n_ok_positive_control_pairs) >= 1L)
     ) {
         sceptre_object@B3 <- compute_empirical_budget(
-            max(sceptre_object@n_ok_discovery_pairs,
-                sceptre_object@n_ok_positive_control_pairs),
-            sceptre_object@multiple_testing_alpha, sceptre_object@side_code,
-            sceptre_object@B1, sceptre_object@B2
+            max(
+                sceptre_object@n_ok_discovery_pairs,
+                sceptre_object@n_ok_positive_control_pairs
+            ),
+            sceptre_object@multiple_testing_alpha,
+            sceptre_object@side_code,
+            sceptre_object@B1,
+            sceptre_object@B2
         )
     }
 

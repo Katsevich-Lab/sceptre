@@ -93,7 +93,8 @@ run_calibration_check <- function(
 #' Missing group size/pair count derive from discovery metadata/pass counts;
 #' both must be supplied when discovery pairs are absent. Empirical inference
 #' updates B3 for this family before constructing the existing sampled pairs.
-#' @return Facade with calibration sizes, negative-control pairs and any required
+#' @return Facade with calibration sizes, negative-control pairs and any
+#'   required
 #'   prerequisite updates. No association tests or result finalization run here.
 #'   The transition/validation/message/sampling order is intentional. Pipeline
 #'   preparation calls this phase separately and retains the returned facade.
@@ -149,8 +150,11 @@ run_calibration_check_pt_1 <- function(
 
     if (sceptre_object@resampling_approximation == "no_approximation") {
         sceptre_object@B3 <- compute_empirical_budget(
-            n_calibration_pairs, sceptre_object@multiple_testing_alpha,
-            sceptre_object@side_code, sceptre_object@B1, sceptre_object@B2
+            n_calibration_pairs,
+            sceptre_object@multiple_testing_alpha,
+            sceptre_object@side_code,
+            sceptre_object@B1,
+            sceptre_object@B2
         )
     }
 
@@ -205,7 +209,10 @@ run_calibration_check_pt_2 <- function(
     } else {
         out$result
     }
-    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
 }
 
@@ -307,7 +314,10 @@ run_power_check <- function(
     } else {
         out$result
     }
-    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
 }
 
@@ -409,7 +419,10 @@ run_discovery_analysis <- function(
     } else {
         out$result
     }
-    sceptre_object <- commit_response_fits(sceptre_object, out$response_precomputations)
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
 }
 
@@ -511,7 +524,8 @@ get_result <- function(sceptre_object, analysis) {
 #' @param directory a string giving the file path to a directory on disk in
 #' which to write the results
 #'
-#' @return No return value; called for its side effect of writing files to `directory`.
+#' @return No return value; called for its side effect of writing files to
+#'   `directory`.
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -643,7 +657,8 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 #' Called by calibration, power and discovery after their parallelism check.
 #' Imported/parameterized objects missing both stages run assignment then QC;
 #' objects missing only QC run QC. Otherwise the facade is returned unchanged
-#' and the later workflow transition enforces prerequisites. Messages, assignment
+#' and the later workflow transition enforces prerequisites. Messages,
+#' assignment
 #' randomness/parallel logs and QC cache invalidation belong to those actual
 #' calls; n_processors/parallel are forwarded only to assignment.
 #' @noRd

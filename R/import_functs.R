@@ -106,12 +106,15 @@ import_data <- function(
 #'
 #' @param response_matrix,grna_matrix Feature-by-source-cell count matrices with
 #'   unique feature IDs; cell columns and any supplied cell names must align.
-#' @param grna_target_data_frame Guide/target metadata; `vector_id`, when present,
+#' @param grna_target_data_frame Guide/target metadata; `vector_id`, when
+#'   present,
 #'   groups guide rows for count summation before covariates are computed.
 #' @param moi Character `"low"` or `"high"`.
-#' @param extra_covariates Data frame in source-cell order, or an empty data frame.
+#' @param extra_covariates Data frame in source-cell order, or an empty data
+#'   frame.
 #' @param response_names Character feature labels aligned with response rows,
-#'   or `NA_character_` to use response row names for mitochondrial identification.
+#'   or `NA_character_` to use response row names for mitochondrial
+#'   identification.
 #' @return Initialized `sceptre_object` with row-accessible sparse counts and
 #'   source-ordered covariates. Validation/conversion can allocate new matrices.
 #' @noRd
@@ -238,7 +241,8 @@ import_data_use_ondisc <- function(
 #' `features.tsv.gz` and `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`).
 #' For standard in-memory objects, when every supplied directory contains a
 #' barcode file, the cell barcodes are retained as the column names of the
-#' response and gRNA matrices and the row names of the cell covariate data frame.
+#' response and gRNA matrices and the row names of the cell covariate data
+#' frame.
 #' When multiple directories are supplied, the retained cell barcodes are
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
 #' the cell IDs unique and stable across imports.
@@ -331,10 +335,13 @@ import_data_from_cellranger <- function(
 #'   tables and coordinate Matrix Market counts. Each modality follows its
 #'   feature-file row order, even when modalities are interleaved; unique
 #'   coordinates may be unsorted. Repeated coordinates fail before CSC use.
-#' @param moi,grna_target_data_frame,extra_covariates Inputs to `import_data_memory()`;
+#' @param moi,grna_target_data_frame,extra_covariates Inputs to
+#'   `import_data_memory()`;
 #'   extra covariates follow concatenated batch/cell order.
-#' @return Initialized object in input-directory/column order. Barcode files must
-#'   be present for all batches or none; retained barcodes are batch-prefixed for
+#' @return Initialized object in input-directory/column order. Barcode files
+#'   must
+#'   be present for all batches or none; retained barcodes are batch-prefixed
+#'   for
 #'   multiple inputs. Adds/replaces the `batch` covariate and emits progress.
 #' @noRd
 import_data_from_cellranger_memory <- function(
@@ -532,8 +539,10 @@ import_data_from_cellranger_memory <- function(
             # subset
             dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
             # Feature-file rows need not form contiguous modality blocks. Map
-            # into this modality's original row order, then use zero-based slots.
-            dt_sub$feature_idx <- match(dt_sub$feature_idx, curr_feature_idxs) - 1L
+            # into this modality's original row order, then use zero-based
+            # slots.
+            dt_sub$feature_idx <- match(dt_sub$feature_idx, curr_feature_idxs) -
+                1L
             dt_sub$cell_idx <- dt_sub$cell_idx - 1L
             # create a sparse matrix in csc format
             out <- create_csc_matrix(
@@ -616,7 +625,8 @@ import_data_from_cellranger_memory <- function(
 #' Read Cell Ranger batches through ondisc and initialize the S4 facade
 #'
 #' @param directories Character paths passed in order to the ondisc importer.
-#' @param moi,grna_target_data_frame,extra_covariates Import metadata/covariates;
+#' @param moi,grna_target_data_frame,extra_covariates Import
+#'   metadata/covariates;
 #'   extra covariates must follow the ondisc importer's returned cell order.
 #' @param directory_to_write Single output directory, created if necessary.
 #' @return Object with backed gene/gRNA modalities and their shared import ID.
@@ -839,12 +849,15 @@ import_data_from_parse <- function(
 ##################
 #' Initialize persistent S4 slots without changing source-cell order
 #'
-#' @param response_matrix,grna_matrix Aligned feature-by-cell stores (row-accessible
+#' @param response_matrix,grna_matrix Aligned feature-by-cell stores
+#'   (row-accessible
 #'   sparse matrices or ondisc objects), already validated by the import path.
-#' @param covariate_data_frame Source-cell-ordered data frame with computed guide
+#' @param covariate_data_frame Source-cell-ordered data frame with computed
+#'   guide
 #'   maximum/fraction columns, moved into `import_grna_assignment_info`.
 #' @param moi Character `"low"` or `"high"`.
-#' @param grna_target_data_frame Guide metadata; IDs/targets are coerced to character
+#' @param grna_target_data_frame Guide metadata; IDs/targets are coerced to
+#'   character
 #'   while row order and additional columns are preserved.
 #' @return New `sceptre_object` with the legacy slot layout and initial workflow
 #'   flags. Stores supplied matrices without reordering or eagerly reading them.
@@ -893,32 +906,45 @@ init_sceptre_object <- function(
 #' mutated. Keep every value, including explicit zeros, and reject repeated
 #' file coordinates rather than selecting or summing them. Dimensions and slot
 #' lengths must fit the native integer pointer builder before it is called.
-#' Returns a numeric dgCMatrix in feature-file/cell-file order, without dimnames.
+#' Returns a numeric dgCMatrix in feature-file/cell-file order, without
+#' dimnames.
 #' No dense assay, RNG draws or file writes occur.
 #' @noRd
 create_csc_matrix <- function(dt, n_cells, n_features) {
     check_native_scalar_count(n_cells, "n_cells")
     check_native_scalar_count(n_features, "n_features")
     if (n_cells == .Machine$integer.max) {
-        stop("The imported cell count leaves no room for its final sparse pointer.")
+        stop(
+            "The imported cell count leaves no room for its final sparse pointer."
+        )
     }
     check_native_scalar_count(nrow(dt), "Stored coordinate count")
-    if (!is.integer(dt$cell_idx) || !is.integer(dt$feature_idx) ||
-        anyNA(dt$cell_idx) || anyNA(dt$feature_idx) ||
-        any(dt$cell_idx < 0L | dt$cell_idx >= n_cells) ||
-        any(dt$feature_idx < 0L | dt$feature_idx >= n_features)) {
-        stop("Imported cell or feature coordinates are outside the matrix dimensions.")
+    if (
+        !is.integer(dt$cell_idx) ||
+            !is.integer(dt$feature_idx) ||
+            anyNA(dt$cell_idx) ||
+            anyNA(dt$feature_idx) ||
+            any(dt$cell_idx < 0L | dt$cell_idx >= n_cells) ||
+            any(dt$feature_idx < 0L | dt$feature_idx >= n_features)
+    ) {
+        stop(
+            "Imported cell or feature coordinates are outside the matrix dimensions."
+        )
     }
     scan_order <- order(dt$cell_idx, dt$feature_idx, method = "radix")
     cell_idxs <- dt$cell_idx[scan_order]
     feature_idxs <- dt$feature_idx[scan_order]
     if (any(diff(cell_idxs) == 0L & diff(feature_idxs) == 0L)) {
-        stop("Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique.")
+        stop(
+            "Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique."
+        )
     }
     methods::new(
-        "dgCMatrix", i = feature_idxs,
+        "dgCMatrix",
+        i = feature_idxs,
         p = obtain_pointer_vector(i = cell_idxs, dim = as.integer(n_cells)),
-        x = dt$x[scan_order], Dim = as.integer(c(n_features, n_cells))
+        x = dt$x[scan_order],
+        Dim = as.integer(c(n_features, n_cells))
     )
 }
 
@@ -952,9 +978,12 @@ get_mtx_metadata <- function(
 #' Write the two imported modalities under a common backing identity
 #'
 #' @param response_matrix,grna_matrix Aligned feature-by-cell count matrices.
-#' @param directory_to_write Output directory accepted by `prepare_directory_to_write()`.
-#' @param integer_id Integer identity shared by the saved object and both stores.
-#' @return The `storage_create_backed_pair()` list of response/gRNA handles after
+#' @param directory_to_write Output directory accepted by
+#'   `prepare_directory_to_write()`.
+#' @param integer_id Integer identity shared by the saved object and both
+#'   stores.
+#' @return The `storage_create_backed_pair()` list of response/gRNA handles
+#'   after
 #'   writing `response.odm` and `grna.odm` in that order.
 #' @noRd
 write_matrices_to_disk <- function(
@@ -965,7 +994,10 @@ write_matrices_to_disk <- function(
 ) {
     directory_to_write <- prepare_directory_to_write(directory_to_write)
     storage_create_backed_pair(
-        response_matrix, grna_matrix, directory_to_write, integer_id
+        response_matrix,
+        grna_matrix,
+        directory_to_write,
+        integer_id
     )
 }
 
@@ -1032,9 +1064,11 @@ prepare_ondisc_file_path <- function(file_path, arg_name) {
 
 #' Reject embedded tildes before invoking ondisc's legacy path handling
 #'
-#' @param file_path Canonical character path with leading home expansion complete.
+#' @param file_path Canonical character path with leading home expansion
+#'   complete.
 #' @param arg_name Character argument label used in the error.
-#' @return `NULL` on success; errors if any tilde remains. Does not access files.
+#' @return `NULL` on success; errors if any tilde remains. Does not access
+#'   files.
 #' @noRd
 check_path_has_no_tilde <- function(file_path, arg_name) {
     if (grepl("~", file_path, fixed = TRUE)) {
@@ -1057,9 +1091,12 @@ check_path_has_no_tilde <- function(file_path, arg_name) {
 #' Compute aligned cell covariates and prepare row-accessible R matrices
 #'
 #' @param response_matrix,grna_matrix In-memory feature-by-cell count matrices.
-#' @param extra_covariates Empty data frame or covariates in the same cell order.
-#' @param response_names Aligned response labels, or `NA_character_` for row names.
-#' @return List with `covariate_data_frame`, `response_matrix`, and `grna_matrix`.
+#' @param extra_covariates Empty data frame or covariates in the same cell
+#'   order.
+#' @param response_names Aligned response labels, or `NA_character_` for row
+#'   names.
+#' @return List with `covariate_data_frame`, `response_matrix`, and
+#'   `grna_matrix`.
 #'   Dimensions, feature IDs and cell order are retained; count storage may be
 #'   converted. This runs before the backed import writes its matrices to disk.
 #' @noRd
@@ -1100,7 +1137,8 @@ process_covariates_and_matrices <- function(
 #' @param grna_target_data_frame Data frame with `grna_id`, `vector_id`, and
 #'   `grna_target`; every vector must map to exactly one target.
 #' @return Metadata with `vector_id` renamed to `grna_id` and original guide IDs
-#'   removed. Deduplicates complete remaining rows in first-seen order, so differing
+#'   removed. Deduplicates complete remaining rows in first-seen order, so
+#'   differing
 #'   additional annotations can retain repeated vector IDs.
 #' @noRd
 collapse_grna_target_data_frame <- function(grna_target_data_frame) {
@@ -1127,10 +1165,13 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 #' @param grna_target_data_frame Metadata identifying matrix rows by `grna_id`
 #'   and their vector groups by `vector_id`.
 #' @return Dense numeric vector-by-cell matrix in first-seen vector order and
-#'   original cell order. Metadata repetitions contribute repeated row selections.
-#'   Sparse row preparation retains Matrix's numeric/logical duplicate semantics.
+#'   original cell order. Metadata repetitions contribute repeated row
+#'   selections.
+#'   Sparse row preparation retains Matrix's numeric/logical duplicate
+#'   semantics.
 #'   Sums use bounded dense column blocks to preserve the original platform's
-#'   dense accumulation. Vector-by-cell assembly/output and its existing transpose
+#'   dense accumulation. Vector-by-cell assembly/output and its existing
+#'   transpose
 #'   workspace are dense; the full sparse input is not. Inputs remain unchanged;
 #'   there are no RNG or file effects.
 #' @noRd
@@ -1182,15 +1223,22 @@ sum_sparse_vector_rows <- function(counts) {
     }
     sums <- numeric(n_cells)
     names(sums) <- colnames(counts)
-    if (n_cells == 0L) return(sums)
+    if (n_cells == 0L) {
+        return(sums)
+    }
 
     # Linux dense colSums can accumulate in extended precision while Matrix's
-    # sparse method uses doubles. Keep every selected row in a single sum; adding
-    # partial row sums would change rounding. Column blocks only bound workspace.
+    # sparse method uses doubles. Keep every selected row in a single sum;
+    # adding
+    # partial row sums would change rounding. Column blocks only bound
+    # workspace.
     block_width <- max(1, floor(2^20 / max(1L, nrow(counts))))
     for (first in seq.int(1, n_cells, by = block_width)) {
         columns <- seq.int(first, min(n_cells, first + block_width - 1))
-        sums[columns] <- Matrix::colSums(as.matrix(counts[, columns, drop = FALSE]))
+        sums[columns] <- Matrix::colSums(as.matrix(counts[,
+            columns,
+            drop = FALSE
+        ]))
     }
     return(sums)
 }

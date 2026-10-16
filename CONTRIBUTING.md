@@ -11,7 +11,8 @@ For bug reports, feature requests, and questions about using `sceptre`, see
 
 ## Contributing code and documentation
 
-Small bug fixes and documentation corrections may be submitted as pull requests without prior discussion.
+Small bug fixes and documentation corrections may be submitted as pull requests
+without prior discussion.
 
 Before implementing a substantial feature, public API change, or change to
 statistical methodology, start a [feature-request discussion](https://github.com/Katsevich-Lab/sceptre/discussions/categories/feature-requests).
@@ -28,10 +29,33 @@ compatibility fixtures and downstream/resource checks.
 
 - Keep changes focused on a single problem or feature.
 - Add or update tests for behavior changes and bug fixes.
-- Follow the existing R style. The repository's `air.toml` file records the formatting configuration.
+- Format handwritten R code with Air as described below.
 - Update user-facing documentation when public behavior changes.
 
-Changes affecting model fitting, calibration, power, numerical results, or other statistical behavior generally require more than unit tests. Describe the relevant simulation, benchmark, or reproducible analysis in the pull request.
+Changes affecting model fitting, calibration, power, numerical results, or other
+statistical behavior generally require more than unit tests. Describe the relevant
+simulation, benchmark, or reproducible analysis in the pull request.
+
+### Formatting R code
+
+Use Air 0.9.0 as the single R formatter. The repository's `air.toml` specifies
+four-space indentation and a preferred width of 80 characters. Format only the
+handwritten package source, then check it with the same command used by CI:
+
+```sh
+air format R
+air format --check R
+```
+
+Keep Air's default exclusions for generated bindings. Immutable fixtures and
+`tools/` (including reference code and retained results) are explicitly excluded;
+do not recursively format tests or reference/evidence directories.
+
+Air does not guarantee that every line is at most 80 characters. Wrap ordinary
+prose comments and documentation separately where useful, preserving code
+examples, fenced blocks, URLs, mathematical notation and executable strings.
+BiocCheck remains a separate Bioconductor checker; Air does not replace its
+checks or guarantee that every style note is resolved.
 
 ### Before submitting a pull request
 
@@ -55,4 +79,5 @@ that fall outside the project's scope or current roadmap.
 
 ## License
 
-Contributions accepted into the repository are distributed under the project's [GPL-3 license](LICENSE.md).
+Contributions accepted into the repository are distributed under the project's
+[GPL-3 license](LICENSE.md).

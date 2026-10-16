@@ -1,10 +1,12 @@
 #' Select source cells and record overlapping removal reasons
 #'
-#' Uses full-source cell covariates, validated quantile ranges, the mitochondrial
+#' Uses full-source cell covariates, validated quantile ranges, the
+#' mitochondrial
 #' threshold and one-based explicit removals. Quantile endpoints are inclusive;
 #' counts outside them and mitochondrial fractions above the threshold are
 #' removed, together with the already prepared zero/multiple-guide exclusions.
-#' @return Facade with increasing source-cell `cells_in_use` and removal metrics.
+#' @return Facade with increasing source-cell `cells_in_use` and removal
+#'   metrics.
 #'   Each reason counts its own supplied indices, so reasons can overlap and
 #'   need not sum to the unique removed total. Other slots are unchanged; run_qc
 #'   owns subsequent empty-view checks, cache invalidation and guide reindexing.
@@ -88,9 +90,12 @@ determine_cells_to_retain <- function(
 
 
 #' Reindex raw guide memberships after cell QC and retain the saved NT schema
-#' @param sceptre_object Facade with source-cell raw assignments and retained cells.
-#' @return Facade with QC assignments: unique analysis-order treatment/NT members,
-#'   empty NT guides removed, and NT-local groups for NT controls. Only that slot
+#' @param sceptre_object Facade with source-cell raw assignments and retained
+#'   cells.
+#' @return Facade with QC assignments: unique analysis-order treatment/NT
+#'   members,
+#'   empty NT guides removed, and NT-local groups for NT controls. Only that
+#'   slot
 #'   is replaced; caller retains the return. No fits, RNG or files are used.
 #' @noRd
 update_grna_assignments_given_qc <- function(sceptre_object) {

@@ -138,7 +138,9 @@ construct_cis_pairs <- function(
             max_posit <- max(x$end)
             # Integer genomic endpoints may sum beyond INT_MAX even though the
             # midpoint is representable. Widen before addition, then floor.
-            midpoint <- as.integer(floor((as.double(min_posit) + as.double(max_posit)) / 2))
+            midpoint <- as.integer(floor(
+                (as.double(min_posit) + as.double(max_posit)) / 2
+            ))
             paired_responses <- response_ids[compute_genes_within_distance(
                 midpoint,
                 response_posits,

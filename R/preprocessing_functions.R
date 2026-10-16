@@ -46,9 +46,11 @@ convert_covariate_df_to_design_matrix <- function(
 #' @param matrix_in Feature-by-cell R count matrix, converted to column access.
 #' @param feature_names Character response labels aligned with rows; an empty
 #'   vector disables mitochondrial summaries even when requested.
-#' @param compute_p_mito,compute_max_feature Logical flags for optional summaries.
+#' @param compute_p_mito,compute_max_feature Logical flags for optional
+#'   summaries.
 #' @return Data frame in column order with `n_nonzero` (values greater than 0.5)
-#'   and `n_umis`, plus requested mito/max-feature columns. Max-feature ties take
+#'   and `n_umis`, plus requested mito/max-feature columns. Max-feature ties
+#'   take
 #'   the first row; zero-total fractions retain native division results (NaN).
 #' @noRd
 compute_cell_covariates <- function(
@@ -75,7 +77,10 @@ compute_cell_covariates <- function(
     }
     # call the low-level function
     out <- storage_cell_covariates(
-        matrix_in, mt_gene_idxs, compute_p_mito, compute_max_feature
+        matrix_in,
+        mt_gene_idxs,
+        compute_p_mito,
+        compute_max_feature
     )
     ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
     if (compute_p_mito) {
@@ -93,16 +98,22 @@ compute_cell_covariates <- function(
 
 #' Generate the native permutation bank for one prepared analysis
 #'
-#' @param grna_assignments Post-QC named memberships in the saved analysis/NT-local
-#'   representation; empty targeting groups are ignored for NT-control size ranges.
+#' @param grna_assignments Post-QC named memberships in the saved
+#'   analysis/NT-local
+#'   representation; empty targeting groups are ignored for NT-control size
+#'   ranges.
 #' @param B Integer total draw budget, normally `B1 + B2 + B3`.
-#' @param calibration_check,control_group_complement Logical analysis/view flags.
-#' @param calibration_group_size Number of NT guides pooled per calibration group.
-#' @param n_cells Number of retained analysis cells, used for complement controls.
+#' @param calibration_check,control_group_complement Logical analysis/view
+#'   flags.
+#' @param calibration_group_size Number of NT guides pooled per calibration
+#'   group.
+#' @param n_cells Number of retained analysis cells, used for complement
+#'   controls.
 #' @return External pointer owning a native bank of zero-based indices. Its
 #'   interpretation is specific to the selected Fisher-Yates/hybrid fit view;
 #'   these are not source-cell IDs. Samplers use fixed native seeds without
-#'   consuming R random draws; the pointer must not be persisted in saved objects.
+#'   consuming R random draws; the pointer must not be persisted in saved
+#'   objects.
 #' @details Complement-control discovery draws in all retained cells with length
 #'   equal to the largest treatment group. Complement calibration instead bounds
 #'   that length by the sum of the largest pooled NT groups, capped at n_cells
@@ -110,7 +121,8 @@ compute_cell_covariates <- function(
 #'   calibration uses that pooled-size bound in the ordered NT fit universe.
 #'   NT-control discovery uses the hybrid sampler with N NT controls and the
 #'   smallest/largest nonempty treatment sizes m/M: for m <= k <= M, each size-k
-#'   prefix is valid in its N+k fit universe. Fixed-size consumers read only their treatment
+#'   prefix is valid in its N+k fit universe. Fixed-size consumers read only
+#'   their treatment
 #'   prefix, not every stored bank entry. Generate the full B bank once here;
 #'   stage selection must not redraw or reseed its segments.
 #' @noRd
@@ -125,10 +137,21 @@ get_synthetic_permutation_idxs <- function(
     check_native_scalar_count(B, "B")
     check_native_scalar_count(n_cells, "n_cells")
     if (calibration_check) {
-        check_native_scalar_count(calibration_group_size, "calibration_group_size", 1)
-        active_nt_count <- sum(lengths(grna_assignments$indiv_nt_grna_idxs) > 0L)
-        if (calibration_group_size > active_nt_count)
-            stop("`calibration_group_size` exceeds the active non-targeting gRNA count after QC (", active_nt_count, ").")
+        check_native_scalar_count(
+            calibration_group_size,
+            "calibration_group_size",
+            1
+        )
+        active_nt_count <- sum(
+            lengths(grna_assignments$indiv_nt_grna_idxs) > 0L
+        )
+        if (calibration_group_size > active_nt_count) {
+            stop(
+                "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+                active_nt_count,
+                ")."
+            )
+        }
     }
     if (calibration_check && !control_group_complement) {
         indiv_nt_sizes <- vapply(
@@ -149,7 +172,10 @@ get_synthetic_permutation_idxs <- function(
             sort(decreasing = TRUE)
         # Overlapping high-MOI memberships can sum beyond the cell count; any
         # union used by calibration is bounded by the number of cells.
-        M <- min(sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)])), n_cells)
+        M <- min(
+            sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)])),
+            n_cells
+        )
         out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
     } else if (!calibration_check && !control_group_complement) {
         grna_group_sizes <- vapply(
@@ -186,9 +212,11 @@ get_synthetic_permutation_idxs <- function(
 
 #' Add integration-specific group IDs to metadata and requested pair tables
 #'
-#' @param sceptre_object Parameterized object with guide/target metadata and pair
+#' @param sceptre_object Parameterized object with guide/target metadata and
+#'   pair
 #'   tables whose rows may repeat.
-#' @return Updated object. Union uses target IDs without expanding rows; singleton
+#' @return Updated object. Union uses target IDs without expanding rows;
+#'   singleton
 #'   and Bonferroni expand each pair through a many-to-many target/guide join.
 #'   Guide order follows metadata, repeated pair requests are retained, and NT
 #'   guides keep the reserved `non-targeting` group label.

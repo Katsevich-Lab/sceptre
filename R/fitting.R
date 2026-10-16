@@ -1,4 +1,5 @@
-# Current response fitting is Poisson glm.fit plus a clipped dispersion estimate.
+# Current response fitting is Poisson glm.fit plus a clipped dispersion
+# estimate.
 # It does not execute a second NB regression. Keep arithmetic/warnings here;
 # this module has no object, storage, scheduling, or cache responsibilities.
 #' Fit the existing response nuisance model on one aligned cell view
@@ -6,9 +7,11 @@
 #' @param expressions Numeric response vector of length n.
 #' @param covariate_matrix Numeric n-by-p design, ordered with `expressions`;
 #'   callers supply the validated design and select the fit-cell view.
-#' @return Compact list `fitted_coefs` (p coefficients in design-column order) and
+#' @return Compact list `fitted_coefs` (p coefficients in design-column order)
+#'   and
 #'   scalar `theta`, clipped to [0.01, 1000] using the existing arithmetic.
-#' @details Fits Poisson `glm.fit`, then estimates dispersion at its fitted means;
+#' @details Fits Poisson `glm.fit`, then estimates dispersion at its fitted
+#'   means;
 #'   no second negative-binomial regression is performed. Existing fit warnings
 #'   propagate and missing coefficients produce the existing covariate error.
 #'   Does not mutate inputs, cache results, access storage, or use RNG/files.

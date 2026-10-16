@@ -6,12 +6,15 @@
 #'
 #' @param Zt_wZ Numeric symmetric p-by-p design crossproduct.
 #' @param wZ Numeric n-by-p design multiplied rowwise by weights w, not sqrt(w).
-#' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the symmetric
+#' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the
+#'   symmetric
 #'   eigendecomposition. Rows are eigenbasis coordinates in `eigen()` order,
 #'   with row count equal to the design coefficient count; columns retain the
 #'   fit-cell order in `wZ`.
-#' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced; existing
-#'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are untouched.
+#' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced;
+#'   existing
+#'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are
+#'   untouched.
 #' @noRd
 compute_D_matrix <- function(Zt_wZ, wZ) {
     P_decomp <- eigen(Zt_wZ, symmetric = TRUE)

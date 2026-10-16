@@ -5,14 +5,25 @@
 #' @param analysis_type,proc_id Existing role and block ID used in its filename.
 #' @param parallel,print_progress Logical flags; either false returns NULL.
 #' @param log_dir Existing logging root, resolved by get_log_dir.
-#' @param initialize Whether to truncate/create the file; CRT guide phase appends.
+#' @param initialize Whether to truncate/create the file; CRT guide phase
+#'   appends.
 #' @return File path or NULL. May create directories and a file; no RNG changes.
 #' @noRd
-analysis_log_file <- function(analysis_type, proc_id, parallel, print_progress,
-                              log_dir, initialize = TRUE) {
-    if (!parallel || !print_progress) return(NULL)
+analysis_log_file <- function(
+    analysis_type,
+    proc_id,
+    parallel,
+    print_progress,
+    log_dir,
+    initialize = TRUE
+) {
+    if (!parallel || !print_progress) {
+        return(NULL)
+    }
     path <- paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
-    if (initialize) file.create(path) |> invisible()
+    if (initialize) {
+        file.create(path) |> invisible()
+    }
     path
 }
 
@@ -37,16 +48,21 @@ announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
 #' @param blocks Ordered list of inputs, already partitioned by the caller.
 #' @param worker Function accepting a block and NULL or one-based process ID.
 #' @param parallel Logical switch; fork count equals the number of blocks.
-#' @return Block results in input-block order. Retains mclapply defaults and caller
+#' @return Block results in input-block order. Retains mclapply defaults and
+#'   caller
 #'   worker effects; does not repartition or reseed work.
 #' @noRd
 execute_analysis_blocks <- function(blocks, worker, parallel) {
     if (!parallel) {
         lapply(blocks, function(block) worker(block, NULL))
     } else {
-        parallel::mclapply(seq_along(blocks), function(proc_id) {
-            worker(blocks[[proc_id]], proc_id)
-        }, mc.cores = length(blocks))
+        parallel::mclapply(
+            seq_along(blocks),
+            function(proc_id) {
+                worker(blocks[[proc_id]], proc_id)
+            },
+            mc.cores = length(blocks)
+        )
     }
 }
 
@@ -54,7 +70,9 @@ execute_analysis_blocks <- function(blocks, worker, parallel) {
 #' @param blocks Ordered list of compatible result tables.
 #' @return data.table using rbindlist(fill=TRUE), including its factor handling.
 #' @noRd
-bind_analysis_results <- function(blocks) data.table::rbindlist(blocks, fill = TRUE)
+bind_analysis_results <- function(blocks) {
+    data.table::rbindlist(blocks, fill = TRUE)
+}
 
 
 #' Report progress for one item in a worker block.
@@ -68,11 +86,28 @@ bind_analysis_results <- function(blocks) data.table::rbindlist(blocks, fill = T
 #' @return Invisible NULL. Emits at item 1 and multiples of five. Parallel write
 #'   retains its extra terminating newline; disabled reporting does no file I/O.
 #' @noRd
-report_worker_progress <- function(position, id, total, print_progress, parallel,
-                                   log_file, feature = "response",
-                                   prefix = "Analyzing pairs containing ") {
+report_worker_progress <- function(
+    position,
+    id,
+    total,
+    print_progress,
+    parallel,
+    log_file,
+    feature = "response",
+    prefix = "Analyzing pairs containing "
+) {
     if ((position == 1L || position %% 5L == 0L) && print_progress) {
-        msg <- paste0(prefix, feature, " ", id, " (", position, " of ", total, ")\n")
+        msg <- paste0(
+            prefix,
+            feature,
+            " ",
+            id,
+            " (",
+            position,
+            " of ",
+            total,
+            ")\n"
+        )
         if (parallel) {
             write(x = msg, file = log_file, append = TRUE)
         } else {
@@ -85,10 +120,13 @@ report_worker_progress <- function(position, id, total, print_progress, parallel
 #' Run periodic worker maintenance independently of progress reporting.
 #'
 #' @param position One-based block-local position.
-#' @return Invisible NULL. Calls GC at multiples of 200, after progress and before
+#' @return Invisible NULL. Calls GC at multiples of 200, after progress and
+#'   before
 #'   the caller reads or fits the current item. Does not change RNG state.
 #' @noRd
 collect_worker_garbage <- function(position) {
-    if (position %% 200L == 0L) gc() |> invisible()
+    if (position %% 200L == 0L) {
+        gc() |> invisible()
+    }
     invisible(NULL)
 }
