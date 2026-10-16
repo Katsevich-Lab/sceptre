@@ -1,0 +1,443 @@
+{
+  "target_commit": "4430c55a3f05780f7ac6ec3bd380b1ecc198abe2",
+  "readback_head": "750b1b5da81de3fb3189f2ca95368c4beaa9c618",
+  "scope": "32 retained handwritten R files from the original 34; generated bindings separately excluded; precomputation_functions.R and test_functs.R retired",
+  "method": "Source/caller audit, current text readback and byte comparisons to prior independently reviewed unit checkpoints. No R execution/build/test. Hashes identify bytes; matching an anchor does not itself prove correctness.",
+  "files": [
+    {
+      "file": "R/analysis.R",
+      "target_sha256": "05de77ba0b217b64d755a10f8eceee60bc472f029dbb1b0ea4e1e0a0a93b2497",
+      "reviewed_working_sha256": "05de77ba0b217b64d755a10f8eceee60bc472f029dbb1b0ea4e1e0a0a93b2497",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/analysis_context.R",
+      "target_sha256": "c24034bbc966a1bdd7f49df99dee4f58973279a0e324e7baeee2a839f1a456b7",
+      "reviewed_working_sha256": "c24034bbc966a1bdd7f49df99dee4f58973279a0e324e7baeee2a839f1a456b7",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/assign_grna_functions.R",
+      "target_sha256": "d9ce47de1d9ba371ef366deda9c26744d6616d220273b3e19c0f32c688a5f48c",
+      "reviewed_working_sha256": "d9ce47de1d9ba371ef366deda9c26744d6616d220273b3e19c0f32c688a5f48c",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/association_execution.R",
+      "target_sha256": "8915709e29869860bae5b6562b965318063a33c1dfdf161369d62e07ca022451",
+      "reviewed_working_sha256": "8915709e29869860bae5b6562b965318063a33c1dfdf161369d62e07ca022451",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/association_workers.R",
+      "target_sha256": "dc9f8e5722463734e717c49dfa91af8035deb93aaeb179e2bb970c336dcdc58b",
+      "reviewed_working_sha256": "dc9f8e5722463734e717c49dfa91af8035deb93aaeb179e2bb970c336dcdc58b",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/aux_functions.R",
+      "target_sha256": "e19d9dbc78f091f0e71347aae299c9a0228e8f6526210a01c5bb744abc653dc6",
+      "reviewed_working_sha256": "e19d9dbc78f091f0e71347aae299c9a0228e8f6526210a01c5bb744abc653dc6",
+      "matches_prior_review_checkpoint": [
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/cellwise_qc_functs.R",
+      "target_sha256": "a650fa3cbc82610d774c730f15565c7ce0a774316b47791818db2452a0b422db",
+      "reviewed_working_sha256": "97f7dd7c715f54472c5eccfe1e7b7d3883aea68bb6c5cd2c4cf6fbbb827862ff",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/check_functions.R",
+      "target_sha256": "3b021705dcf19128b263e871fe65ee75bd45ed0a8630b238b859367560731f34",
+      "reviewed_working_sha256": "3b021705dcf19128b263e871fe65ee75bd45ed0a8630b238b859367560731f34",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/data.R",
+      "target_sha256": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+      "reviewed_working_sha256": "8a35c3f2206b3424701158e5bb6315d125d10cc5535820406c6c4d69432cc4a6",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "226a5b4",
+        "2f40f4f",
+        "09a704c",
+        "da6a079",
+        "abf7245",
+        "5ac0fca",
+        "c7d6250"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/execution.R",
+      "target_sha256": "679d96e3f20e8be9178cdc4de1e3de3dd7503d941a49db8687c93fe4c4981235",
+      "reviewed_working_sha256": "679d96e3f20e8be9178cdc4de1e3de3dd7503d941a49db8687c93fe4c4981235",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/fit_cache.R",
+      "target_sha256": "9decdf97b39ec9da539bf806cd4064ff033c60e0109254064cf0cb6173ce22a1",
+      "reviewed_working_sha256": "9decdf97b39ec9da539bf806cd4064ff033c60e0109254064cf0cb6173ce22a1",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/fitting.R",
+      "target_sha256": "0b6935e9439ff9e32f4699ad1968c0fdd8180d7c87f955b255b226fe77208993",
+      "reviewed_working_sha256": "0b6935e9439ff9e32f4699ad1968c0fdd8180d7c87f955b255b226fe77208993",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/getters_and_setters.R",
+      "target_sha256": "bbbbbe812200e74218149c7b21f9ddf21bbfe915d371cde5458c3f04cb153e26",
+      "reviewed_working_sha256": "26647c51ce4c9b855c08e9d3bd01f5308239a384555ef26a3134259c1aa59f41",
+      "matches_prior_review_checkpoint": [
+        "09a704c"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/import_functs.R",
+      "target_sha256": "bf9e43c4eb3a0cff6eda120101d071298554c5ba29e359121511890307c2e890",
+      "reviewed_working_sha256": "b2fa50e9c82205457ac13d65fd7b528fef47739775706e80416d22db609054c7",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/mixture_model_functs.R",
+      "target_sha256": "d3d05730b8912169063dcfb0ffea94056ab188fd276b355470537b5ec5605ff8",
+      "reviewed_working_sha256": "d3d05730b8912169063dcfb0ffea94056ab188fd276b355470537b5ec5605ff8",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/neg_control_functions.R",
+      "target_sha256": "f4fe402cc769cb8d823cf31f18a1b86c2c2a57f664a78aa20c19fce8cb6717dd",
+      "reviewed_working_sha256": "f4fe402cc769cb8d823cf31f18a1b86c2c2a57f664a78aa20c19fce8cb6717dd",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/ondisc_functs.R",
+      "target_sha256": "5c6579aac2477259e2209cc0da68ccce839971abab96df08015f83decc19704d",
+      "reviewed_working_sha256": "5c6579aac2477259e2209cc0da68ccce839971abab96df08015f83decc19704d",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/pair_constructor_functs.R",
+      "target_sha256": "95135d4871d73b90e53bba1f1f06cb3ae4210ddadc17155c2198ef7c685b7971",
+      "reviewed_working_sha256": "95135d4871d73b90e53bba1f1f06cb3ae4210ddadc17155c2198ef7c685b7971",
+      "matches_prior_review_checkpoint": [
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/pair_qc.R",
+      "target_sha256": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+      "reviewed_working_sha256": "dc77c0f53390416e4ba3c881167fc73485bc578f64871ac5b7a7142467629be0",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "226a5b4",
+        "2f40f4f",
+        "09a704c",
+        "da6a079",
+        "abf7245",
+        "5ac0fca",
+        "c7d6250"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/pairwise_qc_functs.R",
+      "target_sha256": "27f9ecb236ef0b56dbd2ebc880bc847201bd31b3d15fa1d91ad6eb516cc4a5e8",
+      "reviewed_working_sha256": "27f9ecb236ef0b56dbd2ebc880bc847201bd31b3d15fa1d91ad6eb516cc4a5e8",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/plotting_functions.R",
+      "target_sha256": "66b1547678d785da9d14ed2fd784ac8d5ed42bb88059a73742bb65c8de98bcfa",
+      "reviewed_working_sha256": "66b1547678d785da9d14ed2fd784ac8d5ed42bb88059a73742bb65c8de98bcfa",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/preprocessing_functions.R",
+      "target_sha256": "3a225440729bfe1fbee9ece14e88bd7a8c4fe6e38de873a786aae369da425792",
+      "reviewed_working_sha256": "0658ba6fa9737ade671633bef93cda547e6b693dec6ed69845b6d0ae0806eca1",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/qq_plot_helpers.R",
+      "target_sha256": "348fc17cde0864bea749054fa755324d7f1b24dd746395cd6eb8c6b19ec7d568",
+      "reviewed_working_sha256": "348fc17cde0864bea749054fa755324d7f1b24dd746395cd6eb8c6b19ec7d568",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/result_processing.R",
+      "target_sha256": "95616bcf1db514ada70fb504cdea1e1abc981e13f0071511d15ddd396ae40e4f",
+      "reviewed_working_sha256": "5d94e22022669ba12af53b7dd221d05c3149ca367b857625f1807e8072b21185",
+      "matches_prior_review_checkpoint": [
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/s4_analysis_functs_1.R",
+      "target_sha256": "52df97f69fe6f5a9b9876ac4bbccb92fab7c03df88b1ad31d8d8ce1c73b8d3d1",
+      "reviewed_working_sha256": "52df97f69fe6f5a9b9876ac4bbccb92fab7c03df88b1ad31d8d8ce1c73b8d3d1",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/s4_analysis_functs_2.R",
+      "target_sha256": "1e11d0b35e75928d12b7790c65df01c46d317afd24a9d771d2d213c39b9b626a",
+      "reviewed_working_sha256": "026e88e022d7a93e09ddb34d813524d121cdeafab3851d2bc86f45f120c55868",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": true
+    },
+    {
+      "file": "R/s4_class.R",
+      "target_sha256": "3f66cd9c563e6e51ef1b0e838831b404bc52f08545494f48b11ea026f6539998",
+      "reviewed_working_sha256": "3f66cd9c563e6e51ef1b0e838831b404bc52f08545494f48b11ea026f6539998",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/s4_helpers.R",
+      "target_sha256": "29a31262d8cae42b7dc48fd29d42897c58ba23a9a098be1c8db40a07a5d5d770",
+      "reviewed_working_sha256": "29a31262d8cae42b7dc48fd29d42897c58ba23a9a098be1c8db40a07a5d5d770",
+      "matches_prior_review_checkpoint": [
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/sceptre.R",
+      "target_sha256": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+      "reviewed_working_sha256": "a38a62c6bef1af6a1b52ea60edabcde900eb71de6e23b1cbca4f25a941a62ecf",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "226a5b4",
+        "2f40f4f",
+        "09a704c",
+        "da6a079",
+        "abf7245",
+        "5ac0fca",
+        "c7d6250"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/score_preparation.R",
+      "target_sha256": "9d7d9088c452bb7a28e71290184916aec990734464fe3d905c3d8a1c08b64bb1",
+      "reviewed_working_sha256": "9d7d9088c452bb7a28e71290184916aec990734464fe3d905c3d8a1c08b64bb1",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "2f40f4f",
+        "09a704c",
+        "abf7245"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/storage.R",
+      "target_sha256": "3755dea9c81629b0140b03230a09d6359e57169ea02580ce4f19c1da9b4df06e",
+      "reviewed_working_sha256": "3755dea9c81629b0140b03230a09d6359e57169ea02580ce4f19c1da9b4df06e",
+      "matches_prior_review_checkpoint": [
+        "da6a079"
+      ],
+      "working_text_changed_from_target": false
+    },
+    {
+      "file": "R/workflow_state.R",
+      "target_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "reviewed_working_sha256": "8f3d2e01033ea89e7f46a8faec76f3f902fe374b956e5955050584cd897443ca",
+      "matches_prior_review_checkpoint": [
+        "5c39e2b",
+        "627e7e4",
+        "cacf390",
+        "7df5ad1",
+        "226a5b4",
+        "2f40f4f",
+        "09a704c",
+        "da6a079",
+        "abf7245",
+        "5ac0fca",
+        "c7d6250"
+      ],
+      "working_text_changed_from_target": false
+    }
+  ],
+  "architecture_reviewed_working_sha256": "1e82cbe207eefdc43118dd3bef399fc97de34cae1b76fe13cc03cc12a7d71d0f",
+  "documentation_closure_commit": "750b1b5da81de3fb3189f2ca95368c4beaa9c618",
+  "native_owning_comments": {
+    "src/compute_nb_size_param_functions.cpp": "69eb74805365148f5a57c8ae1a1801732c4e6a6c6d3ae71ee0d1c21ea1c70628",
+    "src/mixture_functs.cpp": "216af4e9cb91f3aaba547df81661b61aad4351c2281c191607eea87720c635dc"
+  }
+}

@@ -71,11 +71,21 @@ persisted. Setters clear incompatible fits when assignments, analysis cells,
 actual designs or control views change. The open guide-cache feature in PR 233
 is deferred.
 
+The saved `covariate_matrix` remains in full source-cell order. The transient
+context selects its common design once, and guide-specific NT fits select their
+own aligned rows from that view. Cache identity checks the actual source design
+and fit-cell scope; changing a fitted response's name alone cannot establish
+that an old coefficient/dispersion record is reusable.
+
 The private ondisc route is deliberate: backing pointers, identity-preserving
 construction, reattachment and private kernels are confined to `storage.R`.
 In-memory workflows do not need ondisc. Import-format parsers and construction
 of the exported assignment matrix retain their format/output-specific sparse
 construction code. Existing HDF5 and sparse native scans remain separate.
+Response access materializes one complete source row before selecting a cell
+view. Regular QC can request a fused NT summary; nuclear/pod QC omits that
+all-response summary and counts its requested response block. These are concrete
+I/O and allocation boundaries, not promises of arbitrary out-of-core scalability.
 
 ## Where to make a later change
 
@@ -91,8 +101,8 @@ construction code. Existing HDF5 and sparse native scans remain separate.
   calibration sampler call it. A replacement requiring side, family or new
   measurements must define those inputs and calibration behavior together.
   Do not change only the discovery filter or replace the candidate stream.
-- **Inference method:** current score/effect arrays and the original design are
-  available in the workers. Implement the selected runner there and reuse raw
+- **Inference method:** aligned response/treatment inputs, design and current
+  score/effect arrays are available in the workers. Implement the selected runner there and reuse raw
   result conversion/finalization where justified. SPA or Wilcoxon need not
   generate this method's `D` or draw bank. This guide does not select their
   statistical definitions or add empty extension hooks.
@@ -106,8 +116,10 @@ construction code. Existing HDF5 and sparse native scans remain separate.
 SCEPTRE's sparse count kernels convert coordinates once into native-owned
 scratch and leave R inputs unchanged. External ondisc kernels that decrement
 indices receive disposable copies at the storage boundary. Current counters
-count stored sparse positions, including explicit zeros;
-ondisc construction coerces fractional values to integers. Those legacy rules
+count stored sparse positions, including explicit zeros. Storage conversion of
+logical sparse input gives every stored entry the legacy value one, including
+stored FALSE; vector-count aggregation instead follows Matrix's logical values.
+Ondisc construction coerces fractional values to integers. Those legacy rules
 are characterized rather than silently normalized.
 
 ## Results and component compatibility
@@ -129,6 +141,27 @@ banks or reconstruct missing context. No parallel obsolete algorithm is kept.
 The pinned pipeline's scripts, file schemas and known limitations are listed in
 [the consumer inventory](tools/refactor/consumer-inventory.json) and tested by
 [the consumer harness](tools/refactor/CONSUMER_COVERAGE.md).
+
+## Trace one association
+
+Start with `run_discovery_analysis()` in `s4_analysis_functs_2.R`. It owns workflow
+checks and successful facade/cache writeback; `analyze_association_pairs()` builds
+the transient context, filters the eligible family and dispatches its plan.
+`run_permutation_analysis()` visits responses, whereas `run_crt_analysis()` first
+prepares response fits and then visits guides. The four functions in
+`association_workers.R` express shared versus guide-specific fits explicitly.
+They use storage reads and aligned fit/score inputs, then call the Rcpp boundary
+in `low_level_full_test.cpp`; score/effect arithmetic and selected tail segments
+belong to the inference components, not the facade. Result assembly restores
+failed-QC requests before complete-family guide integration/correction, or
+retains raw output for the pipeline collector.
+
+For a small numerical trace, the observed/synthetic-coordinate test in
+`tests/testthat/test-refactor-indexing.R` independently specifies cell membership,
+builds score components and checks the same native entry point. Its supplied
+draws separate the one-based observed boundary from zero-based synthetic
+positions without relying on a sampler. Full frozen native cases and the
+original-source sampler oracle cover stage selection and actual draw streams.
 
 ## Verification for contributors
 
