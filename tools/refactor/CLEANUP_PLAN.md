@@ -6,6 +6,11 @@ this status/review record update changes no target decisions. Source inspected: 
 October 16, 2026. This addendum supplements REFACTOR_SPEC.md; it does not
 declare the current source pristine or the refactor complete.
 
+Subsequent explicit user choices are recorded in
+[decisions.md](cleanup/decisions.md); implementation ownership/dependencies in
+[WORK_ALLOCATION.md](cleanup/WORK_ALLOCATION.md). These records do not replace
+the hash-pinned plan review.
+
 ## 1. Scope and safe checkpoints
 
 Eugene requires systematic understanding and a reviewed plan before further
