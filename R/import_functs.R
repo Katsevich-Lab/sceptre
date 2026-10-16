@@ -1128,8 +1128,9 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 #'   and their vector groups by `vector_id`.
 #' @return Dense numeric vector-by-cell matrix in first-seen vector order and
 #'   original cell order. Metadata repetitions contribute repeated row selections.
-#'   Sparse row preparation and per-vector sums retain Matrix's numeric/logical
-#'   duplicate semantics. Vector-by-cell assembly/output and its existing transpose
+#'   Sparse row preparation retains Matrix's numeric/logical duplicate semantics.
+#'   Sums use bounded dense column blocks to preserve the original platform's
+#'   dense accumulation. Vector-by-cell assembly/output and its existing transpose
 #'   workspace are dense; the full sparse input is not. Inputs remain unchanged;
 #'   there are no RNG or file effects.
 #' @noRd
@@ -1151,10 +1152,40 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
             curr_grna_ids <- grna_target_data_frame |>
                 dplyr::filter(vector_id == curr_vector_id) |>
                 dplyr::pull(grna_id)
-            Matrix::colSums(grna_matrix[curr_grna_ids, , drop = FALSE])
+            selected <- grna_matrix[curr_grna_ids, , drop = FALSE]
+            if (methods::is(selected, "sparseMatrix")) {
+                sum_sparse_vector_rows(selected)
+            } else {
+                Matrix::colSums(selected)
+            }
         },
         FUN.VALUE = numeric(n_cells)
     ) |>
         t()
     return(grna_matrix_collapsed)
+}
+
+#' Sum a selected sparse guide group with the original dense accumulator
+#'
+#' @param counts Sparse matrix whose rows already include metadata repetitions
+#'   in their original order; columns retain source-cell order.
+#' @return Named numeric column sums. Each temporary dense block targets at most
+#'   2^20 elements (8 MiB for doubles); one complete column is the minimum, so a
+#'   larger guide group can exceed that target. Output storage is additional.
+#' @noRd
+sum_sparse_vector_rows <- function(counts) {
+    n_cells <- ncol(counts)
+    sums <- numeric(n_cells)
+    names(sums) <- colnames(counts)
+    if (n_cells == 0L) return(sums)
+
+    # Linux dense colSums can accumulate in extended precision while Matrix's
+    # sparse method uses doubles. Keep every selected row in a single sum; adding
+    # partial row sums would change rounding. Column blocks only bound workspace.
+    block_width <- max(1, floor(2^20 / max(1L, nrow(counts))))
+    for (first in seq.int(1, n_cells, by = block_width)) {
+        columns <- seq.int(first, min(n_cells, first + block_width - 1))
+        sums[columns] <- Matrix::colSums(as.matrix(counts[, columns, drop = FALSE]))
+    }
+    return(sums)
 }

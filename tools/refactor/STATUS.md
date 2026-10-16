@@ -94,17 +94,19 @@ coordinates/zeros/IDs, map actual modality rows and reject repeated coordinates
 per Eugene's choice. Installed-source qualification is pending; sparse sorting
 workspace is unmeasured. The externally delegated ondisc file parser is unchanged
 and unqualified for this policy. See the explicit boundary in decisions.md.
-B6 characterization
-has 28 exact helper and 200 exact rounding matches, plus public import probes.
-The sparse-input candidate 88ed37c passed all 228 installed comparisons and 134
-focused checks. Its complete 80-child experiment passed four exact output/RSS
-pairs and three meaningful timing gates; actual Papalexi timing remains
-explicitly inconclusive below one second. Primary 20-call medians were
-20.912 versus 12.353 seconds, and max measured single-process RSS was
-1,374.14 versus 613.61 MiB. The reviewed unit is integrated as 06fb0ea/52265b8;
-[full retained evidence](results/vector-aggregation-88ed37c/README.md) does not
-replace final combined qualification. Dense output/transpose workspace,
-metadata multiplicity and backed capability are unchanged.
+B6's initial Mac-only characterization and 80-child resource experiment at
+88ed37c remain preserved in [the original evidence](results/vector-aggregation-88ed37c/README.md).
+Hosted Linux CI exposed a real compatibility defect: dense column sums use an
+extended accumulator there while the replacement sparse sum uses doubles.
+Those initial results therefore do not establish cross-platform acceptance.
+The repair keeps sparse row preparation but sums complete selected rows in
+bounded dense column blocks, preserving the current platform's original
+accumulator. Tests now execute the frozen original on the same platform,
+including all 28 immutable fixtures and 200 seeded duplicate/rounding cases.
+Fresh installed, hosted and resource qualification of the repair is required;
+see [the superseding amendment](cleanup/aggregation-precision-amendment.md).
+Dense output/transpose workspace, metadata multiplicity and backed capability
+are unchanged.
 Dispersion taxonomy has 107 exact
 original-state comparisons. The two-type narrowing at `ef0c77b` passed 107
 actual-source numerical comparisons and 14 paired controlled MLE/MM failure

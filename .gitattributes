@@ -6,3 +6,7 @@ tests/testthat/helper-refactor.R text eol=lf
 tools/refactor/results/** -text
 # Preserve raw console output rather than trimming its recorded bytes.
 tools/refactor/results/**/*.log -whitespace
+
+# Additional aggregation inputs/reference are separate from the RF0 goldens.
+tests/testthat/fixtures/aggregation-original-21f9ea0.R -text
+tests/testthat/fixtures/aggregation-inputs-6a43fa5.rds -text

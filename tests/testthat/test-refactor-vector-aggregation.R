@@ -42,16 +42,68 @@ test_that("vector aggregation preserves dense output and both duplicate meanings
     }
 })
 
-test_that("vector sums retain current large-count and fractional rounding behavior", {
+# Run the frozen original in this R/Matrix environment: dense accumulation uses
+# extended precision on some platforms. Recorded Mac sums are not a Linux oracle.
+aggregation_original <- local({
+    path <- testthat::test_path("fixtures", "aggregation-original-21f9ea0.R")
+    stopifnot(identical(digest::digest(file = path, algo = "sha256"),
+        "9cb66ee837ae924268adc953ef8ac753d35a654f410d7aa3194af5f7d03ef6d9"))
+    environment <- new.env(parent = baseenv())
+    sys.source(path, envir = environment)
+    environment$collapse_grna_matrix
+})
+
+test_that("vector sums preserve this platform's original dense rounding", {
     counts <- matrix(c(2^53, 1, 1, 0, .1, .2, .3, 0), 4L,
                      dimnames = list(paste0("g", 1:4), c("large", "fractional")))
     metadata <- data.frame(grna_id = paste0("g", 1:3), vector_id = "v", grna_target = "t")
-    # Verified original Matrix::colSums double accumulation: unit increments at
-    # 2^53 are lost, and .1+.2+.3 rounds above .6. Do not silently compensate it.
-    expected <- matrix(c(2^53, .1 + .2 + .3), 1L, dimnames = list("v", colnames(counts)))
     for (input in list(counts, methods::as(Matrix::Matrix(counts, sparse = TRUE), "RsparseMatrix"),
                       methods::as(Matrix::Matrix(counts, sparse = TRUE), "TsparseMatrix"))) {
-        expect_identical(refactor_private("collapse_grna_matrix")(input, metadata), expected)
+        expect_identical(refactor_private("collapse_grna_matrix")(input, metadata),
+                         aggregation_original(input, metadata))
+    }
+})
+
+test_that("column blocks keep every selected row in the original sum", {
+    # 1025 x1025 crosses the 2^20-element target and leaves a final short block.
+    n <- 1025L
+    counts <- Matrix::sparseMatrix(i = rep(1:3, n), j = rep(seq_len(n), each = 3L),
+        x = rep(c(2^53, 1, 1), n), dims = c(n, n),
+        dimnames = list(paste0("g", seq_len(n)), paste0("c", seq_len(n))))
+    metadata <- data.frame(grna_id = rownames(counts), vector_id = "v", grna_target = "t")
+    before <- serialize(counts, NULL)
+    expect_identical(refactor_private("collapse_grna_matrix")(counts, metadata),
+                     aggregation_original(counts, metadata))
+    expect_identical(serialize(counts, NULL), before)
+    for (columns in list(integer(), 1L)) {
+        input <- counts[, columns, drop = FALSE]
+        expect_identical(refactor_private("collapse_grna_matrix")(input, metadata),
+                         aggregation_original(input, metadata))
+    }
+})
+
+test_that("vector aggregation replays immutable and seeded duplicate fixtures exactly", {
+    path <- testthat::test_path("fixtures", "aggregation-inputs-6a43fa5.rds")
+    stopifnot(identical(digest::digest(file = path, algo = "sha256"),
+        "f53c93eabbb30a53d5fed01788ee8ef0ef4447b94ed308540410e21baa624e2d"))
+    fixtures <- readRDS(path)
+    expect_length(fixtures, 28L)
+    withr::with_seed(94201L, {
+        for (k in seq_len(200L)) {
+            counts <- methods::new("dgTMatrix", i = sample.int(4L, 30L, TRUE) - 1L,
+                j = sample.int(3L, 30L, TRUE) - 1L,
+                x = sample(c(0, .1, .2, .3, 1, 2, 2^53, 1e-20), 30L, TRUE),
+                Dim = c(4L, 3L), Dimnames = list(paste0("g", 1:4), c("z", "a", "m")))
+            metadata <- data.frame(grna_id = paste0("g", sample.int(4L, 8L, TRUE)),
+                grna_target = "t", vector_id = sample(c("vZ", "vA"), 8L, TRUE))
+            fixtures[[paste0("rounding-", k)]] <- list(m = counts, d = metadata)
+        }
+    })
+    for (fixture in fixtures) {
+        before <- serialize(fixture, NULL)
+        expect_identical(refactor_private("collapse_grna_matrix")(fixture$m, fixture$d),
+                         aggregation_original(fixture$m, fixture$d))
+        expect_identical(serialize(fixture, NULL), before)
     }
 })
 
