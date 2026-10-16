@@ -843,15 +843,7 @@ init_sceptre_object <- function(
     sceptre_object@nf_pipeline <- FALSE
     sceptre_object@nuclear <- FALSE
     sceptre_object@last_function_called <- "import_data"
-    sceptre_object@functs_called <- c(
-        import_data = TRUE,
-        set_analysis_parameters = FALSE,
-        assign_grnas = FALSE,
-        run_qc = FALSE,
-        run_calibration_check = FALSE,
-        run_power_check = FALSE,
-        run_discovery_analysis = FALSE
-    )
+    sceptre_object@functs_called <- workflow_initial_state()
     return(sceptre_object)
 }
 
