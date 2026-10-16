@@ -32,7 +32,8 @@ report <- list(schema_version = 1L, observed_at = format(Sys.time(), tz = "UTC",
     outstanding_gates = c("Full Nextflow/nf-test execution", "Historical container execution"),
     limitations = c("Only the backed high-MOI permutation fixture is exercised here.",
         "Nuclear threshold CLI values are built but not passed by the pinned script.",
-        "The pinned nuclear writer writes Parquet even when use_parquet=FALSE; this harness uses TRUE."))
+        "The pinned nuclear writer writes Parquet even when use_parquet=FALSE; this harness uses TRUE.",
+        "The zero-passing nuclear branch preserves baseline logical NA p-value/effect columns."))
 report$dependencies <- stats::setNames(lapply(c("ondisc", "arrow", "Matrix", "data.table", "dplyr", "ggplot2"), function(package) {
     if (!requireNamespace(package, quietly = TRUE)) return(list(available = FALSE))
     list(available = TRUE, version = as.character(packageVersion(package)),
@@ -159,7 +160,7 @@ main <- function() {
                         comparison$stages[[label]][[name]] <<- plain(value)
                         report$stages[[label]]$result_summary[[name]] <<- table_summary(value)
                     } else if (isS4(value) && is(value, "sceptre_object")) {
-                        slots <- c("functs_called", "last_function_called", "response_precomputations", "calibration_result", "power_result", "discovery_result")
+                        slots <- c("functs_called", "last_function_called", "response_precomputations", "calibration_result", "power_result", "discovery_result", "nuclear", "nf_pipeline", "n_discovery_pairs", "grna_assignment_method", "initial_grna_assignment_list", "grna_assignments_raw", "grna_assignments", "cells_in_use", "M_matrix", "discovery_pairs")
                         comparison$stages[[label]][[name]] <<- stats::setNames(lapply(slots, function(n) plain(methods::slot(value, n))), slots)
                     } else comparison$stages[[label]][[name]] <<- plain(value)
                 } else if (grepl("[.]parquet$", name)) {
@@ -168,7 +169,8 @@ main <- function() {
                     report$stages[[label]]$result_summary[[name]] <<- table_summary(value)
                     shard_checks <- list(no_significant = !"significant" %in% names(value),
                         result_columns = all(c("response_id", "grna_target", "p_value", "log_2_fold_change") %in% names(value)),
-                        p_values = is.numeric(value$p_value) && all(is.na(value$p_value) | (value$p_value >= 0 & value$p_value <= 1)))
+                        p_values = (is.numeric(value$p_value) || (is.logical(value$p_value) && all(is.na(value$p_value)))) &&
+                            all(is.na(value$p_value) | (value$p_value >= 0 & value$p_value <= 1)))
                     report$stages[[label]]$contract_checks <<- shard_checks
                     if (!all(unlist(shard_checks))) {
                         report$stages[[label]]$status <<- "failed"
@@ -229,6 +231,77 @@ main <- function() {
         report$input_preparation[[name]] <<- list(evidence = "executed", warnings = warnings)
         value
     }
+    # Exercise the original upstream CLI consumers, rather than replacing them
+    # with helper calls. Helpers only create the unassigned backed input object.
+    upstream <- function(name, selected_case, maximum = FALSE) {
+        root <- file.path(output_dir, paste0(name, "-inputs"))
+        dir.create(root)
+        set.seed(271828)
+        object <- refactor_import(inputs, selected_case, backed = TRUE, directory = root)
+        object <- sceptre::set_analysis_parameters(object,
+            discovery_pairs = inputs$discovery_pairs, positive_control_pairs = inputs$positive_control_pairs,
+            formula_object = stats::as.formula("~ batch + z", env = baseenv()),
+            side = selected_case$side, grna_integration_strategy = selected_case$integration,
+            control_group = selected_case$control, resampling_mechanism = selected_case$mechanism,
+            resampling_approximation = selected_case$approximation)
+        sceptre::write_ondisc_backed_sceptre_object(object, root)
+        backing <- file.path(root, c("response.odm", "grna.odm"))
+        parameters <- run_stage(paste0(name, "-parameters"), "set_analysis_parameters.R",
+            c(file.path(root, "sceptre_object.rds"), backing, rep("default", 7L), rep("null.rds", 3L), "FALSE"),
+            c("sceptre_object.rds", "analysis_summary.txt"), setup = function(directory) saveRDS(NULL, file.path(directory, "null.rds")),
+            validate = function(directory) {
+                value <- readRDS(file.path(directory, "sceptre_object.rds"))
+                list(normal_mode = identical(value@nuclear, FALSE), pairs_retained = identical(value@discovery_pairs, object@discovery_pairs))
+            })
+        if (is.null(parameters)) return(NULL)
+        metadata <- file.path(parameters, "sceptre_object.rds")
+        plan <- run_stage(paste0(name, "-guide-plan"), "output_grna_info.R", c(metadata, backing, "2", "FALSE"),
+            c("grna_pods.txt", "grna_to_pod_map.rds", "low_moi.txt"), validate = function(directory) {
+                map <- readRDS(file.path(directory, "grna_to_pod_map.rds"))
+                list(unique_guides = !anyDuplicated(map$grna_id), known_guides = all(map$grna_id %in% inputs$grna_target_data_frame$grna_id),
+                    matching_pods = identical(scan(file.path(directory, "grna_pods.txt"), quiet = TRUE), as.numeric(unique(map$pod_id))))
+            })
+        if (is.null(plan)) return(NULL)
+        formula <- file.path(parameters, "null.rds")
+        map_path <- file.path(plan, "grna_to_pod_map.rds")
+        map <- readRDS(map_path)
+        workers <- if (maximum) list() else lapply(sort(unique(map$pod_id)), function(pod) {
+            run_stage(paste0(name, "-assignment-pod-", pod), "assign_grnas.R",
+                c(metadata, backing, map_path, as.character(pod), "thresholding", "40", rep("default", 4L), formula),
+                c("grna_assignments.rds", "grna_assignment_formula.rds"))
+        })
+        if (any(vapply(workers, is.null, logical(1L)))) return(NULL)
+        files <- if (maximum) "dummy.rds" else paste0("grna_assignments_", seq_along(workers), ".rds")
+        gathered <- run_stage(paste0(name, "-assignment-gather"), "process_grna_assignments.R",
+            c(metadata, backing, if (maximum) "maximum" else "thresholding", "default", "default", formula, files),
+            c("sceptre_object.rds", "grna_assignment_matrix.rds", "plot_grna_count_distributions.png", "plot_assign_grnas.png", "analysis_summary.txt"),
+            setup = function(directory) {
+                if (maximum) saveRDS(NULL, file.path(directory, "dummy.rds"))
+                else for (i in seq_along(workers)) stopifnot(file.copy(file.path(workers[[i]], "grna_assignments.rds"), file.path(directory, files[i])))
+            }, validate = function(directory) {
+                value <- readRDS(file.path(directory, "sceptre_object.rds"))
+                list(assignment_completed = isTRUE(value@functs_called[["assign_grnas"]]),
+                    method_preserved = identical(value@grna_assignment_method, if (maximum) "maximum" else "thresholding"),
+                    assignment_dimensions = identical(dim(readRDS(file.path(directory, "grna_assignment_matrix.rds"))), dim(inputs$high_grna_matrix)))
+            })
+        if (!is.null(gathered)) run_stage(paste0(name, "-qc"), "run_qc.R",
+            c(file.path(gathered, "sceptre_object.rds"), backing, "7", "7", "0", "1", "0", "1", "default"),
+            c("sceptre_object.rds", "plot_covariates.png", "plot_run_qc.png", "analysis_summary.txt"))
+        # The trans sentinel and its normal parameter path are distinct consumers.
+        run_stage(paste0(name, "-trans-parameters"), "set_analysis_parameters.R",
+            c(file.path(root, "sceptre_object.rds"), backing, rep("default", 7L), "null.rds", "trans.rds", "null.rds", "FALSE"),
+            c("sceptre_object.rds", "analysis_summary.txt"), setup = function(directory) {
+                saveRDS(NULL, file.path(directory, "null.rds")); saveRDS("trans", file.path(directory, "trans.rds"))
+            }, validate = function(directory) {
+                value <- readRDS(file.path(directory, "sceptre_object.rds"))
+                list(nuclear = isTRUE(value@nuclear), unadjusted = identical(value@multiple_testing_method, "none"),
+                    no_precomputed_pairs = nrow(value@discovery_pairs) == 0L && nrow(value@positive_control_pairs) == 0L)
+            })
+        invisible(NULL)
+    }
+    tryCatch(upstream("upstream-high", case), error = function(e) blocked("upstream-high", conditionMessage(e)))
+    tryCatch(upstream("upstream-low", readRDS(cases_path)$low_complement_perm, maximum = TRUE),
+        error = function(e) blocked("upstream-low", conditionMessage(e)))
     standard <- tryCatch(capture_prepare("standard"), error = function(e) {
         blocked("standard-inputs", conditionMessage(e)); NULL
     })
@@ -288,10 +361,35 @@ main <- function() {
         if (!requireNamespace("arrow", quietly = TRUE)) {
             blocked("nuclear-shards", "Arrow is unavailable; raw Parquet gate remains outstanding.")
         } else if (is.null(qc)) blocked("nuclear-shards", "Nuclear cellwise QC failed.")
-        else for (pod in sort(unique(response_map$pod_id))) {
-            run_stage(paste0("nuclear-pod-", pod), "run_association_analysis_nuclear.R",
-                c(file.path(qc, "sceptre_object.rds"), nuclear$response, nuclear$grna, map_path,
-                    as.character(pod), "default", "default", "TRUE", "TRUE"), paste0("result_", pod, ".parquet"))
+        else {
+            run_stage("nuclear-response-plan", "prepare_association_analysis_nuclear.R",
+                c(file.path(qc, "sceptre_object.rds"), nuclear$response, nuclear$grna, "8"),
+                c("discovery_analysis_pods", "response_to_pod_map.rds"), validate = function(directory) {
+                    plan <- readRDS(file.path(directory, "response_to_pod_map.rds"))
+                    list(all_responses = setequal(plan$response_id, rownames(inputs$response_matrix)),
+                        one_pod_per_response = !anyDuplicated(plan$response_id),
+                        matching_pods = identical(scan(file.path(directory, "discovery_analysis_pods"), quiet = TRUE), as.numeric(unique(plan$pod_id))))
+                })
+            for (trial in c(TRUE, FALSE)) for (pod in sort(unique(response_map$pod_id))) {
+                label <- if (trial) paste0("nuclear-pod-", pod) else paste0("nuclear-nontrial-pod-", pod)
+                run_stage(label, "run_association_analysis_nuclear.R",
+                    c(file.path(qc, "sceptre_object.rds"), nuclear$response, nuclear$grna, map_path,
+                        as.character(pod), "default", "default", as.character(trial), "TRUE"), paste0("result_", pod, ".parquet"))
+            }
+            zero_map <- file.path(output_dir, "nuclear-zero-response-map.rds")
+            zero_ids <- rownames(inputs$response_matrix)[rowSums(inputs$response_matrix) == 0]
+            stopifnot(length(zero_ids) > 0L)
+            saveRDS(data.frame(response_id = zero_ids, pod_id = 3L), zero_map, version = 3L)
+            run_stage("nuclear-zero-pass", "run_association_analysis_nuclear.R",
+                c(file.path(qc, "sceptre_object.rds"), nuclear$response, nuclear$grna, zero_map,
+                    "3", "default", "default", "FALSE", "TRUE"), "result_3.parquet", validate = function(directory) {
+                        value <- as.data.frame(arrow::read_parquet(file.path(directory, "result_3.parquet")))
+                        list(nonempty_failed_family = nrow(value) > 0L && !any(value$pass_qc),
+                            only_empty_responses = all(as.character(value$response_id) %in% zero_ids),
+                            missing_statistics = all(is.na(value$p_value)) && all(is.na(value$log_2_fold_change)),
+                            baseline_na_schema = is.logical(value$p_value) && is.logical(value$log_2_fold_change),
+                            no_significant = !"significant" %in% names(value))
+                    })
         }
     }
 }
