@@ -176,7 +176,7 @@ run_perm_test_in_memory <- function(
 
             # 9. combine the response-wise results into a data table; insert
             # into list
-            result_out_list[[response_idx]] <- construct_data_frame_v2(
+            result_out_list[[response_idx]] <- pair_results_from_native(
                 curr_df,
                 curr_response_result,
                 output_amount
@@ -390,7 +390,7 @@ run_crt_in_memory_v2 <- function(
                     index = index
                 )
             }
-            result_out_list[[grna_group_idx]] <- construct_data_frame_v2(
+            result_out_list[[grna_group_idx]] <- pair_results_from_native(
                 curr_df,
                 curr_response_result,
                 output_amount
