@@ -15,6 +15,19 @@ not increase simultaneous writers merely to occupy slots.
 | Independent review | rf0_senior_review, read-only against pinned commits | Review actual source clarity, callers, deletions, indexing/ownership, guards, retained complexity and evidence. Green tests/metrics alone do not establish acceptance. Reviewer owns review artifacts, not implementation. |
 | Integration/acceptance | root; integration checkout codex/refactor | Read/review diffs and real contracts, merge coherent tested commits, resolve routine conflicts, own current CI/evidence/decision records and later global tool/name migrations, publish/check CI and qualify final immutable source. |
 
+The count lane released `test-refactor-indexing.R` at
+ab4777591cb31906f1c154c1825f0a6bed8c7c6a after its first immutable focused
+qualification. The context lane adopts that commit before migrating the real
+index/fitting aliases and tests. Count resource acceptance remains open.
+
+Root additionally owns the bounded B1 import repair in `R/import_functs.R` and a
+new `test-refactor-import-coordinates.R`: stable complete CSC construction,
+actual modality mapping and the explicitly chosen file-coordinate rejection.
+Neither implementation worker edits those files. This small independent repair
+does not expand the two worker lanes; it requires source review and focused
+regressions before acceptance. B6 aggregation and broader import contracts remain
+separate gated work.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current

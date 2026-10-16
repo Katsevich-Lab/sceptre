@@ -503,10 +503,10 @@ import_data_from_cellranger_memory <- function(
             curr_feature_idxs <- modality_idxs[[modality]]
             # subset
             dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
-            # offset the feature idxs such that they start at 1
-            increment_feature_vector_value <- -min(curr_feature_idxs)
-            increment_vector(dt_sub$feature_idx, increment_feature_vector_value)
-            increment_vector(dt_sub$cell_idx, -1L)
+            # Feature-file rows need not form contiguous modality blocks. Map
+            # into this modality's original row order, then use zero-based slots.
+            dt_sub$feature_idx <- match(dt_sub$feature_idx, curr_feature_idxs) - 1L
+            dt_sub$cell_idx <- dt_sub$cell_idx - 1L
             # create a sparse matrix in csc format
             out <- create_csc_matrix(
                 dt = dt_sub,
@@ -761,8 +761,8 @@ import_data_from_parse <- function(
             nThread = 2L
         )
         # make the cell and feature idxs zero-based
-        increment_vector(dt$cell_idx, value = -1L)
-        increment_vector(dt$feature_idx, value = -1L)
+        dt$cell_idx <- dt$cell_idx - 1L
+        dt$feature_idx <- dt$feature_idx - 1L
 
         # create a sparse matrix in csc format
         out <- create_csc_matrix(
@@ -848,14 +848,40 @@ init_sceptre_object <- function(
 }
 
 
+#' Construct complete CSC slots from a parsed file's coordinates
+#'
+#' `dt` contains zero-based integer `cell_idx` and `feature_idx`, and numeric
+#' `x`. Sort owned output vectors by cell then feature; the input table is not
+#' mutated. Keep every value, including explicit zeros, and reject repeated
+#' file coordinates rather than selecting or summing them. Dimensions and slot
+#' lengths must fit the native integer pointer builder before it is called.
+#' Returns a numeric dgCMatrix in feature-file/cell-file order, without dimnames.
+#' No dense assay, RNG draws or file writes occur.
+#' @noRd
 create_csc_matrix <- function(dt, n_cells, n_features) {
-    p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
-    out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-    out@i <- dt$feature_idx
-    out@p <- p
-    out@x <- dt$x
-    out@Dim <- c(n_features, n_cells)
-    return(out)
+    check_native_scalar_count(n_cells, "n_cells")
+    check_native_scalar_count(n_features, "n_features")
+    if (n_cells == .Machine$integer.max) {
+        stop("The imported cell count leaves no room for its final sparse pointer.")
+    }
+    check_native_scalar_count(nrow(dt), "Stored coordinate count")
+    if (!is.integer(dt$cell_idx) || !is.integer(dt$feature_idx) ||
+        anyNA(dt$cell_idx) || anyNA(dt$feature_idx) ||
+        any(dt$cell_idx < 0L | dt$cell_idx >= n_cells) ||
+        any(dt$feature_idx < 0L | dt$feature_idx >= n_features)) {
+        stop("Imported cell or feature coordinates are outside the matrix dimensions.")
+    }
+    scan_order <- order(dt$cell_idx, dt$feature_idx, method = "radix")
+    cell_idxs <- dt$cell_idx[scan_order]
+    feature_idxs <- dt$feature_idx[scan_order]
+    if (any(diff(cell_idxs) == 0L & diff(feature_idxs) == 0L)) {
+        stop("Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique.")
+    }
+    methods::new(
+        "dgCMatrix", i = feature_idxs,
+        p = obtain_pointer_vector(i = cell_idxs, dim = as.integer(n_cells)),
+        x = dt$x[scan_order], Dim = as.integer(c(n_features, n_cells))
+    )
 }
 
 
