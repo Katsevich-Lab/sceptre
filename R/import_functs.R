@@ -893,17 +893,9 @@ write_matrices_to_disk <- function(
     integer_id
 ) {
     directory_to_write <- prepare_directory_to_write(directory_to_write)
-    response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = response_matrix,
-        file_to_write = file.path(directory_to_write, "response.odm"),
-        integer_id = integer_id
+    storage_create_backed_pair(
+        response_matrix, grna_matrix, directory_to_write, integer_id
     )
-    grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = grna_matrix,
-        file_to_write = file.path(directory_to_write, "grna.odm"),
-        integer_id = integer_id
-    )
-    return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
 }
 
 

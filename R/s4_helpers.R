@@ -361,15 +361,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 
 
 load_row <- function(mat, id) {
-    if (methods::is(mat, "odm")) {
-        mat[id, ]
-    } else if (methods::is(mat, "dgRMatrix")) {
-        load_csr_row(
-            j = mat@j,
-            p = mat@p,
-            x = mat@x,
-            row_idx = which(id == rownames(mat)),
-            n_cells = ncol(mat)
-        )
+    if (methods::is(mat, "odm") || methods::is(mat, "dgRMatrix")) {
+        storage_read_response(mat, storage_response_index(mat, id))
     }
 }

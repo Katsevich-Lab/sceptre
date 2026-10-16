@@ -86,38 +86,14 @@ assign_grnas_to_cells_thresholding <- function(
     grna_assign_threshold,
     grna_ids
 ) {
-    # take cases on the class of grna_matrix
-    if (methods::is(grna_matrix, "odm")) {
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            ondisc:::threshold_count_matrix_cpp(
-                file_name_in = grna_matrix@h5_file,
-                f_row_ptr = grna_matrix@ptr,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    } else {
-        # 1. make the grna expression matrix row-accessible; ensure threshold is
-        # numeric
-        grna_matrix <- set_matrix_accessibility(
-            grna_matrix,
-            make_row_accessible = TRUE
+    grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
+        storage_threshold_row(
+            grna_matrix, storage_response_index(grna_matrix, grna_id),
+            grna_assign_threshold
         )
-        grna_assign_threshold <- as.numeric(grna_assign_threshold)
-
-        # 2. perform the assignments
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            threshold_count_matrix(
-                j = grna_matrix@j,
-                p = grna_matrix@p,
-                x = grna_matrix@x,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    }
+    }) |>
+        stats::setNames(grna_ids)
 
     return(initial_assignment_list)
 }

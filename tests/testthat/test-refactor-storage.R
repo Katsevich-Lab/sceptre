@@ -76,3 +76,94 @@ test_that("legacy backed storage coerces fractions and retains stored positions"
     expect_identical(out, matrix(c(1L, 2L, 1L, 2L), 2L))
     expect_identical(groups, list(c(1L, 2L), c(3L, 0L, 4L)))
 })
+
+test_that("storage reads preserve requested source order and repeated cells", {
+    mat <- storage_test_matrix()
+    expect_identical(storage_response_index(mat, "r2"), 2L)
+    expect_identical(storage_read_response(mat, 1L, c(11L, 4L, 11L, 8L, 1L)),
+                     c(4.2, 2.5, 4.2, 3.8, 0))
+    expect_identical(storage_read_response(mat, 2L, 8L), 0)
+    expect_identical(storage_read_response(mat, 2L, integer()), numeric())
+    expect_identical(storage_read_response(mat, 1L), load_row(mat, "r1"))
+    expect_identical(storage_threshold_row(mat, 1L, 2.8), c(8L, 11L))
+})
+
+storage_test_contract <- function(mat) {
+    cells <- c(2L, 4L, 5L, 8L, 11L)
+    groups <- list(A = c(2L, 3L), B = c(4L, 1L, 5L))
+    nt_groups <- list(nt1 = 4L, nt2 = c(1L, 5L))
+    controls <- c(4L, 1L, 5L)
+    pairs <- data.frame(response_idx = c(2L, 1L, 2L, 1L),
+                        group_idx = c(2L, 1L, 1L, 1L))
+    original <- serialize(list(cells, groups, nt_groups, controls, pairs), NULL)
+    for (control in list("complement", controls)) {
+        for (nuclear in c(FALSE, TRUE)) {
+            out <- storage_pair_counts(mat, pairs, groups, cells, control,
+                                        nt_groups, nuclear)
+            expect_identical(out$n_nonzero_trt, c(2L, 1L, 1L, 1L))
+            expect_identical(out$n_nonzero_cntrl,
+                             if (identical(control, "complement")) c(1L, 2L, 2L, 2L)
+                             else rep(2L, 4L))
+            if (!(nuclear && methods::is(mat, "odm"))) {
+                expect_identical(out$n_nonzero_mat, matrix(rep(1L, 4L), 2L))
+                expect_identical(out$n_nonzero_tot,
+                                 if (identical(control, "complement")) c(3L, 3L) else c(2L, 2L))
+            }
+        }
+        # Pair-only API must agree without constructing unused NT summaries.
+        pair_only <- storage_pair_counts(mat, pairs, groups, cells, control)
+        expect_identical(pair_only$n_nonzero_trt, out$n_nonzero_trt)
+        expect_identical(pair_only$n_nonzero_cntrl, out$n_nonzero_cntrl)
+        expect_identical(pair_only$n_nonzero_tot, integer())
+        empty <- storage_pair_counts(mat, pairs[integer(), ], groups, cells, control)
+        expect_identical(empty$n_nonzero_trt, integer())
+        expect_identical(empty$n_nonzero_cntrl, integer())
+    }
+    expected <- matrix(c(1L, 2L, 1L, 2L), 2L)
+    for (repeat_call in seq_len(2L)) {
+        expect_identical(storage_group_counts(mat, c(2L, 1L, 2L), groups, cells),
+                         expected[, c(2L, 1L, 2L), drop = FALSE])
+    }
+    expect_identical(storage_group_counts(mat, 1L, groups[1L], cells),
+                     matrix(1L, 1L, 1L))
+    expect_identical(storage_group_counts(mat, integer(), groups, cells),
+                     matrix(integer(), 2L, 0L))
+    expect_identical(storage_group_counts(mat, c(1L, 2L), list(), cells),
+                     matrix(integer(), 0L, 2L))
+    # Reordered analysis cells change all local coordinates together.
+    reordered <- storage_pair_counts(
+        mat, pairs, list(c(4L, 5L), c(1L, 2L, 3L)),
+        cells[c(4L, 1L, 5L, 2L, 3L)], "complement"
+    )
+    expect_identical(reordered$n_nonzero_trt, c(2L, 1L, 1L, 1L))
+    expect_identical(reordered$n_nonzero_cntrl, c(1L, 2L, 2L, 2L))
+    expect_identical(serialize(list(cells, groups, nt_groups, controls, pairs), NULL), original)
+}
+
+test_that("sparse storage counts preserve requests and caller-owned indices", {
+    storage_test_contract(storage_test_matrix())
+})
+
+test_that("backed storage has the same ordered count and ownership contracts", {
+    skip_if_not_installed("ondisc")
+    directory <- tempfile("storage-adapter-")
+    dir.create(directory)
+    on.exit(unlink(directory, recursive = TRUE), add = TRUE)
+    mat <- storage_test_matrix(200L)
+    set.seed(79)
+    rng <- .Random.seed
+    pair <- storage_create_backed_pair(mat, mat, directory, 9876L)
+    expect_identical(.Random.seed, rng)
+    expect_identical(pair$response_matrix@integer_id, 9876L)
+    expect_identical(pair$grna_matrix@integer_id, 9876L)
+    expect_identical(storage_read_response(pair$response_matrix, 1L, c(11L, 4L, 11L, 8L, 1L)),
+                     c(4, 2, 4, 3, 0))
+    storage_test_contract(pair$response_matrix)
+    reopened <- storage_reopen_backed_pair(file.path(directory, "response.odm"),
+                                           file.path(directory, "grna.odm"), 9876L)
+    expect_identical(storage_read_response(reopened$response_matrix, 1L),
+                     storage_read_response(pair$response_matrix, 1L))
+    expect_error(storage_reopen_backed_pair(file.path(directory, "response.odm"),
+                                            file.path(directory, "grna.odm"), 9877L),
+                 "distinct IDs", fixed = TRUE)
+})

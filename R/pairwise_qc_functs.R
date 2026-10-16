@@ -30,71 +30,24 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         discovery = response_grna_group_pairs$discovery
     ) |>
         data.table::setorder(cols = "response_idx")
-    to_analyze_response_idxs <- dt$response_idx
-    to_analyze_grna_idxs <- dt$grna_idx
-
-    # take cases on odm
-    if (methods::is(response_matrix, "odm")) {
-        if (sceptre_object@nuclear) {
-            out <- ondisc:::compute_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use,
-                unique_response_idxs = sort(unique(to_analyze_response_idxs))
-            )
-            out$n_nonzero_mat <- matrix()
-            out$n_nonzero_tot <- integer()
-        } else {
-            out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use
-            )
-        }
+    controls <- if (control_group_complement) {
+        "complement"
     } else {
-        out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            n_cells_orig = ncol(response_matrix),
-            n_cells_sub = length(cells_in_use),
-            grna_group_idxs = grna_group_idxs,
-            indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-            all_nt_idxs = if (!control_group_complement) {
-                grna_assignments$all_nt_idxs
-            } else {
-                integer()
-            },
-            to_analyze_response_idxs = to_analyze_response_idxs,
-            to_analyze_grna_idxs = to_analyze_grna_idxs,
-            control_group_complement = control_group_complement,
-            cells_in_use = cells_in_use
-        )
+        grna_assignments$all_nt_idxs
     }
+    nt_groups <- grna_assignments$indiv_nt_grna_idxs
+    if (!control_group_complement) {
+        # Legacy objects store NT memberships relative to the ordered NT view.
+        # Normalize that persisted representation before crossing the boundary.
+        nt_groups <- lapply(nt_groups, function(group) controls[group])
+    }
+    out <- storage_pair_counts(
+        store = response_matrix,
+        pair_index = data.frame(response_idx = dt$response_idx, group_idx = dt$grna_idx),
+        groups = grna_group_idxs, source_cells = cells_in_use,
+        controls = controls, nt_groups = nt_groups,
+        nuclear = sceptre_object@nuclear
+    )
 
     # process results and update sceptre_object
     dt$n_nonzero_trt <- out$n_nonzero_trt
