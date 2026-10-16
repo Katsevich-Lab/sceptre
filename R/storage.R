@@ -267,18 +267,22 @@ storage_cell_covariates <- function(
 #'   keeps in-memory workflows independent of the optional ondisc dependency.
 #' @noRd
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
+    owns_i <- owns_j <- owns_x <- FALSE
     # Preserve legacy presence semantics: every stored logical entry becomes 1.
     if (methods::is(matrix_in, "lgRMatrix")) {
         attr(matrix_in, "class") <- "dgRMatrix"
         matrix_in@x <- rep(1.0, length(matrix_in@j))
+        owns_x <- TRUE
     }
     if (methods::is(matrix_in, "lgCMatrix")) {
         attr(matrix_in, "class") <- "dgCMatrix"
         matrix_in@x <- rep(1.0, length(matrix_in@i))
+        owns_x <- TRUE
     }
     if (methods::is(matrix_in, "lgTMatrix")) {
         attr(matrix_in, "class") <- "dgTMatrix"
         matrix_in@x <- rep(1.0, length(matrix_in@j))
+        owns_x <- TRUE
     }
 
     if (methods::is(matrix_in, "dgRMatrix") && make_row_accessible) {
@@ -288,7 +292,6 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
     } else if (methods::is(matrix_in, "odm")) {
         out <- matrix_in
     } else {
-        # basic info: get matrix_in, n_responses, response_ids, and n_cells
         n_responses <- nrow(matrix_in)
         response_ids <- rownames(matrix_in)
         cell_ids <- colnames(matrix_in)
@@ -300,22 +303,29 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
             matrix_in <- methods::as(matrix_in, "TsparseMatrix")
             i <- matrix_in@i
             j <- matrix_in@j
+            owns_i <- owns_j <- owns_x <- TRUE
         } else if (methods::is(matrix_in, "dgCMatrix")) {
             i <- matrix_in@i
             j <- sparse_pointer_to_indices(matrix_in@p)
+            owns_j <- TRUE
         } else if (methods::is(matrix_in, "dgRMatrix")) {
             i <- sparse_pointer_to_indices(matrix_in@p)
             j <- matrix_in@j
+            owns_i <- TRUE
         } else {
             stop("Class not recognized.")
         }
         x <- matrix_in@x
 
-        # Triplet slots can alias caller vectors. The constructor gives sorting
-        # its own columns; no in-place ordering is applied to source slots.
-        dt <- data.table::data.table(i = i, j = j, x = x)
+        # Sort only owned columns. Sparse slots may alias caller vectors; dense
+        # coercion, pointer expansion and logical replacement create fresh data.
+        # Explicit duplication preserves value bits and avoids recopying these
+        # fresh columns. Ownership follows constructors, never NAMED/refcounts.
+        dt <- list(i = if (owns_i) i else data.table::copy(i),
+                   j = if (owns_j) j else data.table::copy(j),
+                   x = if (owns_x) x else data.table::copy(x))
+        data.table::setDT(dt)
 
-        # finally, initialize the output
         if (make_row_accessible) {
             data.table::setorderv(x = dt, cols = c("i", "j"))
             p <- obtain_pointer_vector(i = dt$i, dim = n_responses)

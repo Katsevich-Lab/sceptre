@@ -105,3 +105,54 @@ test_that("triplet conversion owns sorting and preserves stored entry semantics"
     }
     expect_identical(sparse_pointer_to_indices(c(0L, 0L, 2L, 2L, 3L)), c(1L, 1L, 3L))
 })
+
+test_that("sorting preserves borrowed value bits and every source representation", {
+    # A nondefault quiet-NaN payload and negative zero must survive duplication;
+    # arithmetic used as a copying shortcut could change these bits.
+    payload <- readBin(as.raw(c(0x17, 0, 0, 0, 0, 0, 0xf8, 0x7f)),
+                       what = "double", n = 1L, size = 8L, endian = "little")
+    values <- c(-0, payload, 1.25, -Inf, Inf)
+    triplet <- methods::new("dgTMatrix", i = c(2L, 0L, 1L, 0L, 2L),
+        j = c(0L, 2L, 0L, 0L, 2L), x = values, Dim = c(3L, 3L))
+    before <- serialize(triplet, NULL)
+    for (row_access in c(TRUE, FALSE)) {
+        order <- if (row_access) order(triplet@i, triplet@j) else order(triplet@j, triplet@i)
+        actual <- set_matrix_accessibility(triplet, row_access)
+        expect_identical(writeBin(actual@x, raw(), size = 8L),
+                         writeBin(values[order], raw(), size = 8L))
+        expect_identical(serialize(triplet, NULL), before)
+    }
+
+    dense <- matrix(c(3, 1, 4, 2, 6, 5), 2L, 3L,
+                    dimnames = list(c("r1", "r2"), c("c1", "c2", "c3")))
+    numeric_inputs <- list(dense, methods::as(dense, "RsparseMatrix"),
+                          methods::as(dense, "CsparseMatrix"))
+    for (input in numeric_inputs) {
+        before <- serialize(input, NULL)
+        aliases <- if (methods::is(input, "sparseMatrix")) {
+            list(index = if (methods::is(input, "RsparseMatrix")) input@j else input@i,
+                 pointer = input@p, value = input@x)
+        } else list(value = input)
+        aliases_before <- serialize(aliases, NULL)
+        for (row_access in c(TRUE, FALSE)) {
+            actual <- set_matrix_accessibility(input, row_access)
+            expect_identical(as.matrix(actual), dense)
+            expect_identical(serialize(input, NULL), before)
+            expect_identical(serialize(aliases, NULL), aliases_before)
+        }
+    }
+
+    names <- list(c("r1", "r2", "r3"), c("c1", "c2", "c3"))
+    logical_csc <- methods::new("lgCMatrix", i = c(1L, 0L, 2L),
+        p = 0:3, x = c(FALSE, TRUE, FALSE), Dim = c(3L, 3L), Dimnames = names)
+    logical_csr <- methods::as(logical_csc, "RsparseMatrix")
+    expected <- matrix(c(0, 1, 0, 1, 0, 0, 0, 0, 1), 3L, 3L, dimnames = names)
+    for (input in list(logical_csc, logical_csr)) {
+        before <- serialize(input, NULL)
+        for (row_access in c(TRUE, FALSE)) {
+            actual <- set_matrix_accessibility(input, row_access)
+            expect_identical(as.matrix(actual), expected)
+            expect_identical(serialize(input, NULL), before)
+        }
+    }
+})

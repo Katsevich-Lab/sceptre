@@ -38,7 +38,7 @@ stream_hash <- function(object) {
     digest::digest(file = path, algo = "sha256")
 }
 if (mode == "profile") {
-    for (function_name in c("data.table", "setDT", "setorderv")) {
+    for (function_name in c("data.table", "copy", "setDT", "setorderv")) {
         before <- substitute(get("triplet_resource_mark", .GlobalEnv)(PHASE),
             list(PHASE = paste0(function_name, "_start")))
         after <- substitute(get("triplet_resource_mark", .GlobalEnv)(PHASE),
