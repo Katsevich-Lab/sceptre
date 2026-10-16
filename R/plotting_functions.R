@@ -110,8 +110,8 @@ plot_grna_count_distributions <- function(
     # one column (`bin_upper_bounds`) contains the upper end point of the
     # resulting bin,
     # and the other column (`bin_labels`) has the name that that bin will get.
-    grna_expressions_to_binned_factor <- function(gnra_expressions) {
-        max_expression_count <- max(gnra_expressions)
+    grna_expressions_to_binned_factor <- function(grna_expressions) {
+        max_expression_count <- max(grna_expressions)
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
         bin_upper_bounds <- 0:max_single_bin
         bin_labels <- as.character(bin_upper_bounds)

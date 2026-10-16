@@ -236,7 +236,6 @@ check_set_analysis_parameters <- function(
     resampling_approximation
 ) {
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_matrix <- get_grna_matrix(sceptre_object)
     covariate_data_frame <- sceptre_object@covariate_data_frame
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
