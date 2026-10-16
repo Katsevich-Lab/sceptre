@@ -55,7 +55,9 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
     while(true) {
       g_mus_pert1 = g_mus_pert0 + curr_g_pert;
 
-      // compute log likelihood
+      // Two Poisson components use baseline and baseline + current perturbation
+      // means. Floor their mixture density only for log-likelihood evaluation;
+      // the posterior below uses an algebraic log-odds expression instead.
       p0 = exp(log(1 - curr_pi) + g * log(g_mus_pert0) - g_mus_pert0 - log_g_factorial);
       p1 = exp(log(curr_pi) + g * log(g_mus_pert1) - g_mus_pert1 - log_g_factorial);
       s = p0 + p1;
@@ -78,7 +80,8 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
         break;
       }
 
-      // estimate new_pi and ensure new_pi is less than 0.5
+      // Keep the lower-weight component labelled as perturbed: when its fitted
+      // weight exceeds 1/2, complement the posteriors and the weight together.
       curr_pi = Rcpp::sum(Ti1s)/n_doub;
       if (curr_pi > 0.5) {
         Ti1s = 1 - Ti1s;
@@ -96,11 +99,15 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
         if (iteration >= max_it) break;
       }
 
-      // M step
+      // Retain the implemented log ratio of posterior-weighted count/baseline
+      // sums as the next perturbation, including its use in the additive mean
+      // above. Replacing these updates is a separate numerical-method change.
       e1 = Rcpp::sum(Ti1s * g);
       e2 = Rcpp::sum(Ti1s * g_mus_pert0);
       curr_g_pert = log(e1) - log(e2);
     }
+    // Only converged starts compete; strict improvement retains the earlier
+    // start on ties. Failure leaves the initialized record for R's fallback.
     if (curr_log_lik > outer_log_lik && converged) {
       for (int j = 0; j < n; j ++) outer_Ti1s[j] = Ti1s[j];
       outer_i = i;

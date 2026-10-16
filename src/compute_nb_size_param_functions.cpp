@@ -7,6 +7,9 @@
 #include <stdexcept>
 using namespace Rcpp;
 
+// Size theta uses Var(Y | mu) = mu + mu^2/theta. The R fitter supplies fixed
+// Poisson fitted means in the same cell view as y; this is dispersion estimation,
+// not a second joint negative-binomial coefficient fit. R owns final clipping.
 
 // Negative-binomial size score for aligned response/mean vectors at trial th.
 // Uses the existing Boost double special-function policy; domain/overflow can
@@ -48,6 +51,9 @@ std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, do
   double del = 1;
   while (++it < limit && fabs(del) > eps) {
     t0 = fabs(t0);
+    // Match the Pearson residual sum to the supplied residual degrees of
+    // freedom. Keep the existing step denominator and absolute-value restart;
+    // neither a warning nor an exceptional step selects a new estimator here.
     del = (Rcpp::sum(Rcpp::pow(y - mu, 2)/(mu + Rcpp::pow(mu, 2)/t0)) - dfr)/Rcpp::sum(Rcpp::pow(y - mu, 2)/Rcpp::pow(mu + t0, 2));
     t0 -= del;
   }
@@ -68,6 +74,8 @@ std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, i
 
   while (++it < limit && fabs(del) > eps) {
     t0 = fabs(t0);
+    // Observed information is minus the score derivative, hence the plus
+    // Newton step. Do not reorder its cell sums or change the stopping test.
     del = nb_score(t0, mu, y)/nb_info(t0, mu, y);
     t0 += del;
   }
@@ -81,6 +89,8 @@ std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, i
 
 // Aligned response/mean vectors and the existing degrees-of-freedom, iteration
 // and tolerance controls produce (estimate, method): 1 MLE, 2 MM, 3 pilot.
+// Method records the existing committed branch, not a convergence guarantee:
+// e.g. an MM exception leaves the preceding warning-bearing MLE state/method 1.
 // Keep the whole MLE/MM try boundary and assignment order: a numerical failure
 // during MM retains the already committed MLE state. Only the reached Boost
 // domain/overflow failures are suppressed; allocation/system failures propagate.
@@ -95,7 +105,8 @@ List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, do
     std::vector<double> out = nb_theta_mle(t0, y, mu, limit, eps);
     estimate = out[0];
     method = 1;
-    // if there is a warning, swtich to MM
+    // A numerical warning selects MM from the original pilot (not the last
+    // MLE iterate). A second warning restores that pilot and method 3.
     if (out[1] > 0.5) {
       out = nb_theta_mm(t0, y, mu, dfr, limit, eps);
       estimate = out[0];

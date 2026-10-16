@@ -93,6 +93,17 @@ implementation follows its own scope and resource gates after this handoff.
 
 ## Working rules and handoff
 
+Eugene's additional explicit C1 acceptance focus is whole-guide freshness and
+useful documentation across **every retained handwritten native source/header**.
+Root owns ARCHITECTURE.md, native mixture/dispersion and the four identified
+R facade/cell-selection contracts, sampler-choice explanation, Parse local-read
+comment and getter return prose. Native retirement owns other native contracts
+and targeted difficult-loop explanations. Final independent coverage includes
+numerical/statistical stages, dimensions/views/bases, prefixes/full-bank reuse,
+order/duplicates/stored zeros, RNG, pointer lifetimes, allocation/failure ordering
+and numerical fallback/threshold reasons. Keep it proportionate and check every
+claim against actual callers; this creates no new algorithm or approval gate.
+
 - Workers use isolated active worktrees and named branches from recorded
   integration commits. Preserve unrelated checkpoints and uncommitted work.
 - Every task names owned files and exclusions. An overlap/dependency is resolved

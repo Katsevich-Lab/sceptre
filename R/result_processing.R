@@ -172,8 +172,9 @@ finalize_association_result <- function(result, integration_strategy, target_map
 # Nuclear raw shards retain their separate existing script-level contract.
 #' Finalize a gathered calibration family using facade settings
 #'
-#' Retains the direct Nextflow private-name contract and skips discovery-only
-#' Bonferroni collapse. Returns the finalized table; does not update facade slots.
+#' Retains the direct Nextflow private-name contract and skips the non-calibration
+#' Bonferroni collapse used by power/discovery. Returns the finalized table;
+#' does not update facade slots.
 #' @noRd
 process_calibration_result <- function(result, sceptre_object) {
     finalize_association_result(result, sceptre_object@grna_integration_strategy,

@@ -773,6 +773,10 @@ import_data_from_parse <- function(
         }
     }
 
+    # Parse files are cell-first triplets. Each read owns its table, converts
+    # file positions to zero-based coordinates, then delegates complete stable
+    # CSC ordering/duplicate rejection to create_csc_matrix. Output rows are
+    # features and columns are cells; this is the in-memory import route.
     load_matrix <- function(mat_fp) {
         matrix_metadata <- get_mtx_metadata(
             mat_fp,

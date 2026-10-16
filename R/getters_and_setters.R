@@ -73,7 +73,9 @@ get_cell_covariates <- function(sceptre_object) {
 #' whether to return the gRNA-to-cell assignment matrix after cellwise QC has
 #' been applied (default `FALSE`)
 #'
-#' @return a sparse logical matrix containing the gRNA-to-cell assignments
+#' @return a sparse logical matrix containing the gRNA-to-cell assignments.
+#'   With `apply_cellwise_qc = TRUE`, the existing Matrix subsetting behavior
+#'   may return a logical vector when one retained dimension has length one.
 #' @export
 #' @examples
 #' data(highmoi_example_data)

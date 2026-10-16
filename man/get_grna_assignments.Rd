@@ -15,7 +15,9 @@ whether to return the gRNA-to-cell assignment matrix after cellwise QC has
 been applied (default \code{FALSE})}
 }
 \value{
-a sparse logical matrix containing the gRNA-to-cell assignments
+a sparse logical matrix containing the gRNA-to-cell assignments.
+With \code{apply_cellwise_qc = TRUE}, the existing Matrix subsetting behavior
+may return a logical vector when one retained dimension has length one.
 }
 \description{
 \code{get_grna_assignments()} returns the gRNA-to-cell assignments contained

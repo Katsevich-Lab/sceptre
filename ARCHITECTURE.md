@@ -103,8 +103,10 @@ construction code. Existing HDF5 and sparse native scans remain separate.
   Enabling backed CRT later also requires separate parity/resource validation
   and review of the existing validation guard and distributed work plan.
 
-Native count kernels that decrement indices receive owned disposable vectors.
-Current counters count stored sparse positions, including explicit zeros;
+SCEPTRE's sparse count kernels convert coordinates once into native-owned
+scratch and leave R inputs unchanged. External ondisc kernels that decrement
+indices receive disposable copies at the storage boundary. Current counters
+count stored sparse positions, including explicit zeros;
 ondisc construction coerces fractional values to integers. Those legacy rules
 are characterized rather than silently normalized.
 
@@ -112,17 +114,18 @@ are characterized rather than silently normalized.
 
 `pair_results_from_native()` preserves output amounts 1/2/3 and legacy fields,
 including `se_fold_change`. `assemble_pair_results()` restores failed-QC rows
-and the output ordering. `integrate_guides_current()` and
+and the output ordering. `integrate_guides()` and
 `finalize_association_result()` take plain tables and explicit settings; neither
 needs an S4 object. Finalized standard analyses integrate and correct the complete
 family after collection. Nuclear pipeline shards remain raw Parquet without a
 global correction or significance column.
 
 Private pipeline names such as QC/calibration part functions and result
-processors remain compatibility entrypoints. The old precomputation and table
-construction names are thin delegates; the unused legacy index factory and
-its discovery-only helper were removed after checking package and pinned
-consumer callers. No second algorithm is retained behind those delegates.
+processors remain compatibility entrypoints. Unconsumed precomputation/table
+aliases and optional worker reconstruction routes were removed after checking
+package and pinned consumer callers. The lean `make_treatment_index_lookup()`
+closure resolves the one canonical index; it does not retain per-guide view
+banks or reconstruct missing context. No parallel obsolete algorithm is kept.
 The pinned pipeline's scripts, file schemas and known limitations are listed in
 [the consumer inventory](tools/refactor/consumer-inventory.json) and tested by
 [the consumer harness](tools/refactor/CONSUMER_COVERAGE.md).

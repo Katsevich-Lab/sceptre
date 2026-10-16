@@ -97,7 +97,7 @@ SCEPTRE_REQUIRE_ONDISC=true Rscript --vanilla -e 'devtools::test(stop_on_failure
 ```
 
 `SCEPTRE_REQUIRE_ONDISC=true` makes a missing backed dependency a failure. The
-macOS check lane pins the ondisc source revision. A separate fresh Linux lane
+standard check lanes pin the ondisc source revision. A separate fresh Linux lane
 installs hard dependencies plus test tooling, asserts ondisc is absent and runs
 the package suite. Existing Linux/macOS/Windows checks remain. The dependency
 action's [documented inputs](https://github.com/r-lib/actions/blob/v2/setup-r-dependencies/action.yaml)

@@ -194,6 +194,12 @@ exception review if the general gate is exceeded.
    package checks, five hosted lanes, affected real consumers and resource gates.
 4. Refresh final-source maintainability evidence and obtain independent source/
    deletion review. Existing metrics are historical, not a cleanliness score.
+5. Review every retained handwritten C++ implementation/header for useful
+   maintainer documentation, including numerical meaning, cell/index/draw views,
+   reuse, ownership/allocation ordering and fallback state. Audit the whole
+   ARCHITECTURE.md against final names, actual callers and compatibility
+   boundaries. Eugene explicitly requires both in source/documentation coverage;
+   passing tests or metric improvements cannot substitute for this review.
 
 New methods, SPA/accelerated fits/Wilcoxon, replacement QC, new backed CRT or
 aggregation, Bioconductor adapters and public-object replacement remain deferred.

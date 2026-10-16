@@ -1,3 +1,15 @@
+#' Select source cells and record overlapping removal reasons
+#'
+#' Uses full-source cell covariates, validated quantile ranges, the mitochondrial
+#' threshold and one-based explicit removals. Quantile endpoints are inclusive;
+#' counts outside them and mitochondrial fractions above the threshold are
+#' removed, together with the already prepared zero/multiple-guide exclusions.
+#' @return Facade with increasing source-cell `cells_in_use` and removal metrics.
+#'   Each reason counts its own supplied indices, so reasons can overlap and
+#'   need not sum to the unique removed total. Other slots are unchanged; run_qc
+#'   owns subsequent empty-view checks, cache invalidation and guide reindexing.
+#'   Reads covariates/dimensions only, without assay realization, RNG or files.
+#' @noRd
 determine_cells_to_retain <- function(
     sceptre_object,
     response_n_umis_range,

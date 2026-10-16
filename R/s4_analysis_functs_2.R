@@ -86,6 +86,18 @@ run_calibration_check <- function(
 }
 
 
+#' Prepare the calibration family before package or pipeline execution
+#'
+#' May advance missing assignment/QC steps with their defaults and effects, then
+#' applies the existing workflow transition and validates calibration settings.
+#' Missing group size/pair count derive from discovery metadata/pass counts;
+#' both must be supplied when discovery pairs are absent. Empirical inference
+#' updates B3 for this family before constructing the existing sampled pairs.
+#' @return Facade with calibration sizes, negative-control pairs and any required
+#'   prerequisite updates. No association tests or result finalization run here.
+#'   The transition/validation/message/sampling order is intentional. Pipeline
+#'   preparation calls this phase separately and retains the returned facade.
+#' @noRd
 run_calibration_check_pt_1 <- function(
     sceptre_object,
     n_calibration_pairs = NULL,
@@ -157,6 +169,15 @@ run_calibration_check_pt_1 <- function(
 }
 
 
+#' Execute an already prepared calibration family and commit its results
+#'
+#' Consumes phase one's eligible-pair metadata and the current cell/fit view.
+#' Association drivers own resampling, progress/logs and serial/fork dispatch.
+#' @return Facade with calibration_result and merged compact response fits.
+#'   Ordinary runs finalize the complete family; nf_pipeline retains raw results
+#'   for external collection. No guide-cache feature or pair reconstruction is
+#'   added here. The caller retains the successful returned facade.
+#' @noRd
 run_calibration_check_pt_2 <- function(
     sceptre_object,
     output_amount = 1,
@@ -617,6 +638,15 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
+#' Advance only missing assignment/QC prerequisites using their public defaults
+#'
+#' Called by calibration, power and discovery after their parallelism check.
+#' Imported/parameterized objects missing both stages run assignment then QC;
+#' objects missing only QC run QC. Otherwise the facade is returned unchanged
+#' and the later workflow transition enforces prerequisites. Messages, assignment
+#' randomness/parallel logs and QC cache invalidation belong to those actual
+#' calls; n_processors/parallel are forwarded only to assignment.
+#' @noRd
 skip_assign_grnas_and_run_qc <- function(
     sceptre_object,
     parallel,

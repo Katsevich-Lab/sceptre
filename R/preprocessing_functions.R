@@ -103,6 +103,16 @@ compute_cell_covariates <- function(
 #'   interpretation is specific to the selected Fisher-Yates/hybrid fit view;
 #'   these are not source-cell IDs. Samplers use fixed native seeds without
 #'   consuming R random draws; the pointer must not be persisted in saved objects.
+#' @details Complement-control discovery draws in all retained cells with length
+#'   equal to the largest treatment group. Complement calibration instead bounds
+#'   that length by the sum of the largest pooled NT groups, capped at n_cells
+#'   because overlapping memberships cannot enlarge the cell universe. NT-only
+#'   calibration uses that pooled-size bound in the ordered NT fit universe.
+#'   NT-control discovery uses the hybrid sampler with N NT controls and the
+#'   smallest/largest nonempty treatment sizes m/M: for m <= k <= M, each size-k
+#'   prefix is valid in its N+k fit universe. Fixed-size consumers read only their treatment
+#'   prefix, not every stored bank entry. Generate the full B bank once here;
+#'   stage selection must not redraw or reseed its segments.
 #' @noRd
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
