@@ -155,3 +155,24 @@ test_that("shared processor validation keeps existing predicates and error order
     expect_match(messages, "The calibration check (`run_calibration_check()`) should be run before the discovery analysis.", fixed = TRUE)
     expect_identical(outcome, "Zero pairs pass pairwise QC. Cannot run analysis.")
 })
+
+
+test_that("maximum assignment needs only aligned import summaries and retains order", {
+    ids <- c("b", "a", "b", "other", "a", "b")
+    fractions <- c(.8, .81, .4, 1, .9, .95)
+    totals <- c(5, 4, 100, 8, 10, 5)
+    requested <- c("b", "a", "b")
+    before <- serialize(list(ids, fractions, totals, requested), NULL)
+    set.seed(1831L)
+    seed <- .Random.seed
+    actual <- refactor_private("assign_grnas_to_cells_maximum")(
+        max_grna = ids, max_grna_frac_umis = fractions,
+        umi_fraction_threshold = .8, grna_n_umis = totals,
+        min_grna_n_umis_threshold = 5, grna_ids = requested)
+    expect_identical(actual$initial_assignment_list,
+        stats::setNames(list(c(1L, 3L, 6L), c(2L, 5L), c(1L, 3L, 6L)), requested))
+    # Existing union order is ambiguous cells first, then new low-total cells.
+    expect_identical(actual$cells_w_zero_or_twoplus_grnas, c(1L, 3L, 2L))
+    expect_identical(serialize(list(ids, fractions, totals, requested), NULL), before)
+    expect_identical(.Random.seed, seed)
+})

@@ -53,7 +53,8 @@ assign_grnas_to_cells <- function(
     }
     if (grna_assignment_method == "maximum") {
         max_result <- assign_grnas_to_cells_maximum(
-            sceptre_object = sceptre_object,
+            max_grna = sceptre_object@import_grna_assignment_info$max_grna,
+            max_grna_frac_umis = sceptre_object@import_grna_assignment_info$max_grna_frac_umis,
             umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,
             grna_n_umis = cell_covariate_data_frame$grna_n_umis,
             min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
@@ -119,7 +120,8 @@ assign_grnas_to_cells_thresholding <- function(
 # MAXIMUM
 #########
 #' Resolve maximum-guide assignments from the existing import summaries.
-#' @param sceptre_object Facade with source-cell max_grna and max_grna_frac_umis.
+#' @param max_grna Source-cell maximum-guide IDs from the import summary.
+#' @param max_grna_frac_umis Corresponding maximum fractions in the same order.
 #' @param umi_fraction_threshold Cells at or below this fraction are flagged.
 #' @param grna_n_umis Source-cell guide totals.
 #' @param min_grna_n_umis_threshold Cells below this total are flagged.
@@ -129,19 +131,19 @@ assign_grnas_to_cells_thresholding <- function(
 #'   applies exclusions. No matrix scan, input mutation, RNG or files.
 #' @noRd
 assign_grnas_to_cells_maximum <- function(
-    sceptre_object,
+    max_grna,
+    max_grna_frac_umis,
     umi_fraction_threshold,
     grna_n_umis,
     min_grna_n_umis_threshold,
     grna_ids
 ) {
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-        which(sceptre_object@import_grna_assignment_info$max_grna == grna_id)
+        which(max_grna == grna_id)
     }) |>
         stats::setNames(grna_ids)
     cells_w_multiple_grnas <- which(
-        sceptre_object@import_grna_assignment_info$max_grna_frac_umis <=
-            umi_fraction_threshold
+        max_grna_frac_umis <= umi_fraction_threshold
     )
     cells_w_zero_grnas <- which(grna_n_umis < min_grna_n_umis_threshold)
     cells_w_zero_or_twoplus_grnas <- union(
