@@ -68,7 +68,9 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
       quotient = log(1 - curr_pi) - log(curr_pi) + g * (log(g_mus_pert0) - log(g_mus_pert1)) + g_mus_pert1 - g_mus_pert0;
       Ti1s = 1/(exp(quotient) + 1);
 
-      // verify that Ti1s are not NA or uniformly 0
+      // Abandon this start if any posterior is nonfinite or none exceeds
+      // 1e-100. This posterior-degeneracy guard is separate from the density
+      // floor used only in the log likelihood above.
       all_zero = true;
       any_na = false;
       for (int j = 0; j < Ti1s.size(); j ++) {
@@ -107,7 +109,7 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
       curr_g_pert = log(e1) - log(e2);
     }
     // Only converged starts compete; strict improvement retains the earlier
-    // start on ties. Failure leaves the initialized record for R's fallback.
+    // start on ties. With no winner, the initialized record drives R's fallback.
     if (curr_log_lik > outer_log_lik && converged) {
       for (int j = 0; j < n; j ++) outer_Ti1s[j] = Ti1s[j];
       outer_i = i;
