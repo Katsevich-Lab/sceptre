@@ -74,22 +74,21 @@ run_perm_test_in_memory <- function(
         NA
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
-    indiv_nt_grna_idxs <- grna_assignments$indiv_nt_grna_idxs
-    n_cells_orig <- ncol(response_matrix)
-    get_idx_f <- get_idx_vector_factory(
-        calibration_check,
-        indiv_nt_grna_idxs,
-        grna_group_idxs,
-        low_moi
-    )
+    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
+        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
+        calibration_check, control_group_complement, low_moi)
+    get_idx_f <- prepared_index_factory(index)
+    common_view <- make_fit_view(index)
     response_ids <- unique(response_grna_group_pairs$response_id)
     fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
     # 1. subset covariate matrix to cells_in_use and then to nt cells (if
     # applicable)
-    covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
-    if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+    covariate_matrix <- covariate_matrix[common_view$source_cells, , drop = FALSE]
+    # Preserve the legacy NT-only one-column behavior until its separately
+    # recorded compatibility decision; the index itself never drops dimensions.
+    if (subset_to_nt_cells && ncol(covariate_matrix) == 1L) {
+        covariate_matrix <- covariate_matrix[, 1L]
     }
 
     # 2. define function to loop subset of response IDs
@@ -112,6 +111,7 @@ run_perm_test_in_memory <- function(
             length = length(curr_response_ids)
         )
 
+        curr_response_idxs <- match(curr_response_ids, index$response_ids)
         for (response_idx in seq_along(curr_response_ids)) {
             response_id <- get_id_from_idx(
                 response_idx,
@@ -122,38 +122,33 @@ run_perm_test_in_memory <- function(
             )
 
             # 3. load the expressions of the current response
-            expression_vector <- load_row(
-                mat = response_matrix,
-                id = response_id
-            )[cells_in_use]
-            if (subset_to_nt_cells) {
-                expression_vector <- expression_vector[all_nt_idxs]
-            }
+            store_response_idx <- curr_response_idxs[response_idx]
+            expression_vector <- storage_read_response(response_matrix,
+                store_response_idx, common_view$source_cells)
 
             # 4. obtain the gRNA groups to analyze
-            l <- response_grna_group_pairs$response_id == response_id
-            curr_df <- response_grna_group_pairs[l, ]
+            request_rows <- index$rows_by_response[[as.character(store_response_idx)]]
+            curr_df <- response_grna_group_pairs[request_rows, ]
             grna_groups <- as.character(curr_df$grna_group)
 
             # 6. perform outer regression (if applicable)
             if (run_outer_regression) {
                 # if precomp is available, load
-                if (!is.null(response_precomputations[[response_id]])) {
-                    response_precomp <- response_precomputations[[response_id]]
+                if (!is.null(lookup_response_fit(response_precomputations, response_id))) {
+                    response_precomp <- lookup_response_fit(response_precomputations, response_id)
                 } else {
                     # perform the regression to get the coefficients
-                    response_precomp <- perform_response_precomputation(
+                    response_precomp <- fit_response_current(
                         expressions = expression_vector,
                         covariate_matrix = covariate_matrix
                     )
                     # save precomputation
                     precomp_out_list[[response_id]] <- response_precomp
                 }
-                pieces_precomp <- compute_precomputation_pieces(
+                pieces_precomp <- prepare_score_current(
                     expression_vector,
                     covariate_matrix,
-                    response_precomp$fitted_coefs,
-                    response_precomp$theta,
+                    response_precomp,
                     full_test_stat = TRUE
                 )
                 curr_response_result <- perm_test_glm_factored_out(
@@ -182,7 +177,8 @@ run_perm_test_in_memory <- function(
                     grna_group_idxs,
                     grna_groups,
                     expression_vector,
-                    side_code
+                    side_code,
+                    index = index
                 )
             }
 
@@ -245,7 +241,7 @@ run_perm_test_in_memory <- function(
         chunk[["precomp_out_list"]]
     }) |>
         purrr::flatten()
-    response_precomputations <- c(response_precomputations, precomp_out_list)
+    response_precomputations <- merge_response_fits(response_precomputations, precomp_out_list)
 
     return(list(
         result = result,
@@ -288,22 +284,21 @@ run_crt_in_memory_v2 <- function(
         NA
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
-    indiv_nt_grna_idxs <- grna_assignments$indiv_nt_grna_idxs
-    n_cells_orig <- ncol(response_matrix)
-    get_idx_f <- get_idx_vector_factory(
-        calibration_check,
-        indiv_nt_grna_idxs,
-        grna_group_idxs,
-        low_moi
-    )
+    index <- prepare_index_context(cells_in_use, ncol(response_matrix),
+        grna_assignments, response_grna_group_pairs, rownames(response_matrix),
+        calibration_check, control_group_complement, low_moi)
+    get_idx_f <- prepared_index_factory(index)
+    common_view <- make_fit_view(index)
     response_ids <- unique(response_grna_group_pairs$response_id)
     fit_parametric_curve <- (resampling_approximation == "skew_normal")
 
     # 1. subset covariate matrix to cells_in_use and then to nt cells (if
     # applicable)
-    covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
-    if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+    covariate_matrix <- covariate_matrix[common_view$source_cells, , drop = FALSE]
+    # Preserve the legacy NT-only one-column behavior until its separately
+    # recorded compatibility decision; the index itself never drops dimensions.
+    if (subset_to_nt_cells && ncol(covariate_matrix) == 1L) {
+        covariate_matrix <- covariate_matrix[, 1L]
     }
 
     # 2. define the run precomputation function
@@ -325,6 +320,7 @@ run_crt_in_memory_v2 <- function(
         }
         precomp_out_list <- list()
 
+        curr_response_idxs <- match(curr_response_ids, index$response_ids)
         for (response_idx in seq_along(curr_response_ids)) {
             response_id <- get_id_from_idx(
                 response_idx,
@@ -336,23 +332,15 @@ run_crt_in_memory_v2 <- function(
             )
 
             # 3. load the expressions of the current response
-            expression_vector <- load_csr_row(
-                j = response_matrix@j,
-                p = response_matrix@p,
-                x = response_matrix@x,
-                row_idx = which(rownames(response_matrix) == response_id),
-                n_cells = n_cells_orig
-            )[cells_in_use]
-            if (subset_to_nt_cells) {
-                expression_vector <- expression_vector[all_nt_idxs]
-            }
+            expression_vector <- storage_read_response(response_matrix,
+                curr_response_idxs[response_idx], common_view$source_cells)
 
             # 4. # if precomp is available, load
-            if (!is.null(response_precomputations[[response_id]])) {
-                response_precomp <- response_precomputations[[response_id]]
+            if (!is.null(lookup_response_fit(response_precomputations, response_id))) {
+                response_precomp <- lookup_response_fit(response_precomputations, response_id)
             } else {
                 # perform the regression to get the coefficients
-                response_precomp <- perform_response_precomputation(
+                response_precomp <- fit_response_current(
                     expressions = expression_vector,
                     covariate_matrix = covariate_matrix
                 )
@@ -399,10 +387,7 @@ run_crt_in_memory_v2 <- function(
             )
         }
         precomp_out_list <- purrr::flatten(res)
-        response_precomputations <- c(
-            response_precomputations,
-            precomp_out_list
-        )
+        response_precomputations <- merge_response_fits(response_precomputations, precomp_out_list)
     }
 
     # 6. define the function to analyze the pairs
@@ -428,9 +413,11 @@ run_crt_in_memory_v2 <- function(
             )
 
             # 7. obtain the genes to analyze
-            l <- response_grna_group_pairs$grna_group == curr_grna_group
-            curr_df <- response_grna_group_pairs[l, ]
+            group_idx <- match(curr_grna_group, index$group_ids)
+            request_rows <- index$rows_by_group[[as.character(group_idx)]]
+            curr_df <- response_grna_group_pairs[request_rows, ]
             response_ids <- as.character(curr_df$response_id)
+            response_idxs <- index$pair_rows$response_idx[request_rows]
 
             # 8. call the low-level analysis function
             if (run_outer_regression) {
@@ -449,7 +436,8 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    response_idxs = response_idxs
                 )
             } else {
                 curr_response_result <- discovery_ntcells_crt(
@@ -465,7 +453,9 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    response_idxs = response_idxs,
+                    index = index
                 )
             }
             result_out_list[[grna_group_idx]] <- construct_data_frame_v2(

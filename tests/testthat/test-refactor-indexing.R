@@ -92,3 +92,61 @@ test_that("legacy calibration unions and overlapping NT remapping stay explicit"
     expect_identical(mapped$all_nt_idxs, c(4L, 1L, 5L))
     expect_identical(mapped$indiv_nt_grna_idxs, list(a = 1:2, b = 3:4))
 })
+
+test_that("canonical contexts compose source, analysis and fit coordinates once", {
+    screen <- indexing_screen()
+    object <- refactor_private("update_grna_assignments_given_qc")(screen$object)
+    pairs <- data.frame(response_id = c("other", "r", "other"),
+                        grna_group = rep("A", 3L))
+    before <- serialize(list(object, pairs), NULL)
+    prepare <- refactor_private("prepare_index_context")
+    view_for <- refactor_private("make_fit_view")
+    index <- prepare(object@cells_in_use, 12L, object@grna_assignments, pairs,
+        rownames(screen$store), FALSE, FALSE, TRUE)
+    expect_identical(index$analysis_to_source, c(2L, 4L, 5L, 8L, 11L))
+    expect_identical(index$nt_to_analysis, c(4L, 1L, 5L))
+    expect_identical(index$nt_groups_analysis, list(ntA = 4L, ntB = c(1L, 5L)))
+    view <- view_for(index, "A")
+    expect_identical(view$source_cells, c(4L, 5L, 8L, 2L, 11L))
+    expect_identical(view$trt_fit_pos, 1:2)
+    expect_identical(view$control_fit_pos, 3:5)
+    expect_identical(view$n_trt, 2L)
+    expect_identical(unname(screen$counts[1L, view$source_cells]), c(1, 0, 1, 0, 1))
+    expect_identical(screen$design[view$source_cells, , drop = FALSE],
+        screen$design[c(4L, 5L, 8L, 2L, 11L), , drop = FALSE])
+
+    # The request-row map survives traversal in response order, including
+    # repeated row identities. Public duplicate rejection remains upstream.
+    expect_identical(index$pair_rows$response_idx, c(2L, 1L, 2L))
+    expect_identical(index$pair_rows$pair_row_id, 1:3)
+    traversal <- unname(unlist(index$rows_by_response))
+    expect_identical(traversal, c(2L, 1L, 3L))
+    expect_identical(index$pair_rows$pair_row_id[traversal][order(traversal)], 1:3)
+
+    calibration_pairs <- pairs
+    calibration_pairs$grna_group <- "ntB"
+    calibration <- prepare(object@cells_in_use, 12L, object@grna_assignments,
+        calibration_pairs, rownames(screen$store), TRUE, FALSE, TRUE)
+    nt_view <- view_for(calibration, "ntB")
+    expect_identical(nt_view$source_cells, c(8L, 2L, 11L))
+    expect_identical(nt_view$trt_fit_pos, c(2L, 3L))
+    expect_identical(nt_view$source_cells[nt_view$control_fit_pos], 8L)
+    expect_identical(refactor_private("prepared_index_factory")(calibration)("ntB"),
+                     list(trt_idxs = c(2L, 3L), n_trt = 2L))
+    expect_identical(view_for(index, "A"), view)
+    expect_identical(serialize(list(object, pairs), NULL), before)
+})
+
+test_that("analysis-cell normalization preserves reordered requested cells", {
+    make_map <- refactor_private("prepare_cell_map")
+    normalize <- refactor_private("source_membership_to_analysis")
+    map <- make_map(c(11L, 4L, 2L, 8L, 5L), 12L)
+    expect_identical(map, c(11L, 4L, 2L, 8L, 5L))
+    expect_identical(normalize(c(5L, 4L, 5L), map), c(2L, 5L))
+    expect_identical(normalize(integer(), map), integer())
+    expect_error(make_map(c(2L, 2L), 12L), "unique integer")
+    expect_error(make_map(c(0L, 4L), 12L), "unique integer")
+    expect_error(make_map(c(4, 4.5), 12L), "unique integer")
+    expect_error(make_map(c(4L, NA_integer_), 12L), "unique integer")
+    expect_identical(refactor_private("native_observed_positions")(c(2L, 5L)), c(2L, 5L))
+})

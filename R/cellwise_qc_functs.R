@@ -81,26 +81,19 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     grna_assignments_raw <- sceptre_object@grna_assignments_raw
     n_cells <- ncol(get_response_matrix(sceptre_object))
 
-    # 1. define update idxs funct
-    update_idxs <- function(v, cells_in_use, n_cells) {
-        v_log <- logical(length = n_cells)
-        v_log[v] <- TRUE
-        v_log_sub <- v_log[cells_in_use] # subset step
-        v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
-        return(v_updated)
-    }
+    analysis_to_source <- prepare_cell_map(cells_in_use, n_cells)
 
     # 2. for each gRNA group and NT gRNA, subset the grna vector and the update
     # the indices
     grna_group_idxs_new <- lapply(
         grna_assignments_raw$grna_group_idxs,
         function(v) {
-            update_idxs(v, cells_in_use, n_cells)
+            source_membership_to_analysis(v, analysis_to_source)
         }
     ) |>
         stats::setNames(names(grna_assignments_raw$grna_group_idxs))
     nt_idxs_new <- lapply(grna_assignments_raw$indiv_nt_grna_idxs, function(v) {
-        update_idxs(v, cells_in_use, n_cells)
+        source_membership_to_analysis(v, analysis_to_source)
     }) |>
         stats::setNames(names(grna_assignments_raw$indiv_nt_grna_idxs))
     # remove those nt grnas with 0 cells (after QC)
@@ -129,17 +122,5 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
 
 
 update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
-    out <- list()
-    nt_grnas <- names(indiv_nt_grna_idxs)
-    all_nt_idxs <- unique(stats::setNames(unlist(indiv_nt_grna_idxs), NULL))
-    n_cells_per_nt <- vapply(indiv_nt_grna_idxs, length, FUN.VALUE = integer(1))
-    stop <- cumsum(n_cells_per_nt)
-    start <- c(0L, stop[-length(stop)]) + 1L
-    indiv_nt_grna_idxs <- lapply(seq(1, length(nt_grnas)), function(i) {
-        seq(start[i], stop[i])
-    }) |>
-        stats::setNames(nt_grnas)
-    out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
-    out$all_nt_idxs <- all_nt_idxs
-    return(out)
+    legacy_nt_fit_assignments(indiv_nt_grna_idxs)
 }
