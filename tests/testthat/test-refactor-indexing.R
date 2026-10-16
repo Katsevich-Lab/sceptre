@@ -64,7 +64,7 @@ test_that("observed native positions are one based and synthetic positions are z
         # Identical observed/synthetic memberships exercise the two distinct
         # bases in the production entry point, without relying on a sampler.
         draws <- rep(list(view$trt - 1L), 3L)
-        result <- refactor_private("run_low_level_test_full_v4")(
+        result <- refactor_private("run_association_test")(
             y = view$y, mu = pieces$mu, a = pieces$a, w = pieces$w,
             D = pieces$D, trt_idxs = view$trt, n_trt = length(view$trt),
             use_all_cells = FALSE,

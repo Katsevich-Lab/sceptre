@@ -10,7 +10,7 @@
 #'   May return fewer pairs than requested with a message; errors if none qualify.
 #'   Native samplers use fixed seeds and do not consume R random draws.
 #' @noRd
-construct_negative_control_pairs_v2 <- function(
+construct_negative_control_pairs <- function(
     sceptre_object,
     n_calibration_pairs,
     calibration_group_size
@@ -18,8 +18,6 @@ construct_negative_control_pairs_v2 <- function(
     message("Constructing negative control pairs.")
     grna_assignments <- sceptre_object@grna_assignments
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-    low_moi <- sceptre_object@low_moi
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
     n_nonzero_m <- sceptre_object@M_matrix
@@ -48,7 +46,7 @@ construct_negative_control_pairs_v2 <- function(
         } else {
             mean(discovery_pairs_with_info$pass_qc)
         }
-        possible_groups_m <- sample_combinations_v2(
+        possible_groups_m <- sample_calibration_groups(
             calibration_group_size,
             n_calibration_pairs,
             n_possible_groups,
@@ -62,7 +60,7 @@ construct_negative_control_pairs_v2 <- function(
     calculate_ess_using_m_matrix <- sceptre_object@low_moi ||
         calibration_group_size == 1L
     if (calculate_ess_using_m_matrix) {
-        samp <- sample_undercover_pairs_v2(
+        samp <- sample_calibration_pairs(
             n_nonzero_m = n_nonzero_m,
             n_nonzero_tot = n_nonzero_tot,
             possible_groups_m = possible_groups_m,
@@ -88,7 +86,7 @@ construct_negative_control_pairs_v2 <- function(
             seq_along(nt_grna_group_idxs) - 1L,
             ncol = 1L
         )
-        samp <- sample_undercover_pairs_v2(
+        samp <- sample_calibration_pairs(
             n_nonzero_m = n_nonzero_m,
             n_nonzero_tot = n_nonzero_tot,
             possible_groups_m = dummy_possibly_groups_m,
@@ -103,7 +101,7 @@ construct_negative_control_pairs_v2 <- function(
         stop("No negative control pair passes pairwise QC.")
     }
     response_ids <- rownames(response_matrix)
-    increment_matrix(possible_groups_m)
+    increment_group_indices_in_place(possible_groups_m)
     undercover_groups <- get_undercover_group_names(
         possible_groups_m,
         nt_grna_names

@@ -1,5 +1,4 @@
 #include "inference.h"
-#include "shared_low_level_functions.h"
 #include <boost/math/distributions/skew_normal.hpp>
 #include <cmath>
 #include <math.h>
@@ -8,7 +7,13 @@
 using namespace Rcpp;
 using boost::math::skew_normal;
 
-// side: -1 is left, 0 is both, 1 is right
+namespace sceptre {
+namespace inference {
+
+// Inclusive empirical exceedances with add-one numerator/denominator: side -1
+// left, +1 right, otherwise twice the smaller tail. Ties count in both tails;
+// two-sided p can exceed one and is intentionally not clamped. Empty segments
+// retain the same formula. Scores are read only and no RNG is used.
 double compute_empirical_p_value(const std::vector<double>& null_statistics, double z_orig, int side) {
   double p;
   if (side == -1 || side == 1) { // left or right
@@ -28,6 +33,11 @@ double compute_empirical_p_value(const std::vector<double>& null_statistics, dou
 }
 
 
+namespace {
+// Moment fit on the selected segment: return location/scale/shape plus sample
+// mean and population SD. Keep original moment/summation order: skewness >.995
+// is replaced by .9*.995; no new symmetric cap or degenerate-fit repair. Nonfinite
+// parameters are handled by the owning fitter's existing empirical fallback.
 std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
   // initialize variables
   int n = y.size();
@@ -63,6 +73,10 @@ std::vector<double> fit_skew_normal_funct(const std::vector<double>& y) {
 }
 
 
+// Goodness-of-fit check on an ascending right-tail representation (>=100).
+// At probabilities .90,.905,...,.99, compare the recorded order statistic with
+// fitted upper-tail probability; a ratio >2 declines the fit. The owning fitter
+// supplies sorted/possibly sign-reflected data and enforces the length bound.
 bool check_sn_tail(const std::vector<double>& y, double xi_hat, double omega_hat, double alpha_hat) {
   // The owning fitter checks n >= 100 before this internal .99 quantile lookup.
   // define variables
@@ -90,7 +104,11 @@ bool check_sn_tail(const std::vector<double>& y, double xi_hat, double omega_hat
 }
 
 
-bool check_for_outliers (std::vector<double>& null_statistics, double mu, double sd) {
+// Existing two-tail extreme/normal-envelope ratio gate (threshold 1.5).
+// Input is the nonempty ascending selected segment; endpoint ratios and even
+// degenerate divisions retain original arithmetic. The const segment is neither
+// sorted nor changed by this gate.
+bool check_for_outliers (const std::vector<double>& null_statistics, double mu, double sd) {
   double min_z = null_statistics[0], max_z = null_statistics[null_statistics.size() - 1];
   double RATIO_THRESH = 1.5;
   double B = (double) null_statistics.size();
@@ -100,6 +118,16 @@ bool check_for_outliers (std::vector<double>& null_statistics, double mu, double
   return ok;
 }
 
+} // namespace
+
+// Own the optional tail fit on a selected segment of at least 100 scores.
+// Reject nonfinite moments/outliers/poor selected-tail fit with p=-1; stages
+// then apply the existing empirical fallback. Accepted p uses requested side
+// and is floored at 1e-250. Return xi/omega/alpha/p, even on a declined fit.
+// Sorting is in place on this owned segment. A left-tail check reverses and
+// reflects it, then restores signs only, so returned segment order can remain
+// descending. Preserve that observable order; never touch the full draw bank.
+// Short reached segments fail clearly; no RNG, R callbacks or file effects.
 std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<double>& null_statistics, int side_code) {
   if (null_statistics.size() < 100)
     stop("Reached skew-normal fitting requires at least 100 null statistics.");
@@ -159,3 +187,6 @@ std::vector<double> fit_and_evaluate_skew_normal(double z_orig, std::vector<doub
   // 9. return p, xi, omega, alpha
   return std::vector<double> {fitted_params[0], fitted_params[1], fitted_params[2], p};
 }
+
+} // namespace inference
+} // namespace sceptre

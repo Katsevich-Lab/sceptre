@@ -9,12 +9,20 @@
 #include "sampling_safety.h"
 using namespace Rcpp;
 
+// Calibration uses private std engines and consumes no R random draws. The
+// generated Rcpp RNGScope is retained, including initialization of an absent
+// R seed; an existing R stream is not advanced by these native draws.
+
 namespace {
+// Calibration needs nonempty NT guides and 1<=group_size<=active NT count.
+// Guard enumeration/sampling before indexing or allocating; no metadata fallback.
 void check_group_size(int n_nt_grnas, int group_size) {
   if (n_nt_grnas < 1 || group_size < 1 || group_size > n_nt_grnas)
     stop("Calibration group size must be between 1 and the active NT group count.");
 }
 
+// Double-valued count guard before narrowing to native int; finite, integral,
+// positive and within capacity. This does not choose a smaller feasible request.
 void positive_integer(double value, const char* name) {
   if (!std::isfinite(value) || value < 1 || value != std::floor(value) ||
       value > std::numeric_limits<int>::max())
@@ -23,6 +31,9 @@ void positive_integer(double value, const char* name) {
 }
 
 
+// Distinct zero-based NT-guide subset in draw order, using caller-owned std
+// mt19937/uniform state and O(n) scratch. Caller establishes 0<=k<=n. This std
+// stream belongs to calibration; it is deliberately not the Boost bank stream.
 std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uniform_real_distribution<double>& distribution) {
   std::vector<int> x(n);
   for (int i = 0; i < n; i ++) x[i] = i;
@@ -39,8 +50,15 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
 }
 
 
+// Sample a bounded set of distinct unordered NT-guide combinations, returning
+// group x member integer matrix with zero-based active-NT-guide positions.
+// Group count is min(choose(n,k), max(threshold,ceil(5*pairs/(p_hat*genes))));
+// validate empirical p_hat and capacity before narrowing/allocation. Each subset
+// is sorted for uniqueness; result rows follow the existing unordered_set
+// iteration order, not a newly imposed order. Fixed std mt19937(4), no R draws
+// or input mutation. Preserve rejection/draw order and the existing heuristic.
 // [[Rcpp::export]]
-IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups,
+IntegerMatrix sample_calibration_groups(int calibration_group_size, double n_calibration_pairs, double n_possible_groups,
                                      int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat) {
   check_group_size(n_nt_grnas, calibration_group_size);
   positive_integer(n_calibration_pairs, "n_calibration_pairs");
@@ -89,6 +107,10 @@ IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibr
 }
 
 
+// Enumerate all size-k subsets of active NT guides into a group x member
+// zero-based integer matrix. Preserve the current next_permutation visitation
+// order (including its first step/wrap), rather than sorting output rows.
+// Check choose(n,k), dimensions and capacity before filling. No RNG/mutation.
 // [[Rcpp::export]]
 IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_size, int n_possible_groups) {
   check_group_size(n_nt_grnas, undercover_group_size);
@@ -114,8 +136,12 @@ IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_siz
 }
 
 
+// Convert an explicitly owned scratch combination matrix from zero-based NT
+// guide positions to R one-based label positions. MUTATES the supplied matrix,
+// preserving shape/member/row order; the R calibration constructor calls this
+// only after sampling has finished with the zero-based representation.
 // [[Rcpp::export]]
-void increment_matrix(IntegerMatrix m) {
+void increment_group_indices_in_place(IntegerMatrix m) {
   int n_row = m.nrow();
   int n_col = m.ncol();
   for (int i = 0; i < n_row; i ++) {
@@ -127,8 +153,19 @@ void increment_matrix(IntegerMatrix m) {
 }
 
 
+// Sample QC-eligible group/response pairs without replacement. Count matrix
+// is active-NT-group x all-response; possible_groups_m is candidate-group x
+// member, with ZERO-based row positions in that matrix. Summing member counts
+// is correct for low-MOI/disjoint groups or the caller's precomputed union row;
+// high-MOI overlap must be unioned before entry. Totals share response columns.
+// Enumerate candidates by group*n_genes+response, traverse a fixed std seed-4
+// partial Fisher-Yates stream and retain shared legacy_pair_eligible outcomes.
+// Return one-based response/candidate-group positions plus counts in acceptance
+// order; may exhaust before requested pairs. Widen/check products and sums
+// before allocation/narrowing. Inputs read only, thresholds inclusive, no R RNG;
+// do not replace this stream/eligibility policy with a new acceptance heuristic.
 // [[Rcpp::export]]
-List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
+List sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
                                 int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
   positive_integer(n_genes, "n_genes");
   positive_integer(n_calibration_pairs, "n_calibration_pairs");

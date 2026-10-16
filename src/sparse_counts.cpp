@@ -15,6 +15,9 @@ struct PositionView {
   int size;
 };
 
+// Borrow/materialize an integer R vector of one-based coordinates, validating
+// [1,limit] and int length. Preserve order/repeats; do not subtract or mutate.
+// Its protected normalized R owner must outlive the later compute scope.
 PositionView prepare_positions(SEXP positions, int limit, const char* name) {
   const R_xlen_t size = Rf_xlength(positions);
   if (size > std::numeric_limits<int>::max())
@@ -26,6 +29,9 @@ PositionView prepare_positions(SEXP positions, int limit, const char* name) {
   return {data, static_cast<int>(size)};
 }
 
+// Coerce each R group to integer once and root it in normalized before native
+// ownership. Trivial PositionViews use R_alloc; an R longjmp during coercion or
+// validation cannot strand std::vector storage. Groups index the analysis view.
 PositionView* prepare_groups(const List& groups, int n_cells, SEXP normalized) {
   PositionView* views = reinterpret_cast<PositionView*>(R_alloc(groups.size(), sizeof(PositionView)));
   for (R_xlen_t group = 0; group < groups.size(); ++group) {
@@ -36,12 +42,17 @@ PositionView* prepare_groups(const List& groups, int n_cells, SEXP normalized) {
   return views;
 }
 
+// Guard list length before narrowing dimensions to native int. Empty groups are
+// a supported zero-row output; no group contents or count policy changes.
 int checked_group_count(const List& groups) {
   if (groups.size() > std::numeric_limits<int>::max())
     stop("Group count exceeds native coordinate capacity.");
   return static_cast<int>(groups.size());
 }
 
+// Obtain all-response dimension from CSR pointer length, checking representable
+// source/analysis sizes. Canonical CSR layout/slot consistency is the storage
+// adapter's precondition; this is not a second sparse-layout validator.
 int response_count(const IntegerVector& p, int n_cells_orig,
                    const IntegerVector& cells) {
   if (n_cells_orig < 0 || p.size() < 1 ||
@@ -60,6 +71,9 @@ std::vector<int> copy_zero_based(PositionView positions) {
   return owned;
 }
 
+// Own every ordered group after R preparation. Convert each one-based position
+// once, retaining repeated memberships (including NT sums) and empty groups.
+// Only pure C++ allocation/copies occur while these native owners are alive.
 std::vector<std::vector<int>> copy_zero_based_groups(const PositionView* groups,
                                                     int n_groups) {
   std::vector<std::vector<int>> owned(n_groups);

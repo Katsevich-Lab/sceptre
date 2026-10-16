@@ -1,6 +1,10 @@
 #include <Rcpp.h>
 #include "pair_eligibility.h"
 
+// Vector R boundary for the shared eligibility rule. Aligned integer treatment/
+// control counts retain input order and duplicates; validated scalar thresholds
+// come from QC settings. Return logical with FALSE dominating NA as in R's
+// original vector comparisons; source vectors are read only, with no RNG.
 // [[Rcpp::export]]
 Rcpp::LogicalVector evaluate_pair_eligibility_cpp(
     Rcpp::IntegerVector treatment, Rcpp::IntegerVector control,

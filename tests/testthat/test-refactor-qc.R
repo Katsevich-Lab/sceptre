@@ -17,7 +17,7 @@ test_that("calibration candidate acceptance uses the same count policy", {
     total <- c(16L, 14L, 16L, 16L)
     groups <- matrix(0L, 1L, 1L)
     before <- serialize(list(treatment, total, groups), NULL)
-    sampled <- sample_undercover_pairs_v2(treatment, total, groups,
+    sampled <- sample_calibration_pairs(treatment, total, groups,
         n_genes = 4L, n_calibration_pairs = 4L,
         n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L)
     metrics <- list(n_nonzero_trt = as.integer(treatment[1L, ]),

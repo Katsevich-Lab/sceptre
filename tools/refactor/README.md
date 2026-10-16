@@ -57,8 +57,19 @@ Native fixtures cover 17 prepared cases, stage thresholds, accepted and failed
 skew-normal approximation, all sidedness, positive/zero B3 and selected null
 segments. Only ordinary zero-based arrays are saved, never external pointers.
 The test-only C++ bridge is outside production `src/` and exports no package API.
-Every platform compares full sampler banks with an immutable baseline source
-oracle compiled in that same test environment. Its pinned Git-blob identity is
+Every platform compares the full banks of exactly three active samplers with
+an immutable baseline source oracle compiled in that same test environment.
+The literal candidate map is Fisher-Yates -> `fisher_yates_sampler`, hybrid ->
+`hybrid_fisher_iwor_sampler`, and production fast CRT -> `sample_crt_indices`.
+The fast CRT comparison uses all 5,498 draws, never a diagnostic prefix.
+Actual banks must come from the installed candidate namespace; expected banks
+come only from the independent frozen original source. The fourth frozen
+configuration, slow CRT, has no production substitute: its source/config/archive
+integrity is checked on every platform and its original-oracle full bank is
+compared with the historical bank on the recorded platform/toolchain. This is
+archive evidence, not a fourth active candidate sampler. The controlled pointer
+ownership probe covers three retained samplers x three failure phases (nine
+cases). The original bridge/include/configs and historical reports stay intact. Its pinned Git-blob identity is
 checked during tests. The saved platform-specific stream is an additional
 check, so differing hosted compiler versions do not disable exact RNG parity.
 Floating comparisons use the predeclared tolerance `1e-8`; memberships, order,
@@ -98,7 +109,9 @@ reference/candidate comparisons or their warnings suppressed by SCEPTRE.
 ## Package tests and CI
 
 ```sh
-SCEPTRE_REQUIRE_ONDISC=true Rscript --vanilla -e 'devtools::test(stop_on_failure=TRUE)'
+R CMD INSTALL --preclean --library=/path/to/fresh-candidate-library .
+R_LIBS=/path/to/fresh-candidate-library SCEPTRE_REQUIRE_ONDISC=true \
+  Rscript --vanilla -e 'library(sceptre); testthat::test_dir("tests/testthat", stop_on_failure=TRUE)'
 ```
 
 `SCEPTRE_REQUIRE_ONDISC=true` makes a missing backed dependency a failure. The

@@ -7,12 +7,18 @@ using namespace Rcpp;
 namespace sceptre {
 namespace inference {
 
+// Shared score shape guard: a/w length n and D columns n. The Rcpp entry
+// separately checks y/mu/observed cardinality. D rows may be zero; this does not
+// revalidate a fitted model's rank or scan producer-owned bank coordinates.
 void check_score_dimensions(const NumericVector& a, const NumericVector& w,
                             const NumericMatrix& D) {
   if (a.size() != w.size() || a.size() != D.ncol())
     stop("Score arrays a/w and D columns must have aligned cell dimensions.");
 }
 
+// Allocate an owned vector preserving observed order/repetitions and subtract
+// one once. Positivity/NA is checked here; the Rcpp entry checks upper bounds.
+// The caller's R vector is never decremented in place.
 IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
   IntegerVector zero_based(positions.size());
   for (R_xlen_t i = 0; i < positions.size(); ++i) {
@@ -22,6 +28,10 @@ IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
   return zero_based;
 }
 
+// Ratio of treated sums y/mu and its existing residual-based standard error,
+// both on the fold-change (not log) scale. y/mu share the fit-cell view;
+// trt_idxs are zero-based, n_trt entries, in caller order (repetitions count).
+// Degenerate sums/zero n_trt keep ordinary floating NaN/Inf. No mutation or RNG.
 EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, const IntegerVector& trt_idxs, int n_trt) {
   double sum_y = 0, sum_mu = 0, sum_top = 0, curr_top, n_trt_double = (double) n_trt;
   for (int i = 0; i < n_trt; i ++) {
@@ -38,6 +48,10 @@ EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, 
 }
 
 
+// Studentized efficient score: sum(a[T]) / sqrt(sum(w[T])-||sum(D[,T])||^2).
+// D is nuisance-columns x fit-cells, T is zero-based and already validated by
+// the owning boundary. Preserve summation order, including repeated positions;
+// no clamping/new fallback for a zero or negative studentizer. Inputs read only.
 double observed_score(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, const IntegerVector& trt_idxs) {
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
   int D_nrow = D.nrow();
@@ -62,6 +76,13 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
 }
 
 
+// Evaluate only bank rows [start_pos,start_pos+B), returning B ordered scores.
+// Bank entries are already zero-based fit positions. Fixed-cardinality views
+// read exactly n_trt entries per row; use_all_cells (CRT) instead uses the whole
+// current row, whose length can differ from observed n_trt or be zero. Producers
+// establish coordinate validity; check only selected row lengths/segment bounds,
+// never a hybrid suffix that belongs to a larger fit. The complete bank remains
+// const and reusable across responses/stages. No draws, input mutation or RNG.
 std::vector<double> null_score_segment(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, bool use_all_cells, const DrawBank& synthetic_idxs) {
   check_score_dimensions(a, w, D);
   sceptre::sampling::nonnegative(n_trt, "n_trt");
@@ -112,9 +133,3 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
 
 } // namespace inference
 } // namespace sceptre
-
-// Retain the existing native helper signature for callers in the package.
-std::vector<double> estimate_log_fold_change_v2(NumericVector y, NumericVector mu, IntegerVector trt_idxs, int n_trt) {
-  sceptre::inference::EffectEstimate effect = sceptre::inference::estimate_effect(y, mu, sceptre::inference::observed_positions_zero_based(trt_idxs), n_trt);
-  return std::vector<double> {effect.fold_change, effect.standard_error};
-}

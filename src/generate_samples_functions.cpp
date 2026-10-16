@@ -4,7 +4,15 @@
 #include "sampling_safety.h"
 using namespace Rcpp;
 
+// Native sampler streams are local Boost engines, independent of R draws.
+// Generated Rcpp RNGScope behavior is unchanged: an absent R seed may be
+// initialized at the wrapper boundary, but an existing R stream is not advanced.
 
+
+// Reset scratch x to 0..n_tot-1, then perform M partial Fisher-Yates swaps.
+// The selected ordered sample occupies x[n_tot-M..n_tot); callers preserve
+// that extraction order. Scratch/i_doub_array have n_tot/M capacity, 0<=M<=n_tot.
+// Advance the supplied Boost stream by exactly M uniform draws; no R RNG/state.
 void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_real_distribution<double>& distribution, const std::vector<double>& i_doub_array, std::vector<int>& x, int n_tot, int M) {
   for (int i = 0; i < n_tot; i ++) x[i] = i;
   double n_tot_doub = (double) n_tot, u, temp;
@@ -21,12 +29,13 @@ void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_r
 }
 
 
-//' @title Fisher-Yates sampler
-//' @description This function draws a without replacement sample using the Fisher-Yates sampling algorithm
-//' @param n_tot the total number of cells
-//' @param M the maximum number of cells in a given gRNA group
-//' @param B the number of WOR samples to generate
-//' @noRd
+// Own one B-row bank of M distinct zero-based positions in the current fit
+// universe [0,n_tot). Workers reuse prefixes/selected stages of this full bank;
+// no source-cell IDs or R one-based positions enter it. Empty B/M is supported.
+// Each call restarts Boost mt19937(4), preserving swap/extraction order without
+// consuming R random draws. Guard sizes, protect/register a finalizing NULL XPtr,
+// then allocate native storage; transfer ownership only after the whole bank is
+// ready. R errors at the pointer boundary therefore cannot strand a live bank.
 // [[Rcpp::export]]
 SEXP fisher_yates_sampler(int n_tot, int M, int B) {
   sceptre::sampling::nonnegative(n_tot, "n_tot");
@@ -62,13 +71,15 @@ SEXP fisher_yates_sampler(int n_tot, int M, int B) {
 }
 
 
-//' @title Hybrid Fisher-Yates/IWOR sampler
-//' @description This function draws an inductive without replacement sample using the hybrid Fisher-Yates/IWOR sampling algorithm (developed by Barry et al, to be described in a forthcoming preprint)
-//' @param N the number of control cells
-//' @param m the minumum number of cells in a given gRNA group
-//' @param M the maximum number of cells in a given gRNA group
-//' @param B the number of WOR samples to generate
-//' @noRd
+// Full B-row bank for NT-control fits with N controls and treatment sizes
+// m..M (N>=1, 1<=m<=M). Each stored row has M distinct zero-based positions;
+// its size-k PREFIX, m<=k<=M, is valid in the N+k fit universe. A suffix can be
+// outside a smaller current fit, so consumers must not validate/read the whole
+// row as though it belonged to that smaller view. This prefix coupling is why
+// one bank serves different guides instead of redrawing separately per guide.
+// Preserve the initial Fisher-Yates extraction, inductive update order and
+// fresh Boost mt19937(4) stream. No R draws/input mutation; NULL-XPtr-before-bank
+// ownership and size/overflow guards are the same as fisher_yates_sampler.
 // [[Rcpp::export]]
 SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
   if (N < 1 || m < 1 || M < m) stop("Hybrid sampling requires N >= 1 and 1 <= m <= M.");
@@ -83,8 +94,6 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
 
   // initialize x vector shared across samples; also initialize i_doub vector
   std::vector<int> x(N + m);
-  //std::vector<double> i_doub_array(M);
-  //for (int i = 0; i < M; i ++) i_doub_array[i] = (double) i;
   std::vector<double> i_doub_array(M + 1);
   for (int i = 0; i < M + 1; i ++) i_doub_array[i] = (double) i;
 
@@ -145,6 +154,9 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
 
 
 namespace {
+// Validate finite probabilities in [0,1] and integer-indexed B/cell capacities
+// before allocating any native bank. Endpoints, empty cells and B=0 are valid;
+// these checks never shrink a request or replace its statistical mechanism.
 void check_crt_request(const NumericVector& probabilities, int B) {
   sceptre::sampling::nonnegative(B, "B");
   if (probabilities.size() > std::numeric_limits<int>::max())
@@ -158,35 +170,17 @@ void check_crt_request(const NumericVector& probabilities, int B) {
 }
 
 
+// Bernoulli CRT bank: B variable-length rows of zero-based fit-cell positions.
+// For each cell in input order, draw its number of inclusions with Boost
+// binomial(B,p), then a Fisher-Yates subset of draw rows. Appending cells in
+// this order preserves every full-bank draw and the original random stream;
+// it is not equivalent to a row-major Bernoulli loop for seeded parity.
+// Both CRT workers create the complete B1+B2+B3 bank once per guide and reuse
+// it across responses; observed n_trt does not set synthetic row cardinality.
+// Fresh Boost mt19937(4), no R random draws or input mutation. Protect the finalizing
+// NULL XPtr before native allocation and attach ownership only on success.
 // [[Rcpp::export]]
-SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
-  check_crt_request(fitted_probabilities, B);
-  Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
-    static_cast<std::vector<std::vector<int>>*>(nullptr), true);
-  // initialize output list of vectors
-  std::unique_ptr<std::vector<std::vector<int>>> synth_idx_list(
-    new std::vector<std::vector<int>>(B));
-
-  // initialize the random number generator
-  boost::random::mt19937 generator(4);
-  boost::random::uniform_real_distribution<double> distribution(0, 1);
-  double u;
-
-  // generate B resampled treatment vectors
-  for (int i = 0; i < B; i ++) {
-    std::vector<int> v;
-    for (int j = 0; j < fitted_probabilities.size(); j ++) {
-      u = distribution(generator);
-      if (fitted_probabilities[j] > u) v.push_back(j);
-    }
-    (*synth_idx_list)[i] = v;
-  }
-  return sceptre::sampling::register_bank(pointer, synth_idx_list);
-}
-
-
-// [[Rcpp::export]]
-SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
+SEXP sample_crt_indices(NumericVector fitted_probabilities, int B) {
   check_crt_request(fitted_probabilities, B);
   Rcpp::XPtr<std::vector<std::vector<int>>> pointer(
     static_cast<std::vector<std::vector<int>>*>(nullptr), true);

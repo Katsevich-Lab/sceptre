@@ -22,8 +22,10 @@ writeLines(c(sprintf('#define SCEPTRE_SAMPLING_SOURCE %s', encodeString(source, 
     readLines(probe)), bridge)
 environment <- new.env(parent = globalenv())
 Rcpp::sourceCpp(bridge, env = environment, rebuild = TRUE, showOutput = TRUE)
+# Three retained production samplers x three R pointer-boundary failures.
+samplers <- c("fisher_yates_sampler", "hybrid_fisher_iwor_sampler", "sample_crt_indices")
 results <- list()
-for (sampler in 0:3) for (phase in 1:3) {
+for (sampler in 0:2) for (phase in 1:3) {
     error <- tryCatch({
         environment$refactor_sampling_pointer_failure(sampler, phase)
         NA_character_
@@ -31,7 +33,7 @@ for (sampler in 0:3) for (phase in 1:3) {
     state <- environment$refactor_sampling_failure_state()
     stopifnot(identical(error, "Controlled R pointer-boundary failure."),
               identical(state$phase, phase), isTRUE(state$address_was_null))
-    results[[length(results) + 1L]] <- list(sampler = sampler, phase = phase,
+    results[[length(results) + 1L]] <- list(sampler = samplers[[sampler + 1L]], phase = phase,
         error = error, state = state)
 }
 stopifnot(identical(before, tools::md5sum(files)))
@@ -43,4 +45,5 @@ saveRDS(list(source_files_md5 = before, generated_bridge_md5 = tools::md5sum(bri
 stopifnot(all(file.copy(files, output, overwrite = TRUE)))
 stopifnot(file.copy(bridge, file.path(output, "sampling-ownership-instrumented.cpp"), overwrite = TRUE))
 unlink(bridge)
-cat("Passed", length(results), "controlled R-boundary ownership cases.\n")
+cat("Passed", length(results), "controlled R-boundary ownership cases across",
+    length(samplers), "retained samplers.\n")

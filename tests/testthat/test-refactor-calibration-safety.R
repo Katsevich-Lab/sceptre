@@ -7,15 +7,13 @@ test_that("native producers retain safe zero and endpoint domains", {
     expect_identical(materialize(fy(5L, 0L, 2L)), rep(list(integer()), 2L))
     expect_identical(materialize(fy(5L, 3L, 0L)), list())
     expect_identical(materialize(hybrid(2L, 1L, 3L, 0L)), list())
-    for (name in c("crt_index_sampler", "crt_index_sampler_fast")) {
-        sampler <- refactor_private(name)
-        expect_identical(materialize(sampler(numeric(), 3L)), rep(list(integer()), 3L))
-        expect_identical(materialize(sampler(c(0, 1, 0, 1), 3L)), rep(list(c(1L, 3L)), 3L))
-        expect_identical(materialize(sampler(c(0, 1), 0L)), list())
-        for (probabilities in list(NA_real_, NaN, Inf, -0.1, 1.1))
-            expect_error(sampler(probabilities, 0L), "finite and in")
-        expect_error(sampler(0.5, -1L), "nonnegative")
-    }
+    sampler <- refactor_private("sample_crt_indices")
+    expect_identical(materialize(sampler(numeric(), 3L)), rep(list(integer()), 3L))
+    expect_identical(materialize(sampler(c(0, 1, 0, 1), 3L)), rep(list(c(1L, 3L)), 3L))
+    expect_identical(materialize(sampler(c(0, 1), 0L)), list())
+    for (probabilities in list(NA_real_, NaN, Inf, -0.1, 1.1))
+        expect_error(sampler(probabilities, 0L), "finite and in")
+    expect_error(sampler(0.5, -1L), "nonnegative")
     for (args in list(list(-1L, 0L, 0L), list(1L, -1L, 0L),
                      list(1L, 2L, 0L), list(1L, 1L, NA_integer_)))
         expect_error(do.call(fy, args), "nonnegative|must not exceed")
@@ -28,7 +26,7 @@ test_that("native producers retain safe zero and endpoint domains", {
 
 test_that("calibration combinations reject unsafe sizes and rates before allocation", {
     enumerate <- refactor_private("iterate_over_combinations")
-    sample_groups <- refactor_private("sample_combinations_v2")
+    sample_groups <- refactor_private("sample_calibration_groups")
     expect_identical(enumerate(3L, 2L, 3L), rbind(c(1L, 2L), c(0L, 2L), c(0L, 1L)))
     for (args in list(list(2L, 3L, 0L), list(2L, 0L, 1L),
                      list(3L, 2L, 2L), list(3L, 2L, NA_integer_)))
@@ -44,7 +42,7 @@ test_that("calibration combinations reject unsafe sizes and rates before allocat
 })
 
 test_that("candidate calibration sampling checks dimensions counts and wide products", {
-    sample_pairs <- refactor_private("sample_undercover_pairs_v2")
+    sample_pairs <- refactor_private("sample_calibration_pairs")
     call <- function(counts = matrix(1L, 1L, 1L), totals = 2L,
                      groups = matrix(0L, 1L, 1L), genes = 1L, request = 1L) {
         sample_pairs(counts, totals, groups, genes, request, 0L, 0L)
@@ -159,7 +157,7 @@ test_that("public high-MOI calibration accepts overlapping NT unions", {
 
 test_that("native adapter checks selected prefixes without restricting CRT cardinality", {
     bridge <- refactor_native_bridge(test_path("fixtures", "refactor", "native-bridge.cpp"))
-    run <- refactor_private("run_low_level_test_full_v4")
+    run <- refactor_private("run_association_test")
     args <- list(y = c(2, 1, 3), mu = c(1, 1, 1), a = c(2, -1, 0),
                  w = rep(1, 3), D = matrix(0, 0L, 3L), trt_idxs = 1L,
                  n_trt = 1L, use_all_cells = FALSE,

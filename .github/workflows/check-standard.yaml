@@ -166,4 +166,16 @@ jobs:
         shell: Rscript {0}
         run: |
           stopifnot(!requireNamespace("ondisc", quietly = TRUE))
-          testthat::test_local(".", reporter = "summary", stop_on_failure = TRUE)
+          candidate_library <- tempfile("sceptre-installed-")
+          dir.create(candidate_library)
+          status <- system2(file.path(R.home("bin"), "R"), c("CMD", "INSTALL",
+            "--preclean", paste0("--library=", shQuote(candidate_library)), "."))
+          stopifnot(identical(status, 0L))
+          .libPaths(c(candidate_library, .libPaths()))
+          library(sceptre)
+          stopifnot(identical(normalizePath(find.package("sceptre")),
+            normalizePath(file.path(candidate_library, "sceptre"))),
+            file.exists(file.path(find.package("sceptre"), "Meta", "package.rds")),
+            !requireNamespace("ondisc", quietly = TRUE))
+          testthat::test_dir("tests/testthat", package = "sceptre",
+            load_package = "installed", reporter = "summary", stop_on_failure = TRUE)

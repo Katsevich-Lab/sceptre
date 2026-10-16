@@ -112,12 +112,24 @@ samplers <- list(
 )
 inputs <- list(index_base = list(observed_treatment = 1L, synthetic_draws = 0L),
                numeric_tolerance = 1e-8, cases = cases, samplers = samplers)
-outputs <- lapply(cases, refactor_native_run_case, bridge = bridge)
+# This historical generator executes only the source-verified original loaded
+# above. Current installed-candidate helpers deliberately use different names;
+# keep original entry points local here rather than adding production aliases.
+run_original_case <- function(case) {
+    args <- case[setdiff(names(case), c("draws", "expected_stage", "expected_sn"))]
+    args$synthetic_idxs <- bridge$refactor_native_pointer(case$draws, length(case$a))
+    do.call(getFromNamespace("run_low_level_test_full_v4", "sceptre"), args)
+}
+sample_original_bank <- function(config) {
+    pointer <- do.call(getFromNamespace(config$function_name, "sceptre"), config$args)
+    bridge$refactor_native_materialize(pointer)
+}
+outputs <- lapply(cases, run_original_case)
 for (name in names(cases)) {
     stopifnot(identical(outputs[[name]]$stage, cases[[name]]$expected_stage))
     stopifnot(identical(all(is.finite(outputs[[name]]$sn_params)), cases[[name]]$expected_sn))
 }
-draws <- lapply(samplers, refactor_native_sample, bridge = bridge)
+draws <- lapply(samplers, sample_original_bank)
 expected <- list(
     provenance = list(production_commit = pinned, reference_checkout = tryCatch(
                           git(c("rev-parse", "HEAD"), reference),

@@ -2,6 +2,12 @@
 using namespace Rcpp;
 using namespace std;
 
+// Load one zero-based compressed segment into caller-owned dense scratch out
+// (length dim), resetting it first. Slots/pointers are canonical zero-based
+// Matrix CSR/CSC coordinates; adapters establish valid layout and dimensions.
+// Explicit zero/fractional VALUES are loaded; no threshold or stored-position
+// counting occurs. Canonical segments have unique indices (otherwise last wins).
+// Mutates only out, never source slots, and allocates nothing/no RNG.
 void load_sparse_vector(IntegerVector l, IntegerVector p, NumericVector x, int idx, int dim, NumericVector out) {
   int start = p[idx], end = p[idx + 1];
   for (int k = 0; k < dim; k ++) out[k] = 0.0;
@@ -9,6 +15,10 @@ void load_sparse_vector(IntegerVector l, IntegerVector p, NumericVector x, int i
 }
 
 
+// Dense numeric row in original source-cell order from valid CSR j/p/x.
+// row_idx is R one-based, converted once for load_sparse_vector; n_cells is
+// full source width. Returns a new vector, retaining loaded values and implicit
+// zeros; storage selects/reorders requested cells afterward. No input mutation.
 // [[Rcpp::export]]
 NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells) {
   NumericVector out(n_cells);
@@ -17,6 +27,11 @@ NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, in
 }
 
 
+// Build dim+1 zero-based compressed pointers from an already nondecreasing
+// stream of zero-based major indices in [0,dim). Empty rows/columns get repeated
+// offsets; dim=1 uses all entries. Import/storage callers establish sorted valid
+// coordinates before entry. Repetitions remain stored entries, not coalesced.
+// Returns a new vector, with no mutation, value inspection, RNG or file effect.
 // [[Rcpp::export]]
 IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
   int i_size = i.size();
@@ -36,8 +51,13 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 }
 
 
+// Feature-by-source-cell CSC summaries: i/p/x are canonical zero-based slots,
+// n_genes rows/n_cells columns; output vectors follow original cell order.
 // Column summaries load values (not stored-position counts): nonzero means
-// value > 0.5. Active mitochondrial indices are copied from R one-based rows
+// value > 0.5. UMIs sum all loaded values, including fractional counts; optional
+// mito fractions use R one-based feature rows. Optional max-feature returns a
+// zero-based first strictly maximal row; all-zero columns keep row 0/NaN ratio.
+// Unrequested optional fields remain their allocated zeros. Active mitochondrial indices are copied from R one-based rows
 // only after all R allocation/materialization, including the named result.
 // The native compute scope uses cached pointers and ends before return. Source
 // i/p/x and all R inputs remain unchanged; preserve ties and zero-total ratios.
@@ -105,30 +125,10 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
 }
 
 
-List compute_colwise_max(IntegerVector i, IntegerVector p, NumericVector x, int n_cells, NumericVector grna_lib_size) {
-  IntegerVector assignment_vect(n_cells);
-  NumericVector frac_umis(n_cells);
-  int p_start, p_end, curr_maximizer;
-  double curr_max;
-
-  for (int k = 0; k < n_cells; k ++) {
-    p_start = p[k];
-    p_end = p[k+1];
-    curr_max = -1.0;
-    curr_maximizer = -1;
-    for (int l = p_start; l < p_end; l ++) {
-      if (x[l] > curr_max) {
-        curr_max = x[l];
-        curr_maximizer = i[l];
-      }
-    }
-    assignment_vect[k] = curr_maximizer + 1;
-    frac_umis[k] = curr_max/grna_lib_size[k];
-  }
-  return(List::create(Named("assignment_vect") = assignment_vect, Named("frac_umis") = frac_umis));
-}
-
-
+// Count guide memberships per cell from a list of R one-based cell positions
+// in the caller's n_cells view. Order/duplicates are not normalized: repeated
+// memberships contribute repeatedly. Inputs have already been validated by the
+// assignment path. Returns a new zero-initialized integer vector, no RNG/mutation.
 // [[Rcpp::export]]
 IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells) {
   IntegerVector out(n_cells), current_assignments;
@@ -142,13 +142,11 @@ IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells
 }
 
 
-// [[Rcpp::export]]
-void increment_vector(IntegerVector x, int value) {
-  for (int i = 0; i < x.size(); i++) x[i] += value;
-  return;
-}
-
-
+// Threshold the STORED values of one CSR feature row (R one-based row_idx).
+// Return R one-based source-cell positions in segment order for x>=threshold;
+// explicit zeros can qualify at threshold<=0, but implicit zeros are not visited.
+// Compare numeric fractions directly; no integer conversion or deduplication.
+// Two passes allocate an exact result; source j/p/x and caller vectors unchanged.
 // [[Rcpp::export]]
 IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold) {
   IntegerVector out;

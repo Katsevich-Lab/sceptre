@@ -73,6 +73,11 @@ compact work. The same separate diagnostic checks response/assignment fitting
 and per-guide draw sharing for the CRT case. Its Rprofmem/tracing overhead is
 absent from elapsed trials.
 R allocation profiling excludes C++/HDF5 allocations and fork memory.
+The profiler takes six positional arguments: library, case RDS, frozen fixture
+directory, `cold` or `warm`, output JSON, and `original` or `candidate`.
+The final argument selects an explicit three-sampler map for that source;
+missing functions fail tracing rather than silently reducing coverage. The
+archived original slow CRT sampler is not an active production producer.
 
 Baseline and candidate inputs, library paths, source pins, dependency/platform/
 BLAS details, thread settings, scientific hashes and warning lists are retained

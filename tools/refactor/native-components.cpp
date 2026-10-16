@@ -46,7 +46,7 @@ Rcpp::List component_tail_record(double z_orig, Rcpp::NumericVector a,
                                           fit_parametric_curve, side_code);
   if (bank != before) Rcpp::stop("Staged evaluation mutated the draw bank.");
   EffectEstimate effect = {fold_change, standard_error};
-  return legacy_result_record(effect, z_orig, result, return_resampling_dist);
+  return association_result_record(effect, z_orig, result, return_resampling_dist);
 }
 
 // [[Rcpp::export]]

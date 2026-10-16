@@ -155,7 +155,7 @@ run_calibration_check_pt_1 <- function(
     }
 
     # 3. construct the negative control pairs
-    negative_control_pairs <- construct_negative_control_pairs_v2(
+    negative_control_pairs <- construct_negative_control_pairs(
         sceptre_object = sceptre_object,
         n_calibration_pairs = n_calibration_pairs,
         calibration_group_size = calibration_group_size

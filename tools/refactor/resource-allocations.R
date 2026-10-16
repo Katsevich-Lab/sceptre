@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 # Separate diagnostic run: profiling/tracing never contaminates elapsed trials.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 5L) stop("Usage: resource-allocations.R <library> <case.rds> <fixtures> <cold|warm> <output.json>")
+if (length(args) != 6L) stop("Usage: resource-allocations.R <library> <case.rds> <fixtures> <cold|warm> <output.json> <original|candidate>")
+source_role <- match.arg(args[[6L]], c("original", "candidate"))
 .libPaths(c(normalizePath(args[[1L]]), .libPaths()))
 library(sceptre)
 stopifnot(identical(normalizePath(find.package("sceptre")), file.path(normalizePath(args[[1L]]), "sceptre")))
@@ -38,7 +39,15 @@ trace_one <- function(name, namespace) {
     trace(name, tracer = tracer, where = asNamespace(namespace), print = FALSE)
 }
 trace_one("glm.fit", "stats")
-samplers <- c("fisher_yates_sampler", "hybrid_fisher_iwor_sampler", "crt_index_sampler", "crt_index_sampler_fast")
+# Enumerate the three actual production samplers explicitly for each source.
+# The original-only slow CRT implementation is archival, not an active bank
+# producer. A missing mapped function is a hard trace error, never filtered out.
+sampler_functions <- switch(source_role,
+    original = c(fisher_yates = "fisher_yates_sampler",
+        hybrid = "hybrid_fisher_iwor_sampler", crt_fast_production = "crt_index_sampler_fast"),
+    candidate = c(fisher_yates = "fisher_yates_sampler",
+        hybrid = "hybrid_fisher_iwor_sampler", crt_fast_production = "sample_crt_indices"))
+samplers <- unname(sampler_functions)
 for (sampler in samplers) trace_one(sampler, "sceptre")
 profile <- tempfile("sceptre-rprofmem-")
 gc()
@@ -51,6 +60,7 @@ lines <- readLines(profile)
 allocations <- as.double(sub(" .*", "", lines[grepl("^[0-9]+ ", lines)]))
 jsonlite::write_json(list(
     case = sub("\\.rds$", "", basename(args[[2L]])), cache = mode,
+    source_role = source_role, sampler_functions = as.list(sampler_functions),
     passing_pairs = result@n_ok_discovery_pairs,
     current_response_fit_expectation = if (mode == "cold") length(unique(object@discovery_pairs_with_info$response_id[object@discovery_pairs_with_info$pass_qc])) else 0L,
     assignment_fit_and_draw_bank_expectation = if (parameters$mechanism == "crt") length(unique(object@discovery_pairs_with_info$grna_group[object@discovery_pairs_with_info$pass_qc])) else 0L,

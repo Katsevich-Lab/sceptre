@@ -119,7 +119,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     base_case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_nt_perm
     originals <- lapply(c("fit_response", "fit_assignment_probabilities",
-        "crt_index_sampler_fast", "get_synthetic_permutation_idxs",
+        "sample_crt_indices", "get_synthetic_permutation_idxs",
         "storage_read_response"), refactor_private)
     names(originals) <- c("fit", "assignment", "crt", "permutation", "read")
     events <- new.env(parent = emptyenv())
@@ -134,7 +134,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
         fit_assignment_probabilities = function(...) {
             events$assignment <- events$assignment + 1L; originals$assignment(...)
         },
-        crt_index_sampler_fast = function(fitted_probabilities, B) {
+        sample_crt_indices = function(fitted_probabilities, B) {
             events$crt <- c(events$crt, B); originals$crt(fitted_probabilities, B)
         },
         get_synthetic_permutation_idxs = function(..., B) {

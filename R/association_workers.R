@@ -18,7 +18,7 @@ test_permutation_shared_fit <- function(expression, score, treatment_lookup,
     results <- vector("list", length(groups))
     for (i in seq_along(groups)) {
         treatment <- treatment_lookup(groups[i])
-        results[[i]] <- run_low_level_test_full_v4(
+        results[[i]] <- run_association_test(
             y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
             trt_idxs = treatment$trt_idxs, use_all_cells = FALSE,
             n_trt = treatment$n_trt, synthetic_idxs = synthetic_idxs,
@@ -55,7 +55,7 @@ test_permutation_group_fit <- function(expression, design, index, groups,
         group_design <- design[view$fit_to_analysis, , drop = FALSE]
         fit <- fit_response(group_expression, group_design)
         score <- prepare_score_components(group_expression, group_design, fit)
-        results[[i]] <- run_low_level_test_full_v4(
+        results[[i]] <- run_association_test(
             y = group_expression, mu = score$mu, a = score$a, w = score$w,
             D = score$D, trt_idxs = view$trt_fit_pos, use_all_cells = FALSE,
             n_trt = view$n_trt, synthetic_idxs = synthetic_idxs,
@@ -86,14 +86,14 @@ test_crt_shared_fit <- function(response_store, response_rows, response_ids,
                                 design, source_cells, treatment, response_fits,
                                 test_options, output_amount) {
     probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
-    synthetic_idxs <- crt_index_sampler_fast(probabilities,
+    synthetic_idxs <- sample_crt_indices(probabilities,
                                              B = test_options$total_resamples)
     results <- vector("list", length(response_rows))
     for (i in seq_along(response_rows)) {
         expression <- storage_read_response(response_store, response_rows[i], source_cells)
         score <- prepare_score_components(expression, design,
             lookup_response_fit(response_fits, response_ids[i]))
-        results[[i]] <- run_low_level_test_full_v4(
+        results[[i]] <- run_association_test(
             y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
             trt_idxs = treatment$trt_idxs, use_all_cells = TRUE,
             n_trt = treatment$n_trt, synthetic_idxs = synthetic_idxs,
@@ -122,7 +122,7 @@ test_crt_group_fit <- function(response_store, response_rows, design, fit_view,
                                test_options, output_amount) {
     group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
     probabilities <- fit_assignment_probabilities(fit_view$trt_fit_pos, group_design)
-    synthetic_idxs <- crt_index_sampler_fast(probabilities,
+    synthetic_idxs <- sample_crt_indices(probabilities,
                                              B = test_options$total_resamples)
     results <- vector("list", length(response_rows))
     for (i in seq_along(response_rows)) {
@@ -130,7 +130,7 @@ test_crt_group_fit <- function(response_store, response_rows, design, fit_view,
                                             fit_view$source_cells)
         fit <- fit_response(expression, group_design)
         score <- prepare_score_components(expression, group_design, fit)
-        results[[i]] <- run_low_level_test_full_v4(
+        results[[i]] <- run_association_test(
             y = expression, mu = score$mu, a = score$a, w = score$w, D = score$D,
             trt_idxs = fit_view$trt_fit_pos, use_all_cells = TRUE,
             n_trt = fit_view$n_trt, synthetic_idxs = synthetic_idxs,

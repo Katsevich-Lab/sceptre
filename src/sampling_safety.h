@@ -11,10 +11,14 @@
 // allocation; these helpers do not choose smaller budgets or change draw order.
 namespace sceptre {
 namespace sampling {
+// Native integer domain check (R NA_INTEGER is negative). Failure precedes
+// arithmetic/allocation; zero is supported where the caller permits it.
 inline void nonnegative(int value, const char* name) {
   if (value < 0) Rcpp::stop("%s must be nonnegative and not NA.", name);
 }
 
+// Nonnegative int addition via int64_t, returning int only after range check;
+// used for stage offsets and hybrid universe sizes, never to cap budgets.
 inline int sum(int left, int right, const char* name) {
   nonnegative(left, name);
   nonnegative(right, name);
@@ -24,6 +28,8 @@ inline int sum(int left, int right, const char* name) {
   return static_cast<int>(total);
 }
 
+// Check a nonnegative rows x columns result against R length and native integer
+// vector allocation capacity before creating its R matrix. No feasibility guess.
 inline void matrix_extent(int rows, int columns) {
   nonnegative(rows, "Matrix rows");
   nonnegative(columns, "Matrix columns");
@@ -33,6 +39,8 @@ inline void matrix_extent(int rows, int columns) {
     Rcpp::stop("Requested matrix exceeds allocation capacity.");
 }
 
+// Check the requested nested-vector shape and total int payload for representable
+// allocation, including empty rows/banks. No allocation or random draws here.
 inline void bank_extent(int rows, int width) {
   nonnegative(rows, "B");
   nonnegative(width, "Draw width");

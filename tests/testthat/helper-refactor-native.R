@@ -43,12 +43,26 @@ refactor_native_run_case <- function(case, bridge) {
     )
     args <- case[setdiff(names(case), c("draws", "expected_stage", "expected_sn"))]
     args$synthetic_idxs <- bridge$refactor_native_pointer(case$draws, length(case$a))
-    do.call(refactor_native_function("run_low_level_test_full_v4"), args)
+    do.call(refactor_native_function("run_association_test"), args)
 }
 
-refactor_native_sample <- function(config, bridge) {
-    pointer <- do.call(refactor_native_function(config$function_name), config$args)
-    # Materialize the entire requested bank before taking a diagnostic prefix.
+# Frozen configurations are historical inputs, never a candidate name registry.
+# Keep this literal map separate so the retired slow CRT oracle cannot silently
+# re-enter active coverage or be replaced by a reference implementation.
+refactor_native_candidate_samplers <- function() {
+    c(fisher_yates = "fisher_yates_sampler",
+      hybrid = "hybrid_fisher_iwor_sampler",
+      crt_fast_production = "sample_crt_indices")
+}
+
+refactor_native_sample <- function(config, candidate_name, bridge) {
+    path <- getNamespaceInfo(asNamespace("sceptre"), "path")
+    if (!file.exists(file.path(path, "Meta", "package.rds"))) {
+        stop("Full-bank candidate comparisons require an installed sceptre namespace.")
+    }
+    pointer <- do.call(refactor_native_function(candidate_name), config$args)
+    # Actual always comes from the installed candidate. The independent frozen
+    # source oracle below supplies expected; materialize the entire B bank.
     bridge$refactor_native_materialize(pointer)
 }
 

@@ -4,49 +4,34 @@
 
 using namespace Rcpp;
 
-// Keep the existing native helper signatures while ordinary numeric components
-// own the arithmetic. Observed R indices are converted once at these adapters;
-// synthetic draw indices are already zero-based and are never converted again.
-double compute_observed_full_statistic_v2(NumericVector a, NumericVector w,
-                                          NumericMatrix D, IntegerVector trt_idxs) {
-  sceptre::inference::check_score_dimensions(a, w, D);
-  for (int position : trt_idxs) {
-    if (position < 1 || position > a.size()) stop("Observed treatment position is outside the aligned cell range.");
-  }
-  return sceptre::inference::observed_score(a, w, D,
-    sceptre::inference::observed_positions_zero_based(trt_idxs));
-}
 
-std::vector<double> compute_null_full_statistics(const NumericVector& a,
-                                                const NumericVector& w,
-                                                const NumericMatrix& D,
-                                                int start_pos, int B, int n_trt,
-                                                bool use_all_cells,
-                                                SEXP synthetic_idxs) {
-  XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
-  if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
-  return sceptre::inference::null_score_segment(a, w, D, start_pos, B, n_trt,
-                                               use_all_cells, *draws);
-}
-
+// Sole Rcpp association boundary. y/mu/a/w have n ordered fit cells and D is
+// nuisance-columns x n; observed trt_idxs are R one-based positions and n_trt
+// is their observed cardinality. Validate dimensions/positions/budget arithmetic
+// before converting observed positions exactly once. Empty/degenerate numeric
+// fits retain their existing NaN/Inf arithmetic rather than a new fallback.
+// synthetic_idxs is a live worker-local XPtr owning a zero-based full DrawBank;
+// validate its address, then borrow it const. Fixed-size tests use n_trt prefixes;
+// CRT tests use each selected row's entire cardinality, including empty rows.
+// Return the unchanged effect/score/tail schema, optionally the last selected
+// null segment. Components allocate their own result and never mutate inputs
+// or the bank; no RNG or file effects. This is not a persisted pointer format.
 // [[Rcpp::export]]
-SEXP run_low_level_test_full_v4(NumericVector y,
-                                NumericVector mu,
-                                NumericVector a,
-                                NumericVector w,
-                                NumericMatrix D,
-                                IntegerVector trt_idxs,
-                                int n_trt,
-                                bool use_all_cells,
-                                SEXP synthetic_idxs,
-                                int B1,
-                                int B2,
-                                int B3,
-                                bool fit_parametric_curve,
-                                bool return_resampling_dist,
-                                int side_code) {
-  // The compatibility boundary alone unwraps R's external pointer. Numeric
-  // components receive a const bank reference with worker-local lifetime.
+SEXP run_association_test(NumericVector y,
+                          NumericVector mu,
+                          NumericVector a,
+                          NumericVector w,
+                          NumericMatrix D,
+                          IntegerVector trt_idxs,
+                          int n_trt,
+                          bool use_all_cells,
+                          SEXP synthetic_idxs,
+                          int B1,
+                          int B2,
+                          int B3,
+                          bool fit_parametric_curve,
+                          bool return_resampling_dist,
+                          int side_code) {
   sceptre::inference::check_score_dimensions(a, w, D);
   if (y.size() != a.size() || mu.size() != a.size())
     stop("Response, fitted means and score arrays must have aligned cell dimensions.");
@@ -68,6 +53,6 @@ SEXP run_low_level_test_full_v4(NumericVector y,
   sceptre::inference::TailResult tail = sceptre::inference::evaluate_staged_tail(
     z_orig, a, w, D, n_trt, use_all_cells, *draws, B1, B2, B3,
     fit_parametric_curve, side_code);
-  return sceptre::inference::legacy_result_record(effect, z_orig, tail,
-                                                 return_resampling_dist);
+  return sceptre::inference::association_result_record(effect, z_orig, tail,
+                                                       return_resampling_dist);
 }

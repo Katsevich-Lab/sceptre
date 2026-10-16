@@ -79,8 +79,7 @@ void refactor_sampling_pointer_failure(int sampler, int phase) {
   address_was_null = false;
   if (sampler == 0) actual_candidate_samplers::fisher_yates_sampler(3, 1, 2);
   else if (sampler == 1) actual_candidate_samplers::hybrid_fisher_iwor_sampler(2, 1, 2, 2);
-  else if (sampler == 2) actual_candidate_samplers::crt_index_sampler(Rcpp::NumericVector::create(0.5), 2);
-  else if (sampler == 3) actual_candidate_samplers::crt_index_sampler_fast(Rcpp::NumericVector::create(0.5), 2);
+  else if (sampler == 2) actual_candidate_samplers::sample_crt_indices(Rcpp::NumericVector::create(0.5), 2);
   else Rcpp::stop("Unknown sampler probe.");
   requested_phase = 0;
 }
