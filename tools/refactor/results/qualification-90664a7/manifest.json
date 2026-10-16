@@ -1,0 +1,14 @@
+{
+  "source_commit": "90664a763140a6197a429f65ab45d31f0f7f94c9",
+  "scope": "Historical installed qualification; subsequent production cleanup requires new qualification.",
+  "sha256": {
+    "00check.log": "c77d060c02a16c4888b6ee996f669d5702ff5d3497e2d8e6256e34ecaa6e6b85",
+    "installed-test-counts.csv": "614dd0f9d7baa2c02ea62d7ad6c92782a7bb95099f6b70a39f335b76b3ec01c0",
+    "installed-test-summary.json": "d118e6f8e3215b69259b5f12682b937e25fec1ea3ad290aa909ee914fa9b3bdf",
+    "native-component-test-counts.csv": "cb60aae94b9ef0aff9b573906aaa2be4faa91d659d6333e2ed3478a307f46f20",
+    "native-component-test-summary.json": "8436a948ebb13d3068bf074f5bead6af1d2a99c9bb5ed87ad48d8ef4502c890e",
+    "preparation.json": "81ec8f3a98c7136b8f45a80cb634a75817ed7628b35a1cea71a63f651e05a1d2",
+    "qualification-summary.json": "fa7453764acb16a1a4451360b6fa55d47f287d6d20d648b9d6af18e516d73016",
+    "summary.json": "f7593af1c76d0f3d44e5fad377ead4be9ed4fb543a9c7466fa542bec3731382b"
+  }
+}

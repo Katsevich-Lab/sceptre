@@ -1,0 +1,241 @@
+Oct-16 11:38:31.742 [main] DEBUG nextflow.cli.Launcher - $> nextflow run /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/main.nf -c /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/local.config -work-dir /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work --sceptre_object_fp /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/inputs/sceptre_object.rds --response_odm_fp /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/inputs/response.odm --grna_odm_fp /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/inputs/grna.odm --outdir /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/published -ansi-log false --discovery_pairs trans
+Oct-16 11:38:31.820 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.10.4
+Oct-16 11:38:31.843 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/ekatsevi/.nextflow/plugins; core-plugins: nf-amazon@3.4.4,nf-azure@1.20.2,nf-cloudcache@0.5.0,nf-codecommit@0.5.0,nf-console@1.3.0,nf-google@1.23.5,nf-k8s@1.2.2,nf-tower@1.17.5,nf-wave@1.16.1
+Oct-16 11:38:31.865 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-16 11:38:31.866 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-16 11:38:31.868 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Oct-16 11:38:31.881 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-16 11:38:31.917 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/nextflow.config
+Oct-16 11:38:31.921 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/local.config
+Oct-16 11:38:31.922 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/nextflow.config
+Oct-16 11:38:31.923 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/local.config
+Oct-16 11:38:31.946 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-16 11:38:33.132 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-16 11:38:33.221 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins declared=[nf-schema@2.4.2]
+Oct-16 11:38:33.222 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-16 11:38:33.222 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[nf-schema@2.4.2]
+Oct-16 11:38:33.223 [main] DEBUG nextflow.plugin.PluginUpdater - Installing plugin nf-schema version: 2.4.2
+Oct-16 11:38:33.239 [main] INFO  org.pf4j.AbstractPluginManager - Plugin 'nf-schema@2.4.2' resolved
+Oct-16 11:38:33.240 [main] INFO  org.pf4j.AbstractPluginManager - Start plugin 'nf-schema@2.4.2'
+Oct-16 11:38:33.248 [main] DEBUG nextflow.plugin.BasePlugin - Plugin started nf-schema@2.4.2
+Oct-16 11:38:33.267 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/ekatsevi/.nextflow/secrets/store.json
+Oct-16 11:38:33.270 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@373e6b9d] - activable => nextflow.secret.LocalSecretsProvider@373e6b9d
+Oct-16 11:38:33.272 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Oct-16 11:38:33.287 [main] INFO  nextflow.cli.CmdRun - Launching `/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/main.nf` [fabulous_goldwasser] DSL2 - revision: 5b30847309
+Oct-16 11:38:33.338 [main] DEBUG nextflow.Session - Session UUID: 7ded06e5-007c-4d1d-bff5-8f161e5e5eec
+Oct-16 11:38:33.339 [main] DEBUG nextflow.Session - Run name: fabulous_goldwasser
+Oct-16 11:38:33.339 [main] DEBUG nextflow.Session - Executor pool size: 18
+Oct-16 11:38:33.347 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Oct-16 11:38:33.353 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=54; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-16 11:38:33.378 [main] DEBUG nextflow.cli.CmdInfo - Unable to fetch totalSwapSpaceSize - errno: 1 error: sysctlbyname failed
+
+Oct-16 11:38:33.378 [main] DEBUG nextflow.cli.CmdInfo - Unable to fetch freeSwapSpaceSize - errno: 1 error: sysctlbyname failed
+
+Oct-16 11:38:33.379 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.10.4 build 11173
+  Created: 10-02-2026 15:17 UTC (10:17 EDT)
+  System: Mac OS X 26.6.2
+  Runtime: Groovy 4.0.28 on OpenJDK 64-Bit Server VM 17.0.10+7
+  Encoding: UTF-8 (UTF-8)
+  Process: 12634@WHA-STGPK4DX-ML [198.19.254.2]
+  CPUs: 18 - Mem: 48 GB (3.1 GB) - Swap: - (-)
+Oct-16 11:38:33.396 [main] DEBUG nextflow.Session - Work-dir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work [Mac OS X]
+Oct-16 11:38:33.430 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-16 11:38:33.439 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Oct-16 11:38:33.446 [main] DEBUG nextflow.Session - Observer factory (v2): DefaultObserverFactory
+Oct-16 11:38:33.490 [main] DEBUG nextflow.Session - Observer factory: ValidationObserverFactory
+Oct-16 11:38:33.611 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-16 11:38:33.620 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 19; maxThreads: 1000
+Oct-16 11:38:33.703 [main] DEBUG nextflow.Session - Session start
+Oct-16 11:38:33.711 [main] DEBUG n.validation.config.ValidationConfig - Set `validation.monochromeLogs` to false
+Oct-16 11:38:33.715 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.enabled` to true
+Oct-16 11:38:33.716 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHiddenParameter` to show_hidden
+Oct-16 11:38:33.716 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.showHidden` to false (Due to --show_hidden)
+Oct-16 11:38:33.717 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.fullParameter` to help_full
+Oct-16 11:38:33.725 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.beforeText` to 
+-------------------------------------------------
+  sceptre-pipeline
+  Single-cell CRISPR screen analysis with sceptre
+-------------------------------------------------
+
+Oct-16 11:38:33.727 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.afterText` to 
+* sceptre
+    https://timothy-barry.github.io/sceptre-book/
+
+* The nf-core framework
+    https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+    https://github.com/Katsevich-Lab/sceptre-pipeline/blob/main/CITATIONS.md
+
+Oct-16 11:38:33.729 [main] DEBUG n.validation.config.HelpConfig - Set `validation.help.command` to nextflow run Katsevich-Lab/sceptre-pipeline -profile <docker/singularity/conda> --sceptre_object_fp <FP> --response_odm_fp <FP> --grna_odm_fp <FP> --outdir <DIR>
+Oct-16 11:38:33.731 [main] DEBUG n.validation.config.SummaryConfig - Set `validation.summary.beforeText` to 
+-------------------------------------------------
+  sceptre-pipeline
+  Single-cell CRISPR screen analysis with sceptre
+-------------------------------------------------
+
+Oct-16 11:38:33.733 [main] DEBUG n.validation.config.SummaryConfig - Set `validation.summary.afterText` to 
+* sceptre
+    https://timothy-barry.github.io/sceptre-book/
+
+* The nf-core framework
+    https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+    https://github.com/Katsevich-Lab/sceptre-pipeline/blob/main/CITATIONS.md
+
+Oct-16 11:38:33.737 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/published/pipeline_info/execution_trace_2026-10-16_11-38-32.txt
+Oct-16 11:38:34.187 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-16 11:38:35.284 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name SET_ANALYSIS_PARAMETERS
+Oct-16 11:38:35.286 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:SET_ANALYSIS_PARAMETERS` matches process SET_ANALYSIS_PARAMETERS
+Oct-16 11:38:35.289 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process SET_ANALYSIS_PARAMETERS
+Oct-16 11:38:35.292 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.293 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.311 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Oct-16 11:38:35.320 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=18; memory=48 GB; capacity=1; pollInterval=100ms; dumpInterval=5m
+Oct-16 11:38:35.322 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Oct-16 11:38:35.346 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'SET_ANALYSIS_PARAMETERS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.411 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name PREPARE_ASSIGN_GRNAS
+Oct-16 11:38:35.413 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process PREPARE_ASSIGN_GRNAS
+Oct-16 11:38:35.414 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.414 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.415 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'PREPARE_ASSIGN_GRNAS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.452 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name ASSIGN_GRNAS
+Oct-16 11:38:35.452 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:ASSIGN_GRNAS|RUN_ASSOCIATION_ANALYSIS|RUN_DISCOVERY_ANALYSIS_TRANS` matches process ASSIGN_GRNAS
+Oct-16 11:38:35.453 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process ASSIGN_GRNAS
+Oct-16 11:38:35.454 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.454 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.455 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'ASSIGN_GRNAS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.462 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_single` matches labels `process_single` for process with name DUMMY_ASSIGN_GRNAS
+Oct-16 11:38:35.462 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process DUMMY_ASSIGN_GRNAS
+Oct-16 11:38:35.464 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.464 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.465 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'DUMMY_ASSIGN_GRNAS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.484 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name COMBINE_ASSIGN_GRNAS
+Oct-16 11:38:35.485 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:COMBINE_ASSIGN_GRNAS` matches process COMBINE_ASSIGN_GRNAS
+Oct-16 11:38:35.486 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process COMBINE_ASSIGN_GRNAS
+Oct-16 11:38:35.489 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.489 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.490 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'COMBINE_ASSIGN_GRNAS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.494 [main] WARN  nextflow.extension.OperatorImpl - The operator `first` is useless when applied to a value channel which returns a single value by definition
+Oct-16 11:38:35.501 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name RUN_QC_TRANS
+Oct-16 11:38:35.502 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:RUN_QC|RUN_QC_TRANS` matches process RUN_QC_TRANS
+Oct-16 11:38:35.502 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process RUN_QC_TRANS
+Oct-16 11:38:35.503 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.504 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.504 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'RUN_QC_TRANS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.508 [main] WARN  nextflow.extension.OperatorImpl - The operator `first` is useless when applied to a value channel which returns a single value by definition
+Oct-16 11:38:35.515 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name PREPARE_ASSOCIATION_ANALYSIS_TRANS
+Oct-16 11:38:35.516 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:PREPARE_ASSOCIATION_ANALYSIS_TRANS` matches process PREPARE_ASSOCIATION_ANALYSIS_TRANS
+Oct-16 11:38:35.516 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process PREPARE_ASSOCIATION_ANALYSIS_TRANS
+Oct-16 11:38:35.517 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.517 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.518 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'PREPARE_ASSOCIATION_ANALYSIS_TRANS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.522 [main] WARN  nextflow.extension.OperatorImpl - The operator `first` is useless when applied to a value channel which returns a single value by definition
+Oct-16 11:38:35.532 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name RUN_DISCOVERY_ANALYSIS_TRANS
+Oct-16 11:38:35.533 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:ASSIGN_GRNAS|RUN_ASSOCIATION_ANALYSIS|RUN_DISCOVERY_ANALYSIS_TRANS` matches process RUN_DISCOVERY_ANALYSIS_TRANS
+Oct-16 11:38:35.534 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:RUN_DISCOVERY_ANALYSIS_TRANS` matches process RUN_DISCOVERY_ANALYSIS_TRANS
+Oct-16 11:38:35.534 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:.*` matches process RUN_DISCOVERY_ANALYSIS_TRANS
+Oct-16 11:38:35.535 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-16 11:38:35.535 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 11:38:35.539 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'RUN_DISCOVERY_ANALYSIS_TRANS': maxForks=1; fair=true; array=0
+Oct-16 11:38:35.587 [main] DEBUG nextflow.Session - Config process names validation disabled as requested
+Oct-16 11:38:35.590 [main] DEBUG nextflow.Session - Igniting dataflow network (28)
+Oct-16 11:38:35.617 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > SET_ANALYSIS_PARAMETERS
+Oct-16 11:38:35.618 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > PREPARE_ASSIGN_GRNAS
+Oct-16 11:38:35.618 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > ASSIGN_GRNAS
+Oct-16 11:38:35.618 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > DUMMY_ASSIGN_GRNAS
+Oct-16 11:38:35.618 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > COMBINE_ASSIGN_GRNAS
+Oct-16 11:38:35.621 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > RUN_QC_TRANS
+Oct-16 11:38:35.622 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > PREPARE_ASSOCIATION_ANALYSIS_TRANS
+Oct-16 11:38:35.623 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > RUN_DISCOVERY_ANALYSIS_TRANS
+Oct-16 11:38:35.623 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_4cd96c2e2f2d789b: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/subworkflows/local/run_analysis/main.nf
+  Script_a45d3d55e03ae8da: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/run_qc/main.nf
+  Script_89adbac1d282a039: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/run_discovery_analysis_trans/main.nf
+  Script_8f233434d5be0f8e: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/main.nf
+  Script_b13bda80f392da98: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/dummy_process/main.nf
+  Script_307ac988f545de52: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/prepare_association_analysis_trans/main.nf
+  Script_2ac8d3ca7286ddf5: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/assign_grnas/main.nf
+  Script_a91c78eafe7190dd: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/combine_association_analysis/main.nf
+  Script_62d1a1053b596d32: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/run_association_analysis/main.nf
+  Script_ce62b5792e267f9b: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/set_analysis_parameters/main.nf
+  Script_d32f53047d8ab6bc: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/prepare_assign_grnas/main.nf
+  Script_8ddba28e596aca79: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/combine_assign_grnas/main.nf
+  Script_02fed338904cb06f: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/dummy_assign_grnas/main.nf
+  Script_8a5e3573922e235c: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/run_qc_trans/main.nf
+  Script_71d82ff127b869bb: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/modules/local/prepare_association_analysis/main.nf
+Oct-16 11:38:35.623 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Oct-16 11:38:35.623 [main] DEBUG nextflow.Session - Session await
+Oct-16 11:38:35.803 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Oct-16 11:38:35.827 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:35.831 [Task submitter] INFO  nextflow.Session - [5a/6f65a9] Submitted process > SET_ANALYSIS_PARAMETERS (1)
+Oct-16 11:38:37.552 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: SET_ANALYSIS_PARAMETERS (1); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/5a/6f65a9e3a0413f99065314c8ee42bd]
+Oct-16 11:38:37.553 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=54; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-16 11:38:37.581 [TaskFinalizer-1] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=54; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-16 11:38:37.583 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:37.583 [Task submitter] INFO  nextflow.Session - [27/9e8af8] Submitted process > PREPARE_ASSIGN_GRNAS (1)
+Oct-16 11:38:40.903 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: PREPARE_ASSIGN_GRNAS (1); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/27/9e8af8844e351afd48ef9e799b0c49]
+Oct-16 11:38:40.938 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:40.938 [Task submitter] INFO  nextflow.Session - [d0/970df4] Submitted process > ASSIGN_GRNAS (2)
+Oct-16 11:38:42.907 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: ASSIGN_GRNAS (2); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/d0/970df4de01a50b9e11952beb6a6660]
+Oct-16 11:38:42.911 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:42.911 [Task submitter] INFO  nextflow.Session - [4e/74b36d] Submitted process > ASSIGN_GRNAS (3)
+Oct-16 11:38:44.408 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: ASSIGN_GRNAS (3); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/4e/74b36d755817faec260595d1940a14]
+Oct-16 11:38:44.411 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:44.411 [Task submitter] INFO  nextflow.Session - [30/90cf49] Submitted process > ASSIGN_GRNAS (1)
+Oct-16 11:38:45.794 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: ASSIGN_GRNAS (1); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/30/90cf49dfaea2e5422b3dd394bc3189]
+Oct-16 11:38:45.797 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:45.798 [Task submitter] INFO  nextflow.Session - [d1/10bf49] Submitted process > ASSIGN_GRNAS (4)
+Oct-16 11:38:47.218 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 7; name: ASSIGN_GRNAS (4); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/d1/10bf49544812edf683e90f158dcab2]
+Oct-16 11:38:47.238 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:47.238 [Task submitter] INFO  nextflow.Session - [65/ca0878] Submitted process > COMBINE_ASSIGN_GRNAS
+Oct-16 11:38:49.993 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: COMBINE_ASSIGN_GRNAS; status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/65/ca087851585b6adfdcbe0d913f914d]
+Oct-16 11:38:50.015 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:50.015 [Task submitter] INFO  nextflow.Session - [fc/5d65c1] Submitted process > RUN_QC_TRANS
+Oct-16 11:38:52.484 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 9; name: RUN_QC_TRANS; status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/fc/5d65c1e5b8ce7451a5fce38b9feebb]
+Oct-16 11:38:52.498 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:52.498 [Task submitter] INFO  nextflow.Session - [e8/1d3d35] Submitted process > PREPARE_ASSOCIATION_ANALYSIS_TRANS
+Oct-16 11:38:54.242 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 10; name: PREPARE_ASSOCIATION_ANALYSIS_TRANS; status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/e8/1d3d3545b8cf0eb37254b58725f654]
+Oct-16 11:38:54.264 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:54.264 [Task submitter] INFO  nextflow.Session - [0e/6d11b0] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (2)
+Oct-16 11:38:56.263 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 12; name: RUN_DISCOVERY_ANALYSIS_TRANS (2); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/0e/6d11b010ccda105da4a4903a8967f5]
+Oct-16 11:38:56.266 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:56.266 [Task submitter] INFO  nextflow.Session - [3a/4ad6b4] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (1)
+Oct-16 11:38:58.056 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 11; name: RUN_DISCOVERY_ANALYSIS_TRANS (1); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/3a/4ad6b49770015829d38fccbb2635c0]
+Oct-16 11:38:58.059 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:58.059 [Task submitter] INFO  nextflow.Session - [67/47a51f] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (8)
+Oct-16 11:38:58.071 [Actor Thread 19] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 6; slices: 1; internal sort time: 0.009 s; external sort time: 0.001 s; total time: 0.01 s
+Oct-16 11:38:58.075 [Actor Thread 19] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/collect-file/aa7a23ab8c6b716a8721f944d89ae7d1
+Oct-16 11:38:58.079 [Actor Thread 19] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/nxf-9319919970236644444
+Oct-16 11:38:59.798 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 18; name: RUN_DISCOVERY_ANALYSIS_TRANS (8); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/67/47a51f14ac596999688548a52dc219]
+Oct-16 11:38:59.801 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:38:59.801 [Task submitter] INFO  nextflow.Session - [59/2e1eb4] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (4)
+Oct-16 11:39:01.582 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 14; name: RUN_DISCOVERY_ANALYSIS_TRANS (4); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/59/2e1eb477a7189dcd819ca9758b8b0e]
+Oct-16 11:39:01.584 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:39:01.584 [Task submitter] INFO  nextflow.Session - [50/8c14a5] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (5)
+Oct-16 11:39:03.464 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 15; name: RUN_DISCOVERY_ANALYSIS_TRANS (5); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/50/8c14a517d907a02d944a08a29a56ba]
+Oct-16 11:39:03.467 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:39:03.467 [Task submitter] INFO  nextflow.Session - [93/0661ea] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (7)
+Oct-16 11:39:05.313 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 17; name: RUN_DISCOVERY_ANALYSIS_TRANS (7); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/93/0661ea17d2652c535cbb96894927a5]
+Oct-16 11:39:05.316 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:39:05.316 [Task submitter] INFO  nextflow.Session - [82/d65681] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (6)
+Oct-16 11:39:07.116 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 16; name: RUN_DISCOVERY_ANALYSIS_TRANS (6); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/82/d65681379b2b83b96f91ac8b3418b3]
+Oct-16 11:39:07.124 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 11:39:07.125 [Task submitter] INFO  nextflow.Session - [eb/ae5cad] Submitted process > RUN_DISCOVERY_ANALYSIS_TRANS (3)
+Oct-16 11:39:08.922 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 13; name: RUN_DISCOVERY_ANALYSIS_TRANS (3); status: COMPLETED; exit: 0; error: -; workDir: /private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/nuclear/work/eb/ae5cad442a2072ea84ef0d6ac8bad4]
+Oct-16 11:39:08.925 [main] DEBUG nextflow.Session - Session await > all processes finished
+Oct-16 11:39:09.028 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Oct-16 11:39:09.028 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-16 11:39:09.030 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Oct-16 11:39:09.030 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Oct-16 11:39:09.035 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=17; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=30s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=1 GB; ]
+Oct-16 11:39:09.049 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
+Oct-16 11:39:09.774 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+Oct-16 11:39:09.841 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
+Oct-16 11:39:09.844 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Oct-16 11:39:09.862 [main] INFO  org.pf4j.AbstractPluginManager - Stop plugin 'nf-schema@2.4.2'
+Oct-16 11:39:09.863 [main] DEBUG nextflow.plugin.BasePlugin - Plugin stopped nf-schema
+Oct-16 11:39:09.863 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Oct-16 11:39:09.864 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

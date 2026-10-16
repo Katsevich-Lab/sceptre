@@ -1,0 +1,4 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-native-components.R","native-components","effect and scores have independent explicit inputs",6,0,FALSE,FALSE,0,0.014,0.005,0.0190000000000001,6
+"test-native-components.R","native-components","empirical tails retain ties and the existing two-sided convention",3,0,FALSE,FALSE,0,0.00700000000000001,0.002,0.0089999999999999,3
+"test-native-components.R","native-components","the staged component independently reproduces every frozen native case",103,0,FALSE,FALSE,0,0.11,0.037,0.148,103

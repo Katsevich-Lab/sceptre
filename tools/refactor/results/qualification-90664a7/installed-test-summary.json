@@ -1,0 +1,11 @@
+{
+  "blocks": 101,
+  "checks": 3522,
+  "passed": 3522,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skipped": 0,
+  "package_path": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/library/sceptre",
+  "ondisc": "1.3.5"
+}

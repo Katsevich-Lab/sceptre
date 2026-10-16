@@ -1,0 +1,31 @@
+{
+  "state": "prepared_waiting_for_explicit_go",
+  "prepared_at_utc": "2026-10-16T15:26:37.784426+00:00",
+  "root": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof",
+  "candidate_commit": "90664a763140a6197a429f65ab45d31f0f7f94c9",
+  "baseline_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "production_identical_to": "28df390",
+  "production_identical": true,
+  "archives_sha256": {
+    "candidate": "33143e1ed5c3fa093d5583bc7f24b0024abf2cfbbf889f7c8cb2cf54754d075c",
+    "reference": "4f93c20315d66f03046ff97c36ba853e96ead6ffd675e0980c81ec53daa06048"
+  },
+  "environment": {
+    "R_LIBS": "/private/tmp/sceptre-rf0-ondisc-library",
+    "SCEPTRE_REFACTOR_ORACLE_DEBUG": "false",
+    "SCEPTRE_REQUIRE_ONDISC": "true",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1"
+  },
+  "scope": [
+    "fresh release original oracle",
+    "fresh candidate install with tests",
+    "full installed test_package",
+    "direct native component tests",
+    "R CMD build --no-build-vignettes",
+    "R CMD check --no-manual --no-vignettes"
+  ],
+  "full_vignette_check": false
+}

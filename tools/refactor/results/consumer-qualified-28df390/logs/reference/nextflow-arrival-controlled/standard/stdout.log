@@ -1,0 +1,29 @@
+N E X T F L O W  ~  version 25.10.4
+Launching `/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow-arrival-controlled/pipeline/main.nf` [suspicious_kimura] DSL2 - revision: 5b30847309
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: Task runtime metrics are not reported when using macOS without a container engine
+[ff/702cee] Submitted process > SET_ANALYSIS_PARAMETERS (1)
+[69/d778b9] Submitted process > PREPARE_ASSIGN_GRNAS (1)
+[76/9b5aa0] Submitted process > ASSIGN_GRNAS (4)
+[76/131132] Submitted process > ASSIGN_GRNAS (2)
+[27/3309f4] Submitted process > ASSIGN_GRNAS (1)
+[59/8972e6] Submitted process > ASSIGN_GRNAS (3)
+[a0/e5346e] Submitted process > COMBINE_ASSIGN_GRNAS
+[6d/ae5aed] Submitted process > RUN_QC
+[1b/0a62ca] Submitted process > PREPARE_ASSOCIATION_ANALYSIS
+[cf/82a914] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:RUN_ASSOCIATION_ANALYSIS (1)
+[d0/902a1f] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:RUN_ASSOCIATION_ANALYSIS (2)
+[8a/63273b] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:COMBINE_ASSOCIATION_ANALYSIS
+[ec/fb5127] Submitted process > RUN_ANALYSIS_POWER_CHECK:RUN_ASSOCIATION_ANALYSIS (1)
+[88/809e47] Submitted process > RUN_ANALYSIS_POWER_CHECK:COMBINE_ASSOCIATION_ANALYSIS
+[ee/e56849] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:RUN_ASSOCIATION_ANALYSIS (1)
+[b0/1f9ad0] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:RUN_ASSOCIATION_ANALYSIS (2)
+[1f/fd0bab] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:COMBINE_ASSOCIATION_ANALYSIS

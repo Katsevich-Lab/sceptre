@@ -1,0 +1,102 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-assign_grnas.R","assign_grnas","assign_grnas method=maximum moi=low grna_matrix all 1",4,0,FALSE,FALSE,0,0.214,0.02,0.238,4
+"test-assign_grnas.R","assign_grnas","assign_grnas method=maximum moi=low grna_matrix clear max",4,0,FALSE,FALSE,0,0.083,0.005,0.0899999999999999,4
+"test-assign_grnas.R","assign_grnas","assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_threshold",2,0,FALSE,FALSE,0,0.026,0.003,0.0289999999999999,2
+"test-assign_grnas.R","assign_grnas","assign_grnas method=threshold moi=low",8,0,FALSE,FALSE,0,0.04,0.00599999999999999,0.046,8
+"test-assign_grnas.R","assign_grnas","assign_grnas method=threshold moi=high",4,0,FALSE,FALSE,0,0.0319999999999998,0.003,0.036,4
+"test-assign_grnas.R","assign_grnas","assign_grnas method=mixture moi=high",4,0,FALSE,FALSE,0,0.024,0.003,0.0270000000000001,4
+"test-assign_grnas.R","assign_grnas","assign_grnas method=mixture reports invalid assignment formulas",5,0,FALSE,FALSE,0,0.028,0.002,0.028,5
+"test-aux_functions.R","aux_functions","auto_compute_cell_covariates",27,0,FALSE,FALSE,0,0.0720000000000001,0.014,0.087,27
+"test-aux_functions.R","aux_functions","seeded internal helpers preserve the caller's RNG state",9,0,FALSE,FALSE,0,0.012,0.002,0.0150000000000001,9
+"test-aux_functions.R","aux_functions","auto_construct_formula_object",2,0,FALSE,FALSE,0,0.004,0.001,0.006,2
+"test-check_functions.R","check_functions","check_import_data_inputs",36,0,FALSE,FALSE,0,0.112,0.003,0.116,36
+"test-data.R","data","example data use consistent cell IDs",4,0,FALSE,FALSE,0,0.0290000000000001,0.00399999999999998,0.0350000000000001,4
+"test-import_functs.R","import_functs","import_data_from_cellranger retains cell barcodes",3,0,FALSE,FALSE,0,0.551,0.044,0.631,3
+"test-import_functs.R","import_functs","single-directory Cell Ranger imports retain raw cell barcodes",3,0,FALSE,FALSE,0,0.327,0.023,0.368,3
+"test-import_functs.R","import_functs","Cell Ranger barcode files remain optional",2,0,FALSE,FALSE,0,0.305,0.018,0.335,2
+"test-import_functs.R","import_functs","Cell Ranger barcode files cannot be supplied only partially",1,0,FALSE,FALSE,0,0.00499999999999989,0.002,0.00800000000000001,1
+"test-import_functs.R","import_functs","batch prefixes disambiguate duplicate Cell Ranger barcodes",3,0,FALSE,FALSE,0,0.449,0.041,0.519,3
+"test-import_functs.R","import_functs","Cell Ranger barcodes agree with named extra covariates",2,0,FALSE,FALSE,0,0.569,0.041,0.641,2
+"test-import_functs.R","import_functs","multi-directory barcodes agree with prefixed extra covariates",2,0,FALSE,FALSE,0,0.907,0.076,1.047,2
+"test-import_functs.R","import_functs","Cell Ranger barcode counts must match matrix cell counts",1,0,FALSE,FALSE,0,0.0570000000000004,0.016,0.0819999999999999,1
+"test-mock-data-functions.R","mock-data-functions",".make_mock_target_and_chr_only",35,0,FALSE,FALSE,0,0.0730000000000004,0.026,0.101,35
+"test-mock-data-functions.R","mock-data-functions",".make_mock_cross_target_chr_with_distances",112,0,FALSE,FALSE,0,0.2,0.055,0.258,112
+"test-mock-data-functions.R","mock-data-functions","make_mock_grna_target_data",352,0,FALSE,FALSE,0,0.643,0.172,0.825,352
+"test-mock-data-functions.R","mock-data-functions",".make_mock_patterned_matrix",1520,0,FALSE,FALSE,0,2.347,0.807,3.24,1520
+"test-mock-data-functions.R","mock-data-functions",".make_mock_matrix_pattern_list",28,0,FALSE,FALSE,0,0.0710000000000006,0.024,0.0969999999999995,28
+"test-mock-data-functions.R","mock-data-functions","make_mock_grna_matrices",29,0,FALSE,FALSE,0,0.0720000000000001,0.02,0.0949999999999989,29
+"test-mock-data-functions.R","mock-data-functions","make_mock_response_matrices",7,0,FALSE,FALSE,0,0.0190000000000001,0.006,0.0259999999999998,7
+"test-mock-data-functions.R","mock-data-functions","make_mock_extra_covariates_data_frames",142,0,FALSE,FALSE,0,0.296999999999999,0.0910000000000002,0.395000000000001,142
+"test-ondisc_paths.R","ondisc_paths","ondisc output directories are normalized before use",3,0,FALSE,FALSE,0,0.00699999999999967,0.00300000000000011,0.00999999999999979,3
+"test-ondisc_paths.R","ondisc_paths","ondisc output paths reject tildes after normalization",1,0,FALSE,FALSE,0,0.00399999999999956,0.00100000000000011,0.004999999999999,1
+"test-ondisc_paths.R","ondisc_paths","leading ~/ paths are accepted (expanded before the tilde check)",2,0,FALSE,FALSE,0,0.004999999999999,0.002,0.00600000000000023,2
+"test-ondisc_paths.R","ondisc_paths","import_data can create ondisc-backed objects in a normalized directory",4,0,FALSE,FALSE,0,0.072000000000001,0.0110000000000001,0.0840000000000014,4
+"test-pair_constructor_functs.R","pair_constructor_functs","construct_cis_pairs loads packaged default response positions",3,0,FALSE,FALSE,0,0.129999999999999,0.006,0.136000000000001,3
+"test-parallel_mac.R","parallel_mac","full pipeline runs end-to-end with parallel = TRUE",7,0,FALSE,FALSE,0,0.484,0.212,2.182,7
+"test-parallel_mac.R","parallel_mac","assign_grnas mixture method runs with parallel = TRUE",2,0,FALSE,FALSE,0,0.167999999999999,0.036,0.35,2
+"test-parallel_windows.R","parallel_windows","parallel mode is rejected on Windows",3,0,FALSE,FALSE,0,0.00500000000000078,0.00099999999999989,0.0080000000000009,3
+"test-parallel_windows.R","parallel_windows","parallel argument must be a single logical value",3,0,FALSE,FALSE,0,0.00799999999999912,0.002,0.00999999999999979,3
+"test-plotting_functions.R","plotting_functions","test all plots",64,0,FALSE,FALSE,0,1.489,0.069,1.571,64
+"test-preprocessing_functs.R","preprocessing_functs","set_matrix_accessibility",24,0,FALSE,FALSE,0,0.0499999999999989,0.014,0.0650000000000013,24
+"test-preprocessing_functs.R","preprocessing_functs","convert_covariate_df_to_design_matrix",11,0,FALSE,FALSE,0,0.0309999999999988,0.00499999999999989,0.036999999999999,11
+"test-refactor-cache.R","refactor-cache","discovery calibration discovery preserves valid fit views",6,0,FALSE,FALSE,0,1.649,0.0219999999999998,1.728,6
+"test-refactor-cache.R","refactor-cache","changing the control view discards incompatible calibration fits",3,0,FALSE,FALSE,0,0.402000000000001,0.00499999999999989,0.411000000000001,3
+"test-refactor-cache.R","refactor-cache","actual design contrasts rather than formula text govern cache reuse",4,0,FALSE,FALSE,0,0.141,0.00300000000000011,0.145000000000003,4
+"test-refactor-contracts.R","refactor-contracts","reference provenance and every fixture digest are intact",6,0,FALSE,FALSE,0,0.0300000000000011,0.0169999999999999,2.443,6
+"test-refactor-contracts.R","refactor-contracts","temporary runtime references reject unpinned stale and incomplete evidence",7,0,FALSE,FALSE,0,0.144,0.0420000000000003,0.626999999999999,7
+"test-refactor-contracts.R","refactor-contracts","cached runtime evidence rejects live RNG flags and debug-mode changes",7,0,FALSE,FALSE,0,0.0539999999999985,0.0350000000000001,5.667,7
+"test-refactor-contracts.R","refactor-contracts","toolchain caching observes edits to effective Makevars at the same path",2,0,FALSE,FALSE,0,0.0150000000000006,0.0190000000000001,9.648,2
+"test-refactor-contracts.R","refactor-contracts","dynamic Makevars do not hide changes to referenced external flags",1,0,FALSE,FALSE,0,0.135000000000002,0.0190000000000001,5.625,1
+"test-refactor-contracts.R","refactor-contracts","developer selection invalidates compiler and runtime oracle caches",14,0,FALSE,FALSE,0,0.048,0.0139999999999998,0.0640000000000001,14
+"test-refactor-contracts.R","refactor-contracts","source byte verification identifies changed paths and MD5 values",2,0,FALSE,FALSE,0,0.00600000000000023,0.00200000000000022,0.00799999999999557,2
+"test-refactor-contracts.R","refactor-contracts","stored-platform qualification checks its recorded compiler and RNG",3,0,FALSE,FALSE,0,0.0210000000000008,0.012,2.316,3
+"test-refactor-contracts.R","refactor-contracts","refactor preserves the exact public API and existing S4 facade",1,0,FALSE,FALSE,0,0.00600000000000023,0.00099999999999989,0.0069999999999979,1
+"test-refactor-contracts.R","refactor-contracts","supported scientific workflows reproduce the pinned baseline",425,0,FALSE,FALSE,0,3.221,0.179,3.487,425
+"test-refactor-contracts.R","refactor-contracts","ordered assignment remapping preserves source and fit views",5,0,FALSE,FALSE,0,0.00600000000000023,0.00300000000000011,0.00900000000000034,5
+"test-refactor-contracts.R","refactor-contracts","repeated analyses and existing cache invalidation match baseline",8,0,FALSE,FALSE,0,0.675999999999998,0.0089999999999999,0.759,8
+"test-refactor-contracts.R","refactor-contracts","baseline saved objects remain analyzable",1,0,FALSE,FALSE,0,0.113,0.00499999999999989,0.192999999999998,1
+"test-refactor-contracts.R","refactor-contracts","rejected requests and degenerate baseline behavior remain explicit",3,0,FALSE,FALSE,0,0.145999999999997,0.00500000000000034,0.222999999999999,3
+"test-refactor-contracts.R","refactor-contracts","serial and two-worker execution preserve pair identity and results",1,0,FALSE,FALSE,0,0.861000000000001,0.0949999999999998,1.001,1
+"test-refactor-contracts.R","refactor-contracts","backed permutation workflows and independent reattachment match sparse",9,0,FALSE,FALSE,0,0.689,0.0549999999999997,1.112,9
+"test-refactor-fitting.R","refactor-fitting","current fitters accept plain arrays without object or cache state",7,0,FALSE,FALSE,0,0.0129999999999981,0.004,0.0159999999999982,7
+"test-refactor-fitting.R","refactor-fitting","score preparation declares and preserves one ordered numeric view",10,0,FALSE,FALSE,0,0.0120000000000005,0.004,0.0160000000000053,10
+"test-refactor-indexing.R","refactor-indexing","noncontiguous cells preserve actual extraction and native QC coordinates",15,0,FALSE,FALSE,0,0.0180000000000007,0.00699999999999967,0.0260000000000034,15
+"test-refactor-indexing.R","refactor-indexing","observed native positions are one based and synthetic positions are zero based",6,0,FALSE,FALSE,0,0.0160000000000018,0.00800000000000001,2.576,6
+"test-refactor-indexing.R","refactor-indexing","legacy calibration unions and overlapping NT remapping stay explicit",4,0,FALSE,FALSE,0,0.004999999999999,0.00299999999999967,0.0069999999999979,4
+"test-refactor-indexing.R","refactor-indexing","canonical contexts compose source, analysis and fit coordinates once",19,0,FALSE,FALSE,0,0.0280000000000022,0.0100000000000002,0.0380000000000038,19
+"test-refactor-indexing.R","refactor-indexing","analysis-cell normalization preserves reordered requested cells",8,0,FALSE,FALSE,0,0.0159999999999982,0.004,0.019999999999996,8
+"test-refactor-native.R","refactor-native","prepared native cases preserve scores, stages, effects and distributions",188,0,FALSE,FALSE,0,0.210000000000001,0.0740000000000003,0.286000000000001,188
+"test-refactor-native.R","refactor-native","native fallback uses its selected segment including zero B3",4,0,FALSE,FALSE,0,0.0160000000000018,0.00199999999999978,0.0180000000000007,4
+"test-refactor-native.R","refactor-native","native distribution can be omitted without changing the inference",2,0,FALSE,FALSE,0,0.00900000000000034,0.00099999999999989,0.0110000000000028,2
+"test-refactor-native.R","refactor-native","production samplers retain draw counts, ranges and membership laws",22,0,FALSE,FALSE,0,0.0519999999999996,0.0100000000000002,0.0619999999999976,22
+"test-refactor-native.R","refactor-native","all platforms preserve exact draws against the frozen source oracle",6,0,FALSE,FALSE,0,0.0129999999999981,0.00299999999999967,0.017000000000003,6
+"test-refactor-native.R","refactor-native","sampler streams match the pinned platform and toolchain baseline",4,0,FALSE,FALSE,0,0.0139999999999993,0.00299999999999967,0.294000000000004,4
+"test-refactor-native.R","refactor-native","test-only bank construction rejects invalid native indices",5,0,FALSE,FALSE,0,0.0189999999999984,0.00099999999999989,0.0210000000000008,5
+"test-refactor-qc.R","refactor-qc","legacy eligibility preserves boundaries missing counts and input order",4,0,FALSE,FALSE,0,0.00600000000000023,0.00200000000000022,0.00900000000000034,4
+"test-refactor-qc.R","refactor-qc","calibration candidate acceptance uses the same count policy",4,0,FALSE,FALSE,0,0.00600000000000023,0.00199999999999978,0.00900000000000034,4
+"test-refactor-results.R","refactor-results","result finalization integrates guides before complete-family correction",9,0,FALSE,FALSE,0,0.0260000000000034,0.00499999999999989,0.0319999999999965,9
+"test-refactor-results.R","refactor-results","raw assembly retains failed QC identity and native output fields",8,0,FALSE,FALSE,0,0.0160000000000018,0.004,0.0209999999999937,8
+"test-refactor-state.R","refactor-state","workflow transitions preserve sibling analyses and caller state",13,0,FALSE,FALSE,0,0.0219999999999985,0.00699999999999967,0.0290000000000035,13
+"test-refactor-storage.R","refactor-storage","legacy storage retains stored-zero and fractional semantics",7,0,FALSE,FALSE,0,0.0109999999999992,0.004,0.0149999999999935,7
+"test-refactor-storage.R","refactor-storage","legacy group kernels consume disposable index vectors",2,0,FALSE,FALSE,0,0.00799999999999912,0.00199999999999978,0.00999999999999801,2
+"test-refactor-storage.R","refactor-storage","legacy matrix conversion agrees with the selected ondisc copy",8,0,FALSE,FALSE,0,0.0240000000000009,0.00499999999999989,0.0300000000000011,8
+"test-refactor-storage.R","refactor-storage","legacy backed storage coerces fractions and retains stored positions",5,0,FALSE,FALSE,0,0.0109999999999992,0.004,0.0159999999999982,5
+"test-refactor-storage.R","refactor-storage","storage reads preserve requested source order and repeated cells",6,0,FALSE,FALSE,0,0.00900000000000034,0.00300000000000011,0.0129999999999981,6
+"test-refactor-storage.R","refactor-storage","sparse storage counts preserve requests and caller-owned indices",34,0,FALSE,FALSE,0,0.0489999999999995,0.0179999999999998,0.0679999999999978,34
+"test-refactor-storage.R","refactor-storage","backed storage has the same ordered count and ownership contracts",36,0,FALSE,FALSE,0,0.0869999999999997,0.0249999999999999,0.113,36
+"test-run_qc.R","run_qc","run_qc remove cells with multiple grnas in low moi",2,0,FALSE,FALSE,0,0.0279999999999987,0.00100000000000033,0.0300000000000011,2
+"test-run_qc.R","run_qc","run_qc remove cells via `additional_cells_to_remove` high moi",2,0,FALSE,FALSE,0,0.0309999999999988,0.00199999999999978,0.0330000000000013,2
+"test-run_qc.R","run_qc","run_qc remove cells with `response_n_umis_range` and `response_n_nonzero_range` high moi",5,0,FALSE,FALSE,0,0.0459999999999994,0.004,0.0500000000000043,5
+"test-run_qc.R","run_qc","run_qc remove cells with `p_mito_threshold` high moi",1,0,FALSE,FALSE,0,0.0199999999999996,0.00100000000000033,0.0219999999999985,1
+"test-run_qc.R","run_qc","run_qc test positive control pairs",10,0,FALSE,FALSE,0,0.0640000000000001,0.00700000000000012,0.0719999999999956,10
+"test-run_qc.R","run_qc","run_qc test discovery pairs",10,0,FALSE,FALSE,0,0.0650000000000013,0.00800000000000001,0.0750000000000028,10
+"test-run_qc.R","run_qc","run_qc PC pairs interaction between cellwise QC with `response_n_umis_range` and `response_n_nonzero_range`, and pairwise QC low moi",4,0,FALSE,FALSE,0,0.0259999999999998,0.00300000000000011,0.0300000000000011,4
+"test-run_qc.R","run_qc","run_qc discovery pairs interaction between cellwise QC with `response_n_umis_range` and `response_n_nonzero_range`, and pairwise QC high moi",4,0,FALSE,FALSE,0,0.0259999999999998,0.00300000000000011,0.0289999999999964,4
+"test-s4_analysis_functs_1.R","s4_analysis_functs_1","import_data",13,0,FALSE,FALSE,0,0.0289999999999999,0.00800000000000001,0.036999999999999,13
+"test-s4_analysis_functs_1.R","s4_analysis_functs_1","set_analysis_parameters",7,0,FALSE,FALSE,0,0.0850000000000009,0.00800000000000001,0.097999999999999,7
+"test-s4_analysis_functs_2.R","s4_analysis_functs_2","run_calibration_check",6,0,FALSE,FALSE,0,0.385999999999999,0.0100000000000002,0.401000000000003,6
+"test-s4_analysis_functs_2.R","s4_analysis_functs_2","run_calibration_check negative control pairs complement set with cellwise and pairwise qc",14,0,FALSE,FALSE,0,0.302,0.00999999999999979,0.313000000000002,14
+"test-s4_analysis_functs_2.R","s4_analysis_functs_2","run_calibration_check negative control pairs nt set with cellwise qc",7,0,FALSE,FALSE,0,0.149000000000001,0.00499999999999989,0.153999999999996,7
+"test-s4_analysis_functs_2.R","s4_analysis_functs_2","run_power_check",4,0,FALSE,FALSE,0,0.155000000000001,0.00300000000000011,0.160000000000004,4
+"test-s4_analysis_functs_2.R","s4_analysis_functs_2","run_discovery_analysis",3,0,FALSE,FALSE,0,0.418999999999997,0.004,0.434000000000005,3
+"test-s4_helpers.R","s4_helpers","perform_status_check_and_update",8,0,FALSE,FALSE,0,0.0140000000000029,0.004,0.0189999999999984,8

@@ -1,0 +1,5 @@
+/Volumes/Temp/tmp/Rtmpf8gpIK/R.INSTALLea95e3cb896/arrow/tools/cpp/src/arrow/util/cpu_info.cc:242: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+/Volumes/Temp/tmp/Rtmpf8gpIK/R.INSTALLea95e3cb896/arrow/tools/cpp/src/arrow/util/cpu_info.cc:242: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+/Volumes/Temp/tmp/Rtmpf8gpIK/R.INSTALLea95e3cb896/arrow/tools/cpp/src/arrow/util/cpu_info.cc:242: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+/Volumes/Temp/tmp/Rtmpf8gpIK/R.INSTALLea95e3cb896/arrow/tools/cpp/src/arrow/util/cpu_info.cc:242: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+{"passed":true,"fatal_error":null,"runs":{"standard":{"status":"passed","error":null},"nuclear":{"status":"passed","error":null}}} 

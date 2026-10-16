@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "state": "completed_with_explicit_external_limitations",
+  "heavy_qualification_started": true,
+  "observed_at": "2026-10-16",
+  "harness_checkout_revision": "f2a8d79185c8ddc79e46beb6446bd3617215f963",
+  "reference": {
+    "source_revision": "21f9ea098b69c444a884a49bc254de711968e3b5",
+    "library": "/private/tmp/sceptre-resource-reference-release-library",
+    "build_mode_declared_by_parent": "clean preclean -O2",
+    "installed_artifacts": {
+      "CITATION": {
+        "bytes": 2347,
+        "sha256": "b96ef70f0cc1e2f2181e52aaa88643a41468d643cb8bbda9fdb0e314b4e3b755"
+      },
+      "NEWS.md": {
+        "bytes": 10169,
+        "sha256": "d230b3741473d7f0c4c7cab00f63ab9e4a9265291f3dc1f097452405d38fd7f6"
+      },
+      "NAMESPACE": {
+        "bytes": 1004,
+        "sha256": "098043a6ccf2135f3c47f5ba78c069cd3243ee8b9d2383fa549dc25a6421f89d"
+      },
+      "README.md": {
+        "bytes": 3328,
+        "sha256": "fa1d8f5a8c675156d15ffb529152bff1dfd4e67c55390894be9ed4c7a23bea79"
+      },
+      "DESCRIPTION": {
+        "bytes": 3224,
+        "sha256": "08999bbf80718c682b982019e2c0721d4dd3a73b14520da19b694e28abef8d0b"
+      },
+      "INDEX": {
+        "bytes": 1915,
+        "sha256": "fbb9607e03eeab9a52270122849397c7e44c938a31bba503b49eee854d51529a"
+      },
+      "extdata/highmoi_example/gem_group_2/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_2/barcodes.tsv.gz": {
+        "bytes": 563,
+        "sha256": "b4ffd1ef17b5ef5afdb24765d5f2aee6e8d7a9c9e03ed599ea9c25e1bf7bfb3e"
+      },
+      "extdata/highmoi_example/gem_group_2/matrix.mtx.gz": {
+        "bytes": 42613,
+        "sha256": "ced6cd0abe450fecf070d0c3b3483f227d27f15afe9d61bc8d8ae2eeb462c4e2"
+      },
+      "extdata/highmoi_example/gem_group_1/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_1/barcodes.tsv.gz": {
+        "bytes": 536,
+        "sha256": "ce8365bb831fe756f3e376bdf70ff18904b1bde6bd78c7ac3f4f2c6e26d87f34"
+      },
+      "extdata/highmoi_example/gem_group_1/matrix.mtx.gz": {
+        "bytes": 42947,
+        "sha256": "b815e20e63571c5831e4563cdea4d91c564376e31ac1f540b3765a65638ebd52"
+      },
+      "extdata/parse_example/README.md": {
+        "bytes": 629,
+        "sha256": "ce20e71b3430ce93e7bd1dd899bc43187cb99b8d4d47bb99e30fc0b18112b328"
+      },
+      "extdata/parse_example/all_genes.csv": {
+        "bytes": 7655,
+        "sha256": "6ae186f9fa439073ac1144d043c4a3b01800149708919de0c9232658619f76af"
+      },
+      "extdata/parse_example/all_grnas.csv": {
+        "bytes": 94,
+        "sha256": "b27aec33dbd9dd8edf8edf7987e46b7c1155296eec768740abcdc11eaf84bb48"
+      },
+      "extdata/parse_example/gene_mat.mtx": {
+        "bytes": 216386,
+        "sha256": "631d3cb0903fc582b36da920f8225d63b1cf4ca1b057996815c04b0166c7996f"
+      },
+      "extdata/parse_example/grna_mat.mtx": {
+        "bytes": 47609,
+        "sha256": "de399779df02a137db631897715b5a28011dcf49cc3a3236c4ac4ef1a5d1860a"
+      },
+      "R/sceptre": {
+        "bytes": 1058,
+        "sha256": "570ca456b280cdeb201ef5ebdf22dc8f80092e2c0c68e33c7f73340e420f3759"
+      },
+      "R/sceptre.rdx": {
+        "bytes": 3068,
+        "sha256": "0877362c32b1fb4318d268fea385a732d0ceb7782f7ee6d04e1840c940e8c4ae"
+      },
+      "R/sceptre.rdb": {
+        "bytes": 421001,
+        "sha256": "81127e6c3db700abd347741dffffc38dc0b9ebf6d76bc409174bc8f0d6f2c1b1"
+      },
+      "Meta/data.rds": {
+        "bytes": 206,
+        "sha256": "2746c5b262317482883605569d2645ec0f8814112f66282a7fd74c708b36cd97"
+      },
+      "Meta/links.rds": {
+        "bytes": 693,
+        "sha256": "41d8c73cf0b1c677325b521f052c15e6f78299093d78234227d3779c9a19c451"
+      },
+      "Meta/features.rds": {
+        "bytes": 122,
+        "sha256": "04abba1fbf14e9ebfa5018fd8a740842010982b85aad6aef0f672275b088d982"
+      },
+      "Meta/nsInfo.rds": {
+        "bytes": 614,
+        "sha256": "3d94264b54fea8ab96373b56ca7b13ab34fee20c23fc3aaee3c5cc21bab36831"
+      },
+      "Meta/package.rds": {
+        "bytes": 2072,
+        "sha256": "5070e915e55b50390651741ef2d45b45a9b53f6c908421a3fd9ffbea38cec7fa"
+      },
+      "Meta/hsearch.rds": {
+        "bytes": 1118,
+        "sha256": "8cdf894cfd0f18172fa5ae044a422414d29ed8f2b9d947a79a273b8e5d0d98f4"
+      },
+      "Meta/Rd.rds": {
+        "bytes": 1246,
+        "sha256": "e3fbc6dfe821f3aa533255997e0d799c96145a0a5f8f6f7553c2568301bafd10"
+      },
+      "html/R.css": {
+        "bytes": 2133,
+        "sha256": "3d290675266eebeba6efff07db879d699843c80bf428f9e71000e2fc6078f5db"
+      },
+      "html/00Index.html": {
+        "bytes": 5962,
+        "sha256": "3590cf00c50696cf0df44e9a333fb2469e5d1b0100e06148b9fed60fa859aed7"
+      },
+      "libs/sceptre.so": {
+        "bytes": 364216,
+        "sha256": "3caa868fd34acf0bb04b6ab3ccc418718e913c8ab76aa4bf53facfbbdda8c37e"
+      },
+      "scripts/DATASET_parse_example_data.R": {
+        "bytes": 3460,
+        "sha256": "19b2ff82f310d81b24bddf4ccdaf40127771541b821fb20e45b2391b9e833557"
+      },
+      "scripts/DATASET_highmoi_example_data.R": {
+        "bytes": 17625,
+        "sha256": "468a4bcaccc76740861737d2cf97695f423daaf0ead64d47e63bb53580e243c8"
+      },
+      "scripts/README.md": {
+        "bytes": 2057,
+        "sha256": "acc5180a730ef0e5de5fcff036683807d4970c004d917f106e5687f2937e6fae"
+      },
+      "scripts/DATASET_lowmoi_example_data.R": {
+        "bytes": 8701,
+        "sha256": "ad495b31e7492128649a8a58e15255d26d58d6a0b582f7f8d525a65f75582b22"
+      },
+      "scripts/DATASET_gene_table.R": {
+        "bytes": 3405,
+        "sha256": "00f353b703a9157a801d4abda549af9e87f6545a7d63cce756794ccf327ff3ea"
+      },
+      "data/grna_target_data_frame_highmoi.rda": {
+        "bytes": 1106,
+        "sha256": "3c31b5825a1351e3e0711d248896d69ee50b118320458989f8a4ce2dd1edebbf"
+      },
+      "data/gene_position_data_frame_grch37.rda": {
+        "bytes": 599797,
+        "sha256": "e3bbe4e3f67539d9cf95a8afb2ccc5fff04fc6a50aa2c015c6cf2601dca19976"
+      },
+      "data/lowmoi_example_data.rda": {
+        "bytes": 45976,
+        "sha256": "c8dc7db81f2b47e3e58d24b9a4f6d022ccb17cd9fd844074c3ec66420c519958"
+      },
+      "data/highmoi_example_data.rda": {
+        "bytes": 30750,
+        "sha256": "b5b03970815151481566de9f549ac6163c5165e4f28054bf3fdec9255db30c0f"
+      },
+      "data/gene_position_data_frame_grch38.rda": {
+        "bytes": 371806,
+        "sha256": "2a96dfa8910245fd55e22c347645c779b1e01c5a747ca71dc25420468b414e63"
+      },
+      "help/AnIndex": {
+        "bytes": 1661,
+        "sha256": "a64772e17eaea29560c22dc0ccf65c29dc976ff56aed6c27c533f8f2ce94795f"
+      },
+      "help/aliases.rds": {
+        "bytes": 510,
+        "sha256": "9b4b0980001a905da9789eecef27cbac2c1425640930bbc140aebd0e57245109"
+      },
+      "help/paths.rds": {
+        "bytes": 540,
+        "sha256": "cb6ce7731f2b78183262bc7f31df8cba752f116e5da4967816e7c07fc64945dc"
+      },
+      "help/sceptre.rdx": {
+        "bytes": 1013,
+        "sha256": "1e793b8d5feb209c2fbd4f8bd5e0f0f18b1579df39944a1c3d658635415d4fcd"
+      },
+      "help/sceptre.rdb": {
+        "bytes": 108796,
+        "sha256": "bdff0c6b3a5fe348bf113d6100d38a1a216beb2ce70738991f723faa8ae62062"
+      },
+      "help/figures/hex.jpg": {
+        "bytes": 91935,
+        "sha256": "9121753fe7048501100c6ae1dc8be3479b0fdd53f6e144ecd7a6f9db7eeebfd5"
+      },
+      "help/figures/logo.png": {
+        "bytes": 105820,
+        "sha256": "e9e47f995c9c00b008b2f3d0215d7b72471dd2c018d96be3e98c54df8237af15"
+      }
+    }
+  },
+  "candidate": {
+    "source_revision": "28df3907f43311efc70908d50b7636c7e6e89db8",
+    "library": "/private/tmp/sceptre-refactor-qualified-library",
+    "build_mode_declared_by_parent": "clean preclean -O2",
+    "installed_artifacts": {
+      "CITATION": {
+        "bytes": 2347,
+        "sha256": "b96ef70f0cc1e2f2181e52aaa88643a41468d643cb8bbda9fdb0e314b4e3b755"
+      },
+      "NEWS.md": {
+        "bytes": 10169,
+        "sha256": "d230b3741473d7f0c4c7cab00f63ab9e4a9265291f3dc1f097452405d38fd7f6"
+      },
+      "NAMESPACE": {
+        "bytes": 1004,
+        "sha256": "098043a6ccf2135f3c47f5ba78c069cd3243ee8b9d2383fa549dc25a6421f89d"
+      },
+      "README.md": {
+        "bytes": 3328,
+        "sha256": "fa1d8f5a8c675156d15ffb529152bff1dfd4e67c55390894be9ed4c7a23bea79"
+      },
+      "DESCRIPTION": {
+        "bytes": 3228,
+        "sha256": "b089c6d0b441aa7e339a0ef197dbc343514cc5252825fdae572ca44648acbaf4"
+      },
+      "INDEX": {
+        "bytes": 1915,
+        "sha256": "fbb9607e03eeab9a52270122849397c7e44c938a31bba503b49eee854d51529a"
+      },
+      "extdata/highmoi_example/gem_group_2/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_2/barcodes.tsv.gz": {
+        "bytes": 563,
+        "sha256": "b4ffd1ef17b5ef5afdb24765d5f2aee6e8d7a9c9e03ed599ea9c25e1bf7bfb3e"
+      },
+      "extdata/highmoi_example/gem_group_2/matrix.mtx.gz": {
+        "bytes": 42613,
+        "sha256": "ced6cd0abe450fecf070d0c3b3483f227d27f15afe9d61bc8d8ae2eeb462c4e2"
+      },
+      "extdata/highmoi_example/gem_group_1/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_1/barcodes.tsv.gz": {
+        "bytes": 536,
+        "sha256": "ce8365bb831fe756f3e376bdf70ff18904b1bde6bd78c7ac3f4f2c6e26d87f34"
+      },
+      "extdata/highmoi_example/gem_group_1/matrix.mtx.gz": {
+        "bytes": 42947,
+        "sha256": "b815e20e63571c5831e4563cdea4d91c564376e31ac1f540b3765a65638ebd52"
+      },
+      "extdata/parse_example/README.md": {
+        "bytes": 629,
+        "sha256": "ce20e71b3430ce93e7bd1dd899bc43187cb99b8d4d47bb99e30fc0b18112b328"
+      },
+      "extdata/parse_example/all_genes.csv": {
+        "bytes": 7655,
+        "sha256": "6ae186f9fa439073ac1144d043c4a3b01800149708919de0c9232658619f76af"
+      },
+      "extdata/parse_example/all_grnas.csv": {
+        "bytes": 94,
+        "sha256": "b27aec33dbd9dd8edf8edf7987e46b7c1155296eec768740abcdc11eaf84bb48"
+      },
+      "extdata/parse_example/gene_mat.mtx": {
+        "bytes": 216386,
+        "sha256": "631d3cb0903fc582b36da920f8225d63b1cf4ca1b057996815c04b0166c7996f"
+      },
+      "extdata/parse_example/grna_mat.mtx": {
+        "bytes": 47609,
+        "sha256": "de399779df02a137db631897715b5a28011dcf49cc3a3236c4ac4ef1a5d1860a"
+      },
+      "R/sceptre": {
+        "bytes": 1058,
+        "sha256": "570ca456b280cdeb201ef5ebdf22dc8f80092e2c0c68e33c7f73340e420f3759"
+      },
+      "R/sceptre.rdx": {
+        "bytes": 3761,
+        "sha256": "afe319e173c307405fc1028e68b6528d5e76e63664ec690cd8808ca7a44eb6f4"
+      },
+      "R/sceptre.rdb": {
+        "bytes": 440540,
+        "sha256": "aa034945714abe5c5042535ec4f897b7810df68171f8017caaf896ff5b037198"
+      },
+      "Meta/data.rds": {
+        "bytes": 206,
+        "sha256": "2746c5b262317482883605569d2645ec0f8814112f66282a7fd74c708b36cd97"
+      },
+      "Meta/links.rds": {
+        "bytes": 693,
+        "sha256": "41d8c73cf0b1c677325b521f052c15e6f78299093d78234227d3779c9a19c451"
+      },
+      "Meta/features.rds": {
+        "bytes": 122,
+        "sha256": "04abba1fbf14e9ebfa5018fd8a740842010982b85aad6aef0f672275b088d982"
+      },
+      "Meta/nsInfo.rds": {
+        "bytes": 614,
+        "sha256": "3d94264b54fea8ab96373b56ca7b13ab34fee20c23fc3aaee3c5cc21bab36831"
+      },
+      "Meta/package.rds": {
+        "bytes": 2081,
+        "sha256": "43e9a12662101f300955a945b7f2f20c26edbf308d8fa6c7c71e9d03642a7edd"
+      },
+      "Meta/hsearch.rds": {
+        "bytes": 1118,
+        "sha256": "8cdf894cfd0f18172fa5ae044a422414d29ed8f2b9d947a79a273b8e5d0d98f4"
+      },
+      "Meta/Rd.rds": {
+        "bytes": 1246,
+        "sha256": "e3fbc6dfe821f3aa533255997e0d799c96145a0a5f8f6f7553c2568301bafd10"
+      },
+      "html/R.css": {
+        "bytes": 2133,
+        "sha256": "3d290675266eebeba6efff07db879d699843c80bf428f9e71000e2fc6078f5db"
+      },
+      "html/00Index.html": {
+        "bytes": 5962,
+        "sha256": "3590cf00c50696cf0df44e9a333fb2469e5d1b0100e06148b9fed60fa859aed7"
+      },
+      "libs/sceptre.so": {
+        "bytes": 387064,
+        "sha256": "afa69951c678af87a2ec30344fe4cb1e093d28af9c710623140e6212c20a27bf"
+      },
+      "scripts/DATASET_parse_example_data.R": {
+        "bytes": 3460,
+        "sha256": "19b2ff82f310d81b24bddf4ccdaf40127771541b821fb20e45b2391b9e833557"
+      },
+      "scripts/DATASET_highmoi_example_data.R": {
+        "bytes": 17625,
+        "sha256": "468a4bcaccc76740861737d2cf97695f423daaf0ead64d47e63bb53580e243c8"
+      },
+      "scripts/README.md": {
+        "bytes": 2057,
+        "sha256": "acc5180a730ef0e5de5fcff036683807d4970c004d917f106e5687f2937e6fae"
+      },
+      "scripts/DATASET_lowmoi_example_data.R": {
+        "bytes": 8701,
+        "sha256": "ad495b31e7492128649a8a58e15255d26d58d6a0b582f7f8d525a65f75582b22"
+      },
+      "scripts/DATASET_gene_table.R": {
+        "bytes": 3405,
+        "sha256": "00f353b703a9157a801d4abda549af9e87f6545a7d63cce756794ccf327ff3ea"
+      },
+      "data/grna_target_data_frame_highmoi.rda": {
+        "bytes": 1106,
+        "sha256": "3c31b5825a1351e3e0711d248896d69ee50b118320458989f8a4ce2dd1edebbf"
+      },
+      "data/gene_position_data_frame_grch37.rda": {
+        "bytes": 599797,
+        "sha256": "e3bbe4e3f67539d9cf95a8afb2ccc5fff04fc6a50aa2c015c6cf2601dca19976"
+      },
+      "data/lowmoi_example_data.rda": {
+        "bytes": 45976,
+        "sha256": "c8dc7db81f2b47e3e58d24b9a4f6d022ccb17cd9fd844074c3ec66420c519958"
+      },
+      "data/highmoi_example_data.rda": {
+        "bytes": 30750,
+        "sha256": "b5b03970815151481566de9f549ac6163c5165e4f28054bf3fdec9255db30c0f"
+      },
+      "data/gene_position_data_frame_grch38.rda": {
+        "bytes": 371806,
+        "sha256": "2a96dfa8910245fd55e22c347645c779b1e01c5a747ca71dc25420468b414e63"
+      },
+      "help/AnIndex": {
+        "bytes": 1661,
+        "sha256": "a64772e17eaea29560c22dc0ccf65c29dc976ff56aed6c27c533f8f2ce94795f"
+      },
+      "help/aliases.rds": {
+        "bytes": 510,
+        "sha256": "9b4b0980001a905da9789eecef27cbac2c1425640930bbc140aebd0e57245109"
+      },
+      "help/paths.rds": {
+        "bytes": 535,
+        "sha256": "3914a7d2f4c976f6b2bf3281152e77b05c571653033b9c99f03c9344e2c24073"
+      },
+      "help/sceptre.rdx": {
+        "bytes": 1009,
+        "sha256": "edf326a0529b9ad6b760074e9f33f81a3aebd840454232d5765b92ee6d82dd4b"
+      },
+      "help/sceptre.rdb": {
+        "bytes": 108773,
+        "sha256": "99ff24c79132328253715eb17520aeb4e7cd9c365db493b62fb9e177aceb6453"
+      },
+      "help/figures/hex.jpg": {
+        "bytes": 91935,
+        "sha256": "9121753fe7048501100c6ae1dc8be3479b0fdd53f6e144ecd7a6f9db7eeebfd5"
+      },
+      "help/figures/logo.png": {
+        "bytes": 105820,
+        "sha256": "e9e47f995c9c00b008b2f3d0215d7b72471dd2c018d96be3e98c54df8237af15"
+      }
+    }
+  },
+  "ondisc": {
+    "library": "/private/tmp/sceptre-rf0-ondisc-library",
+    "source_version": "1.3.5",
+    "installed_artifacts": {
+      "LICENSE": {
+        "bytes": 44,
+        "sha256": "9501cea9c40571d3ef7714a8fe727bbcc97eb448532b37284e54a3595be570a6"
+      },
+      "NEWS.md": {
+        "bytes": 382,
+        "sha256": "ab099e4617085e713ace26b9315ac87303be2620356b5a3e14bafb1683829b43"
+      },
+      "NAMESPACE": {
+        "bytes": 372,
+        "sha256": "778b82cdfd9faa14926ce860eb007a2230f0d28b62358f5cec979a7c3e08c206"
+      },
+      "README.md": {
+        "bytes": 1335,
+        "sha256": "9bfd2e8bb4bc3dbed50e9a18613f0b9b5a8e9cf124f103c6ed7af319801079be"
+      },
+      "DESCRIPTION": {
+        "bytes": 2313,
+        "sha256": "d26c509065b734ed09a42d9e5a983e6080ddec39a8ba46f47ea82925e90cfc21"
+      },
+      "INDEX": {
+        "bytes": 742,
+        "sha256": "0fceade314aa6c27bd14743061188a4af80306a6603d290d0708614310972dbb"
+      },
+      "extdata/highmoi_example/gem_group_2/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_2/barcodes.tsv.gz": {
+        "bytes": 563,
+        "sha256": "b4ffd1ef17b5ef5afdb24765d5f2aee6e8d7a9c9e03ed599ea9c25e1bf7bfb3e"
+      },
+      "extdata/highmoi_example/gem_group_2/matrix.mtx.gz": {
+        "bytes": 42613,
+        "sha256": "ced6cd0abe450fecf070d0c3b3483f227d27f15afe9d61bc8d8ae2eeb462c4e2"
+      },
+      "extdata/highmoi_example/gem_group_1/features.tsv.gz": {
+        "bytes": 1393,
+        "sha256": "8a061b7bdbba880de5e43a96f305c5966e905264d8a0372a7e594f91baaaf579"
+      },
+      "extdata/highmoi_example/gem_group_1/barcodes.tsv.gz": {
+        "bytes": 536,
+        "sha256": "ce8365bb831fe756f3e376bdf70ff18904b1bde6bd78c7ac3f4f2c6e26d87f34"
+      },
+      "extdata/highmoi_example/gem_group_1/matrix.mtx.gz": {
+        "bytes": 42947,
+        "sha256": "b815e20e63571c5831e4563cdea4d91c564376e31ac1f540b3765a65638ebd52"
+      },
+      "R/ondisc.rdx": {
+        "bytes": 1499,
+        "sha256": "cf3ed827b41d7db493fff584bd47855c64998cc6282fa999e083e30d96063c99"
+      },
+      "R/ondisc.rdb": {
+        "bytes": 183007,
+        "sha256": "8100db9395a487578e447e313b020753bab379f48907dbaf6842016d69983377"
+      },
+      "R/ondisc": {
+        "bytes": 1058,
+        "sha256": "570ca456b280cdeb201ef5ebdf22dc8f80092e2c0c68e33c7f73340e420f3759"
+      },
+      "Meta/links.rds": {
+        "bytes": 309,
+        "sha256": "c08b485c07110c96884cd8fb17e2f3e2d45766daac0a66b208c569ba3f8b18b8"
+      },
+      "Meta/features.rds": {
+        "bytes": 122,
+        "sha256": "04abba1fbf14e9ebfa5018fd8a740842010982b85aad6aef0f672275b088d982"
+      },
+      "Meta/nsInfo.rds": {
+        "bytes": 416,
+        "sha256": "c56f6dbf8f324daaf55284736c4732b6c947f7345b2097602e40e9868d5919b0"
+      },
+      "Meta/package.rds": {
+        "bytes": 1678,
+        "sha256": "cee11db0d4d734646d3883fe4999fc967a67a19887dbe9ad1f5d02575d760a07"
+      },
+      "Meta/hsearch.rds": {
+        "bytes": 589,
+        "sha256": "3b581f7a3269078af0a64cbabc7059591ba8d380a8e1e25e1962b0ce18f37072"
+      },
+      "Meta/Rd.rds": {
+        "bytes": 599,
+        "sha256": "d5cac18c2428fc553d24ea475a910110b8f512363c7b8ce5d6f85a5de0788edc"
+      },
+      "html/R.css": {
+        "bytes": 2133,
+        "sha256": "3d290675266eebeba6efff07db879d699843c80bf428f9e71000e2fc6078f5db"
+      },
+      "html/00Index.html": {
+        "bytes": 2687,
+        "sha256": "59221501a1e12b2bc56142759f403841b9df5ebe4bf561f6991062b2f1d25d85"
+      },
+      "libs/ondisc.so": {
+        "bytes": 8486168,
+        "sha256": "876191bbd08aaab169838b0e7073696070c8a12278e087c4e5e4bd949e090e6f"
+      },
+      "help/ondisc.rdx": {
+        "bytes": 404,
+        "sha256": "d1f50d7bb18da58053c53dd55e13fd7ba3dbfd3129c85186d393c3d3c22eedf2"
+      },
+      "help/AnIndex": {
+        "bytes": 455,
+        "sha256": "845376eb7cb92e61b8fb29a55b840090b194e10682f5884a69a28d74c1b425ca"
+      },
+      "help/ondisc.rdb": {
+        "bytes": 20884,
+        "sha256": "5b27b22baa6a4872b4f94e955c7f2e5b947a2d13927aadb820ee32f8c9dd4051"
+      },
+      "help/aliases.rds": {
+        "bytes": 254,
+        "sha256": "142724deed1a3dfa5d0022c374963e740cf9800dbfb1cb4d683a903359924978"
+      },
+      "help/paths.rds": {
+        "bytes": 261,
+        "sha256": "97423703a847df65e4ce7d06afa449041904f27734ee763b8538b88f90a4d542"
+      },
+      "help/figures/hex.png": {
+        "bytes": 137996,
+        "sha256": "7bdaca08aed38fab6d6cf344284b9f2a1d3e7fabfffac475a15135659f34743f"
+      }
+    }
+  },
+  "runtime": {
+    "java": "Temurin17.0.10",
+    "nextflow": "25.10.4 build11173",
+    "offline_plugin": "nf-schema2.4.2 cached",
+    "mode": "local; containers/conda/job arrays disabled; task seed271828"
+  },
+  "runners": [
+    {
+      "source_path": "/Users/ekatsevi/code/research/sceptre/tools/refactor/pipeline-smoke.R",
+      "staged_path": "/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/runners/pipeline-smoke.R",
+      "sha256": "3b8c468d96c685cc36fc29b8299a9ef1ea20b276897c7c666b05d793fefd0d12"
+    },
+    {
+      "source_path": "/Users/ekatsevi/code/research/sceptre/tools/refactor/pipeline-nextflow.R",
+      "staged_path": "/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/runners/pipeline-nextflow.R",
+      "sha256": "c90afb57b720760b8f657fe8f2a69e16b79054e1fb798754a79c95b2a9c9e204"
+    },
+    {
+      "source_path": "/Users/ekatsevi/code/research/sceptre/tools/refactor/book-smoke.R",
+      "staged_path": "/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/runners/book-smoke.R",
+      "sha256": "91477e6468781c82a1bf125dcbebe0926fbd2de4a0eab014d5dc8fcd0f0a0436"
+    },
+    {
+      "source_path": "/Users/ekatsevi/code/research/sceptre/tools/refactor/consumer-inventory.json",
+      "staged_path": "/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/runners/consumer-inventory.json",
+      "sha256": "ef6c5e4ef018e3d4f7f1ba496f1f78875523e96f5259b3098d3a27c17e053f3c"
+    }
+  ],
+  "planned_outputs": {
+    "reference": [
+      "reference/stages",
+      "reference/nextflow",
+      "reference/book"
+    ],
+    "candidate": [
+      "candidate/stages",
+      "candidate/nextflow",
+      "candidate/book"
+    ],
+    "summary": [
+      "qualification-comparison.json",
+      "artifact-manifest.json"
+    ]
+  },
+  "comparison_contract": "Floating-point scientific values tolerance1e-8; exact identifiers, row order, decisions, classes, schemas and pod maps. Both known empty-barcode failures retained, never counted as passing.",
+  "execution_authorized_at": "2026-10-16T15:31:23.671808+00:00",
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "BLIS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "R_DATATABLE_NUM_THREADS": "1"
+  },
+  "helper": {
+    "path": "/Users/ekatsevi/code/research/sceptre/tests/testthat/helper-refactor.R",
+    "sha256": "51b65c4761c6d7015476db86c91e72227778642578ecac06a0eeb1890c00cc68"
+  },
+  "fixture_manifest": {
+    "path": "/Users/ekatsevi/code/research/sceptre/tests/testthat/fixtures/refactor/manifest.json",
+    "sha256": "641980c425fdb658b5dabfe506477f2d00ded257240d9225194daed84fd161ec"
+  },
+  "completed_at": "2026-10-16T15:41:34.355198+00:00",
+  "installed_artifact_immutability": {
+    "reference": {
+      "library": "/private/tmp/sceptre-resource-reference-release-library",
+      "all_installed_artifacts_unchanged": true,
+      "artifact_count": 47
+    },
+    "candidate": {
+      "library": "/private/tmp/sceptre-refactor-qualified-library",
+      "all_installed_artifacts_unchanged": true,
+      "artifact_count": 47
+    },
+    "ondisc": {
+      "library": "/private/tmp/sceptre-rf0-ondisc-library",
+      "all_installed_artifacts_unchanged": true,
+      "artifact_count": 30
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "state": "passed",
+  "candidate_commit": "90664a763140a6197a429f65ab45d31f0f7f94c9",
+  "baseline_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "production_identical_to": "28df390",
+  "production_identical": true,
+  "archives_sha256": {
+    "candidate": "33143e1ed5c3fa093d5583bc7f24b0024abf2cfbbf889f7c8cb2cf54754d075c",
+    "reference": "4f93c20315d66f03046ff97c36ba853e96ead6ffd675e0980c81ec53daa06048"
+  },
+  "environment": {
+    "R_LIBS": "/private/tmp/sceptre-rf0-ondisc-library",
+    "SCEPTRE_REFACTOR_ORACLE_DEBUG": "false",
+    "SCEPTRE_REQUIRE_ONDISC": "true",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1"
+  },
+  "started_at_utc": "2026-10-16T15:31:01.006148+00:00",
+  "finished_at_utc": "2026-10-16T15:35:29.402331+00:00",
+  "installed_tests": {
+    "blocks": 101,
+    "checks": 3522,
+    "passed": 3522,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skipped": 0,
+    "package_path": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/library/sceptre",
+    "ondisc": "1.3.5"
+  },
+  "native_components": {
+    "blocks": 3,
+    "checks": 112,
+    "passed": 112,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skipped": 0
+  },
+  "package_check": {
+    "errors": 0,
+    "warnings": 2,
+    "notes": 0,
+    "conditions": [
+      "* checking files in \u2018vignettes\u2019 ... WARNING\nFiles in the 'vignettes' directory but no files in 'inst/doc':\n  \u2018calibration_check.png\u2019 \u2018discovery_analysis.png\u2019\n  \u2018grna_count_assignments.png\u2019 \u2018grna_count_distribution.png\u2019\n  \u2018pipeline_schematic.png\u2019 \u2018power_check.png\u2019 \u2018qc.png\u2019 \u2018sceptre.Rmd\u2019\n  \u2018update_vignette.sh\u2019",
+      "* checking package vignettes ... WARNING\nDirectory 'inst/doc' does not exist.\nPackage vignette without corresponding single PDF/HTML:\n  \u2018sceptre.Rmd\u2019"
+    ],
+    "same_baseline_vignette_warnings": true,
+    "full_vignette_check": false
+  },
+  "package_tarball": {
+    "path": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/sceptre_0.99.0.tar.gz",
+    "sha256": "251536103fbb193a06a668689518c724ab6a53384373f49581580f2f16c5b290"
+  },
+  "paths": {
+    "root": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof",
+    "oracle": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/oracle-release",
+    "reference_source": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/reference-source",
+    "pristine_candidate_source": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/candidate-source",
+    "installed_library": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/library",
+    "logs": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/logs",
+    "installed_test_results": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/installed-test-results.rds",
+    "native_test_results": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/native-component-test-results.rds",
+    "full_provenance": "/private/tmp/sceptre-final-qualification-90664a7.4685nrof/summary.json"
+  },
+  "scope_note": "Release installed qualification; R CMD build omitted vignette building and R CMD check used --no-manual --no-vignettes. This is not a full vignette check.",
+  "resolved_collection_issue": "Native RDS collection wrapper was corrected before native assertions; initial error log retained and successful 112-check results saved."
+}

@@ -1,0 +1,29 @@
+N E X T F L O W  ~  version 25.10.4
+Launching `/private/tmp/sceptre-consumer-qualification-28df390-o2-20261016/reference/nextflow/pipeline/main.nf` [pensive_descartes] DSL2 - revision: 5b30847309
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: The operator `first` is useless when applied to a value channel which returns a single value by definition
+WARN: Task runtime metrics are not reported when using macOS without a container engine
+[8e/bdb397] Submitted process > SET_ANALYSIS_PARAMETERS (1)
+[89/ec5e44] Submitted process > PREPARE_ASSIGN_GRNAS (1)
+[0e/62e416] Submitted process > ASSIGN_GRNAS (2)
+[13/a6deba] Submitted process > ASSIGN_GRNAS (4)
+[53/a3cc52] Submitted process > ASSIGN_GRNAS (3)
+[d0/1a61d8] Submitted process > ASSIGN_GRNAS (1)
+[5a/e6051c] Submitted process > COMBINE_ASSIGN_GRNAS
+[8d/a3beb4] Submitted process > RUN_QC
+[e3/d7de75] Submitted process > PREPARE_ASSOCIATION_ANALYSIS
+[e7/1dcc4b] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:RUN_ASSOCIATION_ANALYSIS (1)
+[04/8feb8d] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:RUN_ASSOCIATION_ANALYSIS (2)
+[4e/ed7002] Submitted process > RUN_ANALYSIS_CALIBRATION_CHECK:COMBINE_ASSOCIATION_ANALYSIS
+[92/3e7afa] Submitted process > RUN_ANALYSIS_POWER_CHECK:RUN_ASSOCIATION_ANALYSIS (1)
+[76/9beeee] Submitted process > RUN_ANALYSIS_POWER_CHECK:COMBINE_ASSOCIATION_ANALYSIS
+[27/01dff9] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:RUN_ASSOCIATION_ANALYSIS (1)
+[16/ef324c] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:RUN_ASSOCIATION_ANALYSIS (2)
+[d7/978dab] Submitted process > RUN_ANALYSIS_DISCOVERY_ANALYSIS:COMBINE_ASSOCIATION_ANALYSIS
