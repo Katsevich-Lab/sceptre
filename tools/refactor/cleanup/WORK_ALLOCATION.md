@@ -40,6 +40,14 @@ Root also owns B5/T7 connection lifetimes in `get_mtx_metadata` and `write_vecto
 file. Only unconditional helper-owned cleanup is changed; parser formats, normal
 file contents and caller-owned connections retain their existing behavior.
 
+Root owns the result adapter/private-alias retirement in `R/result_processing.R`,
+the production-only test-utility deletion and its single actual test-helper
+caller. Actual pipeline `process_*`/`apply_grouping_to_result` adapters remain;
+the unconsumed historical alias and production dimname setters do not. No worker
+edits these files concurrently. Root's contract-only import/QC/preparation/source
+doc unit is pinned at cacf390; native retirement may adopt those comments before
+its subsequent actual-caller name changes.
+
 CL1 at 5ac0fca is integrated as 489ca7c after independent source closure and exact
 immutable local qualification (3,631 full checks, 344 focused, 112 native, 12
 controlled ownership cases). That prerequisite is complete. The two current
