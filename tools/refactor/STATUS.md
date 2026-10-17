@@ -63,3 +63,8 @@ comparison lives under `tools/refactor/consistency/`, with `compare.R` as its
 explicit entry point and `walkthrough.qmd` as Tim's reading guide. See
 [CI_HANDOFF.md](CI_HANDOFF.md) for the boundary and follow-up validation record.
 This does not alter the production implementation or the earlier acceptance.
+
+The follow-up local gates pass: 4,199 permanent installed expectations without an
+oracle, full package check Status OK, all five current-source native probes,
+and 1,265 explicit manual old/new expectations. Exact tested commits and source
+carry are in the handoff receipt. Hosted status is tied to the published PR head.

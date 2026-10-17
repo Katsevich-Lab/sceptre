@@ -41,7 +41,28 @@ should follow a tagged source/evidence snapshot.
 
 ## Validation record
 
-The final validation receipt will record the immutable source commit, ordinary
-installed/package checks with the oracle unset, five current-source probes,
-manual old/new comparison and hosted CI. Preliminary failed test-authoring and
-render attempts remain in local logs; they did not change production behavior.
+Local validation is retained in [the evidence receipt](results/ci-handoff-370897a/qualification.json)
+and [restorable raw logs/results](results/ci-handoff-370897a/README.md).
+
+| Check | Qualified source | Outcome |
+|---|---|---|
+| Installed permanent suite; `CI=true`, oracle unset, guarded ondisc required | 708f37a | 4,199/4,199 expectations; 138 blocks; zero failures/errors/warnings/skips |
+| Current native mathematics | 708f37a | 9 independent expectations |
+| Controlled current sampler/count/dispersion/result probes | 708f37a | 9 / 214 / 14 / 959 cases; negative controls retained |
+| Full `R CMD build` and `R CMD check --no-manual` | 708f37a | Status OK; examples and rebuilt vignettes; no historical oracle |
+| Source tarball inspection | 708f37a | Both developer directories and old output/source oracles absent |
+| Front-door old/new comparison | 370897a vs original 21f9ea0 | 1,265/1,265 expectations; 31 blocks; zero failures/errors/warnings/skips |
+| Historical relocation | 04df2f0 to new paths | All 32 files byte-exact; SHA256 verified |
+| Walkthrough | QMD hash in receipt | Rendered HTML; executed indexing result and live source snippets checked |
+
+The receipt verifies identical permanent source/test/workflow bytes between
+708f37a and 370897a. The latter changes only the manual wrapper and Git
+attributes. Subsequent handoff evidence/documentation is build-excluded.
+Production files remain identical to 0a9f9d8. No resource or actual-consumer
+rerun is claimed for this test/tooling separation.
+
+Hosted checks belong to the published PR head; consult
+[PR 234 checks](https://github.com/Katsevich-Lab/sceptre/pull/234/checks).
+The local receipt does not substitute for their outcome or claim future heads
+have passed. Preliminary failed test-authoring, wrapper and render attempts
+are retained separately in the evidence archive.
