@@ -11,11 +11,11 @@ reference <- normalizePath(args[[1L]], winslash = "/", mustWork = TRUE)
 output <- args[[2L]]
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 output <- normalizePath(output, winslash = "/", mustWork = TRUE)
-fixture <- normalizePath(file.path(repo, "tests/testthat/fixtures/refactor"), winslash = "/")
+fixture <- normalizePath(file.path(repo, "tools/refactor/consistency/testthat/fixtures/refactor"), winslash = "/")
 if (identical(output, fixture) || length(list.files(output, all.files = TRUE, no.. = TRUE))) {
     stop("Runtime oracle output must be a fresh directory separate from committed fixtures.")
 }
-helper <- file.path(repo, "tests/testthat/helper-refactor.R")
+helper <- file.path(repo, "tools/refactor/consistency/testthat/helper-refactor.R")
 source(helper)
 options(sceptre.refactor.fixture_dir = fixture)
 manifest <- readRDS(file.path(fixture, "manifest.rds"))

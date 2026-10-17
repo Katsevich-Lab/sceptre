@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, dev, codex/refactor]
+    branches: [main, dev]
   pull_request:
 
 name: R-CMD-check
@@ -36,7 +36,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       SCEPTRE_REQUIRE_ONDISC: ${{ matrix.config.os == 'macOS-latest' && 'true' || 'false' }}
-      SCEPTRE_REFACTOR_ORACLE_DEBUG: 'false'
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
       MKL_NUM_THREADS: 1
@@ -102,30 +101,19 @@ jobs:
           }
           stopifnot(identical(utils::packageDescription("ondisc")$RemoteSha, pin))
 
-      - name: Build verified original-package workflow reference
-        run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
-
       - name: Check independent private native components
-        run: Rscript --vanilla tools/refactor/test-native-components.R .
+        run: Rscript --vanilla tools/checks/test-native-components.R .
 
       - name: Check draw-bank ownership at R error boundaries
-        run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+        run: Rscript --vanilla tools/checks/test-sampling-ownership.R .
 
       - name: Check count ownership at R and native error boundaries
-        run: Rscript --vanilla tools/refactor/test-count-ownership.R .
+        run: Rscript --vanilla tools/checks/test-count-ownership.R .
 
-      - name: Check dispersion exception state and platform policy
-        run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
-
-      - name: Check native result ownership at R return boundaries
-        shell: Rscript {0}
-        run: |
-          reference <- Sys.getenv("SCEPTRE_REFACTOR_ORIGINAL_SOURCE")
-          stopifnot(nzchar(reference))
-          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
-            shQuote("tools/refactor/test-result-ownership.R"), shQuote(normalizePath(".")),
-            shQuote(reference), shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "sceptre-result-ownership"))))
-          stopifnot(identical(status, 0L))
+      - name: Check current dispersion exception policy
+        run: Rscript --vanilla tools/checks/test-dispersion-exceptions.R . "${{ runner.temp }}/sceptre-dispersion-policy"
+      - name: Check current result ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-result-ownership.R . "${{ runner.temp }}/sceptre-result-ownership"
 
       - name: Retain native boundary evidence
         if: always()
@@ -135,7 +123,7 @@ jobs:
           path: |
             ${{ runner.temp }}/sceptre-sampling-ownership
             ${{ runner.temp }}/sceptre-count-ownership
-            ${{ runner.temp }}/sceptre-dispersion-exceptions
+            ${{ runner.temp }}/sceptre-dispersion-policy
             ${{ runner.temp }}/sceptre-result-ownership
 
       - uses: r-lib/actions/check-r-package@v2
@@ -143,7 +131,6 @@ jobs:
   in-memory-without-ondisc:
     runs-on: ubuntu-latest
     env:
-      SCEPTRE_REFACTOR_ORACLE_DEBUG: 'true'
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
       MKL_NUM_THREADS: 1
@@ -164,25 +151,17 @@ jobs:
             any::R.utils
             any::MASS
             any::digest
-      - name: Build verified original-package reference without ondisc
-        run: Rscript --vanilla tools/refactor/prepare-runtime-oracle.R
       - name: Check independent private native components
-        run: Rscript --vanilla tools/refactor/test-native-components.R .
+        run: Rscript --vanilla tools/checks/test-native-components.R .
       - name: Check draw-bank ownership at R error boundaries
-        run: Rscript --vanilla tools/refactor/test-sampling-ownership.R .
+        run: Rscript --vanilla tools/checks/test-sampling-ownership.R .
       - name: Check count ownership at R and native error boundaries
-        run: Rscript --vanilla tools/refactor/test-count-ownership.R .
-      - name: Check dispersion exception state and platform policy
-        run: Rscript --vanilla tools/refactor/test-dispersion-exceptions.R .
-      - name: Check native result ownership at R return boundaries
-        shell: Rscript {0}
-        run: |
-          reference <- Sys.getenv("SCEPTRE_REFACTOR_ORIGINAL_SOURCE")
-          stopifnot(nzchar(reference))
-          status <- system2(file.path(R.home("bin"), "Rscript"), c("--vanilla",
-            shQuote("tools/refactor/test-result-ownership.R"), shQuote(normalizePath(".")),
-            shQuote(reference), shQuote(file.path(Sys.getenv("RUNNER_TEMP"), "sceptre-result-ownership"))))
-          stopifnot(identical(status, 0L))
+        run: Rscript --vanilla tools/checks/test-count-ownership.R .
+      - name: Check current dispersion exception policy
+        run: Rscript --vanilla tools/checks/test-dispersion-exceptions.R . "${{ runner.temp }}/sceptre-dispersion-policy"
+      - name: Check current result ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-result-ownership.R . "${{ runner.temp }}/sceptre-result-ownership"
+
       - name: Retain native boundary evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -191,7 +170,7 @@ jobs:
           path: |
             ${{ runner.temp }}/sceptre-sampling-ownership
             ${{ runner.temp }}/sceptre-count-ownership
-            ${{ runner.temp }}/sceptre-dispersion-exceptions
+            ${{ runner.temp }}/sceptre-dispersion-policy
             ${{ runner.temp }}/sceptre-result-ownership
       - name: Require an ondisc-free environment and run package tests
         shell: Rscript {0}

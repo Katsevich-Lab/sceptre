@@ -32,12 +32,12 @@ if (length(added)) stop("Additional production source invalidates the reference:
 if (!identical(unname(read.dcf(file.path(reference, "DESCRIPTION"))[1L, "Version"]), "0.99.0")) {
     stop("Unexpected reference package version.")
 }
-source(file.path(repository, "tests/testthat/helper-refactor-native.R"))
+source(file.path(repository, "tools/refactor/consistency/testthat/helper-refactor-native.R"))
 pkgload::load_all(reference, export_all = FALSE, helpers = FALSE, quiet = TRUE,
                   compile = TRUE, recompile = TRUE)
 rebuilt_hashes <- git(c("hash-object", "--no-filters", "--", shQuote(file.path(reference, paths))))
 if (!identical(rebuilt_hashes, hashes)) stop("Compilation changed the pinned production source.")
-bridge <- refactor_native_bridge(file.path(repository, "tests/testthat/fixtures/refactor/native-bridge.cpp"))
+bridge <- refactor_native_bridge(file.path(repository, "tools/refactor/consistency/testthat/fixtures/refactor/native-bridge.cpp"))
 
 # One treated cell, unit weights, and zero nuisance projection make a selected
 # a-value its exact statistic. y/mu retain nontrivial effect/SE calculations.

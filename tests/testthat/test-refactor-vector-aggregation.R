@@ -42,25 +42,36 @@ test_that("vector aggregation preserves dense output and both duplicate meanings
     }
 })
 
-# Run the frozen original in this R/Matrix environment: dense accumulation uses
-# extended precision on some platforms. Recorded Mac sums are not a Linux oracle.
-aggregation_original <- local({
-    path <- testthat::test_path("fixtures", "aggregation-original-21f9ea0.R")
-    stopifnot(identical(digest::digest(file = path, algo = "sha256"),
-        "9cb66ee837ae924268adc953ef8ac753d35a654f410d7aa3194af5f7d03ef6d9"))
-    environment <- new.env(parent = baseenv())
-    sys.source(path, envir = environment)
-    environment$collapse_grna_matrix
-})
+# Independent dense-algebra specification, including repeated metadata rows.
+# base colSums deliberately uses this platform's accumulator/rounding contract.
+aggregation_dense_spec <- function(counts, metadata) {
+    dense <- as.matrix(counts)
+    groups <- unique(metadata$vector_id)
+    labels <- if (is.character(groups)) groups else NULL
+    out <- matrix(0, length(groups), ncol(dense),
+                  dimnames = list(labels, if (length(groups)) colnames(dense) else NULL))
+    for (i in seq_along(groups)) {
+        # which() drops missing group comparisons. Factor row selectors retain
+        # R matrix indexing semantics; character selectors use row labels.
+        selected <- which(metadata$vector_id == groups[[i]])
+        rows <- metadata$grna_id[selected]
+        out[i, ] <- base::colSums(dense[rows, , drop = FALSE])
+    }
+    # The public implementation retains its legacy one-cell simplification:
+    # a 1-by-group matrix, with group names on columns instead of rows.
+    if (ncol(dense) == 1L)
+        return(matrix(as.numeric(out), 1L, length(groups), dimnames = list(NULL, labels)))
+    out
+}
 
-test_that("vector sums preserve this platform's original dense rounding", {
+test_that("vector sums preserve the platform's dense column-sum contract", {
     counts <- matrix(c(2^53, 1, 1, 0, .1, .2, .3, 0), 4L,
                      dimnames = list(paste0("g", 1:4), c("large", "fractional")))
     metadata <- data.frame(grna_id = paste0("g", 1:3), vector_id = "v", grna_target = "t")
     for (input in list(counts, methods::as(Matrix::Matrix(counts, sparse = TRUE), "RsparseMatrix"),
                       methods::as(Matrix::Matrix(counts, sparse = TRUE), "TsparseMatrix"))) {
         expect_identical(refactor_private("collapse_grna_matrix")(input, metadata),
-                         aggregation_original(input, metadata))
+                         aggregation_dense_spec(input, metadata))
     }
 })
 
@@ -73,16 +84,16 @@ test_that("column blocks keep every selected row in the original sum", {
     metadata <- data.frame(grna_id = rownames(counts), vector_id = "v", grna_target = "t")
     before <- serialize(counts, NULL)
     expect_identical(refactor_private("collapse_grna_matrix")(counts, metadata),
-                     aggregation_original(counts, metadata))
+                     aggregation_dense_spec(counts, metadata))
     expect_identical(serialize(counts, NULL), before)
     for (columns in list(integer(), 1L)) {
         input <- counts[, columns, drop = FALSE]
         expect_identical(refactor_private("collapse_grna_matrix")(input, metadata),
-                         aggregation_original(input, metadata))
+                         aggregation_dense_spec(input, metadata))
     }
 })
 
-test_that("vector aggregation replays immutable and seeded duplicate fixtures exactly", {
+test_that("vector aggregation agrees with dense algebra on fixed and seeded duplicates", {
     path <- testthat::test_path("fixtures", "aggregation-inputs-6a43fa5.rds")
     stopifnot(identical(digest::digest(file = path, algo = "sha256"),
         "f53c93eabbb30a53d5fed01788ee8ef0ef4447b94ed308540410e21baa624e2d"))
@@ -102,7 +113,7 @@ test_that("vector aggregation replays immutable and seeded duplicate fixtures ex
     for (fixture in fixtures) {
         before <- serialize(fixture, NULL)
         expect_identical(refactor_private("collapse_grna_matrix")(fixture$m, fixture$d),
-                         aggregation_original(fixture$m, fixture$d))
+                         aggregation_dense_spec(fixture$m, fixture$d))
         expect_identical(serialize(fixture, NULL), before)
     }
 })

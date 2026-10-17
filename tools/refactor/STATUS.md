@@ -55,3 +55,11 @@ to finish this internal refactor. Merge/release require a separate instruction.
 The detailed execution chronology remains in this file's Git history through
 0a9f9d8 and the unchanged unit evidence. Earlier passing counts are historical
 evidence, not a substitute for the final report's explicit source/coverage map.
+
+## Maintainer handoff follow-up
+
+Permanent package/CI checks are now independent of old SCEPTRE. The manual
+comparison lives under `tools/refactor/consistency/`, with `compare.R` as its
+explicit entry point and `walkthrough.qmd` as Tim's reading guide. See
+[CI_HANDOFF.md](CI_HANDOFF.md) for the boundary and follow-up validation record.
+This does not alter the production implementation or the earlier acceptance.

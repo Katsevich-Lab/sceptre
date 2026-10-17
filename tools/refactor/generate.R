@@ -26,8 +26,8 @@ for (file in files) {
     actual <- system2("git", c("hash-object", shQuote(file.path(reference, file))), stdout = TRUE)
     if (!identical(actual, expected)) stop("Compilation changed pinned source: ", file)
 }
-source(file.path(repo, "tests/testthat/helper-refactor.R"))
-output <- file.path(repo, "tests/testthat/fixtures/refactor")
+source(file.path(repo, "tools/refactor/consistency/testthat/helper-refactor.R"))
+output <- file.path(repo, "tools/refactor/consistency/testthat/fixtures/refactor")
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 options(sceptre.refactor.fixture_dir = output)
 inputs <- refactor_make_inputs()

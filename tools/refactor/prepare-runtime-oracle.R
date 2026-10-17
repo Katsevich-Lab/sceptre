@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# CI bootstrap. Keep both reference source and results outside the candidate
+# Historical bootstrap, no longer invoked by CI. Keep both reference source and results outside the candidate
 # checkout and outside R's session tempdir, which disappears when R exits.
 args <- commandArgs(trailingOnly = TRUE)
 persistent <- if (length(args)) args[[1L]] else Sys.getenv("RUNNER_TEMP")

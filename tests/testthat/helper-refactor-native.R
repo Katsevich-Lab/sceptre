@@ -14,26 +14,6 @@ refactor_native_bridge <- local({
     }
 })
 
-refactor_native_platform <- function() {
-    compiler <- paste(
-        system2(file.path(R.home("bin"), "R"), c("CMD", "config", "CXX"), stdout = TRUE),
-        collapse = " "
-    )
-    compiler_command <- strsplit(compiler, " ", fixed = TRUE)[[1L]][[1L]]
-    list(
-        platform = R.version$platform,
-        system = unname(Sys.info()[["sysname"]]),
-        R = as.character(getRversion()),
-        BH = as.character(utils::packageVersion("BH")),
-        Rcpp = as.character(utils::packageVersion("Rcpp")),
-        compiler = compiler,
-        compiler_version = paste(
-            system2(compiler_command, "--version", stdout = TRUE),
-            collapse = " "
-        )
-    )
-}
-
 refactor_native_run_case <- function(case, bridge) {
     stopifnot(
         is.integer(case$trt_idxs),
@@ -46,9 +26,7 @@ refactor_native_run_case <- function(case, bridge) {
     do.call(refactor_native_function("run_association_test"), args)
 }
 
-# Frozen configurations are historical inputs, never a candidate name registry.
-# Keep this literal map separate so the retired slow CRT oracle cannot silently
-# re-enter active coverage or be replaced by a reference implementation.
+# The three currently supported production samplers; no retired implementation.
 refactor_native_candidate_samplers <- function() {
     c(fisher_yates = "fisher_yates_sampler",
       hybrid = "hybrid_fisher_iwor_sampler",
@@ -56,21 +34,7 @@ refactor_native_candidate_samplers <- function() {
 }
 
 refactor_native_sample <- function(config, candidate_name, bridge) {
-    path <- getNamespaceInfo(asNamespace("sceptre"), "path")
-    if (!file.exists(file.path(path, "Meta", "package.rds"))) {
-        stop("Full-bank candidate comparisons require an installed sceptre namespace.")
-    }
     pointer <- do.call(refactor_native_function(candidate_name), config$args)
-    # Actual always comes from the installed candidate. The independent frozen
-    # source oracle below supplies expected; materialize the entire B bank.
+    # Materialize the entire bank from the current package namespace.
     bridge$refactor_native_materialize(pointer)
-}
-
-refactor_native_reference <- function() {
-    list(
-        commit = "21f9ea098b69c444a884a49bc254de711968e3b5",
-        source = "src/generate_samples_functions.cpp",
-        git_blob = "5a839ba737db9d6ef0e5e031adb7486d3692ff91",
-        sha256 = "deb2dee4338f5779588408f4d80caa9a42d64e1df5e2a5c519c8361dd1c06cfd"
-    )
 }

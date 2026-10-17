@@ -52,7 +52,7 @@ testthat::test_that("empirical tails retain ties and the existing two-sided conv
 })
 
 testthat::test_that("the staged component independently reproduces every frozen native case", {
-    fixture <- file.path(root, "tests", "testthat", "fixtures", "refactor")
+    fixture <- file.path(root, "tools", "refactor", "consistency", "testthat", "fixtures", "refactor")
     inputs <- readRDS(file.path(fixture, "native-inputs.rds"))
     expected <- readRDS(file.path(fixture, "native-expected.rds"))
     set.seed(719L)

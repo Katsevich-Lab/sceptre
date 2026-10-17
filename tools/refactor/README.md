@@ -1,4 +1,44 @@
-# Internal refactor verification
+# Refactor review and manual comparison
+
+This directory is temporary developer tooling kept in Git for maintainer review.
+It is excluded from the source package by `^tools/refactor$` in `.Rbuildignore`.
+No CI workflow invokes it. Permanent package tests live in `tests/testthat/`;
+current-source safety probes live in [`tools/checks/`](../checks/README.md).
+
+## Start here
+
+For Tim's code review, read [the walkthrough](walkthrough.qmd), then the lasting
+[root architecture guide](../../ARCHITECTURE.md). To compare original and new
+SCEPTRE from two immutable Git snapshots:
+
+```sh
+Rscript --vanilla tools/refactor/compare.R /absolute/fresh/output
+# Optional second argument: a committed candidate Git ref; default HEAD.
+```
+
+The command builds both sides in isolated temporary source trees, installs the
+candidate, runs the verified original separately, then checks the installed
+candidate. It uses existing developer dependencies and inherits `R_LIBS`.
+It compares committed code only. Read `comparison.json`, `checks.csv` and the
+logs in the output directory. Failures return nonzero and keep their evidence.
+See [consistency/README.md](consistency/README.md) for scope, dependencies and
+qualified skips. It does not rerun resource or actual Nextflow qualification.
+
+To render the walkthrough from the repository root (Quarto and knitr required):
+
+```sh
+(cd tools/refactor && quarto render walkthrough.qmd)
+```
+
+The page executes only the small indexing example and reads snippets directly
+from this checkout. It does not install or silently load an installed SCEPTRE.
+Rendered HTML and support files are ignored; the QMD source stays versioned.
+
+After maintainer review and acceptance, preserve a tagged source/evidence
+snapshot before deleting this directory from active development. Keep permanent
+CI, package tests and `ARCHITECTURE.md`. Retirement is a later decision.
+
+## Earlier qualification and supporting tools
 
 Final source 0a9f9d8 is qualified. See [final acceptance](FINAL_ACCEPTANCE.md)
 for the explicit source/coverage map and two bounded accepted memory costs,
@@ -35,7 +75,7 @@ measurement/CI/documentation units when they are independently reviewable.
 
 ## Reference fixtures
 
-Fixtures are committed under `tests/testthat/fixtures/refactor`. Tests load
+Historical fixtures are committed under `tools/refactor/consistency/testthat/fixtures/refactor`. The manual suite loads
 saved inputs and expectations; they never regenerate them. `manifest.json`
 records source hashes, dependencies, platform, RNG conventions and artifact
 hashes. `api.json` is the readable export/formal/method/slot inventory; R's
@@ -62,7 +102,7 @@ Native fixtures cover 17 prepared cases, stage thresholds, accepted and failed
 skew-normal approximation, all sidedness, positive/zero B3 and selected null
 segments. Only ordinary zero-based arrays are saved, never external pointers.
 The test-only C++ bridge is outside production `src/` and exports no package API.
-Every platform compares the full banks of exactly three active samplers with
+The manual suite compares the full banks of exactly three active samplers with
 an immutable baseline source oracle compiled in that same test environment.
 The literal candidate map is Fisher-Yates -> `fisher_yates_sampler`, hybrid ->
 `hybrid_fisher_iwor_sampler`, and production fast CRT -> `sample_crt_indices`.
@@ -75,7 +115,7 @@ compared with the historical bank on the recorded platform/toolchain. This is
 archive evidence, not a fourth active candidate sampler. The controlled pointer
 ownership probe covers three retained samplers x three failure phases (nine
 cases). The original bridge/include/configs and historical reports stay intact. Its pinned Git-blob identity is
-checked during tests. The saved platform-specific stream is an additional
+checked during manual consistency tests. The saved platform-specific stream is an additional
 check, so differing hosted compiler versions do not disable exact RNG parity.
 Floating comparisons use the predeclared tolerance `1e-8`; memberships, order,
 API, QC/significance decisions, stages and budgets use exact comparisons.
@@ -91,12 +131,12 @@ compilation. Review the resulting fixture diff and hashes before committing.
 ```sh
 rf0_reference_dir=$(mktemp -d)
 git archive 21f9ea098b69c444a884a49bc254de711968e3b5 | tar -x -C "$rf0_reference_dir"
-Rscript --vanilla tools/refactor/generate-native.R "$rf0_reference_dir" tests/testthat/fixtures/refactor
+Rscript --vanilla tools/refactor/generate-native.R "$rf0_reference_dir" tools/refactor/consistency/testthat/fixtures/refactor
 Rscript --vanilla tools/refactor/generate.R "$rf0_reference_dir"
 ```
 
 Run the workflow generator last: it finalizes SHA256/MD5 digests for the complete
-fixture set, including native artifacts. Package tests verify the saved manifest
+fixture set, including native artifacts. Manual consistency tests verify the saved manifest
 and all artifact MD5 digests without additional runtime dependencies.
 Git attributes preserve fixture bytes across checkout line-ending settings.
 
@@ -111,7 +151,10 @@ standard hosted jobs install and verify the exact source pin; the no-ondisc lane
 remains separate. Dependency sources must not be silently interchanged in
 reference/candidate comparisons or their warnings suppressed by SCEPTRE.
 
-## Package tests and CI
+## Permanent package tests and CI
+
+Routine checks run without a reference checkout, oracle environment variable,
+historical output files or network access to old SCEPTRE:
 
 ```sh
 R CMD INSTALL --preclean --library=/path/to/fresh-candidate-library .
@@ -119,21 +162,15 @@ R_LIBS=/path/to/fresh-candidate-library SCEPTRE_REQUIRE_ONDISC=true \
   Rscript --vanilla -e 'library(sceptre); testthat::test_dir("tests/testthat", package="sceptre", load_package="installed", stop_on_failure=TRUE)'
 ```
 
-`SCEPTRE_REQUIRE_ONDISC=true` makes a missing backed dependency a failure. The
-standard check lanes pin the ondisc source revision. A separate fresh Linux lane
-installs hard dependencies plus test tooling, asserts ondisc is absent and runs
-the package suite. Existing Linux/macOS/Windows checks remain. The dependency
-action's [documented inputs](https://github.com/r-lib/actions/blob/v2/setup-r-dependencies/action.yaml)
-support the explicit hard-dependency selection. Hosted results must be checked
-after publication; editing workflow YAML is not evidence of successful CI.
+`SCEPTRE_REQUIRE_ONDISC=true` makes missing backed coverage a failure. The
+standard check lanes pin the ondisc source revision; a separate fresh Linux lane
+asserts ondisc is absent and runs the package suite. Native mathematical and
+controlled error-boundary checks use `tools/checks/`, which is also excluded
+from source packages. They load current source only.
 
-The hosted lanes build the verified original in a separate process with the
-same numerical environment as the candidate. This accommodates pre-existing
-cross-platform fit differences without changing fixtures or tolerances.
-[RUNTIME_ORACLE.md](RUNTIME_ORACLE.md) documents source-byte verification,
-toolchain/RNG fingerprints and debug versus release pairing. A missing or stale
-reference is a CI failure. Public API, ordering, decisions and exact native
-sampler checks retain their independent fixed contracts.
+The original-source comparison that previously ran inside CI is now explicit
+manual tooling only. [RUNTIME_ORACLE.md](RUNTIME_ORACLE.md) documents its
+unchanged verification and numerical-environment checks.
 
 ## Downstream stage smoke tests
 
@@ -148,7 +185,7 @@ Use identical ondisc/Arrow/R dependencies for both. Run:
 ```sh
 Rscript --vanilla tools/refactor/pipeline-smoke.R \
   /path/to/package-library /path/to/pinned/sceptre-pipeline \
-  tests/testthat/fixtures/refactor /path/to/fresh-output-directory
+  tools/refactor/consistency/testthat/fixtures/refactor /path/to/fresh-output-directory
 ```
 
 Each real script runs in a fresh R process with an isolated working directory,
@@ -176,7 +213,7 @@ recorded rather than repaired by the refactor.
 
 ```sh
 python3 tools/refactor/benchmark.py /path/to/package-library \
-  tests/testthat/fixtures/refactor /path/to/output --repetitions 3
+  tools/refactor/consistency/testthat/fixtures/refactor /path/to/output --repetitions 3
 ```
 
 This original compact harness fixes common BLAS/thread controls, runs one warm-up and at least

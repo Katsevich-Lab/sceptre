@@ -16,9 +16,9 @@ relative <- c("src/inference.h", "src/inference_scores.cpp", "src/inference_tail
     "src/result_lifetime.h", "src/sampling_safety.h", "src/pair_eligibility.h",
     "src/RcppExports.cpp", "tools/refactor/result-ownership.cpp",
     "tools/refactor/test-result-ownership.R",
-    "tests/testthat/fixtures/refactor/native-inputs.rds",
-    "tests/testthat/fixtures/refactor/native-expected.rds",
-    "tests/testthat/helper-refactor.R", "tests/testthat/fixtures/refactor/manifest.rds")
+    "tools/refactor/consistency/testthat/fixtures/refactor/native-inputs.rds",
+    "tools/refactor/consistency/testthat/fixtures/refactor/native-expected.rds",
+    "tools/refactor/consistency/testthat/helper-refactor.R", "tools/refactor/consistency/testthat/fixtures/refactor/manifest.rds")
 paths <- file.path(root, relative)
 before <- tools::md5sum(paths)
 stopifnot(all(file.exists(paths)),
@@ -57,8 +57,8 @@ options(warn = 2) # warnings are failures during controlled qualification
 # The CI oracle bootstrap already compiled this verified original archive.
 # Load those bytes without building or looking for an installed/candidate fallback.
 if ("sceptre" %in% loadedNamespaces()) stop("Use a fresh process before loading sceptre.")
-source(file.path(root, "tests/testthat/helper-refactor.R"))
-manifest <- readRDS(file.path(root, "tests/testthat/fixtures/refactor/manifest.rds"))
+source(file.path(root, "tools/refactor/consistency/testthat/helper-refactor.R"))
+manifest <- readRDS(file.path(root, "tools/refactor/consistency/testthat/fixtures/refactor/manifest.rds"))
 stopifnot(identical(manifest$source_commit, "21f9ea098b69c444a884a49bc254de711968e3b5"),
           isTRUE(manifest$reference_source_verified))
 original_paths <- stats::setNames(file.path(reference, names(manifest$source_files)),

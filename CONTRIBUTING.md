@@ -24,8 +24,11 @@ promote a sufficiently scoped proposal to an issue for implementation tracking.
 
 For internal ownership, cell-coordinate conventions, numerical boundaries and
 component compatibility, see [Internal architecture](ARCHITECTURE.md).
-The refactor [verification guide](tools/refactor/README.md) describes the frozen
-compatibility fixtures and downstream/resource checks.
+Permanent tests in `tests/testthat/` check current package behavior without an
+old installation. CI also runs [current-source native checks](tools/checks/README.md).
+Temporary [refactor review tools](tools/refactor/README.md) hold the explicit
+old-versus-new comparison and downstream/resource evidence. They are excluded
+from package builds and never run in CI.
 
 - Keep changes focused on a single problem or feature.
 - Add or update tests for behavior changes and bug fixes.

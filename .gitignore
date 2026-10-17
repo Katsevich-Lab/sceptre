@@ -16,3 +16,7 @@ src/*.so
 
 /.quarto/
 **/*.quarto_ipynb
+
+/tools/refactor/walkthrough.html
+/tools/refactor/walkthrough_files/
+/tools/refactor/walkthrough_cache/

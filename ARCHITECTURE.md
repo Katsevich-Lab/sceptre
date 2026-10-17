@@ -187,8 +187,9 @@ For a small numerical trace, the observed/synthetic-coordinate test in
 `tests/testthat/test-refactor-indexing.R` independently specifies cell membership,
 builds score components and checks the same native entry point. Its supplied
 draws separate the one-based observed boundary from zero-based synthetic
-positions without relying on a sampler. Full frozen native cases and the
-original-source sampler oracle cover stage selection and actual draw streams.
+positions without relying on a sampler. Permanent tests cover declared stages, effect formulas and sampler laws.
+The separate manual consistency suite retains full frozen native cases and
+original-source comparisons of actual draw streams.
 
 ## Verification for contributors
 
@@ -201,10 +202,13 @@ devtools::check()
 ```
 
 Use `SCEPTRE_REQUIRE_ONDISC=true` for required backed coverage. Run private native
-component checks with `Rscript tools/refactor/test-native-components.R` from a
-source checkout. [The harness guide](tools/refactor/README.md) describes frozen
-fixtures, same-environment reference comparisons, pipeline checks and resource
-measurement. Never regenerate expected outputs from a refactor candidate.
+component checks with `Rscript tools/checks/test-native-components.R .` from a
+source checkout; [tools/checks/README.md](tools/checks/README.md) describes the
+other current-source safety checks used by CI. Routine package checks require
+no old package or oracle. [The manual harness guide](tools/refactor/README.md)
+describes the explicit old-versus-new command, frozen fixtures, pipeline checks
+and resource measurement. Never regenerate historical expectations from a
+refactor candidate.
 Use separate source trees for concurrent compilation/check/install jobs.
 
 Preserve the supported behavior matrix and public API. Numerical or method
