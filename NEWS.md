@@ -33,8 +33,8 @@
 - Guide-vector aggregation avoids making the whole sparse input dense while
   retaining its existing values, ordering and output shape.
 - Parallel analysis reports a failed worker's original error and block number
-  before combining results. A worker returning no result cannot silently drop
-  a block of work.
+  before combining results. A child exiting without replying cannot silently drop a block of work;
+  successful empty results remain supported.
 
 # sceptre 0.99.0 (2026-06-24)
 

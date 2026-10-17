@@ -50,25 +50,28 @@ announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
 #' @param worker Function accepting a block and a worker number; serial work
 #'   receives NULL instead of a number.
 #' @param parallel Whether to use `mclapply()`, with one worker per block.
-#' @return Non-NULL worker results in input-block order. Stop if a worker fails
+#' @return Worker results in input-block order, including legitimate NULL results.
+#'   Stop if a worker fails
 #'   or exits without returning a result. Include its block number and original
 #'   error message, before callers combine results or report success. Blocks and
 #'   random seeds are not rearranged; `mclapply()` keeps its default behavior.
 #' @noRd
 execute_analysis_blocks <- function(blocks, worker, parallel) {
-    results <- if (!parallel) {
-        lapply(blocks, function(block) worker(block, NULL))
+    # A successful worker can return NULL for an empty block. Put its result
+    # inside a list so that this differs from a child exiting without replying.
+    replies <- if (!parallel) {
+        lapply(blocks, function(block) list(value = worker(block, NULL)))
     } else {
         parallel::mclapply(
             seq_along(blocks),
             function(proc_id) {
-                worker(blocks[[proc_id]], proc_id)
+                list(value = worker(blocks[[proc_id]], proc_id))
             },
             mc.cores = length(blocks)
         )
     }
-    for (i in seq_along(results)) {
-        result <- results[[i]]
+    for (i in seq_along(replies)) {
+        result <- replies[[i]]
         if (inherits(result, "try-error")) {
             cause <- attr(result, "condition")
             detail <- if (inherits(cause, "condition")) {
@@ -87,7 +90,7 @@ execute_analysis_blocks <- function(blocks, worker, parallel) {
             )
         }
     }
-    results
+    lapply(replies, function(reply) reply$value)
 }
 
 #' Join worker result tables in block order

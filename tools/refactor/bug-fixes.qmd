@@ -499,14 +499,15 @@ ordinary cases; the regression tests above specify the intended corrections.
 
 **Example / old behavior.** A worker could report “Cannot read response gene_X”,
 while the parent subsequently failed with “$ operator is invalid for atomic
-vectors” when combining its outputs. A worker returning no result could also
+vectors” when combining its outputs. A child exiting without replying could also
 leave an incomplete block unrecognized.
 
 **Fix.** Check each returned block before reporting success or combining results.
-Report the failed worker's block number and original error. Reject a missing
-result instead of silently dropping work. Successful result order and random
+Report the failed worker's block number and original error. Distinguish a
+missing reply from a successful empty result, so empty work blocks remain valid. Successful result order and random
 seeds are unchanged.
 
 **Code / test.** [execution.R](../../R/execution.R) and
 [test-worker-errors.R](../../tests/testthat/test-worker-errors.R) cover serial and
-forked errors, missing results, successful order and preserved cause text.
+forked errors, a child exiting before replying, valid empty results, zero-eligible
+CRT assembly, successful order and preserved cause text.
