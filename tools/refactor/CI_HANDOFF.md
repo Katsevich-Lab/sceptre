@@ -53,7 +53,7 @@ and [restorable raw logs/results](results/ci-handoff-370897a/README.md).
 | Source tarball inspection | 708f37a | Both developer directories and old output/source oracles absent |
 | Front-door old/new comparison | 370897a vs original 21f9ea0 | 1,265/1,265 expectations; 31 blocks; zero failures/errors/warnings/skips |
 | Historical relocation | 04df2f0 to new paths | All 32 files byte-exact; SHA256 verified |
-| Walkthrough | QMD hash in receipt | Rendered HTML; executed indexing result and live source snippets checked |
+| Initial walkthrough (before illustrated revision) | QMD hash in receipt | Rendered HTML; executed indexing result and live source snippets checked |
 
 The receipt verifies identical permanent source/test/workflow bytes between
 708f37a and 370897a. The latter changes only the manual wrapper and Git
@@ -66,3 +66,14 @@ Hosted checks belong to the published PR head; consult
 The local receipt does not substitute for their outcome or claim future heads
 have passed. Preliminary failed test-authoring, wrapper and render attempts
 are retained separately in the evidence archive.
+
+## Hosted result and guide revision
+
+All six jobs pass for published code/test/workflow head `e230067` in
+[run 38987592424](https://github.com/Katsevich-Lab/sceptre/actions/runs/38987592424).
+The subsequent illustrated tour and bug appendix change developer documentation
+and figures only. Their renders and local links are checked separately; package
+source, tests and CI inputs retain the receipt's exact bytes.
+
+The guide revision's source/HTML hashes, executed example, links and diagram
+checks are recorded separately in [TOUR_VALIDATION.json](TOUR_VALIDATION.json).

@@ -1,0 +1,31 @@
+{
+  "scope": "Documentation-only illustrated tour and bug appendix; no production/test/CI changes",
+  "source_sha256": {
+    "tools/refactor/walkthrough.qmd": "2a88b3b629f4004d044c5451408881295cf8491ea2aeeef07adff23808fb07ce",
+    "tools/refactor/bug-fixes.qmd": "ab40bcdaecfee6e70ad2490e8d7e0a688483d139a5b10c0859b6c64263dbeaa3",
+    "tools/refactor/figures/analysis-flow.dot": "2630f7cd5fd71857d458b8460ed5b628f1ecf8a817b9cd8493ca29c2dd449dda",
+    "tools/refactor/figures/analysis-flow.svg": "b09cdfeb2a2d5095ad01fe7ee05ce391a2dc4a9fac3d6c6dcec7e2009a722b39",
+    "tools/refactor/figures/execution-plans.dot": "8cee2e9e856837c282421f67711fc806f3b7a497946cef92fc26ae2a0396ee4d",
+    "tools/refactor/figures/execution-plans.svg": "2c29fc3b90d84a5b5367b77b9f606e63c80f8f12ad28b1f82fbb1b338a8223ff",
+    "R/analysis_context.R": "7a2995446a921540f4fca377dbd2b2bb80f5bb0759ab5a4b1c05812120a086c8",
+    "R/fitting.R": "5111892527d82829ce4aef41118acb4134a396df268f75445dbbf56ccaa37da3"
+  },
+  "rendered_html_sha256": {
+    "tools/refactor/walkthrough.html": "a3566f236de004fb7772ccac1989cb3db77a34da8d9308009c46f14d299b2ff7",
+    "tools/refactor/bug-fixes.html": "5d2fbd2fe543591e15f700cd1f4bad7eaed7bd65d7154758f00de504d0b1b707"
+  },
+  "checks": {
+    "quarto_render": "Both documents succeeded; tour executes actual ordered-cell example and reads actual R functions",
+    "diagram_regeneration": "Both SVGs exactly match Graphviz DOT regeneration",
+    "diagram_visual_review": "PNG renders inspected; text and arrows legible, without clipping",
+    "local_links": "All authored links resolve to current local artifacts/source",
+    "bug_entries": 26,
+    "separate_memory_improvement_entries": 1,
+    "permanent_inputs_unchanged": 113
+  },
+  "quarto": "1.9.38",
+  "diagram_generator": "dot - graphviz version 14.1.5 (20260411.2331)",
+  "qualified_code_head": "e23006783be1202d1818c35d8a0e6cc1924e7ef1",
+  "hosted_run": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38987592424",
+  "hosted_result": "All six jobs passed at the qualified code head before these documentation-only edits"
+}

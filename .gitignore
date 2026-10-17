@@ -20,3 +20,7 @@ src/*.so
 /tools/refactor/walkthrough.html
 /tools/refactor/walkthrough_files/
 /tools/refactor/walkthrough_cache/
+
+/tools/refactor/bug-fixes.html
+/tools/refactor/bug-fixes_files/
+/tools/refactor/bug-fixes_cache/

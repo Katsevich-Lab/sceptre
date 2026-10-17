@@ -1,29 +1,37 @@
 ---
-title: "A maintainer's tour of the SCEPTRE refactor"
-subtitle: "Reading guide for Tim and future contributors"
+title: "Finding your way around the refactored SCEPTRE"
+subtitle: "A reading guide for Tim"
 format:
   html:
     toc: true
+    toc-depth: 2
     embed-resources: true
+    code-fold: true
+    code-summary: "Show the R code"
+    grid:
+      body-width: 1000px
 execute:
-  echo: true
+  echo: false
   warning: true
   error: false
 ---
 
-This is a guide to reviewing the refactor, rather than a new user tutorial.
-The public functions, defaults and 56-slot saved object remain the interface.
-The refactor adds no SPA, Wilcoxon, accelerated fitter, new QC rule, backend or
-backed CRT. The lasting reference is [ARCHITECTURE.md](../../ARCHITECTURE.md).
-This temporary walkthrough and comparison harness live with the code in Git,
-but are excluded from the R source package and permanent CI.
+The aim is to make SCEPTRE easier to work on. The functions a user calls and the
+saved `sceptre_object` stay the same. Inside the package, selecting cells,
+reading counts, fitting models, running tests and assembling results now have
+clearer homes.
+
+**Suggested reading:** start with the first diagram, follow the example of one
+test, then use the file map when you want to change something. The
+[bug-by-bug notes](bug-fixes.html) are a separate appendix, with a concrete
+example, fix and regression test for each item. Its [QMD source](bug-fixes.qmd)
+is also versioned.
 
 ```{r}
 #| label: setup
 #| include: false
 root <- normalizePath("../..", mustWork = TRUE)
 stopifnot(file.exists(file.path(root, "R/analysis_context.R")))
-# Display actual source, not a second hand-maintained version of the code.
 show_function <- function(file, name) {
     expressions <- parse(file.path(root, file), keep.source = TRUE)
     refs <- attr(expressions, "srcref")
@@ -39,62 +47,77 @@ show_function <- function(file, name) {
 }
 ```
 
-## Start with the ownership map
+## The picture: what happens during discovery?
 
-The former large analysis and numerical routines mixed cell selection, storage,
-fitting, sampling, execution and result processing. The new responsibilities
-are concrete modules with ordinary inputs. The S4 object remains the workflow
-facade and saved state; it is not passed through every numerical operation.
+![Discovery starts in the familiar public function, prepares pairs and cells, chooses a permutation or CRT traversal, prepares numerical inputs, calls C++ inference, and assembles results. Count access, fitting and fit reuse have separate supporting files.](figures/analysis-flow.svg){width=100%}
 
-| Concern | Start reading here | Key boundary |
-|---|---|---|
-| Workflow checks and state commit | `R/s4_analysis_functs_2.R`, `R/workflow_state.R` | Commit successful outputs/cache |
-| Analysis preparation | `R/analysis.R`, `R/analysis_context.R` | Transient context and ordered views |
-| Sparse/backed access | `R/storage.R` | Source row and source-cell positions |
-| QC measurements and rule | `R/pair_qc.R`, `src/pair_eligibility.h` | Measurements separate from the shared predicate |
-| Response/assignment fits | `R/fitting.R` | Aligned response/design to compact fit/probabilities |
-| Scores and fit reuse | `R/score_preparation.R`, `R/fit_cache.R` | Array orientation and explicit invalidation |
-| Association traversal | `R/association_execution.R`, `R/association_workers.R` | Different permutation/CRT reuse scopes |
-| Worker dispatch | `R/execution.R` | Partitioning, logs, collection |
-| Native inference | `src/inference_scores.cpp`, `src/inference_tail.cpp`, `src/inference_stages.cpp` | Scores, selected null segments, stages, R conversion |
-| Result processing | `R/result_processing.R` | Requested rows, guide integration, complete-family correction |
+Read the numbered boxes from top to bottom. The yellow boxes are supporting
+jobs used along the way. This is a map of responsibilities; it leaves out
+individual function calls. R filenames are under `R/`; numerical C++ files are
+under `src/`.
 
-The split does not create a generic plugin framework. A later extension should
-change the few concrete owners it needs and add its own scientific validation.
+Calibration and power use many of the same pieces, with their own requested
+pairs and final processing. For example, power results are grouped without the
+discovery analysis's multiple-testing correction. Nextflow also uses some of
+these pieces directly; its nuclear shards are saved before global correction.
 
-## Trace one discovery association
+The practical change is that a function computing fitted means can now receive
+a response vector and a design matrix. It does not need to know how counts
+were stored, how workers were started, or where results will be saved.
 
-1. `run_discovery_analysis()` checks workflow prerequisites and owns successful
-   state/cache writeback.
-2. `analyze_association_pairs()` prepares eligible requests and a transient
-   analysis context. Each request keeps its identity independently of traversal.
-3. `run_permutation_analysis()` traverses responses and shares the full run's
-   permutation bank. `run_crt_analysis()` prepares response fits, then traverses
-   guides and shares one assignment model/full bank across that guide's responses.
-4. Workers read aligned counts and design through the same cell view, obtain
-   the applicable shared or guide-specific fit, and prepare the score arrays.
-5. The checked `run_association_test()` Rcpp boundary converts observed R
-   positions once. Private numerical components calculate the effect, score and
-   selected tail/stage. Synthetic draw positions are already zero based.
-6. `pair_results_from_native()` converts native records. `assemble_pair_results()`
-   restores failed-QC requests. Finalization integrates guides and applies the
-   correction over the complete analysis family. Nuclear pipeline shards remain
-   raw; the collector owns the corresponding complete-family operation.
+## Follow one requested test
 
-Keep the two traversals distinct: a single universal loop would hide where
-fitting and sampling can safely be reused. NT-control discovery needs its own
-treatment-plus-NT fits; an all-cell fit cannot silently replace them.
+Suppose discovery requests a test of **guide group A against response gene R1**.
 
-## Indexing: source, analysis, fit
+1. **Start from the existing object.** `run_discovery_analysis()` checks that
+   prerequisite steps have run. It reads the settings and saves the completed
+   results back into the returned object.
+2. **Choose the pairs and cells.** `analysis.R` keeps pairs that passed QC.
+   `analysis_context.R` works out which original count-matrix columns belong in
+   each fit, and in what order. Counts and covariates must use that same order.
+3. **Obtain the model fit.** The analysis reuses an earlier response fit only
+   where it is still valid. Otherwise `fitting.R` fits the response model.
+   `score_preparation.R` turns the fit into the arrays the current test needs.
+4. **Run the test.** `association_workers.R` connects those inputs to the
+   C++ function `run_association_test()`. The C++ files calculate the effect,
+   score and p-value using the existing resampling method.
+5. **Put the result in its proper place.** `result_processing.R` restores
+   requested pair order, keeps failed-QC rows in the expected output shape,
+   integrates guides and applies the complete-family correction. The public
+   analysis function then saves the results and reusable response fits.
 
-Source positions are original matrix columns. Analysis positions index the
-ordered retained-cell map. Fit positions index a particular ordered view.
-All three use **one-based R positions**; native draw banks use zero-based fit
-positions. Saved legacy NT-local assignments are decoded once at preparation.
+The saved object still holds the user's data and results. The temporary lists
+used inside an analysis hold the selected cells, settings and prepared inputs.
+They disappear when the run ends; they do not replace the saved-object format.
 
-The following example executes the actual private view functions directly from
-this checkout. It does not load an installed package, open backing files or fit
-a model.
+## Why permutation and CRT have different loops
+
+The two methods can reuse different work. The diagram below shows the common
+case using **complement controls**.
+
+![Permutation generates draws once and visits responses, reusing each response fit across guide groups. CRT obtains shared response fits, then visits guide groups, reusing each group's assignment fit and draws across responses.](figures/execution-plans.svg){width=100%}
+
+For permutation, reading and preparing R1 once lets us test it against its
+requested guide groups. For CRT, fitting A's assignment probabilities and
+generating A's draws once lets us test A against its requested responses.
+These loops live in `association_execution.R`; the calculations for the
+individual tests live in `association_workers.R`.
+
+**NT-control discovery is an important qualification.** Each guide group's
+response fit uses that group's treatment cells plus the NT cells. Those fits
+therefore remain specific to the group. Calibration with NT controls uses the
+NT pool. The refactor keeps those statistical distinctions explicit.
+
+## The indexing change, with five cells
+
+A cell can have a different position in the original matrix, the cells retained
+after QC, and the particular fit being run. Those are three position numbers
+for the same cell.
+
+Suppose QC retained original columns **2, 4, 5, 8, 11**. Group A's treatment cells
+are original columns **4, 5**, and the NT pool is ordered **8, 2, 11**.
+For NT-control discovery, the fitted data use treatment cells followed by NT
+cells. The actual selection code gives:
 
 ```{r}
 #| label: ordered-cell-view
@@ -108,109 +131,182 @@ index <- list(
     control_group_complement = FALSE
 )
 view <- context_code$make_fit_view(index, "A")
-view
 stopifnot(identical(view$source_cells, c(4L, 5L, 8L, 2L, 11L)),
           identical(view$trt_fit_pos, 1:2))
+knitr::kable(data.frame(
+    `Position in this fit` = seq_along(view$source_cells),
+    `Original matrix column` = view$source_cells,
+    `Position after QC` = view$fit_to_analysis,
+    Role = c("Treatment", "Treatment", "NT", "NT", "NT"),
+    check.names = FALSE
+))
 ```
 
-The response row and design select source columns `4, 5, 8, 2, 11` in that order.
-Observed treatment positions are `1, 2` inside this fit, not `4, 5`.
-The code that constructs that view is included directly below.
+Both the response vector and the design matrix select original columns
+**4, 5, 8, 2, 11**. The treatment cells are positions **1, 2** inside that fit.
+That is why passing the original column numbers straight into a fitted test
+would be wrong.
+
+The new code constructs this ordered selection in one place and passes it to
+both count-reading and model-fitting code. It avoids rediscovering the same
+relationships in several functions. Inside R, positions start at 1. At the
+R-to-C++ test entry, observed treatment positions are converted once to start
+at 0. The synthetic draws already use that C++ convention.
+
+<details>
+<summary>Show the actual cell-selection function</summary>
+
+This excerpt is read from `R/analysis_context.R` when the page is rendered.
 
 ```{r}
 #| label: view-source
-#| echo: false
 #| results: asis
 show_function("R/analysis_context.R", "make_fit_view")
 ```
 
-Raw source membership uses set membership in analysis order. It must not use
-the incoming vector's ordering as the fitted-cell order:
+</details>
+
+## Where would I make a change?
+
+Use the question in the first column to choose a starting file. The last column
+says what work that file actually does.
+
+| I want to… | Start here | What I will find |
+|---|---|---|
+| Change the checks or state updates around a public analysis | `s4_analysis_functs_2.R`, `workflow_state.R` | Prerequisite checks and saving completed results/fits into the returned object |
+| Understand which cells and pairs a test uses | `analysis_context.R`, `analysis.R` | Cell selections, cell order, pair identities and analysis settings |
+| Change how counts are read from R matrices or ondisc | `storage.R` | Read a response, count selected cells, construct/reopen backed data |
+| Change pairwise QC | `pair_qc.R`, `src/pair_eligibility.h` | Collect the measurements, then apply the current threshold rule; calibration uses that rule too |
+| Change the response or assignment model fit | `fitting.R` | Response/design to coefficients and dispersion, or treatment/design to assignment probabilities |
+| Change how the fitted response becomes test inputs | `score_preparation.R` | Fitted means and the current score arrays, in the selected cell order |
+| Understand reuse of an earlier response fit | `fit_cache.R` | Which changes clear saved fits, and how new fits are saved |
+| Change the order or sharing of association work | `association_execution.R`, `association_workers.R` | The response loop for permutation, guide loop for CRT, and their test calculations |
+| Change process splitting, progress messages or logs | `execution.R` | Starting serial/parallel work and collecting its outputs |
+| Change the numerical association test | `src/inference_*.cpp`, `src/low_level_full_test.cpp` | Effect/score calculations, tail approximation, resampling stages and the R entry function |
+| Change output tables or guide integration | `result_processing.R` | Output columns, failed-QC rows, guide integration and family correction |
+
+`ondisc` is a separate dependency. SCEPTRE's private ondisc calls are now grouped
+in `storage.R`, which makes that dependency easier to inspect and change.
+Importing data and assigning guides still begin in their familiar
+`import_functs.R` and `assign_grna_functions.R` files.
+
+### If you remember the old files
+
+Much of the work previously spread across `medium_level_functs_v2.R` and
+`association_testing_functions_v2.R` is now divided among the analysis,
+execution and worker files above. Numerical response fitting and score
+preparation previously grouped in `precomputation_functions.R` now live in
+`fitting.R` and `score_preparation.R`. Result processing also has its own file.
+The old large files were removed after their callers were updated.
+
+### A small example of the new style
+
+Inside the package, response fitting and score preparation can be read as two
+separate steps:
 
 ```{r}
-context_code$source_membership_to_analysis(c(5L, 4L, 5L),
-                                         index$analysis_to_source)
-# Analysis positions 2 and 3, with duplicates removed.
+#| eval: false
+#| echo: true
+fit <- fit_response(expressions, covariate_matrix)
+score <- prepare_score_components(expressions, covariate_matrix, fit)
 ```
 
-Review `tests/testthat/test-refactor-indexing.R` for independently specified
-ordering, noncontiguous cells and observed/synthetic coordinate tests.
+The existing response fitter runs Poisson `glm.fit()` and then estimates and
+clips dispersion. A future faster fitter has a specific place to start.
+Changing the fitter would still require checking its statistical behavior and
+whether old saved fits can be reused.
 
-## A small fitting boundary
+<details>
+<summary>Show the actual response-fitting function</summary>
 
-`fit_response()` accepts an expression vector and an aligned matrix design.
-It owns the existing Poisson fit and clipped dispersion estimate; it does not
-select cells, read storage, schedule work or commit a cache. Score preparation
-is a separate owner.
+This excerpt comes directly from `R/fitting.R`.
 
 ```{r}
 #| label: fitter-source
-#| echo: false
 #| results: asis
 show_function("R/fitting.R", "fit_response")
 ```
 
-A future GLMGamPoi-style replacement can start here, but must decide compatible
-fit outputs, warnings and numerical behavior. Effective fitter/settings changes
-also require cache-identity review and scientific validation. This refactor does
-not choose those definitions or claim any acceleration.
+</details>
 
-## Where extensions would enter
+## Which bugs were fixed?
 
-| Possible later work | Owners to inspect | Work still required later |
-|---|---|---|
-| Faster response fitting | `fitting.R`, `score_preparation.R`, `fit_cache.R` | Fit/score compatibility, cache identity, statistical and resource checks |
-| SPA or Wilcoxon | Association workers and result conversion | Define method inputs/results; avoid unnecessary current score/draw work |
-| Pairwise QC replacement | `pair_qc.R`, `pair_eligibility.h`, calibration candidate construction | Define measurements and a rule shared by discovery and calibration |
-| Bioconductor-backed data | Import boundary and `storage.R` | Representation semantics, ordering, shapes, nonmutation and I/O validation |
-| Backed CRT | Storage, CRT plan, existing validation guard, pipeline | Validate one assignment bank per guide/view, fit access and resource behavior before relaxing the guard |
-| New outcome models | Fitter/score/test boundaries and workflow validation | Specify model and inferential meaning rather than forcing it into count-model assumptions |
-| Nextflow changes | Compatibility entrypoints and collector | Respect raw shard schemas and global correction; run real consumers |
+Some changes intentionally repair previously broken behavior. They are separate
+from moving code into clearer files. For example:
 
-`ondisc` is a separate package/dependency boundary. Its private calls are isolated
-in storage; this does not establish that ondisc needs no future work or change
-its own API. Existing backed CRT remains unsupported.
+- An unsorted list of genomic positions could make cis-pair construction miss
+  an eligible gene.
+- An accepted intercept-only formula could fail when using NT controls because
+  R had dropped a matrix dimension.
+- Asking for extra diagnostic output could make discovery plots omit valid
+  results whose optional diagnostics were missing.
+- A cached response fit could survive a change of control cells or design and
+  then be reused for the wrong fit.
 
-## Review and compare
+The [bug-by-bug appendix](bug-fixes.html) explains these and the import,
+input-mutation, plotting, calibration-safety and memory-cleanup fixes. It also
+identifies an avoidable dense-allocation improvement, the remaining limitations,
+and the two accepted memory costs. Every fix points to its implementation and
+regression test, so Tim can review a single item without reading an audit log.
 
-Normal package CI checks the **current package**. It has no old SCEPTRE bootstrap,
-reference oracle or historical output comparison. Permanent tests retain
-mathematical contracts, indexing, nonmutation, current cache behavior,
-serial/fork and sparse/backed parity, and current saved-object roundtrips.
-`tools/checks/` contains current-source mathematical and controlled native
-error-boundary probes. Both developer directories are build-excluded.
+## How this helps later extensions
 
-For the separate refactor-specific comparison, from a committed checkout run:
+The refactor gives future work a starting point; it does not implement those
+extensions.
+
+- **Faster GLM fitting:** start with `fitting.R` and then check score inputs and
+  saved-fit reuse.
+- **SPA or Wilcoxon:** start with the individual-test functions in
+  `association_workers.R`. A method should prepare the inputs it needs.
+- **New pairwise QC:** change the measurements and shared eligibility rule
+  together, including how calibration candidates are accepted.
+- **Bioconductor data or backed CRT:** start with count access in `storage.R`
+  and inspect the relevant analysis loop. Backed CRT still needs its current
+  validation restriction, I/O behavior and statistical/resource validation
+  addressed before it can be enabled.
+- **Nextflow:** keep the scripts' inputs, output tables and saved-object fields
+  compatible. Apply the global correction after collecting the complete family,
+  at the stage required by that pipeline.
+
+The more detailed reference is [ARCHITECTURE.md](../../ARCHITECTURE.md).
+
+## How to check the refactor
+
+There are two separate tools for two different questions:
+
+| Question | Where it is checked |
+|---|---|
+| Does the current package behave correctly? | Permanent `tests/testthat/` tests and checks of the current C++ code under `tools/checks/`; these run in CI |
+| Does the refactor match the old implementation on the agreed cases? | The manual suite under `tools/refactor/consistency/`; this stays outside CI |
+
+From a committed checkout, run the old/new comparison with:
 
 ```bash
 Rscript --vanilla tools/refactor/compare.R /absolute/fresh/output
 ```
 
-The optional second argument selects a candidate commit/ref; default `HEAD`.
-Uncommitted changes are not included. The command archives both refs into the
-output directory, installs the candidate freshly, verifies and runs the original
-in a separate R process with matching dependencies, then executes the relocated
-historical suite against the installed candidate. It neither updates expected
-outputs from candidate code nor installs missing developer dependencies.
-See [the command guide](consistency/README.md) for dependencies and output files.
+It builds the original and the committed candidate separately, then compares
+the installed candidate with verified original results. Read `comparison.json`
+for the exact commits and outcome, and `checks.csv`/the logs for details.
+Uncommitted changes are excluded. [The command guide](consistency/README.md)
+explains dependencies, output files and platform-specific skips.
 
-Read the pinned refs and status in `comparison.json`, then `checks.csv` and logs.
-The manual suite covers public inventories, saved-object compatibility, workflows,
-QC/ordering/budgets/cache observations, prepared numerical stages and full
-same-environment production sampler banks. A platform-specific archived-stream
-check may skip on another toolchain; the source-stream comparison still runs.
-Failures return nonzero and retain logs.
+This command compares the agreed historical cases. The bug regressions check
+the intended repaired behavior separately. Actual Nextflow and resource tests
+have their own [qualification report](FINAL_ACCEPTANCE.md).
 
-This one command does not certify actual Nextflow, selected book examples or
-performance. [FINAL_ACCEPTANCE.md](FINAL_ACCEPTANCE.md) binds those earlier
-qualifications to their measured source commits. It also records the separately
-accepted eight-million-entry conversion memory cost and Papalexi cold serial
-peak increase from about 505 to 667 MiB. The latter's cause remains unresolved.
-This tooling separation does not change production code or remeasure those costs.
+## A few words used in other notes
 
-## What to keep later
+| Word | Meaning here |
+|---|---|
+| Cache | Previously computed response coefficients and dispersion, saved so they can be reused |
+| View | The selected cells in a particular order; it does not mean copying the whole count matrix |
+| Context | A temporary list of inputs and settings prepared for one analysis |
+| Worker | An R function that performs one chunk of the analysis, in the current process or a separate process |
+| Facade | The user-facing SCEPTRE functions and object that call the smaller internal functions |
+| Backend | The way counts are stored and accessed, such as an R sparse matrix or ondisc |
 
-Keep `ARCHITECTURE.md`, permanent tests and current-source CI checks with SCEPTRE.
-Retain this walkthrough, manual comparison and historical evidence for Tim's
-review. After acceptance, preserve a tagged snapshot before retiring
-`tools/refactor/`; deleting it is a separate maintainer decision.
+The tour, figures, bug notes and comparison command stay in Git under
+`tools/refactor/` for maintainer review. `.Rbuildignore` excludes them from the
+R source package. Keep the root architecture guide and permanent tests later;
+after review, preserve a tagged snapshot before retiring this temporary folder.

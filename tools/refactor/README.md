@@ -7,7 +7,8 @@ current-source safety probes live in [`tools/checks/`](../checks/README.md).
 
 ## Start here
 
-For Tim's code review, read [the walkthrough](walkthrough.qmd), then the lasting
+For Tim's code review, read [the illustrated walkthrough](walkthrough.qmd) and
+[bug-by-bug notes](bug-fixes.qmd), then the lasting
 [root architecture guide](../../ARCHITECTURE.md). To compare original and new
 SCEPTRE from two immutable Git snapshots:
 
@@ -27,8 +28,11 @@ qualified skips. It does not rerun resource or actual Nextflow qualification.
 To render the walkthrough from the repository root (Quarto and knitr required):
 
 ```sh
-(cd tools/refactor && quarto render walkthrough.qmd)
+(cd tools/refactor && quarto render walkthrough.qmd && quarto render bug-fixes.qmd)
 ```
+
+The tour uses two static SVG diagrams, with editable Graphviz `.dot` sources
+under `figures/`. Regenerate an SVG with `dot -Tsvg INPUT.dot -o OUTPUT.svg`.
 
 The page executes only the small indexing example and reads snippets directly
 from this checkout. It does not install or silently load an installed SCEPTRE.
