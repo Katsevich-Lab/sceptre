@@ -1,11 +1,17 @@
 # SCEPTRE refactor handoff
 
-Start with the [illustrated tour](walkthrough.qmd), its [bug appendix](bug-fixes.qmd)
-and the lasting [architecture guide](../../ARCHITECTURE.md). The public API and
+Download [the readable tour ZIP](sceptre-refactor-tour.zip), extract it and open
+`walkthrough.html`; its links open the bug appendix. No render tool is needed to
+read it. The [tour source](walkthrough.qmd), [appendix source](bug-fixes.qmd) and
+lasting [architecture guide](../../ARCHITECTURE.md) are also available.
+The public API and
 56-slot saved-object format are preserved. The refactor adds no new inference
 method, storage backend or replacement QC policy. Normal numerical behavior is
 checked against original commit `21f9ea098b69c444a884a49bc254de711968e3b5`.
 Reviewed bug domains and improved worker-error reporting are explicit exceptions.
+From a repository clone, `gh pr checkout 234` selects the review branch. The
+[validation receipt](validation/README.md) gives the final measured outcomes and
+source pins. The portable tour is a ready-to-read entry point for Tim.
 
 ## Material to keep
 
@@ -18,7 +24,7 @@ Current-source native safety checks live in [tools/checks](../checks/README.md).
 The maintained diagram lives in [tools/architecture](../architecture/README.md).
 
 This directory alone is temporary. It retains the tour, exact manual comparison
-suite and the two explicit entry commands below for maintainer review. Routine CI
+suite and the explicit review commands below for maintainer review. Routine CI
 never calls it. All developer directories are excluded from `R CMD build`.
 
 ## Full historical evidence
@@ -83,7 +89,7 @@ is retained for review and is excluded from the package.
 ## Adversarial test check
 
 The explicit command below checks genuine current outputs first, then verifies
-that eight deliberately wrong outputs are rejected by their intended assertions.
+that nine deliberately wrong outputs are rejected by their intended assertions.
 It exercises the same helpers used in permanent tests and does not alter the
 package or any expected fixture:
 
@@ -106,6 +112,11 @@ Existing scientific and pipeline roadmap work stays separate: mixture replacemen
 [#220](https://github.com/Katsevich-Lab/sceptre/issues/220), pairwise QC
 [#225](https://github.com/Katsevich-Lab/sceptre/issues/225), and pipeline plotting
 [timothy-barry/sceptre-pipeline#6](https://github.com/timothy-barry/sceptre-pipeline/issues/6).
+The final handoff also freshly executes all 30 original and candidate pipeline
+R-script stages; their ordered payloads match exactly. This checks actual
+standard/nuclear phase scripts, distinct from the earlier full Nextflow run.
+Inherited nuclear-script options and the book example are owned for triage in
+[#238](https://github.com/Katsevich-Lab/sceptre/issues/238).
 The recorded book qualification is selected cells (14/15, with the inherited
 empty-barcode failure); pipeline qualification uses matched local arrival/seed
 settings. Full-book, container/array/hosted-scheduler validation belongs to their
@@ -113,4 +124,4 @@ maintainers' next qualification work, not a new feature promise from this PR.
 
 Maintainer review of the final diff precedes merge/release. No one has been
 messaged, assigned a review, or represented as having approved the refactor by
-this handoff. The goal is a reproducible, reviewable delivery ready for that step.
+this handoff. This is the reproducible, reviewable delivery prepared for that step.

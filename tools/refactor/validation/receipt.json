@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-17T04:02:19.370857+00:00",
+  "package_check": {
+    "root": "/private/tmp/sceptre-handoff-qualified-r19h35sn",
+    "source": "/private/tmp/sceptre-handoff-qualified-r19h35sn/source",
+    "source_commit": "47f76f63f4affa661b98a51d2916d218379acfc9",
+    "log": "/private/tmp/sceptre-handoff-qualified-r19h35sn/check.log",
+    "build_exit": 0,
+    "tarball": "/private/tmp/sceptre-handoff-qualified-r19h35sn/sceptre_0.99.0.tar.gz",
+    "tarball_sha256": "4028d5d94ededde8ce28d42087221c3f4aa6e20fd5164900894d65adbd056d2c",
+    "developer_material_absent": true,
+    "saved_compatibility_fixture_present": true,
+    "check_exit": 0
+  },
+  "permanent_tests": {
+    "failed": 0,
+    "warnings": 0,
+    "skipped": 0,
+    "passed": 4397
+  },
+  "manual_comparison": {
+    "source_commit": "2f610015e26acf06d7179b099e96774b3d3f7a25",
+    "counts": {
+      "blocks": 31,
+      "checks": 1266,
+      "passed": 1266,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0
+    },
+    "required_backed_assertion": true
+  },
+  "pipeline": {
+    "reference": "21f9ea098b69c444a884a49bc254de711968e3b5",
+    "candidate": "2f610015e26acf06d7179b099e96774b3d3f7a25",
+    "pipeline": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+    "reference_passed": 30,
+    "candidate_passed": 30,
+    "ordered_payloads_equal": true,
+    "tolerance": 0,
+    "ondisc_source": "589803edea2a66ad15e7f07186bee16c7739ab8c",
+    "scope": "Fresh actual pipeline R scripts, standard/nuclear phases; full Nextflow/container execution retains earlier qualified source pins"
+  },
+  "bioccheck": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 5,
+    "version": "1.47.26",
+    "flags": [
+      "no-check-bioc-help",
+      "no-check-version-num"
+    ],
+    "source_commit": "47f76f63f4affa661b98a51d2916d218379acfc9"
+  },
+  "negative_controls": {
+    "genuine_outputs_pass": true,
+    "rejected": 9
+  },
+  "comparison_failure_controls": {
+    "all_record_failed_status": true,
+    "cases": [
+      "unknown-ref",
+      "old-candidate",
+      "unqualified-ondisc"
+    ]
+  },
+  "input_recipes": {
+    "all_four_reproduce_identical_R_objects": true,
+    "permanent_sampler_configs": "Three active samplers only; prepared cases and active arguments preserved exactly."
+  },
+  "scope_review": {
+    "only_changed_executable_R_file_since_e1f8109": "R/execution.R",
+    "native_source_namespace_description_and_generated_bindings_byte_identical_since_e1f8109": true,
+    "package_implementation_and_inputs_identical_between_comparison_and_package_check": 84,
+    "permanent_native_fixture_cleanup": "Removed unused retired-sampler metadata only; every prepared mathematical case and active sampler argument is identical."
+  },
+  "historical_evidence": {
+    "tag": "refactor-evidence-2026-10-16-e1f8109",
+    "published": true,
+    "files_removed_from_active_tree": 787
+  },
+  "followups": [
+    235,
+    236,
+    237,
+    238
+  ],
+  "earlier_attempts": [
+    {
+      "source": "2f610015e26acf06d7179b099e96774b3d3f7a25",
+      "status": "superseded test-design failure",
+      "reason": "A new test bypassed the public zero-passing-QC guard and assumed successful final assembly. Corrected to test supported internal dispatch; public validation remains unchanged."
+    }
+  ],
+  "hosted_checks": "Use live PR #234 checks for the final published head; this local receipt does not assert a future CI outcome."
+}

@@ -63,7 +63,8 @@ future methods and storage integrations a concrete starting point. Extensions
 such as accelerated fitters, replacement QC and backed CRT remain separate work.
 
 **Status.** Implemented on `codex/refactor` in [PR #234](https://github.com/Katsevich-Lab/sceptre/pull/234);
-completion checks and maintainer handoff precede merge and release. See the lasting
+validated and prepared for maintainer handoff. Maintainer review precedes
+merge and release. See the lasting
 [architecture guide](ARCHITECTURE.md) for the resulting structure.
 
 ### 6. Improved calibration functionality

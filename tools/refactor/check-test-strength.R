@@ -48,6 +48,8 @@ reject("constant_CRT", expect_sampler_probabilities(rep(list(4L), B), p, joint),
 u <- (seq_len(B) - .5) / B
 correlated <- lapply(u, function(x) as.integer(which(p > x) - 1L))
 reject("correlated_CRT", expect_sampler_probabilities(correlated, p, joint), "joint inclusion")
+repeated <- rep(real[seq_len(B / 2L)], each = 2L)
+reject("repeated_CRT_draws", expect_sampler_probabilities(repeated, p, joint), "independence between")
 real <- refactor_native_sample(list(args = list(n_tot = 5L, M = 2L, B = B)), "fisher_yates_sampler", bridge)
 wor_joint <- function(pairs) rep(.1, ncol(pairs))
 expect_sampler_probabilities(real, rep(.4, 5L), wor_joint)

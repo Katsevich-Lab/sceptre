@@ -1,0 +1,26 @@
+{
+  "root": "/private/tmp/sceptre-handoff-failures-8s3zlz6m",
+  "results": [
+    {
+      "case": "unknown-ref",
+      "exit": 1,
+      "status": "failed",
+      "phase": "preflight",
+      "error": "fatal: Needed a single revision"
+    },
+    {
+      "case": "old-candidate",
+      "exit": 1,
+      "status": "failed",
+      "phase": "validate-candidate",
+      "error": "Candidate ref predates the developer consistency suite; choose a newer committed ref."
+    },
+    {
+      "case": "unqualified-ondisc",
+      "exit": 1,
+      "status": "failed",
+      "phase": "preflight",
+      "error": "Installed ondisc is not the qualified guarded source. Follow the backed installation instructions in README.md before comparing; version 1.3.5 alone is insufficient."
+    }
+  ]
+}

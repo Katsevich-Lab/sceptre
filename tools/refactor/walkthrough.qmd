@@ -349,12 +349,14 @@ shows that every branch, input or statistical result has been checked.
 The table records a matched coverage measurement at the earlier post-separation
 checkpoint, before the final handoff tests were strengthened. It is retained as
 that measurement, not presented as a fresh coverage percentage for a later commit.
-The final handoff receipt reports the current test totals separately.
+The final source-package check passes **4,397 assertions**, with no failures,
+warnings or skips. Its receipt records the tested commit and package build.
+The coverage percentage above remains the earlier matched measurement.
 
 The handoff pass also adds checks of individual and joint sampling probabilities,
 direct QC calculations from the input counts, meaningful result rows and pair
 labels, expected warnings, older saved-object inputs and failed worker reporting.
-A controlled check confirms that constant/biased samplers, correlated CRT draws,
+A controlled check confirms that constant/biased samplers, correlated cells or repeated CRT draws,
 p-values of 2 on these toy inputs, changed pair labels, missing rows and unexpected
 warnings are rejected. Repeatability alone would miss several of these defects.
 
@@ -384,7 +386,9 @@ These answer different questions:
 | Does the current package behave correctly? | Permanent `tests/testthat/` tests and checks of the current C++ code under `tools/checks/`; these run in CI |
 | Does the refactor match the old implementation on the agreed cases? | The manual suite under `tools/refactor/consistency/`; this stays outside CI |
 
-The separate manual comparison passes **1,265 assertions in 31 blocks**. It
+The unflagged manual comparison records **1,265 assertions in 31 blocks**.
+The final handoff run explicitly requires backed coverage and passes **1,266**:
+the additional assertion requires ondisc to be installed. It
 checks old/new API and saved-object compatibility, scientific outputs, cell/pair
 order and complete sampler streams. Some scenarios overlap the permanent suite,
 so these counts should not be added as independent test cases. The earlier

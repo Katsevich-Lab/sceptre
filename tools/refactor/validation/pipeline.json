@@ -1,0 +1,11 @@
+{
+  "reference": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate": "2f610015e26acf06d7179b099e96774b3d3f7a25",
+  "pipeline": "38dc760a5b4105d1c3f339cd45f2c98d971087f4",
+  "reference_passed": 30,
+  "candidate_passed": 30,
+  "ordered_payloads_equal": true,
+  "tolerance": 0,
+  "ondisc_source": "589803edea2a66ad15e7f07186bee16c7739ab8c",
+  "scope": "Fresh actual pipeline R scripts, standard/nuclear phases; full Nextflow/container execution retains earlier qualified source pins"
+}
