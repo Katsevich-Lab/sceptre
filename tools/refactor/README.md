@@ -7,6 +7,11 @@ current-source safety probes live in [`tools/checks/`](../checks/README.md).
 
 ## Start here
 
+The accepted [refactor specification](REFACTOR_SPEC.md) and its
+[cleanup addendum](CLEANUP_PLAN.md) live here alongside the review and comparison
+tools. They record this refactor's decisions and acceptance requirements; ongoing
+development uses the root architecture and contributor guides.
+
 For Tim's code review, read [the illustrated walkthrough](walkthrough.qmd), including
 its before/after testing section, and
 [bug-by-bug notes](bug-fixes.qmd), then the lasting
@@ -41,8 +46,15 @@ from this checkout. It does not install or silently load an installed SCEPTRE.
 Rendered HTML and support files are ignored; the QMD source stays versioned.
 
 After maintainer review and acceptance, preserve a tagged source/evidence
-snapshot before deleting this directory from active development. Keep permanent
-CI, package tests and `ARCHITECTURE.md`. Retirement is a later decision.
+snapshot before retiring this directory from active development. Its specification,
+plans, walkthrough, comparisons and retained evidence can then retire together.
+Keep permanent CI, package tests, `tools/checks/` and `ARCHITECTURE.md`, including
+regression tests whose filenames contain `refactor`. Remove optional links to
+this directory from current contributor guidance when retiring it. Nothing in
+this cleanup deletes the review material now.
+
+Paths and hashes inside captured historical reports refer to their recorded
+commits. Keep those records unchanged when moving current documentation.
 
 ## Earlier qualification and supporting tools
 
@@ -52,8 +64,8 @@ and [retained evidence](results/final-0a9f9d8/README.md) for restoration.
 Earlier checkpoint results below remain historical.
 
 This directory contains developer-only characterization and qualification tooling. It is excluded from
-the package tarball. `REFACTOR_SPEC.md` defines the accepted scope; live stage
-results and remaining gates are summarized in `STATUS.md` here.
+the package tarball. [REFACTOR_SPEC.md](REFACTOR_SPEC.md) defines the accepted
+scope; [STATUS.md](STATUS.md) records completed stages and acceptance decisions.
 
 The source baseline is sceptre commit
 `21f9ea098b69c444a884a49bc254de711968e3b5` (0.99.0). PR 233 is excluded.

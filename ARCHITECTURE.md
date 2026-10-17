@@ -1,17 +1,18 @@
 # Internal architecture
 
-This guide describes the internal refactor on `codex/refactor`. Acceptance
-evidence and remaining gates are recorded in [the refactor status](tools/refactor/STATUS.md).
-The public functions, defaults, 56-slot S4 object and saved-object representation
-remain the user interface. No accelerated method, new QC rule, new backend,
-backed CRT, or plugin framework is introduced by this work.
+This is the lasting guide to how SCEPTRE's internal code fits together and where
+to make changes. Keep it current as the package develops. The public functions,
+defaults and saved `sceptre_object` remain the user interface; its 56 fields (S4
+slots) hold data, settings, workflow status, reusable fits and results.
+For tests, source checks and the distinction between permanent package material
+and temporary project records, see [Contributing](CONTRIBUTING.md).
 
 ## Ownership and data flow
 
-| Responsibility | Owner | Boundary |
+| Responsibility | Files | Inputs and outputs |
 | --- | --- | --- |
 | Public workflow and saved state | `R/s4_analysis_functs_1.R`, `R/s4_analysis_functs_2.R`, `R/workflow_state.R` | Validate supported requests, enforce prerequisites, commit successful outputs |
-| Facade to numerical inputs | `R/analysis.R`, `R/analysis_context.R` | Ordinary transient lists and explicit ordered cell/request maps |
+| Analysis preparation | `R/analysis.R`, `R/analysis_context.R` | Temporary lists of settings, requested pairs and ordered cell selections |
 | Sparse/backed operations | `R/storage.R`, `src/sparse_counts.cpp`, `src/sparse_matrix_functs.cpp` | R 1-based source columns; representation operations with declared count conventions |
 | QC measurements and eligibility | `R/pair_qc.R`, `src/pair_eligibility.h` | Aligned counts and the existing shared threshold predicate |
 | Calibration candidate construction | `R/neg_control_functions.R`, `src/negative_control_functions.cpp` | Existing candidate stream, RNG and acceptance rule |
@@ -68,8 +69,8 @@ compact response coefficients/dispersion remain in its existing list. Its view
 is the common analysis universe for complement controls or the NT-only
 calibration universe for NT controls; guide-specific NT-discovery fits are not
 persisted. Setters clear incompatible fits when assignments, analysis cells,
-actual designs or control views change. The open guide-cache feature in PR 233
-is deferred.
+actual designs or control views change. Assignment probabilities and their
+random draws are currently prepared during a run rather than saved in this list.
 
 The saved `covariate_matrix` remains in full source-cell order. The transient
 context selects its common design once, and guide-specific NT fits select their
@@ -159,15 +160,13 @@ Stage-1 and empirical-tail diagnostics, and padded null-draw columns, can be
 missing in valid results. Discovery plotting selects complete p-value, effect
 and significance fields; optional diagnostic missingness does not remove rows.
 
-Private pipeline names such as QC/calibration part functions and result
-processors remain compatibility entrypoints. Unconsumed precomputation/table
-aliases and optional worker reconstruction routes were removed after checking
-package and pinned consumer callers. The lean `make_treatment_index_lookup()`
-closure resolves the one canonical index; it does not retain per-guide view
-banks or reconstruct missing context. No parallel obsolete algorithm is kept.
-The pinned pipeline's scripts, file schemas and known limitations are listed in
-[the consumer inventory](tools/refactor/consumer-inventory.json) and tested by
-[the consumer harness](tools/refactor/CONSUMER_COVERAGE.md).
+Nextflow calls internal QC/calibration phase functions and result processors
+directly. Preserve those entrypoints and their intermediate table/file formats
+until changes are coordinated with the pipeline. Standard collection combines
+all worker outputs before adjustment; nuclear tasks retain their raw outputs.
+`make_treatment_index_lookup()` keeps one set of cell lookups, rather than
+storing a cell selection for every guide at once. Callers supply the prepared
+inputs explicitly.
 
 ## Trace one association
 
@@ -188,8 +187,6 @@ For a small numerical trace, the observed/synthetic-coordinate test in
 builds score components and checks the same native entry point. Its supplied
 draws separate the one-based observed boundary from zero-based synthetic
 positions without relying on a sampler. Permanent tests cover declared stages, effect formulas and sampler laws.
-The separate manual consistency suite retains full frozen native cases and
-original-source comparisons of actual draw streams.
 
 ## Verification for contributors
 
@@ -204,13 +201,12 @@ devtools::check()
 Use `SCEPTRE_REQUIRE_ONDISC=true` for required backed coverage. Run private native
 component checks with `Rscript tools/checks/test-native-components.R .` from a
 source checkout; [tools/checks/README.md](tools/checks/README.md) describes the
-other current-source safety checks used by CI. Routine package checks require
-no old package or oracle. [The manual harness guide](tools/refactor/README.md)
-describes the explicit old-versus-new command, frozen fixtures, pipeline checks
-and resource measurement. Never regenerate historical expectations from a
-refactor candidate.
+other current-source safety checks used by CI. Routine package checks use
+current code, explicit mathematical expectations and current-mode comparisons;
+they require no old package or historical comparison outputs. Regression tests
+remain useful after the change that introduced them is complete.
 Use separate source trees for concurrent compilation/check/install jobs.
 
-Preserve the supported behavior matrix and public API. Numerical or method
-changes need their own review and validation; the bounded control-view cache
-correctness correction is recorded explicitly in the refactor status.
+Preserve supported workflows and the public API. Numerical or method changes
+need their own review and validation, including the cells used for each fit
+and whether saved fits remain reusable.

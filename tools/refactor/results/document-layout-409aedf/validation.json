@@ -1,0 +1,20 @@
+{
+  "source_tree": "0944f4983ee971c9acac03c056a16a283e21a20c",
+  "work": "/private/tmp/sceptre-doc-layout-ueiluy3z",
+  "source": "/private/tmp/sceptre-doc-layout-ueiluy3z/source",
+  "baseline_commit": "409aedfce0eaf0aa58cb0b36ca4e837f72a0fd97",
+  "package": "sceptre_0.99.0.tar.gz",
+  "package_sha256": "1bde5ad584f2fd6bade8e377996028a46dcdb570402bf10994c4c6a25e8545fa",
+  "R_CMD_build_exit": 0,
+  "build_flags": [
+    "--no-build-vignettes",
+    "--no-manual"
+  ],
+  "excluded_temporary_material": true,
+  "excluded_developer_only_permanent_material": true,
+  "packaged_code_and_test_files_verified": 99,
+  "source_tests_CI_unchanged_files": 181,
+  "current_doc_links_resolve": true,
+  "lasting_architecture_independent_of_temporary_material": true,
+  "scope": "Documentation relocation and build-exclusion cleanup; no package/test/CI executable changes. This is a source-build/content check, not a new full R CMD check."
+}

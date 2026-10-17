@@ -14,7 +14,6 @@
 ^\.gitattributes$
 ^air\.toml$
 ^ROADMAP\.md$
-^REFACTOR_SPEC\.md$
 ^ARCHITECTURE\.md$
 ^tools/refactor$
 ^CONTRIBUTING\.md$

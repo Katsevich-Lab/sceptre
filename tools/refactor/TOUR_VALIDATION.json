@@ -1,6 +1,9 @@
 {
-  "scope": "Documentation and source-comment changes only; package/test executable expressions, C++ tokens and CI configuration unchanged from 805666e",
+  "scope": "Current walkthrough and maintainer-documentation layout; latest changes are Markdown relocation/clarification and removal of an obsolete build exclusion. Earlier code/comment qualification keeps its named snapshots.",
   "source_sha256": {
+    ".Rbuildignore": "b79ca6af611dbb8050488cb92e164caf95d89a1da22d26df2fb7971e07c094c5",
+    "ARCHITECTURE.md": "1c2ef7e9de640b5acd13e6dfdfc4533fa0ea32ca3b74971b1c0a5a87d2ad4865",
+    "CONTRIBUTING.md": "1fe76d5e6646de5d6aef0195a3cf3828dc2a3c76d3ddd0767d41d79af5fa9663",
     "R/analysis.R": "a0808199566a977d06b297ea91b93cb8096766375c753028fcbbeb8c09f9210c",
     "R/analysis_context.R": "a148140fc48df13136860cd7f8a8f6cfc9d1a3e13408b0f860d29ad1b7f7d211",
     "R/association_execution.R": "08f5d31956377d3291a329a610d84e515030b8ce85160a6f45514218891022f2",
@@ -14,7 +17,9 @@
     "R/s4_analysis_functs_1.R": "4f2063f517d269f6cad883d59a71cb1644ff43d717fb8c1c154bcb484f620c6b",
     "R/s4_analysis_functs_2.R": "70ab2f70e360c605d98ce95f77c7e6f52a5051dd2d67b351865f4be31d5583c0",
     "R/storage.R": "926c69b1d584b3f5fcaace32e35de333479e134fb11c84836dfbe7a69d8323cb",
-    "tools/refactor/README.md": "892a88f323fe9f7361e376cab2f649baf94ee5232298a5dec24f9a1914f3af4a",
+    "tools/refactor/CLEANUP_PLAN.md": "aa30d4f6c370b85cc6751985c7dab39c695c02b15efb66b08d90548618e546eb",
+    "tools/refactor/README.md": "158faa3c56475fbd03c39a053b5e70b8477ffcc01bc3bfb22a797ef985c64184",
+    "tools/refactor/REFACTOR_SPEC.md": "2085716c65349369249e9945a8e3e75305e5cebd4e6284ed389538d59d1b5b16",
     "tools/refactor/bug-fixes.qmd": "ab40bcdaecfee6e70ad2490e8d7e0a688483d139a5b10c0859b6c64263dbeaa3",
     "tools/refactor/figures/analysis-flow.dot": "cd91644a999fb9d5ac5c93cd56f4bd78f0b8ebfc16ce24c7eea3bca20c72637f",
     "tools/refactor/figures/analysis-flow.svg": "9d5b31f5149cc401c3f152edfa355f7fd5c01bc0572c691da40bc35a486b7e18",
@@ -36,8 +41,8 @@
     "bug_entries": 26,
     "separate_memory_improvement_entries": 1,
     "permanent_input_files": 113,
-    "permanent_inputs_byte_unchanged": 42,
-    "permanent_executable_inputs_unchanged": 113
+    "permanent_inputs_byte_unchanged": 41,
+    "package_test_CI_files_unchanged_from_409aedf": 181
   },
   "quarto": "1.9.38",
   "diagram_generator": "dot - graphviz version 14.1.5 (20260411.2331)",
@@ -72,5 +77,12 @@
     "R_files": 51,
     "cpp_files": 21,
     "published_roxygen_unchanged": true
+  },
+  "documentation_layout": {
+    "specification": "tools/refactor/REFACTOR_SPEC.md",
+    "evidence": "results/document-layout-409aedf/validation.json",
+    "evidence_sha256": "b4a1b74b5eba8addd74a9c24f3bf7342619cdd09c9cb13914adc8871c5ed476c",
+    "permanent_architecture_has_no_temporary_dependency": true,
+    "R_CMD_build": "Passed on immutable tree; temporary material excluded; permanent regression tests retained"
   }
 }

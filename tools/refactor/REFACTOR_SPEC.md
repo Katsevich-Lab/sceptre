@@ -3,10 +3,15 @@
 Status: implemented and qualified at production checkpoint 0a9f9d8, with two
 explicitly accepted bounded memory costs. Date: October 16, 2026.
 
-See [final acceptance](tools/refactor/FINAL_ACCEPTANCE.md),
-[current status](tools/refactor/STATUS.md) and the resulting
-[architecture](ARCHITECTURE.md). This specification and its approved
-[source cleanup addendum](tools/refactor/CLEANUP_PLAN.md) preserve the design,
+This is a temporary record of the refactor plan and acceptance requirements.
+For ongoing package development, use [the architecture guide](../../ARCHITECTURE.md)
+and [contributor guide](../../CONTRIBUTING.md). Code-formatted paths and commands
+below are relative to the repository root.
+
+See [final acceptance](FINAL_ACCEPTANCE.md),
+[current status](STATUS.md) and the resulting
+[architecture](../../ARCHITECTURE.md). This specification and its approved
+[source cleanup addendum](CLEANUP_PLAN.md) preserve the design,
 reviewed exception ledger and deferred extension scope; proposal/future tense
 below describes that original plan. No deferred extension became a deliverable.
 
@@ -531,7 +536,7 @@ The design check passes when an engineer can identify the three storage reads, c
 
 ### Reference artifacts
 
-RF0 also freezes the [maintainability scorecard](tools/refactor/MAINTAINABILITY.md): fixed change-locality exercises, reviewed responsibility/duplication sites, per-function complexity and a fixed core-operation testability inventory. Keep R and handwritten C++ analyzer definitions separate and pin their versions. Unmeasured human exercises or unavailable metrics remain explicit gaps. There is no composite score or requirement that every metric decrease at each stage; completed stages must improve their targeted responsibility and explain temporary costs.
+RF0 also freezes the [maintainability scorecard](MAINTAINABILITY.md): fixed change-locality exercises, reviewed responsibility/duplication sites, per-function complexity and a fixed core-operation testability inventory. Keep R and handwritten C++ analyzer definitions separate and pin their versions. Unmeasured human exercises or unavailable metrics remain explicit gaps. There is no composite score or requirement that every metric decrease at each stage; completed stages must improve their targeted responsibility and explain temporary costs.
 
 Add a small versioned fixture set under `tests/testthat/fixtures/refactor/` and a deliberate regeneration script outside normal test execution. Include input counts and metadata, explicit parameters, selected cell/group indices, expected metrics and results, compact fits, representative native outputs, and a manifest with source commits, R/dependency versions, BLAS/compiler/platform, RNG conventions, and comparison tolerances.
 

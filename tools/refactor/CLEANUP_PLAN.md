@@ -9,7 +9,8 @@ its references to pending work describe the reviewed planning checkpoint.
 Status: **independently approved for bounded implementation**. The complete
 reviewed target is preserved at commit 08e02601b356c3cf6f64bffd074072f6d2eb59de;
 this status/review record update changes no target decisions. Source inspected: c7d62502757f2a17741e2ef18b9e4d006bf063dc,
-October 16, 2026. This addendum supplements REFACTOR_SPEC.md; it does not
+October 16, 2026. This addendum supplements
+[REFACTOR_SPEC.md](REFACTOR_SPEC.md); it does not
 declare the current source pristine or the refactor complete.
 
 Subsequent explicit user choices are recorded in

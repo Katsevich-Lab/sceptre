@@ -22,13 +22,27 @@ promote a sufficiently scoped proposal to an issue for implementation tracking.
 
 ### Code, tests, and documentation
 
-For internal ownership, cell-coordinate conventions, numerical boundaries and
-component compatibility, see [Internal architecture](ARCHITECTURE.md).
-Permanent tests in `tests/testthat/` check current package behavior without an
-old installation. CI also runs [current-source native checks](tools/checks/README.md).
-Temporary [refactor review tools](tools/refactor/README.md) hold the explicit
-old-versus-new comparison and downstream/resource evidence. They are excluded
-from package builds and never run in CI.
+For the code's main parts, cell numbering, numerical calculations and pipeline
+compatibility, see [Internal architecture](ARCHITECTURE.md).
+
+| Material | Where it belongs | How long it stays |
+|---|---|---|
+| Package implementation, help, examples and datasets | `R/`, `src/`, `man/`, `vignettes/`, `data/`, `inst/` | Permanent; maintain with the package |
+| Tests of current behavior and bug fixes | `tests/testthat/` | Permanent, including regression tests first added during the refactor |
+| CI and current-source C++ checks | `.github/workflows/`, [tools/checks/](tools/checks/README.md), `air.toml` | Permanent maintainer tooling |
+| Current architecture and contributor/project guidance | Root `ARCHITECTURE.md`, this guide, `README`, `ROADMAP.md`, `GOVERNANCE.md` and other project policies | Permanent; keep current |
+| Refactor specification, cleanup plan, Tim's walkthrough, old-versus-new comparison and acceptance evidence | [tools/refactor/](tools/refactor/README.md) | Temporary; retain for refactor review, then archive before retiring |
+
+**Build exclusion does not mean temporary.** `.Rbuildignore` keeps maintainer
+material out of the distributed R source package. Both permanent `tools/checks/`
+and temporary `tools/refactor/` are excluded, as are several lasting root guides.
+
+Routine CI uses current-package tests and current-source checks. It must not
+depend on `tools/refactor/`, an old SCEPTRE installation or historical comparison
+outputs. Some permanent tests still have `refactor` in their filenames; that
+records their origin, not a plan to delete them. Remove temporary review links
+when retiring the refactor directory, and keep the lasting architecture guide
+independent of it.
 
 - Keep changes focused on a single problem or feature.
 - Add or update tests for behavior changes and bug fixes.
