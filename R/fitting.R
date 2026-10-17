@@ -7,7 +7,7 @@
 #' @param covariate_matrix Numeric design matrix with one row per selected cell,
 #'   in exactly the same order as `expressions`.
 #' @return Coefficients (`fitted_coefs`) in design-column order and dispersion
-#'   (`theta`), restricted to [0.01, 1000]. These are small enough to save for reuse.
+#'   (`theta`), restricted to `[0.01, 1000]`. These are small enough to save for reuse.
 #' @details Fit Poisson `glm.fit()`, then estimate dispersion at its fitted means.
 #'   Warnings from the fit are passed through. Missing coefficients trigger the
 #'   covariate error below. The caller handles saving or reusing this fit.

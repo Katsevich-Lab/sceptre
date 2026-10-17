@@ -53,7 +53,8 @@ function should be in feature-barcode format, containing the files
 \code{features.tsv.gz} and \code{matrix.mtx.gz} (and optionally \code{barcodes.tsv.gz}).
 For standard in-memory objects, when every supplied directory contains a
 barcode file, the cell barcodes are retained as the column names of the
-response and gRNA matrices and the row names of the cell covariate data frame.
+response and gRNA matrices and the row names of the cell covariate data
+frame.
 When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, \code{b1_} and \code{b2_}) to keep
 the cell IDs unique and stable across imports.
@@ -64,6 +65,8 @@ Users can create either a standard \code{sceptre} object or an \code{ondisc}-bac
 or
 \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
 of the manual for more information about this function.
+}
+\details{
 For in-memory import, count-file entries may be unsorted. Each cell-feature
 coordinate must occur only once; repeated coordinates cause an import error
 rather than being summed. This does not reject repeated guide-metadata rows.

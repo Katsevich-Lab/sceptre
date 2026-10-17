@@ -16,12 +16,11 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     treatment_lookup <- make_treatment_index_lookup(index)
     response_rows <- unique(index$pair_rows$response_idx)
 
-    #' Analyze a block of response genes assigned to one worker
-    #' @param block_rows Original count-matrix gene rows, in the order to process.
-    #' @param proc_id Worker number used in its log filename, or NULL for serial work.
-    #' @return This block's results and newly computed shared response fits.
-    #'   Each worker builds its own output lists and reads the prepared inputs.
-    #' @noRd
+    # Analyze a block of response genes assigned to one worker
+    # block_rows: Original count-matrix gene rows, in the order to process.
+    # proc_id: Worker number used in its log filename, or NULL for serial work.
+    # Returns: This block's results and newly computed shared response fits.
+    #   Each worker builds its own output lists and reads the prepared inputs.
     analyze_response_block <- function(block_rows, proc_id = NULL) {
         log_file <- analysis_log_file(
             context$analysis,
@@ -142,12 +141,11 @@ run_crt_analysis <- function(context, execution) {
     treatment_lookup <- make_treatment_index_lookup(index)
     response_fits <- context$response_fits
 
-    #' Prepare missing shared response fits for one worker's genes
-    #' @param block_rows Original count-matrix gene rows, in processing order.
-    #' @param proc_id Worker number used in the progress log, or NULL for serial work.
-    #' @return Newly fitted genes only, named and ordered as processed. Each gene is
-    #'   read before looking up its saved fit, including when that fit already exists.
-    #' @noRd
+    # Prepare missing shared response fits for one worker's genes
+    # block_rows: Original count-matrix gene rows, in processing order.
+    # proc_id: Worker number used in the progress log, or NULL for serial work.
+    # Returns: Newly fitted genes only, named and ordered as processed. Each gene is
+    #   read before looking up its saved fit, including when that fit already exists.
     prepare_response_block <- function(block_rows, proc_id = NULL) {
         log_file <- analysis_log_file(
             context$analysis,
@@ -207,12 +205,11 @@ run_crt_analysis <- function(context, execution) {
         )
     }
 
-    #' Analyze a block of guide groups assigned to one worker
-    #' @param block_groups Positions in the prepared guide-group list, starting at 1.
-    #' @param proc_id Worker number used to append to its log, or NULL for serial work.
-    #' @return Results in block, group and within-group request order. For NT controls,
-    #'   construct only the current group's treatment-plus-NT selection as needed.
-    #' @noRd
+    # Analyze a block of guide groups assigned to one worker
+    # block_groups: Positions in the prepared guide-group list, starting at 1.
+    # proc_id: Worker number used to append to its log, or NULL for serial work.
+    # Returns: Results in block, group and within-group request order. For NT controls,
+    #   construct only the current group's treatment-plus-NT selection as needed.
     analyze_guide_block <- function(block_groups, proc_id = NULL) {
         log_file <- analysis_log_file(
             context$analysis,

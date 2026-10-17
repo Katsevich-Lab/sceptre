@@ -108,14 +108,13 @@ plot_grna_count_distributions <- function(
     ) |>
         dplyr::filter(grna_expressions < 10000)
 
-    #' Choose histogram bin bounds and labels for one guide's counts
-    #' @param grna_expressions Finite per-cell counts, already restricted below 10000
-    #'   by the outer plotting function.
-    #' @return Table of bin_upper_bounds and bin_labels in display order. Use the
-    #'   outer function's rounded threshold: individual-count bins extend through
-    #'   max(10, threshold - 1), then bin widths grow exponentially as needed.
-    #'   Keep the existing bin labels, including at the threshold.
-    #' @noRd
+    # Choose histogram bin bounds and labels for one guide's counts
+    # grna_expressions: Finite per-cell counts, already restricted below 10000
+    #   by the outer plotting function.
+    # Returns: Table of bin_upper_bounds and bin_labels in display order. Use the
+    #   outer function's rounded threshold: individual-count bins extend through
+    #   max(10, threshold - 1), then bin widths grow exponentially as needed.
+    #   Keep the existing bin labels, including at the threshold.
     grna_expressions_to_binned_factor <- function(grna_expressions) {
         max_expression_count <- max(grna_expressions)
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
@@ -1033,14 +1032,13 @@ plot_covariates <- function(
         p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
     }
     covariate_data_frame <- sceptre_object@covariate_data_frame
-    #' Plot one covariate across original cells with candidate QC cutoff lines
-    #' @param v Covariate values before cell removal; curr_range gives quantiles or
-    #'   direct value cutoffs.
-    #' @param plot_tit Plot title; use_quantile selects whether to convert curr_range
-    #'   from quantiles to observed values.
-    #' @return Histogram with cutoff lines. Showing candidate cutoffs does not apply
-    #'   QC or remove cells from the data.
-    #' @noRd
+    # Plot one covariate across original cells with candidate QC cutoff lines
+    # v: Covariate values before cell removal; curr_range gives quantiles or
+    #   direct value cutoffs.
+    # plot_tit: Plot title; use_quantile selects whether to convert curr_range
+    #   from quantiles to observed values.
+    # Returns: Histogram with cutoff lines. Showing candidate cutoffs does not apply
+    #   QC or remove cells from the data.
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
             stats::quantile(v, probs = curr_range)

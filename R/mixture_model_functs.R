@@ -62,11 +62,10 @@ assign_grnas_to_cells_mixture <- function(
         make_row_accessible = TRUE
     )
 
-    #' Assign cells for one worker's block of guides
-    #' @param curr_grna_ids Guide names in processing order; proc_id names the worker log.
-    #' @return Named assignment list. Report progress and collect garbage before
-    #'   reading each guide, using the shared design and fixed starting guesses.
-    #' @noRd
+    # Assign cells for one worker's block of guides
+    # curr_grna_ids: Guide names in processing order; proc_id names the worker log.
+    # Returns: Named assignment list. Report progress and collect garbage before
+    #   reading each guide, using the shared design and fixed starting guesses.
     assign_guide_block <- function(curr_grna_ids, proc_id = NULL) {
         f_name <- analysis_log_file(
             "assign_grnas",

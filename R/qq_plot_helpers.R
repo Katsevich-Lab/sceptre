@@ -3,13 +3,12 @@ StatQQBand <- ggplot2::ggproto(
     "StatQQBand",
     ggplot2::Stat,
     required_aes = c("y"), # the sample will come through the y aesthetic
-    #' Choose one group's rows for the shared QQ confidence band in each panel
-    #' @param data Plot rows with transformed y values, PANEL and group numbers.
-    #' @param params ggplot statistic settings.
-    #' @return Rows from the lowest-numbered group in each panel, keeping their order.
-    #'   Groups within a panel must have the same number of points to share a band;
-    #'   otherwise error. Select separately per panel, since group numbers can differ.
-    #' @noRd
+    # Choose one group's rows for the shared QQ confidence band in each panel
+    # data: Plot rows with transformed y values, PANEL and group numbers.
+    # params: ggplot statistic settings.
+    # Returns: Rows from the lowest-numbered group in each panel, keeping their order.
+    #   Groups within a panel must have the same number of points to share a band;
+    #   otherwise error. Select separately per panel, since group numbers can differ.
     setup_data = function(data, params) {
         if ("group" %in% names(data)) {
             # Require equal group sizes within each panel before selecting a
@@ -38,16 +37,15 @@ StatQQBand <- ggplot2::ggproto(
             data
         }
     },
-    #' Calculate a pointwise QQ confidence band for one plotted group
-    #' @param data,scales Transformed y values and panel scales. Undo the y
-    #'   transformation before ranking observations.
-    #' @param distribution,max_pts_to_plot,ci_level Reference distribution, display-grid
-    #'   resolution and pointwise confidence level. Break rank ties by first occurrence.
-    #' @return x/y/ymin/ymax in plotted coordinates. To reduce overplotting, retain
-    #'   one sampled row per occupied x/y grid cell, using seed 4 and restoring the
-    #'   previous random state. max_pts_to_plot controls grid resolution, rather than
-    #'   imposing a total point limit.
-    #' @noRd
+    # Calculate a pointwise QQ confidence band for one plotted group
+    # data,scales: Transformed y values and panel scales. Undo the y
+    #   transformation before ranking observations.
+    # distribution,max_pts_to_plot,ci_level: Reference distribution, display-grid
+    #   resolution and pointwise confidence level. Break rank ties by first occurrence.
+    # Returns: x/y/ymin/ymax in plotted coordinates. To reduce overplotting, retain
+    #   one sampled row per occupied x/y grid cell, using seed 4 and restoring the
+    #   previous random state. max_pts_to_plot controls grid resolution, rather than
+    #   imposing a total point limit.
     compute_group = function(
         data,
         scales,
@@ -147,14 +145,13 @@ StatQQPoints <- ggplot2::ggproto(
     "StatQQPoints",
     ggplot2::Stat,
     required_aes = c("y"),
-    #' Calculate QQ points for one group using its panel's scales
-    #' @param data,scales Transformed y values and panel scales. Undo the y
-    #'   transformation before ranking, with first-occurrence tie breaking.
-    #' @param distribution,max_pts_to_plot Reference distribution and display-grid resolution.
-    #' @param ymin,ymax Display cutoffs on the original y scale, applied after ranking.
-    #' @return x/y rows in plotted coordinates. Sample one row per occupied grid cell
-    #'   using seed 4, then restore the caller's previous random state.
-    #' @noRd
+    # Calculate QQ points for one group using its panel's scales
+    # data,scales: Transformed y values and panel scales. Undo the y
+    #   transformation before ranking, with first-occurrence tie breaking.
+    # distribution,max_pts_to_plot: Reference distribution and display-grid resolution.
+    # ymin,ymax: Display cutoffs on the original y scale, applied after ranking.
+    # Returns: x/y rows in plotted coordinates. Sample one row per occupied grid cell
+    #   using seed 4, then restore the caller's previous random state.
     compute_group = function(
         data,
         scales,
@@ -244,7 +241,7 @@ stat_qq_points <- function(
 #' Transform a positive value to minus its logarithm for plotting
 #' @param base Logarithm base, defaulting to e.
 #' @return Scale transformation -log(x, base), with inverse base^(-x), logarithmic
-#'   breaks and domain [1e-100, Inf]. The two local functions implement the forward
+#'   breaks and domain `[1e-100, Inf]`. The two local functions implement the forward
 #'   and inverse calculations; values are not otherwise checked here.
 #' @noRd
 revlog_trans <- function(base = exp(1)) {

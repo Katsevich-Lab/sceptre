@@ -62,11 +62,10 @@ check_import_data_inputs <- function(
     }
 
     # check type of input matrices
-    #' Check that one input matrix has a supported class
-    #' @param input_matrix Matrix to check; `input_matrix_name` identifies it in errors.
-    #' @param allowed_matrix_classes Supported class names. Do not convert the input.
-    #' @return Invisible NULL on success, otherwise an error naming the input matrix.
-    #' @noRd
+    # Check that one input matrix has a supported class
+    # input_matrix: Matrix to check; `input_matrix_name` identifies it in errors.
+    # allowed_matrix_classes: Supported class names. Do not convert the input.
+    # Returns: Invisible NULL on success, otherwise an error naming the input matrix.
     check_matrix_class <- function(
         input_matrix,
         input_matrix_name,
@@ -482,7 +481,7 @@ check_processor_count <- function(n_processors) {
 #' @param hyperparameters Named method settings after merging user values and defaults.
 #' @param n_processors Requested worker count, checked after method settings.
 #' @return NULL on success, otherwise the first method, range or setting-name error
-#'   below. The perturbation parameter uses its documented [0, 20] range. Other
+#'   below. The perturbation parameter uses its documented `[0, 20]` range. Other
 #'   type, missing-value and scalar checks retain their current rules. No models
 #'   are fitted and no assignments are changed here.
 #' @noRd
