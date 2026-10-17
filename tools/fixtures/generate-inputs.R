@@ -78,13 +78,10 @@ variable$draws <- lapply(seq_along(variable$draws), function(i) {
 })
 cases$variable_crt_cardinality <- variable
 samplers <- list(
-    fisher_yates = list(function_name = "fisher_yates_sampler", args = list(n_tot = 13L, M = 4L, B = 17L)),
-    hybrid = list(function_name = "hybrid_fisher_iwor_sampler", args = list(N = 9L, m = 2L, M = 5L, B = 17L)),
-    crt_fast_production = list(function_name = "crt_index_sampler_fast", args = list(
-        fitted_probabilities = c(0, 0.15, 0.4, 0.85, 1), B = 499L + 4999L + 0L
-    )),
-    crt_legacy = list(function_name = "crt_index_sampler", args = list(
-        fitted_probabilities = c(0, 0.15, 0.4, 0.85, 1), B = 17L
+    fisher_yates = list(args = list(n_tot = 13L, M = 4L, B = 17L)),
+    hybrid = list(args = list(N = 9L, m = 2L, M = 5L, B = 17L)),
+    crt_fast_production = list(args = list(
+        fitted_probabilities = c(0, 0.15, 0.4, 0.85, 1), B = 499L + 4999L
     ))
 )
 inputs <- list(index_base = list(observed_treatment = 1L, synthetic_draws = 0L),

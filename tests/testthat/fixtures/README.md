@@ -12,8 +12,9 @@ input changes, alongside the reason and affected tests.
 - `refactor/native-inputs.rds` contains explicitly constructed score arrays and
   draw lists, plus sampler settings. Stage labels describe the intended examples;
   tests also check independent effect/SE formulas and selected draw segments.
-  Historical function-name strings in sampler metadata are unused: the current
-  helper explicitly selects the production entry points.
+  Sampler settings cover the three production samplers. The helper supplies
+  current function names; retired samplers and unused historical name fields
+  remain only in the temporary comparison suite.
 - `aggregation-inputs-6a43fa5.rds` is a frozen set of 28 count-matrix/metadata
   examples introduced at 6a43fa5: duplicate triplets and metadata, stored zeros,
   logical/pattern matrices and rounding-sensitive counts. Keep these inputs
