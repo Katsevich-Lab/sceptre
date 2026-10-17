@@ -1,0 +1,216 @@
+{
+  "exports": ["assign_grnas", "construct_cis_pairs", "construct_positive_control_pairs", "construct_trans_pairs", "get_cell_covariates", "get_grna_assignments", "get_grna_matrix", "get_response_matrix", "get_result", "import_data", "import_data_from_cellranger", "import_data_from_parse", "plot", "plot_assign_grnas", "plot_covariates", "plot_grna_count_distributions", "plot_response_grna_target_pair", "plot_run_calibration_check", "plot_run_discovery_analysis", "plot_run_power_check", "plot_run_qc", "print", "read_ondisc_backed_sceptre_object", "run_calibration_check", "run_discovery_analysis", "run_power_check", "run_qc", "set_analysis_parameters", "write_ondisc_backed_sceptre_object", "write_outputs_to_directory"],
+  "formals": {
+    "assign_grnas": {
+      "sceptre_object": "",
+      "method": "\"default\"",
+      "print_progress": "TRUE",
+      "parallel": "FALSE",
+      "n_processors": "\"auto\"",
+      "log_dir": "tempdir()",
+      "...": ""
+    },
+    "construct_cis_pairs": {
+      "sceptre_object": "",
+      "positive_control_pairs": "data.frame()",
+      "distance_threshold": "500000L",
+      "response_position_data_frame": "NULL"
+    },
+    "construct_positive_control_pairs": {
+      "sceptre_object": ""
+    },
+    "construct_trans_pairs": {
+      "sceptre_object": "",
+      "positive_control_pairs": "data.frame()",
+      "pairs_to_exclude": "\"none\""
+    },
+    "get_cell_covariates": {
+      "sceptre_object": ""
+    },
+    "get_grna_assignments": {
+      "sceptre_object": "",
+      "apply_cellwise_qc": "FALSE"
+    },
+    "get_grna_matrix": {
+      "sceptre_object": ""
+    },
+    "get_response_matrix": {
+      "sceptre_object": ""
+    },
+    "get_result": {
+      "sceptre_object": "",
+      "analysis": ""
+    },
+    "import_data": {
+      "response_matrix": "",
+      "grna_matrix": "",
+      "grna_target_data_frame": "",
+      "moi": "",
+      "extra_covariates": "data.frame()",
+      "response_names": "NA_character_",
+      "use_ondisc": "FALSE",
+      "directory_to_write": "NULL"
+    },
+    "import_data_from_cellranger": {
+      "directories": "",
+      "moi": "",
+      "grna_target_data_frame": "",
+      "extra_covariates": "data.frame()",
+      "use_ondisc": "FALSE",
+      "directory_to_write": "NULL"
+    },
+    "import_data_from_parse": {
+      "gene_mat_fp": "",
+      "grna_mat_fp": "",
+      "all_genes_fp": "",
+      "all_grnas_fp": "",
+      "moi": "",
+      "grna_target_data_frame": "",
+      "extra_covariates": "data.frame()"
+    },
+    "plot": {
+      "x": "",
+      "y": "",
+      "...": ""
+    },
+    "plot_assign_grnas": {
+      "sceptre_object": "",
+      "n_grnas_to_plot": "3L",
+      "grnas_to_plot": "NULL",
+      "point_size": "0.9",
+      "transparency": "0.8",
+      "return_indiv_plots": "FALSE"
+    },
+    "plot_covariates": {
+      "sceptre_object": "",
+      "response_n_umis_range": "c(0.01, 0.99)",
+      "response_n_nonzero_range": "c(0.01, 0.99)",
+      "p_mito_threshold": "0.2",
+      "return_indiv_plots": "FALSE"
+    },
+    "plot_grna_count_distributions": {
+      "sceptre_object": "",
+      "n_grnas_to_plot": "4L",
+      "grnas_to_plot": "NULL",
+      "threshold": "NULL",
+      "return_indiv_plots": "FALSE"
+    },
+    "plot_response_grna_target_pair": {
+      "sceptre_object": "",
+      "response_id": "",
+      "grna_target": ""
+    },
+    "plot_run_calibration_check": {
+      "sceptre_object": "",
+      "point_size": "0.55",
+      "transparency": "0.8",
+      "return_indiv_plots": "FALSE"
+    },
+    "plot_run_discovery_analysis": {
+      "sceptre_object": "",
+      "x_limits": "c(-1.5, 1.5)",
+      "point_size": "0.55",
+      "transparency": "0.8",
+      "return_indiv_plots": "FALSE"
+    },
+    "plot_run_power_check": {
+      "sceptre_object": "",
+      "point_size": "1",
+      "transparency": "0.8",
+      "clip_to": "1e-20"
+    },
+    "plot_run_qc": {
+      "sceptre_object": "",
+      "downsample_pairs": "10000L",
+      "point_size": "0.55",
+      "transparency": "0.8",
+      "return_indiv_plots": "FALSE"
+    },
+    "print": {
+      "x": "",
+      "...": ""
+    },
+    "read_ondisc_backed_sceptre_object": {
+      "sceptre_object_fp": "",
+      "response_odm_file_fp": "",
+      "grna_odm_file_fp": ""
+    },
+    "run_calibration_check": {
+      "sceptre_object": "",
+      "n_calibration_pairs": "NULL",
+      "calibration_group_size": "NULL",
+      "print_progress": "TRUE",
+      "parallel": "FALSE",
+      "n_processors": "\"auto\"",
+      "log_dir": "tempdir()",
+      "output_amount": "1"
+    },
+    "run_discovery_analysis": {
+      "sceptre_object": "",
+      "output_amount": "1",
+      "print_progress": "TRUE",
+      "parallel": "FALSE",
+      "n_processors": "\"auto\"",
+      "log_dir": "tempdir()"
+    },
+    "run_power_check": {
+      "sceptre_object": "",
+      "output_amount": "1",
+      "print_progress": "TRUE",
+      "parallel": "FALSE",
+      "n_processors": "\"auto\"",
+      "log_dir": "tempdir()"
+    },
+    "run_qc": {
+      "sceptre_object": "",
+      "n_nonzero_trt_thresh": "7L",
+      "n_nonzero_cntrl_thresh": "7L",
+      "response_n_umis_range": "c(0.01, 0.99)",
+      "response_n_nonzero_range": "c(0.01, 0.99)",
+      "p_mito_threshold": "0.2",
+      "additional_cells_to_remove": "integer()"
+    },
+    "set_analysis_parameters": {
+      "sceptre_object": "",
+      "discovery_pairs": "data.frame(grna_target = character(0), response_id = character(0))",
+      "positive_control_pairs": "data.frame(grna_target = character(0), response_id = character(0))",
+      "side": "\"both\"",
+      "grna_integration_strategy": "\"union\"",
+      "formula_object": "\"default\"",
+      "resampling_approximation": "\"skew_normal\"",
+      "control_group": "\"default\"",
+      "resampling_mechanism": "\"default\"",
+      "multiple_testing_method": "\"BH\"",
+      "multiple_testing_alpha": "0.1"
+    },
+    "write_ondisc_backed_sceptre_object": {
+      "sceptre_object": "",
+      "directory_to_write": ""
+    },
+    "write_outputs_to_directory": {
+      "sceptre_object": "",
+      "directory": ""
+    }
+  },
+  "methods": {
+    "plot": {
+      "ANY": {
+        "x": "",
+        "y": "",
+        "...": ""
+      },
+      "sceptre_object": {
+        "x": "",
+        "y": "",
+        "...": ""
+      }
+    },
+    "print": {
+      "sceptre_object": {
+        "x": "",
+        "...": ""
+      }
+    }
+  },
+  "slots": ["list", "list", "data.frame", "matrix", "data.frame", "logical", "character", "data.frame", "data.frame", "formula", "integer", "character", "logical", "logical", "integer", "integer", "integer", "integer", "integer", "character", "character", "list", "numeric", "character", "integer", "list", "logical", "matrix", "integer", "data.frame", "data.frame", "data.frame", "list", "list", "list", "integer", "integer", "integer", "integer", "integer", "integer", "integer", "integer", "integer", "list", "numeric", "list", "character", "logical", "data.frame", "data.frame", "data.frame", "logical", "logical", "integer", "character"]
+}

@@ -1,0 +1,21 @@
+# Manual refactor consistency suite
+
+This preserved suite compares current SCEPTRE with source-verified original
+`21f9ea098b69c444a884a49bc254de711968e3b5`. It is outside package-test discovery,
+excluded from the source package and never called by CI. See the parent
+[handoff README](../README.md) for the command, dependency preflight, required
+backed coverage and interpretation of failures/skips.
+
+The original helpers, comparison tests and complete fixtures remain byte-for-byte
+preserved from finishing commit 04df2f0. `relocation.json` binds those 32 files to
+their SHA256 values. Never regenerate historical expectations from candidate
+code. The source-verified original produces same-environment observations in a
+separate process; candidate comparisons require the exact input/source/environment
+checks and complete random-draw banks. The recorded-toolchain stream check can
+skip elsewhere; the same-environment comparison remains required.
+
+This suite does not replace the current package's independent mathematical,
+workflow, probability, ownership, saved-format and warning tests. It does not
+qualify performance, actual Nextflow or a whole book render. Deliberate historical
+fixture-generation tools and their original instructions are preserved at the
+[pre-handoff evidence tag](https://github.com/Katsevich-Lab/sceptre/tree/refactor-evidence-2026-10-16-e1f8109/tools/refactor).

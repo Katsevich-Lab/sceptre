@@ -8,6 +8,16 @@ on:
 name: R-CMD-check
 
 jobs:
+  R-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: posit-dev/setup-air@v1
+        with:
+          version: '0.9.0'
+      - name: Check handwritten R formatting
+        run: air format --check R
+
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
@@ -25,6 +35,11 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      SCEPTRE_REQUIRE_ONDISC: ${{ matrix.config.os == 'macOS-latest' && 'true' || 'false' }}
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      VECLIB_MAXIMUM_THREADS: 1
 
     steps:
       - uses: actions/checkout@v2
@@ -59,16 +74,118 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install ondisc R package (macOS only)
+      - name: Prepare ondisc build dependencies (macOS only)
         if: ${{ matrix.config.os == 'macOS-latest' }}
         run: |
           Rscript -e "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
           Rscript -e "install.packages('BiocManager')"
           Rscript -e "BiocManager::install('Rhdf5lib', type = 'source')"
-          Rscript -e "remotes::install_github('timothy-barry/ondisc')"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            any::pkgload
+            any::digest
+
+      - name: Install verified ondisc source with pair-iteration bounds guard
+        shell: Rscript {0}
+        run: |
+          pin <- "589803edea2a66ad15e7f07186bee16c7739ab8c"
+          if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+          installed <- if (nzchar(system.file(package = "ondisc")))
+            utils::packageDescription("ondisc")$RemoteSha else NULL
+          if (!identical(installed, pin)) {
+            remotes::install_github(paste0("timothy-barry/ondisc@", pin),
+              dependencies = FALSE, upgrade = "never")
+          }
+          stopifnot(identical(utils::packageDescription("ondisc")$RemoteSha, pin))
+
+      - name: Check independent private native components
+        run: Rscript --vanilla tools/checks/test-native-components.R .
+
+      - name: Check draw-bank ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-sampling-ownership.R .
+
+      - name: Check count ownership at R and native error boundaries
+        run: Rscript --vanilla tools/checks/test-count-ownership.R .
+
+      - name: Check current dispersion exception policy
+        run: Rscript --vanilla tools/checks/test-dispersion-exceptions.R . "${{ runner.temp }}/sceptre-dispersion-policy"
+      - name: Check current result ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-result-ownership.R . "${{ runner.temp }}/sceptre-result-ownership"
+
+      - name: Retain native boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-boundaries-${{ matrix.config.os }}-${{ matrix.config.r }}
+          path: |
+            ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-count-ownership
+            ${{ runner.temp }}/sceptre-dispersion-policy
+            ${{ runner.temp }}/sceptre-result-ownership
 
       - uses: r-lib/actions/check-r-package@v2
+
+  in-memory-without-ondisc:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      VECLIB_MAXIMUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache: false
+          dependencies: '"hard"'
+          extra-packages: |
+            any::testthat
+            any::pkgload
+            any::R.utils
+            any::MASS
+            any::digest
+      - name: Check independent private native components
+        run: Rscript --vanilla tools/checks/test-native-components.R .
+      - name: Check draw-bank ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-sampling-ownership.R .
+      - name: Check count ownership at R and native error boundaries
+        run: Rscript --vanilla tools/checks/test-count-ownership.R .
+      - name: Check current dispersion exception policy
+        run: Rscript --vanilla tools/checks/test-dispersion-exceptions.R . "${{ runner.temp }}/sceptre-dispersion-policy"
+      - name: Check current result ownership at R error boundaries
+        run: Rscript --vanilla tools/checks/test-result-ownership.R . "${{ runner.temp }}/sceptre-result-ownership"
+
+      - name: Retain native boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-boundaries-without-ondisc
+          path: |
+            ${{ runner.temp }}/sceptre-sampling-ownership
+            ${{ runner.temp }}/sceptre-count-ownership
+            ${{ runner.temp }}/sceptre-dispersion-policy
+            ${{ runner.temp }}/sceptre-result-ownership
+      - name: Require an ondisc-free environment and run package tests
+        shell: Rscript {0}
+        run: |
+          stopifnot(!requireNamespace("ondisc", quietly = TRUE))
+          candidate_library <- tempfile("sceptre-installed-")
+          dir.create(candidate_library)
+          status <- system2(file.path(R.home("bin"), "R"), c("CMD", "INSTALL",
+            "--preclean", paste0("--library=", shQuote(candidate_library)), "."))
+          stopifnot(identical(status, 0L))
+          .libPaths(c(candidate_library, .libPaths()))
+          library(sceptre)
+          stopifnot(identical(normalizePath(find.package("sceptre")),
+            normalizePath(file.path(candidate_library, "sceptre"))),
+            file.exists(file.path(find.package("sceptre"), "Meta", "package.rds")),
+            !requireNamespace("ondisc", quietly = TRUE))
+          testthat::test_dir("tests/testthat", package = "sceptre",
+            load_package = "installed", reporter = "summary", stop_on_failure = TRUE)

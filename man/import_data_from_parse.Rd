@@ -56,6 +56,10 @@ Parse platform and the structure of the Parse count matrix generation program
 output.
 
 The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
+
+Count-file entries may be unsorted, but each cell-feature coordinate must
+occur only once. Repeated coordinates cause an import error rather than being
+summed; repeated guide-metadata rows are a separate matter.
 }
 \examples{
 directory <- paste0(

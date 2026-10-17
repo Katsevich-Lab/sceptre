@@ -38,7 +38,7 @@ close physical proximity to one another. \code{construct_cis_pairs()} is a usefu
 pair constructor function for screens that aim to map noncoding regulatory
 elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 \emph{cis}. \code{construct_cis_pairs()} assumes that the columns \code{chr}, \code{start}, and
-\code{stop} are present in the \code{grna_target_data_frame}, giving the chromosome,
+\code{end} are present in the \code{grna_target_data_frame}, giving the chromosome,
 start position, and end position, respectively, of the region that each gRNA
 targets. \code{construct_cis_pairs()} takes several arguments: \code{sceptre_object}
 (required), \code{distance_threshold} (optional), \code{positive_control_pairs}

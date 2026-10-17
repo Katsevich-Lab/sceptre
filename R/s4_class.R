@@ -1,11 +1,7 @@
-# class union
 #' @import Matrix
-# setClassUnion("grna_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix",
-# "dgTMatrix", "lgCMatrix", "lgRMatrix", "lgTMatrix"))
-# setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix",
-# "dgTMatrix"))
-
-# sceptre object class
+# Users and Nextflow save objects with these 56 fields (S4 slots). Matrix fields
+# use one-element lists. Keep this saved format compatible; temporary analysis
+# lists are built during a run and are not added to the saved object.
 setClass(
     "sceptre_object",
     slots = list(

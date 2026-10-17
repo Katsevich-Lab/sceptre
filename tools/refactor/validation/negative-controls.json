@@ -1,0 +1,41 @@
+{
+  "positive_controls_passed": true,
+  "rejected": {
+    "p_value": {
+      "rejected": true,
+      "assertion": "Expected `all(...)` to be TRUE.\nDifferences:\n`actual`:   FALSE\n`expected`: TRUE \n\neligible p-values on these toy inputs must lie in [0, 1]"
+    },
+    "pair_label": {
+      "rejected": true,
+      "assertion": "Expected `observed` to be identical to `workflow_expected_pairs(inputs, case, pairs)`.\nDifferences:\n`actual`:   \"r2/B/FALSE\" \"r3/A/TRUE\"  \"r4/A/FALSE\" \"r5/B/TRUE\"  \"r8/A/TRUE\"\n`expected`: \"r1/A/TRUE\"  \"r2/B/FALSE\" \"r3/A/TRUE\"  \"r4/A/FALSE\" \"r5/B/TRUE\"\n\ndiscovery_result pair identities and independent QC"
+    },
+    "warning": {
+      "rejected": true,
+      "assertion": "Expected `actual$warnings` to be identical to `character()`.\nDifferences:\n`actual`:   \"Unexpected workflow warning\"\n`expected`:                              \n\nunexpected workflow warnings"
+    },
+    "empty_table": {
+      "rejected": true,
+      "assertion": "Expected `observed` to be identical to `workflow_expected_pairs(inputs, case, pairs)`.\nDifferences:\n`actual`:                                                                \n`expected`: \"r1/A/TRUE\" \"r2/B/FALSE\" \"r3/A/TRUE\" \"r4/A/FALSE\" \"r5/B/TRUE\"\n\ndiscovery_result pair identities and independent QC"
+    },
+    "qc_flag": {
+      "rejected": true,
+      "assertion": "Expected `observed` to be identical to `workflow_expected_pairs(inputs, case, pairs)`.\nDifferences:\n`actual`:   \"r1/A/TRUE\" \"r2/B/FALSE\" \"r3/A/TRUE\" \"r4/A/TRUE\"  \"r5/B/TRUE\"\n`expected`: \"r1/A/TRUE\" \"r2/B/FALSE\" \"r3/A/TRUE\" \"r4/A/FALSE\" \"r5/B/TRUE\"\n\ndiscovery_result pair identities and independent QC"
+    },
+    "constant_CRT": {
+      "rejected": true,
+      "assertion": "Expected `within(colMeans(selected), probabilities, B)` to be TRUE.\nDifferences:\n`actual`:   FALSE\n`expected`: TRUE \n\ncell inclusion probabilities"
+    },
+    "correlated_CRT": {
+      "rejected": true,
+      "assertion": "Expected `within(observed, pair_probability(pairs), B)` to be TRUE.\nDifferences:\n`actual`:   FALSE\n`expected`: TRUE \n\njoint inclusion probabilities within each draw"
+    },
+    "repeated_CRT_draws": {
+      "rejected": true,
+      "assertion": "Expected `within(observed, probabilities^2, length(odd))` to be TRUE.\nDifferences:\n`actual`:   FALSE\n`expected`: TRUE \n\nindependence between successive draws"
+    },
+    "constant_permutation": {
+      "rejected": true,
+      "assertion": "Expected `within(colMeans(selected), probabilities, B)` to be TRUE.\nDifferences:\n`actual`:   FALSE\n`expected`: TRUE \n\ncell inclusion probabilities"
+    }
+  }
+}

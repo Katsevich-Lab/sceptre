@@ -70,24 +70,16 @@ read_ondisc_backed_sceptre_object <- function(
         "`grna_odm_file_fp`"
     )
     sceptre_object <- readRDS(sceptre_object_fp)
-    response_odm <- ondisc::initialize_odm_from_backing_file(
-        response_odm_file_fp
+    matrices <- storage_reopen_backed_pair(
+        response_odm_file_fp,
+        grna_odm_file_fp,
+        sceptre_object@integer_id
     )
-    grna_odm <- ondisc::initialize_odm_from_backing_file(grna_odm_file_fp)
-    # check for concordance of integer ids
-    if (sceptre_object@integer_id != response_odm@integer_id) {
-        stop(
-            "The `sceptre_object` and `response_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."
-        )
-    }
-    if (sceptre_object@integer_id != grna_odm@integer_id) {
-        stop(
-            "The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."
-        )
-    }
-    # update response_odm and grna_odm and return
-    sceptre_object <- set_response_matrix(sceptre_object, response_odm)
-    sceptre_object <- set_grna_matrix(sceptre_object, grna_odm)
+    sceptre_object <- set_response_matrix(
+        sceptre_object,
+        matrices$response_matrix
+    )
+    sceptre_object <- set_grna_matrix(sceptre_object, matrices$grna_matrix)
     return(sceptre_object)
 }
 
@@ -106,9 +98,13 @@ write_ondisc_backed_sceptre_object <- function(
 }
 
 
-###########################
-# PIPELINE HELPER FUNCTIONS
-###########################
+#' Label consecutive pipeline work items with approximate task numbers
+#'
+#' Nextflow supplies an ordered vector and a positive target number of items per
+#' task (pod). Return an integer task label for each item, keeping item order.
+#' The number of tasks is rounded, so task size is approximate. Empty input gives
+#' integer(). No random splitting is used.
+#' @noRd
 get_id_vect <- function(v, pod_size) {
     n_elements <- length(v)
     breaks <- round(n_elements / pod_size)
@@ -119,8 +115,14 @@ get_id_vect <- function(v, pod_size) {
     }
 }
 
+#' Write pipeline items as unquoted text lines in their supplied order
+#'
+#' Convert values to text, keeping repeats, and replace the destination file.
+#' Close the connection on error as well as success. Return invisible NULL.
+#' Nextflow scripts call this helper directly.
+#' @noRd
 write_vector <- function(vector, file_name) {
     file_con <- file(file_name)
+    on.exit(close(file_con), add = TRUE)
     writeLines(as.character(vector), file_con)
-    close(file_con)
 }

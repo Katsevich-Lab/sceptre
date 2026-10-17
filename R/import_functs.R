@@ -102,6 +102,18 @@ import_data <- function(
 }
 
 # memory
+#' Import in-memory count matrices and create a sceptre object
+#' @param response_matrix,grna_matrix Feature-by-cell matrices with unique feature
+#'   names and cells in the same order. Supplied cell names must also match.
+#' @param grna_target_data_frame Guide-to-target metadata. If vector_id is present,
+#'   sum guides within each vector before calculating cell covariates.
+#' @param moi `"low"` or `"high"`.
+#' @param extra_covariates Covariates in the same cell order, or an empty data frame.
+#' @param response_names Feature labels matching response rows; NA_character_ uses
+#'   row names when identifying mitochondrial genes.
+#' @return Initialized object with row-accessible sparse counts and per-cell
+#'   covariates, retaining original cell order. Conversion may allocate new matrices.
+#' @noRd
 import_data_memory <- function(
     response_matrix,
     grna_matrix,
@@ -148,7 +160,15 @@ import_data_memory <- function(
     )
 }
 
-# 1. ondisc
+#' Import R count matrices by writing them to ondisc files
+#' @param response_matrix,grna_matrix,grna_target_data_frame,moi,extra_covariates,response_names
+#'   Inputs as for `import_data_memory()`. In this path, guide rows are written
+#'   as supplied; they are not first summed by vector_id.
+#' @param directory_to_write Output directory, created if necessary.
+#' @return Initialized object and backing files response.odm and grna.odm, sharing
+#'   a newly sampled integer_id. Sampling this ID advances R's random state;
+#'   matrix construction follows the existing response-then-guide order.
+#' @noRd
 import_data_use_ondisc <- function(
     response_matrix,
     grna_matrix,
@@ -216,7 +236,8 @@ import_data_use_ondisc <- function(
 #' `features.tsv.gz` and `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`).
 #' For standard in-memory objects, when every supplied directory contains a
 #' barcode file, the cell barcodes are retained as the column names of the
-#' response and gRNA matrices and the row names of the cell covariate data frame.
+#' response and gRNA matrices and the row names of the cell covariate data
+#' frame.
 #' When multiple directories are supplied, the retained cell barcodes are
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
 #' the cell IDs unique and stable across imports.
@@ -227,6 +248,12 @@ import_data_use_ondisc <- function(
 #' or
 #' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
 #' of the manual for more information about this function.
+#'
+#' For in-memory import, count-file entries may be unsorted. Each cell-feature
+#' coordinate must occur only once; repeated coordinates cause an import error
+#' rather than being summed. This does not reject repeated guide-metadata rows.
+#' Backed Cell Ranger import delegates file parsing to ondisc, which has its own
+#' coordinate handling. See the README for the qualified ondisc installation.
 #'
 #' @param directories a character vector of file paths to directories containing
 #' the output of one or more calls to Cell Ranger count. Each directory should
@@ -303,21 +330,30 @@ import_data_from_cellranger <- function(
     }
 }
 
-# 1. memory
+#' Read Cell Ranger batches into in-memory response and guide matrices
+#' @param directories Batch directories in desired cell order. Feature tables must
+#'   match across batches. Matrix Market entries may arrive unsorted, and response
+#'   and guide rows may be interleaved in the feature file. Reject repeated
+#'   (feature, cell) entries before building the sparse matrix.
+#' @param moi,grna_target_data_frame,extra_covariates Inputs to import_data_memory();
+#'   extra covariates follow concatenated batch/cell order.
+#' @return Initialized object with cells in directory order and features in their
+#'   feature-file order. Supply barcode files for every batch or none. For multiple
+#'   batches, prefix retained barcodes with batch IDs. Add or replace the batch
+#'   covariate and report progress.
+#' @noRd
 import_data_from_cellranger_memory <- function(
     directories,
     moi,
     grna_target_data_frame,
     extra_covariates
 ) {
-    # 1. check that directories exist
     for (curr_directory in directories) {
         if (!dir.exists(curr_directory)) {
             stop("The directory ", curr_directory, " does not exist.")
         }
     }
 
-    # 2. create the vector of matrix, features, and barcode files
     input_files <- lapply(X = directories, function(curr_directory) {
         fs <- list.files(curr_directory)
         grep_strs <- c("*features.tsv($|.gz)", "*matrix.mtx($|.gz)")
@@ -369,7 +405,6 @@ import_data_from_cellranger_memory <- function(
     }) |>
         stats::setNames(NULL)
 
-    # 3. obtain the barcodes, features, and matrix fp vectors
     feature_fps <- vapply(
         X = input_files,
         FUN = function(i) i[["features"]],
@@ -403,7 +438,6 @@ import_data_from_cellranger_memory <- function(
         NULL
     }
 
-    # 4. obtain the feature data frame; determine the ids of each feature
     feature_df <- data.table::fread(
         file = feature_fps[1],
         colClasses = c("character", "character", "character"),
@@ -421,7 +455,6 @@ import_data_from_cellranger_memory <- function(
         which(feature_df$modality == modality)
     })
 
-    # 5. loop over directories, loading the matrix corresponding to each
     out_list <- vector(mode = "list", length = length(directories))
     n_cells_per_matrix <- vector(mode = "integer", length = length(directories))
     for (i in seq_along(directories)) {
@@ -503,10 +536,12 @@ import_data_from_cellranger_memory <- function(
             curr_feature_idxs <- modality_idxs[[modality]]
             # subset
             dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
-            # offset the feature idxs such that they start at 1
-            increment_feature_vector_value <- -min(curr_feature_idxs)
-            increment_vector(dt_sub$feature_idx, increment_feature_vector_value)
-            increment_vector(dt_sub$cell_idx, -1L)
+            # Genes and guides may be interleaved in the feature file. Find
+            # each feature's row within this type's own list, preserving file
+            # order, then subtract one for Matrix's internal row numbers.
+            dt_sub$feature_idx <- match(dt_sub$feature_idx, curr_feature_idxs) -
+                1L
+            dt_sub$cell_idx <- dt_sub$cell_idx - 1L
             # create a sparse matrix in csc format
             out <- create_csc_matrix(
                 dt = dt_sub,
@@ -521,7 +556,6 @@ import_data_from_cellranger_memory <- function(
         message(crayon::green(" \u2713"))
     }
 
-    # 6. combine the matrices via do.call cbind
     message("Combining matrices across directories.")
     out_mats <- lapply(modalities, function(modality) {
         l <- lapply(out_list, function(mat) mat[[modality]])
@@ -532,7 +566,6 @@ import_data_from_cellranger_memory <- function(
     gc() |> invisible()
     message(crayon::green(" \u2713"))
 
-    # 7. collect metadata pieces
     cell_ids <- if (retain_cell_barcodes) {
         unlist(cell_barcodes, use.names = FALSE)
     } else {
@@ -560,7 +593,6 @@ import_data_from_cellranger_memory <- function(
     }
     gene_names <- feature_df$feature_name[modality_idxs[["Gene Expression"]]]
 
-    # 8. set up the extra covariates
     batch <- if (length(directories) >= 2L) {
         rep(paste0("b", seq_along(n_cells_per_matrix)), n_cells_per_matrix) |>
             factor()
@@ -573,7 +605,6 @@ import_data_from_cellranger_memory <- function(
         extra_covariates$batch <- batch
     }
 
-    # 9. initialize the sceptre object
     message("Creating the sceptre object.")
     sceptre_object <- import_data_memory(
         response_matrix = out_mats[["Gene Expression"]],
@@ -589,7 +620,17 @@ import_data_from_cellranger_memory <- function(
 }
 
 
-# 2. disk
+#' Read Cell Ranger batches using the ondisc importer
+#' @param directories Batch directories passed to ondisc in supplied order.
+#' @param moi,grna_target_data_frame,extra_covariates Import settings and metadata;
+#'   extra covariate rows must follow the cell order returned by ondisc.
+#' @param directory_to_write Output directory, created if necessary.
+#' @return Object with response and guide backing files sharing one import ID.
+#'   ondisc writes the files, computes cell covariates and combines vector_id
+#'   counts; update guide metadata to match its output. ondisc also parses and
+#'   checks file coordinates itself. SCEPTRE's duplicate-coordinate rejection in
+#'   the in-memory importer does not govern this separate parser.
+#' @noRd
 import_data_from_cellranger_use_ondisc <- function(
     directories,
     moi,
@@ -597,10 +638,8 @@ import_data_from_cellranger_use_ondisc <- function(
     extra_covariates,
     directory_to_write
 ) {
-    # 0. check that directory_to_write has been supplied
     directory_to_write <- prepare_directory_to_write(directory_to_write)
 
-    # 1. call the corresponding ondisc function
     vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
     out <- ondisc::create_odm_from_cellranger(
         directories_to_load = directories,
@@ -613,14 +652,12 @@ import_data_from_cellranger_use_ondisc <- function(
         }
     )
 
-    # 1.5. update grna_target_data_frame, if vector supplied
     if (vector_supplied) {
         grna_target_data_frame <- collapse_grna_target_data_frame(
             grna_target_data_frame
         )
     }
 
-    # 2. check data imports
     check_import_data_inputs(
         out$gene,
         out$grna,
@@ -630,7 +667,6 @@ import_data_from_cellranger_use_ondisc <- function(
     ) |>
         invisible()
 
-    # 3. process the cellwise covariates
     covariate_df <- out$cellwise_covariates
     colnames(covariate_df) <- gsub(
         pattern = "gene",
@@ -642,7 +678,6 @@ import_data_from_cellranger_use_ondisc <- function(
         covariate_df <- cbind(extra_covariates, covariate_df)
     }
 
-    # 4. initialize the sceptre_object
     sceptre_object <- init_sceptre_object(
         response_matrix = out$gene,
         grna_matrix = out$grna,
@@ -651,7 +686,6 @@ import_data_from_cellranger_use_ondisc <- function(
         grna_target_data_frame = grna_target_data_frame
     )
 
-    # 5. add integer id
     sceptre_object@integer_id <- out$gene@integer_id
     return(sceptre_object)
 }
@@ -673,6 +707,10 @@ import_data_from_cellranger_use_ondisc <- function(
 #' output.
 #'
 #' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
+#'
+#' Count-file entries may be unsorted, but each cell-feature coordinate must
+#' occur only once. Repeated coordinates cause an import error rather than being
+#' summed; repeated guide-metadata rows are a separate matter.
 #'
 #' @param gene_mat_fp file path to the gene `count_matrix.mtx` file.
 #' @param grna_mat_fp file path to the gRNA `count_matrix.mtx` file.
@@ -726,7 +764,6 @@ import_data_from_parse <- function(
     grna_target_data_frame,
     extra_covariates = data.frame()
 ) {
-    # 1. check that files exist
     fps <- c(
         gene_mat_fp = gene_mat_fp,
         grna_mat_fp = grna_mat_fp,
@@ -746,7 +783,10 @@ import_data_from_parse <- function(
         }
     }
 
-    # 2. load the gene.mtx and grna.mtx data
+    # Parse lists each entry as (cell, feature, count). Read into a new table
+    # and subtract one from file positions for Matrix's internal numbering.
+    # create_csc_matrix() then sorts by cell/feature and rejects duplicate
+    # entries. The resulting matrix has features in rows and cells in columns.
     load_matrix <- function(mat_fp) {
         matrix_metadata <- get_mtx_metadata(
             mat_fp,
@@ -761,8 +801,8 @@ import_data_from_parse <- function(
             nThread = 2L
         )
         # make the cell and feature idxs zero-based
-        increment_vector(dt$cell_idx, value = -1L)
-        increment_vector(dt$feature_idx, value = -1L)
+        dt$cell_idx <- dt$cell_idx - 1L
+        dt$feature_idx <- dt$feature_idx - 1L
 
         # create a sparse matrix in csc format
         out <- create_csc_matrix(
@@ -775,7 +815,6 @@ import_data_from_parse <- function(
     gene_mat <- load_matrix(gene_mat_fp)
     grna_mat <- load_matrix(grna_mat_fp)
 
-    # 3. load the gene ids; update rownames of gene mat
     gene_feature_df <- data.table::fread(
         file = all_genes_fp,
         colClasses = c("character", "character", "character"),
@@ -785,7 +824,6 @@ import_data_from_parse <- function(
     rownames(gene_mat) <- gene_feature_df$feature_id[seq(1L, nrow(gene_mat))]
     gene_names <- gene_feature_df$feature_name[seq(1L, nrow(gene_mat))]
 
-    # 4. load the grna ids; update rownames of grna mat
     grna_feature_df <- data.table::fread(
         file = all_grnas_fp,
         colClasses = c("character", "character", "character"),
@@ -794,7 +832,6 @@ import_data_from_parse <- function(
     )
     rownames(grna_mat) <- grna_feature_df$feature_name
 
-    # 5. create the sceptre_object
     sceptre_object <- import_data_memory(
         response_matrix = gene_mat,
         grna_matrix = grna_mat,
@@ -810,6 +847,17 @@ import_data_from_parse <- function(
 ##################
 # HELPER FUNCTIONS
 ##################
+#' Create the saved sceptre object from prepared matrices and covariates
+#' @param response_matrix,grna_matrix Validated feature-by-cell matrices with cells
+#'   in matching order, stored for row access in memory or in ondisc.
+#' @param covariate_data_frame Covariates in the same cell order. Move the guide
+#'   maximum/fraction summaries into import_grna_assignment_info.
+#' @param moi `"low"` or `"high"`.
+#' @param grna_target_data_frame Guide metadata. Convert guide IDs and targets to
+#'   character while retaining row order and other columns.
+#' @return New object with its existing field layout and initial workflow flags.
+#'   Save the supplied matrices without reordering cells or loading all counts.
+#' @noRd
 init_sceptre_object <- function(
     response_matrix,
     grna_matrix,
@@ -838,47 +886,84 @@ init_sceptre_object <- function(
             grna_id = as.character(grna_id),
             grna_target = as.character(grna_target)
         )
-    # 5. initialize flags
     sceptre_object@elements_to_analyze <- NA_character_
     sceptre_object@nf_pipeline <- FALSE
     sceptre_object@nuclear <- FALSE
     sceptre_object@last_function_called <- "import_data"
-    sceptre_object@functs_called <- c(
-        import_data = TRUE,
-        set_analysis_parameters = FALSE,
-        assign_grnas = FALSE,
-        run_qc = FALSE,
-        run_calibration_check = FALSE,
-        run_power_check = FALSE,
-        run_discovery_analysis = FALSE
-    )
+    sceptre_object@functs_called <- workflow_initial_state()
     return(sceptre_object)
 }
 
 
+#' Build a sparse feature-by-cell matrix from file entries
+#'
+#' Each row of dt gives cell_idx, feature_idx and value x. Positions already start
+#' at zero. Make new output vectors sorted by cell, then feature, without changing
+#' dt. Keep every value, including explicitly stored zeros. Reject repeated
+#' (feature, cell) positions rather than summing them or choosing one value.
+#' Check that dimensions and entry counts fit C++ integers before building the
+#' column pointers. Return a numeric dgCMatrix without row or column names;
+#' features and cells keep their file order.
+#' @noRd
 create_csc_matrix <- function(dt, n_cells, n_features) {
-    p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
-    out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-    out@i <- dt$feature_idx
-    out@p <- p
-    out@x <- dt$x
-    out@Dim <- c(n_features, n_cells)
-    return(out)
+    check_native_scalar_count(n_cells, "n_cells")
+    check_native_scalar_count(n_features, "n_features")
+    if (n_cells == .Machine$integer.max) {
+        stop(
+            "The imported cell count leaves no room for its final sparse pointer."
+        )
+    }
+    check_native_scalar_count(nrow(dt), "Stored coordinate count")
+    if (
+        !is.integer(dt$cell_idx) ||
+            !is.integer(dt$feature_idx) ||
+            anyNA(dt$cell_idx) ||
+            anyNA(dt$feature_idx) ||
+            any(dt$cell_idx < 0L | dt$cell_idx >= n_cells) ||
+            any(dt$feature_idx < 0L | dt$feature_idx >= n_features)
+    ) {
+        stop(
+            "Imported cell or feature coordinates are outside the matrix dimensions."
+        )
+    }
+    scan_order <- order(dt$cell_idx, dt$feature_idx, method = "radix")
+    cell_idxs <- dt$cell_idx[scan_order]
+    feature_idxs <- dt$feature_idx[scan_order]
+    if (any(diff(cell_idxs) == 0L & diff(feature_idxs) == 0L)) {
+        stop(
+            "Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique."
+        )
+    }
+    methods::new(
+        "dgCMatrix",
+        i = feature_idxs,
+        p = obtain_pointer_vector(i = cell_idxs, dim = as.integer(n_cells)),
+        x = dt$x[scan_order],
+        Dim = as.integer(c(n_features, n_cells))
+    )
 }
 
 
+#' Read the dimensions at the start of a Matrix Market file
+#'
+#' Skip header/comment lines and read the first dimensions line, using the
+#' existing space-separated parser for plain or gzip input. Return the three
+#' integer dimensions named by col_id and n_to_skip, the total header/comment/
+#' dimensions lines to skip when reading values. Close the file on success or
+#' error. Other malformed-file checks are not added here.
+#' @noRd
 get_mtx_metadata <- function(
     mtx_file,
     col_id = c("n_features", "n_cells", "n_nonzero")
 ) {
     con <- file(mtx_file, "r")
+    on.exit(close(con), add = TRUE)
     n_to_skip <- 0L
     while (TRUE) {
         n_to_skip <- n_to_skip + 1L
         line <- readLines(con, n = 1)
         if (substr(line, 0, 1) != "%") break()
     }
-    close(con)
     metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
     out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
     names(out) <- c(col_id, "n_to_skip")
@@ -886,6 +971,13 @@ get_mtx_metadata <- function(
 }
 
 
+#' Write response and guide counts with the same import ID
+#' @param response_matrix,grna_matrix Feature-by-cell matrices with matching cells.
+#' @param directory_to_write Output directory from prepare_directory_to_write().
+#' @param integer_id ID shared by the saved object and both count files.
+#' @return Open response and guide matrices from storage_create_backed_pair(),
+#'   after writing response.odm followed by grna.odm.
+#' @noRd
 write_matrices_to_disk <- function(
     response_matrix,
     grna_matrix,
@@ -893,20 +985,21 @@ write_matrices_to_disk <- function(
     integer_id
 ) {
     directory_to_write <- prepare_directory_to_write(directory_to_write)
-    response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = response_matrix,
-        file_to_write = file.path(directory_to_write, "response.odm"),
-        integer_id = integer_id
+    storage_create_backed_pair(
+        response_matrix,
+        grna_matrix,
+        directory_to_write,
+        integer_id
     )
-    grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = grna_matrix,
-        file_to_write = file.path(directory_to_write, "grna.odm"),
-        integer_id = integer_id
-    )
-    return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
 }
 
 
+#' Create the output directory and return its absolute path
+#' @param directory_to_write One nonmissing path. Expand a leading ~ for the home
+#'   directory and create parent directories as needed.
+#' @return Existing absolute path with forward slashes. Reject any remaining ~
+#'   before passing the path to ondisc, whose path handling could misread it.
+#' @noRd
 prepare_directory_to_write <- function(directory_to_write) {
     if (is.null(directory_to_write)) {
         stop("`directory_to_write` must be supplied.")
@@ -932,6 +1025,12 @@ prepare_directory_to_write <- function(directory_to_write) {
 }
 
 
+#' Expand and check an existing object or count-file path
+#' @param file_path One nonmissing path that must already exist.
+#' @param arg_name Argument name used in error messages.
+#' @return Absolute path with forward slashes and the home-directory abbreviation
+#'   expanded. Reject remaining ~ characters. Do not open or modify the file.
+#' @noRd
 prepare_ondisc_file_path <- function(file_path, arg_name) {
     if (is.null(file_path)) {
         stop(arg_name, " must be supplied.")
@@ -953,6 +1052,11 @@ prepare_ondisc_file_path <- function(file_path, arg_name) {
 }
 
 
+#' Reject remaining ~ characters before passing a path to ondisc
+#' @param file_path Path whose leading home-directory abbreviation is already expanded.
+#' @param arg_name Argument name used in the error message.
+#' @return NULL if no ~ remains, otherwise an error. This checks the text only.
+#' @noRd
 check_path_has_no_tilde <- function(file_path, arg_name) {
     if (grepl("~", file_path, fixed = TRUE)) {
         stop(
@@ -971,6 +1075,14 @@ check_path_has_no_tilde <- function(file_path, arg_name) {
 }
 
 
+#' Compute cell covariates and prepare count matrices for row access
+#' @param response_matrix,grna_matrix In-memory feature-by-cell counts.
+#' @param extra_covariates Extra covariates in the same cell order, or an empty table.
+#' @param response_names Response labels matching rows, or NA_character_ for row names.
+#' @return covariate_data_frame, response_matrix and grna_matrix. Keep dimensions,
+#'   feature names and cell order while converting count storage as needed.
+#'   The backed R-matrix importer also calls this before writing files.
+#' @noRd
 process_covariates_and_matrices <- function(
     response_matrix,
     grna_matrix,
@@ -1003,6 +1115,13 @@ process_covariates_and_matrices <- function(
 }
 
 
+#' Replace individual guide IDs with the vector IDs used to combine their counts
+#' @param grna_target_data_frame Metadata with grna_id, vector_id and grna_target.
+#'   Every vector must map to exactly one target.
+#' @return Metadata with vector_id renamed to grna_id and the old guide IDs removed.
+#'   Keep the first occurrence of each distinct remaining row. Different extra
+#'   annotations can therefore leave repeated vector IDs in the output.
+#' @noRd
 collapse_grna_target_data_frame <- function(grna_target_data_frame) {
     vector_nested_within_target <- (grna_target_data_frame |>
         dplyr::group_by(vector_id) |>
@@ -1021,12 +1140,29 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 }
 
 
+#' Sum counts of guides belonging to the same vector during in-memory import
+#' @param grna_matrix Guide-by-cell count matrix with named guide rows.
+#' @param grna_target_data_frame Metadata identifying rows by grna_id and their
+#'   vector groups by vector_id.
+#' @return Dense vector-by-cell matrix in first-seen vector order and original
+#'   cell order. Repeated metadata rows select the same guide more than once.
+#' @details Prepare sparse rows using Matrix's rules for duplicate numeric/logical
+#'   entries. Sum bounded blocks of complete columns using dense colSums(), to
+#'   preserve its platform-specific rounding. The vector-level output and transpose
+#'   workspace are dense, but the entire sparse guide input is not made dense.
+#'   Caller inputs remain unchanged.
+#' @noRd
 collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
-    # temporary function; we may rewrite this function to improve its
-    # speed and memory efficiency if multiguide vector data become more
-    # prevalent.
     vector_ids <- grna_target_data_frame$vector_id |> unique()
-    grna_matrix <- as.matrix(grna_matrix)
+    # Prepare rows once using Matrix's conversion, which combines duplicate
+    # triplet entries. Here logical FALSE contributes zero to count sums;
+    # do not use storage's separate rule that counts all stored positions.
+    if (methods::is(grna_matrix, "sparseMatrix")) {
+        grna_matrix <- methods::as(grna_matrix, "RsparseMatrix")
+    } else {
+        # Keep the original non-sparse coercion/dispatch behavior.
+        grna_matrix <- as.matrix(grna_matrix)
+    }
     n_cells <- ncol(grna_matrix)
     grna_matrix_collapsed <- vapply(
         vector_ids,
@@ -1034,10 +1170,50 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
             curr_grna_ids <- grna_target_data_frame |>
                 dplyr::filter(vector_id == curr_vector_id) |>
                 dplyr::pull(grna_id)
-            Matrix::colSums(grna_matrix[curr_grna_ids, , drop = FALSE])
+            selected <- grna_matrix[curr_grna_ids, , drop = FALSE]
+            if (methods::is(selected, "sparseMatrix")) {
+                sum_sparse_vector_rows(selected)
+            } else {
+                Matrix::colSums(selected)
+            }
         },
         FUN.VALUE = numeric(n_cells)
     ) |>
         t()
     return(grna_matrix_collapsed)
+}
+
+#' Sum one vector's selected guide rows using dense column blocks
+#' @param counts Sparse matrix with selected guides in rows and original cells in
+#'   columns. Repeated metadata selections appear as repeated rows, in order.
+#' @return Named column sums. Each temporary dense block targets at most 2^20
+#'   values (8 MiB for doubles). A whole column is the minimum, so a vector with
+#'   more guides than that can exceed the target. Output memory is additional.
+#' @noRd
+sum_sparse_vector_rows <- function(counts) {
+    n_cells <- ncol(counts)
+    # Most vectors contain only a few guides and already fit the block target.
+    # Avoid another sparse column subset and numeric output copy in that case.
+    if (as.double(nrow(counts)) * n_cells <= 2^20) {
+        return(Matrix::colSums(as.matrix(counts)))
+    }
+    sums <- numeric(n_cells)
+    names(sums) <- colnames(counts)
+    if (n_cells == 0L) {
+        return(sums)
+    }
+
+    # On Linux, dense colSums() can use extra precision while sparse sums use
+    # doubles. Sum every selected guide for a cell together to keep the same
+    # rounding as the original dense calculation. Split only between cells
+    # (columns), not between the guides contributing to one cell.
+    block_width <- max(1, floor(2^20 / max(1L, nrow(counts))))
+    for (first in seq.int(1, n_cells, by = block_width)) {
+        columns <- seq.int(first, min(n_cells, first + block_width - 1))
+        sums[columns] <- Matrix::colSums(as.matrix(counts[,
+            columns,
+            drop = FALSE
+        ]))
+    }
+    return(sums)
 }

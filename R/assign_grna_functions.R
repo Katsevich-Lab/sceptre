@@ -1,6 +1,16 @@
 ###########################################
 # TOP-LEVEL FUNCTION: ASSIGN GRNAS TO CELLS
 ###########################################
+#' Assign guides to cells, then combine assignments when appropriate
+#' @param sceptre_object Sceptre object with assignment method and settings chosen.
+#' @param print_progress,parallel,n_processors,log_dir Mixture-model worker and
+#'   progress settings.
+#' @return Object with initial assignments as original matrix column numbers and,
+#'   for maximum assignment, cells flagged for exclusion. Standard runs also
+#'   combine assignments into guide groups. Nextflow runs process only
+#'   `elements_to_analyze` and combine groups after workers' outputs are gathered.
+#'   Warn if no guides were assigned. Mixture fitting can use workers and logs.
+#' @noRd
 assign_grnas_to_cells <- function(
     sceptre_object,
     print_progress,
@@ -44,7 +54,8 @@ assign_grnas_to_cells <- function(
     }
     if (grna_assignment_method == "maximum") {
         max_result <- assign_grnas_to_cells_maximum(
-            sceptre_object = sceptre_object,
+            max_grna = sceptre_object@import_grna_assignment_info$max_grna,
+            max_grna_frac_umis = sceptre_object@import_grna_assignment_info$max_grna_frac_umis,
             umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,
             grna_n_umis = cell_covariate_data_frame$grna_n_umis,
             min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
@@ -81,43 +92,31 @@ assign_grnas_to_cells <- function(
 #######################
 # THRESHOLDING FUNCTION
 #######################
+#' Assign a guide to cells whose counts reach the threshold
+#' @param grna_matrix Guide-by-cell matrix prepared for row access.
+#' @param grna_assign_threshold Count cutoff.
+#' @param grna_ids Guide names, in desired output order.
+#' @return Named list of original cell-column numbers, starting at 1, in storage
+#'   order. `storage_threshold_row()` handles in-memory versus ondisc counts,
+#'   including their different numeric/integer threshold conversion.
+#' @noRd
 assign_grnas_to_cells_thresholding <- function(
     grna_matrix,
     grna_assign_threshold,
     grna_ids
 ) {
-    # take cases on the class of grna_matrix
-    if (methods::is(grna_matrix, "odm")) {
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            ondisc:::threshold_count_matrix_cpp(
-                file_name_in = grna_matrix@h5_file,
-                f_row_ptr = grna_matrix@ptr,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    } else {
-        # 1. make the grna expression matrix row-accessible; ensure threshold is
-        # numeric
-        grna_matrix <- set_matrix_accessibility(
+    grna_matrix <- set_matrix_accessibility(
+        grna_matrix,
+        make_row_accessible = TRUE
+    )
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
+        storage_threshold_row(
             grna_matrix,
-            make_row_accessible = TRUE
+            storage_response_index(grna_matrix, grna_id),
+            grna_assign_threshold
         )
-        grna_assign_threshold <- as.numeric(grna_assign_threshold)
-
-        # 2. perform the assignments
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            threshold_count_matrix(
-                j = grna_matrix@j,
-                p = grna_matrix@p,
-                x = grna_matrix@x,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    }
+    }) |>
+        stats::setNames(grna_ids)
 
     return(initial_assignment_list)
 }
@@ -125,20 +124,31 @@ assign_grnas_to_cells_thresholding <- function(
 #########
 # MAXIMUM
 #########
+#' Assign each cell to its highest-count guide and flag ambiguous cells
+#' @param max_grna Highest-count guide name for each original cell.
+#' @param max_grna_frac_umis Fraction of that cell's guide UMIs from its top guide.
+#' @param umi_fraction_threshold Flag cells whose top-guide fraction is at or below this.
+#' @param grna_n_umis Total guide UMIs per original cell.
+#' @param min_grna_n_umis_threshold Flag cells whose total is below this.
+#' @param grna_ids Guide names, in desired output order.
+#' @return Named cell assignments and the combined set of ambiguous/low-total
+#'   cells, as original matrix columns starting at 1. Flagged cells still appear
+#'   in the initial assignments; subsequent QC removes them.
+#' @noRd
 assign_grnas_to_cells_maximum <- function(
-    sceptre_object,
+    max_grna,
+    max_grna_frac_umis,
     umi_fraction_threshold,
     grna_n_umis,
     min_grna_n_umis_threshold,
     grna_ids
 ) {
     initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-        which(sceptre_object@import_grna_assignment_info$max_grna == grna_id)
+        which(max_grna == grna_id)
     }) |>
         stats::setNames(grna_ids)
     cells_w_multiple_grnas <- which(
-        sceptre_object@import_grna_assignment_info$max_grna_frac_umis <=
-            umi_fraction_threshold
+        max_grna_frac_umis <= umi_fraction_threshold
     )
     cells_w_zero_grnas <- which(grna_n_umis < min_grna_n_umis_threshold)
     cells_w_zero_or_twoplus_grnas <- union(
@@ -153,18 +163,27 @@ assign_grnas_to_cells_maximum <- function(
 
 
 ######################
-# AUXILLIARY FUNCTIONS
+# HELPER FUNCTIONS
 ######################
-# add three fields to sceptre_object:
-# 1. grnas_per_cell, 2. cells_w_zero_or_twoplus_grnas, 3. grna_assignments_raw
+#' Combine individual guide assignments into the groups saved before QC
+#' @param sceptre_object Object with gathered guide assignments and guide metadata.
+#' @return Object with `grna_assignments_raw` and `mean_cells_per_grna`. Methods
+#'   other than maximum also count guides per cell and flag low-MOI cells with
+#'   zero or multiple guides. Target groups follow first-seen metadata order;
+#'   their cells are combined without duplicates, in first-seen order. Individual
+#'   NT guide lists keep their original names and cell order. All cell numbers
+#'   still refer to original matrix columns; QC renumbers them later.
+#' @details Nextflow calls this after collecting guide assignments from its tasks.
+#'   The supplied membership vectors are left unchanged.
+#' @noRd
 process_initial_assignment_list <- function(sceptre_object) {
-    # 0. set variables
+    # set variables
     initial_assignment_list <- sceptre_object@initial_grna_assignment_list
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
     low_moi <- sceptre_object@low_moi
     n_cells <- ncol(get_grna_matrix(sceptre_object))
     maximum_assignment <- sceptre_object@grna_assignment_method == "maximum"
-    # 1. if not using maximum assignment, compute n grnas per cell and cells
+    # if not using maximum assignment, compute n grnas per cell and cells
     # with multiple grnas
     if (!maximum_assignment) {
         sceptre_object@grnas_per_cell <- compute_n_grnas_per_cell_vector(
@@ -182,7 +201,7 @@ process_initial_assignment_list <- function(sceptre_object) {
             )
         }
     }
-    # 2. pool together targeting gRNAs via the or operation
+    # pool together targeting gRNAs via the or operation
     targeting_grna_group_data_table <- grna_target_data_frame |>
         dplyr::filter(grna_group != "non-targeting") |>
         data.table::as.data.table()
@@ -201,19 +220,19 @@ process_initial_assignment_list <- function(sceptre_object) {
         }
     ) |>
         stats::setNames(targeting_grna_groups)
-    # 4. obtain the individual non-targeting grna idxs
+    # obtain the individual non-targeting grna idxs
     nontargeting_grna_ids <- grna_target_data_frame |>
         dplyr::filter(grna_group == "non-targeting") |>
         dplyr::pull(grna_id)
     indiv_nt_grna_idxs <- initial_assignment_list[nontargeting_grna_ids]
-    # 5. construct the grna_group_idxs list
+    # construct the grna_group_idxs list
     grna_assignments_raw <- list(
         grna_group_idxs = grna_group_idxs,
         indiv_nt_grna_idxs = indiv_nt_grna_idxs
     )
-    # 6. initialize output
+    # initialize output
     sceptre_object@grna_assignments_raw <- grna_assignments_raw
-    # 7. save mean cells per grna
+    # save mean cells per grna
     sceptre_object@mean_cells_per_grna <- vapply(
         sceptre_object@initial_grna_assignment_list,
         length,
@@ -224,6 +243,16 @@ process_initial_assignment_list <- function(sceptre_object) {
 }
 
 
+#' Choose which guides to process, retaining their metadata order
+#' @param sceptre_object Object with guide metadata, requested targets and pipeline mode.
+#' @param restricted_grnas FALSE selects every metadata row. TRUE selects guides
+#'   for requested targets plus NT guides. For a nuclear trial run, instead sample
+#'   at most 30 targeting metadata rows, take their targets, then add NT guides.
+#'   Thirty rows need not mean 30 different targets.
+#' @return Guide names in metadata order, keeping repeated metadata rows.
+#'   Nuclear trial sampling uses seed 4 and restores R's previous random state.
+#'   Nextflow's `output_grna_info` uses this restricted mode for trial runs.
+#' @noRd
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
     if (restricted_grnas) {

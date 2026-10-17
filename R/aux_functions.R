@@ -1,65 +1,11 @@
-construct_data_frame_v2 <- function(
-    curr_df,
-    curr_response_result,
-    output_amount
-) {
-    curr_df$p_value <- vapply(
-        X = curr_response_result,
-        FUN = function(l) l$p,
-        FUN.VALUE = numeric(1)
-    )
-    fold_change <- vapply(
-        curr_response_result,
-        FUN = function(l) l$fc,
-        FUN.VALUE = numeric(1)
-    )
-    curr_df$fold_change <- fold_change
-    curr_df$se_fold_change <- vapply(
-        curr_response_result,
-        FUN = function(l) l$se,
-        FUN.VALUE = numeric(1)
-    )
-    curr_df$log_2_fold_change <- log(fold_change) / log(2)
-    if (output_amount >= 2L) {
-        curr_df$stage <- vapply(
-            curr_response_result,
-            FUN = function(l) l$stage,
-            FUN.VALUE = integer(1)
-        )
-        curr_df$z_orig <- vapply(
-            curr_response_result,
-            FUN = function(l) l$z_orig,
-            FUN.VALUE = numeric(1)
-        )
-        curr_df$xi <- vapply(
-            curr_response_result,
-            FUN = function(l) l$sn_params[1L],
-            FUN.VALUE = numeric(1)
-        )
-        curr_df$omega <- vapply(
-            curr_response_result,
-            FUN = function(l) l$sn_params[2L],
-            FUN.VALUE = numeric(1)
-        )
-        curr_df$alpha <- vapply(
-            curr_response_result,
-            FUN = function(l) l$sn_params[3L],
-            FUN.VALUE = numeric(1)
-        )
-    }
-    if (output_amount >= 3L) {
-        to_append <- lapply(curr_response_result, FUN = function(l) {
-            m <- data.table::as.data.table(matrix(l$resampling_dist, nrow = 1))
-            colnames(m) <- paste0("z_null_", seq(1L, ncol(m)))
-            m
-        }) |>
-            data.table::rbindlist(fill = TRUE)
-        curr_df <- cbind(curr_df, to_append)
-    }
-    return(curr_df)
-}
-
-
+#' Choose the default model formula from the available cell covariates
+#'
+#' Keep covariates in column order, excluding response mitochondrial fraction and,
+#' when requested, guide count summaries. Use log(x) for names matching n_umis or
+#' n_nonzero, adding one if any value is zero. Other covariates are included only
+#' if they have fewer than 15 distinct values. Return a formula for model.matrix();
+#' validation of the supplied covariates happens elsewhere.
+#' @noRd
 auto_construct_formula_object <- function(
     cell_covariates,
     include_grna_covariates
@@ -109,6 +55,13 @@ auto_construct_formula_object <- function(
 }
 
 
+#' Combine response summaries, guide summaries and extra cell covariates
+#'
+#' Response and guide matrices must have cells in the same order. Calculate their
+#' summaries, prefix the column names with response_ or grna_, and append any extra
+#' covariates. Use response-matrix cell IDs as row names when supplied. Matrix
+#' storage may be converted for column access; cell order is kept.
+#' @noRd
 auto_compute_cell_covariates <- function(
     response_matrix,
     grna_matrix,
@@ -146,23 +99,23 @@ auto_compute_cell_covariates <- function(
 }
 
 
+#' Divide gene or guide IDs into blocks for workers
+#'
+#' When parallel work has at least twice as many items as workers, shuffle using
+#' seed 4 and split into blocks. Otherwise return one block in input order.
+#' For n_processors = "auto", use the preferred fraction of available physical
+#' cores once. Restore the caller's random state and temporary options afterward.
+#' This prepares the blocks; it does not start workers.
+#' @noRd
 partition_response_ids <- function(response_ids, parallel, n_processors) {
     groups_set <- FALSE
     if (parallel) {
         if (identical(n_processors, "auto")) {
-            # Read the user's preferred fraction (default 0.5 = half cores),
-            # then
-            # neutralize that option on the parallelly call so parallelly's own
-            # option-aware default does not apply the same fraction a second
-            # time.
-            # parallelly's `fraction` arg defaults to getOption(
-            # "parallelly.availableCores.fraction", 1), so omitting it would
-            # silently double-scale when the user has set that option. The arg
-            # itself was only added in 1.47.0, so passing `fraction = 1`
-            # directly
-            # would break parallelly < 1.47.0 -- `withr::with_options`
-            # neutralizes
-            # the option for the call on any parallelly >= 1.23.0.
+            # Apply the user's core fraction once, defaulting to half the cores.
+            # availableCores() can apply that same option itself, so temporarily
+            # set it to 1 while counting cores, then multiply by frac below.
+            # Use an option rather than fraction = 1: that argument was added in
+            # parallelly 1.47.0, while supported installations can be older.
             frac <- getOption("parallelly.availableCores.fraction", 0.5)
             n_processors <- max(
                 1L,
@@ -195,6 +148,11 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
 }
 
 
+#' Find or create the sceptre_logs subdirectory
+#'
+#' Return log_dir/sceptre_logs/ with a trailing slash. Create parent directories
+#' as needed; individual worker log files are created by their callers.
+#' @noRd
 get_log_dir <- function(log_dir) {
     log_dir <- paste0(log_dir, "/sceptre_logs/")
     if (!dir.exists(log_dir)) {

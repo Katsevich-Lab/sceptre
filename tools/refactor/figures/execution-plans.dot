@@ -1,0 +1,22 @@
+digraph plans {
+  graph [rankdir=TB, bgcolor="transparent", pad="0.18", nodesep="0.4", ranksep="0.4", fontname="Helvetica", newrank=true];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=18, margin="0.2,0.16", penwidth=1.2];
+  edge [color="#526C8B", arrowsize=0.8, penwidth=1.5, fontname="Helvetica", fontsize=14];
+  subgraph cluster_perm {
+    label="PERMUTATION"; fontname="Helvetica"; fontsize=21; color="#8DADD5"; style=rounded; margin=18;
+    p1 [label="Make the full set of\npermutation draws once", fillcolor="#E3EDFA", color="#7397C6"];
+    p2 [label="For each response:\nread counts and obtain its fit", fillcolor="#E3EDFA", color="#7397C6"];
+    p3 [label="Test that response against\nits requested guide groups", fillcolor="#E3EDFA", color="#7397C6"];
+    p1 -> p2 -> p3;
+  }
+  subgraph cluster_crt {
+    label="CRT"; fontname="Helvetica"; fontsize=21; color="#88B49A"; style=rounded; margin=18;
+    c1 [label="Obtain the shared response fits\nfor the analysis cells", fillcolor="#E4F1E8", color="#659576"];
+    c2 [label="For each guide group:\nfit assignment probabilities\nand make its full set of draws", fillcolor="#E4F1E8", color="#659576"];
+    c3 [label="Test that guide group against\nits requested responses", fillcolor="#E4F1E8", color="#659576"];
+    c1 -> c2 -> c3;
+  }
+  {rank=same; p1; c1;}
+  {rank=same; p2; c2;}
+  {rank=same; p3; c3;}
+}

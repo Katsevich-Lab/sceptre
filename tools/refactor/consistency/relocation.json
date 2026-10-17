@@ -1,0 +1,166 @@
+{
+  "from_commit": "04df2f045bdcc3ec98982eefe1425d3fa1ae5904",
+  "scope": "Byte-exact historical consistency suite and fixtures relocated before changing permanent package tests. No expected output regenerated.",
+  "files": [
+    {
+      "original": "tests/testthat/helper-refactor.R",
+      "preserved": "tools/refactor/consistency/testthat/helper-refactor.R",
+      "sha256": "02c387a4b348c5ebd580e41991279493706ed160bda25a1aba777cb242890987"
+    },
+    {
+      "original": "tests/testthat/helper-refactor-native.R",
+      "preserved": "tools/refactor/consistency/testthat/helper-refactor-native.R",
+      "sha256": "6e736d4f6a3bc9eab09e734fd435182305a974165ebe78bab04759045a9253dc"
+    },
+    {
+      "original": "tests/testthat/test-refactor-contracts.R",
+      "preserved": "tools/refactor/consistency/testthat/test-refactor-contracts.R",
+      "sha256": "0e9e18bf089020ac0edef76aaf2a59f85d1baf0f7468d86f5c0e300e8850d36b"
+    },
+    {
+      "original": "tests/testthat/test-refactor-native.R",
+      "preserved": "tools/refactor/consistency/testthat/test-refactor-native.R",
+      "sha256": "c688fc76c5558ac49df13dac22c69262b42fad0beaf49dc675de241ebdbd4420"
+    },
+    {
+      "original": "tests/testthat/test-refactor-vector-aggregation.R",
+      "preserved": "tools/refactor/consistency/testthat/test-refactor-vector-aggregation.R",
+      "sha256": "834c59c2e910934d461414f49ef9b00ffce5358a50f581adfee37dca7ef44b06"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/indexing.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/indexing.rds",
+      "sha256": "750cc0cc487e676ab68c217012ddde18da7c2a4d12a6b3f036639e444c756164"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/native-expected.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/native-expected.rds",
+      "sha256": "f8dad9d57c288e6058d4b70b58cc008f2d4c9133d978e1bdcd5332654b612fb3"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/low-guide-counts.tsv",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/low-guide-counts.tsv",
+      "sha256": "cefabd23da6f56072a9a9b68b82c0aae4cb429c5a600726695370832330b977e"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/saved-object-result.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/saved-object-result.rds",
+      "sha256": "b3b443f1c93e009f71c5acc64cbce24502c2cae6259ef40a7d54d65d343667e3"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/api.json",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/api.json",
+      "sha256": "15635c149df82faa3fae8cef69f11eb75c05d43110a062539a71a9a4ce568371"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/saved-object.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/saved-object.rds",
+      "sha256": "c6b6fc377e85a064a994ce20bead6d6f0931f0a4345abf6df79eb8b1eb1d70c5"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/high-guide-counts.tsv",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/high-guide-counts.tsv",
+      "sha256": "0a7dc0b6001db0d274f0a94abd8a06fb006191c9458c1032fb35e2d46429ba11"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/api.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/api.rds",
+      "sha256": "2f693904bbff7308cda124df07e514f578890c1fa5742bbfb7ab253735e0377f"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/backed-workflow.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/backed-workflow.rds",
+      "sha256": "9ee5cff5e0c86f8eac837f935c706d9bb4176e5004fa164e6f788a2a761a5dff"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/native-draws.tsv",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/native-draws.tsv",
+      "sha256": "b4e0aebe806271a1dfe93704030d419be36896c449f2fc6f2fe3059b0d2db8ea"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/cases.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/cases.rds",
+      "sha256": "7a3832d88c4f84c0d86330e39e1d21c7d70ce33755916e5403ee1c40374a4fc6"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/workflows.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/workflows.rds",
+      "sha256": "1bf826cabb07a5895b210a8fa698d0ef48dfb469710b9f693f0edc99411d90be"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/edges.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/edges.rds",
+      "sha256": "07c94bac873a491634cccbbd12c5a6a3520faab4f82479c9626511f3170cabb2"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/covariates.tsv",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/covariates.tsv",
+      "sha256": "de32a9b1982e479c365a6f0a6e32590db7d8d8e8b7677cd4ea8a134b201517a9"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/response-counts.tsv",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/response-counts.tsv",
+      "sha256": "767f8e65d4a1b09ebf689ee82bafb2fcbd605ee29e78cfd3ad1d6915fd1c2e50"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/backed-discovery.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/backed-discovery.rds",
+      "sha256": "b22f242c580323ebe56c111f153ed41d90998b905b73b19371c3bc6709f80e14"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/native-inputs.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/native-inputs.rds",
+      "sha256": "52f9e680f58c9a1e7496c19e6aa7c058b01388100b3eab72d8eedc7d14e96ce6"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/manifest.json",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/manifest.json",
+      "sha256": "641980c425fdb658b5dabfe506477f2d00ded257240d9225194daed84fd161ec"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/backed-inputs.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/backed-inputs.rds",
+      "sha256": "9207274e6d33585dc31b5187f06b560b7c7124699c8b811924fcb3bd8ef2f826"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/inputs.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/inputs.rds",
+      "sha256": "55d01efe7b8e5737528b0f0b54585edb470a273579547fda97531c02e2f27c00"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/cache.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/cache.rds",
+      "sha256": "c1aa24abf86a05f3469e9d1de06e11fa87c085bbf4992f9265ccd6159b3c3779"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/backed-metadata.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/backed-metadata.rds",
+      "sha256": "a432182d6a3d54b75627494af93d67b1fc513a8a0bfaa7ded9c4dd623c3c4f75"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/manifest.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/manifest.rds",
+      "sha256": "588506ddc5fe601d8a94f39653477aaf776384285fb7e3d6699046cb52d3ec1a"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/native-sampler-reference.inc",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/native-sampler-reference.inc",
+      "sha256": "deb2dee4338f5779588408f4d80caa9a42d64e1df5e2a5c519c8361dd1c06cfd"
+    },
+    {
+      "original": "tests/testthat/fixtures/refactor/native-bridge.cpp",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/refactor/native-bridge.cpp",
+      "sha256": "ffe5d50bcfa829e9d8e75f24fee8875fc5d3fe0de7a18d0a625301ea00ba678b"
+    },
+    {
+      "original": "tests/testthat/fixtures/aggregation-original-21f9ea0.R",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/aggregation-original-21f9ea0.R",
+      "sha256": "9cb66ee837ae924268adc953ef8ac753d35a654f410d7aa3194af5f7d03ef6d9"
+    },
+    {
+      "original": "tests/testthat/fixtures/aggregation-inputs-6a43fa5.rds",
+      "preserved": "tools/refactor/consistency/testthat/fixtures/aggregation-inputs-6a43fa5.rds",
+      "sha256": "f53c93eabbb30a53d5fed01788ee8ef0ef4447b94ed308540410e21baa624e2d"
+    }
+  ]
+}

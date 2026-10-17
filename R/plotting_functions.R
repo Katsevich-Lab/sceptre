@@ -1,3 +1,7 @@
+#' Use the package's shared plot appearance
+#' @param element_text_size Plot-title text size.
+#' @return ggplot2 theme defining line, grid and title appearance.
+#' @noRd
 get_my_theme <- function(element_text_size = 11) {
     ggplot2::theme_bw() +
         ggplot2::theme(
@@ -104,18 +108,19 @@ plot_grna_count_distributions <- function(
     ) |>
         dplyr::filter(grna_expressions < 10000)
 
-    # this function takes a vector of grna expressions and returns a data.frame
-    # which gets passed to `cut` for binning that vector. In the returned
-    # data.frame,
-    # one column (`bin_upper_bounds`) contains the upper end point of the
-    # resulting bin,
-    # and the other column (`bin_labels`) has the name that that bin will get.
-    grna_expressions_to_binned_factor <- function(gnra_expressions) {
-        max_expression_count <- max(gnra_expressions)
+    # Choose histogram bin bounds and labels for one guide's counts
+    # grna_expressions: Finite per-cell counts, already restricted below 10000
+    #   by the outer plotting function.
+    # Returns: Table of bin_upper_bounds and bin_labels in display order. Use the
+    #   outer function's rounded threshold: individual-count bins extend through
+    #   max(10, threshold - 1), then bin widths grow exponentially as needed.
+    #   Keep the existing bin labels, including at the threshold.
+    grna_expressions_to_binned_factor <- function(grna_expressions) {
+        max_expression_count <- max(grna_expressions)
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
         bin_upper_bounds <- 0:max_single_bin
         bin_labels <- as.character(bin_upper_bounds)
-        if (max_expression_count > 10) {
+        if (max_expression_count > max_single_bin) {
             # now we need to add exp growing bins, w/ more complex labels
             # this next section relies on the fact that the upper bounds are
             # going to be at locations
@@ -146,11 +151,8 @@ plot_grna_count_distributions <- function(
         ))
     }
 
-    # creating a list of bar plots for each grna_id, so that we can avoid
-    # dropping
-    # any bins inside the range of the expressions for each grna_id, but we
-    # don't
-    # keep empty ones in the tail.
+    # Build each guide's histogram separately. Keep empty bins within its count
+    # range, but omit empty bins beyond its largest count.
     plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
         curr_df <- dplyr::filter(
             to_plot,
@@ -255,13 +257,13 @@ plot_grna_count_distributions <- function(
 #' points in the plot
 #' @param transparency (optional; default \code{0.8}) the transparency of the
 #' individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE},
-#' then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
-#' single \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{TRUE},
+#' return the individual panels as a list; if \code{FALSE}, return one combined
+#' \code{cowplot} object.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is \code{TRUE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -495,13 +497,13 @@ plot_assign_grnas <- function(
 #' points in the plot
 #' @param transparency (optional; default \code{0.8}) the transparency of the
 #' individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
-#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
-#' \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{TRUE},
+#' return the individual panels as a list; if \code{FALSE}, return one combined
+#' \code{cowplot} object.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is \code{TRUE})
 #' @export
 #'
 #' @examples
@@ -642,6 +644,16 @@ plot_run_calibration_check <- function(
 ############################
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
+#' Plot calibration and discovery p-values against a reference distribution
+#' @param calibration_result,discovery_result Tables containing p_value in row order.
+#'   Overlaid groups need equal sizes within a panel to share its QQ band.
+#' @param p_thresh Discovery display threshold, or NA to omit its reference line.
+#' @param transform_scale,include_legend,include_y_axis_text Plot display options.
+#' @param point_size,transparency Point appearance settings.
+#' @return QQ plot with points/bands sampled on a display grid using a fixed seed.
+#'   Restore the previous random state and use already processed results, without
+#'   recalculating significance.
+#' @noRd
 compare_calibration_and_discovery_results <- function(
     calibration_result,
     discovery_result,
@@ -720,6 +732,14 @@ compare_calibration_and_discovery_results <- function(
 }
 
 
+#' Plot effects and p-values, coloring points by their saved significance flag
+#' @param discovery_result Table with p_value, log_2_fold_change and significant.
+#' @param p_thresh P-value used only for the horizontal reference line.
+#' @param x_limits Display bounds for log2 effects; p-values below 1e-12 display at 1e-12.
+#' @param transparency,point_size Point appearance settings.
+#' @return ggplot using the result's significant column exactly, including ties.
+#'   Clipping changes only displayed values; it does not recompute significance.
+#' @noRd
 make_volcano_plot <- function(
     discovery_result,
     p_thresh,
@@ -731,7 +751,7 @@ make_volcano_plot <- function(
     out <- ggplot2::ggplot(
         data = discovery_result |>
             dplyr::mutate(
-                reject = p_value < p_thresh,
+                reject = significant,
                 p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
                 log_2_fold_change = ifelse(
                     log_2_fold_change > x_limits[2],
@@ -797,12 +817,12 @@ make_volcano_plot <- function(
 #' points in the plot
 #' @param transparency (optional; default \code{0.8}) the transparency of the
 #' individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
-#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
-#' \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{TRUE},
+#' return the individual panels as a list; if \code{FALSE}, return one combined
+#' \code{cowplot} object.
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is \code{TRUE})
 #'
 #' @export
 #' @examples
@@ -845,8 +865,18 @@ plot_run_discovery_analysis <- function(
             "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
         )
     }
-    # first, compute the rejection set
-    discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
+    # Optional stage diagnostics and padded null draws can be missing for valid
+    # tests. Exclude only rows missing the scientific fields these plots use.
+    discovery_result <- sceptre_object@discovery_result
+    discovery_result <- discovery_result[
+        stats::complete.cases(
+            discovery_result$p_value,
+            discovery_result$log_2_fold_change,
+            discovery_result$significant
+        ),
+        ,
+        drop = FALSE
+    ]
     calibration_result <- sceptre_object@calibration_result
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
@@ -970,13 +1000,13 @@ plot_run_discovery_analysis <- function(
 #' in the interval \[0,1\] specifying the location at which to draw a vertical
 #' line on the `response_p_mito` histogram. Note that `p_mito_threshold` is an
 #' absolute number rather than a percentile.
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE},
-#' then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
-#' single \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{TRUE},
+#' return the individual panels as a list; if \code{FALSE}, return one combined
+#' \code{cowplot} object.
 #'
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is \code{TRUE})
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -1002,6 +1032,13 @@ plot_covariates <- function(
         p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
     }
     covariate_data_frame <- sceptre_object@covariate_data_frame
+    # Plot one covariate across original cells with candidate QC cutoff lines
+    # v: Covariate values before cell removal; curr_range gives quantiles or
+    #   direct value cutoffs.
+    # plot_tit: Plot title; use_quantile selects whether to convert curr_range
+    #   from quantiles to observed values.
+    # Returns: Histogram with cutoff lines. Showing candidate cutoffs does not apply
+    #   QC or remove cells from the data.
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
             stats::quantile(v, probs = curr_range)
@@ -1102,12 +1139,13 @@ plot_covariates <- function(
 #' points in the plot
 #' @param transparency (optional; default \code{0.8}) the transparency of the
 #' individual points in the plot
-#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{FALSE}
-#' then a list of \code{ggplot} is returned; if \code{TRUE} then a single
-#' \code{cowplot} object is returned.
+#' @param return_indiv_plots (optional; default \code{FALSE}) if \code{TRUE},
+#' return the individual panels as a list; if \code{FALSE}, return one combined
+#' \code{cowplot} object.
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is \code{TRUE}). If no discovery
+#' pairs are present, returns the single cellwise plot for either setting.
 #'
 #' @export
 #' @examples
@@ -1145,10 +1183,9 @@ plot_run_qc <- function(
     if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
         p_b <- plot_pairwise_qc(
             sceptre_object,
-            downsample_pairs = 10000L,
-            point_size = 0.55,
-            transparency = 0.8,
-            return_indiv_plots = FALSE
+            downsample_pairs = downsample_pairs,
+            point_size = point_size,
+            transparency = transparency
         )
         # combine the plots
         if (return_indiv_plots) {
@@ -1162,6 +1199,12 @@ plot_run_qc <- function(
     return(p_out)
 }
 
+#' Plot the stored percentage of cells removed for each QC reason
+#' @param sceptre_object Post-QC object with six removal counts in their saved order.
+#' @return Bar plot using the original cell count as denominator. Removal reasons
+#'   can overlap, so bars need not sum to the total. High MOI omits the zero/
+#'   multiple-guide bar. Read the saved counts rather than rerunning QC.
+#' @noRd
 plot_cellwise_qc <- function(sceptre_object) {
     cell_removal_metrics <- sceptre_object@cell_removal_metrics
     n_orig_cells <- ncol(get_response_matrix(sceptre_object))
@@ -1195,7 +1238,6 @@ plot_cellwise_qc <- function(sceptre_object) {
         ggplot2::xlab("Filter") +
         ggplot2::ylab("Percent cells removed") +
         ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(angle = 20)) +
-        get_my_theme() +
         ggplot2::theme(
             legend.position = "none",
             axis.title.x = ggplot2::element_blank()
@@ -1204,12 +1246,19 @@ plot_cellwise_qc <- function(sceptre_object) {
     return(p_a)
 }
 
+#' Plot saved treatment/control counts and which discovery pairs pass QC
+#' @param sceptre_object Post-QC object with discovery_pairs_with_info and thresholds.
+#' @param downsample_pairs Maximum number of table rows to sample for display.
+#' @param point_size,transparency Point appearance settings from plot_run_qc().
+#' @return Scatterplot of stored counts and QC flags. Row sampling uses seed 4
+#'   and restores the previous random state. Repeated pair rows remain separate
+#'   observations; counts and QC decisions are not recomputed.
+#' @noRd
 plot_pairwise_qc <- function(
     sceptre_object,
     downsample_pairs = 10000L,
     point_size = 0.55,
-    transparency = 0.8,
-    return_indiv_plots = FALSE
+    transparency = 0.8
 ) {
     my_cols <- c("mediumseagreen", "indianred2")
     my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
@@ -1385,6 +1434,13 @@ plot_run_power_check <- function(
 }
 
 
+#' Sample result rows separately within p-value ranges for plotting
+#' @param result_df Table containing p_value; keep repeated rows as separate observations.
+#' @param downsample_pairs Maximum rows per power-of-ten p-value bin, rather than
+#'   a maximum across the entire table.
+#' @return Tibble still grouped by bin, in group/sample order. Sampling uses seed 4
+#'   and restores the previous random state. This reduces display data only.
+#' @noRd
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
     withr::with_seed(4, {
         result_df |>
@@ -1450,6 +1506,8 @@ plot_response_grna_target_pair <- function(
 ) {
     # check that grnas have been assigned and qc has been called
     functs_called <- sceptre_object@functs_called
+    # Preserve singleton-ID versus target-ID annotation lookup. A Bonferroni
+    # guide-to-target plotting interpretation is separately deferred.
     singleton_integration_strategy <- sceptre_object@grna_integration_strategy ==
         "singleton"
     if (!functs_called[["assign_grnas"]]) {

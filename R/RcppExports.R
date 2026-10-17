@@ -5,69 +5,56 @@ estimate_theta <- function(y, mu, dfr, limit, eps) {
     .Call(`_sceptre_estimate_theta`, y, mu, dfr, limit, eps)
 }
 
-#' @title Fisher-Yates sampler
-#' @description This function draws a without replacement sample using the Fisher-Yates sampling algorithm
-#' @param n_tot the total number of cells
-#' @param M the maximum number of cells in a given gRNA group
-#' @param B the number of WOR samples to generate
-#' @noRd
 fisher_yates_sampler <- function(n_tot, M, B) {
     .Call(`_sceptre_fisher_yates_sampler`, n_tot, M, B)
 }
 
-#' @title Hybrid Fisher-Yates/IWOR sampler
-#' @description This function draws an inductive without replacement sample using the hybrid Fisher-Yates/IWOR sampling algorithm (developed by Barry et al, to be described in a forthcoming preprint)
-#' @param N the number of control cells
-#' @param m the minumum number of cells in a given gRNA group
-#' @param M the maximum number of cells in a given gRNA group
-#' @param B the number of WOR samples to generate
-#' @noRd
 hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
-crt_index_sampler <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B)
+sample_crt_indices <- function(fitted_probabilities, B) {
+    .Call(`_sceptre_sample_crt_indices`, fitted_probabilities, B)
 }
 
-crt_index_sampler_fast <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
-}
-
-run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
-    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
+run_association_test <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
+    .Call(`_sceptre_run_association_test`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
 }
 
 run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {
     .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
 }
 
-sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
-    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
+sample_calibration_groups <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
+    .Call(`_sceptre_sample_calibration_groups`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
     .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
-increment_matrix <- function(m) {
-    invisible(.Call(`_sceptre_increment_matrix`, m))
+increment_group_indices_in_place <- function(m) {
+    invisible(.Call(`_sceptre_increment_group_indices_in_place`, m))
 }
 
-sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
-}
-
-compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
-    .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
+sample_calibration_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
+    .Call(`_sceptre_sample_calibration_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 }
 
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
     .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }
 
-compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
-    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
+evaluate_pair_eligibility_cpp <- function(treatment, control, treatment_threshold, control_threshold) {
+    .Call(`_sceptre_evaluate_pair_eligibility_cpp`, treatment, control, treatment_threshold, control_threshold)
+}
+
+sparse_pair_counts <- function(j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
+    .Call(`_sceptre_sparse_pair_counts`, j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
+}
+
+sparse_group_counts <- function(j, p, n_cells_orig, groups, cells_in_use) {
+    .Call(`_sceptre_sparse_group_counts`, j, p, n_cells_orig, groups, cells_in_use)
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
@@ -84,10 +71,6 @@ compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs,
 
 compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
     .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
-}
-
-increment_vector <- function(x, value) {
-    invisible(.Call(`_sceptre_increment_vector`, x, value))
 }
 
 threshold_count_matrix <- function(j, p, x, row_idx, threshold) {

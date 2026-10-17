@@ -1,86 +1,9 @@
-set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
-    # if a logical matrix, convert to the corresponding numeric matrix; consider
-    # more efficient implementation later
-    if (methods::is(matrix_in, "lgRMatrix")) {
-        attr(matrix_in, "class") <- "dgRMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@j))
-    }
-    if (methods::is(matrix_in, "lgCMatrix")) {
-        attr(matrix_in, "class") <- "dgCMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@i))
-    }
-    if (methods::is(matrix_in, "lgTMatrix")) {
-        attr(matrix_in, "class") <- "dgTMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@j))
-    }
-
-    if (methods::is(matrix_in, "dgRMatrix") && make_row_accessible) {
-        out <- matrix_in
-    } else if (methods::is(matrix_in, "dgCMatrix") && !make_row_accessible) {
-        out <- matrix_in
-    } else if (methods::is(matrix_in, "odm")) {
-        out <- matrix_in
-    } else {
-        # basic info: get matrix_in, n_responses, response_ids, and n_cells
-        n_responses <- nrow(matrix_in)
-        response_ids <- rownames(matrix_in)
-        cell_ids <- colnames(matrix_in)
-        n_cells <- ncol(matrix_in)
-        if (methods::is(matrix_in, "dgTMatrix")) {
-            i <- matrix_in@i
-            j <- matrix_in@j
-        } else if (methods::is(matrix_in, "matrix")) {
-            matrix_in <- methods::as(matrix_in, "TsparseMatrix")
-            i <- matrix_in@i
-            j <- matrix_in@j
-        } else if (methods::is(matrix_in, "dgCMatrix")) {
-            i <- matrix_in@i
-            j <- convert_pointer_to_index_vector_v2(matrix_in@p)
-        } else if (methods::is(matrix_in, "dgRMatrix")) {
-            i <- convert_pointer_to_index_vector_v2(matrix_in@p)
-            j <- matrix_in@j
-        } else {
-            stop("Class not recognized.")
-        }
-        x <- matrix_in@x
-
-        # perform the sorting operation
-        sort_in_place <- methods::is(matrix_in, "matrix") ||
-            methods::is(matrix_in, "dgTMatrix")
-        if (sort_in_place) {
-            l <- list(i = i, j = j, x = x)
-            dt <- data.table::setDT(l) # assign by reference
-        } else {
-            dt <- data.table::data.table(i = i, j = j, x = x) # deep copy
-        }
-
-        # finally, initialize the output
-        if (make_row_accessible) {
-            data.table::setorderv(x = dt, cols = c("i", "j"))
-            p <- obtain_pointer_vector(i = dt$i, dim = n_responses)
-            out <- Matrix::sparseMatrix(j = 1, p = c(0, 1), x = 1, repr = "R")
-            out@j <- dt$j
-        } else {
-            data.table::setorderv(x = dt, cols = c("j", "i"))
-            p <- obtain_pointer_vector(i = dt$j, dim = n_cells)
-            out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-            out@i <- dt$i
-        }
-        out@p <- p
-        out@x <- dt$x
-        out@Dim <- c(n_responses, n_cells)
-        rownames(out) <- response_ids
-        colnames(out) <- cell_ids
-    }
-    return(out)
-}
-
-
-convert_pointer_to_index_vector_v2 <- function(p) {
-    l <- diff(p)
-    rep(x = seq(0, length(l) - 1L), times = l)
-}
-
+#' Apply the model formula while keeping one design row per original cell
+#' @param covariate_data_frame Covariates with one row per original cell.
+#' @param formula_object Formula for model.matrix(), including intercept/contrasts.
+#' @return Numeric design matrix in input-cell order. Error if transformation drops
+#'   cells, creates missing/infinite values or gives redundant design columns.
+#' @noRd
 convert_covariate_df_to_design_matrix <- function(
     covariate_data_frame,
     formula_object
@@ -116,6 +39,16 @@ convert_covariate_df_to_design_matrix <- function(
 }
 
 
+#' Calculate cell summaries from an in-memory feature-by-cell count matrix
+#' @param matrix_in Count matrix, converted to column access for the calculation.
+#' @param feature_names Labels matching feature rows. An empty vector disables
+#'   mitochondrial summaries even when requested.
+#' @param compute_p_mito,compute_max_feature Whether to include mitochondrial
+#'   fractions and the largest feature's contribution/name.
+#' @return Data frame in original cell order with n_nonzero (values greater than
+#'   0.5), n_umis and the requested optional summaries. Largest-feature ties use
+#'   the first row; a zero total can produce NaN fractions.
+#' @noRd
 compute_cell_covariates <- function(
     matrix_in,
     feature_names,
@@ -139,15 +72,11 @@ compute_cell_covariates <- function(
         mt_gene_idxs <- integer()
     }
     # call the low-level function
-    out <- compute_cell_covariates_cpp(
-        i = matrix_in@i,
-        p = matrix_in@p,
-        x = matrix_in@x,
-        n_genes = nrow(matrix_in),
-        n_cells = ncol(matrix_in),
-        mt_gene_idxs = mt_gene_idxs,
-        compute_p_mito = compute_p_mito,
-        compute_max_feature = compute_max_feature
+    out <- storage_cell_covariates(
+        matrix_in,
+        mt_gene_idxs,
+        compute_p_mito,
+        compute_max_feature
     )
     ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
     if (compute_p_mito) {
@@ -163,6 +92,34 @@ compute_cell_covariates <- function(
 }
 
 
+#' Generate all permutation draws once for an analysis
+#' @param grna_assignments Saved post-QC guide memberships. Targeting groups use
+#'   positions among cells kept after QC; with NT controls, NT groups use
+#'   positions within the NT-cell list. Ignore empty targeting groups when
+#'   finding the range of treatment sizes.
+#' @param B Total number of draws, normally B1 + B2 + B3.
+#' @param calibration_check,control_group_complement Whether this is calibration
+#'   and whether controls are all other kept cells.
+#' @param calibration_group_size Number of NT guides combined per calibration group.
+#' @param n_cells Number of cells kept after QC, used with complement controls.
+#' @return An R external pointer to C++ memory containing the complete draws.
+#'   Draws contain positions starting at 0 within the data used by a fit, not
+#'   original matrix column numbers. The pointer is temporary and must not be
+#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing R's
+#'   random-number stream.
+#' @details Complement discovery samples among all kept cells, drawing enough
+#'   positions for the largest treatment group. Calibration needs enough for a
+#'   combination of NT groups: use the sum of the largest group sizes, capped at
+#'   the available cell count when memberships overlap. NT calibration samples
+#'   within the ordered NT-cell list.
+#'
+#'   NT discovery fits each guide's treatment cells followed by N NT cells. The
+#'   hybrid sampler supports treatment sizes m through M in one set of draws:
+#'   the first k entries of each draw are valid positions among N+k cells.
+#'   Entries after those k may belong to a larger fit and must not be read for
+#'   the smaller one. Generate all B draws now and let test stages select their
+#'   portions later, without resampling or resetting seeds.
+#' @noRd
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
     B,
@@ -171,29 +128,50 @@ get_synthetic_permutation_idxs <- function(
     calibration_group_size,
     n_cells
 ) {
+    check_native_scalar_count(B, "B")
+    check_native_scalar_count(n_cells, "n_cells")
+    if (calibration_check) {
+        check_native_scalar_count(
+            calibration_group_size,
+            "calibration_group_size",
+            1
+        )
+        active_nt_count <- sum(
+            lengths(grna_assignments$indiv_nt_grna_idxs) > 0L
+        )
+        if (calibration_group_size > active_nt_count) {
+            stop(
+                "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+                active_nt_count,
+                ")."
+            )
+        }
+    }
     if (calibration_check && !control_group_complement) {
-        # 1. calibration check, nt cells (low MOI only)
         indiv_nt_sizes <- vapply(
             grna_assignments$indiv_nt_grna_idxs,
             length,
             FUN.VALUE = integer(1)
         ) |>
             sort(decreasing = TRUE)
-        M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+        M <- sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)]))
         n_control_cells <- length(grna_assignments$all_nt_idxs)
         out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
     } else if (calibration_check && control_group_complement) {
-        # 2. calibration check, complement (low and high MOI)
         indiv_nt_sizes <- vapply(
             grna_assignments$indiv_nt_grna_idxs,
             length,
             FUN.VALUE = integer(1)
         ) |>
             sort(decreasing = TRUE)
-        M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+        # Overlapping high-MOI memberships can sum beyond the cell count; any
+        # union used by calibration is bounded by the number of cells.
+        M <- min(
+            sum(as.double(indiv_nt_sizes[seq_len(calibration_group_size)])),
+            n_cells
+        )
         out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
     } else if (!calibration_check && !control_group_complement) {
-        # 3. discovery, nt cells (low MOI only)
         grna_group_sizes <- vapply(
             grna_assignments$grna_group_idxs,
             length,
@@ -209,7 +187,6 @@ get_synthetic_permutation_idxs <- function(
             B = B
         )
     } else if (!calibration_check && control_group_complement) {
-        # 4. discovery, complement (low and high MOI)
         max_cells_per_grna_group <- vapply(
             grna_assignments$grna_group_idxs,
             length,
@@ -227,6 +204,14 @@ get_synthetic_permutation_idxs <- function(
 }
 
 
+#' Add the guide-group names used by the chosen integration strategy
+#' @param sceptre_object Object with guide/target metadata and requested pair tables.
+#' @return Updated object. Union uses target names without expanding pairs.
+#'   Singleton and Bonferroni join each requested target to all matching guides,
+#'   so multiple guides or repeated metadata matches can create multiple rows.
+#'   Keep metadata guide order and repeated requests. NT guides retain the
+#'   reserved group label non-targeting.
+#' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
     grouping_strategy <- sceptre_object@grna_integration_strategy
     if (grouping_strategy == "union") {

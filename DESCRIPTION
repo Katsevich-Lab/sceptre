@@ -45,6 +45,8 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
+    digest,
+    BH,
     ondisc,
     R.utils,
     sessioninfo,

@@ -28,14 +28,14 @@ in the interval [0,1] specifying the location at which to draw a vertical
 line on the \code{response_p_mito} histogram. Note that \code{p_mito_threshold} is an
 absolute number rather than a percentile.}
 
-\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{FALSE},
-then a list of \code{ggplot} objects is returned; if \code{TRUE} then a
-single \code{cowplot} object is returned.}
+\item{return_indiv_plots}{(optional; default \code{FALSE}) if \code{TRUE},
+return the individual panels as a list; if \code{FALSE}, return one combined
+\code{cowplot} object.}
 }
 \value{
 a single \code{cowplot} object containing the combined panels (if
-\code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-panels (if \code{return_indiv_plots} is set to \code{FALSE})
+\code{return_indiv_plots} is \code{FALSE}) or a list of the individual
+panels (if \code{return_indiv_plots} is \code{TRUE})
 }
 \description{
 \code{plot_covariates()} creates a histogram of the covariates

@@ -1,3 +1,41 @@
+# sceptre (development version)
+
+- Internal analysis code now has shared cell-coordinate and storage boundaries,
+  separate fitting, score, QC policy, inference and result-processing modules,
+  and common worker utilities. The public API and saved S4 layout are unchanged.
+- Response fits are invalidated when the actual design or control-cell view
+  changes. This prevents NT-only calibration fits from being reused for a later
+  complement-control analysis and preserves agreement with a fresh fit.
+
+- Count-file import now handles unsorted entries and interleaved Cell Ranger
+  gene/guide rows correctly. In-memory Cell Ranger and Parse import reject
+  repeated `(cell, feature)` coordinates with a clear error. This rule concerns
+  file coordinates, not repeated guide metadata or existing R triplet inputs;
+  the external ondisc file parser has its own behavior.
+- Dense symmetric and nearly symmetric input matrices retain all supplied
+  values. Sparse conversions and summary/getter operations no longer modify
+  arrays shared with the caller's counts, indices or metadata.
+- Cis-pair construction handles unsorted gene positions and avoids overflow
+  when calculating genomic midpoints and distances.
+- Intercept-only formulas now work with non-targeting controls. Calibration
+  handles overlapping NT groups safely and checks the guides actually retained
+  after QC before sampling groups. Invalid native requests fail clearly before
+  unsafe allocation or indexing; file connections and native buffers are cleaned
+  up on the checked error paths.
+- Mixture-assignment input validation checks the intended perturbation bound.
+  The known statistical inconsistency described below is retained pending a
+  separately validated replacement. Dispersion fitting retains its numerical
+  fallback while allowing unrelated system/allocation failures to propagate.
+- QC plots honor their supplied options; large guide-count thresholds no longer
+  break histogram construction. Volcano colors follow stored significance calls,
+  QQ confidence bands appear in each facet, and missing optional diagnostics no
+  longer remove valid discovery rows from plots.
+- Guide-vector aggregation avoids making the whole sparse input dense while
+  retaining its existing values, ordering and output shape.
+- Parallel analysis reports a failed worker's original error and block number
+  before combining results. A child exiting without replying cannot silently drop a block of work;
+  successful empty results remain supported.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.

@@ -1,4 +1,4 @@
-# show method
+# Show the original matrix dimensions and which workflow steps have finished.
 setMethod("show", signature = signature("sceptre_object"), function(object) {
     # 0. determine the functions that have been run
     funct_run_vect <- object@functs_called
@@ -84,7 +84,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     show(x)
 
     # 1. print analysis status
-    funct_run_vect <- x@functs_called
+    funct_run_vect <- workflow_status(x@functs_called)
     get_mark <- function(bool) {
         ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
     }
@@ -308,8 +308,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' `plot()` is "generic" in the sense that it dispatches a specific plotting
 #' function based on the pipeline function that was most recently called on the
-#' `sceptre_object`. For example, if `run_assign_grnas()` is the most recently
-#' called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`.
+#' `sceptre_object`. For example, if `assign_grnas()` is the most recently
+#' called pipeline function, then `plot()` dispatches `plot_assign_grnas()`.
 #' Similarly, if `run_power_check()` is the most recently called pipeline
 #' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
 #' can pass arguments to the function dispatched by `plot()` as named arguments
@@ -319,8 +319,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' @param y ignored argument
 #' @param ... arguments passed to the plotting function dispatched by `plot()`
 #' @return a single \code{cowplot} object containing the combined panels (if
-#' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
-#' panels (if \code{return_indiv_plots} is set to \code{FALSE})
+#' \code{return_indiv_plots} is set to \code{FALSE}) or a list of the individual
+#' panels (if \code{return_indiv_plots} is set to \code{TRUE})
 #'
 #' @export
 #' @examples
@@ -360,52 +360,16 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 })
 
 
-perform_status_check_and_update <- function(sceptre_object, curr_funct) {
-    rank_vector <- c(
-        import_data = 1L,
-        set_analysis_parameters = 2L,
-        assign_grnas = 3L,
-        run_qc = 4L,
-        run_power_check = 5L,
-        run_discovery_analysis = 5L,
-        run_calibration_check = 5L
-    )
-    functs_called <- sceptre_object@functs_called
-    curr_rank <- rank_vector[[curr_funct]]
-    direct_upstream_functs <- names(rank_vector)[rank_vector == curr_rank - 1L]
-    downstream_functs <- names(rank_vector)[rank_vector > curr_rank]
-    # verify that the direct upstream funct has been called
-    if (!all(functs_called[direct_upstream_functs])) {
-        stop(paste0(
-            "The function",
-            if (length(direct_upstream_functs) >= 2L) "s " else " ",
-            paste0("`", direct_upstream_functs, "()`", collapse = ", "),
-            " must be called before `",
-            curr_funct,
-            "()` is called."
-        ))
-    }
-    # set current funct to true
-    functs_called[curr_funct] <- TRUE
-    # set all downstream functions to false
-    functs_called[downstream_functs] <- FALSE
-    # update sceptre_object and return
-    sceptre_object@functs_called <- functs_called
-    sceptre_object@last_function_called <- curr_funct
-    return(sceptre_object)
-}
-
-
+#' Read all cells for one named gene or guide
+#' @param mat Row-accessible sparse matrix (dgRMatrix) or open ondisc matrix (odm)
+#'   with unique row names.
+#' @param id Gene/guide name present in rownames(mat).
+#' @return Dense numeric vector in original cell-column order. Other matrix
+#'   classes return NULL; callers must prepare row access first. Used by mixture
+#'   fitting and plotting; the supplied matrix is left unchanged.
+#' @noRd
 load_row <- function(mat, id) {
-    if (methods::is(mat, "odm")) {
-        mat[id, ]
-    } else if (methods::is(mat, "dgRMatrix")) {
-        load_csr_row(
-            j = mat@j,
-            p = mat@p,
-            x = mat@x,
-            row_idx = which(id == rownames(mat)),
-            n_cells = ncol(mat)
-        )
+    if (methods::is(mat, "odm") || methods::is(mat, "dgRMatrix")) {
+        storage_read_response(mat, storage_response_index(mat, id))
     }
 }

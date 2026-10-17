@@ -86,6 +86,15 @@ run_calibration_check <- function(
 }
 
 
+#' Prepare calibration settings and choose negative-control pairs
+#'
+#' Complete missing assignment/QC steps, record workflow status, choose defaults
+#' and check calibration sizes. For empirical p-values, calculate B3 for the
+#' requested calibration size before sampling the pairs.
+#' @return Object with calibration sizes, eligible negative-control pairs and any
+#'   completed prerequisites. No association tests run yet. Nextflow calls this
+#'   phase separately and keeps the returned object for its worker tasks.
+#' @noRd
 run_calibration_check_pt_1 <- function(
     sceptre_object,
     n_calibration_pairs = NULL,
@@ -126,29 +135,27 @@ run_calibration_check_pt_1 <- function(
     if (is.null(n_calibration_pairs)) {
         n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
     }
-    if (
-        !is.null(n_calibration_pairs) &&
-            sceptre_object@resampling_approximation == "no_approximation"
-    ) {
-        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-        sceptre_object@B3 <- ceiling(
-            mult_fact *
-                n_calibration_pairs /
-                sceptre_object@multiple_testing_alpha
-        ) |>
-            as.integer()
-    }
-
     # 2. check inputs
     check_calibration_check_inputs(
         sceptre_object,
         n_calibration_pairs,
-        n_processors
+        n_processors,
+        calibration_group_size
     ) |>
         invisible()
 
+    if (sceptre_object@resampling_approximation == "no_approximation") {
+        sceptre_object@B3 <- compute_empirical_budget(
+            n_calibration_pairs,
+            sceptre_object@multiple_testing_alpha,
+            sceptre_object@side_code,
+            sceptre_object@B1,
+            sceptre_object@B2
+        )
+    }
+
     # 3. construct the negative control pairs
-    negative_control_pairs <- construct_negative_control_pairs_v2(
+    negative_control_pairs <- construct_negative_control_pairs(
         sceptre_object = sceptre_object,
         n_calibration_pairs = n_calibration_pairs,
         calibration_group_size = calibration_group_size
@@ -162,6 +169,15 @@ run_calibration_check_pt_1 <- function(
 }
 
 
+#' Test previously prepared calibration pairs and save their results
+#'
+#' Use the pairs chosen in phase one and the current cells and settings. Analysis
+#' helpers handle random draws, progress and serial/parallel work.
+#' @return Object with calibration_result and updated reusable response fits.
+#'   Standard runs combine guides and adjust across all results; nf_pipeline
+#'   keeps raw results for external collection. Save completed outputs only after
+#'   the analysis returns successfully. The caller must retain the returned object.
+#' @noRd
 run_calibration_check_pt_2 <- function(
     sceptre_object,
     output_amount = 1,
@@ -172,10 +188,9 @@ run_calibration_check_pt_2 <- function(
 ) {
     # 5. run the sceptre analysis (high-level function call)
     response_grna_group_pairs <- sceptre_object@negative_control_pairs
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = TRUE,
         analysis_type = "calibration_check",
         output_amount = output_amount,
         print_progress = print_progress,
@@ -190,21 +205,11 @@ run_calibration_check_pt_2 <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
-}
-
-
-process_calibration_result <- function(result, sceptre_object) {
-    result |>
-        apply_grouping_to_result(sceptre_object, TRUE) |>
-        dplyr::mutate(
-            significant = stats::p.adjust(
-                p_value,
-                method = sceptre_object@multiple_testing_method
-            ) <
-                sceptre_object@multiple_testing_alpha
-        )
 }
 
 
@@ -288,10 +293,9 @@ run_power_check <- function(
         invisible()
 
     # 3.  run the sceptre analysis (high-level function call)
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = FALSE,
         analysis_type = "power_check",
         output_amount = output_amount,
         print_progress = print_progress,
@@ -306,7 +310,10 @@ run_power_check <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
 }
 
@@ -391,10 +398,9 @@ run_discovery_analysis <- function(
         invisible()
 
     # 3.  run the sceptre analysis (high-level function call)
-    out <- run_sceptre_analysis_high_level(
+    out <- analyze_association_pairs(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        calibration_check = FALSE,
         analysis_type = "discovery_analysis",
         output_amount = output_amount,
         print_progress = print_progress,
@@ -409,157 +415,11 @@ run_discovery_analysis <- function(
     } else {
         out$result
     }
-    sceptre_object@response_precomputations <- out$response_precomputations
+    sceptre_object <- commit_response_fits(
+        sceptre_object,
+        out$response_precomputations
+    )
     return(sceptre_object)
-}
-
-
-process_discovery_result <- function(result, sceptre_object) {
-    result |>
-        apply_grouping_to_result(sceptre_object) |>
-        dplyr::mutate(
-            significant = stats::p.adjust(
-                p_value,
-                method = sceptre_object@multiple_testing_method
-            ) <
-                sceptre_object@multiple_testing_alpha
-        )
-}
-
-
-run_sceptre_analysis_high_level <- function(
-    sceptre_object,
-    response_grna_group_pairs,
-    calibration_check,
-    analysis_type,
-    output_amount,
-    print_progress,
-    parallel,
-    n_processors,
-    log_dir
-) {
-    # if running permutations, generate the permutation idxs
-    if (sceptre_object@run_permutations) {
-        message("Generating permutation resamples.")
-        synthetic_idxs <- get_synthetic_permutation_idxs(
-            grna_assignments = sceptre_object@grna_assignments,
-            B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
-            calibration_check = calibration_check,
-            control_group_complement = sceptre_object@control_group_complement,
-            calibration_group_size = sceptre_object@calibration_group_size,
-            n_cells = length(sceptre_object@cells_in_use)
-        )
-        message(crayon::green(" \u2713"))
-    }
-    gc() |> invisible()
-
-    # initialize the args to pass
-    args_to_pass <- list(
-        response_matrix = get_response_matrix(sceptre_object),
-        grna_assignments = sceptre_object@grna_assignments,
-        covariate_matrix = sceptre_object@covariate_matrix,
-        response_grna_group_pairs = response_grna_group_pairs |>
-            dplyr::filter(pass_qc),
-        output_amount = output_amount,
-        resampling_approximation = sceptre_object@resampling_approximation,
-        B1 = sceptre_object@B1,
-        B2 = sceptre_object@B2,
-        B3 = sceptre_object@B3,
-        calibration_check = calibration_check,
-        control_group_complement = sceptre_object@control_group_complement,
-        n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-        n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
-        side_code = sceptre_object@side_code,
-        low_moi = sceptre_object@low_moi,
-        response_precomputations = sceptre_object@response_precomputations,
-        cells_in_use = sceptre_object@cells_in_use,
-        print_progress = print_progress,
-        parallel = parallel,
-        n_processors = n_processors,
-        log_dir = log_dir,
-        analysis_type = analysis_type
-    )
-
-    # run the method
-    out <- if (sceptre_object@run_permutations) {
-        args_to_pass$synthetic_idxs <- synthetic_idxs
-        do.call(what = "run_perm_test_in_memory", args = args_to_pass)
-    } else {
-        do.call(what = "run_crt_in_memory_v2", args = args_to_pass)
-    }
-
-    # wrangle the result and return
-    final_result <- data.table::rbindlist(
-        list(out$result, response_grna_group_pairs |> dplyr::filter(!pass_qc)),
-        fill = TRUE
-    )
-    data.table::setorderv(
-        final_result,
-        cols = c("p_value", "response_id"),
-        na.last = TRUE
-    )
-    out$result <- final_result
-    return(out)
-}
-
-
-apply_grouping_to_result <- function(
-    result,
-    sceptre_object,
-    is_calibration_check = FALSE
-) {
-    grna_integration_strategy <- sceptre_object@grna_integration_strategy
-    if (grna_integration_strategy == "union") {
-        new_result <- result |> dplyr::rename("grna_target" = "grna_group")
-    }
-    if (grna_integration_strategy %in% c("singleton", "bonferroni")) {
-        grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
-            dplyr::select(grna_id, grna_target)
-        new_result <- result |>
-            dplyr::rename("grna_id" = "grna_group") |>
-            dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
-            dplyr::relocate(response_id, grna_id, grna_target)
-        if (
-            grna_integration_strategy == "bonferroni" && !is_calibration_check
-        ) {
-            new_result <- new_result |>
-                dplyr::group_by(response_id, grna_target) |>
-                dplyr::group_modify(.f = function(tbl, key) {
-                    if (!any(tbl$pass_qc)) {
-                        n_nonzero_trt_out <- max(tbl$n_nonzero_trt)
-                        n_nonzero_cntrl_out <- max(tbl$n_nonzero_cntrl)
-                        log_2_fold_change_out <- p_value_out <- NA
-                        pass_qc_out <- FALSE
-                    } else {
-                        min_p_idx <- which.min(tbl$p_value)
-                        n_nonzero_trt_out <- tbl$n_nonzero_trt[min_p_idx]
-                        n_nonzero_cntrl_out <- tbl$n_nonzero_cntrl[min_p_idx]
-                        log_2_fold_change_out <- tbl$log_2_fold_change[
-                            min_p_idx
-                        ]
-                        p_value_out <- min(
-                            sum(tbl$pass_qc) * tbl$p_value[min_p_idx],
-                            1
-                        )
-                        pass_qc_out <- TRUE
-                    }
-                    data.frame(
-                        p_value = p_value_out,
-                        n_nonzero_trt = n_nonzero_trt_out,
-                        n_nonzero_cntrl = n_nonzero_cntrl_out,
-                        log_2_fold_change = log_2_fold_change_out,
-                        pass_qc = pass_qc_out
-                    )
-                }) |>
-                dplyr::ungroup()
-        }
-        data.table::setorderv(
-            new_result,
-            c("p_value", "response_id"),
-            na.last = TRUE
-        )
-    }
-    return(new_result)
 }
 
 
@@ -660,7 +520,8 @@ get_result <- function(sceptre_object, analysis) {
 #' @param directory a string giving the file path to a directory on disk in
 #' which to write the results
 #'
-#' @return No return value; called for its side effect of writing files to `directory`.
+#' @return No return value; called for its side effect of writing files to
+#'   `directory`.
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -787,6 +648,15 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
+#' Run missing assignment and QC steps with their public defaults
+#'
+#' Calibration, power and discovery call this after checking parallel support.
+#' If data and parameters are ready, run assignment then QC when both are missing,
+#' or just QC when assignment is complete. Otherwise return the object unchanged;
+#' the later workflow check reports missing prerequisites. Forward parallel and
+#' n_processors to assignment. Its messages, randomness and logs, and QC's removal
+#' of unusable saved fits, come from those normal public calls.
+#' @noRd
 skip_assign_grnas_and_run_qc <- function(
     sceptre_object,
     parallel,

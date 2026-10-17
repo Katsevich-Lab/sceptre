@@ -11,10 +11,16 @@
 ^Meta$
 ^\.claude$
 ^\.git$
+^\.gitattributes$
 ^air\.toml$
 ^ROADMAP\.md$
+^ARCHITECTURE\.md$
+^tools/refactor$
 ^CONTRIBUTING\.md$
 ^CODE_OF_CONDUCT\.md$
 ^GOVERNANCE\.md$
 ^SUPPORT\.md$
 ^CITATION\.cff$
+^tools/checks$
+^tools/fixtures$
+^tools/architecture$

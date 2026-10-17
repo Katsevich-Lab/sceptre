@@ -1,3 +1,10 @@
+#' Add treatment and control counts to discovery and positive-control pairs
+#'
+#' Prepare cell/group lookups, count requested pairs through the storage helpers,
+#' and save the counts in the object's discovery and positive-control tables.
+#' Also save the NT-group-by-gene summary matrix and per-gene totals needed for
+#' calibration. Keep each table's requested pairs aligned with its returned counts.
+#' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
     # extract basic information from sceptre_object
     cells_in_use <- sceptre_object@cells_in_use
@@ -8,93 +15,49 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     control_group_complement <- sceptre_object@control_group_complement
     grna_group_idxs <- grna_assignments$grna_group_idxs
 
-    # 1. construct the entire set of response pairs by combining discovery pairs
-    # and pc pairs
     response_grna_group_pairs <- rbind(
         dplyr::mutate(discovery_pairs, discovery = TRUE),
         dplyr::mutate(positive_control_pairs, discovery = FALSE)
     )
 
-    # 2. map each response id and grna group to its index
+    # Use the same link between original matrix columns and cells kept after QC
+    # as the association tests, so counts refer to the same cells.
+    index <- prepare_index_context(
+        cells_in_use,
+        ncol(response_matrix),
+        grna_assignments,
+        response_grna_group_pairs,
+        rownames(response_matrix),
+        FALSE,
+        control_group_complement,
+        sceptre_object@low_moi
+    )
     dt <- data.table::data.table(
-        response_idx = match(
-            x = response_grna_group_pairs$response_id,
-            table = rownames(response_matrix)
-        ),
+        response_idx = index$pair_rows$response_idx,
         response_id = response_grna_group_pairs$response_id,
-        grna_idx = match(
-            x = response_grna_group_pairs$grna_group,
-            table = names(grna_group_idxs)
-        ),
+        grna_idx = index$pair_rows$group_idx,
         grna_group = response_grna_group_pairs$grna_group,
         discovery = response_grna_group_pairs$discovery
     ) |>
         data.table::setorder(cols = "response_idx")
-    to_analyze_response_idxs <- dt$response_idx
-    to_analyze_grna_idxs <- dt$grna_idx
-
-    # take cases on odm
-    if (methods::is(response_matrix, "odm")) {
-        if (sceptre_object@nuclear) {
-            out <- ondisc:::compute_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use,
-                unique_response_idxs = sort(unique(to_analyze_response_idxs))
-            )
-            out$n_nonzero_mat <- matrix()
-            out$n_nonzero_tot <- integer()
-        } else {
-            out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use
-            )
-        }
+    controls <- if (control_group_complement) {
+        "complement"
     } else {
-        out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            n_cells_orig = ncol(response_matrix),
-            n_cells_sub = length(cells_in_use),
-            grna_group_idxs = grna_group_idxs,
-            indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-            all_nt_idxs = if (!control_group_complement) {
-                grna_assignments$all_nt_idxs
-            } else {
-                integer()
-            },
-            to_analyze_response_idxs = to_analyze_response_idxs,
-            to_analyze_grna_idxs = to_analyze_grna_idxs,
-            control_group_complement = control_group_complement,
-            cells_in_use = cells_in_use
-        )
+        index$nt_to_analysis
     }
+    nt_groups <- index$nt_groups_analysis
+    out <- collect_pair_qc_metrics(
+        store = response_matrix,
+        pair_index = data.frame(
+            response_idx = dt$response_idx,
+            group_idx = dt$grna_idx
+        ),
+        groups = grna_group_idxs,
+        source_cells = cells_in_use,
+        controls = controls,
+        nt_groups = nt_groups,
+        nuclear = sceptre_object@nuclear
+    )
 
     # process results and update sceptre_object
     dt$n_nonzero_trt <- out$n_nonzero_trt
@@ -113,6 +76,14 @@ compute_pairwise_qc_information <- function(sceptre_object) {
 }
 
 
+#' Mark QC-passing pairs and count how many hypotheses remain
+#' @param sceptre_object Object with treatment/control counts, QC thresholds and
+#'   guide integration strategy already set.
+#' @return Object with pass_qc in each nonempty pair table and updated passing-pair
+#'   counts. For Bonferroni, count distinct gene-target pairs with any passing guide.
+#'   Otherwise count passing rows, including repeated requests. Leave empty tables
+#'   and their existing count fields unchanged.
+#' @noRd
 compute_qc_metrics <- function(sceptre_object) {
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
@@ -130,8 +101,16 @@ compute_qc_metrics <- function(sceptre_object) {
                 data_frame_name
             ) |>
                 dplyr::mutate(
-                    pass_qc = (n_nonzero_trt >= n_nonzero_trt_thresh &
-                        n_nonzero_cntrl >= n_nonzero_cntrl_thresh)
+                    pass_qc = evaluate_pair_eligibility(
+                        list(
+                            n_nonzero_trt = n_nonzero_trt,
+                            n_nonzero_cntrl = n_nonzero_cntrl
+                        ),
+                        list(
+                            n_nonzero_trt_thresh = n_nonzero_trt_thresh,
+                            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+                        )
+                    )
                 )
             if (sceptre_object@grna_integration_strategy == "bonferroni") {
                 grna_target_data_frame <- sceptre_object@grna_target_data_frame |>

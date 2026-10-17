@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "scope": "Manual refactor consistency only; not permanent CI, performance or whole-consumer qualification.",
+  "reference_pin": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_pin": "2f610015e26acf06d7179b099e96774b3d3f7a25",
+  "requested_ref": "HEAD",
+  "working_tree_included": false,
+  "output": "/private/tmp/sceptre-handoff-comparison-final",
+  "status": "passed",
+  "phase": "complete",
+  "commands": [
+    {
+      "stage": "archive-original",
+      "command": "git",
+      "arguments": ["-C", "'/Users/ekatsevi/code/research/sceptre'", "-c", "core.autocrlf=false", "-c", "core.eol=lf", "archive", "--format=tar", "--output='/private/tmp/sceptre-handoff-comparison-final/original.tar'", "21f9ea098b69c444a884a49bc254de711968e3b5"],
+      "status": 0,
+      "log": "archive-original.log",
+      "seconds": 0.055682897567749
+    },
+    {
+      "stage": "archive-candidate",
+      "command": "git",
+      "arguments": ["-C", "'/Users/ekatsevi/code/research/sceptre'", "-c", "core.autocrlf=false", "-c", "core.eol=lf", "archive", "--format=tar", "--output='/private/tmp/sceptre-handoff-comparison-final/candidate.tar'", "2f610015e26acf06d7179b099e96774b3d3f7a25"],
+      "status": 0,
+      "log": "archive-candidate.log",
+      "seconds": 0.0703270435333252
+    },
+    {
+      "stage": "install-candidate",
+      "command": "/Library/Frameworks/R.framework/Resources/bin/R",
+      "arguments": ["CMD", "INSTALL", "--preclean", "--library='/private/tmp/sceptre-handoff-comparison-final/library'", "'/private/tmp/sceptre-handoff-comparison-final/candidate'"],
+      "status": 0,
+      "log": "install-candidate.log",
+      "seconds": 19.9575271606445
+    },
+    {
+      "stage": "run-original",
+      "command": "/Library/Frameworks/R.framework/Resources/bin/Rscript",
+      "arguments": ["--vanilla", "'/private/tmp/sceptre-handoff-comparison-final/candidate/tools/refactor/generate-runtime-oracle.R'", "'/private/tmp/sceptre-handoff-comparison-final/original'", "'/private/tmp/sceptre-handoff-comparison-final/oracle'"],
+      "status": 0,
+      "log": "run-original.log",
+      "seconds": 23.0066161155701
+    },
+    {
+      "stage": "compare",
+      "command": "/Library/Frameworks/R.framework/Resources/bin/Rscript",
+      "arguments": ["--vanilla", "'/private/tmp/sceptre-handoff-comparison-final/compare-installed.R'"],
+      "status": 0,
+      "log": "compare.log",
+      "seconds": 27.4274320602417
+    }
+  ],
+  "backed": {
+    "enabled": true,
+    "version": "1.3.5",
+    "source_sha": "589803edea2a66ad15e7f07186bee16c7739ab8c"
+  },
+  "environment": {
+    "R": "R version 4.6.0 (2026-04-24)",
+    "platform": "aarch64-apple-darwin23",
+    "libraries": ["/private/tmp/sceptre-handoff-dependencies", "/Users/ekatsevi/Library/R/arm64/4.6/library", "/Library/Frameworks/R.framework/Versions/4.6/Resources/library"],
+    "packages": [
+      {
+        "package": "Matrix",
+        "version": "1.7.5"
+      },
+      {
+        "package": "Rcpp",
+        "version": "1.1.1.1.1"
+      },
+      {
+        "package": "BH",
+        "version": "1.90.0.1"
+      },
+      {
+        "package": "pkgload",
+        "version": "1.5.2"
+      },
+      {
+        "package": "testthat",
+        "version": "3.3.2"
+      }
+    ]
+  },
+  "counts": {
+    "blocks": 31,
+    "checks": 1266,
+    "passed": 1266,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skipped": 0
+  },
+  "artifacts": {
+    "log": "compare.log",
+    "detailed_results": "results.rds",
+    "checks": "checks.csv"
+  },
+  "limits": ["A recorded platform-specific stream test can skip; its full same-environment source comparison still runs.", "Only supported historical domains are compared; reviewed bug-fix regressions remain in permanent package tests.", "No resource, actual Nextflow or whole-book claim follows from this command."]
+}
