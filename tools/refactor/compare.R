@@ -78,7 +78,7 @@ worker <- file.path(out, "compare-installed.R")
 writeLines(c(
     paste0(".libPaths(c(", literal(library_dir), ", .libPaths()))"),
     "library(sceptre)",
-    paste0("stopifnot(identical(normalizePath(find.package('sceptre')), normalizePath(", literal(file.path(library_dir, "sceptre")), "))))"),
+    paste0("stopifnot(identical(normalizePath(find.package('sceptre')), normalizePath(", literal(file.path(library_dir, "sceptre")), ")))"),
     "data.table::setDTthreads(1L)",
     paste0("results <- testthat::test_dir(", literal(suite), ", package='sceptre', load_package='installed', reporter='summary', stop_on_failure=FALSE, stop_on_warning=FALSE)"),
     paste0("saveRDS(results, ", literal(file.path(out, "results.rds")), ")"),
@@ -88,6 +88,7 @@ writeLines(c(
     paste0("jsonlite::write_json(summary, ", literal(file.path(out, "counts.json")), ", pretty=TRUE, auto_unbox=TRUE)"),
     "if (summary$failed || summary$errors || summary$warnings) quit(status=1L)"
 ), worker)
+invisible(parse(file = worker))
 run("compare", file.path(R.home("bin"), "Rscript"), c("--vanilla", shQuote(worker)))
 report$counts <- jsonlite::read_json(file.path(out, "counts.json"), simplifyVector = TRUE)
 report$status <- "passed"
