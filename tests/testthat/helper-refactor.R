@@ -147,6 +147,60 @@ refactor_run_case <- function(inputs, case, parallel = FALSE, backed = FALSE, di
     }))
 }
 
+# Calculate eligibility directly from the toy count matrices, without calling
+# SCEPTRE's assignment, indexing or QC helpers. These inputs use threshold 40,
+# remove five named cells and require seven nonzero counts in each group.
+workflow_expected_pairs <- function(inputs, case, pairs) {
+    guides <- inputs[[paste0(case$moi, "_grna_matrix")]]
+    metadata <- inputs$grna_target_data_frame
+    cells <- setdiff(seq_len(ncol(guides)), inputs$remove_cells)
+    nt <- which(colSums(guides[metadata$grna_target == "non-targeting", , drop = FALSE] >= 40) > 0)
+    records <- lapply(seq_len(nrow(pairs)), function(i) {
+        ids <- which(metadata$grna_target == pairs$grna_target[i])
+        groups <- if (case$integration == "union") list(ids) else as.list(ids)
+        passes <- vapply(groups, function(rows) {
+            treatment <- intersect(cells, which(colSums(guides[rows, , drop = FALSE] >= 40) > 0))
+            control <- if (case$control == "nt_cells") intersect(cells, nt) else setdiff(cells, treatment)
+            y <- inputs$response_matrix[pairs$response_id[i], ]
+            sum(y[treatment] > 0) >= 7L && sum(y[control] > 0) >= 7L
+        }, logical(1))
+        if (case$integration == "bonferroni") passes <- any(passes)
+        paste(pairs$response_id[i], pairs$grna_target[i], passes, sep = "/")
+    })
+    sort(unlist(records, use.names = FALSE))
+}
+
+expect_workflow_results <- function(actual, inputs, case) {
+    expect_identical(actual$warnings, character(), info = "unexpected workflow warnings")
+    for (table in c("calibration_result", "power_result", "discovery_result")) {
+        result <- actual$value$final[[table]]$columns
+        expect_true(all(c("response_id", "grna_target", "pass_qc", "p_value") %in% names(result)))
+        expect_false(anyNA(result$pass_qc))
+        expect_true(all(result$response_id %in% rownames(inputs$response_matrix)))
+        expect_true(all(is.finite(result$p_value[result$pass_qc])))
+        expect_true(all(result$p_value[result$pass_qc] >= 0 & result$p_value[result$pass_qc] <= 1))
+        expect_true(all(is.na(result$p_value[!result$pass_qc])))
+        if (table == "calibration_result") {
+            expect_length(result$response_id, 4L)
+            expect_true(all(result$pass_qc))
+        } else {
+            pairs <- inputs[[if (table == "power_result") "positive_control_pairs" else "discovery_pairs"]]
+            observed <- sort(paste(result$response_id, result$grna_target, result$pass_qc, sep = "/"))
+            expect_identical(observed, workflow_expected_pairs(inputs, case, pairs), info = table)
+            # The input generator adds 20 counts to A-targeted cells for r1.
+            # This is a strong positive effect, regardless of inference method.
+            positive <- result$response_id == "r1" & result$grna_target == "A"
+            expect_true(any(positive & result$pass_qc))
+            if (case$side == "left") {
+                expect_true(all(result$p_value[positive] > .9))
+            } else {
+                expect_true(all(result$p_value[positive] < .05))
+            }
+            if ("fold_change" %in% names(result)) expect_true(all(result$fold_change[positive] > 2))
+        }
+    }
+}
+
 refactor_cache_observations <- function(inputs, case) {
     refactor_capture({
         object <- refactor_prepare(inputs, case)

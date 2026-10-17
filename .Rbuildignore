@@ -22,3 +22,4 @@
 ^SUPPORT\.md$
 ^CITATION\.cff$
 ^tools/checks$
+^tools/fixtures$

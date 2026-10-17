@@ -84,3 +84,27 @@ test_that("test-only bank construction rejects invalid native indices", {
     expect_error(bridge$refactor_native_pointer(list(c(1L, 1L)), 5L), "must be unique")
     expect_error(bridge$refactor_native_pointer(list(1.5), 5L), "integer vectors")
 })
+
+test_that("permutation and hybrid prefixes sample uniformly without replacement", {
+    bridge <- refactor_native_bridge(test_path("fixtures", "refactor", "native-bridge.cpp"))
+    B <- 10000L
+    draws <- refactor_native_sample(list(args = list(n_tot = 5L, M = 2L, B = B)),
+                                    "fisher_yates_sampler", bridge)
+    expect_sampler_probabilities(draws, rep(2 / 5, 5L), function(pairs) rep(2 / 20, ncol(pairs)))
+    draws <- refactor_native_sample(list(args = list(N = 3L, m = 2L, M = 5L, B = B)),
+                                    "hybrid_fisher_iwor_sampler", bridge)
+    for (k in 2:5) {
+        n <- 3L + k
+        prefix <- lapply(draws, function(draw) draw[seq_len(k)])
+        expect_sampler_probabilities(prefix, rep(k / n, n),
+                                     function(pairs) rep(k * (k - 1) / (n * (n - 1)), ncol(pairs)))
+    }
+})
+
+test_that("CRT uses the supplied probabilities independently across cells and draws", {
+    bridge <- refactor_native_bridge(test_path("fixtures", "refactor", "native-bridge.cpp"))
+    p <- c(0, .15, .4, .85, 1)
+    draws <- refactor_native_sample(list(args = list(fitted_probabilities = p, B = 10000L)),
+                                    "sample_crt_indices", bridge)
+    expect_sampler_probabilities(draws, p, function(pairs) p[pairs[1L, ]] * p[pairs[2L, ]])
+})

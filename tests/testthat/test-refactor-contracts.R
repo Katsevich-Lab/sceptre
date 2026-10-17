@@ -8,12 +8,8 @@ test_that("supported workflows produce valid complete results reproducibly", {
         actual <- refactor_run_case(inputs, cases[[name]])
         repeat_run <- refactor_run_case(inputs, cases[[name]])
         expect_identical(actual, repeat_run, info = name)
+        expect_workflow_results(actual, inputs, cases[[name]])
         final <- actual$value$final
-        for (table in c("calibration_result", "power_result", "discovery_result")) {
-            result <- final[[table]]$columns
-            expect_true(all(is.na(result$p_value) | is.finite(result$p_value)), info = paste(name, table))
-            expect_true(all(is.na(result$p_value) | result$p_value >= 0), info = paste(name, table))
-        }
         expect_equal(length(final$cells_in_use), ncol(inputs$response_matrix) - length(inputs$remove_cells))
         expect_identical(serialize(inputs, NULL), before)
     }
@@ -62,7 +58,8 @@ test_that("backed permutation workflows and independent reattachment match spars
     actual <- refactor_run_case(inputs, cases$high_perm, backed = TRUE, directory = directory)
     expected <- refactor_run_case(inputs, cases$high_perm)
     actual$value$rng_after <- expected$value$rng_after <- NULL
-    actual$warnings <- expected$warnings <- NULL
+    expect_identical(actual$warnings, character())
+    expect_identical(expected$warnings, character())
     expect_equal(actual, expected, tolerance = 1e-8)
 
     object <- refactor_capture(refactor_prepare(inputs, cases$high_perm, TRUE, directory))$value
@@ -103,5 +100,20 @@ test_that("current saved objects resume without changing discovery results", {
     first <- refactor_capture(sceptre::run_discovery_analysis(prepared, print_progress = FALSE))
     second <- refactor_capture(sceptre::run_discovery_analysis(restored, print_progress = FALSE))
     expect_identical(refactor_observe(first$value), refactor_observe(second$value))
+    expect_identical(serialize(restored, NULL), before)
+})
+
+test_that("a versioned saved object remains a supported input", {
+    inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
+    case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_complement_perm
+    restored <- readRDS(test_path("fixtures", "saved-objects", "sceptre-0.99.0-21f9ea0.rds"))
+    before <- serialize(restored, NULL)
+    current <- refactor_capture(refactor_prepare(inputs, case))
+    old_run <- refactor_capture(sceptre::run_discovery_analysis(restored, print_progress = FALSE))
+    new_run <- refactor_capture(sceptre::run_discovery_analysis(current$value, print_progress = FALSE))
+    expect_identical(current$warnings, character())
+    expect_identical(old_run$warnings, character())
+    expect_identical(new_run$warnings, character())
+    expect_identical(refactor_observe(old_run$value), refactor_observe(new_run$value))
     expect_identical(serialize(restored, NULL), before)
 })

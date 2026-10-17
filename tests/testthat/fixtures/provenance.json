@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "file": "aggregation-inputs-6a43fa5.rds",
+      "sha256": "f53c93eabbb30a53d5fed01788ee8ef0ef4447b94ed308540410e21baa624e2d",
+      "kind": "count/configuration input; no recorded analysis output"
+    },
+    {
+      "file": "refactor/backed-inputs.rds",
+      "sha256": "9207274e6d33585dc31b5187f06b560b7c7124699c8b811924fcb3bd8ef2f826",
+      "kind": "count/configuration input; no recorded analysis output"
+    },
+    {
+      "file": "refactor/cases.rds",
+      "sha256": "7a3832d88c4f84c0d86330e39e1d21c7d70ce33755916e5403ee1c40374a4fc6",
+      "kind": "count/configuration input; no recorded analysis output"
+    },
+    {
+      "file": "refactor/inputs.rds",
+      "sha256": "55d01efe7b8e5737528b0f0b54585edb470a273579547fda97531c02e2f27c00",
+      "kind": "count/configuration input; no recorded analysis output"
+    },
+    {
+      "file": "refactor/native-inputs.rds",
+      "sha256": "52f9e680f58c9a1e7496c19e6aa7c058b01388100b3eab72d8eedc7d14e96ce6",
+      "kind": "count/configuration input; no recorded analysis output"
+    },
+    {
+      "file": "saved-objects/sceptre-0.99.0-21f9ea0.rds",
+      "sha256": "c6b6fc377e85a064a994ce20bead6d6f0931f0a4345abf6df79eb8b1eb1d70c5",
+      "kind": "saved object input"
+    }
+  ]
+}
