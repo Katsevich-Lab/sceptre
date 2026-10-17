@@ -1,7 +1,7 @@
 {
   "scope": "Documentation-only illustrated tour and bug appendix; no production/test/CI changes",
   "source_sha256": {
-    "tools/refactor/walkthrough.qmd": "2a88b3b629f4004d044c5451408881295cf8491ea2aeeef07adff23808fb07ce",
+    "tools/refactor/walkthrough.qmd": "fc8615152b9b3c54962c215c75588adc7c2719c7160401045687bf8c041230b1",
     "tools/refactor/bug-fixes.qmd": "ab40bcdaecfee6e70ad2490e8d7e0a688483d139a5b10c0859b6c64263dbeaa3",
     "tools/refactor/figures/analysis-flow.dot": "2630f7cd5fd71857d458b8460ed5b628f1ecf8a817b9cd8493ca29c2dd449dda",
     "tools/refactor/figures/analysis-flow.svg": "b09cdfeb2a2d5095ad01fe7ee05ce391a2dc4a9fac3d6c6dcec7e2009a722b39",
@@ -11,7 +11,7 @@
     "R/fitting.R": "5111892527d82829ce4aef41118acb4134a396df268f75445dbbf56ccaa37da3"
   },
   "rendered_html_sha256": {
-    "tools/refactor/walkthrough.html": "a3566f236de004fb7772ccac1989cb3db77a34da8d9308009c46f14d299b2ff7",
+    "tools/refactor/walkthrough.html": "a1ffe5f683a626156f16f98c9539532144cc1a620a29e93b4fcb4b8aaffd1020",
     "tools/refactor/bug-fixes.html": "5d2fbd2fe543591e15f700cd1f4bad7eaed7bd65d7154758f00de504d0b1b707"
   },
   "checks": {
@@ -27,5 +27,13 @@
   "diagram_generator": "dot - graphviz version 14.1.5 (20260411.2331)",
   "qualified_code_head": "e23006783be1202d1818c35d8a0e6cc1924e7ef1",
   "hosted_run": "https://github.com/Katsevich-Lab/sceptre/actions/runs/38987592424",
-  "hosted_result": "All six jobs passed at the qualified code head before these documentation-only edits"
+  "hosted_result": "All six jobs passed at the qualified code head before these documentation-only edits",
+  "testing_section": {
+    "evidence": "results/testing-coverage-2ec09e9/summary.json",
+    "evidence_sha256": "91964039d6c2832b6c2df433c07dad8efcd9ce3686827022099f532141743f26",
+    "rendered_numbers_and_heading_verified": true,
+    "R_only_coverage_before_percent": 70.6480304955527,
+    "R_only_coverage_after_percent": 84.1618734593262,
+    "C++_line_coverage_measured": false
+  }
 }

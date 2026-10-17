@@ -7,7 +7,8 @@ current-source safety probes live in [`tools/checks/`](../checks/README.md).
 
 ## Start here
 
-For Tim's code review, read [the illustrated walkthrough](walkthrough.qmd) and
+For Tim's code review, read [the illustrated walkthrough](walkthrough.qmd), including
+its before/after testing section, and
 [bug-by-bug notes](bug-fixes.qmd), then the lasting
 [root architecture guide](../../ARCHITECTURE.md). To compare original and new
 SCEPTRE from two immutable Git snapshots:
