@@ -1,24 +1,38 @@
 {
   "scope": "Documentation-only illustrated tour and bug appendix; no production/test/CI changes",
   "source_sha256": {
-    "tools/refactor/walkthrough.qmd": "fc8615152b9b3c54962c215c75588adc7c2719c7160401045687bf8c041230b1",
+    "R/analysis.R": "f1b4bbd0e7aceb90f82ea16dafc5764b54bc715c21e234598341a89edd1417b0",
+    "R/analysis_context.R": "7a2995446a921540f4fca377dbd2b2bb80f5bb0759ab5a4b1c05812120a086c8",
+    "R/association_execution.R": "11473b172c46d11b5126d11960c861a0aeddf2db2108e9bf16ff99d0b0ac311e",
+    "R/association_workers.R": "30984bf3d4d26c76c34a70328fce497cf762615479c977a3a4fb33822c2e1af5",
+    "R/execution.R": "febcf00e2c9776418c97bd0ae889bd79ab9f9b637a341bd054c79fa31797be60",
+    "R/fit_cache.R": "39f1c05162035125b89b783f68c3be877cd2a726492d4687a982e3bce6d75ad0",
+    "R/fitting.R": "5111892527d82829ce4aef41118acb4134a396df268f75445dbbf56ccaa37da3",
+    "R/neg_control_functions.R": "18c2b805e47be0c896d84917814aa3d53a22c4a54a9c5eff52a5655373646dbb",
+    "R/pair_qc.R": "79eb11592f520765ec655e561fdac4b72e045b3fc57fc1b84800e9967ddc188e",
+    "R/result_processing.R": "dcedae413a2f9e24eee354f69f5adafb79fc22a92155eb4d226f4a4be277ce82",
+    "R/s4_analysis_functs_1.R": "25c478034bc0c20db6e43d14adb06cb5081442304684979cb24c769bfd16666b",
+    "R/s4_analysis_functs_2.R": "0cdfe05a3d263eaeed54fef7e5c55ed5310807523445e5291764e7f1c660e7e1",
+    "R/storage.R": "b1426da4a6b3c8db98915f6028d7b429a92f6bebd4440d97697d40b9b60ec069",
+    "tools/refactor/README.md": "892a88f323fe9f7361e376cab2f649baf94ee5232298a5dec24f9a1914f3af4a",
     "tools/refactor/bug-fixes.qmd": "ab40bcdaecfee6e70ad2490e8d7e0a688483d139a5b10c0859b6c64263dbeaa3",
     "tools/refactor/figures/analysis-flow.dot": "2630f7cd5fd71857d458b8460ed5b628f1ecf8a817b9cd8493ca29c2dd449dda",
     "tools/refactor/figures/analysis-flow.svg": "b09cdfeb2a2d5095ad01fe7ee05ce391a2dc4a9fac3d6c6dcec7e2009a722b39",
     "tools/refactor/figures/execution-plans.dot": "8cee2e9e856837c282421f67711fc806f3b7a497946cef92fc26ae2a0396ee4d",
     "tools/refactor/figures/execution-plans.svg": "2c29fc3b90d84a5b5367b77b9f606e63c80f8f12ad28b1f82fbb1b338a8223ff",
-    "R/analysis_context.R": "7a2995446a921540f4fca377dbd2b2bb80f5bb0759ab5a4b1c05812120a086c8",
-    "R/fitting.R": "5111892527d82829ce4aef41118acb4134a396df268f75445dbbf56ccaa37da3"
+    "tools/refactor/figures/module-map.dot": "ab5f12e57fa4994ee4cbf4a57ab7167e58393abccbfc2b2ba5144cb549dccc33",
+    "tools/refactor/figures/module-map.svg": "09e6ee8c1b5c1aa82e0e1160657495ebb9f05a4a4cc8b2268b232885f232f4e0",
+    "tools/refactor/walkthrough.qmd": "1e4dff85e49f4691c9f5f4ba2aaf441bdf2f7438ecee5067cb7bb8bad7e167a1"
   },
   "rendered_html_sha256": {
-    "tools/refactor/walkthrough.html": "a1ffe5f683a626156f16f98c9539532144cc1a620a29e93b4fcb4b8aaffd1020",
+    "tools/refactor/walkthrough.html": "6ed25ea62d36e4bc030bdcd7570ff350781ff37b93e258df553b9b3292710d0d",
     "tools/refactor/bug-fixes.html": "5d2fbd2fe543591e15f700cd1f4bad7eaed7bd65d7154758f00de504d0b1b707"
   },
   "checks": {
-    "quarto_render": "Both documents succeeded; tour executes actual ordered-cell example and reads actual R functions",
-    "diagram_regeneration": "Both SVGs exactly match Graphviz DOT regeneration",
-    "diagram_visual_review": "PNG renders inspected; text and arrows legible, without clipping",
-    "local_links": "All authored links resolve to current local artifacts/source",
+    "quarto_render": "Updated walkthrough succeeded, executing actual ordered-cell example and reading actual R functions; unchanged bug appendix retains its earlier successful render",
+    "diagram_regeneration": "All three SVGs exactly match Graphviz DOT regeneration and are embedded byte-for-byte in the standalone walkthrough HTML",
+    "diagram_visual_review": "New module-map PNG inspected at native size and at the 1000 px document width; readable labels and arrows, without clipping; earlier diagrams retain prior visual review",
+    "local_links": "All authored QMD links resolve; all local walkthrough HTML anchors resolve",
     "bug_entries": 26,
     "separate_memory_improvement_entries": 1,
     "permanent_inputs_unchanged": 113
@@ -35,5 +49,19 @@
     "R_only_coverage_before_percent": 70.6480304955527,
     "R_only_coverage_after_percent": 84.1618734593262,
     "C++_line_coverage_measured": false
+  },
+  "module_map": {
+    "conceptual_groups": 9,
+    "scope": "Main calls within the refactored analysis core of one R package, not a complete dependency graph or enforced module system",
+    "arrow_meaning": "Caller to called group; label gives input and returned value",
+    "source_relationships_reviewed": [
+      "Public workflow calls negative-control construction, analysis, result processing and successful fit commit",
+      "analyze_association_pairs prepares the analysis context and selects permutation or CRT execution",
+      "Execution plans/workers call storage, fitting, score preparation, fit lookup/merge and native inference",
+      "Pair-QC measurement calls storage; calibration and observed QC share the native eligibility predicate"
+    ],
+    "html_embedded": true,
+    "visual_review_width_px": 1000,
+    "production_test_CI_inputs_unchanged": true
   }
 }

@@ -21,7 +21,7 @@ saved `sceptre_object` stay the same. Inside the package, selecting cells,
 reading counts, fitting models, running tests and assembling results now have
 clearer homes.
 
-**Suggested reading:** start with the first diagram, follow the example of one
+**Suggested reading:** start with the module map, follow the example of one
 test, then use the file map when you want to change something. The
 [bug-by-bug notes](bug-fixes.html) are a separate appendix, with a concrete
 example, fix and regression test for each item. Its [QMD source](bug-fixes.qmd)
@@ -47,14 +47,62 @@ show_function <- function(file, name) {
 }
 ```
 
-## The picture: what happens during discovery?
+## The modules and how they talk to each other
+
+Yes: the refactored package has **conceptual modules**. Here, a module means a
+group of functions and files with a particular job. They all live in the same
+R package and share its namespace. The separation comes from smaller functions
+with explicit inputs and outputs; these are not separately installed packages.
+
+![Nine conceptual modules in the refactored analysis core. Public workflow calls pair QC, analysis preparation and result processing. Preparation calls execution, whose workers use count access, model fitting, fit reuse and numerical inference. Pair QC also uses count access. Each arrow labels a request and its returned value.](figures/module-map.svg){width=100%}
+
+**How to read this map:** an arrow points from the part asking for work to the
+part doing it. Its label reads **input → returned value**. For example,
+execution asks count access for a gene in a particular set of cells and gets a
+count vector back. The returned values travel back along the same connection;
+there is no separate return arrow. These are the main calls, not every helper
+call or their order in time. R filenames are under `R/`; C++ files are under
+`src/`.
+
+The boxes group closely related jobs to keep the map readable. Model fitting
+and score preparation, for example, have separate files even though they share
+a box. Pair QC and calibration-pair construction also have separate files;
+they share the same eligibility rule so that calibration and discovery agree
+about which pairs qualify.
+
+### What actually passes between the modules?
+
+- **Workflow and preparation** read the saved object and make temporary lists
+  of requested pairs, settings and ordered cell selections. The workflow also
+  tells fit reuse when changed inputs require old fits to be cleared, and saves
+  completed fits after a successful run. Those state-update calls are omitted
+  from the figure.
+- **Execution** coordinates the calculations. It asks count access for data,
+  reuses a valid response fit or asks the fitter for one, and asks score
+  preparation for the numerical arrays the test needs. It also arranges
+  resampling draws using the existing sampling helpers.
+- **The numerical test** receives those arrays and draws and returns effect
+  estimates, p-values and requested diagnostics. It does not select data from
+  the saved object or start parallel workers.
+- **Result processing** turns returned records into tables, restores requested
+  pair order and performs the final processing for that analysis. The public
+  workflow saves the completed output in the returned object.
+
+This is a map of the **refactored analysis core**. Importing data, assigning
+guides and plotting remain in their own existing parts of the package. Some
+workflow-facing helpers still read the S4 object; the numerical fitter, score
+preparation and test have narrower inputs. The package is easier to work on
+because, for example, changing a response fitter starts in `fitting.R`, while
+changing count access starts in `storage.R`. Any resulting behavior change
+still needs its own tests and review.
+
+## A run through those modules: discovery
 
 ![Discovery starts in the familiar public function, prepares pairs and cells, chooses a permutation or CRT traversal, prepares numerical inputs, calls C++ inference, and assembles results. Count access, fitting and fit reuse have separate supporting files.](figures/analysis-flow.svg){width=100%}
 
 Read the numbered boxes from top to bottom. The yellow boxes are supporting
-jobs used along the way. This is a map of responsibilities; it leaves out
-individual function calls. R filenames are under `R/`; numerical C++ files are
-under `src/`.
+jobs used along the way. Unlike the module map above, this picture follows the
+order of work during a discovery run; it leaves out individual function calls.
 
 Calibration and power use many of the same pieces, with their own requested
 pairs and final processing. For example, power results are grouped without the

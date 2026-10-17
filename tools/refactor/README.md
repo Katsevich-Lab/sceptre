@@ -32,8 +32,9 @@ To render the walkthrough from the repository root (Quarto and knitr required):
 (cd tools/refactor && quarto render walkthrough.qmd && quarto render bug-fixes.qmd)
 ```
 
-The tour uses two static SVG diagrams, with editable Graphviz `.dot` sources
-under `figures/`. Regenerate an SVG with `dot -Tsvg INPUT.dot -o OUTPUT.svg`.
+The tour uses three static SVG diagrams: a module map, a discovery walkthrough
+and a comparison of the permutation and CRT loops. Editable Graphviz `.dot`
+sources live under `figures/`. Regenerate an SVG with `dot -Tsvg INPUT.dot -o OUTPUT.svg`.
 
 The page executes only the small indexing example and reads snippets directly
 from this checkout. It does not install or silently load an installed SCEPTRE.
