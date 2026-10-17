@@ -33,7 +33,7 @@ compatibility, see [Internal architecture](ARCHITECTURE.md).
 | Test-input recipes and provenance | `tools/fixtures/`, `tests/testthat/fixtures/README.md` | Permanent; never regenerate expected scientific outputs in CI |
 | Module-map drawing and editable source | `tools/architecture/` | Permanent; maintain with `ARCHITECTURE.md` |
 | Current architecture and contributor/project guidance | Root `ARCHITECTURE.md`, this guide, `README`, `ROADMAP.md`, `GOVERNANCE.md` and other project policies | Permanent; keep current |
-| Refactor specification, cleanup plan, Tim's walkthrough, old-versus-new comparison and acceptance evidence | [tools/refactor/](tools/refactor/README.md) | Temporary; retain for refactor review, then archive before retiring |
+| Refactor tour, manual comparison and validation receipt | [tools/refactor/](tools/refactor/README.md); its published archive retains the specification, plans and bulk evidence | Temporary; retain for maintainer review, then archive before retiring |
 
 **Build exclusion does not mean temporary.** `.Rbuildignore` keeps maintainer
 material out of the distributed R source package. Permanent `tools/checks/`,

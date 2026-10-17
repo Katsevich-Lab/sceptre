@@ -1,0 +1,9 @@
+{
+  "render_source": "2afb4e59f3d90a3d63f10b693cb91f257d28910b",
+  "zip_sha256": "500225cee4129bf1e0d5a4a2797ba1744e964628c9208aa3a898a3d930cff0db",
+  "zip_bytes": 682050,
+  "both_pages_self_contained": true,
+  "local_links_resolve": true,
+  "all_three_expected_SVGs_embedded": true,
+  "package_code_and_CI_unchanged_by_delivery": true
+}
