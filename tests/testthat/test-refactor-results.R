@@ -19,8 +19,9 @@ test_that("result finalization integrates guides before complete-family correcti
     partial <- finalize_association_result(raw, "bonferroni", targets, "BH", 0.05)
     expect_equal(partial$p_value, c(0.01, 0.2))
     expect_identical(serialize(targets, NULL), serialize(unserialize(before)[[2L]], NULL))
-    # Applying BH per shard would call 0.04 significant. The complete two-pair
-    # family yields an adjusted value of 0.08 and must not carry that pod flag.
+    # Adjusting each worker's output alone would call p = 0.04 significant.
+    # Across both pairs, BH adjusts it to 0.08; recompute significance after
+    # collection instead of retaining that worker's flag.
     union <- raw[c(1L, 3L), ]
     union$p_value <- c(0.04, 0.2)
     union$significant <- c(TRUE, FALSE)

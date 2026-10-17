@@ -98,11 +98,12 @@ write_ondisc_backed_sceptre_object <- function(
 }
 
 
-#' Label ordered pipeline elements with approximately sized pods
+#' Label consecutive pipeline work items with approximate task numbers
 #'
-#' The private Nextflow consumer supplies an ordered vector and positive target
-#' pod size. Returns integer labels in element order, using rounded bin count;
-#' the size is approximate and empty input returns integer(). No RNG or I/O.
+#' Nextflow supplies an ordered vector and a positive target number of items per
+#' task (pod). Return an integer task label for each item, keeping item order.
+#' The number of tasks is rounded, so task size is approximate. Empty input gives
+#' integer(). No random splitting is used.
 #' @noRd
 get_id_vect <- function(v, pod_size) {
     n_elements <- length(v)
@@ -114,11 +115,11 @@ get_id_vect <- function(v, pod_size) {
     }
 }
 
-#' Write a pipeline vector as unquoted lines in its supplied order
+#' Write pipeline items as unquoted text lines in their supplied order
 #'
-#' Atomic values are coerced to character, preserving repetitions. Owns and
-#' closes its text-file connection on success/error; replaces an existing path.
-#' Returns invisible NULL. This private boundary has actual Nextflow consumers.
+#' Convert values to text, keeping repeats, and replace the destination file.
+#' Close the connection on error as well as success. Return invisible NULL.
+#' Nextflow scripts call this helper directly.
 #' @noRd
 write_vector <- function(vector, file_name) {
     file_con <- file(file_name)

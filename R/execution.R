@@ -1,13 +1,13 @@
-# Execution concerns shared by the response-oriented permutation plan and the
-# guide-oriented CRT plan. Numerical preparation and traversal stay in those
-# separate plans; these helpers only handle worker dispatch, logs and binding.
-#' Resolve and optionally initialize a parallel progress file.
-#' @param analysis_type,proc_id Existing role and block ID used in its filename.
-#' @param parallel,print_progress Logical flags; either false returns NULL.
-#' @param log_dir Existing logging root, resolved by get_log_dir.
-#' @param initialize Whether to truncate/create the file; CRT guide phase
-#'   appends.
-#' @return File path or NULL. May create directories and a file; no RNG changes.
+# Helpers for starting workers, recording progress and joining their results.
+# Both permutation and CRT use these mechanics, while their gene/guide loops
+# and statistical calculations remain in the separate analysis functions.
+#' Choose a worker's progress-log path and optionally create the file
+#' @param analysis_type,proc_id Analysis name and worker number for the filename.
+#' @param parallel,print_progress Return NULL unless both are TRUE.
+#' @param log_dir Directory passed to `get_log_dir()`, which creates it if needed.
+#' @param initialize TRUE creates or empties the file. FALSE lets the CRT guide
+#'   phase append to the file already used during response fitting.
+#' @return Log-file path, or NULL when file-based reporting is disabled.
 #' @noRd
 analysis_log_file <- function(
     analysis_type,
@@ -27,9 +27,10 @@ analysis_log_file <- function(
     path
 }
 
-#' Announce parallel association work and its existing optional log location.
-#' @param analysis_type,print_progress,log_dir Role and progress settings.
-#' @return Invisible message result. Reporting may create the logging directory.
+#' Print the parallel-analysis message and where to find progress logs
+#' @param analysis_type,print_progress,log_dir Analysis name and reporting settings.
+#' @return The invisible result of the message call. Looking up the log location
+#'   can create its directory when progress reporting is enabled.
 #' @noRd
 announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
     message("Running ", analysis_type, " in parallel.")
@@ -44,13 +45,13 @@ announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
     }
 }
 
-#' Execute ordered work blocks using the existing serial or fork dispatch.
-#' @param blocks Ordered list of inputs, already partitioned by the caller.
-#' @param worker Function accepting a block and NULL or one-based process ID.
-#' @param parallel Logical switch; fork count equals the number of blocks.
-#' @return Block results in input-block order. Retains mclapply defaults and
-#'   caller
-#'   worker effects; does not repartition or reseed work.
+#' Run each work block serially or in a separate forked worker
+#' @param blocks Input blocks, already divided and ordered by the caller.
+#' @param worker Function accepting a block and a worker number; serial work
+#'   receives NULL instead of a number.
+#' @param parallel Whether to use `mclapply()`, with one worker per block.
+#' @return Worker results in input-block order. Blocks and random seeds are not
+#'   rearranged here; `mclapply()` keeps its default behavior.
 #' @noRd
 execute_analysis_blocks <- function(blocks, worker, parallel) {
     if (!parallel) {
@@ -66,25 +67,26 @@ execute_analysis_blocks <- function(blocks, worker, parallel) {
     }
 }
 
-#' Bind worker tables with the existing schema and row order.
+#' Join worker result tables in block order
 #' @param blocks Ordered list of compatible result tables.
-#' @return data.table using rbindlist(fill=TRUE), including its factor handling.
+#' @return A data.table from `rbindlist(fill = TRUE)`. Rows keep block order and
+#'   columns absent from a block are filled with missing values.
 #' @noRd
 bind_analysis_results <- function(blocks) {
     data.table::rbindlist(blocks, fill = TRUE)
 }
 
 
-#' Report progress for one item in a worker block.
-#'
-#' @param position One-based item position, restarted for each block and phase.
-#' @param id Character display ID; lookup belongs to the caller.
-#' @param total Number of items in this block.
-#' @param print_progress,parallel Logical reporting and file-output switches.
-#' @param log_file Existing worker file path for parallel reporting.
-#' @param feature,prefix Existing display text, preserved by each caller.
-#' @return Invisible NULL. Emits at item 1 and multiples of five. Parallel write
-#'   retains its extra terminating newline; disabled reporting does no file I/O.
+#' Report which gene or guide group a worker is processing
+#' @param position Item number within this block and phase, starting at 1.
+#' @param id Gene or guide-group name to display.
+#' @param total Number of items assigned to this block.
+#' @param print_progress,parallel Whether to report progress and use a worker log.
+#' @param log_file Worker log path for parallel runs.
+#' @param feature,prefix Text supplied by the calling analysis for its message.
+#' @return Invisible NULL. Report the first item and every fifth item. Parallel
+#'   runs append to the log, retaining the extra newline from `write()`; serial
+#'   runs print a message. Disabled reporting does not write files.
 #' @noRd
 report_worker_progress <- function(
     position,
@@ -117,12 +119,10 @@ report_worker_progress <- function(
     invisible(NULL)
 }
 
-#' Run periodic worker maintenance independently of progress reporting.
-#'
-#' @param position One-based block-local position.
-#' @return Invisible NULL. Calls GC at multiples of 200, after progress and
-#'   before
-#'   the caller reads or fits the current item. Does not change RNG state.
+#' Ask R to reclaim unused memory every 200 items
+#' @param position Item number within this worker's block, starting at 1.
+#' @return Invisible NULL. Run garbage collection after the progress message and
+#'   before reading or fitting the current item, even if progress is hidden.
 #' @noRd
 collect_worker_garbage <- function(position) {
     if (position %% 200L == 0L) {

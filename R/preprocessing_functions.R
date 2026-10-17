@@ -1,10 +1,8 @@
-#' Build a finite, full-rank cell design without dropping rows
-#'
-#' @param covariate_data_frame Data frame with one row per source cell.
-#' @param formula_object Formula passed to `model.matrix()`, including its
-#'   intercept/contrast choices.
-#' @return Numeric cell-by-design-column matrix in input row order. Errors on
-#'   dropped rows, nonfinite entries or rank deficiency; does not modify inputs.
+#' Apply the model formula while keeping one design row per original cell
+#' @param covariate_data_frame Covariates with one row per original cell.
+#' @param formula_object Formula for model.matrix(), including intercept/contrasts.
+#' @return Numeric design matrix in input-cell order. Error if transformation drops
+#'   cells, creates missing/infinite values or gives redundant design columns.
 #' @noRd
 convert_covariate_df_to_design_matrix <- function(
     covariate_data_frame,
@@ -41,17 +39,15 @@ convert_covariate_df_to_design_matrix <- function(
 }
 
 
-#' Compute import-time cell summaries from in-memory count columns
-#'
-#' @param matrix_in Feature-by-cell R count matrix, converted to column access.
-#' @param feature_names Character response labels aligned with rows; an empty
-#'   vector disables mitochondrial summaries even when requested.
-#' @param compute_p_mito,compute_max_feature Logical flags for optional
-#'   summaries.
-#' @return Data frame in column order with `n_nonzero` (values greater than 0.5)
-#'   and `n_umis`, plus requested mito/max-feature columns. Max-feature ties
-#'   take
-#'   the first row; zero-total fractions retain native division results (NaN).
+#' Calculate cell summaries from an in-memory feature-by-cell count matrix
+#' @param matrix_in Count matrix, converted to column access for the calculation.
+#' @param feature_names Labels matching feature rows. An empty vector disables
+#'   mitochondrial summaries even when requested.
+#' @param compute_p_mito,compute_max_feature Whether to include mitochondrial
+#'   fractions and the largest feature's contribution/name.
+#' @return Data frame in original cell order with n_nonzero (values greater than
+#'   0.5), n_umis and the requested optional summaries. Largest-feature ties use
+#'   the first row; a zero total can produce NaN fractions.
 #' @noRd
 compute_cell_covariates <- function(
     matrix_in,
@@ -96,35 +92,33 @@ compute_cell_covariates <- function(
 }
 
 
-#' Generate the native permutation bank for one prepared analysis
+#' Generate all permutation draws once for an analysis
+#' @param grna_assignments Saved post-QC guide memberships. Targeting groups use
+#'   positions among cells kept after QC; with NT controls, NT groups use
+#'   positions within the NT-cell list. Ignore empty targeting groups when
+#'   finding the range of treatment sizes.
+#' @param B Total number of draws, normally B1 + B2 + B3.
+#' @param calibration_check,control_group_complement Whether this is calibration
+#'   and whether controls are all other kept cells.
+#' @param calibration_group_size Number of NT guides combined per calibration group.
+#' @param n_cells Number of cells kept after QC, used with complement controls.
+#' @return An R external pointer to C++ memory containing the complete draws.
+#'   Draws contain positions starting at 0 within the data used by a fit, not
+#'   original matrix column numbers. The pointer is temporary and must not be
+#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing R's
+#'   random-number stream.
+#' @details Complement discovery samples among all kept cells, drawing enough
+#'   positions for the largest treatment group. Calibration needs enough for a
+#'   combination of NT groups: use the sum of the largest group sizes, capped at
+#'   the available cell count when memberships overlap. NT calibration samples
+#'   within the ordered NT-cell list.
 #'
-#' @param grna_assignments Post-QC named memberships in the saved
-#'   analysis/NT-local
-#'   representation; empty targeting groups are ignored for NT-control size
-#'   ranges.
-#' @param B Integer total draw budget, normally `B1 + B2 + B3`.
-#' @param calibration_check,control_group_complement Logical analysis/view
-#'   flags.
-#' @param calibration_group_size Number of NT guides pooled per calibration
-#'   group.
-#' @param n_cells Number of retained analysis cells, used for complement
-#'   controls.
-#' @return External pointer owning a native bank of zero-based indices. Its
-#'   interpretation is specific to the selected Fisher-Yates/hybrid fit view;
-#'   these are not source-cell IDs. Samplers use fixed native seeds without
-#'   consuming R random draws; the pointer must not be persisted in saved
-#'   objects.
-#' @details Complement-control discovery draws in all retained cells with length
-#'   equal to the largest treatment group. Complement calibration instead bounds
-#'   that length by the sum of the largest pooled NT groups, capped at n_cells
-#'   because overlapping memberships cannot enlarge the cell universe. NT-only
-#'   calibration uses that pooled-size bound in the ordered NT fit universe.
-#'   NT-control discovery uses the hybrid sampler with N NT controls and the
-#'   smallest/largest nonempty treatment sizes m/M: for m <= k <= M, each size-k
-#'   prefix is valid in its N+k fit universe. Fixed-size consumers read only
-#'   their treatment
-#'   prefix, not every stored bank entry. Generate the full B bank once here;
-#'   stage selection must not redraw or reseed its segments.
+#'   NT discovery fits each guide's treatment cells followed by N NT cells. The
+#'   hybrid sampler supports treatment sizes m through M in one set of draws:
+#'   the first k entries of each draw are valid positions among N+k cells.
+#'   Entries after those k may belong to a larger fit and must not be read for
+#'   the smaller one. Generate all B draws now and let test stages select their
+#'   portions later, without resampling or resetting seeds.
 #' @noRd
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
@@ -210,16 +204,13 @@ get_synthetic_permutation_idxs <- function(
 }
 
 
-#' Add integration-specific group IDs to metadata and requested pair tables
-#'
-#' @param sceptre_object Parameterized object with guide/target metadata and
-#'   pair
-#'   tables whose rows may repeat.
-#' @return Updated object. Union uses target IDs without expanding rows;
-#'   singleton
-#'   and Bonferroni expand each pair through a many-to-many target/guide join.
-#'   Guide order follows metadata, repeated pair requests are retained, and NT
-#'   guides keep the reserved `non-targeting` group label.
+#' Add the guide-group names used by the chosen integration strategy
+#' @param sceptre_object Object with guide/target metadata and requested pair tables.
+#' @return Updated object. Union uses target names without expanding pairs.
+#'   Singleton and Bonferroni join each requested target to all matching guides,
+#'   so multiple guides or repeated metadata matches can create multiple rows.
+#'   Keep metadata guide order and repeated requests. NT guides retain the
+#'   reserved group label non-targeting.
 #' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
     grouping_strategy <- sceptre_object@grna_integration_strategy

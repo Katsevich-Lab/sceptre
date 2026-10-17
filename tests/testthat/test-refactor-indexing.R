@@ -61,8 +61,9 @@ test_that("observed native positions are one based and synthetic positions are z
         pieces <- refactor_private("prepare_score_components")(
             view$y, matrix(1, n, 1L), list(fitted_coefs = 0, theta = 2)
         )
-        # Identical observed/synthetic memberships exercise the two distinct
-        # bases in the production entry point, without relying on a sampler.
+        # Select the same cells for the observed and synthetic groups. Observed
+        # positions start at 1 and synthetic ones at 0; test that the R-to-C++
+        # function handles both correctly, without involving random sampling.
         draws <- rep(list(view$trt - 1L), 3L)
         result <- refactor_private("run_association_test")(
             y = view$y, mu = pieces$mu, a = pieces$a, w = pieces$w,
@@ -85,8 +86,9 @@ test_that("calibration unions and saved NT memberships retain their declared ord
     overlapping <- list(a = c(4L, 1L), b = c(1L, 5L))
     expect_identical(membership("a&b", overlapping, TRUE), c(4L, 1L, 1L, 5L))
     expect_identical(membership("a&b", overlapping, FALSE), c(4L, 1L, 5L))
-    # Supported low-MOI groups are disjoint after QC; saved memberships index
-    # the first-occurrence NT pool, whose order need not be analysis order.
+    # Low-MOI groups do not overlap. Saved NT memberships are positions within
+    # the combined NT-cell list, which keeps first-seen order and can differ
+    # from the order of all cells kept after QC.
     groups <- list(a = c(4L, 1L), b = 5L)
     mapped <- refactor_private("encode_nt_fit_assignments")(groups)
     expect_identical(mapped$all_nt_idxs, c(4L, 1L, 5L))
@@ -121,8 +123,9 @@ test_that("canonical contexts compose source, analysis and fit coordinates once"
     expect_identical(screen$design[view$source_cells, , drop = FALSE],
         screen$design[c(4L, 5L, 8L, 2L, 11L), , drop = FALSE])
 
-    # The request-row map survives traversal in response order, including
-    # repeated row identities. Public duplicate rejection remains upstream.
+    # Processing tests gene by gene must retain each original request row,
+    # including repeats allowed here. The public input checker separately rejects
+    # unsupported duplicate requests.
     expect_identical(index$pair_rows$response_idx, c(2L, 1L, 2L))
     expect_identical(index$pair_rows$pair_row_id, 1:3)
     traversal <- unname(unlist(index$rows_by_response))

@@ -1,6 +1,7 @@
 #' @import Matrix
-# The 56 slots and one-element matrix payload wrappers are persisted by users
-# and pipeline parts. Internal contexts are transient; this schema stays stable.
+# Users and Nextflow save objects with these 56 fields (S4 slots). Matrix fields
+# use one-element lists. Keep this saved format compatible; temporary analysis
+# lists are built during a run and are not added to the saved object.
 setClass(
     "sceptre_object",
     slots = list(

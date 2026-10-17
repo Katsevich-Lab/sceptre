@@ -1,6 +1,6 @@
 test_that("count boundaries materialize borrowed compact and coercible coordinates", {
-    # Sequences exercise compact ALTREP coordinates; numeric group members
-    # retain the private native boundary's existing integer-coercion behavior.
+    # R can store sequences lazily (ALTREP). Check these position vectors too,
+    # and keep the C++ helper's existing conversion of numeric groups to integers.
     j <- c(0L, 2L, 1L, 3L)
     p <- c(0L, 2L, 4L)
     cells <- 1:4

@@ -1,16 +1,15 @@
-#' Select source cells and record overlapping removal reasons
+#' Select cells that pass cellwise QC and record the removal reasons
 #'
-#' Uses full-source cell covariates, validated quantile ranges, the
-#' mitochondrial
-#' threshold and one-based explicit removals. Quantile endpoints are inclusive;
-#' counts outside them and mitochondrial fractions above the threshold are
-#' removed, together with the already prepared zero/multiple-guide exclusions.
-#' @return Facade with increasing source-cell `cells_in_use` and removal
-#'   metrics.
-#'   Each reason counts its own supplied indices, so reasons can overlap and
-#'   need not sum to the unique removed total. Other slots are unchanged; run_qc
-#'   owns subsequent empty-view checks, cache invalidation and guide reindexing.
-#'   Reads covariates/dimensions only, without assay realization, RNG or files.
+#' Use the per-cell covariates, requested quantile ranges, mitochondrial cutoff,
+#' explicit cell exclusions and precomputed zero/multiple-guide exclusions.
+#' Keep values equal to either quantile endpoint; remove mitochondrial fractions
+#' strictly above the cutoff.
+#' @return Object with `cells_in_use` as original matrix columns in increasing
+#'   order and `cell_removal_metrics` as counts by reason. Reasons can overlap,
+#'   so their counts need not sum to the number of distinct removed cells.
+#'   The caller checks for zero remaining cells, clears incompatible saved fits
+#'   and updates guide assignments afterward. This step reads summaries rather
+#'   than loading the whole count matrix.
 #' @noRd
 determine_cells_to_retain <- function(
     sceptre_object,
@@ -89,25 +88,25 @@ determine_cells_to_retain <- function(
 }
 
 
-#' Reindex raw guide memberships after cell QC and retain the saved NT schema
-#' @param sceptre_object Facade with source-cell raw assignments and retained
-#'   cells.
-#' @return Facade with QC assignments: unique analysis-order treatment/NT
-#'   members,
-#'   empty NT guides removed, and NT-local groups for NT controls. Only that
-#'   slot
-#'   is replaced; caller retains the return. No fits, RNG or files are used.
+#' Remove failed-QC cells from guide assignments and renumber the remaining cells
+#' @param sceptre_object Object with raw assignments as original matrix columns
+#'   and `cells_in_use` listing the columns kept after QC.
+#' @return Object with updated `grna_assignments`. Group members become unique
+#'   positions within `cells_in_use`, in that list's order. Remove NT guides with
+#'   no remaining cells. With NT controls, also store each NT group's positions
+#'   within the combined NT-cell list, as required by the saved-object format.
+#'   The caller must keep the returned object.
 #' @noRd
 update_grna_assignments_given_qc <- function(sceptre_object) {
-    # 0. define several varaibles
+    # Read the saved original-cell assignments and the cells retained by QC.
     cells_in_use <- sceptre_object@cells_in_use
     grna_assignments_raw <- sceptre_object@grna_assignments_raw
     n_cells <- ncol(get_response_matrix(sceptre_object))
 
     analysis_to_source <- prepare_cell_map(cells_in_use, n_cells)
 
-    # 2. for each gRNA group and NT gRNA, subset the grna vector and the update
-    # the indices
+    # For every guide group, remove discarded cells and replace original
+    # column numbers with positions in cells_in_use.
     grna_group_idxs_new <- lapply(
         grna_assignments_raw$grna_group_idxs,
         function(v) {
@@ -128,8 +127,8 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
         indiv_nt_grna_idxs = nt_idxs_new
     )
 
-    # 3. if using the NT cells, update indiv gRNA indices so that they are
-    # relative to all NTs
+    # With NT controls, save each NT group's positions within the combined
+    # NT-cell list, rather than within the list of all cells kept after QC.
     if (!sceptre_object@control_group_complement) {
         l <- encode_nt_fit_assignments(
             grna_assignments$indiv_nt_grna_idxs

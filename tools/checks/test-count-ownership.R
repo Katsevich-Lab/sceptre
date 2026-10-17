@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# Run separately: injected raw R errors intentionally bypass C++ unwinding.
-# No OOM, production hook, installed-package replacement, or changed owner scope.
+# Run in a separate R process: controlled R errors can skip C++ destructors.
+# Test cleanup without exhausting memory or changing installed package functions.
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args) || length(args) > 2L)
     stop("Supply immutable candidate source and optionally an evidence output directory.")
@@ -14,9 +14,9 @@ paths <- file.path(root, c("src/sparse_counts.cpp", "src/sparse_matrix_functs.cp
 before <- tools::md5sum(paths)
 count <- readLines(paths[[1L]])
 covariate <- readLines(paths[[2L]])
-# Mechanical test-only substitutions preserve all actual allocation scopes and
-# arithmetic. The bounded threshold reaches the existing overflow throw without
-# allocating billions of group members; ordinary cases retain INT_MAX.
+# Substitute only the test wrappers, retaining the actual arithmetic and buffer
+# lifetimes. Use a smaller integer limit to reach the overflow error without
+# allocating billions of members; ordinary cases still use INT_MAX.
 needle <- "if (nt_total > std::numeric_limits<int>::max())"
 stopifnot(sum(grepl(needle, count, fixed = TRUE)) == 1L)
 count <- sub(needle, "if (nt_total > refactor_count_overflow_limit)", count, fixed = TRUE)
@@ -46,7 +46,8 @@ record <- function(kernel, phase, position, error, state) {
         position = position, error = error, state = state)
 }
 for (kernel in 0:2) {
-    # Warm Rcpp's callable caches before enumerating stable entrypoint ordinals.
+    # Run once so Rcpp caches are initialized. Later numbered allocation sites
+    # can then be tested without counting one-time setup calls.
     environment$refactor_count_ownership_call(kernel, inputs(), 0L, 0L, 0L)
     environment$refactor_count_ownership_state()
     original <- inputs()
@@ -88,8 +89,8 @@ observed <- unique(unlist(lapply(results, function(x) x$state$boundary_kinds)))
 saveRDS(list(results = results, observed_boundary_kinds = sort(observed)),
     file.path(output, "count-ownership-partial-results.rds"))
 cat("Observed R boundary kinds:", paste(sort(observed), collapse = ", "), "\n")
-# Rcpp versions can allocate a matrix as a vector plus a dim attribute, or via
-# Rf_allocMatrix. Both routes are interposed; require the actual route observed.
+# Depending on Rcpp version, a matrix is made with a vector plus dimensions or
+# Rf_allocMatrix(). Wrap both routes and require errors at the route actually used.
 stopifnot(all(c(1L, 3L, 4L, 5L, 6L, 7L, 8L, 9L) %in% observed),
           any(c(2L, 11L) %in% observed),
           any(vapply(results, function(x) x$phase == "bad-alloc" && x$state$max_live_blocks > 0L, logical(1))))

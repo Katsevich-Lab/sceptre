@@ -1,6 +1,7 @@
-// Developer-only component bridge. test-native-components.R defines the source
-// directory through a generated prefix; these are candidate implementation
-// modules, not a frozen oracle and not installed Rcpp entrypoints.
+// Expose internal C++ functions for direct mathematical tests. The R runner adds
+// a generated prefix identifying the source directory. Include current package
+// code, rather than a frozen reference implementation. These test functions are
+// compiled separately and are not installed with the package.
 // [[Rcpp::depends(BH)]]
 #include SCEPTRE_COMPONENT_SCORES
 #include SCEPTRE_COMPONENT_TAIL

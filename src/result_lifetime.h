@@ -4,11 +4,13 @@
 #include <Rcpp.h>
 
 namespace sceptre {
-// Protect the R continuation before native result ownership begins. A C++
-// compute failure unwinds this guard normally; release transfers only its
-// protection obligation, without an R call. End this guard's scope before
-// entering R_UnwindProtect, then UNPROTECT once after the protected leaf returns.
-// The leaf's raw-R-error path restores the R protection stack itself.
+// Create and protect R's error-continuation token before allocating C++ results.
+// R errors can skip C++ destructors; the token lets a later R_UnwindProtect call
+// run cleanup even on that path. If ordinary C++ computation throws, this guard
+// removes the protection normally. release() transfers that responsibility to
+// the caller without calling R. End the guard's scope before R_UnwindProtect,
+// and UNPROTECT once after successful conversion. On an R error, R restores
+// its protection stack itself.
 class ResultContinuation {
  public:
   ResultContinuation() : token_(PROTECT(R_MakeUnwindCont())), active_(true) {}

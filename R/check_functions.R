@@ -1,17 +1,13 @@
-#' Check the existing import schema without changing matrix representations.
-#' @param response_matrix,grna_matrix Feature-by-source-cell stores with
-#'   supported
-#'   numeric response and numeric/logical guide classes, or initialized odm
-#'   stores.
-#' @param grna_target_data_frame Guide-ID/target metadata; repeats/order are not
-#'   normalized here. Supplied guide IDs must occur in guide row names.
-#' @param moi Existing low/high label.
-#' @param extra_covariates Optional source-cell rows, in supplied barcode order.
-#' @return NULL or the existing ordered validation error. Checks classes, IDs,
-#'   dimensions, supplied barcode equality and covariate/metadata fields; does
-#'   not
-#'   inspect all count values, reorder cells, mutate inputs, draw RNG or write
-#'   files.
+#' Check count matrices, cell labels and metadata before importing
+#' @param response_matrix,grna_matrix Feature-by-cell matrices in the supported
+#'   numeric response or numeric/logical guide formats, or open ondisc matrices.
+#' @param grna_target_data_frame Guide-to-target metadata. Supplied guide names
+#'   must occur in the guide matrix. Keep metadata order and repeated rows.
+#' @param moi `"low"` or `"high"`.
+#' @param extra_covariates Optional covariates with rows in the same cell order.
+#' @return NULL on success, otherwise an error at the first failing check below.
+#'   Check classes, dimensions, labels and metadata fields without scanning every
+#'   count value, converting storage or reordering cells.
 #' @noRd
 check_import_data_inputs <- function(
     response_matrix,
@@ -66,12 +62,10 @@ check_import_data_inputs <- function(
     }
 
     # check type of input matrices
-    #' Check one matrix against the supplied supported-class list.
-    #' @param input_matrix Store; input_matrix_name supplies existing error
-    #'   text.
-    #' @param allowed_matrix_classes Character class names, tested without
-    #'   coercion.
-    #' @return NULL invisibly on success or an error; no data/order changes.
+    #' Check that one input matrix has a supported class
+    #' @param input_matrix Matrix to check; `input_matrix_name` identifies it in errors.
+    #' @param allowed_matrix_classes Supported class names. Do not convert the input.
+    #' @return Invisible NULL on success, otherwise an error naming the input matrix.
     #' @noRd
     check_matrix_class <- function(
         input_matrix,
@@ -219,7 +213,7 @@ check_import_data_inputs <- function(
         stop("`moi` should be either `low` or `high`.")
     }
 
-    # fail if extra_covariates has NA or inifinite values
+    # Reject missing or infinite extra covariate values.
     if (any(is.na(extra_covariates))) {
         stop("`extra_covariates` has NA values that need to be removed.")
     }
@@ -246,21 +240,19 @@ check_import_data_inputs <- function(
 }
 
 
-#' Validate resolved analysis choices against the imported facade.
-#' @param sceptre_object Imported facade containing source stores and
-#'   covariates.
-#' @param formula_object Resolved formula; offsets are unsupported.
-#' @param response_grna_target_pairs_list Named discovery/positive-control
-#'   tables.
-#' @param control_group,resampling_mechanism,side,low_moi Resolved view/test
-#'   choices.
-#' @param grna_integration_strategy,resampling_approximation Existing method
-#'   labels.
-#' @return NULL or an error in existing evaluation order. Pair IDs and duplicate
-#'   complete rows are checked without normalization. Missing pair columns still
-#'   reach the existing NA-column access first. Backed matrices retain their
-#'   permutation restriction. Does not construct a design, mutate data or use
-#'   RNG.
+#' Check proposed analysis settings against the imported data
+#' @param sceptre_object Imported sceptre object with count matrices and covariates.
+#' @param formula_object Model formula; offsets are not supported.
+#' @param response_grna_target_pairs_list Named discovery and positive-control tables.
+#' @param control_group,resampling_mechanism,side,low_moi Chosen control cells,
+#'   resampling method, test direction and MOI setting.
+#' @param grna_integration_strategy,resampling_approximation Chosen guide-combination
+#'   method and resampling approximation.
+#' @return NULL on success, otherwise the first error in the order below.
+#'   Check pair names and duplicate complete rows without changing their order.
+#'   The current checks access missing-value columns before checking their names.
+#'   ondisc-backed matrices currently support permutations only. This helper
+#'   checks settings; building the design matrix happens separately.
 #' @noRd
 check_set_analysis_parameters <- function(
     sceptre_object,
@@ -413,7 +405,7 @@ check_set_analysis_parameters <- function(
         stop("`side` must be one of 'both', 'left', or 'right'.")
     }
 
-    # verify that "grna_integration_strategy" is union or singleton
+    # Check that the guide integration strategy is supported.
     if (
         !(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))
     ) {
@@ -444,12 +436,11 @@ check_set_analysis_parameters <- function(
 }
 
 
-#' Validate the logical parallel switch and the existing fork-platform boundary.
-#' @param parallel Single nonmissing logical value.
-#' @param os_type OS type string; explicit argument permits deterministic tests.
-#' @return NULL, or the existing malformed-switch/Windows-fork error. No
-#'   workers,
-#'   platform configuration, caller state or files are changed.
+#' Check the parallel option and whether the platform supports forked workers
+#' @param parallel One nonmissing logical value.
+#' @param os_type Operating-system type; supplied explicitly in platform tests.
+#' @return NULL, or an error for an invalid option or parallel work on Windows.
+#'   This checks support without starting workers or changing platform settings.
 #' @noRd
 check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
     if (!is.logical(parallel) || length(parallel) != 1L || is.na(parallel)) {
@@ -466,14 +457,11 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 }
 
 
-#' Apply the existing processor-option check at its caller's validation
-#' position.
-#' @param n_processors Existing user option: exactly "auto" or numeric >= 2.
-#' @return NULL on success; retains the existing message and predicate,
-#'   including
-#'   accepted fractional values/Inf and malformed-input errors. No coercion,
-#'   scheduling, mutation, RNG or I/O. Callers retain their prior validation
-#'   order.
+#' Check the requested worker count using the current validation rule
+#' @param n_processors Exactly `"auto"` or a numeric value at least 2.
+#' @return NULL on success, otherwise an error. The existing comparison also accepts
+#'   fractional values and Inf; this helper does not round them or choose workers.
+#'   Call it after the other argument checks, as in the public workflows.
 #' @noRd
 check_processor_count <- function(n_processors) {
     if (
@@ -488,19 +476,15 @@ check_processor_count <- function(n_processors) {
 }
 
 
-#' Check assignment options before dispatching or changing stored
-#' hyperparameters.
-#' @param sceptre_object Facade supplying the MOI flag.
-#' @param assignment_method Resolved maximum, thresholding or mixture method.
-#' @param hyperparameters Complete method-specific named list, with defaults
-#'   merged.
-#' @param n_processors Processor option, checked after method/hyperparameter
-#'   checks.
-#' @return NULL or existing method/range/schema errors in their original order.
-#'   The perturbation range uses its documented [0,20] bound; other
-#'   scalar/NA/type
-#'   behavior is unchanged. No coercion, fitting, assignment mutation, RNG or
-#'   I/O.
+#' Check guide-assignment method and settings before assigning cells
+#' @param sceptre_object Object supplying the low/high-MOI setting.
+#' @param assignment_method Chosen maximum, thresholding or mixture method.
+#' @param hyperparameters Named method settings after merging user values and defaults.
+#' @param n_processors Requested worker count, checked after method settings.
+#' @return NULL on success, otherwise the first method, range or setting-name error
+#'   below. The perturbation parameter uses its documented [0, 20] range. Other
+#'   type, missing-value and scalar checks retain their current rules. No models
+#'   are fitted and no assignments are changed here.
 #' @noRd
 check_assign_grna_inputs <- function(
     sceptre_object,
@@ -635,16 +619,13 @@ check_assign_grna_inputs <- function(
 }
 
 
-#' Apply the current QC threshold/range and nonempty-assignment checks.
-#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pairwise
-#'   cutoffs.
-#' @param response_n_umis_range,response_n_nonzero_range Ordered percentile
-#'   pairs.
-#' @param initial_grna_assignment_list Named source-cell memberships.
-#' @return NULL or the existing ordered errors. Does not validate every public
-#'   QC
-#'   argument, change thresholds/memberships, count pairs, draw RNG or access
-#'   files.
+#' Check pair-count thresholds, QC quantiles and whether any guide was assigned
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pair-QC cutoffs.
+#' @param response_n_umis_range,response_n_nonzero_range Ordered quantile pairs.
+#' @param initial_grna_assignment_list Named lists of original-cell assignments.
+#' @return NULL on success, otherwise the first error below. These are the checks
+#'   performed here, rather than validation of every public QC argument. This
+#'   function does not remove cells or count gene-guide pairs.
 #' @noRd
 check_run_qc_inputs <- function(
     n_nonzero_trt_thresh,
@@ -692,10 +673,12 @@ check_run_qc_inputs <- function(
 }
 
 
-#' Validate one numeric scalar before native integer conversion.
+#' Check that a single count can safely be converted to a C++ integer
 #'
-#' Requires a finite integral value in [minimum, INT_MAX], without coercion;
-#' returns the input invisibly. Zero is valid for unused resampling segments.
+#' Require one finite, whole numeric value between `minimum` and INT_MAX, the
+#' largest C++ integer. Reject invalid values rather than rounding or converting
+#' them first. Return the input invisibly. Zero is allowed for unused resampling
+#' stages when minimum is zero.
 #' @noRd
 check_native_scalar_count <- function(value, name, minimum = 0) {
     if (
@@ -720,8 +703,11 @@ check_native_scalar_count <- function(value, name, minimum = 0) {
     invisible(value)
 }
 
-#' Return an integer bank size after checking three nonnegative scalar budgets.
-#' Sum in double before narrowing; fail rather than wrap or reduce a budget.
+#' Check B1, B2 and B3 and return the total number of resamples
+#'
+#' Each stage size must be a nonnegative whole number. Add using doubles first,
+#' then check that the total also fits a C++ integer before converting it. Report
+#' an error if it is too large; do not silently reduce the number of resamples.
 #' @noRd
 checked_resampling_total <- function(B1, B2, B3) {
     check_native_scalar_count(B1, "B1")
@@ -732,9 +718,12 @@ checked_resampling_total <- function(B1, B2, B3) {
     as.integer(total)
 }
 
-#' Compute the existing empirical B3 and validate its complete bank size.
-#' Pair count is a nonnegative scalar integer; return one representable integer
-#' without changing the multiplier/ceiling rule or silently capping allocation.
+#' Calculate B3 for empirical p-values and check the total resampling size
+#'
+#' For a nonnegative whole pair count, use ceiling(10 * n_pairs / alpha) for a
+#' two-sided test or ceiling(5 * n_pairs / alpha) for a one-sided test. Check both
+#' B3 and B1+B2+B3 before converting B3 to an integer. Large requests error
+#' rather than being silently capped.
 #' @noRd
 compute_empirical_budget <- function(n_pairs, alpha, side_code, B1, B2) {
     check_native_scalar_count(n_pairs, "n_pairs")
@@ -745,18 +734,16 @@ compute_empirical_budget <- function(n_pairs, alpha, side_code, B1, B2) {
     as.integer(budget)
 }
 
-#' Validate calibration sizes against active post-QC NT assignment groups.
-#' @param sceptre_object QC facade; active NT groups come from its assignment
-#'   list,
-#'   independently of metadata rows for guides that lost every cell during QC.
-#' @param n_calibration_pairs Positive representable integer request count.
-#' @param n_processors Existing processor option, checked last.
-#' @param calibration_group_size Positive representable integer at most the
-#'   active
-#'   NT guide count. NT controls require two active guides; complement requires
-#'   one.
-#' @return NULL or the existing ordered errors; no clamping, pair construction,
-#'   random draws, facade changes or file effects.
+#' Check calibration sizes against NT guides that still have cells after QC
+#' @param sceptre_object Post-QC object. Count active NT guides from assignments,
+#'   since metadata can still list guides whose last cell was removed by QC.
+#' @param n_calibration_pairs Positive whole number fitting a C++ integer.
+#' @param n_processors Requested worker count, checked last.
+#' @param calibration_group_size Positive number of NT guides per group, no larger
+#'   than the active NT-guide count. NT controls require at least two active NT
+#'   guides; complement controls require at least one.
+#' @return NULL on success, otherwise the first error below. Sizes are checked
+#'   without rounding them, constructing pairs or drawing random samples.
 #' @noRd
 check_calibration_check_inputs <- function(
     sceptre_object,
@@ -806,20 +793,18 @@ check_calibration_check_inputs <- function(
 }
 
 
-#' Check an eligible discovery/power family before association execution.
-#' @param response_grna_group_pairs Prepared requested pair table, including QC.
-#' @param control_group_complement Logical selected control view.
-#' @param grna_target_data_frame Metadata used for the existing NT-presence
-#'   check.
-#' @param pc_analysis Logical: positive-control power check versus discovery.
-#' @param calibration_result Existing result table; empty emits the advisory
-#'   message.
-#' @param n_ok_pairs Number passing QC; zero stops after the calibration
-#'   advisory.
-#' @param n_processors Existing processor option, checked last.
-#' @return NULL or existing errors/messages in family, NT, calibration, QC then
-#'   processor order. No pair filtering/reordering, state writes, fitting or
-#'   RNG.
+#' Check that discovery or power analysis has pairs and usable control cells
+#' @param response_grna_group_pairs Requested pair table with QC information.
+#' @param control_group_complement Whether controls are all other kept cells.
+#' @param grna_target_data_frame Metadata used to check for NT guides when required.
+#' @param pc_analysis TRUE for the positive-control power check; FALSE for discovery.
+#' @param calibration_result Earlier calibration results; an empty table prompts
+#'   the advisory message to run calibration first.
+#' @param n_ok_pairs Number of pairs passing QC; zero stops the analysis.
+#' @param n_processors Requested worker count, checked last.
+#' @return NULL on success, otherwise messages/errors in the order below: pairs,
+#'   NT guides, calibration advisory, QC-passing count, then worker count.
+#'   This function checks readiness without filtering or running the pairs.
 #' @noRd
 check_discovery_analysis_inputs <- function(
     response_grna_group_pairs,

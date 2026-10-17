@@ -6,7 +6,7 @@ digraph modules {
   workflow [label=< <B>Public workflow &amp; saved state</B><BR/>Check steps; save completed work<BR/><FONT POINT-SIZE="12">s4_analysis_functs_1.R / _2.R<BR/>workflow_state.R</FONT> >, fillcolor="#DAE8FA", color="#4E75A5"];
   qc [label=< <B>Pair QC &amp; calibration pairs</B><BR/>Counts and the shared eligibility rule<BR/><FONT POINT-SIZE="12">pair_qc.R<BR/>neg_control_functions.R</FONT> >];
   preparation [label=< <B>Analysis preparation<BR/>&amp; coordination</B><BR/>Align pairs, cells and settings<BR/><FONT POINT-SIZE="12">analysis.R · analysis_context.R</FONT> >];
-  results [label=< <B>Result tables</B><BR/>Order, guide integration<BR/>and final processing<BR/><FONT POINT-SIZE="12">result_processing.R</FONT> >];
+  results [label=< <B>Result tables</B><BR/>Sort pairs, integrate guides<BR/>and finish output tables<BR/><FONT POINT-SIZE="12">result_processing.R</FONT> >];
   cache [label=< <B>Response-fit reuse</B><BR/>Look up and merge compact fits;<BR/>clear or save them via workflow<BR/><FONT POINT-SIZE="12">fit_cache.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
   execution [label=< <B>Analysis execution</B><BR/>Permutation / CRT loops;<BR/>workers, progress and logs<BR/><FONT POINT-SIZE="12">association_execution.R<BR/>association_workers.R · execution.R</FONT> >, fillcolor="#DAE8FA", color="#4E75A5"];
   storage [label=< <B>Count access</B><BR/>Read responses; count selected cells<BR/><FONT POINT-SIZE="12">storage.R · sparse count kernels in src/</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];

@@ -8,30 +8,33 @@
 using namespace Rcpp;
 
 namespace {
-// Trivial views use R's transient arena, so an R error during preparation never
-// strands a native owner. Protected normalized R inputs retain the viewed data.
+// Keep these small position records in R-managed temporary memory. If R errors
+// while preparing inputs, R can reclaim them; there is no C++ buffer left to
+// leak. Keep the R vectors protected while these records point into them.
 struct PositionView {
   const int* data;
   int size;
 };
 
-// Borrow/materialize an integer R vector of one-based coordinates, validating
-// [1,limit] and int length. Preserve order/repeats; do not subtract or mutate.
-// Its protected normalized R owner must outlive the later compute scope.
+// Read an integer vector of positions starting at 1. Check that positions are
+// between 1 and limit and that the length fits an int. Keep order and repeats;
+// do not subtract from the input. The caller keeps this R vector protected
+// until C++ has finished using its data pointer.
 PositionView prepare_positions(SEXP positions, int limit, const char* name) {
   const R_xlen_t size = Rf_xlength(positions);
   if (size > std::numeric_limits<int>::max())
     stop("%s exceeds native coordinate capacity.", name);
-  const int* data = INTEGER(positions); // Materialize ALTREP before native ownership.
+  const int* data = INTEGER(positions); // Force any lazy R data to load before creating C++ buffers.
   for (R_xlen_t index = 0; index < size; ++index)
     if (data[index] < 1 || data[index] > limit)
       stop("%s contains a position outside its one-based coordinate view.", name);
   return {data, static_cast<int>(size)};
 }
 
-// Coerce each R group to integer once and root it in normalized before native
-// ownership. Trivial PositionViews use R_alloc; an R longjmp during coercion or
-// validation cannot strand std::vector storage. Groups index the analysis view.
+// Convert each group to integers and keep it in the protected normalized R list
+// before allocating C++ buffers. An R error during conversion can skip C++
+// destructors; use R-managed temporary memory for these position records.
+// Group members are positions among the selected analysis cells.
 PositionView* prepare_groups(const List& groups, int n_cells, SEXP normalized) {
   PositionView* views = reinterpret_cast<PositionView*>(R_alloc(groups.size(), sizeof(PositionView)));
   for (R_xlen_t group = 0; group < groups.size(); ++group) {
@@ -42,17 +45,17 @@ PositionView* prepare_groups(const List& groups, int n_cells, SEXP normalized) {
   return views;
 }
 
-// Guard list length before narrowing dimensions to native int. Empty groups are
-// a supported zero-row output; no group contents or count policy changes.
+// Check that the group count fits an int before using it as a matrix dimension.
+// No groups is valid and gives an output with zero rows.
 int checked_group_count(const List& groups) {
   if (groups.size() > std::numeric_limits<int>::max())
     stop("Group count exceeds native coordinate capacity.");
   return static_cast<int>(groups.size());
 }
 
-// Obtain all-response dimension from CSR pointer length, checking representable
-// source/analysis sizes. Canonical CSR layout/slot consistency is the storage
-// adapter's precondition; this is not a second sparse-layout validator.
+// Get the number of gene rows from the row-pointer vector and check that gene
+// and cell counts fit integer positions. The storage caller must already supply
+// valid compressed sparse rows (CSR); this is not a full sparse-format check.
 int response_count(const IntegerVector& p, int n_cells_orig,
                    const IntegerVector& cells) {
   if (n_cells_orig < 0 || p.size() < 1 ||
@@ -62,8 +65,9 @@ int response_count(const IntegerVector& p, int n_cells_orig,
   return static_cast<int>(p.size() - 1);
 }
 
-// Pure C++ helpers make no R calls; native allocation exceptions unwind their
-// owners. Repetitions/order survive the sole one-based-to-zero-based copy.
+// The helpers below copy and convert positions using C++ only, without R calls.
+// C++ exceptions free their buffers normally. Subtract one during the copy,
+// keeping membership order and repeated cells.
 std::vector<int> copy_zero_based(PositionView positions) {
   std::vector<int> owned(positions.size);
   for (int index = 0; index < positions.size; ++index)
@@ -71,9 +75,10 @@ std::vector<int> copy_zero_based(PositionView positions) {
   return owned;
 }
 
-// Own every ordered group after R preparation. Convert each one-based position
-// once, retaining repeated memberships (including NT sums) and empty groups.
-// Only pure C++ allocation/copies occur while these native owners are alive.
+// After R input preparation, make private C++ copies of all groups and convert
+// positions from starting at 1 to starting at 0. Keep empty groups and repeated
+// members, including repeats contributing to NT totals. Only C++ operations may
+// run while these buffers need C++ destructors for cleanup.
 std::vector<std::vector<int>> copy_zero_based_groups(const PositionView* groups,
                                                     int n_groups) {
   std::vector<std::vector<int>> owned(n_groups);
@@ -82,8 +87,9 @@ std::vector<std::vector<int>> copy_zero_based_groups(const PositionView* groups,
   return owned;
 }
 
-// CSR slots are valid zero-based Matrix coordinates. Presence includes stored
-// zeros/fractions. Source and analysis scratch belong only to this native scope.
+// Read valid compressed sparse rows using Matrix's zero-based row/column data.
+// Count stored positions, including stored zeros and fractions, without loading
+// their values. Temporary cell mappings belong only to this C++ calculation.
 void load_stored_positions(const int* j, const int* p, int response,
                            std::vector<bool>& source,
                            std::vector<bool>& analysis,
@@ -96,13 +102,14 @@ void load_stored_positions(const int* j, const int* p, int response,
 }
 }
 
-// Fused all-response summaries and requested pair counts from valid CSR slots.
-// R one-based groups index the ordered cells_in_use analysis view directly;
-// requests are response-sorted and storage restores their original row order.
-// NT totals SUM groups, including overlap; complement totals count analysis
-// cells. Coercion/materialization and named R results precede owned native
-// copies. Their compute-only scope ends before return, including on exceptions.
-// No input mutation, count-value loading, eligibility, RNG, or file effects.
+// Count requested gene-guide pairs and collect NT summaries in the same scan.
+// Groups use positions starting at 1 within the ordered cells_in_use list.
+// Requests arrive sorted by gene; R storage code restores the requested order.
+// NT totals add group counts, counting overlaps again; complement totals count
+// selected cells. These are counts of stored entries, not positive values.
+// Prepare R inputs and result objects before creating private C++ position copies.
+// End the C++ calculation scope before returning to R, freeing copies on success
+// or C++ error. Leave inputs unchanged and apply QC thresholds separately.
 // [[Rcpp::export]]
 List sparse_pair_counts(IntegerVector j, IntegerVector p, int n_cells_orig,
                         List grna_group_idxs, List nt_groups_analysis,
@@ -175,11 +182,12 @@ List sparse_pair_counts(IntegerVector j, IntegerVector p, int n_cells_orig,
   return result;
 }
 
-// Group x all-response stored-position counts, using the same private loader.
-// Normalized inputs and the complete matrix exist before owned native copies;
-// the compute-only scope ends before return. Empty views retain zero dimensions
-// and counts; storage selects/repeats columns later. No input mutation,
-// count-value loading, RNG, or file effects.
+// Return stored-entry counts with guide groups in rows and all genes in columns.
+// Use the same cell-mapping helper as pair counts. Empty selections retain the
+// appropriate zero dimensions/counts; R selects and repeats gene columns later.
+// Prepare R inputs and the result matrix first, then create C++ copies and finish
+// using them before returning. Caller inputs are unchanged; count values need
+// not be loaded because this operation counts stored positions.
 // [[Rcpp::export]]
 IntegerMatrix sparse_group_counts(IntegerVector j, IntegerVector p, int n_cells_orig,
                                   List groups, IntegerVector cells_in_use) {

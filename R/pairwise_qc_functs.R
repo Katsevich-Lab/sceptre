@@ -1,14 +1,9 @@
-#' Measure pair sparsity while retaining the saved QC slot layout
+#' Add treatment and control counts to discovery and positive-control pairs
 #'
-#' @param sceptre_object Cellwise-QC object with source-cell `cells_in_use`,
-#'   post-QC group memberships and discovery/positive-control pair tables.
-#' @return Updated object with pair tables sorted by source response row,
-#'   keeping
-#'   repeated requests. Counts refer to stored sparse positions, including
-#'   explicit
-#'   zeros. `M_matrix` has NT-guide rows and all-response columns; totals use
-#'   the
-#'   configured control view. The nuclear backed path leaves NT summaries empty.
+#' Prepare cell/group lookups, count requested pairs through the storage helpers,
+#' and save the counts in the object's discovery and positive-control tables.
+#' Also save the NT-group-by-gene summary matrix and per-gene totals needed for
+#' calibration. Keep each table's requested pairs aligned with its returned counts.
 #' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
     # extract basic information from sceptre_object
@@ -25,7 +20,8 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         dplyr::mutate(positive_control_pairs, discovery = FALSE)
     )
 
-    # Resolve the same source/analysis coordinates used by association workers.
+    # Use the same link between original matrix columns and cells kept after QC
+    # as the association tests, so counts refer to the same cells.
     index <- prepare_index_context(
         cells_in_use,
         ncol(response_matrix),
@@ -80,15 +76,13 @@ compute_pairwise_qc_information <- function(sceptre_object) {
 }
 
 
-#' Apply pair eligibility thresholds and count retained hypotheses
-#'
-#' @param sceptre_object Object whose QC tables contain aligned
-#'   treatment/control
-#'   counts and whose threshold slots and integration strategy have been set.
-#' @return Updated object with `pass_qc` in existing row order and retained-pair
-#'   counts. Bonferroni counts distinct response/target groups with any passing
-#'   guide; other strategies count passing rows, including repeated requests.
-#'   Empty tables and their existing count slots are left unchanged.
+#' Mark QC-passing pairs and count how many hypotheses remain
+#' @param sceptre_object Object with treatment/control counts, QC thresholds and
+#'   guide integration strategy already set.
+#' @return Object with pass_qc in each nonempty pair table and updated passing-pair
+#'   counts. For Bonferroni, count distinct gene-target pairs with any passing guide.
+#'   Otherwise count passing rows, including repeated requests. Leave empty tables
+#'   and their existing count fields unchanged.
 #' @noRd
 compute_qc_metrics <- function(sceptre_object) {
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh

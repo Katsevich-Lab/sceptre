@@ -10,35 +10,38 @@
 #include "result_lifetime.h"
 using namespace Rcpp;
 
-// Calibration uses private std engines and consumes no R random draws. The
-// generated Rcpp RNGScope is retained, including initialization of an absent
-// R seed; an existing R stream is not advanced by these native draws.
+// Calibration uses its own standard-library random generators, separate from R.
+// The generated Rcpp wrapper can initialize an absent R seed, but these C++
+// draws do not advance an R random stream that already exists.
 
 namespace {
-// Calibration needs nonempty NT guides and 1<=group_size<=active NT count.
-// Guard enumeration/sampling before indexing or allocating; no metadata fallback.
+// Calibration needs NT guides with remaining cells, and a group size between 1
+// and that active guide count. Check before indexing or allocating combinations;
+// metadata rows alone do not show which guides still have cells after QC.
 void check_group_size(int n_nt_grnas, int group_size) {
   if (n_nt_grnas < 1 || group_size < 1 || group_size > n_nt_grnas)
     stop("Calibration group size must be between 1 and the active NT group count.");
 }
 
-// Double-valued count guard before narrowing to native int; finite, integral,
-// positive and within capacity. This does not choose a smaller feasible request.
+// Check a double-valued request before converting to int: it must be finite,
+// positive, whole and within capacity. Error rather than choose a smaller request.
 void positive_integer(double value, const char* name) {
   if (!std::isfinite(value) || value < 1 || value != std::floor(value) ||
       value > std::numeric_limits<int>::max())
     stop("%s must be a positive integer within native capacity.", name);
 }
 
-// Only accepted pairs occupy these vectors; do not preallocate request-sized
-// output buffers for rejection-heavy requests. The pure native compute scope
-// owns this payload until a protected exact-size R conversion takes over.
+// Store only pairs that actually pass QC. Reserving the entire request size can
+// waste substantial memory when most candidates fail. The C++ result holds these
+// vectors until protected conversion allocates R vectors of the accepted size.
 struct CalibrationPairResult {
   std::vector<int> response_idxs, grna_group_idxs, n_nonzero_trt_v, n_nonzero_cntrl_v;
 };
 
-// Raw R leaf: no native/precious C++ owners or C++ exceptions. Every allocating
-// operation is inside the caller's preprovided-token R_UnwindProtect context.
+// Copy accepted pairs into R using the raw R API. The caller has already set up
+// R_UnwindProtect with a protected continuation token, so an R allocation error
+// still frees the C++ result. Do not create Rcpp cleanup objects or C++ buffers
+// here: an R error could skip their destructors.
 SEXP calibration_pair_record(void* data) {
   const CalibrationPairResult* result = static_cast<CalibrationPairResult*>(data);
   const R_xlen_t size = result->response_idxs.size();
@@ -58,18 +61,19 @@ SEXP calibration_pair_record(void* data) {
   return out;
 }
 
-// R calls this once after normal conversion or before continuing a raw R jump.
-// Vector destruction/delete cannot allocate or throw; no R operation follows
-// ownership release until the protected context has been entered.
+// Free the C++ result once, after conversion or before R continues an error.
+// Deleting vectors must not allocate or throw. Between releasing the C++ owner
+// and entering R_UnwindProtect, do not make an R call that could error and leak it.
 void delete_calibration_pair_result(void* data, Rboolean) noexcept {
   delete static_cast<CalibrationPairResult*>(data);
 }
 }
 
 
-// Distinct zero-based NT-guide subset in draw order, using caller-owned std
-// mt19937/uniform state and O(n) scratch. Caller establishes 0<=k<=n. This std
-// stream belongs to calibration; it is deliberately not the Boost bank stream.
+// Sample k distinct NT-guide positions among n guides, starting at 0, in draw
+// order. Reuse the caller's std::mt19937 generator and O(n) working array.
+// The caller checks 0 <= k <= n. Calibration deliberately uses this standard-
+// library generator, rather than the Boost generator used for association draws.
 std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uniform_real_distribution<double>& distribution) {
   std::vector<int> x(n);
   for (int i = 0; i < n; i ++) x[i] = i;
@@ -86,13 +90,13 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
 }
 
 
-// Sample a bounded set of distinct unordered NT-guide combinations, returning
-// group x member integer matrix with zero-based active-NT-guide positions.
-// Group count is min(choose(n,k), max(threshold,ceil(5*pairs/(p_hat*genes))));
-// validate empirical p_hat and capacity before narrowing/allocation. Each subset
-// is sorted for uniqueness; result rows follow the existing unordered_set
-// iteration order, not a newly imposed order. Fixed std mt19937(4), no R draws
-// or input mutation. Preserve rejection/draw order and the existing heuristic.
+// Sample distinct combinations of k active NT guides. Return a matrix with groups
+// in rows and members in columns, as guide positions starting at 0. Choose up to
+// min(choose(n,k), max(threshold, ceil(5*pairs/(p_hat*genes)))) groups, following
+// the current heuristic. Check p_hat and sizes before conversion/allocation.
+// Sort each subset to detect repeated combinations, but keep the existing
+// unordered_set iteration order for output rows. Start std::mt19937 at seed 4
+// and preserve rejection/draw order; R's random stream and inputs are unchanged.
 // [[Rcpp::export]]
 IntegerMatrix sample_calibration_groups(int calibration_group_size, double n_calibration_pairs, double n_possible_groups,
                                      int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat) {
@@ -108,7 +112,7 @@ IntegerMatrix sample_calibration_groups(int calibration_group_size, double n_cal
     stop("n_possible_groups must equal the represented combination count.");
   double MULT_FACTOR = 5.0;
 
-  // Estimate/check the exact output before any native container is owned.
+  // Check the output size before creating C++ containers that need destruction.
   double selected_groups = ceil((MULT_FACTOR * n_calibration_pairs)/(p_hat * n_genes));
   selected_groups = std::max(selected_groups, static_cast<double>(N_POSSIBLE_GROUPS_THRESHOLD));
   selected_groups = std::min(selected_groups, n_possible_groups);
@@ -119,8 +123,9 @@ IntegerMatrix sample_calibration_groups(int calibration_group_size, double n_cal
   IntegerMatrix out(n_grna_groups, calibration_group_size);
   int* output = INTEGER(out);
   {
-    // R allocation/materialization is finished. Native failures unwind this
-    // scope; no R operation occurs while H, sample or copied set rows are live.
+    // All R allocations and data loading are finished. Use only C++ while the set
+    // and working vectors are alive, so a C++ exception frees them normally and an
+    // R error cannot skip their destructors.
     std::unordered_set<std::vector<int>, boost::hash<std::vector<int>>> H;
     std::vector<int> sample;
     std::mt19937 generator(4);
@@ -144,10 +149,10 @@ IntegerMatrix sample_calibration_groups(int calibration_group_size, double n_cal
 }
 
 
-// Enumerate all size-k subsets of active NT guides into a group x member
-// zero-based integer matrix. Preserve the current next_permutation visitation
-// order (including its first step/wrap), rather than sorting output rows.
-// Check choose(n,k), dimensions and capacity before filling. No RNG/mutation.
+// List all combinations of k active NT guides, with groups in rows and members
+// in columns, as positions starting at 0. Keep the current next_permutation
+// order, including its first step and wraparound, rather than sorting the rows.
+// Check choose(n,k) and dimensions before filling the output. No random draws.
 // [[Rcpp::export]]
 IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_size, int n_possible_groups) {
   check_group_size(n_nt_grnas, undercover_group_size);
@@ -173,10 +178,10 @@ IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_siz
 }
 
 
-// Convert an explicitly owned scratch combination matrix from zero-based NT
-// guide positions to R one-based label positions. MUTATES the supplied matrix,
-// preserving shape/member/row order; the R calibration constructor calls this
-// only after sampling has finished with the zero-based representation.
+// Add one to the supplied working combination matrix so its entries can index
+// R guide labels. This changes the input matrix in place, preserving row/member
+// order and shape. The R caller must supply its own temporary matrix and call
+// this only after finishing all sampling that uses positions starting at 0.
 // [[Rcpp::export]]
 void increment_group_indices_in_place(IntegerMatrix m) {
   int n_row = m.nrow();
@@ -190,17 +195,18 @@ void increment_group_indices_in_place(IntegerMatrix m) {
 }
 
 
-// Sample QC-eligible group/response pairs without replacement. Count matrix
-// is active-NT-group x all-response; possible_groups_m is candidate-group x
-// member, with ZERO-based row positions in that matrix. Summing member counts
-// is correct for low-MOI/disjoint groups or the caller's precomputed union row;
-// high-MOI overlap must be unioned before entry. Totals share response columns.
-// Enumerate candidates by group*n_genes+response, traverse a fixed std seed-4
-// partial Fisher-Yates stream and retain shared legacy_pair_eligible outcomes.
-// Return one-based response/candidate-group positions plus counts in acceptance
-// order; may exhaust before requested pairs. Widen/check products and sums
-// before allocation/narrowing. Inputs read only, thresholds inclusive, no R RNG;
-// do not replace this stream/eligibility policy with a new acceptance heuristic.
+// Sample distinct calibration guide-group/gene pairs that pass the shared QC rule.
+// Count-matrix rows are active NT groups and columns are genes. Each row of
+// possible_groups_m lists positions in those count rows, starting at 0.
+// Summing member counts is valid for disjoint low-MOI groups, or for a precomputed
+// union row. For overlapping high-MOI guides, the caller must first count their
+// union so cells are not counted twice. Totals use the same gene-column order.
+// Encode candidates as group*n_genes + gene and visit them with the current
+// partial Fisher-Yates stream, using std seed 4. Keep the shared inclusive QC
+// thresholds and this sampling order. Return accepted gene/group positions
+// starting at 1 and their counts, in acceptance order. Candidates may run out
+// before the requested size. Check products and sums before allocating or
+// converting to int. Caller inputs and R's random stream stay unchanged.
 // [[Rcpp::export]]
 SEXP sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
                                 int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
@@ -227,7 +233,8 @@ SEXP sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero
   int n_possible_pairs = static_cast<int>(pair_count);
   double n_possible_pairs_doub = (double) n_possible_pairs;
 
-  // Materialize all R inputs and continuation before native result ownership.
+  // Load all R input data and protect the error-continuation token before creating
+  // the C++ result; an R error must not skip cleanup of already allocated vectors.
   const int* counts = INTEGER(n_nonzero_m);
   const int* totals = INTEGER(n_nonzero_tot);
   const int* group_members = INTEGER(possible_groups_m);
@@ -270,7 +277,7 @@ SEXP sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero
       n_nonzero_trt = static_cast<int>(treatment_count);
       n_nonzero_cntrl = totals[gene_idx] - n_nonzero_trt;
 
-      // if n_nonzero_trt and n_nonzero_cntrl exceed the thresholds, append the grna_group_idx and gene_idx
+      // Keep the pair if both counts meet their inclusive QC thresholds.
       if (legacy_pair_eligible(n_nonzero_trt, n_nonzero_cntrl, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)) {
         result->response_idxs.push_back(gene_idx + 1);
         result->grna_group_idxs.push_back(grna_group_idx + 1);
@@ -284,7 +291,8 @@ SEXP sample_calibration_pairs(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero
     owned_result = result.release();
     continuation = token.release();
   }
-  // This transfer window contains no R operation or surviving compute owner.
+  // Pass the released result directly to protected R conversion. No R call may
+  // intervene before conversion takes responsibility for freeing its C++ memory.
   SEXP out = R_UnwindProtect(calibration_pair_record, owned_result,
                              delete_calibration_pair_result, owned_result, continuation);
   UNPROTECT(1);

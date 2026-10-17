@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# Run separately from package tests: controlled R errors intentionally bypass
-# C++ unwinding. No OOM, production hook, or installed sampler replacement.
+# Run separately from package tests: controlled R errors can skip C++ destructors.
+# Check cleanup without exhausting memory or replacing installed sampler functions.
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args) || length(args) > 2L)
     stop("Supply immutable candidate source and optionally an evidence output directory.")
@@ -16,13 +16,13 @@ files <- c(source, probe, header, runner)
 before <- tools::md5sum(files)
 bridge <- tempfile("sceptre-ownership-", fileext = ".cpp")
 writeLines(c(sprintf('#define SCEPTRE_SAMPLING_SOURCE %s', encodeString(source, quote = '"')),
-    # Load the guard header globally so its R/Rcpp types never enter the private
-    # namespace used for the real candidate sampler functions.
+    # Include R/Rcpp header types outside the private test namespace; only the
+    # actual sampler functions should be put inside that namespace.
     sprintf('#define SCEPTRE_SAMPLING_HEADER %s', encodeString(header, quote = '"')),
     readLines(probe)), bridge)
 environment <- new.env(parent = globalenv())
 Rcpp::sourceCpp(bridge, env = environment, rebuild = TRUE, showOutput = TRUE)
-# Three retained production samplers x three R pointer-boundary failures.
+# Test each of the three package samplers at three pointer-setup failure sites.
 samplers <- c("fisher_yates_sampler", "hybrid_fisher_iwor_sampler", "sample_crt_indices")
 results <- list()
 for (sampler in 0:2) for (phase in 1:3) {

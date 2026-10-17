@@ -1,17 +1,17 @@
-#' Run an eligible association family through its prepared permutation/CRT plan
-#' @param sceptre_object Sceptre facade; no slot is committed here.
-#' @param response_grna_group_pairs Full requested table, including failed QC
-#'   rows.
-#' @param analysis_type Calibration, power or discovery role string.
-#' @param output_amount,print_progress,parallel,n_processors,log_dir Valid
-#'   execution
-#'   settings from the public wrapper. Output schema/log bytes remain unchanged.
-#' @return List `result` (eligible native results plus failed rows) and compact
-#'   `response_precomputations`, for the facade to commit after success.
-#' @details Creates one full permutation bank before response traversal; CRT
-#'   creates its full banks per guide. Performs the existing initial GC,
-#'   preserves
-#'   RNG/bank scope, and leaves guide integration/family correction to callers.
+#' Run the requested gene-guide tests that passed QC
+#' @param sceptre_object Sceptre object supplying data and settings. This function
+#'   returns results separately; the public workflow saves them into the object.
+#' @param response_grna_group_pairs All requested pairs, including failed-QC rows.
+#' @param analysis_type Calibration, power or discovery analysis name.
+#' @param output_amount,print_progress,parallel,n_processors,log_dir Validated
+#'   output, progress, worker-count and logging settings from the public function.
+#' @return A list with the result table and reusable response fits in
+#'   `response_precomputations`. Failed-QC requests are included in the table.
+#' @details Prepare the cell selections and settings, then choose the permutation
+#'   or CRT loop. Permutations share one full set of random draws across the run;
+#'   CRT generates a full set per guide group. Keep that sharing and draw order:
+#'   regenerating draws for each pair could change results. Guide integration and
+#'   multiple-testing correction happen later, in the caller.
 #' @noRd
 analyze_association_pairs <- function(
     sceptre_object,

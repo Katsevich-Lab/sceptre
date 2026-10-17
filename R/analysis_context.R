@@ -1,13 +1,17 @@
-# Source cells index store columns; analysis positions index analysis_to_source;
-# fit positions index one ordered view. All R positions here are one based.
+# A cell can have three different position numbers:
+# * source: its column in the original count matrix;
+# * analysis: its position among the cells kept after QC;
+# * fit: its position among the cells selected, in order, for one model fit.
+# For example, if QC keeps original columns c(2, 4, 5), original cell 5 is
+# analysis cell 3. If a fit uses original cells c(5, 2), it is fit cell 1.
+# The helpers below translate between these lists. All R positions start at 1.
 
-#' Validate an ordered source-cell map
-#' @param source_cells Numeric integer-valued source positions, without missing
-#'   values or repetitions; order is significant.
-#' @param n_source Number of source columns.
-#' @return Integer map in caller order. Empty input is allowed here; workflow QC
-#'   separately rejects an empty retained-cell set. Inputs/RNG/files are
-#'   unchanged.
+#' Check the original matrix columns selected for analysis
+#' @param source_cells Original count-matrix column numbers, in the order to use.
+#'   They must be whole numbers, without missing values or duplicates.
+#' @param n_source Number of columns in the original count matrix.
+#' @return The same column numbers as an integer vector. This helper accepts an
+#'   empty vector; the QC workflow separately rejects an analysis with no cells.
 #' @noRd
 prepare_cell_map <- function(source_cells, n_source) {
     if (
@@ -24,30 +28,31 @@ prepare_cell_map <- function(source_cells, n_source) {
     as.integer(source_cells)
 }
 
-#' Normalize raw source membership to unique analysis positions
-#' @param source_members Source-column memberships; order/repetitions are
-#'   ignored.
-#' @param analysis_to_source Valid ordered source-cell map.
-#' @return Integer analysis positions in analysis order, including `integer()`
-#'   for
-#'   no members. This set-membership rule deliberately differs from NT-pool
-#'   order.
+#' Find a group's cells in the list of cells kept after QC
+#' @param source_members Group members given as original count-matrix columns.
+#' @param analysis_to_source Original matrix columns of the cells kept after QC,
+#'   in analysis order. For example, `c(2, 4, 5)` means analysis cell 1 is
+#'   original column 2, analysis cell 2 is original column 4, and so on.
+#' @return Positions in `analysis_to_source`, in that list's order, with each
+#'   position included once. For example, members `c(5, 2, 5)` give `c(1, 3)`
+#'   for the list above. Members removed by QC are omitted; no matches gives
+#'   `integer()`. The original order of `source_members` does not affect this.
 #' @noRd
 source_membership_to_analysis <- function(source_members, analysis_to_source) {
     which(analysis_to_source %in% source_members)
 }
 
-#' Encode analysis memberships in the existing saved NT-local schema
-#' @param nt_groups_analysis Named list of nonempty NT groups after QC, with
-#'   one-based analysis positions. Supported low-MOI NT groups are disjoint.
-#' @return List `all_nt_idxs` (ordered first-occurrence analysis pool) and
-#'   `indiv_nt_grna_idxs` (named group positions within that pool). An empty
-#'   list
-#'   yields an empty integer pool/list; calibration validates active group
-#'   count.
-#' @details Explicit matching preserves the saved partition/order without
-#'   cumulative out-of-pool positions for overlaps. Does not mutate input or
-#'   RNG.
+#' Store nontargeting guide groups as positions within one NT-cell list
+#' @param nt_groups_analysis Named list of nontargeting (NT) guide groups. Each
+#'   group contains positions among the cells kept after QC. Low-MOI groups
+#'   must not overlap.
+#' @return A list with `all_nt_idxs`, the combined NT cells in first-seen order,
+#'   and `indiv_nt_grna_idxs`, each group's positions within that combined list.
+#'   For example, groups `A = c(4, 1)` and `B = 5` give the combined list
+#'   `c(4, 1, 5)` and within-list positions `A = c(1, 2)` and `B = 3`.
+#'   Empty input gives an empty cell vector and group list.
+#' @details Matching cell numbers to the combined list also handles overlapping
+#'   groups without inventing positions beyond the end of that list.
 #' @noRd
 encode_nt_fit_assignments <- function(nt_groups_analysis) {
     nt_to_analysis <- as.integer(unique(unlist(
@@ -58,14 +63,15 @@ encode_nt_fit_assignments <- function(nt_groups_analysis) {
     list(indiv_nt_grna_idxs = groups_fit, all_nt_idxs = nt_to_analysis)
 }
 
-#' Resolve a compound calibration group in its supplied coordinate view
-#' @param group_id One valid compound NT ID, with constituent names joined by
-#'   `&`.
-#' @param nt_groups Named NT membership list, normally in analysis coordinates.
-#' @param low_moi Logical; low-MOI groups concatenate, high-MOI groups use the
-#'   unique union in first-occurrence order.
-#' @return Unnamed memberships retaining the declared order/duplicate rule;
-#'   no coordinate conversion, mutation, sampling or storage access occurs.
+#' Collect cells from the NT guides named in a calibration group
+#' @param group_id NT guide names joined by `&`, for example `"NT1&NT2"`.
+#' @param nt_groups Named list giving each NT guide's cells. These are usually
+#'   positions among cells kept after QC; this function keeps those numbers.
+#' @param low_moi If TRUE, concatenate the guides' cell lists. If FALSE, remove
+#'   repeated cells, keeping the order in which they first appear.
+#' @return One unnamed vector of cell positions. For `"NT1&NT2"`, NT1's cells
+#'   come before any additional NT2 cells. The position numbers are not converted
+#'   to original matrix columns or to positions within a model fit.
 #' @noRd
 calibration_group_membership <- function(group_id, nt_groups, low_moi) {
     nt_ids <- strsplit(group_id, "&", fixed = TRUE)[[1L]]
@@ -76,14 +82,14 @@ calibration_group_membership <- function(group_id, nt_groups, low_moi) {
     members
 }
 
-#' Resolve request identities once against validated response/group labels
-#' @param pairs Table with `response_id` and `grna_group` columns in request
-#'   order.
-#' @param response_ids,group_ids Unique canonical lookup labels.
-#' @return Data frame with one-based `pair_row_id`, `response_idx`, `group_idx`.
-#'   Rows and repeated requests are retained; public validation owns
-#'   duplicate/ID
-#'   rejection. Missing labels are not validated here; no input is mutated.
+#' Match each requested gene-guide test to its gene and guide-group positions
+#' @param pairs Requested tests, with `response_id` and `grna_group` columns.
+#' @param response_ids,group_ids Lists of unique gene and guide-group names to
+#'   match against. The caller has already checked that the requested names exist.
+#' @return A table with the original request row (`pair_row_id`), gene position
+#'   (`response_idx`) and guide-group position (`group_idx`). All start at 1.
+#'   Request order and repeated requests are kept. This helper only matches names;
+#'   checks for missing names or forbidden duplicates belong to the caller.
 #' @noRd
 resolve_pair_rows <- function(pairs, response_ids, group_ids) {
     data.frame(
@@ -93,18 +99,22 @@ resolve_pair_rows <- function(pairs, response_ids, group_ids) {
     )
 }
 
-#' Normalize saved assignments into transient analysis/request coordinates
-#' @param cells_in_use,n_source Ordered source cells and source-column count.
-#' @param grna_assignments Saved QC-filtered assignments. Treatment groups index
-#'   analysis cells; NT groups are NT-local only when NT controls are selected.
-#' @param pairs,response_ids Valid requested pairs and source-row labels.
-#' @param calibration_check,control_group_complement,low_moi Logical role flags.
-#' @return Ordinary list containing source/NT maps, canonical analysis groups,
-#'   response/group labels, request rows and row splits by source
-#'   response/group.
-#'   Splits retain request order; calibration group IDs use first occurrence.
-#' @details Decodes the saved NT-local schema once, retaining the ordered pool.
-#'   No fits, draw banks, persistent state, RNG or files are changed.
+#' Prepare the cell and pair lookups used by an analysis
+#' @param cells_in_use,n_source Original matrix columns kept after QC, in order,
+#'   and the original number of matrix columns.
+#' @param grna_assignments Saved guide assignments after QC. Targeting groups
+#'   already use positions among the kept cells. When using NT controls, saved
+#'   NT groups instead use positions within the separate NT-cell list.
+#' @param pairs,response_ids Requested tests and the original matrix's gene names.
+#' @param calibration_check,control_group_complement,low_moi Logical settings
+#'   identifying calibration, complement controls and low-MOI data.
+#' @return A list connecting original matrix columns to cells kept after QC,
+#'   including the ordered NT-cell list and guide memberships. It also matches
+#'   each requested pair to a gene and guide group and lists request rows for
+#'   each gene and group, preserving request order within each list.
+#' @details Saved NT-group positions are translated back to positions among all
+#'   kept cells here, once. Subsequent helpers can then use the same numbering.
+#'   This prepares lookups; it does not fit models or change the saved object.
 #' @noRd
 prepare_index_context <- function(
     cells_in_use,
@@ -150,11 +160,12 @@ prepare_index_context <- function(
     )
 }
 
-#' Obtain one requested treatment membership in analysis coordinates
-#' @param index Prepared index context.
-#' @param group_id One validated treatment or compound calibration group ID.
-#' @return One-based analysis memberships, with calibration concatenation/union
-#'   semantics above. Does not construct a fit/source view or mutate the index.
+#' Get the treated cells for one guide group
+#' @param index Cell and pair lookups returned by `prepare_index_context()`.
+#' @param group_id A targeting guide group, or joined NT guide names for calibration.
+#' @return Positions among the cells kept after QC. Calibration combines the NT
+#'   guides using `calibration_group_membership()`; other analyses use the saved
+#'   targeting group directly. These are not original matrix column numbers.
 #' @noRd
 group_treatment_analysis <- function(index, group_id) {
     if (index$calibration_check) {
@@ -168,22 +179,26 @@ group_treatment_analysis <- function(index, group_id) {
     }
 }
 
-#' Compose one common or guide-specific fit-cell view
-#' @param index Prepared index context, with all positions one based.
-#' @param group_id One group ID, or `NULL` for the common view without
-#'   treatment.
-#' @return List `fit_to_analysis`, `source_cells`, `trt_fit_pos`, `n_trt`.
-#'   Complement uses all analysis cells; NT calibration
-#'   uses the ordered NT pool; NT discovery uses treatment then NT. `NULL` under
-#'   NT discovery gives all analysis cells so group workers can subset that
-#'   view.
-#' @details Order/repetitions follow memberships; controls occupy the remaining
-#'   fit positions, without a separately materialized control map.
-#'   For analysis->source `c(2,4,5,8,11)`, treatment `c(2,3)` and NT
-#'   `c(4,1,5)`, NT discovery has source `c(4,5,8,2,11)` and treatment `1:2`.
-#'   Views are transient, constructed at their sharing scope, never a bank of
-#'   all
-#'   guide-by-cell maps. No design, storage, fit, RNG or cache is changed.
+#' Choose the cells and their order for a model fit
+#' @param index Cell and pair lookups returned by `prepare_index_context()`.
+#' @param group_id Guide-group name, or NULL to prepare cells shared across groups.
+#' @return A list containing `fit_to_analysis` (positions among cells kept after
+#'   QC), `source_cells` (the corresponding original matrix columns),
+#'   `trt_fit_pos` (treated cells' positions within this fit) and `n_trt`.
+#' @details With complement controls, use all kept cells. With NT controls,
+#'   calibration uses the ordered NT-cell list, while discovery uses the chosen
+#'   treatment cells followed by the NT cells. For NT discovery, NULL returns all
+#'   kept cells so each group worker can later select its own subset.
+#'
+#'   Example: QC keeps original columns `c(2, 4, 5, 8, 11)`. Treatment occupies
+#'   positions `c(2, 3)` in that list and NT cells occupy `c(4, 1, 5)`.
+#'   The discovery fit therefore reads original columns `c(4, 5, 8, 2, 11)`;
+#'   treatment occupies positions `1:2` within this fit. Counts and design-matrix
+#'   rows must follow this same order. Membership order and repeats are kept.
+#'
+#'   Each selection is built when needed, rather than keeping a cell list for
+#'   every guide at once. This helper only selects cells; it does not read counts
+#'   or fit a model.
 #' @noRd
 make_fit_view <- function(index, group_id = NULL) {
     treatment <- if (is.null(group_id)) {
@@ -212,16 +227,15 @@ make_fit_view <- function(index, group_id = NULL) {
     )
 }
 
-#' Prepare a lean treatment lookup in the common fit-cell view
-#' @param index Prepared index context, captured once for a run.
-#' @return Closure taking a group ID and returning one-based `trt_idxs`,
-#'   `n_trt`.
-#'   NT calibration translates analysis memberships to ordered NT-pool
-#'   positions;
-#'   otherwise the common view uses analysis positions. NT discovery workers use
-#'   their separate guide fit view, not this common-view lookup.
-#' @details Resolves memberships only: no full source map/design per pair,
-#'   all-guide view cache, RNG draw or mutation of the captured index.
+#' Make a function that finds treated cells in the shared model-fitting data
+#' @param index Cell and pair lookups returned by `prepare_index_context()`.
+#' @return A function taking a guide-group name and returning `trt_idxs`, the
+#'   treated cells' positions starting at 1, and `n_trt`, their count.
+#' @details For NT calibration, positions refer to the ordered NT-cell list.
+#'   Otherwise they refer to all cells kept after QC. NT discovery workers use
+#'   their own treatment-plus-NT selections instead. The returned function keeps
+#'   one set of lookups, rather than storing cell lists or design matrices for
+#'   every requested pair.
 #' @noRd
 make_treatment_index_lookup <- function(index) {
     function(group_id) {
@@ -237,24 +251,21 @@ make_treatment_index_lookup <- function(index) {
     }
 }
 
-#' Prepare one common matrix design and canonical analysis inputs from the
-#' facade
-#' @param object Sceptre object with full source-row design and valid saved
-#'   cache.
-#' @param analysis One of `calibration_check`, `power_check`,
-#'   `discovery_analysis`.
-#' @param pairs Already validated eligible pair table in request order.
-#' @return Transient list `response_store`, `index`, `common_view`, aligned
-#'   matrix
-#'   `design`, `pairs`, `analysis`, `shared_response_fit`, `test_options` and
-#'   compact `response_fits`. Options contain staged budgets, their checked
-#'   total,
-#'   side and curve-fitting flag. NT discovery keeps guide-specific fits
-#'   uncached.
-#' @details Preserves matrix dimensions for accepted intercept-only formulas.
-#'   The saved full source-row design/cache schema remains untouched; no full
-#'   assay, fitted-vector cache, all-guide views, RNG or file writes are
-#'   created.
+#' Collect the data, cell selections and settings needed to run the tests
+#' @param object Sceptre object containing the original design matrix and any
+#'   response fits that are still valid for its current settings.
+#' @param analysis One of `calibration_check`, `power_check`, `discovery_analysis`.
+#' @param pairs Validated gene-guide pairs that passed QC, in request order.
+#' @return A temporary list containing the count matrix (`response_store`), cell
+#'   and pair lookups (`index`), shared cell selection (`common_view`), and design
+#'   rows selected in the same order (`design`). It also contains the requested
+#'   pairs, analysis name, test settings and reusable response fits.
+#' @details `shared_response_fit` says whether groups use the same response fit.
+#'   NT discovery instead fits each group's treatment-plus-NT cells separately.
+#'   `test_options` includes B1, B2, B3, their checked sum, test direction and the
+#'   tail-approximation setting. Keeping `drop = FALSE` preserves a matrix even
+#'   when the formula contains only an intercept. The saved object and its full
+#'   design matrix are left unchanged.
 #' @noRd
 prepare_analysis_context <- function(object, analysis, pairs) {
     total_resamples <- checked_resampling_total(object@B1, object@B2, object@B3)

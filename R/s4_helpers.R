@@ -1,4 +1,4 @@
-# Basic display uses source-store dimensions and the facade's workflow state.
+# Show the original matrix dimensions and which workflow steps have finished.
 setMethod("show", signature = signature("sceptre_object"), function(object) {
     # 0. determine the functions that have been run
     funct_run_vect <- object@functs_called
@@ -360,13 +360,13 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 })
 
 
-#' Read one full source-cell row by its feature ID
-#'
-#' @param mat Row-accessible `dgRMatrix` or ondisc `odm` with unique row IDs.
-#' @param id Scalar feature ID present in `rownames(mat)`.
-#' @return Dense numeric vector in source-column order, without changing the
-#'   store. Other classes return `NULL`; callers prepare row
-#'   accessibility before using this helper for mixture fitting or plotting.
+#' Read all cells for one named gene or guide
+#' @param mat Row-accessible sparse matrix (dgRMatrix) or open ondisc matrix (odm)
+#'   with unique row names.
+#' @param id Gene/guide name present in rownames(mat).
+#' @return Dense numeric vector in original cell-column order. Other matrix
+#'   classes return NULL; callers must prepare row access first. Used by mixture
+#'   fitting and plotting; the supplied matrix is left unchanged.
 #' @noRd
 load_row <- function(mat, id) {
     if (methods::is(mat, "odm") || methods::is(mat, "dgRMatrix")) {

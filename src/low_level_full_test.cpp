@@ -6,17 +6,17 @@
 using namespace Rcpp;
 
 
-// Sole Rcpp association boundary. y/mu/a/w have n ordered fit cells and D is
-// eigenbasis-rows x n (eigen() order); observed trt_idxs are R one-based positions and n_trt
-// is their observed cardinality. Validate dimensions/positions/budget arithmetic
-// before converting observed positions exactly once. Empty/degenerate numeric
-// fits retain their existing NaN/Inf arithmetic rather than a new fallback.
-// synthetic_idxs is a live worker-local XPtr owning a zero-based full DrawBank;
-// validate its address, then borrow it const. Fixed-size tests use n_trt prefixes;
-// CRT tests use each selected row's entire cardinality, including empty rows.
-// Return the unchanged effect/score/tail schema, optionally the last selected
-// null segment. Components allocate their own result and never mutate inputs
-// or the bank; no RNG or file effects. This is not a persisted pointer format.
+// Entry called from R for one gene-guide association test.
+// y, mu, a and w contain the selected cells in the same order; D has one column
+// per cell and eigenvectors in rows. Observed trt_idxs start at 1, and n_trt is
+// their count. Check lengths, positions and resampling sizes before converting
+// observed positions once to C++ numbering. Keep existing NaN/Inf arithmetic
+// for empty or degenerate fits.
+// synthetic_idxs points to this worker's full set of draws, with positions
+// already starting at 0. Check the pointer, then read without changing it.
+// Permutations use the first n_trt entries of each draw; CRT uses the full draw,
+// including empty ones. Return effects, score, tail diagnostics and, if requested,
+// the final stage's null statistics. This pointer is temporary, not a saved format.
 // [[Rcpp::export]]
 SEXP run_association_test(NumericVector y,
                           NumericVector mu,
@@ -52,7 +52,8 @@ SEXP run_association_test(NumericVector y,
     sceptre::ResultContinuation token;
     const sceptre::inference::DrawBank* bank;
     {
-      // Finish owned Rcpp temporaries before allocating the native tail.
+      // Finish temporary Rcpp objects before allocating the C++ tail result.
+      // An R error can skip C++ destructors, so keep those lifetimes separate.
       const IntegerVector observed_positions =
         sceptre::inference::observed_positions_zero_based(trt_idxs);
       effect = sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
@@ -68,7 +69,8 @@ SEXP run_association_test(NumericVector y,
     owned_tail = tail.release();
     continuation = token.release();
   }
-  // No R operation or surviving compute owner in this transfer window.
+  // Transfer directly to protected conversion: no intervening R call may
+  // raise an error before the conversion function takes responsibility for cleanup.
   SEXP out = sceptre::inference::association_result_record(
     effect, z_orig, owned_tail, return_resampling_dist, continuation);
   UNPROTECT(1);

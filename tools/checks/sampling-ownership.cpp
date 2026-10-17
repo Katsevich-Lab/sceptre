@@ -1,7 +1,7 @@
-// Developer-only instrumentation. The runner includes the actual candidate
-// sampler source by absolute path and records both source and probe digests.
-// Interpose only this translation unit's R allocation/preservation/finalizer
-// calls; the installed package and frozen native oracle are untouched.
+// Test cleanup in the actual sampler code, included by the runner's absolute
+// path, and record hashes of that source and this test. Wrap R allocation,
+// object-protection and pointer-cleanup calls only in this test compilation.
+// The installed package and frozen reference code are unchanged.
 #define R_MakeExternalPtr refactor_controlled_make_external_ptr
 #define R_GetCCallable refactor_controlled_get_callable
 #define R_RegisterCFinalizerEx refactor_controlled_register_finalizer
@@ -31,8 +31,9 @@ void fail_at_pointer_boundary(SEXP pointer, int phase) {
   observed_phase = phase;
   address_was_null = R_ExternalPtrAddr(pointer) == nullptr;
   requested_phase = 0;
-  // On an old bank-first implementation, use a C++ exception to permit RAII
-  // cleanup instead of deliberately leaking its live native allocation.
+  // For the deliberately unsafe comparison case, throw a C++ exception so normal
+  // C++ destructors can free its live draws. This detects the bad ordering without
+  // actually leaking memory through an R error that skips those destructors.
   if (!address_was_null) Rcpp::stop("Bank was allocated before the R boundary.");
   Rf_error("Controlled R pointer-boundary failure.");
 }

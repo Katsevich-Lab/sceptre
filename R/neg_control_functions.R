@@ -1,15 +1,13 @@
-#' Sample QC-eligible negative controls from combinations of NT guides
-#'
-#' @param sceptre_object Post-QC object with NT memberships, `M_matrix` and
-#'   `n_nonzero_tot_vector` aligned to guide order and all response rows.
-#' @param n_calibration_pairs Positive requested number of distinct pairs.
-#' @param calibration_group_size Positive number of NT guides per group, no
-#'   greater than the available number of NT guides.
-#' @return Data frame in native sampling order, with `response_id`, ampersand-
-#'   joined `grna_group`, treatment/control counts and `pass_qc = TRUE`.
-#'   May return fewer pairs than requested with a message; errors if none
-#'   qualify.
-#'   Native samplers use fixed seeds and do not consume R random draws.
+#' Choose negative-control gene-guide pairs that pass the QC thresholds
+#' @param sceptre_object Post-QC object containing nontargeting (NT) guide cells,
+#'   `M_matrix` (NT-group counts by gene) and `n_nonzero_tot_vector` (totals by gene).
+#' @param n_calibration_pairs Requested number of distinct calibration pairs.
+#' @param calibration_group_size Number of NT guides to combine per group; must
+#'   be positive and no larger than the number of available NT guides.
+#' @return Table with gene names, joined NT guide names (`grna_group`), treatment
+#'   and control counts, and `pass_qc = TRUE`, in the C++ sampler's order. If too
+#'   few pairs qualify, return fewer with a message; if none qualify, error.
+#'   C++ sampling uses fixed seeds without advancing R's random-number generator.
 #' @noRd
 construct_negative_control_pairs <- function(
     sceptre_object,
@@ -133,13 +131,12 @@ construct_negative_control_pairs <- function(
 }
 
 
-#' Choose the default calibration group size from integration metadata
-#'
-#' @param grna_target_data_frame Guide metadata with `grna_group` already set;
-#'   the caller needs a nonempty targeting-group distribution for a finite
-#'   result.
-#' @return Integer rounded median targeting-group size, capped by the number of
-#'   NT metadata rows. No minimum or empty-target fallback is imposed here.
+#' Choose how many NT guides to combine in a calibration group by default
+#' @param grna_target_data_frame Guide metadata with `grna_group` already set.
+#'   The caller needs at least one targeting group to obtain a finite median.
+#' @return Rounded median number of guides per targeting group, limited to the
+#'   number of NT metadata rows. This helper adds no minimum or fallback for
+#'   missing targeting groups.
 #' @noRd
 compute_calibration_group_size <- function(grna_target_data_frame) {
     median_group_size <- grna_target_data_frame |>
@@ -156,12 +153,13 @@ compute_calibration_group_size <- function(grna_target_data_frame) {
 }
 
 
-#' Encode NT combinations as calibration group IDs
-#'
-#' @param possible_groups_m Integer matrix, one combination per row, containing
-#'   one-based positions in `nt_grna_names` after the native increment step.
-#' @param nt_grna_names Character NT guide IDs in assignment-list order.
-#' @return Character vector of ampersand-joined IDs in matrix row/member order.
+#' Join the NT guide names that make up each calibration group
+#' @param possible_groups_m Integer matrix with one guide combination per row.
+#'   Entries are positions in `nt_grna_names`, starting at 1 after the C++ output
+#'   has been converted to R numbering.
+#' @param nt_grna_names NT guide names in the same order as the assignment list.
+#' @return One name per matrix row, for example `"NT1&NT2"`, keeping row order
+#'   and guide order within each combination.
 #' @noRd
 get_undercover_group_names <- function(possible_groups_m, nt_grna_names) {
     apply(X = possible_groups_m, MARGIN = 1, FUN = function(r) {

@@ -1,5 +1,6 @@
-// Developer-only actual-source probe: controlled errors, never actual OOM.
-// Interposition precedes Rcpp templates and preserves candidate owner scopes.
+// Test cleanup of C++ results using controlled errors, without exhausting memory.
+// Wrap relevant calls before including Rcpp templates, keeping the package's
+// actual buffer lifetimes and calculation scopes unchanged.
 // [[Rcpp::depends(BH)]]
 #define Rf_allocVector probe_result_alloc_vector
 #define Rf_allocMatrix probe_result_alloc_matrix
@@ -84,7 +85,8 @@ void r_boundary(int kind) {
   protections[boundary_count++] = protected_depth;
   if ((live_blocks || live_payloads) && !protected_depth) {
     ++unsafe_boundaries;
-    // Sensitive negative control without intentionally longjmp-leaking memory.
+    // Detect the deliberately unsafe case with a C++ exception, allowing its
+    // destructors to free memory rather than leaking it through an R error.
     throw std::runtime_error("Unprotected R boundary with native result ownership.");
   }
   if (boundary_count == requested_boundary) {
@@ -184,8 +186,9 @@ template<class T> using result_vector = std::vector<T, ResultAllocator<T>>;
 template<class Key, class Hash> using result_set =
   std::unordered_set<Key, Hash, std::equal_to<Key>, ResultAllocator<Key>>;
 
-// Test-only marker in actual payload structs. Copy/move follow real object
-// lifetime, including returned TailResult temporaries; no production hook.
+// Add a test-only marker to the actual result structs to count live objects.
+// Track copies and moves too, including temporary TailResult returns. Production
+// code has no such marker or test option.
 struct ResultPayloadLifetime {
   ResultPayloadLifetime() {
     native_boundary();

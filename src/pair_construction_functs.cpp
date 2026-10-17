@@ -4,13 +4,12 @@
 using namespace Rcpp;
 
 
-// Supplied chromosome positions need not be sorted. Return their one-based
-// input positions satisfying the inclusive distance predicate, in input order.
-// Widen before subtraction so valid signed integer coordinates cannot overflow.
-// Negative thresholds retain an empty result; missing/unrepresentable native
-// coordinates fail clearly. Inputs are read only and no RNG is used.
-// Count before allocating the exact R result: no native-owned result buffer is
-// alive across R allocation/return wrapping, and no full-length scratch is needed.
+// Find supplied genomic positions within the inclusive distance threshold,
+// even if they are unsorted. Return their positions in the input, starting at 1,
+// in input order. Use wider arithmetic before subtracting genomic coordinates
+// to avoid integer overflow. Negative thresholds give no matches; missing or
+// out-of-range integer coordinates error. Count matches before allocating the R
+// output, so no C++ result buffer can leak if R allocation fails.
 // [[Rcpp::export]]
 IntegerVector compute_genes_within_distance(int midpoint, IntegerVector gene_tss_posits, int distance_threshold) {
   if (midpoint == NA_INTEGER || distance_threshold == NA_INTEGER ||

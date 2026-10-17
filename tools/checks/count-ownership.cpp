@@ -1,5 +1,6 @@
-// Developer-only actual-source probe. Interposition precedes Rcpp templates so
-// vector/matrix constructors, named lists and precious preservation are covered.
+// Test memory cleanup in the package's actual count functions. Wrap R allocation
+// calls before including Rcpp templates, so the test can trigger errors during
+// vector/matrix creation, named-list construction and Rcpp object protection.
 #define Rf_allocVector refactor_count_alloc_vector
 #define Rf_allocMatrix refactor_count_alloc_matrix
 #define R_alloc refactor_count_r_alloc
@@ -175,7 +176,7 @@ SEXP refactor_count_ownership_call(int kernel, Rcpp::List inputs, int boundary,
     result = actual_candidate_covariates::compute_cell_covariates_cpp(inputs[7], inputs[8],
         inputs[9], 4, 1, inputs[10], true, true);
   } else Rcpp::stop("Unknown count kernel.");
-  // Include the actual return/copy/wrap preparation in the observation window.
+  // Track allocations through the function return and conversion to an R result too.
   Rcpp::RObject wrapped(Rcpp::wrap(result));
   observing = false;
   return wrapped;

@@ -24,9 +24,9 @@ test_that("vector aggregation preserves dense output and both duplicate meanings
     collapse <- refactor_private("collapse_grna_matrix")
     for (logical in c(FALSE, TRUE)) {
         fixture <- aggregation_example(logical)
-        # Valid triplets permit duplicate coordinates; their Matrix value
-        # aggregation differs from repeated metadata selections. Stored FALSE
-        # is zero here, regardless of storage's separate position-count contract.
+        # Matrix can combine duplicate sparse triplet entries. That differs
+        # from selecting a guide twice through repeated metadata rows. Here
+        # stored FALSE contributes zero; QC's stored-entry counts use a different rule.
         representations <- list(dense = as.matrix(fixture$counts),
             C = methods::as(fixture$counts, "CsparseMatrix"),
             R = methods::as(fixture$counts, "RsparseMatrix"), T = fixture$counts)
@@ -42,8 +42,8 @@ test_that("vector aggregation preserves dense output and both duplicate meanings
     }
 })
 
-# Independent dense-algebra specification, including repeated metadata rows.
-# base colSums deliberately uses this platform's accumulator/rounding contract.
+# Calculate expected sums directly from dense matrices, keeping repeated
+# metadata rows. Use base colSums() to match this platform's numeric rounding.
 aggregation_dense_spec <- function(counts, metadata) {
     dense <- as.matrix(counts)
     groups <- unique(metadata$vector_id)

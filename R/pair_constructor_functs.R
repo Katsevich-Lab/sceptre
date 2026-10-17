@@ -136,8 +136,8 @@ construct_cis_pairs <- function(
             ]
             min_posit <- min(x$start)
             max_posit <- max(x$end)
-            # Integer genomic endpoints may sum beyond INT_MAX even though the
-            # midpoint is representable. Widen before addition, then floor.
+            # Adding two valid genomic endpoints can overflow an R integer.
+            # Convert to doubles before addition, then round the midpoint down.
             midpoint <- as.integer(floor(
                 (as.double(min_posit) + as.double(max_posit)) / 2
             ))
@@ -273,8 +273,8 @@ construct_trans_pairs <- function(
     )
     data.table::setDT(out_pairs)
     if (pairs_to_exclude == "pc_pairs") {
-        # setDT operates by reference. Exclusion preparation owns its table,
-        # including when a caller supplies an existing data.table.
+        # setDT() changes its input in place. Copy the exclusion table first,
+        # including when the caller has already supplied a data.table.
         positive_control_pairs <- data.table::copy(positive_control_pairs)
         data.table::setDT(positive_control_pairs)
         if (nrow(positive_control_pairs) >= 1) {

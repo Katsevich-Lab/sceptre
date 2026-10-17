@@ -1,7 +1,6 @@
-#' Supply the shared plotting theme.
-#' @param element_text_size Numeric plot-title text size.
-#' @return ggplot2 theme with existing line/grid/title defaults; no state
-#'   effects.
+#' Use the package's shared plot appearance
+#' @param element_text_size Plot-title text size.
+#' @return ggplot2 theme defining line, grid and title appearance.
 #' @noRd
 get_my_theme <- function(element_text_size = 11) {
     ggplot2::theme_bw() +
@@ -109,15 +108,13 @@ plot_grna_count_distributions <- function(
     ) |>
         dplyr::filter(grna_expressions < 10000)
 
-    #' Build the current single-count/exponential upper bounds and display
-    #' labels.
-    #' @param grna_expressions Finite source-cell counts for one selected guide,
-    #'   already restricted to values below 10000 by the outer plot.
-    #' @return Data frame of bin_upper_bounds and bin_labels in their existing
-    #'   order.
-    #'   Uses outer rounded threshold; expands only above max(10, threshold-1).
-    #'   This retains the existing label convention; it does not change
-    #'   counts/RNG.
+    #' Choose histogram bin bounds and labels for one guide's counts
+    #' @param grna_expressions Finite per-cell counts, already restricted below 10000
+    #'   by the outer plotting function.
+    #' @return Table of bin_upper_bounds and bin_labels in display order. Use the
+    #'   outer function's rounded threshold: individual-count bins extend through
+    #'   max(10, threshold - 1), then bin widths grow exponentially as needed.
+    #'   Keep the existing bin labels, including at the threshold.
     #' @noRd
     grna_expressions_to_binned_factor <- function(grna_expressions) {
         max_expression_count <- max(grna_expressions)
@@ -155,11 +152,8 @@ plot_grna_count_distributions <- function(
         ))
     }
 
-    # creating a list of bar plots for each grna_id, so that we can avoid
-    # dropping
-    # any bins inside the range of the expressions for each grna_id, but we
-    # don't
-    # keep empty ones in the tail.
+    # Build each guide's histogram separately. Keep empty bins within its count
+    # range, but omit empty bins beyond its largest count.
     plot_list <- lapply(grnas_to_plot, function(curr_grna_id) {
         curr_df <- dplyr::filter(
             to_plot,
@@ -651,18 +645,15 @@ plot_run_calibration_check <- function(
 ############################
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
-#' Build bulk/tail QQ comparisons from already processed result tables.
-#' @param calibration_result,discovery_result Tables with p_value in their row
-#'   order.
-#'   Overlaid groups must have equal per-panel sizes for the existing QQ band.
-#' @param p_thresh Existing discovery display threshold, or NA for no threshold
-#'   line.
-#' @param transform_scale,include_legend,include_y_axis_text Logical display
-#'   options.
-#' @param point_size,transparency Existing point appearance settings.
-#' @return ggplot with fixed-seed grid-sampled QQ points/bands. Does not
-#'   recalculate
-#'   significance, mutate results or consume caller RNG.
+#' Plot calibration and discovery p-values against a reference distribution
+#' @param calibration_result,discovery_result Tables containing p_value in row order.
+#'   Overlaid groups need equal sizes within a panel to share its QQ band.
+#' @param p_thresh Discovery display threshold, or NA to omit its reference line.
+#' @param transform_scale,include_legend,include_y_axis_text Plot display options.
+#' @param point_size,transparency Point appearance settings.
+#' @return QQ plot with points/bands sampled on a display grid using a fixed seed.
+#'   Restore the previous random state and use already processed results, without
+#'   recalculating significance.
 #' @noRd
 compare_calibration_and_discovery_results <- function(
     calibration_result,
@@ -742,16 +733,13 @@ compare_calibration_and_discovery_results <- function(
 }
 
 
-#' Plot effects and p-values using the result family's existing significance
-#' flags.
-#' @param discovery_result Table with p_value, log_2_fold_change and
-#'   significant.
-#' @param p_thresh Existing threshold used only for the horizontal display line.
-#' @param x_limits Effect clipping bounds; displayed p-values clip below 1e-12.
-#' @param transparency,point_size Existing point appearance settings.
-#' @return ggplot; reject colors preserve significant exactly, including ties.
-#'   Clipping changes display data only. No input mutation, new testing rule or
-#'   RNG.
+#' Plot effects and p-values, coloring points by their saved significance flag
+#' @param discovery_result Table with p_value, log_2_fold_change and significant.
+#' @param p_thresh P-value used only for the horizontal reference line.
+#' @param x_limits Display bounds for log2 effects; p-values below 1e-12 display at 1e-12.
+#' @param transparency,point_size Point appearance settings.
+#' @return ggplot using the result's significant column exactly, including ties.
+#'   Clipping changes only displayed values; it does not recompute significance.
 #' @noRd
 make_volcano_plot <- function(
     discovery_result,
@@ -1045,13 +1033,13 @@ plot_covariates <- function(
         p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
     }
     covariate_data_frame <- sceptre_object@covariate_data_frame
-    #' Show one source-cell covariate and its already selected cutoff lines.
-    #' @param v Numeric source-cell values; curr_range is percentile or raw
-    #'   cutoffs.
-    #' @param plot_tit Display title; use_quantile chooses existing quantile
-    #'   lookup.
-    #' @return ggplot histogram; does not subset retained cells or change
-    #'   QC/RNG.
+    #' Plot one covariate across original cells with candidate QC cutoff lines
+    #' @param v Covariate values before cell removal; curr_range gives quantiles or
+    #'   direct value cutoffs.
+    #' @param plot_tit Plot title; use_quantile selects whether to convert curr_range
+    #'   from quantiles to observed values.
+    #' @return Histogram with cutoff lines. Showing candidate cutoffs does not apply
+    #'   QC or remove cells from the data.
     #' @noRd
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
@@ -1213,13 +1201,11 @@ plot_run_qc <- function(
     return(p_out)
 }
 
-#' Show existing overlapping source-cell QC removal percentages.
-#' @param sceptre_object QC facade with six positionally ordered removal
-#'   metrics.
-#' @return Single ggplot; denominator is original source-cell count, and high
-#'   MOI
-#'   omits the empty/multiple-guide bar. Reads stored metrics, not fresh QC; no
-#'   RNG.
+#' Plot the stored percentage of cells removed for each QC reason
+#' @param sceptre_object Post-QC object with six removal counts in their saved order.
+#' @return Bar plot using the original cell count as denominator. Removal reasons
+#'   can overlap, so bars need not sum to the total. High MOI omits the zero/
+#'   multiple-guide bar. Read the saved counts rather than rerunning QC.
 #' @noRd
 plot_cellwise_qc <- function(sceptre_object) {
     cell_removal_metrics <- sceptre_object@cell_removal_metrics
@@ -1262,16 +1248,13 @@ plot_cellwise_qc <- function(sceptre_object) {
     return(p_a)
 }
 
-#' Show stored discovery-pair counts and existing pairwise eligibility.
-#' @param sceptre_object QC facade with discovery_pairs_with_info and cutoffs.
-#' @param downsample_pairs Existing global row-sample limit for this QC
-#'   scatterplot.
-#' @param point_size,transparency Point appearance settings, forwarded by
-#'   plot_run_qc.
-#' @return Single ggplot. Seed-4 row sampling retains duplicate pair rows as
-#'   separate
-#'   observations and restores caller RNG. Does not recompute counts/QC or
-#'   mutate data.
+#' Plot saved treatment/control counts and which discovery pairs pass QC
+#' @param sceptre_object Post-QC object with discovery_pairs_with_info and thresholds.
+#' @param downsample_pairs Maximum number of table rows to sample for display.
+#' @param point_size,transparency Point appearance settings from plot_run_qc().
+#' @return Scatterplot of stored counts and QC flags. Row sampling uses seed 4
+#'   and restores the previous random state. Repeated pair rows remain separate
+#'   observations; counts and QC decisions are not recomputed.
 #' @noRd
 plot_pairwise_qc <- function(
     sceptre_object,
@@ -1453,16 +1436,12 @@ plot_run_power_check <- function(
 }
 
 
-#' Retain the existing deterministic per-p-value-bin result sampling.
-#' @param result_df Table with p_value; row identities/multiplicity are
-#'   retained.
-#' @param downsample_pairs Maximum sampled within each existing power-of-ten
-#'   bin,
-#'   not a global row cap.
-#' @return Grouped tibble (grouped by bin), in existing group/sample order. Seed
-#'   4
-#'   restores caller RNG; does not ungroup, normalize results or change
-#'   inference.
+#' Sample result rows separately within p-value ranges for plotting
+#' @param result_df Table containing p_value; keep repeated rows as separate observations.
+#' @param downsample_pairs Maximum rows per power-of-ten p-value bin, rather than
+#'   a maximum across the entire table.
+#' @return Tibble still grouped by bin, in group/sample order. Sampling uses seed 4
+#'   and restores the previous random state. This reduces display data only.
 #' @noRd
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
     withr::with_seed(4, {

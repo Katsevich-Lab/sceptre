@@ -56,8 +56,8 @@ test_that("candidate calibration sampling checks dimensions counts and wide prod
     expect_error(call(counts = matrix(.Machine$integer.max, 1L, 1L),
                       totals = .Machine$integer.max, groups = matrix(c(0L, 0L), 1L)),
                  "treatment count exceeds native")
-    # These small inputs represent > INT_MAX candidate pairs, without allocating
-    # the former multi-billion-element permutation or executing the old kernel.
+    # Small input matrices can imply more candidate pairs than a C++ int holds.
+    # Check the size error without trying to allocate billions of candidates.
     expect_error(call(counts = matrix(1L, 1L, 46341L), totals = rep(2L, 46341L),
                       groups = matrix(0L, 46341L, 1L), genes = 46341L),
                  "Candidate pair count exceeds")
@@ -83,8 +83,8 @@ test_that("public calibration uses actual NT groups surviving cellwise QC", {
     groups <- object@grna_assignments_raw$indiv_nt_grna_idxs
     expect_true(length(groups) >= 2L)
     removed_group <- names(groups)[[1L]]
-    # Remove source cells through the public QC path; metadata intentionally
-    # still describes the guide that no longer has an assigned analysis cell.
+    # Run public QC to remove a guide's last cell. Keep its metadata row so the
+    # test checks the remaining assignments rather than just counting metadata.
     object <- suppressMessages(sceptre::run_qc(object,
         response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
         n_nonzero_trt_thresh = 0L, n_nonzero_cntrl_thresh = 0L,
@@ -179,11 +179,13 @@ test_that("native adapter checks selected prefixes without restricting CRT cardi
     expect_equal(changed(synthetic_idxs = empty, use_all_cells = TRUE)$stage, 1)
     zero_bank <- refactor_private("fisher_yates_sampler")(3L, 1L, 0L)
     expect_length(changed(synthetic_idxs = zero_bank, B1 = 0L)$resampling_dist, 0L)
-    # A hybrid suffix can exceed the smaller current fit view; its selected
-    # prefix is valid for N + n_trt cells and must not be rejected by a bank scan.
+    # A hybrid draw serves several treatment sizes. Its first n_trt positions
+    # fit within this group's N + n_trt cells; later entries may belong to a
+    # larger group. Do not reject a valid test by checking unused later entries.
     hybrid <- refactor_private("hybrid_fisher_iwor_sampler")(2L, 1L, 5L, 1L)
     expect_equal(changed(synthetic_idxs = hybrid)$stage, 1)
-    # Short B2 is irrelevant to a stage-1 result, including an unused bank tail.
+    # A stage-1 return never fits stage 2, so its short B2 and unused draws
+    # must not trigger the fitter's minimum-size check.
     expect_equal(changed(B2 = 1L, fit_parametric_curve = TRUE)$stage, 1)
     reached <- bridge$refactor_native_pointer(rep(list(1L), 149L), 3L)
     expect_error(changed(synthetic_idxs = reached, B1 = 50L, B2 = 99L,

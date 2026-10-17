@@ -1,18 +1,15 @@
 ###########################################
 # TOP-LEVEL FUNCTION: ASSIGN GRNAS TO CELLS
 ###########################################
-#' Dispatch guide assignment and preserve the pipeline pod boundary.
-#' @param sceptre_object Facade with resolved assignment method/hyperparameters.
-#' @param print_progress,parallel,n_processors,log_dir Existing mixture worker
-#'   options.
-#' @return Facade with initial source-cell memberships and maximum-method
-#'   exclusion
-#'   cells. Standard execution also pools/groups memberships; nf_pipeline uses
-#'   elements_to_analyze and defers pooling until gathered assignments are
-#'   processed.
-#'   Warns if all assignments are empty. Reads storage; mixture may log and run
-#'   GC.
-#'   Assignment/source order and existing RNG behavior are retained.
+#' Assign guides to cells, then combine assignments when appropriate
+#' @param sceptre_object Sceptre object with assignment method and settings chosen.
+#' @param print_progress,parallel,n_processors,log_dir Mixture-model worker and
+#'   progress settings.
+#' @return Object with initial assignments as original matrix column numbers and,
+#'   for maximum assignment, cells flagged for exclusion. Standard runs also
+#'   combine assignments into guide groups. Nextflow runs process only
+#'   `elements_to_analyze` and combine groups after workers' outputs are gathered.
+#'   Warn if no guides were assigned. Mixture fitting can use workers and logs.
 #' @noRd
 assign_grnas_to_cells <- function(
     sceptre_object,
@@ -95,14 +92,13 @@ assign_grnas_to_cells <- function(
 #######################
 # THRESHOLDING FUNCTION
 #######################
-#' Assign selected guide rows using the storage-specific threshold kernel.
-#' @param grna_matrix Supported guide-by-source-cell store, made row-accessible.
-#' @param grna_assign_threshold Existing scalar count cutoff.
-#' @param grna_ids Requested guide IDs in output order.
-#' @return Named list of one-based source-cell positions in stored-column order.
-#'   Retains sparse double versus backed integer-coercion semantics at the
-#'   storage
-#'   boundary; does not pool guides, mutate the caller or draw randomness.
+#' Assign a guide to cells whose counts reach the threshold
+#' @param grna_matrix Guide-by-cell matrix prepared for row access.
+#' @param grna_assign_threshold Count cutoff.
+#' @param grna_ids Guide names, in desired output order.
+#' @return Named list of original cell-column numbers, starting at 1, in storage
+#'   order. `storage_threshold_row()` handles in-memory versus ondisc counts,
+#'   including their different numeric/integer threshold conversion.
 #' @noRd
 assign_grnas_to_cells_thresholding <- function(
     grna_matrix,
@@ -128,18 +124,16 @@ assign_grnas_to_cells_thresholding <- function(
 #########
 # MAXIMUM
 #########
-#' Resolve maximum-guide assignments from the existing import summaries.
-#' @param max_grna Source-cell maximum-guide IDs from the import summary.
-#' @param max_grna_frac_umis Corresponding maximum fractions in the same order.
-#' @param umi_fraction_threshold Cells at or below this fraction are flagged.
-#' @param grna_n_umis Source-cell guide totals.
-#' @param min_grna_n_umis_threshold Cells below this total are flagged.
-#' @param grna_ids Guide IDs in output order.
-#' @return Named one-based source-cell memberships and union of
-#'   ambiguous/low-total
-#'   positions. A flagged cell remains in the initial maximum membership; later
-#'   QC
-#'   applies exclusions. No matrix scan, input mutation, RNG or files.
+#' Assign each cell to its highest-count guide and flag ambiguous cells
+#' @param max_grna Highest-count guide name for each original cell.
+#' @param max_grna_frac_umis Fraction of that cell's guide UMIs from its top guide.
+#' @param umi_fraction_threshold Flag cells whose top-guide fraction is at or below this.
+#' @param grna_n_umis Total guide UMIs per original cell.
+#' @param min_grna_n_umis_threshold Flag cells whose total is below this.
+#' @param grna_ids Guide names, in desired output order.
+#' @return Named cell assignments and the combined set of ambiguous/low-total
+#'   cells, as original matrix columns starting at 1. Flagged cells still appear
+#'   in the initial assignments; subsequent QC removes them.
 #' @noRd
 assign_grnas_to_cells_maximum <- function(
     max_grna,
@@ -169,19 +163,18 @@ assign_grnas_to_cells_maximum <- function(
 
 
 ######################
-# AUXILLIARY FUNCTIONS
+# HELPER FUNCTIONS
 ######################
-#' Pool source-cell assignments and prepare the saved raw-assignment schema.
-#' @param sceptre_object Facade with gathered initial assignments and guide
-#'   metadata.
-#' @return Facade with grna_assignments_raw and mean_cells_per_grna; nonmaximum
-#'   methods also count guides per source cell and low-MOI empty/multiple cells.
-#'   Target groups retain first-seen metadata order and first-occurrence OR
-#'   union;
-#'   individual NT guides retain their initial named membership order. No QC
-#'   view
-#'   conversion occurs. This separate boundary is used after real pipeline pods.
-#'   Does not mutate input memberships, sample, fit models or write files.
+#' Combine individual guide assignments into the groups saved before QC
+#' @param sceptre_object Object with gathered guide assignments and guide metadata.
+#' @return Object with `grna_assignments_raw` and `mean_cells_per_grna`. Methods
+#'   other than maximum also count guides per cell and flag low-MOI cells with
+#'   zero or multiple guides. Target groups follow first-seen metadata order;
+#'   their cells are combined without duplicates, in first-seen order. Individual
+#'   NT guide lists keep their original names and cell order. All cell numbers
+#'   still refer to original matrix columns; QC renumbers them later.
+#' @details Nextflow calls this after collecting guide assignments from its tasks.
+#'   The supplied membership vectors are left unchanged.
 #' @noRd
 process_initial_assignment_list <- function(sceptre_object) {
     # set variables
@@ -250,21 +243,15 @@ process_initial_assignment_list <- function(sceptre_object) {
 }
 
 
-#' Select guide IDs in metadata order for standard or restricted/trial
-#' execution.
-#' @param sceptre_object Facade containing metadata, pair targets and nuclear
-#'   flag.
-#' @param restricted_grnas Logical; FALSE retains all metadata rows. TRUE
-#'   retains
-#'   requested pair targets plus NT, or nuclear trial targets sampled from at
-#'   most
-#'   30 targeting metadata rows (not 30 distinct targets), plus NT.
-#' @return Guide IDs in original metadata order, preserving metadata
-#'   multiplicity.
-#'   Nuclear sampling uses seed 4 and restores caller RNG. Retained because
-#'   actual
-#'   pipeline output_grna_info passes trial through this restricted-mode
-#'   boundary.
+#' Choose which guides to process, retaining their metadata order
+#' @param sceptre_object Object with guide metadata, requested targets and pipeline mode.
+#' @param restricted_grnas FALSE selects every metadata row. TRUE selects guides
+#'   for requested targets plus NT guides. For a nuclear trial run, instead sample
+#'   at most 30 targeting metadata rows, take their targets, then add NT guides.
+#'   Thirty rows need not mean 30 different targets.
+#' @return Guide names in metadata order, keeping repeated metadata rows.
+#'   Nuclear trial sampling uses seed 4 and restores R's previous random state.
+#'   Nextflow's `output_grna_info` uses this restricted mode for trial runs.
 #' @noRd
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame

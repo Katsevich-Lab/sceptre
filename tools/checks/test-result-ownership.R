@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Separate bounded actual-source probe; no actual OOM or production hooks.
+# Test current-source cleanup separately using controlled errors, not real OOM.
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 2L) stop("Supply current immutable source and fresh evidence directory.")
 root <- normalizePath(args[[1L]], mustWork = TRUE)
@@ -24,8 +24,8 @@ for (i in seq_along(source_files)) {
     text <- readLines(source_files[[i]])
     text <- gsub("std::vector<", "result_vector<", text, fixed = TRUE)
     text <- gsub("std::unordered_set<", "result_set<", text, fixed = TRUE)
-    # Test-only lifetime markers have copy/move-aware accounting, no production
-    # mutation and no changed native/R allocation or owner scope.
+    # Count live result objects, including copies/moves, using test-only markers.
+    # Keep the actual R/C++ allocation order and buffer lifetimes unchanged.
     for (name in c("TailResult", "CalibrationPairResult")) {
         needle <- paste0("struct ", name, " {")
         if (any(grepl(needle, text, fixed = TRUE))) {
@@ -48,9 +48,9 @@ writeLines(c(sprintf("#define SCEPTRE_RESULT_%s %s", macros,
 environment <- new.env(parent = globalenv())
 Rcpp::sourceCpp(bridge, env = environment, rebuild = TRUE, showOutput = TRUE)
 options(warn = 2) # warnings are failures during controlled qualification
-# Fault injection certifies current ownership, not equality with another package.
-# The unfailed call is a control for repeatability; mathematics is tested by the
-# separate component/package tests. No old package, outputs or source is loaded.
+# Inject failures to check that current result buffers are freed. Repeat the
+# successful call as a control; separate component/package tests check formulas.
+# This uses no old package, source or saved outputs.
 pair <- list(matrix(c(2L, 1L, 3L, 0L, 1L, 2L), 2L), c(4L, 5L, 4L),
              matrix(0:1, 2L), 3L, 4L, 1L, 1L)
 rejected <- list(matrix(0L, 1L, 500L), rep(2L, 500L), matrix(0L, 100L, 1L),
@@ -88,7 +88,7 @@ for (name in names(cases)) {
     bank <- if (case$kernel == 2L) environment$result_ownership_bank(case$input$draws) else NULL
     call <- function(boundary = 0L, native = 0L)
         environment$result_ownership_call(case$kernel, case$input, bank, boundary, native)
-    # Warm Rcpp callable caches before enumerating stable boundary ordinals.
+    # Initialize Rcpp caches first, so numbered failure sites exclude one-time setup.
     control <- call(); environment$result_ownership_state()
     snapshot <- serialize(case$input, NULL)
     actual <- call()

@@ -1,5 +1,5 @@
-# These small explicit examples characterize the legacy kernels, including
-# representation semantics that are deliberately not normalized by the refactor.
+# Small examples spell out the current count rules, including differences
+# between matrix formats that the refactor must preserve.
 
 test_that("legacy storage retains stored-zero and fractional semantics", {
     mat <- storage_test_matrix()
@@ -121,7 +121,8 @@ storage_test_contract <- function(mat) {
                      matrix(integer(), 2L, 0L))
     expect_identical(storage_group_counts(mat, c(1L, 2L), list(), cells),
                      matrix(integer(), 0L, 2L))
-    # Reordered analysis cells change all local coordinates together.
+    # Reordering cells kept after QC also changes group positions within that
+    # list; update both so they still select the same original matrix columns.
     reordered <- storage_pair_counts(
         mat, pairs, list(c(4L, 5L), c(1L, 2L, 3L)),
         cells[c(4L, 1L, 5L, 2L, 3L)], "complement"

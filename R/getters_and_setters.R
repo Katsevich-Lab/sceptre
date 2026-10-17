@@ -114,8 +114,9 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
     grna_ids <- names(initial_grna_assignment_list)
     names(initial_grna_assignment_list) <- NULL
-    # Saved memberships use one-based source cells. Arithmetic creates the
-    # getter's owned zero-based Matrix slot without mutating saved vectors.
+    # Saved assignments are original cell columns starting at 1. Subtracting
+    # one creates a new vector for Matrix's zero-based column numbers, leaving
+    # the saved assignments unchanged.
     j <- unlist(initial_grna_assignment_list) - 1L
     l <- vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1))
     p <- c(0L, cumsum(l))
@@ -131,27 +132,29 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
         if (!sceptre_object@functs_called[["run_qc"]]) {
             stop("QC has not yet been called on this sceptre_object.")
         }
-        # Keep the public getter's existing Matrix dimension-drop behavior.
+        # Keep Matrix's usual subsetting: a single remaining row/column may
+        # become a vector rather than a matrix.
         mat <- mat[, sceptre_object@cells_in_use]
     }
     return(mat)
 }
 
-#' Replace the response payload within the existing saved-object wrapper
+#' Replace the response matrix stored in the object
 #'
-#' Returns the updated facade, keeping its one-element list slot. The payload
-#' may be an in-memory/backed store or the empty list used for portable saves;
-#' no validation, reading, conversion or other slot changes occur here.
+#' Keep the one-element list used by the saved-object format. Its element may be
+#' an in-memory matrix, an ondisc matrix, or the empty list used when saving an
+#' object without open file handles. Return the updated object; do not read or
+#' convert the supplied matrix here.
 #' @noRd
 set_response_matrix <- function(sceptre_object, response_matrix) {
     sceptre_object@response_matrix[[1]] <- response_matrix
     return(sceptre_object)
 }
 
-#' Replace the guide payload within the existing saved-object wrapper
+#' Replace the guide matrix stored in the object
 #'
-#' Same storage/saved-object contract as set_response_matrix; the one-element
-#' list is a persisted compatibility boundary. Returns the updated facade.
+#' As with set_response_matrix(), keep the saved format's one-element list and
+#' return the updated object. The caller supplies the matrix or empty placeholder.
 #' @noRd
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
     sceptre_object@grna_matrix[[1]] <- grna_matrix

@@ -3,13 +3,12 @@ StatQQBand <- ggplot2::ggproto(
     "StatQQBand",
     ggplot2::Stat,
     required_aes = c("y"), # the sample will come through the y aesthetic
-    #' Select one equal-sized QQ group per panel before band computation.
-    #' @param data Transformed y, PANEL and ggplot-assigned group IDs.
-    #' @param params Existing ggplot stat parameters.
-    #' @return Input rows for the minimum group separately in each panel,
-    #'   retaining
-    #'   row order; errors on unequal group sizes within a panel. No
-    #'   sampling/RNG.
+    #' Choose one group's rows for the shared QQ confidence band in each panel
+    #' @param data Plot rows with transformed y values, PANEL and group numbers.
+    #' @param params ggplot statistic settings.
+    #' @return Rows from the lowest-numbered group in each panel, keeping their order.
+    #'   Groups within a panel must have the same number of points to share a band;
+    #'   otherwise error. Select separately per panel, since group numbers can differ.
     #' @noRd
     setup_data = function(data, params) {
         if ("group" %in% names(data)) {
@@ -39,14 +38,15 @@ StatQQBand <- ggplot2::ggproto(
             data
         }
     },
-    #' Calculate the existing pointwise order-statistic QQ band for one group.
-    #' @param data,scales Transformed y and panel scales; y is inverted first.
-    #' @param distribution,max_pts_to_plot,ci_level Quantile family, grid
-    #'   resolution
-    #'   and pointwise confidence. Rank ties use first occurrence.
-    #' @return Transformed x/y/ymin/ymax rows, one per occupied x/y grid cell
-    #'   under
-    #'   seed 4. Restores caller RNG; no global point cap or new band method.
+    #' Calculate a pointwise QQ confidence band for one plotted group
+    #' @param data,scales Transformed y values and panel scales. Undo the y
+    #'   transformation before ranking observations.
+    #' @param distribution,max_pts_to_plot,ci_level Reference distribution, display-grid
+    #'   resolution and pointwise confidence level. Break rank ties by first occurrence.
+    #' @return x/y/ymin/ymax in plotted coordinates. To reduce overplotting, retain
+    #'   one sampled row per occupied x/y grid cell, using seed 4 and restoring the
+    #'   previous random state. max_pts_to_plot controls grid resolution, rather than
+    #'   imposing a total point limit.
     #' @noRd
     compute_group = function(
         data,
@@ -102,18 +102,15 @@ StatQQBand <- ggplot2::ggproto(
     }
 )
 
-#' Add confidence band for a QQ plot
-#'
+#' Add a pointwise confidence band to a QQ plot
 #' @inheritParams ggplot2::stat_identity
-#' @param distribution The distribution with respect to which to make QQ plot
-#' (e.g. \code{"unif"}, \code{"norm"}, etc.); default \code{"unif"}
-#' @param max_pts_to_plot Number of intervals per axis for deterministic
-#'   x/y-grid
-#' downsampling; at most one point is kept per occupied grid cell, not a global
-#' cap.
-#' @param ci_level The pointwise confidence level for the QQ plot; default 0.95
-#' @return A ggplot layer using the existing per-panel pointwise beta bands,
-#' inverse/forward scales, first-occurrence ranks and restored seed-4 RNG.
+#' @param distribution Reference distribution, such as "unif" or "norm"; default "unif".
+#' @param max_pts_to_plot Number of display-grid intervals per axis. Keep at most
+#'   one point per occupied grid cell; this is not a total point limit.
+#' @param ci_level Pointwise confidence level, default 0.95.
+#' @return ggplot layer with beta order-statistic bands in each panel's scales.
+#'   Break rank ties by first occurrence and restore the previous random state
+#'   after sampling points with seed 4.
 #' @noRd
 stat_qq_band <- function(
     mapping = NULL,
@@ -150,15 +147,13 @@ StatQQPoints <- ggplot2::ggproto(
     "StatQQPoints",
     ggplot2::Stat,
     required_aes = c("y"),
-    #' Calculate existing QQ points for one group in its panel scales.
-    #' @param data,scales Transformed y and panel scales; ranks use
-    #'   inverse-scale y.
-    #' @param distribution,max_pts_to_plot Quantile family and occupied-grid
-    #'   resolution.
-    #' @param ymin,ymax Inverse-scale display clipping bounds, applied after
-    #'   ranking.
-    #' @return Transformed x/y rows sampled per occupied grid cell with seed 4;
-    #'   first-occurrence tie ranks and caller RNG are preserved.
+    #' Calculate QQ points for one group using its panel's scales
+    #' @param data,scales Transformed y values and panel scales. Undo the y
+    #'   transformation before ranking, with first-occurrence tie breaking.
+    #' @param distribution,max_pts_to_plot Reference distribution and display-grid resolution.
+    #' @param ymin,ymax Display cutoffs on the original y scale, applied after ranking.
+    #' @return x/y rows in plotted coordinates. Sample one row per occupied grid cell
+    #'   using seed 4, then restore the caller's previous random state.
     #' @noRd
     compute_group = function(
         data,
@@ -205,22 +200,14 @@ StatQQPoints <- ggplot2::ggproto(
     }
 )
 
-#' Add points for a QQ plot
-#'
+#' Add observed versus expected quantiles to a QQ plot
 #' @inheritParams ggplot2::stat_identity
-#' @param distribution The distribution with respect to which to make QQ plot
-#' (e.g. \code{"unif"}, \code{"norm"}, etc.); default \code{"unif"}
-#' @param max_pts_to_plot Number of intervals per axis for deterministic
-#'   x/y-grid
-#' downsampling; at most one point is kept per occupied grid cell, not a global
-#' cap.
-#' @param ymin Samples with value less than \code{ymin} will be truncated at
-#' \code{ymin} for plotting.
-#' @param ymax Samples with value greater than \code{ymax} will be truncated at
-#' \code{ymax} for plotting.
-#' @return A ggplot point layer preserving inverse-scale ranks, display
-#'   clipping,
-#' occupied-grid sampling and caller RNG.
+#' @param distribution Reference distribution, such as "unif" or "norm"; default "unif".
+#' @param max_pts_to_plot Display-grid intervals per axis; keep at most one point
+#'   per occupied grid cell, rather than limiting the total number of points.
+#' @param ymin,ymax Original-scale y bounds for clipping displayed values.
+#' @return ggplot point layer. Rank on the original y scale before clipping and
+#'   transforming for display. Grid sampling restores the previous random state.
 #' @noRd
 stat_qq_points <- function(
     mapping = NULL,
@@ -254,15 +241,11 @@ stat_qq_points <- function(
 }
 
 
-#' Reverse logarithm transformation
-#'
-#' @param base The base with respect to which to take the logarithm (defaults to
-#' e).
-#'
-#' @return A scale transformation with -log(x, base), inverse base^(-x), log
-#' breaks and the existing positive domain. The two local transform closures
-#' share
-#' this contract; no validation, mutation, sampling or files are involved.
+#' Transform a positive value to minus its logarithm for plotting
+#' @param base Logarithm base, defaulting to e.
+#' @return Scale transformation -log(x, base), with inverse base^(-x), logarithmic
+#'   breaks and domain [1e-100, Inf]. The two local functions implement the forward
+#'   and inverse calculations; values are not otherwise checked here.
 #' @noRd
 revlog_trans <- function(base = exp(1)) {
     trans <- function(x) {

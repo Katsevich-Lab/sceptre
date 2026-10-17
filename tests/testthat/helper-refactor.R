@@ -99,7 +99,8 @@ refactor_prepare <- function(inputs, case, backed = FALSE, directory = NULL, ass
     )
 }
 
-# Preserve table types/order without serializing data.table's external selfref.
+# Keep table types and row order, but omit data.table's internal self-reference
+# pointer, which is not useful when comparing saved values.
 refactor_plain <- function(x) {
     if (is.data.frame(x)) {
         return(list(class = class(x), names = names(x), row_names = rownames(x),
@@ -197,7 +198,7 @@ refactor_index_observations <- function() {
     object@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
     raw <- list(grna_group_idxs = list(A = c(5L, 4L)),
                 indiv_nt_grna_idxs = list(ntA = 8L, ntB = c(2L, 11L)))
-    # Use the actual baseline assignment schema (all_nt_idxs is derived below).
+    # Use the saved assignment format; build the combined NT-cell list below.
     object@grna_assignments_raw <- raw
     before <- serialize(raw, NULL)
     out <- refactor_private("update_grna_assignments_given_qc")(object)

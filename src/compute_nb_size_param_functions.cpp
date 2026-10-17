@@ -7,13 +7,15 @@
 #include <stdexcept>
 using namespace Rcpp;
 
-// Size theta uses Var(Y | mu) = mu + mu^2/theta. The R fitter supplies fixed
-// Poisson fitted means in the same cell view as y; this is dispersion estimation,
-// not a second joint negative-binomial coefficient fit. R owns final clipping.
+// Estimate negative-binomial dispersion theta, where Var(Y | mu) = mu + mu^2/theta.
+// R supplies counts y and fixed Poisson fitted means mu in the same cell order.
+// We estimate dispersion here, rather than refitting regression coefficients.
+// R later restricts the returned estimate to its allowed range.
 
-// Negative-binomial size score for aligned response/mean vectors at trial th.
-// Uses the existing Boost double special-function policy; domain/overflow can
-// throw to the estimator's numerical boundary. Inputs are read only, no RNG.
+// Evaluate the negative-binomial dispersion score at trial theta th.
+// y and mu must describe the same cells in the same order. Use the current Boost
+// special-function calculations; invalid domains or overflow can throw numeric
+// exceptions for the estimator below to handle.
 double nb_score(double th, NumericVector mu, NumericVector y) {
   double sum = 0;
   for (int i = 0; i < mu.size(); i ++) {
@@ -23,8 +25,9 @@ double nb_score(double th, NumericVector mu, NumericVector y) {
 }
 
 
-// Matching observed information at th, with the same alignment/error contract
-// as nb_score. Keep summation and special-function order for numerical parity.
+// Evaluate observed information (minus the score derivative) at th, using the
+// same cells as nb_score(). Preserve sum and special-function evaluation order
+// to keep the fitted numerical results repeatable.
 double nb_info(double th, NumericVector mu, NumericVector y) {
  double sum = 0;
   for (int i = 0; i < mu.size(); i ++) {
@@ -34,8 +37,9 @@ double nb_info(double th, NumericVector mu, NumericVector y) {
 }
 
 
-// Existing moment pilot n / sum((y/mu - 1)^2); zero/nonfinite arithmetic is
-// retained. The estimator evaluates this before its MLE/MM try boundary.
+// Compute the starting dispersion n / sum((y/mu - 1)^2). Keep zero/non-finite
+// arithmetic as is. This initial estimate is calculated before the try block
+// that handles numerical failures in the later iterative estimators.
 double nb_theta_pilot_est(NumericVector y, NumericVector mu) {
   double n = (double) y.size();
   double denom = Rcpp::sum((y/mu - 1) * (y/mu - 1));
@@ -43,9 +47,10 @@ double nb_theta_pilot_est(NumericVector y, NumericVector mu) {
 }
 
 
-// Moment iteration from the supplied pilot and degrees of freedom. Returns
-// {last theta, warning flag}; negative/nonfinite theta or reaching limit warns.
-// Arithmetic/convergence rules are retained; the caller decides pilot fallback.
+// Estimate dispersion by matching moments, starting from the supplied estimate
+// and residual degrees of freedom. Return the last theta and a warning flag.
+// Flag negative/non-finite theta or reaching the iteration limit. The caller
+// decides whether to fall back to the starting estimate.
 std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   int it = 0;
   double del = 1;
@@ -65,9 +70,9 @@ std::vector<double> nb_theta_mm(double t0, NumericVector y, NumericVector mu, do
 }
 
 
-// Score/information iteration from the supplied pilot, returning {theta, warning}
-// with the same warning convention as MM. Numeric exceptions propagate to the
-// estimator; no response/mean mutation, random draws or file effects occur.
+// Estimate dispersion by Newton updates of the score/information ratio.
+// Return theta and a warning flag, with the same warning rules as moment fitting.
+// Numeric exceptions pass to the main estimator below; inputs stay unchanged.
 std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, int limit, double eps) {
   int it = 0;
   double del = 1;
@@ -87,14 +92,15 @@ std::vector<double> nb_theta_mle(double t0, NumericVector y, NumericVector mu, i
 }
 
 
-// Aligned response/mean vectors and the existing degrees-of-freedom, iteration
-// and tolerance controls produce (estimate, method): 1 MLE, 2 MM, 3 pilot.
-// Method records the existing committed branch, not a convergence guarantee:
-// e.g. an MM exception leaves the preceding warning-bearing MLE state/method 1.
-// Keep the whole MLE/MM try boundary and assignment order: a numerical failure
-// during MM retains the already committed MLE state. Only the reached Boost
-// domain/overflow failures are suppressed; allocation/system failures propagate.
-// Pilot computation and result allocation remain outside this boundary.
+// Estimate dispersion from counts and fixed means for the same cells, with the
+// supplied degrees of freedom, iteration limit and tolerance. Return the value
+// and method code: 1 = maximum likelihood, 2 = moments, 3 = starting estimate.
+// The code records the last assigned method, not a promise of convergence.
+// Keep the assignment order within the try block: if moment fitting throws,
+// the preceding likelihood result and method 1 remain, even if it warned.
+// Catch only the expected Boost domain/overflow errors. Memory and system errors
+// must propagate. Starting-estimate calculation and R-result allocation happen
+// outside this numerical error handler.
 // [[Rcpp::export]]
 List estimate_theta(NumericVector y, NumericVector mu, double dfr, int limit, double eps) {
   // first, attempt to estimate theta via MLE

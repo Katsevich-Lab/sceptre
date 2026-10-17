@@ -7,18 +7,20 @@ using namespace Rcpp;
 namespace sceptre {
 namespace inference {
 
-// Shared score shape guard: a/w length n and D columns n. The Rcpp entry
-// separately checks y/mu/observed cardinality. D rows may be zero; this does not
-// revalidate a fitted model's rank or scan producer-owned bank coordinates.
+// Check that a and w have one entry per cell and D has one column per cell.
+// The R entry separately checks counts, fitted means and treatment-group size.
+// D may have zero rows. This check does not assess design rank or resampled
+// cell positions; those are the fitter's and sampler's responsibilities.
 void check_score_dimensions(const NumericVector& a, const NumericVector& w,
                             const NumericMatrix& D) {
   if (a.size() != w.size() || a.size() != D.ncol())
     stop("Score arrays a/w and D columns must have aligned cell dimensions.");
 }
 
-// Allocate an owned vector preserving observed order/repetitions and subtract
-// one once. Positivity/NA is checked here; the Rcpp entry checks upper bounds.
-// The caller's R vector is never decremented in place.
+// Copy observed treatment positions and convert from R numbering (1, 2, ...)
+// to C++ numbering (0, 1, ...), keeping order and repeats. Reject missing or
+// nonpositive positions here; the R entry checks the upper limit. Never subtract
+// from the caller's original vector, which could change saved assignments.
 IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
   IntegerVector zero_based(positions.size());
   for (R_xlen_t i = 0; i < positions.size(); ++i) {
@@ -28,10 +30,11 @@ IntegerVector observed_positions_zero_based(const IntegerVector& positions) {
   return zero_based;
 }
 
-// Ratio of treated sums y/mu and its existing residual-based standard error,
-// both on the fold-change (not log) scale. y/mu share the fit-cell view;
-// trt_idxs are zero-based, n_trt entries, in caller order (repetitions count).
-// Degenerate sums/zero n_trt keep ordinary floating NaN/Inf. No mutation or RNG.
+// Estimate fold change as the treated cells' total counts divided by their total
+// fitted means, with the current residual-based standard error. Both are on the
+// fold-change scale, not the log scale. y and mu use the same selected cells;
+// trt_idxs gives their positions starting at 0. Repeated positions count again.
+// Keep summation order and ordinary NaN/Inf results for zero or undefined ratios.
 EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, const IntegerVector& trt_idxs, int n_trt) {
   double sum_y = 0, sum_mu = 0, sum_top = 0, curr_top, n_trt_double = (double) n_trt;
   for (int i = 0; i < n_trt; i ++) {
@@ -48,16 +51,17 @@ EffectEstimate estimate_effect(const NumericVector& y, const NumericVector& mu, 
 }
 
 
-// Studentized efficient score: sum(a[T]) / sqrt(sum(w[T])-||sum(D[,T])||^2).
-// D is eigenbasis-rows (eigen() order) x fit-cells; its row count equals the
-// design coefficient count. T is zero-based and already validated by
-// the owning boundary. Preserve summation order, including repeated positions;
-// no clamping/new fallback for a zero or negative studentizer. Inputs read only.
+// Compute the standardized score for treated cells T:
+//   sum(a[T]) / sqrt(sum(w[T]) - ||sum(D[, T])||^2).
+// D has cells in columns and eigenvectors in rows, in R's eigen() order. Its row
+// count equals the number of design coefficients. T starts at 0 and has already
+// been checked. Keep repeated positions and summation order. A zero or negative
+// variance keeps the existing NaN/Inf behavior; do not add a numerical fallback.
 double observed_score(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, const IntegerVector& trt_idxs) {
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
   int D_nrow = D.nrow();
 
-  // iterate over the rows of D
+  // Sum each covariate-adjustment row over the treated cells.
   for (int i = 0; i < D_nrow; i ++) {
     inner_sum = 0;
     for (int j = 0; j < trt_idxs.size(); j ++) {
@@ -66,7 +70,7 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
     lower_right += inner_sum * inner_sum;
   }
 
-  // second, compute the lower-left hand of the denominator; also, compute the top
+  // Sum the treatment weights (variance term) and residuals (numerator).
   for (int j = 0; j < trt_idxs.size(); j ++) {
     top += a[trt_idxs[j]];
     lower_left += w[trt_idxs[j]];
@@ -77,15 +81,15 @@ double observed_score(const NumericVector& a, const NumericVector& w, const Nume
 }
 
 
-// Evaluate only bank rows [start_pos,start_pos+B), returning B ordered scores.
-// Bank entries are already zero-based fit positions. Fixed-cardinality views
-// read exactly n_trt entries per row; use_all_cells (CRT) instead uses the whole
-// current row, whose length can differ from observed n_trt or be zero. Producers
-// establish coordinate validity; check only selected row lengths/segment bounds,
-// never a hybrid suffix that belongs to a larger fit. The complete bank remains
-// const and reusable across responses/stages. The owning entry checks aligned
-// shapes before native ownership; do not repeat D.ncol()/its Rcpp protection
-// inside this compute-only scope. No draws, input mutation or RNG.
+// Calculate B null scores using draws start_pos through start_pos+B-1.
+// Each draw lists cell positions starting at 0. For permutations, read only the
+// first n_trt positions. For CRT (use_all_cells), use the entire draw, whose size
+// may differ from the observed treatment group or be zero. The sampler makes
+// positions valid; check the selected draw lengths and requested range here.
+// Hybrid draws can contain unused positions belonging to a larger fit, so do
+// not check or read the unused remainder. Keep the full draws unchanged for
+// other genes and stages. Check array dimensions at the R entry, before creating
+// C++ result buffers: even D.ncol() can use Rcpp protection that raises an R error.
 std::vector<double> null_score_segment(const NumericVector& a, const NumericVector& w, const NumericMatrix& D, int start_pos, int B, int n_trt, bool use_all_cells, const DrawBank& synthetic_idxs) {
   sceptre::sampling::nonnegative(n_trt, "n_trt");
   const int end_pos = sceptre::sampling::sum(start_pos, B, "Draw segment end");
@@ -93,7 +97,7 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
     stop("Selected draw segment exceeds the bank length.");
   // initialize variables
   const int* curr_vect;
-  // begin() returns Rcpp's cached pointer without allocation or materialization.
+  // Use Rcpp's already cached data pointer; this call does not allocate.
   const double* D_data = D.begin();
   std::vector<double> out(B);
   double lower_right = 0, lower_left = 0, top = 0, inner_sum;
@@ -110,7 +114,7 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
     lower_right = 0;
     inner_sum = 0;
 
-    // iterate over the rows of D
+    // Sum each covariate-adjustment row over the treated cells.
     for (int i = 0; i < D_nrow; i ++) {
       inner_sum = 0;
       for (int j = 0; j < n_trt; j ++) {
@@ -119,7 +123,7 @@ std::vector<double> null_score_segment(const NumericVector& a, const NumericVect
       lower_right += inner_sum * inner_sum;
     }
 
-    // second, compute the lower-left hand of the denominator; also, compute the top
+    // Sum the treatment weights (variance term) and residuals (numerator).
     lower_left = 0;
     top = 0;
     for (int j = 0; j < n_trt; j ++) {

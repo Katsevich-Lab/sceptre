@@ -84,8 +84,8 @@ about which pairs qualify.
 - **The numerical test** receives those arrays and draws and returns effect
   estimates, p-values and requested diagnostics. It does not select data from
   the saved object or start parallel workers.
-- **Result processing** turns returned records into tables, restores requested
-  pair order and performs the final processing for that analysis. The public
+- **Result processing** turns returned records into tables, keeps pair labels,
+  adds failed-QC rows back and performs the final processing for that analysis. The public
   workflow saves the completed output in the returned object.
 
 This is a map of the **refactored analysis core**. Importing data, assigning
@@ -129,9 +129,10 @@ Suppose discovery requests a test of **guide group A against response gene R1**.
 4. **Run the test.** `association_workers.R` connects those inputs to the
    C++ function `run_association_test()`. The C++ files calculate the effect,
    score and p-value using the existing resampling method.
-5. **Put the result in its proper place.** `result_processing.R` restores
-   requested pair order, keeps failed-QC rows in the expected output shape,
-   integrates guides and applies the complete-family correction. The public
+5. **Assemble the result table.** `result_processing.R` keeps requested pair
+   labels, adds failed-QC rows back, and sorts by p-value and response gene,
+   with missing p-values last. It also integrates guides and applies the
+   complete-family correction. The public
    analysis function then saves the results and reusable response fits.
 
 The saved object still holds the user's data and results. The temporary lists

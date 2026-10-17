@@ -1,30 +1,26 @@
-#' Traverse responses for permutation inference using a required prepared
-#' context.
-#'
-#' @param context Prepared store, eligible pairs, canonical index, common matrix
-#'   design/view, compatible response fits and checked test settings.
-#' @param execution Output, progress, parallel-worker and log-directory options.
-#' @param synthetic_idxs One complete permutation bank shared across this run.
-#' @return Result table and merged compact response_precomputations. Traverses
-#'   first-request response order (or the existing seeded block order); retains
-#'   pair order within each response. Shared fits are inserted in traversal
-#'   order;
-#'   NT discovery fits remain guide-specific. Reads one row per outer response,
-#'   including cache hits. Progress/logging and periodic GC precede each row
-#'   read.
+#' Run permutation tests one response gene at a time
+#' @param context Data and settings from `prepare_analysis_context()`: selected
+#'   cells, gene-guide pairs that passed QC, aligned design and reusable fits.
+#' @param execution Output level, progress, parallel-worker and log settings.
+#' @param synthetic_idxs Complete set of permutation draws, shared across this run.
+#' @return Result table and the old plus newly computed reusable response fits.
+#' @details Read each gene once per outer loop, even if its fit is saved. Reuse its
+#'   fit and score arrays across guide groups when they use the same cells.
+#'   NT-control discovery needs a separate treatment-plus-NT fit for each group.
+#'   Visit genes in first-request order, or the existing seeded block order when
+#'   partitioned. Keep requests within each gene in order. Progress reporting and
+#'   periodic garbage collection happen before each gene is read.
 #' @noRd
 run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     index <- context$index
     treatment_lookup <- make_treatment_index_lookup(index)
     response_rows <- unique(index$pair_rows$response_idx)
 
-    #' Analyze one ordered block of source response rows.
-    #' @param block_rows One-based source rows; proc_id is the log-file block
-    #'   ID.
-    #' @return Block results and newly fitted shared responses, preserving
-    #'   order.
-    #'   Captures immutable prepared inputs; owns only its local result/cache
-    #'   list.
+    #' Analyze a block of response genes assigned to one worker
+    #' @param block_rows Original count-matrix gene rows, in the order to process.
+    #' @param proc_id Worker number used in its log filename, or NULL for serial work.
+    #' @return This block's results and newly computed shared response fits.
+    #'   Each worker builds its own output lists and reads the prepared inputs.
     #' @noRd
     analyze_response_block <- function(block_rows, proc_id = NULL) {
         log_file <- analysis_log_file(
@@ -129,31 +125,28 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     )
 }
 
-#' Traverse guide groups for CRT inference using a required prepared context.
-#'
-#' @param context Prepared store, eligible pairs, index, common matrix/view,
-#'   checked test settings and compatible saved response fits.
-#' @param execution Output, progress, worker and log-directory options.
-#' @return Result table and compact response_precomputations. Shared-view
-#'   response
-#'   fits are prepared first, including row reads on cache hits; guide-specific
-#'   NT
-#'   discovery fits are not cached. Each guide worker draws exactly one complete
-#'   CRT bank before its response loop. Existing block, row and cache insertion
-#'   order, two-phase log append behavior, progress cadence and GC are retained.
+#' Run CRT tests one guide group at a time
+#' @param context Data and settings from `prepare_analysis_context()`.
+#' @param execution Output level, progress, parallel-worker and log settings.
+#' @return Result table and the old plus newly computed reusable response fits.
+#' @details First prepare response fits that can be shared across groups, reading
+#'   each gene before looking up its saved fit. Then, for each guide group, fit
+#'   its assignment probabilities and generate B1+B2+B3 draws once, reusing those
+#'   draws across the group's requested genes. With NT-control discovery, response
+#'   fits use group-specific treatment-plus-NT cells and are not saved for reuse.
+#'   Preserve block/gene order, saved-fit order and progress timing. The guide
+#'   phase appends to the log started during response fitting.
 #' @noRd
 run_crt_analysis <- function(context, execution) {
     index <- context$index
     treatment_lookup <- make_treatment_index_lookup(index)
     response_fits <- context$response_fits
 
-    #' Prepare missing shared response fits for an ordered source-row block.
-    #' @param block_rows One-based response rows; proc_id selects the progress
-    #'   log.
-    #' @return Only new fits, keyed and inserted in response traversal order.
-    #'   Reads
-    #'   each row before its single cache lookup, even when the fit is
-    #'   available.
+    #' Prepare missing shared response fits for one worker's genes
+    #' @param block_rows Original count-matrix gene rows, in processing order.
+    #' @param proc_id Worker number used in the progress log, or NULL for serial work.
+    #' @return Newly fitted genes only, named and ordered as processed. Each gene is
+    #'   read before looking up its saved fit, including when that fit already exists.
     #' @noRd
     prepare_response_block <- function(block_rows, proc_id = NULL) {
         log_file <- analysis_log_file(
@@ -214,12 +207,11 @@ run_crt_analysis <- function(context, execution) {
         )
     }
 
-    #' Analyze one block of canonical guide-group indices.
-    #' @param block_groups One-based group positions; proc_id selects append
-    #'   log.
-    #' @return Bound requested results in block/group/response order.
-    #'   Materializes
-    #'   only the current guide's NT fit view, never an all-guide view bank.
+    #' Analyze a block of guide groups assigned to one worker
+    #' @param block_groups Positions in the prepared guide-group list, starting at 1.
+    #' @param proc_id Worker number used to append to its log, or NULL for serial work.
+    #' @return Results in block, group and within-group request order. For NT controls,
+    #'   construct only the current group's treatment-plus-NT selection as needed.
     #' @noRd
     analyze_guide_block <- function(block_groups, proc_id = NULL) {
         log_file <- analysis_log_file(

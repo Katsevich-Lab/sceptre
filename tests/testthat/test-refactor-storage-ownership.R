@@ -27,8 +27,9 @@ test_that("canonical counts preserve repeated source and pair views without muta
         expect_identical(result$n_nonzero_cntrl, unname(expected_controls))
         expect_identical(serialize(list(store, cells, groups, nt, pairs), NULL), before)
     }
-    # NT totals deliberately sum overlapping groups: analysis position 2 occurs
-    # twice, unlike a union count. The native kernel must not normalize this.
+    # Cell 2 among the cells kept after QC belongs to two NT groups. Summing
+    # the groups counts it twice, as the current rule requires; combining the
+    # groups into a unique cell list would change the result.
     summed <- storage_pair_counts(store, pairs, groups, cells, 1:3, nt)
     expect_identical(summed$n_nonzero_tot[[1L]], 4L)
     expect_identical(sum(cells[unique(unlist(nt))] %in% stored[[1L]]), 3L)
@@ -107,8 +108,8 @@ test_that("triplet conversion owns sorting and preserves stored entry semantics"
 })
 
 test_that("sorting preserves borrowed value bits and every source representation", {
-    # A nondefault quiet-NaN payload and negative zero must survive duplication;
-    # arithmetic used as a copying shortcut could change these bits.
+    # Preserve the exact stored bits, including a specially encoded NaN and
+    # negative zero. Copying via arithmetic could silently change those values.
     payload <- readBin(as.raw(c(0x17, 0, 0, 0, 0, 0, 0xf8, 0x7f)),
                        what = "double", n = 1L, size = 8L, endian = "little")
     values <- c(-0, payload, 1.25, -Inf, Inf)

@@ -1,5 +1,5 @@
-# Permanent package contracts compare explicit mathematics and current execution
-# modes. Historical package equality is outside test discovery, under tools/.
+# Permanent tests check formulas and compare the package's current execution
+# modes. Original-versus-refactored comparisons run separately under tools/.
 test_that("supported workflows produce valid complete results reproducibly", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     cases <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))
@@ -38,7 +38,7 @@ test_that("serial and two-worker execution preserve pair identity and results", 
     cases <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))
     serial <- refactor_run_case(inputs, cases$high_complement_crt)
     parallel <- refactor_run_case(inputs, cases$high_complement_crt, parallel = TRUE)
-    # Existing caches may have worker-specific insertion order; compare keyed fits.
+    # Workers can append fits in different orders; compare them by gene name.
     for (stage in c("calibrated", "final")) {
         for (out in c("serial", "parallel")) {
             value <- get(out)

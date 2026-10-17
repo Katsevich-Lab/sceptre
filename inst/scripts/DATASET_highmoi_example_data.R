@@ -118,9 +118,9 @@ selected_enhancer_genes <- selected_expression_genes %>%
 enhancer_gene_ids <- selected_enhancer_genes$gene_id
 
 ###############################################################################
-# 3. GENE-TARGETING GNRAS (USING REAL ENSG IDS)
+# 3. GENE-TARGETING GRNAS (USING REAL ENSG IDS)
 ###############################################################################
-# For each of the 3 perturbed genes, place GRNAS_PER_GENE around TSS.
+# For each directly targeted gene, place GRNAS_PER_GENE guides around its TSS.
 # The key: grna_target == the real 'gene_id'.
 
 gene_target_list <- list()
@@ -148,7 +148,7 @@ for (i in seq_len(nrow(selected_perturbed_genes))) {
 gene_target_data_frame <- do.call(rbind, gene_target_list)
 
 ###############################################################################
-# 4. ENHANCER-TARGETING GNRAS (CIS, ±1 MB), "candidate_enh_..."
+# 4. ENHANCER-TARGETING GRNAS (CIS, ±1 MB), "candidate_enh_..."
 ###############################################################################
 enhancers_per_gene <- rep(
     floor(NUM_ENHANCER_TARGETS / NUM_ENHANCER_GENES),
@@ -232,7 +232,7 @@ for (i in seq_len(nrow(selected_enhancer_genes))) {
 enhancer_target_data_frame <- do.call(rbind, enh_rows_list)
 
 ###############################################################################
-# 5. NON-TARGETING GNRAS (NA POSITIONS)
+# 5. NON-TARGETING GRNAS (NA POSITIONS)
 ###############################################################################
 nt_rows <- data.frame(
     grna_id = paste0("non-targeting_grna", seq_len(NUM_NT_GRNAS)),
@@ -244,7 +244,7 @@ nt_rows <- data.frame(
 )
 
 ###############################################################################
-# 6. COMBINE GENE, ENHANCER, AND NON-TARGETING GNRAS
+# 6. COMBINE GENE, ENHANCER, AND NON-TARGETING GRNAS
 ###############################################################################
 # STEP A: Keep a *full copy* of the enhancer table so we can build the map without merges:
 enhancer_target_data_frame_full <- enhancer_target_data_frame
@@ -270,7 +270,7 @@ grna_target_data_frame <- dplyr::bind_rows(
 NUM_GRNAS <- nrow(grna_target_data_frame)
 
 ###############################################################################
-# 7. ASSIGN MULTIPLE GNRAS PER CELL (HIGH MOI)
+# 7. ASSIGN MULTIPLE GRNAS PER CELL (HIGH MOI)
 ###############################################################################
 gRNAs_per_cell_count <- rpois(n = NUM_CELLS, lambda = AVG_MOI)
 assigned_gRNAs_list <- vector("list", length = NUM_CELLS)
@@ -322,7 +322,7 @@ for (cell_idx in seq_len(NUM_CELLS)) {
 }
 
 ###############################################################################
-# 9. BUILD LOG-FOLD CHANGE MATRIX (ROWS=GNRAS, COLS=GENES)
+# 9. BUILD LOG-FOLD CHANGE MATRIX (ROWS=GRNAS, COLS=GENES)
 ###############################################################################
 # We'll label columns by the real ENSG IDs from 'selected_expression_genes$gene_id'.
 all_gene_ids <- selected_expression_genes$gene_id # length=NUM_GENES

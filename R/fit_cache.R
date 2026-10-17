@@ -1,33 +1,30 @@
-# Response fits are compact coefficients/dispersion records in the existing S4
-# list. View validity is owned by the supported setters, not by numerical fits.
-# NT-control discovery does not cache its guide-specific fits; its stored fits
-# belong to NT-only calibration. Complement analyses share the analysis view.
-#' Detect supported parameter changes that invalidate response fits
-#'
-#' @param object Existing sceptre S4 facade.
-#' @param design Proposed full source-row design matrix, before fit-view
-#'   slicing.
-#' @param complement Proposed scalar logical control-group flag.
-#' @return Scalar logical from strict `identical` comparisons, including design
-#'   attributes and source-row order. Full-matrix comparison is conservative
-#'   even
-#'   outside the current fit view. Does not mutate the object or inspect fits.
+# Save only response coefficients and dispersion, not fitted values for every
+# cell. A saved fit is reusable only while its design and selected cells remain
+# valid; the parameter setters and QC steps clear it when those inputs change.
+# With NT controls, discovery fits different cells for each guide, so those fits
+# are not saved here. Saved NT fits belong to calibration on the NT cells.
+# With complement controls, analyses can share fits on all cells kept after QC.
+#' Check whether changed analysis settings make saved response fits unusable
+#' @param object Current sceptre object.
+#' @param design Proposed design matrix, with one row per original cell.
+#' @param complement Proposed setting for whether to use complement controls.
+#' @return TRUE if the design or control setting differs from the saved value.
+#'   Compare the entire matrix, including attributes and row order, even if only
+#'   some of its cells are used in a fit. This function reports a change; it does
+#'   not remove fits from the object.
 #' @noRd
 response_cache_parameters_changed <- function(object, design, complement) {
     !identical(object@covariate_matrix, design) ||
         !identical(object@control_group_complement, complement)
 }
 
-#' Detect assignment changes affecting the low-MOI response-fit view
-#'
-#' @param object Existing sceptre S4 facade.
-#' @param method Proposed assignment-method string.
-#' @param hyperparameters Proposed assignment-hyperparameter list.
-#' @return Scalar logical. Low MOI compares method and hyperparameters strictly;
-#'   high MOI returns false because its response-fit view is not
-#'   assignment-filtered.
-#'   Analysis-cell changes are invalidated separately. No assignment-fit cache
-#'   exists.
+#' Check whether new guide assignments could change the response-fitting cells
+#' @param object Current sceptre object.
+#' @param method Proposed guide-assignment method.
+#' @param hyperparameters Proposed guide-assignment settings.
+#' @return For low MOI, TRUE if the method or settings changed. At high MOI,
+#'   guide assignments do not select response-fitting cells, so return FALSE.
+#'   Changes to the cells kept after QC are checked separately.
 #' @noRd
 response_cache_assignments_changed <- function(
     object,
@@ -39,22 +36,17 @@ response_cache_assignments_changed <- function(
             !identical(object@grna_assignment_hyperparameters, hyperparameters))
 }
 
-#' Clear compact response fits after a supported facade change
-#'
-#' @param object Existing sceptre S4 facade; caller must retain the returned
-#'   object.
-#' @param event One of `parameters`, `assignments`, `analysis_cells`, checked
-#'   here
-#'   to keep the invalidation reason explicit at each caller.
-#' @param changed Scalar logical already resolved by the supported setter/QC
-#'   path.
-#' @return Object with `response_precomputations` cleared iff `changed`; other
-#'   slots are unchanged. No fit-view fingerprint or numerical check is
-#'   inferred.
+#' Remove saved response fits when their inputs have changed
+#' @param object Sceptre object; the caller must keep the returned object.
+#' @param event Reason for checking: `parameters`, `assignments` or `analysis_cells`.
+#' @param changed TRUE when the caller has detected a change requiring new fits.
+#' @return The object with `response_precomputations` emptied if `changed` is TRUE.
+#'   Other fields are unchanged. This function relies on the caller to decide
+#'   whether fits are still usable; it does not compare their inputs itself.
 #' @noRd
 invalidate_response_cache <- function(object, event, changed) {
-    # Keep events explicit at callers, even where conservative invalidation
-    # currently gives them the same implementation.
+    # Name the reason at each call, even though all three reasons currently
+    # clear the same saved-fit list.
     stopifnot(event %in% c("parameters", "assignments", "analysis_cells"))
     if (changed) {
         object@response_precomputations <- list()
@@ -62,45 +54,35 @@ invalidate_response_cache <- function(object, event, changed) {
     object
 }
 
-#' Look up a compact response fit in the existing saved-cache schema
-#'
-#' @param cache Named list of compact coefficient/dispersion records.
-#' @param response_id One response ID used as the list key.
-#' @return Matching record or `NULL` for a miss. Caller-owned facade
-#'   invalidation
-#'   guarantees the fit view is still valid; the response-ID key alone cannot do
-#'   so.
+#' Find a saved response fit by gene name
+#' @param cache Named list of response coefficients and dispersion estimates.
+#' @param response_id Gene name used as the list key.
+#' @return The saved fit, or NULL if it is absent. Finding the gene name alone
+#'   does not prove the fit is reusable: parameter setters and QC must already
+#'   have cleared fits whose design or cell selection changed.
 #' @noRd
 lookup_response_fit <- function(cache, response_id) cache[[response_id]]
 
-#' Append worker cache misses in the existing insertion order
-#'
-#' @param cache Existing named list of compact response-fit records.
-#' @param updates Named list of newly fitted responses, absent from `cache` and
-#'   unique across workers; callers establish this invariant before fitting.
-#' @return Concatenated list, preserving old records then update order. This is
-#'   not an upsert: duplicate names are neither replaced nor deduplicated. No
-#'   fitted
-#'   vectors, designs, or per-response cell maps are persisted or inputs
-#'   mutated.
+#' Append newly computed response fits to the saved-fit list
+#' @param cache Existing named list of response fits.
+#' @param updates New fits, named by gene. Callers must supply only previously
+#'   absent genes and ensure that workers have not fitted the same gene twice.
+#' @return One list containing the old fits followed by the new fits, in order.
+#'   This is simple concatenation: it does not replace or remove duplicate names.
+#'   Only coefficients and dispersion are stored, not cell-length fitted vectors.
 #' @noRd
 merge_response_fits <- function(cache, updates) {
-    # Workers only return newly fitted responses. Preserve legacy insertion
-    # order; no fitted vectors or per-response cell maps are persisted.
+    # Each worker returns only newly fitted genes. Keep the old fits first,
+    # followed by the new coefficients and dispersion estimates.
     c(cache, updates)
 }
 
-#' Commit completed analysis fits to the existing facade slot
-#'
-#' @param object Existing sceptre S4 facade; caller must retain the returned
-#'   object.
-#' @param cache Named list of compact response fits valid for the current fit
-#'   view.
-#' @return Object with only `response_precomputations` replaced. Analysis
-#'   wrappers
-#'   call this after successful execution; no validation, fitting or
-#'   invalidation
-#'   occurs here. No cache operation uses RNG or files.
+#' Save response fits after an analysis finishes successfully
+#' @param object Sceptre object; the caller must keep the returned object.
+#' @param cache Response fits valid for this object's current design and cells.
+#' @return The object with `response_precomputations` replaced by `cache`.
+#'   The public analysis functions call this after the tests finish successfully.
+#'   It saves the supplied fits without fitting models or checking them again.
 #' @noRd
 commit_response_fits <- function(object, cache) {
     object@response_precomputations <- cache

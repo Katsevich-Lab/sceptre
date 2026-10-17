@@ -1,6 +1,7 @@
-// Test-only interposition immediately before the actual MLE/MM calls. Each
-// included source keeps its arithmetic, try boundary and state assignments.
-// Never linked into the package; no production injection interface is added.
+// For tests only, insert controlled exceptions just before the actual likelihood
+// and moment estimators run. Keep the included code's arithmetic, error handler
+// and assignment order unchanged. This file is compiled separately, not linked
+// into the package, and adds no error-injection option to production functions.
 // [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
 #include <boost/math/special_functions/digamma.hpp>
@@ -41,8 +42,9 @@ namespace candidate_dispersion {
 #include SCEPTRE_CANDIDATE_DISPERSION
 }
 
-// Catch outside the actual estimator, recording propagation without a real
-// allocation failure/OOM and without replacing its native numerical functions.
+// Catch exceptions outside the estimator to check which failures it passes on.
+// Use injected failures rather than exhausting real memory, while retaining the
+// actual numerical functions.
 // [[Rcpp::export]]
 Rcpp::List refactor_dispersion_case(Rcpp::NumericVector y,
                                    Rcpp::NumericVector mu, double dfr,
@@ -66,8 +68,8 @@ Rcpp::List refactor_dispersion_case(Rcpp::NumericVector y,
                            Rcpp::Named("reached") = dispersion_probe::reached);
 }
 
-// These facts bind the reviewed default binary64 CPU dispatch on each CI lane.
-// They describe the linked headers/configuration, not a new production policy.
+// Report the headers and CPU configuration used for double-precision calculations
+// on this CI platform, so results can be tied to their build settings.
 // [[Rcpp::export]]
 Rcpp::List refactor_dispersion_policy_facts() {
   using policy = boost::math::policies::policy<>;

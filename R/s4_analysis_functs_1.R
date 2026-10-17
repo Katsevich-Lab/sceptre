@@ -434,23 +434,17 @@ run_qc <- function(
 }
 
 
-#' Prepare the cellwise QC phase shared by standard and nuclear pipeline work.
-#' @param sceptre_object Assigned facade with raw source-cell
-#'   memberships/covariates.
-#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Existing pairwise cutoffs.
-#' @param response_n_umis_range,response_n_nonzero_range Source-count percentile
-#'   bounds.
-#' @param p_mito_threshold Mitochondrial fraction cutoff when that covariate
-#'   exists.
-#' @param additional_cells_to_remove One-based source-cell positions to exclude.
-#' @return Facade with QC status, thresholds, removal metrics, ordered retained
-#'   source cells and assignments reindexed to analysis/NT-local coordinates.
-#'   Clears
-#'   response fits exactly when retained source cells change; preserves
-#'   full-source
-#'   design. Existing high-removal warning/empty-cell error remain. No
-#'   RNG/files.
-#'   Kept separate for the real nuclear pipeline preparation/QC contract.
+#' Run cellwise QC, the phase also used by nuclear Nextflow tasks
+#' @param sceptre_object Object with initial guide assignments and cell covariates.
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Pairwise QC cutoffs to save.
+#' @param response_n_umis_range,response_n_nonzero_range Quantile bounds for cell counts.
+#' @param p_mito_threshold Maximum mitochondrial fraction, when that summary exists.
+#' @param additional_cells_to_remove Original matrix column numbers to remove, starting at 1.
+#' @return Object with QC status, thresholds, removal counts, original columns of
+#'   retained cells and guide assignments renumbered for those cells. Clear saved
+#'   response fits if retained cells changed; keep the full original design matrix.
+#'   Warn about large low-MOI assignment exclusions and error if no cells remain.
+#' @details Nextflow calls this phase separately before distributing pairwise QC.
 #' @noRd
 run_qc_pt_1 <- function(
     sceptre_object,
@@ -533,15 +527,12 @@ run_qc_pt_1 <- function(
 }
 
 
-#' Complete pairwise QC and the existing empirical resampling budget update.
-#' @param sceptre_object Cellwise-QC facade with current analysis assignments.
-#' @return Facade with pair counts/eligibility, NT summary matrix,
-#'   passing-family
-#'   sizes and checked B3 under no_approximation. Uses storage-backed count
-#'   scans
-#'   without adding an inference method or creating draw banks. No RNG/file
-#'   writes.
-#'   This separate stage is also called by real nuclear pipeline pod work.
+#' Run pairwise QC and set the empirical resampling size when needed
+#' @param sceptre_object Object after cellwise QC, with updated guide assignments.
+#' @return Object with pair counts, pass_qc flags, NT summaries and passing-pair
+#'   counts. With no_approximation, also calculate and check B3. Count data through
+#'   storage helpers; random test draws are generated later. Nuclear Nextflow
+#'   tasks can call this phase separately.
 #' @noRd
 run_qc_pt_2 <- function(sceptre_object) {
     # pairwise start

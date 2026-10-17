@@ -1,31 +1,31 @@
 {
-  "scope": "Documentation-only illustrated tour and bug appendix; no production/test/CI changes",
+  "scope": "Documentation and source-comment changes only; package/test executable expressions, C++ tokens and CI configuration unchanged from 805666e",
   "source_sha256": {
-    "R/analysis.R": "f1b4bbd0e7aceb90f82ea16dafc5764b54bc715c21e234598341a89edd1417b0",
-    "R/analysis_context.R": "7a2995446a921540f4fca377dbd2b2bb80f5bb0759ab5a4b1c05812120a086c8",
-    "R/association_execution.R": "11473b172c46d11b5126d11960c861a0aeddf2db2108e9bf16ff99d0b0ac311e",
-    "R/association_workers.R": "30984bf3d4d26c76c34a70328fce497cf762615479c977a3a4fb33822c2e1af5",
-    "R/execution.R": "febcf00e2c9776418c97bd0ae889bd79ab9f9b637a341bd054c79fa31797be60",
-    "R/fit_cache.R": "39f1c05162035125b89b783f68c3be877cd2a726492d4687a982e3bce6d75ad0",
-    "R/fitting.R": "5111892527d82829ce4aef41118acb4134a396df268f75445dbbf56ccaa37da3",
-    "R/neg_control_functions.R": "18c2b805e47be0c896d84917814aa3d53a22c4a54a9c5eff52a5655373646dbb",
-    "R/pair_qc.R": "79eb11592f520765ec655e561fdac4b72e045b3fc57fc1b84800e9967ddc188e",
-    "R/result_processing.R": "dcedae413a2f9e24eee354f69f5adafb79fc22a92155eb4d226f4a4be277ce82",
-    "R/s4_analysis_functs_1.R": "25c478034bc0c20db6e43d14adb06cb5081442304684979cb24c769bfd16666b",
-    "R/s4_analysis_functs_2.R": "0cdfe05a3d263eaeed54fef7e5c55ed5310807523445e5291764e7f1c660e7e1",
-    "R/storage.R": "b1426da4a6b3c8db98915f6028d7b429a92f6bebd4440d97697d40b9b60ec069",
+    "R/analysis.R": "a0808199566a977d06b297ea91b93cb8096766375c753028fcbbeb8c09f9210c",
+    "R/analysis_context.R": "a148140fc48df13136860cd7f8a8f6cfc9d1a3e13408b0f860d29ad1b7f7d211",
+    "R/association_execution.R": "08f5d31956377d3291a329a610d84e515030b8ce85160a6f45514218891022f2",
+    "R/association_workers.R": "4d56cb9f0e420202a78284cef315327a62ff8f2eb5f467cbb71e889968c0d4d0",
+    "R/execution.R": "224145940cd9d973aede866a88859d2cf223fc2afa038305f68fef8fdc427853",
+    "R/fit_cache.R": "cee05a49cee7de9eb8f498e0452baccfb606eed8fef5c9ea110656439ccf5c1e",
+    "R/fitting.R": "f07ca27f4dd4349ff8a663a21000b8f27791d4761beeeabfd2a66f195220f3bb",
+    "R/neg_control_functions.R": "877fd7b8962eaf1947067f5c466a1bfbe02f16907f4b04157525cf4ee3f71026",
+    "R/pair_qc.R": "70a527c62dca1ef0f53b13cc42ae622e2dc9ea358ea6bcf4283d37b29f65ac9c",
+    "R/result_processing.R": "dcdbe6976ddb3c88b440791a0445d507debe4be14c04e76a41fda1bf01f600ea",
+    "R/s4_analysis_functs_1.R": "4f2063f517d269f6cad883d59a71cb1644ff43d717fb8c1c154bcb484f620c6b",
+    "R/s4_analysis_functs_2.R": "70ab2f70e360c605d98ce95f77c7e6f52a5051dd2d67b351865f4be31d5583c0",
+    "R/storage.R": "926c69b1d584b3f5fcaace32e35de333479e134fb11c84836dfbe7a69d8323cb",
     "tools/refactor/README.md": "892a88f323fe9f7361e376cab2f649baf94ee5232298a5dec24f9a1914f3af4a",
     "tools/refactor/bug-fixes.qmd": "ab40bcdaecfee6e70ad2490e8d7e0a688483d139a5b10c0859b6c64263dbeaa3",
-    "tools/refactor/figures/analysis-flow.dot": "2630f7cd5fd71857d458b8460ed5b628f1ecf8a817b9cd8493ca29c2dd449dda",
-    "tools/refactor/figures/analysis-flow.svg": "b09cdfeb2a2d5095ad01fe7ee05ce391a2dc4a9fac3d6c6dcec7e2009a722b39",
+    "tools/refactor/figures/analysis-flow.dot": "cd91644a999fb9d5ac5c93cd56f4bd78f0b8ebfc16ce24c7eea3bca20c72637f",
+    "tools/refactor/figures/analysis-flow.svg": "9d5b31f5149cc401c3f152edfa355f7fd5c01bc0572c691da40bc35a486b7e18",
     "tools/refactor/figures/execution-plans.dot": "8cee2e9e856837c282421f67711fc806f3b7a497946cef92fc26ae2a0396ee4d",
     "tools/refactor/figures/execution-plans.svg": "2c29fc3b90d84a5b5367b77b9f606e63c80f8f12ad28b1f82fbb1b338a8223ff",
-    "tools/refactor/figures/module-map.dot": "ab5f12e57fa4994ee4cbf4a57ab7167e58393abccbfc2b2ba5144cb549dccc33",
-    "tools/refactor/figures/module-map.svg": "09e6ee8c1b5c1aa82e0e1160657495ebb9f05a4a4cc8b2268b232885f232f4e0",
-    "tools/refactor/walkthrough.qmd": "1e4dff85e49f4691c9f5f4ba2aaf441bdf2f7438ecee5067cb7bb8bad7e167a1"
+    "tools/refactor/figures/module-map.dot": "b099b8d7e60f6cc890f6d50958cdb52654b9dbe59ed7b565bf6c22975a63ae14",
+    "tools/refactor/figures/module-map.svg": "97f55b17b963592f5e6c2a2eac8134dbda8bfeb249edb6a4eacf3382669fe2fd",
+    "tools/refactor/walkthrough.qmd": "b03a04d62a56e4809401a0d1f0f89c0373e094c3c7eaafa5fd26b8faddc91ff6"
   },
   "rendered_html_sha256": {
-    "tools/refactor/walkthrough.html": "6ed25ea62d36e4bc030bdcd7570ff350781ff37b93e258df553b9b3292710d0d",
+    "tools/refactor/walkthrough.html": "7e6d3c285641f7435d9e849629736c22c5a495b0d66573b195e9faf1324e2707",
     "tools/refactor/bug-fixes.html": "5d2fbd2fe543591e15f700cd1f4bad7eaed7bd65d7154758f00de504d0b1b707"
   },
   "checks": {
@@ -35,7 +35,9 @@
     "local_links": "All authored QMD links resolve; all local walkthrough HTML anchors resolve",
     "bug_entries": 26,
     "separate_memory_improvement_entries": 1,
-    "permanent_inputs_unchanged": 113
+    "permanent_input_files": 113,
+    "permanent_inputs_byte_unchanged": 42,
+    "permanent_executable_inputs_unchanged": 113
   },
   "quarto": "1.9.38",
   "diagram_generator": "dot - graphviz version 14.1.5 (20260411.2331)",
@@ -62,6 +64,13 @@
     ],
     "html_embedded": true,
     "visual_review_width_px": 1000,
-    "production_test_CI_inputs_unchanged": true
+    "production_test_CI_executable_inputs_unchanged": true
+  },
+  "comment_review": {
+    "evidence": "results/comment-review-805666e/validation.json",
+    "evidence_sha256": "70c4c58e6fef22ae2c607e0a2580e04df3e2b1e536a969f99239777dc1d869d0",
+    "R_files": 51,
+    "cpp_files": 21,
+    "published_roxygen_unchanged": true
   }
 }

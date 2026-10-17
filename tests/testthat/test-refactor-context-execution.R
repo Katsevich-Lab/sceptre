@@ -18,8 +18,9 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
     object@calibration_group_size <- 1L
     object@resampling_approximation <- "no_approximation"
 
-    # These source-cell expectations are written independently of every context
-    # helper: calibration uses NT pool (8,2,11), discovery treatment then NT.
+    # Write the original matrix columns explicitly, without using the selection
+    # helpers to calculate expected values. Calibration uses NT cells (8,2,11);
+    # discovery places treatment cells before the NT cells.
     for (calibration in c(TRUE, FALSE)) {
         source <- if (calibration) c(8L, 2L, 11L) else c(4L, 5L, 8L, 2L, 11L)
         treatment <- if (calibration) c(2L, 3L) else 1:2
@@ -104,8 +105,8 @@ test_that("progress bytes and periodic maintenance retain independent cadences",
         for (i in positions) report(i, "id", 201L, FALSE, TRUE, absent, feature, prefix)
         expect_false(file.exists(absent))
     }
-    # Instrument only this copy of the installed maintenance function. No base
-    # or package GC binding is changed, and disabled display is irrelevant to GC.
+    # Track gc() calls in this local copy of the helper, leaving base and package
+    # functions unchanged. Garbage collection must still run with progress hidden.
     collect <- refactor_private("collect_worker_garbage")
     calls <- 0L
     scope <- new.env(parent = environment(collect))
@@ -208,8 +209,8 @@ test_that("mixture keeps actual EM success, raw-count fallback and caller RNG", 
         calls <<- calls + 1L
         fit_em(...)
     }, .package = "sceptre")
-    # This independently executed native fit has no accepted EM solution; the
-    # orchestration must retain the real count threshold fallback, not new rules.
+    # Fit this case directly in C++ to show that no EM solution is accepted.
+    # Assignment must therefore use the existing raw-count threshold fallback.
     failed_g <- c(rep(c(0, 1, 0, 2), 10L), rep(c(25, 35, 30, 40), 10L))
     failed_design <- matrix(1, length(failed_g), 1L)
     failed_pois <- suppressWarnings(stats::glm.fit(failed_design, failed_g, family = stats::poisson()))

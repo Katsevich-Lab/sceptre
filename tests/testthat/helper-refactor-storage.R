@@ -1,4 +1,4 @@
-# Shared explicit count fixture; numeric values include stored zeros/fractions.
+# Small shared count matrix, including explicitly stored zeros and fractions.
 storage_test_matrix <- function(copies = 1L) {
     mat <- Matrix::sparseMatrix(
         i = rep(c(1L, 1L, 1L, 1L, 2L, 2L, 2L, 2L), copies),

@@ -1,10 +1,10 @@
-#' Choose the existing default formula from source-cell covariates
+#' Choose the default model formula from the available cell covariates
 #'
-#' Retains column order; excludes response mito and optionally guide count
-#' covariates. Names matching n_umis/n_nonzero get log(x), or log(x+1) if any
-#' zero occurs. Other columns with at least 15 distinct values are omitted.
-#' Returns a formula for model.matrix; this is selection, not input validation.
-#' Does not modify covariates or draw random numbers.
+#' Keep covariates in column order, excluding response mitochondrial fraction and,
+#' when requested, guide count summaries. Use log(x) for names matching n_umis or
+#' n_nonzero, adding one if any value is zero. Other covariates are included only
+#' if they have fewer than 15 distinct values. Return a formula for model.matrix();
+#' validation of the supplied covariates happens elsewhere.
 #' @noRd
 auto_construct_formula_object <- function(
     cell_covariates,
@@ -55,13 +55,12 @@ auto_construct_formula_object <- function(
 }
 
 
-#' Combine import summaries and extra covariates in source-cell order
+#' Combine response summaries, guide summaries and extra cell covariates
 #'
-#' Aligned feature-by-cell response/guide counts and response labels produce a
-#' data frame with prefixed response/guide summaries, followed by supplied extra
-#' covariates. Response column IDs become row names when available. Converts
-#' sparse orientation for column scans; does not create a backed store or use
-#' RNG.
+#' Response and guide matrices must have cells in the same order. Calculate their
+#' summaries, prefix the column names with response_ or grna_, and append any extra
+#' covariates. Use response-matrix cell IDs as row names when supplied. Matrix
+#' storage may be converted for column access; cell order is kept.
 #' @noRd
 auto_compute_cell_covariates <- function(
     response_matrix,
@@ -100,30 +99,23 @@ auto_compute_cell_covariates <- function(
 }
 
 
-#' Partition ordered labels or canonical row indices for existing fork workers
+#' Divide gene or guide IDs into blocks for workers
 #'
-#' Returns an ordered list of blocks. Parallel work with at least twice the
-#' requested worker count uses the existing seed-4 shuffle and cut; smaller or
-#' serial work retains one input-order block. "auto" uses the preferred core
-#' fraction once. withr restores caller RNG/options; no worker is launched here.
+#' When parallel work has at least twice as many items as workers, shuffle using
+#' seed 4 and split into blocks. Otherwise return one block in input order.
+#' For n_processors = "auto", use the preferred fraction of available physical
+#' cores once. Restore the caller's random state and temporary options afterward.
+#' This prepares the blocks; it does not start workers.
 #' @noRd
 partition_response_ids <- function(response_ids, parallel, n_processors) {
     groups_set <- FALSE
     if (parallel) {
         if (identical(n_processors, "auto")) {
-            # Read the user's preferred fraction (default 0.5 = half cores),
-            # then
-            # neutralize that option on the parallelly call so parallelly's own
-            # option-aware default does not apply the same fraction a second
-            # time.
-            # parallelly's `fraction` arg defaults to getOption(
-            # "parallelly.availableCores.fraction", 1), so omitting it would
-            # silently double-scale when the user has set that option. The arg
-            # itself was only added in 1.47.0, so passing `fraction = 1`
-            # directly
-            # would break parallelly < 1.47.0 -- `withr::with_options`
-            # neutralizes
-            # the option for the call on any parallelly >= 1.23.0.
+            # Apply the user's core fraction once, defaulting to half the cores.
+            # availableCores() can apply that same option itself, so temporarily
+            # set it to 1 while counting cores, then multiply by frac below.
+            # Use an option rather than fraction = 1: that argument was added in
+            # parallelly 1.47.0, while supported installations can be older.
             frac <- getOption("parallelly.availableCores.fraction", 0.5)
             n_processors <- max(
                 1L,
@@ -156,10 +148,10 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
 }
 
 
-#' Resolve the existing worker-log subdirectory, creating it if needed
+#' Find or create the sceptre_logs subdirectory
 #'
-#' A scalar base path yields base/sceptre_logs/ with a trailing slash. Directory
-#' creation is recursive; no log file is opened and no random state is changed.
+#' Return log_dir/sceptre_logs/ with a trailing slash. Create parent directories
+#' as needed; individual worker log files are created by their callers.
 #' @noRd
 get_log_dir <- function(log_dir) {
     log_dir <- paste0(log_dir, "/sceptre_logs/")

@@ -1,20 +1,16 @@
-#' Test guide groups against one shared permutation response fit.
-#'
-#' @param expression Numeric response in the common fit-view cell order.
-#' @param score Full score components aligned to expression and the common
-#'   design.
-#' @param treatment_lookup Prepared lookup returning one-based fit-local
-#'   treatment
-#'   positions and their count for a guide-group ID.
-#' @param groups Character guide-group IDs in request order, including repeats.
-#' @param synthetic_idxs One complete shared permutation bank; native draws are
-#'   zero-based, whereas observed positions enter native inference one-based.
-#' @param test_options Checked stage budgets, side code and approximation flag.
-#' @param output_amount Existing public output level (3 retains resampling
-#'   values).
-#' @return Native result lists in group order. Does not read storage, fit
-#'   models,
-#'   draw resamples, mutate inputs, or update the response cache.
+#' Test several guide groups using the same response fit and permutation draws
+#' @param expression Gene's counts in the selected model-fitting cell order.
+#' @param score Fitted means and score arrays in that same cell order.
+#' @param treatment_lookup Function returning each group's treated-cell positions
+#'   in those arrays, starting at 1, and their count.
+#' @param groups Guide-group names in request order, including repeats.
+#' @param synthetic_idxs Complete shared set of permutation draws. Draw positions
+#'   start at 0 for C++; observed treatment positions start at 1 and are converted
+#'   by `run_association_test()`.
+#' @param test_options Stage sizes B1/B2/B3, test direction and approximation setting.
+#' @param output_amount Public output level; level 3 includes resampled statistics.
+#' @return C++ result lists in guide-group order. The response fit, score arrays
+#'   and random draws are already prepared; this worker applies the tests.
 #' @noRd
 test_permutation_shared_fit <- function(
     expression,
@@ -49,20 +45,19 @@ test_permutation_shared_fit <- function(
     results
 }
 
-#' Fit and test each treatment-plus-NT permutation view of one response.
-#'
-#' @param expression Numeric response in analysis-cell order.
-#' @param design Matrix in that same common analysis-cell order, including when
-#'   it has only an intercept column.
-#' @param index Prepared coordinate context for NT-only discovery.
-#' @param groups Character requested groups in their existing order.
-#' @param synthetic_idxs Complete shared hybrid bank; inference consumes the
-#'   existing treatment-count prefix for each fit view.
-#' @param test_options,output_amount Checked test settings and output level.
-#' @return Native results in group order. Fits one response per group and keeps
-#'   those guide-specific fits out of the shared response cache. No input
-#'   mutation
-#'   or RNG draws; each view retains treatment-first, then NT order and repeats.
+#' Fit and test one gene separately for each group's treatment-plus-NT cells
+#' @param expression Gene's counts in the order of cells kept after QC.
+#' @param design Design matrix with rows in that same order, even for an
+#'   intercept-only formula.
+#' @param index Cell lookups prepared for discovery with NT controls.
+#' @param groups Guide-group names in request order.
+#' @param synthetic_idxs Complete shared hybrid-permutation draws. Each test uses
+#'   the first n_trt entries of each draw for its own treatment-cell count.
+#' @param test_options,output_amount Validated test settings and output level.
+#' @return C++ results in guide-group order. Each group gets its own response fit,
+#'   with treatment cells first, then NT cells, keeping membership order and repeats.
+#'   These group-specific fits are not saved in the shared response-fit list.
+#'   The supplied draws are reused, rather than generated again here.
 #' @noRd
 test_permutation_group_fit <- function(
     expression,
@@ -101,19 +96,20 @@ test_permutation_group_fit <- function(
     results
 }
 
-#' Test requested responses with a shared CRT assignment fit for one guide.
-#'
-#' @param response_store Row-readable response matrix or storage adapter.
-#' @param response_rows One-based source response rows in request order.
-#' @param response_ids Corresponding cache keys in that same order.
-#' @param design Common fit-view matrix; rows align to source_cells.
-#' @param source_cells One-based source-cell positions, ordered and repeatable.
-#' @param treatment One-based fit-local observed positions and their count.
-#' @param response_fits Complete compatible compact response-fit cache.
-#' @param test_options,output_amount Checked test settings and output level.
-#' @return Native results in response order. Fits the assignment model and draws
-#'   one full B1+B2+B3 bank before reading responses. Reads each requested row,
-#'   reuses cached response fits, and never inserts fits or mutates inputs.
+#' Test one guide group's requested genes using shared response fits
+#' @param response_store Response count matrix, readable one gene at a time.
+#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.
+#' @param response_ids Corresponding gene names used to find their saved fits.
+#' @param design Design matrix whose rows follow `source_cells`.
+#' @param source_cells Original matrix column numbers for this fit, in order;
+#'   repeats are allowed.
+#' @param treatment Treated cells' positions within this fit, starting at 1, and
+#'   their count.
+#' @param response_fits Previously prepared response fits for these same cells/design.
+#' @param test_options,output_amount Validated test settings and output level.
+#' @return C++ results in requested gene order. Fit assignment probabilities and
+#'   generate B1+B2+B3 CRT draws once for this guide, then read each gene and use
+#'   its saved response fit. This worker does not add new response fits.
 #' @noRd
 test_crt_shared_fit <- function(
     response_store,
@@ -164,18 +160,18 @@ test_crt_shared_fit <- function(
     results
 }
 
-#' Fit and test requested responses in one treatment-plus-NT CRT view.
-#'
-#' @param response_store Row-readable response storage.
-#' @param response_rows One-based source response rows in request order.
-#' @param design Common matrix in analysis-cell order.
-#' @param fit_view Prepared guide view: fit_to_analysis selects design rows,
-#'   source_cells selects storage cells, and trt_fit_pos is one-based fit-local.
-#' @param test_options,output_amount Checked test settings and output level.
-#' @return Native results in response order. Fits one assignment and draws one
-#'   full bank per guide, then reads and fits every response in the ordered
-#'   view.
-#'   Guide-specific response fits are not cached. Does not mutate caller inputs.
+#' Fit and test one guide group's genes using its treatment-plus-NT cells
+#' @param response_store Response count matrix, readable one gene at a time.
+#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.
+#' @param design Design matrix for all cells kept after QC, in that order.
+#' @param fit_view Cell selection from `make_fit_view()`: `fit_to_analysis` selects
+#'   design rows; `source_cells` selects original count-matrix columns;
+#'   `trt_fit_pos` locates treatment cells within the selected data, starting at 1.
+#' @param test_options,output_amount Validated test settings and output level.
+#' @return C++ results in requested gene order. Fit assignment probabilities and
+#'   generate a full set of CRT draws once for this guide. Then read, fit and test
+#'   each gene using the selected cells. These response fits belong only to this
+#'   group's cells and are not saved for other groups to reuse.
 #' @noRd
 test_crt_group_fit <- function(
     response_store,

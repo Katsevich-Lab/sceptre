@@ -1,5 +1,5 @@
-# Small valid facade payloads isolate the public pair constructors. No fitting,
-# assignment or hidden fixture-derived pair expectations are involved.
+# Build small valid sceptre objects just for the public pair constructors.
+# Specify expected pairs directly, without model fitting or guide assignment.
 refactor_pair_object <- function() {
     response_ids <- c("left", "far", "right", "edge-left", "edge-right", "other", "large")
     response <- matrix(1, length(response_ids), 2L,
@@ -23,9 +23,9 @@ test_that("cis native positions follow the inclusive predicate in supplied order
     expect_identical(select(100L, integer(), 20L), integer())
     expect_identical(select(100L, c(100L, 99L), -1L), integer())
 
-    # The reference predicate widens before subtraction. In particular the
-    # first/last coordinates span more than signed INT_MAX without allocating
-    # an enormous matrix or executing the old unsafe arithmetic.
+    # Compute expected distances using wider numbers before subtracting. The
+    # first and last positions differ by more than a C++ int can hold, even
+    # though this is a tiny input; no huge matrix is needed to test overflow.
     positions <- c(.Machine$integer.max, -.Machine$integer.max, 0L, 1L,
                    1800000010L, -1800000010L, 80L, 120L)
     before <- serialize(positions, NULL)

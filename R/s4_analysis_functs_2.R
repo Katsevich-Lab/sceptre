@@ -86,18 +86,14 @@ run_calibration_check <- function(
 }
 
 
-#' Prepare the calibration family before package or pipeline execution
+#' Prepare calibration settings and choose negative-control pairs
 #'
-#' May advance missing assignment/QC steps with their defaults and effects, then
-#' applies the existing workflow transition and validates calibration settings.
-#' Missing group size/pair count derive from discovery metadata/pass counts;
-#' both must be supplied when discovery pairs are absent. Empirical inference
-#' updates B3 for this family before constructing the existing sampled pairs.
-#' @return Facade with calibration sizes, negative-control pairs and any
-#'   required
-#'   prerequisite updates. No association tests or result finalization run here.
-#'   The transition/validation/message/sampling order is intentional. Pipeline
-#'   preparation calls this phase separately and retains the returned facade.
+#' Complete missing assignment/QC steps, record workflow status, choose defaults
+#' and check calibration sizes. For empirical p-values, calculate B3 for the
+#' requested calibration size before sampling the pairs.
+#' @return Object with calibration sizes, eligible negative-control pairs and any
+#'   completed prerequisites. No association tests run yet. Nextflow calls this
+#'   phase separately and keeps the returned object for its worker tasks.
 #' @noRd
 run_calibration_check_pt_1 <- function(
     sceptre_object,
@@ -173,14 +169,14 @@ run_calibration_check_pt_1 <- function(
 }
 
 
-#' Execute an already prepared calibration family and commit its results
+#' Test previously prepared calibration pairs and save their results
 #'
-#' Consumes phase one's eligible-pair metadata and the current cell/fit view.
-#' Association drivers own resampling, progress/logs and serial/fork dispatch.
-#' @return Facade with calibration_result and merged compact response fits.
-#'   Ordinary runs finalize the complete family; nf_pipeline retains raw results
-#'   for external collection. No guide-cache feature or pair reconstruction is
-#'   added here. The caller retains the successful returned facade.
+#' Use the pairs chosen in phase one and the current cells and settings. Analysis
+#' helpers handle random draws, progress and serial/parallel work.
+#' @return Object with calibration_result and updated reusable response fits.
+#'   Standard runs combine guides and adjust across all results; nf_pipeline
+#'   keeps raw results for external collection. Save completed outputs only after
+#'   the analysis returns successfully. The caller must retain the returned object.
 #' @noRd
 run_calibration_check_pt_2 <- function(
     sceptre_object,
@@ -652,15 +648,14 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
-#' Advance only missing assignment/QC prerequisites using their public defaults
+#' Run missing assignment and QC steps with their public defaults
 #'
-#' Called by calibration, power and discovery after their parallelism check.
-#' Imported/parameterized objects missing both stages run assignment then QC;
-#' objects missing only QC run QC. Otherwise the facade is returned unchanged
-#' and the later workflow transition enforces prerequisites. Messages,
-#' assignment
-#' randomness/parallel logs and QC cache invalidation belong to those actual
-#' calls; n_processors/parallel are forwarded only to assignment.
+#' Calibration, power and discovery call this after checking parallel support.
+#' If data and parameters are ready, run assignment then QC when both are missing,
+#' or just QC when assignment is complete. Otherwise return the object unchanged;
+#' the later workflow check reports missing prerequisites. Forward parallel and
+#' n_processors to assignment. Its messages, randomness and logs, and QC's removal
+#' of unusable saved fits, come from those normal public calls.
 #' @noRd
 skip_assign_grnas_and_run_qc <- function(
     sceptre_object,

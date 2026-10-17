@@ -4,15 +4,15 @@
 namespace sceptre {
 namespace inference {
 
-// Consume disjoint segments of the already-generated full bank: B1 at offset
-// 0, B2 at B1, B3 at B1+B2. Stage 1 uses add-one empirical tails; p<=.02 reaches
-// optional skew-normal stage 2. A declined/failed fit uses empirical stage 3.
-// B3=0 deliberately retains the previous selected segment (B2 if fitting was
-// attempted, otherwise B1), including its fitter-produced sorting/reversal.
-// Only reached B2 needs the fitter's >=100 observations. No stage redraws or
-// concatenates earlier samples. Output owns its last segment; bank stays const,
-// missing SN parameters stay NA and existing sidedness/floor conventions stay.
-// No RNG or file effects; selected-stage validation errors propagate unchanged.
+// Use separate portions of the already generated draws: B1 from offset 0,
+// B2 from B1, and B3 from B1+B2. Stage 1 uses add-one empirical p-values.
+// If p <= .02, optionally try a skew-normal fit in stage 2; otherwise, or if
+// that fit is declined, use the applicable empirical result. A reached fit
+// requires at least 100 scores. Never generate new draws or pool stage samples.
+// When B3 is zero, retain the previous stage's scores (B2 if a fit was attempted,
+// otherwise B1), including any sorting/reversal by the fitter. The result keeps
+// its own final score vector; full draws stay unchanged. Preserve missing
+// skew-normal parameters and the existing tail/floor rules.
 TailResult evaluate_staged_tail(double z_orig,
                                 const Rcpp::NumericVector& a,
                                 const Rcpp::NumericVector& w,
@@ -60,8 +60,9 @@ TailResult evaluate_staged_tail(double z_orig,
 }
 
 namespace {
-// A trivial stack context survives R's protected leaf; it owns no destructor.
-// Only tail has native storage, deleted by the registered cleanup below.
+// Pass the result pointer and settings through R's error-protected conversion.
+// This small stack record owns no C++ resources. The cleanup function below
+// is responsible for deleting tail, including when R reports an error.
 struct AssociationRecord {
   EffectEstimate effect;
   double z_orig;
@@ -69,9 +70,11 @@ struct AssociationRecord {
   bool return_resampling_dist;
 };
 
-// Exact reached-segment conversion, without Rcpp precious objects or native
-// allocation/C++ throws. Do not allocate unused B2/B3 capacity for a stage1
-// return. The caller registered cleanup before this leaf can allocate/error.
+// Copy the finished result into R objects, allocating only the null scores from
+// the stage actually returned. Do not reserve unused B2/B3 space for a stage-1
+// result. Use the raw R API here: R errors can skip C++ destructors, so avoid
+// Rcpp objects requiring cleanup, new C++ buffers and C++ exceptions. The caller
+// has already installed R_UnwindProtect so an R error still frees the C++ result.
 SEXP association_record_leaf(void* data) {
   const AssociationRecord* record = static_cast<AssociationRecord*>(data);
   const TailResult* tail = record->tail;
@@ -103,8 +106,8 @@ SEXP association_record_leaf(void* data) {
   return out;
 }
 
-// Runs exactly once after conversion or before R resumes its original jump.
-// Destruction is allocation-free/noexcept, including an empty selected segment.
+// Free the C++ result exactly once, after successful conversion or before R
+// continues an error. Deleting this result must not allocate or throw an error.
 void delete_association_tail(void* data, Rboolean) noexcept {
   AssociationRecord* record = static_cast<AssociationRecord*>(data);
   delete record->tail;
@@ -112,9 +115,10 @@ void delete_association_tail(void* data, Rboolean) noexcept {
 }
 } // namespace
 
-// Preserve p/z/effect/SE/stage/SN and optional selected distribution, consuming
-// native ownership at an exact-size R-only leaf. A precreated nonNULL protected
-// token installs R's cleanup context without an allocating transfer window.
+// Return the effect, score, p-value, stage, tail parameters and optional null scores.
+// The caller protected an R continuation token before constructing C++ results.
+// Use that token to install cleanup without an allocation gap that could leak
+// tail if R errors. The conversion above copies only the selected final scores.
 SEXP association_result_record(const EffectEstimate& effect, double z_orig,
                                TailResult* tail, bool return_resampling_dist,
                                SEXP continuation) {

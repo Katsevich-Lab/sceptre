@@ -4,9 +4,9 @@ using namespace Rcpp;
 #include <algorithm>
 
 
-// Relative log-likelihood change used by EM's existing stopping rule. Either
-// negative-infinite likelihood gives 1; zero denominators and other nonfinite
-// cases keep their ordinary floating-point result, rather than a new fallback.
+// Measure relative log-likelihood change for the EM stopping rule. If either
+// likelihood is negative infinity, return 1. Keep ordinary floating-point results
+// for zero denominators or other non-finite cases; do not invent a fallback.
 double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
   double tol;
   if (curr_log_lik == -std::numeric_limits<double>::infinity() || prev_log_lik == -std::numeric_limits<double>::infinity()) {
@@ -18,14 +18,14 @@ double compute_tolerance_cpp(double curr_log_lik, double prev_log_lik) {
 }
 
 
-// Fit each supplied paired (pi, perturbation) start in its original order.
-// The R caller supplies aligned count/Poisson-mean/log-factorial cell vectors
-// and equal-length starting vectors. Inputs are read only; this routine has no
-// RNG or file effects. Keep the existing update arithmetic, mixture-density floor,
-// label flip, 3/50 iteration bounds and likelihood-based winner selection.
-// Return cell-order posterior probabilities, the zero-based winning start,
-// convergence flag and likelihood. With no converged winner these remain
-// zeros/start 0/FALSE/-Inf; obtain_em_assignments owns raw-count fallback.
+// Try each supplied (pi, perturbation) starting pair in order. R supplies guide
+// counts, Poisson means and log-factorials in matching cell order, plus equally
+// long starting-value vectors. Keep inputs unchanged and retain the current EM
+// updates, density floor, label swap and 3/50 iteration bounds.
+// Only converged fits compete, by log likelihood. Return cellwise posterior
+// probabilities, winning start number (starting at 0), convergence and likelihood.
+// With no winner, keep zeros/start 0/FALSE/-Inf; obtain_em_assignments() in R then
+// uses raw-count thresholding instead. No random draws happen in this function.
 // [[Rcpp::export]]
 List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_guesses, NumericVector g,
                              NumericVector g_mus_pert0, NumericVector log_g_factorial) {
@@ -34,11 +34,11 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
   double ep_tol = 0.5 * 1e-4, n_doub = (double) g.size(), outer_log_lik = -std::numeric_limits<double>::infinity();
   int max_it = 50, min_it = 3;
 
-  // define "outer" Ti1s
+  // Keep posterior probabilities from the best converged starting pair.
   NumericVector outer_Ti1s = NumericVector(n);
   bool outer_converged = false;
 
-  // define "inner" variables
+  // Working values for the current starting pair and its EM iterations.
   bool converged, all_zero, any_na;
   double prev_log_lik, curr_log_lik, curr_g_pert, curr_pi, tol, e1, e2;
   int iteration;
@@ -101,9 +101,9 @@ List run_reduced_em_algo_cpp(NumericVector pi_guesses, NumericVector g_pert_gues
         if (iteration >= max_it) break;
       }
 
-      // Retain the implemented log ratio of posterior-weighted count/baseline
-      // sums as the next perturbation, including its use in the additive mean
-      // above. Replacing these updates is a separate numerical-method change.
+      // Update the perturbation from the log ratio of posterior-weighted count and
+      // baseline sums. Keep this formula together with its additive use in the mean
+      // above; changing that parameterization requires separate method validation.
       e1 = Rcpp::sum(Ti1s * g);
       e2 = Rcpp::sum(Ti1s * g_mus_pert0);
       curr_g_pert = log(e1) - log(e2);

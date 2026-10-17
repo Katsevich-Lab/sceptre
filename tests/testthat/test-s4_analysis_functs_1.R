@@ -168,11 +168,8 @@ test_that("import_data", {
 })
 
 
-## this function is still under construction
-# TODO
-# - check_set_analysis_parameters
-# - reset_response_precomps and caching
-# - update_dfs_based_on_grouping_strategy
+# Check the public parameter-setting behavior here. Input-validation, saved-fit
+# reuse and guide-grouping cases also have dedicated tests in this suite.
 
 test_that("set_analysis_parameters", {
     set.seed(12333)

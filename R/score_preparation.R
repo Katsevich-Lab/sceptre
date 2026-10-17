@@ -1,20 +1,18 @@
-# Score arrays share one ordered fit-cell view: y/mu/a/w are length n;
-# D is p by n: rows are eigenbasis coordinates in eigen() order, with p equal
-# to the design coefficient count; columns retain the ordered fit-cell view.
-# Keep the legacy arithmetic/eigen decomposition order for numerical parity.
-#' Form the existing score denominator factor without changing eigensystem order
-#'
-#' @param Zt_wZ Numeric symmetric p-by-p design crossproduct.
-#' @param wZ Numeric n-by-p design multiplied rowwise by weights w, not sqrt(w).
-#' @return Numeric p-by-n matrix `(Lambda^(-1/2) * t(U)) %*% t(wZ)` from the
-#'   symmetric
-#'   eigendecomposition. Rows are eigenbasis coordinates in `eigen()` order,
-#'   with row count equal to the design coefficient count; columns retain the
-#'   fit-cell order in `wZ`.
-#' @details No ridge, eigenvalue clipping, or pseudoinverse is introduced;
-#'   existing
-#'   nonpositive-eigenvalue behavior propagates. Inputs, RNG and files are
-#'   untouched.
+# Every vector below uses the same selected cells in the same order.
+# y, mu, a and w have one value per cell; D has one column per cell.
+# D's rows describe eigenvectors, in eigen() order, rather than individual
+# covariates. There are as many rows as design coefficients.
+# Keep the calculation and eigenvector order to preserve numerical results.
+#' Build the matrix used to adjust the score variance for fitted covariates
+#' @param Zt_wZ Symmetric p-by-p matrix `t(Z) %*% (w * Z)`, where Z is the design.
+#' @param wZ n-by-p design matrix with each cell's row multiplied by its weight w
+#'   (not by sqrt(w)).
+#' @return A p-by-n matrix, `(Lambda^(-1/2) * t(U)) %*% t(wZ)`, where U and Lambda
+#'   come from `eigen(Zt_wZ)`. Columns follow the cells in `wZ`; rows follow the
+#'   eigenvectors in eigen() order, rather than individual covariates.
+#' @details Use the eigenvalues directly, without adding a ridge term, clipping
+#'   them or using a pseudoinverse. Nonpositive eigenvalues keep their existing
+#'   numerical behavior.
 #' @noRd
 compute_D_matrix <- function(Zt_wZ, wZ) {
     P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
@@ -25,14 +23,15 @@ compute_D_matrix <- function(Zt_wZ, wZ) {
 }
 
 
-#' Prepare the current score arrays on the nuisance fit's ordered cell view
-#' @param expression_vector Numeric response vector of length n.
-#' @param covariate_matrix Numeric n-by-p matrix aligned with response and fit.
-#' @param fit Compact record with p fitted_coefs in design-column order and
-#'   scalar theta, computed for this same fit-cell view.
-#' @return List mu, w, a (length n) and D (p by n), preserving the existing full
-#'   statistic formulas and numerical warnings. Does not refit, mutate input,
-#'   persist fitted vectors, resample or access storage/RNG/files.
+#' Turn a fitted response model into the arrays used by the score test
+#' @param expression_vector Response counts, one per selected cell.
+#' @param covariate_matrix Design matrix whose rows follow those same cells.
+#' @param fit Coefficients (`fitted_coefs`) and dispersion (`theta`) fitted on
+#'   exactly these cells and this design.
+#' @return Fitted means `mu`, weights `w`, residual contributions `a` (one value
+#'   per cell) and the covariate-adjustment matrix `D` (one column per cell).
+#'   The formulas below keep the current test's calculations and warnings.
+#'   This helper prepares arrays from an existing fit; it does not fit again.
 #' @noRd
 prepare_score_components <- function(expression_vector, covariate_matrix, fit) {
     fitted_coefs <- fit$fitted_coefs

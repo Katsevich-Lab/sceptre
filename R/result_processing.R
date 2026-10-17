@@ -1,11 +1,13 @@
-# Ordinary raw-table operations; these functions do not fit models, access
-# matrix storage, schedule workers, or mutate the S4 facade.
-#' Attach aligned native records to requested pair rows
+# Turn test outputs into result tables, combine guides and adjust p-values.
+# Table calculations take tables and settings directly. The workflow helpers
+# near the end read those settings from the saved object and return a table.
+#' Add each C++ test result to its requested gene-guide row
 #'
-#' One native record per row supplies p/fold-change/SE. Output amount >=2 adds
-#' stage/score/tail parameters; >=3 binds full null draws with fill for unequal
-#' lengths. Retains pair rows and the existing data-frame/table binding classes.
-#' No guide integration or multiple-testing correction occurs at this boundary.
+#' The caller supplies one result per row, in the same order. Add p-values,
+#' fold changes and their standard errors. Output level 2 also adds the stage,
+#' observed score and fitted tail parameters; level 3 adds resampled statistics,
+#' filling missing columns when tests returned different numbers of draws.
+#' Guide integration and multiple-testing correction happen later.
 #' @noRd
 pair_results_from_native <- function(
     curr_df,
@@ -68,14 +70,17 @@ pair_results_from_native <- function(
     return(curr_df)
 }
 
-#' Integrate guide rows using the configured existing result rule
+#' Combine guide-level results according to the chosen integration strategy
 #'
-#' Union relabels groups as targets. Singleton/Bonferroni join the guide-target
-#' map, retaining its multiplicity, then sort by p-value/response.
-#' Non-calibration
-#' Bonferroni retains one minimum-p record per response/target and multiplies by
-#' passing-guide count, capped at one; all-failed groups keep maximum counts and
-#' missing p/effect. Calibration skips that collapse. No new correction occurs.
+#' For union, guide groups already represent targets: rename the group column.
+#' For singleton or Bonferroni, join guide names to their targets, keeping all
+#' metadata matches, then sort by p-value and response gene.
+#'
+#' For Bonferroni outside calibration, retain the smallest-p guide per gene-target
+#' pair and multiply its p-value by the number of guides that passed QC, capped at
+#' 1. If all guides failed QC, keep the largest treatment/control counts and leave
+#' the effect and p-value missing. Calibration keeps its separate guide rows.
+#' This guide-level adjustment precedes the later adjustment across tested pairs.
 #' @noRd
 integrate_guides <- function(
     result,
@@ -136,11 +141,12 @@ integrate_guides <- function(
     return(new_result)
 }
 
-#' Restore failed-QC requests before final family processing
+#' Put failed-QC pairs back into the result table
 #'
-#' Binds tested rows followed by failed requests, filling missing native fields,
-#' then orders by p-value/response with NA last. Returns a data.table. Requested
-#' identities and repeated rows remain; no p-values are computed or adjusted.
+#' Append the failed-QC requests to tested pairs, leaving unavailable test fields
+#' missing. Sort by p-value and response gene, with missing p-values last, and
+#' return a data.table. Keep pair labels and repeated requests. This sorts the
+#' output; it does not restore original request order or adjust p-values.
 #' @noRd
 assemble_pair_results <- function(raw_result, requested_pairs) {
     result <- data.table::rbindlist(
@@ -151,13 +157,13 @@ assemble_pair_results <- function(raw_result, requested_pairs) {
     result
 }
 
-#' Integrate the complete result family and assign its existing significance
-#' flag
+#' Combine guides and mark significant results across the complete set of tests
 #'
-#' Uses p.adjust with the facade's method and strict adjusted-p < alpha after
-#' guide integration. Resolve alpha outside the table mask: amount 2/3 carries
-#' a separate skew-normal shape column with the same name. Real pipeline callers
-#' invoke this after gathering the full family, rather than per raw shard.
+#' After guide integration, call `p.adjust()` with the chosen method and mark
+#' adjusted p-values strictly below `alpha` as significant. Apply this to all
+#' collected results, not independently to each Nextflow worker's partial output.
+#' The scalar significance cutoff must come from the function argument: output
+#' levels 2 and 3 also have an unrelated tail-shape column named `alpha`.
 #' @noRd
 finalize_association_result <- function(
     result,
@@ -173,22 +179,22 @@ finalize_association_result <- function(
         target_map,
         is_calibration_check
     )
-    # Output amount 2/3 already has a skew-normal shape column named alpha.
-    # Resolve correction settings outside the table's data mask.
+    # Use the function's alpha cutoff, not the table's unrelated tail-shape
+    # column also named alpha. Compute here, outside mutate's column lookup.
     significant <- stats::p.adjust(result$p_value, method = correction_method) <
         alpha
     dplyr::mutate(result, significant = !!significant)
 }
 
-# Pinned pipeline scripts call these private names. They extract facade options
-# and delegate; standard finalization follows gathering the complete family.
-# Nuclear raw shards retain their separate existing script-level contract.
-#' Finalize a gathered calibration family using facade settings
+# Nextflow scripts call these internal function names directly. Read settings
+# from the object, then process the collected results. Standard analyses adjust
+# p-values after collection; nuclear tasks keep their partial outputs raw.
+#' Finish collected calibration results using the object's settings
 #'
-#' Retains the direct Nextflow private-name contract and skips the
-#' non-calibration
-#' Bonferroni collapse used by power/discovery. Returns the finalized table;
-#' does not update facade slots.
+#' Called both by the package and directly by Nextflow scripts. Combine guides and
+#' adjust across the complete set of results, keeping calibration guide rows
+#' rather than using the Bonferroni row reduction for power/discovery. Return the
+#' table; the caller saves it into the object if needed.
 #' @noRd
 process_calibration_result <- function(result, sceptre_object) {
     finalize_association_result(
@@ -201,10 +207,11 @@ process_calibration_result <- function(result, sceptre_object) {
     )
 }
 
-#' Finalize a gathered discovery family using facade settings
+#' Finish collected discovery results using the object's settings
 #'
-#' Direct Nextflow adapter for the complete-family correction above; returns a
-#' table without changing facade slots or recomputing tests.
+#' Called both by the package and directly by Nextflow scripts. Combine guides and
+#' adjust p-values across the complete set of results. Return the table without
+#' rerunning tests or saving it into the object.
 #' @noRd
 process_discovery_result <- function(result, sceptre_object) {
     finalize_association_result(
@@ -216,11 +223,12 @@ process_discovery_result <- function(result, sceptre_object) {
     )
 }
 
-#' Apply guide grouping alone at the actual pipeline boundary
+#' Combine guide rows without marking significance across all tests
 #'
-#' Returns integrated rows using facade metadata and the explicit calibration
-#' flag. This adapter deliberately does not assign complete-family significance;
-#' existing nuclear scripts retain their separate raw-shard processing contract.
+#' Read guide metadata and the integration strategy from the object. The explicit
+#' calibration flag determines whether calibration-specific grouping rules apply.
+#' Return the grouped table. Power uses this step without the across-pair
+#' significance calculation; nuclear pipeline tasks keep their raw-output rules.
 #' @noRd
 apply_grouping_to_result <- function(
     result,

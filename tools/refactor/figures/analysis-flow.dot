@@ -7,7 +7,7 @@ digraph analysis {
   plan [label=< <B>3. Choose how to visit the pairs</B><BR/>Permutation: by response · CRT: by guide<BR/><FONT POINT-SIZE="13">association_execution.R</FONT> >];
   test [label=< <B>4. Prepare the numerical inputs</B><BR/>Counts, fitted means and test inputs<BR/><FONT POINT-SIZE="13">association_workers.R</FONT> >];
   native [label=< <B>5. Calculate effects and p-values</B><BR/>Score, resampling stages and tail calculation<BR/><FONT POINT-SIZE="13">src/inference_*.cpp · low_level_full_test.cpp</FONT> >, fillcolor="#E4F1E8", color="#659576"];
-  finish [label=< <B>6. Assemble and save the results</B><BR/>Restore pair order; integrate guides<BR/>Apply multiple-testing correction<BR/><FONT POINT-SIZE="13">result_processing.R · public analysis functions</FONT> >];
+  finish [label=< <B>6. Assemble and save the results</B><BR/>Include failed QC; integrate guides<BR/>Apply multiple-testing correction<BR/><FONT POINT-SIZE="13">result_processing.R · public analysis functions</FONT> >];
   saved [label=< <B>Updated sceptre_object</B><BR/>Results and reusable response fits >, fillcolor="#DAE8FA", color="#4E75A5"];
   storage [label=< <B>Read counts</B><BR/>R sparse matrix or ondisc file<BR/><FONT POINT-SIZE="13">storage.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
   fits [label=< <B>Fit models and prepare scores</B><BR/>Statistical calculations in small functions<BR/><FONT POINT-SIZE="13">fitting.R · score_preparation.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];

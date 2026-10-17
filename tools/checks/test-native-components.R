@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
-# Direct tests for private native components, run from a source checkout. The
-# installed-package suite tests stages, effect mathematics and draw laws.
-# No historical implementation or expected output is loaded here.
+# Test internal C++ functions directly from the current source checkout. The
+# installed-package suite also checks stages, effect formulas and sampling laws.
+# These tests use no old implementation or saved historical outputs.
 args <- commandArgs(trailingOnly = TRUE)
 root <- normalizePath(if (length(args)) args[[1L]] else ".", mustWork = TRUE)
 stopifnot(file.exists(file.path(root, "src", "inference.h")))
@@ -34,8 +34,8 @@ testthat::test_that("effect and scores have independent explicit inputs", {
     testthat::expect_equal(environment$component_observed(a, w, D, treatment - 1L), score(treatment))
     draws <- list(c(0L, 2L, 3L), c(3L, 1L), c(1L, 2L, 0L), c(2L, 0L))
     before <- serialize(list(a, w, D, treatment, draws), NULL)
-    # Segment offsets are zero-based; cell indices in these banks are already
-    # zero-based. Fixed-cardinality hybrid draws use only the requested prefix.
+    # Draw offsets and cell positions both start at 0. A hybrid draw can serve
+    # several group sizes; each test reads only its requested first k positions.
     fixed <- environment$component_segment(a, w, D, draws, 1L, 2L, 2L, FALSE)
     variable <- environment$component_segment(a, w, D, draws, 1L, 2L, 2L, TRUE)
     testthat::expect_equal(fixed, vapply(draws[2:3], function(x) score(x[1:2] + 1L), numeric(1)))

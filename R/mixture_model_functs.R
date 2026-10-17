@@ -1,16 +1,14 @@
-#' Assign guides using the existing covariate-adjusted count mixture.
-#'
-#' @param grna_matrix Supported row-readable guide-by-source-cell counts.
-#' @param cell_covariate_data_frame Covariates in the same source-cell order.
-#' @param grna_assignment_hyperparameters Existing EM, formula and threshold
-#'   options.
-#' @param print_progress,parallel,n_processors,log_dir Worker/reporting options.
-#' @param grna_ids Ordered guide IDs to process, retained as output names.
-#' @return Named lists of one-based source-cell assignments, in serial or
-#'   existing
-#'   seeded block order. Reads guide rows, may create progress files and runs GC
-#'   every 200 block items. Fixed starting guesses preserve caller RNG; active
-#'   count/nonconvergence fallback and formula-error context remain unchanged.
+#' Assign guides with a count mixture adjusted for cell covariates
+#' @param grna_matrix Guide-by-cell counts prepared for row access.
+#' @param cell_covariate_data_frame Covariates in matching original-cell order.
+#' @param grna_assignment_hyperparameters EM, formula and assignment-threshold settings.
+#' @param print_progress,parallel,n_processors,log_dir Worker and reporting settings.
+#' @param grna_ids Guide names to process, in order.
+#' @return Named lists of original cell-column numbers, starting at 1. Serial work
+#'   follows input order; parallel work follows the seeded block order. Read one
+#'   guide at a time, report progress and collect garbage every 200 items. Starting
+#'   guesses use a fixed seed and restore R's random state. Low counts or failed
+#'   mixture fits use the existing raw-count fallback.
 #' @noRd
 assign_grnas_to_cells_mixture <- function(
     grna_matrix,
@@ -64,10 +62,10 @@ assign_grnas_to_cells_mixture <- function(
         make_row_accessible = TRUE
     )
 
-    #' Assign one ordered block of guide IDs.
-    #' @param curr_grna_ids Character guide IDs; proc_id selects the worker log.
-    #' @return Named assignment list. Reports then collects garbage before each
-    #'   row read; the shared design and fixed guesses are read-only captures.
+    #' Assign cells for one worker's block of guides
+    #' @param curr_grna_ids Guide names in processing order; proc_id names the worker log.
+    #' @return Named assignment list. Report progress and collect garbage before
+    #'   reading each guide, using the shared design and fixed starting guesses.
     #' @noRd
     assign_guide_block <- function(curr_grna_ids, proc_id = NULL) {
         f_name <- analysis_log_file(
@@ -142,18 +140,16 @@ assign_grnas_to_cells_mixture <- function(
 }
 
 
-#' Assign one guide using EM or the existing raw-count fallback.
-#'
-#' @param pi_guesses,g_pert_guesses Numeric starting values in matched order.
-#' @param g Numeric counts in source-cell order.
-#' @param covariate_matrix Matrix aligned to g, including one-column designs.
-#' @param n_nonzero_cells_cutoff Minimum count of cells with g >= 1 for EM.
-#' @param backup_threshold Raw-count fallback threshold.
-#' @param probability_threshold Posterior threshold on an accepted EM fit.
-#' @return Increasing one-based cell positions. Uses the existing Poisson
-#'   initialization and native EM; expected initialization warnings are muffled.
-#'   Low counts or unsuccessful EM retain raw-count thresholding. No input
-#'   mutation.
+#' Assign one guide's cells using a fitted mixture or a raw-count fallback
+#' @param pi_guesses,g_pert_guesses Paired starting values for EM fits.
+#' @param g Guide counts in original-cell order.
+#' @param covariate_matrix Design matrix with rows in that same order.
+#' @param n_nonzero_cells_cutoff Minimum number of cells with g >= 1 to attempt EM.
+#' @param backup_threshold Raw-count threshold used when EM is unsuitable.
+#' @param probability_threshold Posterior-probability cutoff after a successful EM fit.
+#' @return Original cell positions, starting at 1, in increasing order. Initialize
+#'   with a Poisson fit, silencing its expected warnings, then run C++ EM. If too
+#'   few cells have counts or EM fails, use raw-count thresholding instead.
 #' @noRd
 obtain_em_assignments <- function(
     pi_guesses,
@@ -206,13 +202,12 @@ obtain_em_assignments <- function(
 }
 
 
-#' Generate the existing deterministic mixture starting guesses.
-#'
-#' @param n_em_rep Number of paired guesses.
-#' @param pi_guess_range,g_pert_guess_range Numeric uniform bounds.
-#' @return Lists pi_guesses and g_pert_guesses, drawn in that order under seed
-#'   4.
-#'   with_seed restores the caller's RNG state, including its absence.
+#' Generate repeatable starting values for the mixture fits
+#' @param n_em_rep Number of paired starting guesses.
+#' @param pi_guess_range,g_pert_guess_range Uniform sampling bounds.
+#' @return Lists pi_guesses and g_pert_guesses, sampled in that order with seed 4.
+#'   Restore the caller's previous random state afterward, including when no
+#'   random seed existed before the call.
 #' @noRd
 get_random_starting_guesses <- function(
     n_em_rep = 5,

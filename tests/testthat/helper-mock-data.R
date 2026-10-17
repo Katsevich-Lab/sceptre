@@ -204,7 +204,7 @@ make_mock_grna_target_data <- function(
 
     # if we have more columns than the deterministic patterns, then
     # duplicate the patterned matrix as many times as we can and
-    # fill the rest in with iid Pois(1) noice
+    # fill remaining columns with independent Poisson(1) noise
     if (dims[2] > num_patterns) {
         num_copies <- dims[2] %/% num_patterns
         num_extra_cols <- dims[2] %% num_patterns

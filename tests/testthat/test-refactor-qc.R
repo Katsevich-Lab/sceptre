@@ -11,8 +11,8 @@ test_that("legacy eligibility preserves boundaries missing counts and input orde
 })
 
 test_that("calibration candidate acceptance uses the same count policy", {
-    # One candidate group gives an unambiguous identity map while the sampler
-    # retains its existing random traversal and accepts threshold boundary ties.
+    # Use one candidate guide group so its output label is unambiguous. Keep
+    # the sampler's random candidate order and accept counts equal to thresholds.
     treatment <- matrix(c(6L, 7L, 10L, 7L), nrow = 1L)
     total <- c(16L, 14L, 16L, 16L)
     groups <- matrix(0L, 1L, 1L)

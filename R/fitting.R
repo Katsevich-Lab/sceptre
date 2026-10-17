@@ -1,20 +1,16 @@
-# Current response fitting is Poisson glm.fit plus a clipped dispersion
-# estimate.
-# It does not execute a second NB regression. Keep arithmetic/warnings here;
-# this module has no object, storage, scheduling, or cache responsibilities.
-#' Fit the existing response nuisance model on one aligned cell view
-#'
-#' @param expressions Numeric response vector of length n.
-#' @param covariate_matrix Numeric n-by-p design, ordered with `expressions`;
-#'   callers supply the validated design and select the fit-cell view.
-#' @return Compact list `fitted_coefs` (p coefficients in design-column order)
-#'   and
-#'   scalar `theta`, clipped to [0.01, 1000] using the existing arithmetic.
-#' @details Fits Poisson `glm.fit`, then estimates dispersion at its fitted
-#'   means;
-#'   no second negative-binomial regression is performed. Existing fit warnings
-#'   propagate and missing coefficients produce the existing covariate error.
-#'   Does not mutate inputs, cache results, access storage, or use RNG/files.
+# Fit the response using Poisson glm.fit(), then estimate dispersion at those
+# fitted means. There is no second negative-binomial regression. These functions
+# take vectors and design matrices directly; their callers select cells, read
+# counts and decide whether a previous fit can be reused.
+#' Fit the response model for the selected cells
+#' @param expressions Numeric response counts, one per selected cell.
+#' @param covariate_matrix Numeric design matrix with one row per selected cell,
+#'   in exactly the same order as `expressions`.
+#' @return Coefficients (`fitted_coefs`) in design-column order and dispersion
+#'   (`theta`), restricted to [0.01, 1000]. These are small enough to save for reuse.
+#' @details Fit Poisson `glm.fit()`, then estimate dispersion at its fitted means.
+#'   Warnings from the fit are passed through. Missing coefficients trigger the
+#'   covariate error below. The caller handles saving or reusing this fit.
 #' @noRd
 fit_response <- function(expressions, covariate_matrix) {
     pois_fit <- stats::glm.fit(
@@ -43,13 +39,14 @@ fit_response <- function(expressions, covariate_matrix) {
     return(result)
 }
 
-#' Fit assignment probabilities on one aligned fit-cell view
-#' @param trt_idxs Valid one-based fit-row positions, not source columns;
-#'   repeated positions set the same binary indicator entry to one.
-#' @param covariate_matrix Numeric n-by-p matrix in selected fit-cell order.
-#' @return Numeric n-vector of binomial glm.fit probabilities in that order.
-#'   Existing warnings/coefficient/convergence behavior is retained; no extra
-#'   convergence check, input mutation, cache, storage, RNG or files are used.
+#' Fit each selected cell's probability of belonging to the treatment group
+#' @param trt_idxs Treated cells' row numbers in `covariate_matrix`, starting at 1.
+#'   These are positions in this fit, not columns of the original count matrix.
+#'   Repeated positions mark the same cell as treated once.
+#' @param covariate_matrix Numeric design matrix for the cells in this fit.
+#' @return One fitted probability per design row, from binomial `glm.fit()`.
+#'   Existing glm warnings and convergence behavior are passed through; this
+#'   helper adds no separate convergence check.
 #' @noRd
 fit_assignment_probabilities <- function(trt_idxs, covariate_matrix) {
     indicator <- integer(length = nrow(covariate_matrix))
