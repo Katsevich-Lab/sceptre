@@ -38,20 +38,22 @@ test_that("a child exiting without replying cannot silently drop a block", {
         "did not deliver")
 })
 
-test_that("CRT assembly retains failed-QC rows when no requests are eligible", {
+test_that("CRT dispatch preserves empty internal request blocks", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$high_complement_crt
     object <- refactor_capture(refactor_prepare(inputs, case))$value
-    pairs <- object@discovery_pairs_with_info
-    pairs$pass_qc[] <- FALSE
-    run <- refactor_private("analyze_association_pairs")
-    serial <- refactor_capture(run(object, pairs, "discovery_analysis", 1L, FALSE, FALSE, 2L, tempdir()))
+    pairs <- object@discovery_pairs_with_info[FALSE, , drop = FALSE]
+    context <- refactor_private("prepare_analysis_context")(object, "discovery_analysis", pairs)
+    execution <- list(output_amount = 1L, print_progress = FALSE, parallel = FALSE,
+                      n_processors = 2L, log_dir = tempdir())
+    run <- refactor_private("run_crt_analysis")
+    serial <- refactor_capture(run(context, execution))
     expect_identical(serial$warnings, character())
-    expect_equal(nrow(serial$value$result), nrow(pairs))
-    expect_true(all(!serial$value$result$pass_qc))
-    expect_true(all(is.na(serial$value$result$p_value)))
+    expect_equal(nrow(serial$value$result), 0L)
+    expect_identical(serial$value$response_precomputations, context$response_fits)
     skip_on_os("windows")
-    parallel <- refactor_capture(run(object, pairs, "discovery_analysis", 1L, FALSE, TRUE, 2L, tempdir()))
+    execution$parallel <- TRUE
+    parallel <- refactor_capture(run(context, execution))
     expect_identical(parallel$warnings, character())
     expect_equal(parallel$value, serial$value)
 })

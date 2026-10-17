@@ -509,5 +509,5 @@ seeds are unchanged.
 
 **Code / test.** [execution.R](../../R/execution.R) and
 [test-worker-errors.R](../../tests/testthat/test-worker-errors.R) cover serial and
-forked errors, a child exiting before replying, valid empty results, zero-eligible
-CRT assembly, successful order and preserved cause text.
+forked errors, a child exiting before replying, valid empty results, empty
+internal CRT dispatch, successful order and preserved cause text.
