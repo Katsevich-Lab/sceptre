@@ -4,9 +4,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 1L || length(args) > 2L)
     stop("Usage: compare.R /fresh/output [candidate-git-ref; default HEAD]")
-for (package in c("pkgbuild", "pkgload", "testthat", "digest", "jsonlite")) {
-    if (!requireNamespace(package, quietly = TRUE)) stop("Developer dependency missing: ", package)
-}
+if (!requireNamespace("jsonlite", quietly = TRUE)) stop("Developer dependency missing: jsonlite")
 script <- sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))
 repo <- normalizePath(file.path(dirname(script), "../.."), winslash = "/", mustWork = TRUE)
 out <- path.expand(args[[1L]])
@@ -25,14 +23,17 @@ git_read <- function(arguments) {
     result
 }
 candidate_ref <- if (length(args) == 2L) args[[2L]] else "HEAD"
-candidate_pin <- git_read(c("rev-parse", "--verify", shQuote(paste0(candidate_ref, "^{commit}"))))
+candidate_pin <- NULL
 commands <- list()
 report <- list(schema_version = 1L, scope = "Manual refactor consistency only; not permanent CI, performance or whole-consumer qualification.",
     reference_pin = reference_pin, candidate_pin = candidate_pin, requested_ref = candidate_ref,
-    working_tree_included = FALSE, output = out, status = "running", commands = commands)
-write_report <- function() jsonlite::write_json(report, file.path(out, "comparison.json"),
+    working_tree_included = FALSE, output = out, status = "running", phase = "preflight", commands = commands)
+write_report <- function(value = report) jsonlite::write_json(value, file.path(out, "comparison.json"),
     pretty = TRUE, auto_unbox = TRUE, null = "null", digits = NA)
+write_report()
 run <- function(stage, command, arguments) {
+    report$phase <<- stage
+    write_report()
     log <- file.path(out, paste0(stage, ".log"))
     started <- Sys.time()
     status <- system2(command, arguments, stdout = log, stderr = log)
@@ -47,6 +48,24 @@ run <- function(stage, command, arguments) {
         stop(stage, " failed; inspect ", log, call. = FALSE)
     }
 }
+tryCatch({
+for (package in c("pkgbuild", "pkgload", "testthat", "digest")) {
+    if (!requireNamespace(package, quietly = TRUE)) stop("Developer dependency missing: ", package)
+}
+candidate_pin <- git_read(c("rev-parse", "--verify", shQuote(paste0(candidate_ref, "^{commit}"))))
+report$candidate_pin <- candidate_pin
+backed <- requireNamespace("ondisc", quietly = TRUE)
+ondisc <- if (backed) utils::packageDescription("ondisc") else NULL
+report$backed <- list(enabled = backed, version = if (backed) ondisc$Version else NULL,
+    source_sha = if (backed) ondisc$RemoteSha else NULL)
+report$environment <- list(R = R.version.string, platform = R.version$platform,
+    libraries = .libPaths(), packages = lapply(c("Matrix", "Rcpp", "BH", "pkgload", "testthat"),
+        function(p) list(package = p, version = as.character(utils::packageVersion(p)))))
+write_report()
+if (identical(Sys.getenv("SCEPTRE_REQUIRE_ONDISC"), "true") && !backed)
+    stop("Backed comparison required, but ondisc is not installed.")
+if (backed && !identical(ondisc$RemoteSha, "589803edea2a66ad15e7f07186bee16c7739ab8c"))
+    stop("Installed ondisc is not the qualified guarded source. Follow the backed installation instructions in README.md before comparing; version 1.3.5 alone is insufficient.")
 # Fetch only if this clone does not yet contain the exact historical object.
 has_reference <- system2("git", c("-C", shQuote(repo), "cat-file", "-e", reference_pin),
     stdout = FALSE, stderr = FALSE) == 0L
@@ -61,6 +80,7 @@ for (role in c("original", "candidate")) {
     utils::untar(archive, exdir = directory)
 }
 candidate <- file.path(out, "candidate")
+report$phase <- "validate-candidate"
 suite <- file.path(candidate, "tools/refactor/consistency/testthat")
 if (!dir.exists(suite)) stop("Candidate ref predates the developer consistency suite; choose a newer committed ref.")
 library_dir <- file.path(out, "library")
@@ -90,8 +110,10 @@ writeLines(c(
 ), worker)
 invisible(parse(file = worker))
 run("compare", file.path(R.home("bin"), "Rscript"), c("--vanilla", shQuote(worker)))
+report$phase <- "read-comparison-results"
 report$counts <- jsonlite::read_json(file.path(out, "counts.json"), simplifyVector = TRUE)
 report$status <- "passed"
+report$phase <- "complete"
 report$artifacts <- list(log = "compare.log", detailed_results = "results.rds", checks = "checks.csv")
 report$limits <- c("A recorded platform-specific stream test can skip; its full same-environment source comparison still runs.",
     "Only supported historical domains are compared; reviewed bug-fix regressions remain in permanent package tests.",
@@ -105,3 +127,13 @@ writeLines(c("# Refactor consistency comparison", "",
     "No expected output was regenerated from candidate source. This command is not CI."),
     file.path(out, "README.md"))
 cat("Comparison passed. Read ", file.path(out, "README.md"), " and comparison.json\n", sep = "")
+}, error = function(e) {
+    failed <- report
+    failed$status <- "failed"
+    failed$error <- conditionMessage(e)
+    if (is.null(failed$failed_stage)) failed$failed_stage <- failed$phase
+    write_report(failed)
+    writeLines(c("# Refactor comparison failed", "", conditionMessage(e),
+        "See comparison.json for the failed stage and retained logs."), file.path(out, "README.md"))
+    stop(conditionMessage(e), call. = FALSE)
+})

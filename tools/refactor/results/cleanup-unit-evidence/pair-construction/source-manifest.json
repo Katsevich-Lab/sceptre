@@ -1,7 +1,0 @@
-{
-  "R/pair_constructor_functs.R": "95135d4871d73b90e53bba1f1f06cb3ae4210ddadc17155c2198ef7c685b7971",
-  "src/pair_construction_functs.cpp": "e6431b8a18ed986ee5f0a2c5e97ed05bc2a3729313960be00b974b76e8668038",
-  "src/RcppExports.cpp": "4582541709c7da2df03bd0e512ac054cc2ed7ed7b1e933b9d8068a3532b2b513",
-  "man/construct_cis_pairs.Rd": "745273cefdaf75e8076a48fa740ff4d5eeaa52a6131169daa84a89c6dd432193",
-  "tests/testthat/test-refactor-pair-construction.R": "6dab65733fd54a2a0ff8126894f0f760d5b96b496d04873693adad9de692ec70"
-}

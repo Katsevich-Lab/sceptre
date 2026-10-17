@@ -1,4 +1,0 @@
-Error in identical(self$running[[self$current_file]]$context, context) : 
-  attempt to use zero-length variable name
-Calls: <Anonymous> ... <Anonymous> -> test_code -> <Anonymous> -> identical
-Execution halted

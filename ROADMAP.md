@@ -1,6 +1,6 @@
 # sceptre roadmap
 
-Last reviewed: August 2026
+Last reviewed: October 2026
 
 ## Purpose
 
@@ -54,13 +54,17 @@ Since we initially developed `sceptre`, its usage has increased, Perturb-seq dat
 
 ### 5. Maintainable and extensible software architecture
 
-**Goal.** We plan to refactor the `sceptre` code base around clearer, modular interfaces.
+**Goal.** Refactor the internals around clear responsibilities for cell selection,
+count access, model fitting, QC, inference, execution and result processing while
+preserving the public interface and saved-object format.
 
-**Rationale.** As `sceptre` has grown, its internals have become more complex and more difficult to test, maintain, and extend. Clear interfaces for data access, statistical test execution, and result generation will make it easier to add capabilities such as power-aware outputs and distributed execution without coupling them tightly to the current implementation. The refactor will also make the code base easier for community contributors to understand and support stable reference outputs for downstream implementations in other languages or on other hardware.
+**Rationale.** These boundaries make the code easier to test and maintain and give
+future methods and storage integrations a concrete starting point. Extensions
+such as accelerated fitters, replacement QC and backed CRT remain separate work.
 
-**Rough timing.** 2027-2028, as capacity and funding permit.
-
-**Status.** Planned.
+**Status.** Implemented on `codex/refactor` in [PR #234](https://github.com/Katsevich-Lab/sceptre/pull/234);
+completion checks and maintainer handoff precede merge and release. See the lasting
+[architecture guide](ARCHITECTURE.md) for the resulting structure.
 
 ### 6. Improved calibration functionality
 

@@ -23,3 +23,4 @@
 ^CITATION\.cff$
 ^tools/checks$
 ^tools/fixtures$
+^tools/architecture$

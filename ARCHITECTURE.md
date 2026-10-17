@@ -16,28 +16,22 @@ and temporary project records, see [Contributing](CONTRIBUTING.md).
 | Sparse/backed operations | `R/storage.R`, `src/sparse_counts.cpp`, `src/sparse_matrix_functs.cpp` | R 1-based source columns; representation operations with declared count conventions |
 | QC measurements and eligibility | `R/pair_qc.R`, `src/pair_eligibility.h` | Aligned counts and the existing shared threshold predicate |
 | Calibration candidate construction | `R/neg_control_functions.R`, `src/negative_control_functions.cpp` | Existing candidate stream, RNG and acceptance rule |
-| Current numerical fitting | `R/fitting.R` | Response/design or treatment/design arrays to compact fits/probabilities |
+| Model fitting | `R/fitting.R` | Response/design or treatment/design arrays to compact fits/probabilities |
 | Score preparation | `R/score_preparation.R` | Ordered response/design/compact fit to `mu`, `a`, `w`, `D` |
-| Cache validity and updates | `R/fit_cache.R` | Supported mutation events, keyed compact fits, facade writeback |
+| Cache validity and updates | `R/fit_cache.R` | Supported mutation events, keyed compact fits, saving fits in the returned object |
 | Distinct association plans | `R/association_execution.R`, `R/association_workers.R` | Response traversal for permutation; guide traversal for CRT |
 | Worker mechanics | `R/execution.R` | Partition dispatch, progress/logs and result binding |
-| Native inference | `src/inference_scores.cpp`, `src/inference_tail.cpp`, `src/inference_stages.cpp` | Explicit arrays/draw-bank references; checked Rcpp entry in `src/low_level_full_test.cpp` |
+| Native inference | `src/inference_scores.cpp`, `src/inference_tail.cpp`, `src/inference_stages.cpp` | Numeric arrays and shared random draws; checked Rcpp entry in `src/low_level_full_test.cpp` |
 | Results and finalization | `R/result_processing.R` | Native records to raw tables, failed-QC rows, guide integration and family correction |
 
-```mermaid
-flowchart TD
-    F[S4 workflow facade] --> C[Transient analysis context and cell views]
-    C --> P[Permutation response plan]
-    C --> T[CRT guide plan]
-    P --> S[Storage operations]
-    T --> S
-    P --> M[Fitting and score preparation]
-    T --> M
-    M --> N[Native inference components]
-    N --> R[Raw tables and result finalization]
-    R --> F
-    K[Cache validity and compact updates] --- F
-```
+![Main SCEPTRE modules, with the requests and returned values between them.](tools/architecture/module-map.svg)
+
+An arrow points from the part asking for work to the part doing it; labels show
+what is passed in and returned. The map groups related jobs and shows the main
+calls, rather than every helper call or their chronological order. Workflow
+functions also ask fit reuse to clear invalid fits and save completed fits.
+These are groups of files in one R package, not separate installed packages.
+
 
 The plans share worker mechanics, not a universal statistical inner loop.
 Permutation analysis loads each response and reuses its preparation where valid.
@@ -49,8 +43,14 @@ responses. NT-control discovery retains guide-specific response fits.
 
 `analysis_to_source` maps R analysis positions to original matrix columns.
 `nt_to_analysis` retains the ordered NT-only view, which can be nonmonotone.
-Canonical transient group memberships use analysis positions. Persisted legacy
-NT-local assignments are normalized once by `prepare_index_context()`.
+For example, suppose original columns 2, 4 and 7 survive QC. Their analysis
+positions are 1, 2 and 3, so `analysis_to_source = c(2, 4, 7)`. If a fit uses
+analysis positions 3 and 1, its counts and design rows must both use original
+columns 7 and 2, in that order. Within that fit, they are positions 1 and 2.
+
+Temporary guide-group memberships use analysis positions. Some saved NT-only
+assignments instead number cells within the NT selection; `prepare_index_context()`
+converts those once before calculations begin.
 
 `make_fit_view()` supplies ordered source columns and local treatment positions.
 Response extraction and design subsetting use the same view. Raw
@@ -168,17 +168,32 @@ all worker outputs before adjustment; nuclear tasks retain their raw outputs.
 storing a cell selection for every guide at once. Callers supply the prepared
 inputs explicitly.
 
+## Qualified companion versions
+
+| Companion | Qualified source | Supported scope |
+| --- | --- | --- |
+| ondisc | `589803edea2a66ad15e7f07186bee16c7739ab8c` | Backed permutation analyses; see the optional installation instructions in README |
+| sceptre-pipeline | `38dc760a5b4105d1c3f339cd45f2c98d971087f4` | Standard and nuclear workflows using the retained private phase functions and artifact formats |
+
+The recorded pipeline comparison ran locally with matched arrival/seed settings.
+It does not qualify containers, cluster schedulers, array execution or uncontrolled
+arrival ordering. Keep the tested version matrix current when changing either
+repository. Private phase functions are compatibility entry points for this
+consumer, not new public exports. Coordinate their retirement with a tested
+pipeline migration. Nuclear artifacts remain raw per-pod Parquet; standard
+collection applies complete-family correction. Neither gains backed CRT here.
+
 ## Trace one association
 
 Start with `run_discovery_analysis()` in `s4_analysis_functs_2.R`. It owns workflow
-checks and successful facade/cache writeback; `analyze_association_pairs()` builds
+checks and successful saving successful results and fits; `analyze_association_pairs()` builds
 the transient context, filters the eligible family and dispatches its plan.
 `run_permutation_analysis()` visits responses, whereas `run_crt_analysis()` first
 prepares response fits and then visits guides. The four functions in
 `association_workers.R` express shared versus guide-specific fits explicitly.
 They use storage reads and aligned fit/score inputs, then call `run_association_test()`
 in `low_level_full_test.cpp`; score/effect arithmetic and selected tail segments
-belong to the inference components, not the facade. Result assembly restores
+belong to the inference components, not the public workflow. Result assembly restores
 failed-QC requests before complete-family guide integration/correction, or
 retains raw output for the pipeline collector.
 

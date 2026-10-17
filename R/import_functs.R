@@ -249,6 +249,12 @@ import_data_use_ondisc <- function(
 #' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
 #' of the manual for more information about this function.
 #'
+#' For in-memory import, count-file entries may be unsorted. Each cell-feature
+#' coordinate must occur only once; repeated coordinates cause an import error
+#' rather than being summed. This does not reject repeated guide-metadata rows.
+#' Backed Cell Ranger import delegates file parsing to ondisc, which has its own
+#' coordinate handling. See the README for the qualified ondisc installation.
+#'
 #' @param directories a character vector of file paths to directories containing
 #' the output of one or more calls to Cell Ranger count. Each directory should
 #' contain the files `matrix.mtx.gz` and `features.tsv.gz` (and optionally
@@ -701,6 +707,10 @@ import_data_from_cellranger_use_ondisc <- function(
 #' output.
 #'
 #' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
+#'
+#' Count-file entries may be unsorted, but each cell-feature coordinate must
+#' occur only once. Repeated coordinates cause an import error rather than being
+#' summed; repeated guide-metadata rows are a separate matter.
 #'
 #' @param gene_mat_fp file path to the gene `count_matrix.mtx` file.
 #' @param grna_mat_fp file path to the gRNA `count_matrix.mtx` file.

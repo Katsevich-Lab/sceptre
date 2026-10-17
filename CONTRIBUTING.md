@@ -30,12 +30,15 @@ compatibility, see [Internal architecture](ARCHITECTURE.md).
 | Package implementation, help, examples and datasets | `R/`, `src/`, `man/`, `vignettes/`, `data/`, `inst/` | Permanent; maintain with the package |
 | Tests of current behavior and bug fixes | `tests/testthat/` | Permanent, including regression tests first added during the refactor |
 | CI and current-source C++ checks | `.github/workflows/`, [tools/checks/](tools/checks/README.md), `air.toml` | Permanent maintainer tooling |
+| Test-input recipes and provenance | `tools/fixtures/`, `tests/testthat/fixtures/README.md` | Permanent; never regenerate expected scientific outputs in CI |
+| Module-map drawing and editable source | `tools/architecture/` | Permanent; maintain with `ARCHITECTURE.md` |
 | Current architecture and contributor/project guidance | Root `ARCHITECTURE.md`, this guide, `README`, `ROADMAP.md`, `GOVERNANCE.md` and other project policies | Permanent; keep current |
 | Refactor specification, cleanup plan, Tim's walkthrough, old-versus-new comparison and acceptance evidence | [tools/refactor/](tools/refactor/README.md) | Temporary; retain for refactor review, then archive before retiring |
 
 **Build exclusion does not mean temporary.** `.Rbuildignore` keeps maintainer
-material out of the distributed R source package. Both permanent `tools/checks/`
-and temporary `tools/refactor/` are excluded, as are several lasting root guides.
+material out of the distributed R source package. Permanent `tools/checks/`,
+`tools/fixtures/` and `tools/architecture/`, and temporary `tools/refactor/`, are
+excluded, as are several lasting root guides.
 
 Routine CI uses current-package tests and current-source checks. It must not
 depend on `tools/refactor/`, an old SCEPTRE installation or historical comparison

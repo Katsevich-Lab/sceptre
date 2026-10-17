@@ -19,10 +19,11 @@ analyses retain their results. The cases below deliberately behave differently
 because the previous behavior was broken or unsafe. Each item explains what
 could go wrong and points to the code and a test that protects the fix.
 
-The production implementation was qualified at commit `0a9f9d8`. The later CI
-separation and this guide do not change it. The detailed review record is the
-[behavior ledger](cleanup/behavior-dispositions.md); its older planning sections
-are historical, while [final acceptance](FINAL_ACCEPTANCE.md) records completion.
+The production implementation was qualified at commit `0a9f9d8`. Subsequent comment and test improvements preserve its numerical implementation.
+The later worker-error repair improves failure reporting and rejects missing results;
+normal scientific results remain checked by the manual comparison. The detailed review record is the
+[behavior ledger](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/cleanup/behavior-dispositions.md); its older planning sections
+are historical, while [final acceptance](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/FINAL_ACCEPTANCE.md) records completion.
 “Regression test” below means a test designed to prevent the same bug returning.
 
 ## Importing counts and preserving inputs
@@ -72,7 +73,7 @@ external ondisc file parser is a separate implementation.
 
 **Code / test.** [import_functs.R](../../R/import_functs.R) and
 [test-refactor-import-coordinates.R](../../tests/testthat/test-refactor-import-coordinates.R).
-See [decision D2026-10-16-01](cleanup/decisions.md).
+See [decision D2026-10-16-01](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/cleanup/decisions.md).
 
 ### 4. Symmetric dense matrices could lose their lower-triangle values {#dense-symmetry}
 
@@ -478,7 +479,7 @@ The refactor is not uniformly cheaper in memory. Two costs were accepted
 explicitly: eight-million-entry numeric-triplet conversions added about
 122–123 MiB peak RSS in their measured cases, and a final Papalexi cold serial
 workflow rose from about 505 to 667 MiB. The cause of the latter increase remains
-unresolved. [Final acceptance](FINAL_ACCEPTANCE.md) gives the exact measured
+unresolved. [Final acceptance](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/FINAL_ACCEPTANCE.md) gives the exact measured
 commits, resource scopes and limits. The dense-conversion correctness fix also
 has its separately measured extra-copy cost.
 
@@ -491,3 +492,21 @@ remain extensions to implement and validate separately.
 There was no general redefinition of stored zero/fractional counts, scientific
 significance or the pairwise QC rule. The old/new comparison covers its agreed
 ordinary cases; the regression tests above specify the intended corrections.
+
+## Worker errors
+
+### 27. A parallel worker failure could hide its original error
+
+**Example / old behavior.** A worker could report “Cannot read response gene_X”,
+while the parent subsequently failed with “$ operator is invalid for atomic
+vectors” when combining its outputs. A worker returning no result could also
+leave an incomplete block unrecognized.
+
+**Fix.** Check each returned block before reporting success or combining results.
+Report the failed worker's block number and original error. Reject a missing
+result instead of silently dropping work. Successful result order and random
+seeds are unchanged.
+
+**Code / test.** [execution.R](../../R/execution.R) and
+[test-worker-errors.R](../../tests/testthat/test-worker-errors.R) cover serial and
+forked errors, missing results, successful order and preserved cause text.

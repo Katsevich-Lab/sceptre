@@ -1,245 +1,116 @@
-# Refactor review and manual comparison
+# SCEPTRE refactor handoff
 
-This directory is temporary developer tooling kept in Git for maintainer review.
-It is excluded from the source package by `^tools/refactor$` in `.Rbuildignore`.
-No CI workflow invokes it. Permanent package tests live in `tests/testthat/`;
-current-source safety probes live in [`tools/checks/`](../checks/README.md).
+Start with the [illustrated tour](walkthrough.qmd), its [bug appendix](bug-fixes.qmd)
+and the lasting [architecture guide](../../ARCHITECTURE.md). The public API and
+56-slot saved-object format are preserved. The refactor adds no new inference
+method, storage backend or replacement QC policy. Normal numerical behavior is
+checked against original commit `21f9ea098b69c444a884a49bc254de711968e3b5`.
+Reviewed bug domains and improved worker-error reporting are explicit exceptions.
 
-## Start here
+## Material to keep
 
-The accepted [refactor specification](REFACTOR_SPEC.md) and its
-[cleanup addendum](CLEANUP_PLAN.md) live here alongside the review and comparison
-tools. They record this refactor's decisions and acceptance requirements; ongoing
-development uses the root architecture and contributor guides.
+Permanent package tests check current mathematical behavior, workflow results,
+sampling probabilities, warnings, indexing, cache reuse and supported execution
+modes. The older saved object is a lasting file-format input, not an old-output
+snapshot. Input provenance and maintenance instructions are in
+[tests/testthat/fixtures](../../tests/testthat/fixtures/README.md).
+Current-source native safety checks live in [tools/checks](../checks/README.md).
+The maintained diagram lives in [tools/architecture](../architecture/README.md).
 
-For Tim's code review, read [the illustrated walkthrough](walkthrough.qmd), including
-its before/after testing section, and
-[bug-by-bug notes](bug-fixes.qmd), then the lasting
-[root architecture guide](../../ARCHITECTURE.md). To compare original and new
-SCEPTRE from two immutable Git snapshots:
+This directory alone is temporary. It retains the tour, exact manual comparison
+suite and the two explicit entry commands below for maintainer review. Routine CI
+never calls it. All developer directories are excluded from `R CMD build`.
 
-```sh
-Rscript --vanilla tools/refactor/compare.R /absolute/fresh/output
-# Optional second argument: a committed candidate Git ref; default HEAD.
-```
+## Full historical evidence
 
-The command builds both sides in isolated temporary source trees, installs the
-candidate, runs the verified original separately, then checks the installed
-candidate. It uses existing developer dependencies and inherits `R_LIBS`.
-It compares committed code only. Read `comparison.json`, `checks.csv` and the
-logs in the output directory. Failures return nonzero and keep their evidence.
-See [consistency/README.md](consistency/README.md) for scope, dependencies and
-qualified skips. It does not rerun resource or actual Nextflow qualification.
+The complete pre-handoff tree, original specification, plans, frozen reports,
+raw evidence and failed attempts are preserved at the published tag
+[`refactor-evidence-2026-10-16-e1f8109`](https://github.com/Katsevich-Lab/sceptre/tree/refactor-evidence-2026-10-16-e1f8109/tools/refactor).
+The [frozen acceptance report](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/FINAL_ACCEPTANCE.md)
+records measured source pins, actual Nextflow/book scope and accepted resource
+costs. The [specification](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/REFACTOR_SPEC.md)
+remains available there. Current validation belongs to the handoff receipt;
+historical numerical/resource measurements retain their original commits.
 
-To render the walkthrough from the repository root (Quarto and knitr required):
+787 execution/planning/evidence files were removed from the active tree after
+publishing that archive. This reduces the review diff; their Git history remains.
+After maintainer acceptance, archive the final handoff tree before retiring this
+directory. Keep all permanent tests, input recipes, native checks and architecture
+material. Remove this directory's links from contributor guidance at retirement.
 
-```sh
-(cd tools/refactor && quarto render walkthrough.qmd && quarto render bug-fixes.qmd)
-```
+## Compare original and current SCEPTRE
 
-The tour uses three static SVG diagrams: a module map, a discovery walkthrough
-and a comparison of the permutation and CRT loops. Editable Graphviz `.dot`
-sources live under `figures/`. Regenerate an SVG with `dot -Tsvg INPUT.dot -o OUTPUT.svg`.
-
-The page executes only the small indexing example and reads snippets directly
-from this checkout. It does not install or silently load an installed SCEPTRE.
-Rendered HTML and support files are ignored; the QMD source stays versioned.
-
-After maintainer review and acceptance, preserve a tagged source/evidence
-snapshot before retiring this directory from active development. Its specification,
-plans, walkthrough, comparisons and retained evidence can then retire together.
-Keep permanent CI, package tests, `tools/checks/` and `ARCHITECTURE.md`, including
-regression tests whose filenames contain `refactor`. Remove optional links to
-this directory from current contributor guidance when retiring it. Nothing in
-this cleanup deletes the review material now.
-
-Paths and hashes inside captured historical reports refer to their recorded
-commits. Keep those records unchanged when moving current documentation.
-
-## Earlier qualification and supporting tools
-
-Final source 0a9f9d8 is qualified. See [final acceptance](FINAL_ACCEPTANCE.md)
-for the explicit source/coverage map and two bounded accepted memory costs,
-and [retained evidence](results/final-0a9f9d8/README.md) for restoration.
-Earlier checkpoint results below remain historical.
-
-This directory contains developer-only characterization and qualification tooling. It is excluded from
-the package tarball. [REFACTOR_SPEC.md](REFACTOR_SPEC.md) defines the accepted
-scope; [STATUS.md](STATUS.md) records completed stages and acceptance decisions.
-
-The source baseline is sceptre commit
-`21f9ea098b69c444a884a49bc254de711968e3b5` (0.99.0). PR 233 is excluded.
-The integration branch is `codex/refactor`; workers use separate branches and
-worktrees. RF0 froze the original production behavior before RF1–RF9 changed
-internal ownership. Public exports, defaults and the S4 layout remain unchanged.
-See [ARCHITECTURE.md](../../ARCHITECTURE.md) for the resulting module boundaries.
-
-The quantitative [maintainability scorecard](MAINTAINABILITY.md) freezes source
-complexity, ownership/site inventories and repeatable change-tracing questions
-before structural work. Metrics and their limitations are separate from the
-compatibility gates.
-
-## Integration checkpoints
-
-Commit each coherent change together with its relevant tests and fixtures.
-During active coding, aim for a recoverable checkpoint about every 15–30
-minutes when a logical unit is ready; this is a guideline, not a timer or an
-industry-standard interval. Run targeted checks before each integration commit
-and broader checks at stage boundaries. Commit a stable checkpoint before a
-handoff or major restructuring. Keep expectations, generators and integrity
-manifests together whenever separating them would break intermediate commits.
-Do not commit incomplete or unrelated work just to meet the interval. Separate
-measurement/CI/documentation units when they are independently reviewable.
-
-## Reference fixtures
-
-Historical fixtures are committed under `tools/refactor/consistency/testthat/fixtures/refactor`. The manual suite loads
-saved inputs and expectations; they never regenerate them. `manifest.json`
-records source hashes, dependencies, platform, RNG conventions and artifact
-hashes. `api.json` is the readable export/formal/method/slot inventory; R's
-generated `.__T__` method-table bindings are excluded from user API comparison.
-
-The seven small workflows exercise both MOIs, NT/complement controls,
-permutation/CRT, union/singleton/Bonferroni, all three analysis roles and output
-amounts 1/2/3. They use the package's production budget selection, including
-calibration's subsequent B3 update. Indexing fixtures retain noncontiguous
-source cells and the distinct NT and treatment-plus-NT ordering. Other fixtures
-cover warm/cold caches, changed assignments/formula/cells/side, baseline saved
-objects, duplicate requests, no passing pairs and the existing intercept-only
-NT-path failure. Baseline limitations are observations, not desired new rules.
-
-The backed screen repeats the same small count pattern to 1,280 cells. That
-exceeds the existing importer's 1,000-stored-entry chunk limit; it does not
-establish out-of-core scalability. Scientific parity compares ordered values,
-QC and results, while backed import's own RNG use and dependency warnings are
-recorded separately. The selected dependency version gets exact backed
-warning/RNG checks. Reattachment continues a discovery-only baseline; it is not
-compared with a run whose budget was changed by calibration.
-
-Native fixtures cover 17 prepared cases, stage thresholds, accepted and failed
-skew-normal approximation, all sidedness, positive/zero B3 and selected null
-segments. Only ordinary zero-based arrays are saved, never external pointers.
-The test-only C++ bridge is outside production `src/` and exports no package API.
-The manual suite compares the full banks of exactly three active samplers with
-an immutable baseline source oracle compiled in that same test environment.
-The literal candidate map is Fisher-Yates -> `fisher_yates_sampler`, hybrid ->
-`hybrid_fisher_iwor_sampler`, and production fast CRT -> `sample_crt_indices`.
-The fast CRT comparison uses all 5,498 draws, never a diagnostic prefix.
-Actual banks must come from the installed candidate namespace; expected banks
-come only from the independent frozen original source. The fourth frozen
-configuration, slow CRT, has no production substitute: its source/config/archive
-integrity is checked on every platform and its original-oracle full bank is
-compared with the historical bank on the recorded platform/toolchain. This is
-archive evidence, not a fourth active candidate sampler. The controlled pointer
-ownership probe covers three retained samplers x three failure phases (nine
-cases). The original bridge/include/configs and historical reports stay intact. Its pinned Git-blob identity is
-checked during manual consistency tests. The saved platform-specific stream is an additional
-check, so differing hosted compiler versions do not disable exact RNG parity.
-Floating comparisons use the predeclared tolerance `1e-8`; memberships, order,
-API, QC/significance decisions, stages and budgets use exact comparisons.
-
-## Deliberate regeneration
-
-Regeneration requires Git, a compiler, pkgload, Rcpp/BH, jsonlite, digest and the
-chosen runtime dependencies. Use a fresh archive of the baseline, not a
-candidate checkout. Both scripts verify baseline source blobs, reject added
-source and force a clean native rebuild; they recheck source hashes after
-compilation. Review the resulting fixture diff and hashes before committing.
+Use a committed checkout, a C++ toolchain and the package dependencies. Install
+`pkgbuild`, `pkgload`, `testthat`, `digest` and `jsonlite` in your developer library.
+For backed qualification, follow the permanent README's exact guarded ondisc
+installation; set `R_LIBS` to that library and require it explicitly:
 
 ```sh
-rf0_reference_dir=$(mktemp -d)
-git archive 21f9ea098b69c444a884a49bc254de711968e3b5 | tar -x -C "$rf0_reference_dir"
-Rscript --vanilla tools/refactor/generate-native.R "$rf0_reference_dir" tools/refactor/consistency/testthat/fixtures/refactor
-Rscript --vanilla tools/refactor/generate.R "$rf0_reference_dir"
+R_LIBS=/absolute/dependency-library SCEPTRE_REQUIRE_ONDISC=true \
+  Rscript --vanilla tools/refactor/compare.R /absolute/fresh/comparison-output
 ```
 
-Run the workflow generator last: it finalizes SHA256/MD5 digests for the complete
-fixture set, including native artifacts. Manual consistency tests verify the saved manifest
-and all artifact MD5 digests without additional runtime dependencies.
-Git attributes preserve fixture bytes across checkout line-ending settings.
+Without ondisc, in-memory comparisons run and backed tests skip; the report
+states that scope. An installed unqualified ondisc is rejected before running its
+kernels. An optional second argument selects a candidate Git ref; HEAD is the
+default and uncommitted changes are excluded. Output must be a fresh directory
+outside this checkout. The command archives both refs, freshly installs the
+candidate and runs the verified original in a separate process. Read
+`comparison.json`, `checks.csv` and the retained logs. Failures return nonzero and
+record a failed status, stage and error. No candidate output regenerates an
+expected result. This command does not qualify performance or actual Nextflow.
 
-The source ondisc lane uses 1.3.5 from upstream
-`589803edea2a66ad15e7f07186bee16c7739ab8c` (same source tree as the local
-`4d9d75e18f21d11b6da6a54cb03d4424fcf16fe4`). Installed ondisc 1.2.0 was
-separately observed to emit bounds warnings. CRAN's 1.3.5 source retains an
-unbounded final-pair loop that the pinned upstream source guards; its Windows
-binary emitted bounds warnings in the earlier hosted run. Version
-1.3.5 alone therefore does not identify the qualified implementation. All four
-standard hosted jobs install and verify the exact source pin; the no-ondisc lane
-remains separate. Dependency sources must not be silently interchanged in
-reference/candidate comparisons or their warnings suppressed by SCEPTRE.
+## Read or reproduce the illustrated tour
 
-## Permanent package tests and CI
-
-Routine checks run without a reference checkout, oracle environment variable,
-historical output files or network access to old SCEPTRE:
+The handoff includes [a portable tour ZIP](sceptre-refactor-tour.zip): download,
+extract and open `walkthrough.html`; keep `bug-fixes.html` beside it. Both pages
+embed their images/scripts and link source excerpts to the recorded Git commit.
+The ZIP's `READ-ME.txt` and `render.json` identify that source and render tool.
+To reproduce it, install Quarto, R packages `knitr` and `jsonlite`, and the `zip`
+command, then run:
 
 ```sh
-R CMD INSTALL --preclean --library=/path/to/fresh-candidate-library .
-R_LIBS=/path/to/fresh-candidate-library SCEPTRE_REQUIRE_ONDISC=true \
-  Rscript --vanilla -e 'library(sceptre); testthat::test_dir("tests/testthat", package="sceptre", load_package="installed", stop_on_failure=TRUE)'
+Rscript --vanilla tools/refactor/render.R /absolute/fresh/tour-output
 ```
 
-`SCEPTRE_REQUIRE_ONDISC=true` makes missing backed coverage a failure. The
-standard check lanes pin the ondisc source revision; a separate fresh Linux lane
-asserts ondisc is absent and runs the package suite. Native mathematical and
-controlled error-boundary checks use `tools/checks/`, which is also excluded
-from source packages. They load current source only.
+The optional second argument again selects a committed Git ref. Rendering reads
+snippets from an immutable archive; it does not load an installed SCEPTRE or run
+the comparison. Authoring directly with `quarto render walkthrough.qmd` remains
+possible, but that renders the working checkout. Editable diagram sources are
+Graphviz `.dot` files. Rendered working HTML is ignored; the compact handout ZIP
+is retained for review and is excluded from the package.
 
-The original-source comparison that previously ran inside CI is now explicit
-manual tooling only. [RUNTIME_ORACLE.md](RUNTIME_ORACLE.md) documents its
-unchanged verification and numerical-environment checks.
+## Adversarial test check
 
-## Downstream stage smoke tests
-
-`consumer-inventory.json` pins 11 pipeline scripts, their private calls, slots,
-CLI arguments, artifacts and hashes, plus modules, book contracts and observed
-runtime availability. It is an inspected source snapshot; execution evidence is
-in separate smoke reports.
-
-Install the reference and candidate packages into different temporary libraries.
-Use identical ondisc/Arrow/R dependencies for both. Run:
+The explicit command below checks genuine current outputs first, then verifies
+that eight deliberately wrong outputs are rejected by their intended assertions.
+It exercises the same helpers used in permanent tests and does not alter the
+package or any expected fixture:
 
 ```sh
-Rscript --vanilla tools/refactor/pipeline-smoke.R \
-  /path/to/package-library /path/to/pinned/sceptre-pipeline \
-  tools/refactor/consistency/testthat/fixtures/refactor /path/to/fresh-output-directory
+Rscript --vanilla tools/refactor/check-test-strength.R /absolute/installed-library /absolute/fresh/check-output
 ```
 
-Each real script runs in a fresh R process with an isolated working directory,
-explicit package resolution and verified backing-file reattachment. The report
-keeps exit statuses, warnings, hashes, arguments and artifact checks; the RDS
-comparison payload preserves result types/order and relevant pruned/cache state.
-Compare the two `comparison.rds` files with `all.equal(..., tolerance=1e-8)` and
-require exact identities/decisions separately. Standard gather correction and
-nuclear raw Parquet shards are distinct contracts. The expanded harness runs
-30 stages, including both nuclear trial/nontrial branches and zero-passing
-shards. [CONSUMER_COVERAGE.md](CONSUMER_COVERAGE.md) records exact coverage.
+## Follow-up ownership and acceptance
 
-`pipeline-nextflow.R` uses the same arguments to execute the complete standard
-and nuclear workflows through the actual local Nextflow executor. Its explicit
-qualification profile disables containers and arrays and fixes the original
-unseeded pod sampler's startup seed. Historical 0.10.2 containers, the archived
-default array configuration and nf-test/hosted executor profiles remain
-separate qualifications. `book-smoke.R LIB BOOK_CHECKOUT OUT` runs selected
-unchanged book cells without a knitr cache and preserves failed prerequisites.
-Known pipeline behavior (unused nuclear threshold arguments, Parquet bytes under
-the optional `.rds` suffix, discovery gather saving NULL) is preserved and
-recorded rather than repaired by the refactor.
+Eugene, as Lead Maintainer, owns triage of the bounded accepted costs in
+[#235](https://github.com/Katsevich-Lab/sceptre/issues/235) and dependency-release
+coordination in [#236](https://github.com/Katsevich-Lab/sceptre/issues/236).
+Neither acceptance authorizes larger resource costs or enables backed CRT.
+An inherited numerical edge case discovered during handoff is separately tracked
+in [#237](https://github.com/Katsevich-Lab/sceptre/issues/237): fully tied two-sided
+empirical tails can exceed one. Its original statistical formula is preserved in
+this refactor; the new probability-bound tests concern the nondegenerate toy
+workflow inputs. Eugene owns scientific triage of that separate correction.
+Existing scientific and pipeline roadmap work stays separate: mixture replacement
+[#220](https://github.com/Katsevich-Lab/sceptre/issues/220), pairwise QC
+[#225](https://github.com/Katsevich-Lab/sceptre/issues/225), and pipeline plotting
+[timothy-barry/sceptre-pipeline#6](https://github.com/timothy-barry/sceptre-pipeline/issues/6).
+The recorded book qualification is selected cells (14/15, with the inherited
+empty-barcode failure); pipeline qualification uses matched local arrival/seed
+settings. Full-book, container/array/hosted-scheduler validation belongs to their
+maintainers' next qualification work, not a new feature promise from this PR.
 
-## Resource harness
-
-```sh
-python3 tools/refactor/benchmark.py /path/to/package-library \
-  tools/refactor/consistency/testthat/fixtures/refactor /path/to/output --repetitions 3
-```
-
-This original compact harness fixes common BLAS/thread controls, runs one warm-up and at least
-three measured fresh processes for each cold/warm case, and records elapsed
-analysis time plus serial-process peak RSS. Choose dependency libraries through
-the process environment, consistently for both builds. The synthetic screen is
-diagnostic only. [RESOURCE_BENCHMARKS.md](RESOURCE_BENCHMARKS.md) describes the
-separate actual Papalexi, difficult synthetic, sharing-sensitive CRT and backed
-workloads, including sampled individual-worker/process-tree RSS and matched
-clean release builds. Reports distinguish bounded resource acceptance from
-unmeasured full-transcriptome or true out-of-RAM scalability.
+Maintainer review of the final diff precedes merge/release. No one has been
+messaged, assigned a review, or represented as having approved the refactor by
+this handoff. The goal is a reproducible, reviewable delivery ready for that step.

@@ -64,6 +64,11 @@ Users can create either a standard \code{sceptre} object or an \code{ondisc}-bac
 or
 \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
 of the manual for more information about this function.
+For in-memory import, count-file entries may be unsorted. Each cell-feature
+coordinate must occur only once; repeated coordinates cause an import error
+rather than being summed. This does not reject repeated guide-metadata rows.
+Backed Cell Ranger import delegates file parsing to ondisc, which has its own
+coordinate handling. See the README for the qualified ondisc installation.
 }
 \examples{
 data(grna_target_data_frame_highmoi)

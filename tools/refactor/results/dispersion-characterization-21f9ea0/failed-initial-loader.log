@@ -1,5 +1,0 @@
-Error in dyn.load("/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpvsEe3L/sourceCpp-aarch64-apple-darwin23-1.1.1.1.1/sourcecpp_841718923288/sourceCpp_2.so") : 
-  unable to load shared object '/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpvsEe3L/sourceCpp-aarch64-apple-darwin23-1.1.1.1.1/sourcecpp_841718923288/sourceCpp_2.so':
-  dlopen(/private/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T/RtmpvsEe3L/sourceCpp-aarch64-apple-darwin23-1.1.1.1.1/sourcecpp_841718923288/sourceCpp_2.so, 0x0006): symbol not found in flat namespace '__Z14estimate_thetaN4Rcpp6VectorILi14ENS_15PreserveStorageEEES2_did'
-Calls: <Anonymous> -> source -> withVisible -> eval -> eval -> dyn.load
-Execution halted

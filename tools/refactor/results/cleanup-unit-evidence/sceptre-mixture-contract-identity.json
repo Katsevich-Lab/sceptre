@@ -1,8 +1,0 @@
-{
-  "file": "src/mixture_functs.cpp",
-  "source_parent": "09a704c968568866727cb061b1b8a9a83d6d13db",
-  "before_sha256": "493e67387f2efbfc21c536d1c4cd63927ada925e5d69d473dbd2f429e8a5100a",
-  "after_sha256": "bd1051e6b353279c5f6ba85d87b8baec8c85f7b385545ebb7da39967fc10edb4",
-  "noncomment_tokens_identical": true,
-  "scope": "Source contract evidence only; caller/text source review required, no numerical test needed for unchanged expressions."
-}

@@ -1,4 +1,0 @@
-refactor-import-coordinates: ..............................................
-
-══ DONE ════════════════════════════════════════════════════════════════════════
-Source-evaluated import regressions: 46 passed. Native library remains pinned to CL1; this is not an installed-source qualification.

@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 - **Statistical rigor.** Association testing is built on a principled resampling-based methodology. Built-in
   calibration and power checks let you verify that false positives are
   controlled and that real effects are detectable — on your own data.
-- **Massive scalability.** Optimized C++ routines improve performance. Optional [disk-backed data structures](https://cran.r-project.org/package=ondisc) allow the analysis of datasets too large to fit in memory. The companion
+- **Massive scalability.** Optimized C++ routines improve performance. Optional [disk-backed data structures](https://github.com/timothy-barry/ondisc) allow the analysis of datasets too large to fit in memory. The companion
   [`sceptre` Nextflow pipeline](https://github.com/timothy-barry/sceptre-pipeline)
   distributes analyses across hundreds of processors on a cluster or cloud.
 - **Ease of use.** A small, pipe-friendly set of functions takes you from raw
@@ -38,6 +38,29 @@ Install the development version of `sceptre` from GitHub:
 # install.packages("remotes")
 remotes::install_github("Katsevich-Lab/sceptre")
 ```
+
+### Optional disk-backed analyses
+
+Optional backed analyses are qualified with ondisc source commit
+`589803edea2a66ad15e7f07186bee16c7739ab8c`, which includes a pair-iteration
+bounds fix. The package version `1.3.5` alone does not identify that source;
+CRAN's source with that version lacked the guard during qualification.
+In-memory SCEPTRE needs no ondisc installation. For the qualified backed setup,
+install a C++ toolchain and the HDF5 requirements for your platform, then run:
+
+```r
+# install.packages(c("remotes", "BiocManager"))
+BiocManager::install("Rhdf5lib", type = "source")
+remotes::install_github(
+    "timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c",
+    upgrade = "never"
+)
+stopifnot(identical(utils::packageDescription("ondisc")$RemoteSha,
+    "589803edea2a66ad15e7f07186bee16c7739ab8c"))
+```
+
+Backed CRT is still unsupported. Dependency release/distribution follow-up is
+separate from enabling any new backend or method.
 
 ## Documentation
 

@@ -54,7 +54,7 @@ group of functions and files with a particular job. They all live in the same
 R package and share its namespace. The separation comes from smaller functions
 with explicit inputs and outputs; these are not separately installed packages.
 
-![Nine conceptual modules in the refactored analysis core. Public workflow calls pair QC, analysis preparation and result processing. Preparation calls execution, whose workers use count access, model fitting, fit reuse and numerical inference. Pair QC also uses count access. Each arrow labels a request and its returned value.](figures/module-map.svg){width=100%}
+![Nine conceptual modules in the refactored analysis core. Public workflow calls pair QC, analysis preparation and result processing. Preparation calls execution, whose workers use count access, model fitting, fit reuse and numerical inference. Pair QC also uses count access. Each arrow labels a request and its returned value.](../architecture/module-map.svg){width=100%}
 
 **How to read this map:** an arrow points from the part asking for work to the
 part doing it. Its label reads **input → returned value**. For example,
@@ -346,6 +346,18 @@ than counting tests alone: a loop can produce many assertions, and 2,225
 assertions on each side check mock-data helpers. Neither count nor line coverage
 shows that every branch, input or statistical result has been checked.
 
+The table records a matched coverage measurement at the earlier post-separation
+checkpoint, before the final handoff tests were strengthened. It is retained as
+that measurement, not presented as a fresh coverage percentage for a later commit.
+The final handoff receipt reports the current test totals separately.
+
+The handoff pass also adds checks of individual and joint sampling probabilities,
+direct QC calculations from the input counts, meaningful result rows and pair
+labels, expected warnings, older saved-object inputs and failed worker reporting.
+A controlled check confirms that constant/biased samplers, correlated CRT draws,
+p-values of 2 on these toy inputs, changed pair labels, missing rows and unexpected
+warnings are rejected. Repeatability alone would miss several of these defects.
+
 ### What do the added tests cover?
 
 | Area | Examples of checks now made directly |
@@ -400,15 +412,15 @@ does not measure all branches or the space of possible datasets. The figures
 above describe the package tests only; examples, vignettes, C++ source probes,
 manual old/new checks and actual pipeline runs do not contribute to that R
 percentage. Full package checks and the separate
-[pipeline/Nextflow and resource qualification](FINAL_ACCEPTANCE.md) provide
+[pipeline/Nextflow and resource qualification](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/FINAL_ACCEPTANCE.md) provide
 additional evidence.
 
 <details>
 <summary>Measurement details and per-file results</summary>
 
-The [coverage report](results/testing-coverage-2ec09e9/README.md) retains exact
+The [coverage report](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/results/testing-coverage-2ec09e9/README.md) retains exact
 source commits, source/test hashes, logs, test outcomes, coverage objects and
-[per-file results](results/testing-coverage-2ec09e9/after-files.csv).
+[per-file results](https://github.com/Katsevich-Lab/sceptre/blob/refactor-evidence-2026-10-16-e1f8109/tools/refactor/results/testing-coverage-2ec09e9/after-files.csv).
 The paired measurement used covr 3.6.5 on R 4.6.0/macOS arm64, with the same
 dependencies and guarded ondisc 1.3.5. It instrumented R functions only, excluded
 generated Rcpp R wrappers using covr's standard rule, and left native compilation

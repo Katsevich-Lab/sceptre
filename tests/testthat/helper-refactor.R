@@ -178,7 +178,8 @@ expect_workflow_results <- function(actual, inputs, case) {
         expect_false(anyNA(result$pass_qc))
         expect_true(all(result$response_id %in% rownames(inputs$response_matrix)))
         expect_true(all(is.finite(result$p_value[result$pass_qc])))
-        expect_true(all(result$p_value[result$pass_qc] >= 0 & result$p_value[result$pass_qc] <= 1))
+        expect_true(all(result$p_value[result$pass_qc] >= 0 & result$p_value[result$pass_qc] <= 1),
+                    info = "eligible p-values on these toy inputs must lie in [0, 1]")
         expect_true(all(is.na(result$p_value[!result$pass_qc])))
         if (table == "calibration_result") {
             expect_length(result$response_id, 4L)
@@ -186,7 +187,8 @@ expect_workflow_results <- function(actual, inputs, case) {
         } else {
             pairs <- inputs[[if (table == "power_result") "positive_control_pairs" else "discovery_pairs"]]
             observed <- sort(paste(result$response_id, result$grna_target, result$pass_qc, sep = "/"))
-            expect_identical(observed, workflow_expected_pairs(inputs, case, pairs), info = table)
+            expect_identical(observed, workflow_expected_pairs(inputs, case, pairs),
+                             info = paste(table, "pair identities and independent QC"))
             # The input generator adds 20 counts to A-targeted cells for r1.
             # This is a strong positive effect, regardless of inference method.
             positive <- result$response_id == "r1" & result$grna_target == "A"
