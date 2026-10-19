@@ -73,3 +73,5 @@ QC budget policy used before this migration. Raw tests are conservatively rerun
 on working-spec changes; this implementation does not introduce a raw-test cache.
 The response fitter remains Poisson `glm.fit` followed by dispersion estimation,
 with a versioned algorithm key that must change when the fitter changes.
+
+New qualification evidence and exact scope are in [validation/README.md](validation/README.md).

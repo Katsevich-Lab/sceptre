@@ -1,0 +1,7 @@
+low_nt_perm : TRUE 
+low_complement_perm : Component “value”: Component “final”: Component “B3”: Mean relative difference: 0.25 
+high_complement_crt : TRUE 
+low_complement_crt : Component “value”: Component “final”: Component “B3”: Mean relative difference: 0.25 Component “value”: Component “final”: Component “power_result”: Component “columns”: Component “p_value”: Mean relative difference: 0.3322259 Component “value”: Component “final”: Component “discovery_result”: Component “columns”: Component “p_value”: Mean relative difference: 0.1771676 
+high_perm : TRUE 
+low_bonferroni : TRUE 
+low_singleton : Component “value”: Component “final”: Component “B3”: Mean relative difference: 0.25 Component “value”: Component “final”: Component “power_result”: Component “columns”: Component “p_value”: Mean relative difference: 0.1992032 Component “value”: Component “final”: Component “discovery_result”: Component “columns”: Component “p_value”: Mean relative difference: 0.1992032 

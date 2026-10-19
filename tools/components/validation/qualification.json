@@ -1,0 +1,26 @@
+{
+  "implementation_commit": "f3c3dc586d0757ee64ba364ec2b80dcbed8939f6",
+  "base_commit": "97d95da152dbf685e9f4664db7c302844cabe42e",
+  "platform": "macOS arm64",
+  "R": "4.6.0",
+  "ondisc": "1.2.0",
+  "BiocCheck": "1.47.26",
+  "package_version": "0.99.0",
+  "saved_schema": 2,
+  "source_tarball_sha256": "a8c3f9b1e91c03939962f8648ef707da7f24e48c2045559c54ca6ae2d2c400ed",
+  "R_CMD_check": "OK",
+  "testthat": {
+    "pass": 4668,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "BiocCheck_results": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 5
+  },
+  "matched_budget_parity_cases": 7,
+  "matched_budget_parity_tolerance": 0,
+  "native_source_changes": 0
+}
