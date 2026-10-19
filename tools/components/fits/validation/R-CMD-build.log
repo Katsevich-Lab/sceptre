@@ -1,0 +1,13 @@
+* checking for file ‘./DESCRIPTION’ ... OK
+* preparing ‘sceptre’:
+* checking DESCRIPTION meta-information ... OK
+* cleaning src
+* installing the package (it is needed to build vignettes)
+* creating vignettes ... OK
+* cleaning src
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+Removed empty directory ‘sceptre/tools’
+* looking to see if a ‘data/datalist’ file should be added
+* building ‘sceptre_0.99.0.tar.gz’
+

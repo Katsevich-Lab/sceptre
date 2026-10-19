@@ -10,8 +10,10 @@ for execution and retained with completed result provenance.
   from the current S4 class definitions with exhaustive description checks.
 - [Architecture and nested payload contracts](schema3/ARCHITECTURE.md).
 - [Exhaustive legacy-field ownership decisions](schema3/FIELD_DECISIONS.md).
-- [Schema 3 qualification](schema3/VALIDATION.md).
+- [Final RunPlan and unified fit-cache qualification](fits/QUALIFICATION.md).
+- [Initial schema 3 qualification](schema3/VALIDATION.md), preserved as historical evidence.
 - [Typed RunPlan checkpoint qualification](runplan/validation/README.md).
+- [RunPlan engineering assessment](runplan/DECISION.md) and [PR #233 adaptation](fits/PR233.md).
 - [Earlier schema 2 qualification](validation/README.md), preserved as historical evidence.
 
 Canonical requested target-response pairs stay in `AnalysisSpec`. Expanded guide
