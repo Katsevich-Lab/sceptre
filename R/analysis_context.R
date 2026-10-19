@@ -270,12 +270,12 @@ make_treatment_index_lookup <- function(index) {
 #' @noRd
 prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
     if (is.null(plan)) plan <- make_run_plan(object, analysis, pairs)
-    validate_run_plan(object, plan)
-    if (!identical(plan$analysis, analysis_record_name(analysis))) stop("Analysis type does not match run plan.")
+    plan <- validate_run_plan(object, plan)
+    if (!identical(plan@analysis, analysis_record_name(analysis))) stop("Analysis type does not match run plan.")
     analysis <- sub("^run_", "", analysis)
-    expected <- dplyr::filter(plan$pairs, pass_qc)
+    expected <- dplyr::filter(plan@pairs, pass_qc)
     if (!identical(lapply(pairs, identity), lapply(expected, identity))) stop("Analysis pairs do not match the run plan's eligible family.")
-    total_resamples <- checked_resampling_total(plan$B1, plan$B2, plan$B3)
+    total_resamples <- checked_resampling_total(plan@B1, plan@B2, plan@B3)
     store <- get_response_matrix(object)
     index <- prepare_index_context(
         object@preparation@analysis_cells,
@@ -307,9 +307,9 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
         shared_response_fit = index$calibration_check ||
             index$control_group_complement,
         test_options = list(
-            B1 = plan$B1,
-            B2 = plan$B2,
-            B3 = plan$B3,
+            B1 = plan@B1,
+            B2 = plan@B2,
+            B3 = plan@B3,
             total_resamples = total_resamples,
             side_code = object@spec@side_code,
             fit_parametric_curve = object@spec@resampling_approximation ==

@@ -3,13 +3,15 @@
 The final schema is version 3. `sceptre_object` coordinates five persistent
 components: imported `ScreenData`, requested `AnalysisSpec`, compiled
 `PreparationRecord`, compact `ResponseFitCache`, and entry-owned `ResultRecord`.
-`CellView` and run plans are temporary computation values.
+`CellView` is a temporary computation value. A typed per-run `RunPlan` is created
+for execution and retained with completed result provenance.
 
 - [Exact per-object fields and declared types](schema3/OBJECT_FIELDS.md), generated
   from the current S4 class definitions with exhaustive description checks.
 - [Architecture and nested payload contracts](schema3/ARCHITECTURE.md).
 - [Exhaustive legacy-field ownership decisions](schema3/FIELD_DECISIONS.md).
 - [Schema 3 qualification](schema3/VALIDATION.md).
+- [Typed RunPlan checkpoint qualification](runplan/validation/README.md).
 - [Earlier schema 2 qualification](validation/README.md), preserved as historical evidence.
 
 Canonical requested target-response pairs stay in `AnalysisSpec`. Expanded guide

@@ -144,16 +144,16 @@ run_calibration_check_pt_2 <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     require_stage(sceptre_object, "run_qc")
-    validate_run_plan(sceptre_object, plan)
-    if (!identical(plan$analysis, "run_calibration_check")) stop("Expected a calibration run plan.")
+    plan <- validate_run_plan(sceptre_object, plan)
+    if (!identical(plan@analysis, "run_calibration_check")) stop("Expected a calibration run plan.")
     out <- analyze_association_pairs(sceptre_object,
-        response_grna_group_pairs = plan$pairs, analysis_type = "calibration_check",
+        response_grna_group_pairs = plan@pairs, analysis_type = "calibration_check",
         output_amount = output_amount, print_progress = print_progress,
         parallel = parallel, n_processors = n_processors, log_dir = log_dir,
         plan = plan)
     result <- process_calibration_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_calibration_check",
-        result, plan$pairs, output_amount, plan = plan)
+        result, plan@pairs, output_amount, plan = plan)
     commit_response_fits(sceptre_object, out$response_precomputations)
 }
 
@@ -231,7 +231,7 @@ run_power_check <- function(
         n_processors = n_processors, log_dir = log_dir, plan = plan)
     result <- apply_grouping_to_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_power_check",
-        result, plan$pairs, output_amount, plan = plan)
+        result, plan@pairs, output_amount, plan = plan)
     commit_response_fits(sceptre_object, out$response_precomputations)
 }
 
@@ -309,7 +309,7 @@ run_discovery_analysis <- function(
         n_processors = n_processors, log_dir = log_dir, plan = plan)
     result <- process_discovery_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_discovery_analysis",
-        result, plan$pairs, output_amount, plan = plan)
+        result, plan@pairs, output_amount, plan = plan)
     commit_response_fits(sceptre_object, out$response_precomputations)
 }
 

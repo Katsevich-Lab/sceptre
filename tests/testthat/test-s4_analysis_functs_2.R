@@ -144,7 +144,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
     ]
     expect_setequal(scep_complement_size_1@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_complement_size_1@results@records[["run_calibration_check"]]$provenance$plan$pairs
+    neg_df <- scep_complement_size_1@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # a single neg ctrl pair with this seed fails QC so there are 2 left
     expect_equal(
@@ -193,7 +193,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
     ]
     expect_setequal(scep_complement_size_2@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_complement_size_2@results@records[["run_calibration_check"]]$provenance$plan$pairs
+    neg_df <- scep_complement_size_2@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # with this seed we lose one pair but its due to pairwise QC on the actual discovery pairs
     expect_equal(
@@ -304,7 +304,7 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
     ]
     expect_setequal(scep_nt_size_1@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_nt_size_1@results@records[["run_calibration_check"]]$provenance$plan$pairs
+    neg_df <- scep_nt_size_1@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # a single neg ctrl pair with this seed fails QC so there are 2 left
     expect_equal(

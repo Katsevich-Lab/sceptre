@@ -55,3 +55,11 @@ CellView	trt_fit_pos	Treatment positions within this fit.
 CellView	n_trt	Validated treatment-position count; transient numerical convenience.
 BackedCountStore	descriptor	Authoritative backing path, anchored content_md5, integer dimensions, dimnames and native integer_id; validated on creation and reopening.
 BackedCountStore	handle	Process-local external pointer when open, NULL when closed; never used as content identity.
+RunPlan	analysis	Canonical scalar analysis mode: run_calibration_check, run_power_check or run_discovery_analysis.
+RunPlan	pairs	Owned prepared hypothesis rows and complete logical QC status, preserving order, failed-QC rows, repeated requests and table representation. Public result commits require the complete prepared family.
+RunPlan	B1	Realized scalar nonnegative integer stage-one resampling budget.
+RunPlan	B2	Realized scalar nonnegative integer stage-two resampling budget; the total budget is checked before native execution.
+RunPlan	B3	Realized scalar nonnegative integer stage-three resampling budget, frozen for this run independently of later calibration or reporting choices.
+RunPlan	n_calibration_pairs	Requested positive scalar count for calibration, which may exceed the selected qualifying family; integer(0) for other analyses.
+RunPlan	calibration_group_size	Positive scalar number of NT guides per calibration group; integer(0) for other analyses.
+RunPlan	identity	Frozen data, ordered cells, actual design, assignments, choices and canonical execution-payload identity; object-context matching is validated separately.

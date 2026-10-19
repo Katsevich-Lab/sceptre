@@ -1,4 +1,4 @@
-# Domain state only. Execution choices and run plans are transient plain values.
+# Domain state only. RunPlan and CellView are temporary typed values.
 #' @import Matrix
 #' @importFrom methods new slot validObject
 setClassUnion("CountHandle", c("externalptr", "NULL"))
@@ -57,6 +57,12 @@ setClass("ResponseFitCache", slots = c(
     identity = "list"
 ))
 setClass("ResultRecord", slots = c(records = "list", import_metadata = "list"))
+
+setClass("RunPlan", slots = c(
+    analysis = "character", pairs = "data.frame",
+    B1 = "integer", B2 = "integer", B3 = "integer",
+    n_calibration_pairs = "integer", calibration_group_size = "integer",
+    identity = "list"))
 
 setClass("CellView", slots = c(fit_to_analysis = "integer",
     source_cells = "integer", trt_fit_pos = "integer", n_trt = "integer"))

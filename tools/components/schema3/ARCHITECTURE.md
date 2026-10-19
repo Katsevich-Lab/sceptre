@@ -140,21 +140,41 @@ and commits the resulting value only after success.
 
 ## Transient run plans and committed results
 
-A private run plan is a plain list. Calibration preparation returns
-`list(object, plan)`; its execution phase takes the plan explicitly. Public
-workflow signatures retain their familiar object-in/object-out behavior.
+A private `RunPlan` is an S4 value. Calibration preparation returns the ordinary
+wrapper `list(object, plan)`; its execution phase takes the typed plan explicitly.
+Public workflow signatures retain their familiar object-in/object-out behavior.
+`RunPlan` is temporary during preparation and execution, then frozen in a
+completed result's provenance. It is not a second working settings authority.
 
 ```text
-run plan
+RunPlan
   analysis: run_calibration_check | run_power_check | run_discovery_analysis
   pairs: complete prepared family, including failed-QC rows
   B1, B2, B3: validated integer budgets
-  n_calibration_pairs, calibration_group_size: integer or NULL outside calibration
+  n_calibration_pairs, calibration_group_size: positive integer scalars for calibration,
+    integer(0) outside calibration
   identity:
     data, cells, design, assignments,
     choices: side/approximation/control/resampling/integration/reporting settings
     execution: SHA-256 of the plan payload excluding identity
 ```
+
+Structural validity enforces one canonical analysis, prepared identity/QC
+columns, scalar nonnegative integer budgets with a safe total, and coherent
+calibration-only size fields. Screen-context validation separately checks
+canonical response IDs, prepared guide/NT membership and the actual input
+identity. Empty noncalibration scopes and repeated hypothesis rows remain
+legitimate numerical requests; they do not bypass complete-family commit guards.
+The selected pair table is owned independently of mutable caller tables.
+
+`run_plan_payload()` exposes one ordered plain value for hashing and boundary
+conversion. It restores explicitly named `NULL` calibration fields for
+noncalibration plans, preserving the pre-RunPlan execution-hash contract.
+No `$`, `$<-` or indexing compatibility generic is installed for `RunPlan`.
+Known old schema 3 list plans convert only at the boundary, keeping their
+original identity rather than signing a new one. Result history receives the
+same conversion. Unknown or malformed payloads remain inspectable as historical
+migration evidence rather than becoming current plans.
 
 Normal plans derive the existing budget policy: B1 = 499; skew-normal B2 = 4999
 and B3 = 24999 for permutations or 0 for CRT. Empirical plans use B2 = 0 and the
@@ -183,7 +203,7 @@ ResultRecord.records[<public analysis name>]
   provenance:
     schema_version, package_version
     spec: value snapshot of resolved choices (formula language, no environment)
-    plan: full realized plan and family
+    plan: full realized RunPlan and selected family
     output_amount
     response_fit_method: "poisson-glm.fit-then-dispersion-v1"
   history: list of previous entries, each without another nested history list

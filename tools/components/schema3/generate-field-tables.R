@@ -2,7 +2,7 @@
 # is authoritative; missing or stale descriptions stop generation.
 pkgload::load_all(".", quiet = TRUE, recompile = FALSE)
 classes <- c("sceptre_object", "ScreenData", "AnalysisSpec", "PreparationRecord",
-    "ResponseFitCache", "ResultRecord", "CellView", "BackedCountStore")
+    "ResponseFitCache", "ResultRecord", "RunPlan", "CellView", "BackedCountStore")
 metadata <- read.delim("tools/components/schema3/field-descriptions.tsv", check.names = FALSE)
 output <- c("# Final schema 3 object fields", "",
     "Generated from `methods::getSlots()` by `generate-field-tables.R`. Declared",

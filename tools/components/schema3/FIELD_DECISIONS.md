@@ -148,3 +148,15 @@ P.guide_groups and canonical-to-compiled pair tables; typed backing descriptors;
 ResponseFitCache entries/identity; result entries/provenance/history and
 import_metadata. Transient plans/CellViews are not separate persisted working
 fields. See OBJECT_FIELDS.md for the exhaustive current slot/type listing.
+
+## Earlier schema 3 run-plan values
+
+Earlier development snapshots stored each result's realized plan as a plain
+list. The current owner is the S4 `RunPlan` value within that same result's
+provenance. Its scalar fields, selected family and original frozen identity move
+together; the canonical payload keeps the old field order and explicitly named
+`NULL` calibration fields for hash compatibility. History entries are converted
+at the same boundary. Unknown fields or malformed values are retained as
+unrecognized historical provenance, with a diagnostic, rather than silently
+dropped or re-signed as a valid plan. No legacy list-field forwarding layer or
+`RunPlan` dollar-access generic is installed.

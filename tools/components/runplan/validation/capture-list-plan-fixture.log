@@ -1,0 +1,5 @@
+Library: /private/tmp/sceptre-schema3-final-check/sceptre.Rcheck/sceptre 
+Fixture: tests/testthat/fixtures/saved-objects/sceptre-schema3-list-plans-2a0938e.rds 
+Current: TRUE
+History records: 1
+Plan representation: list

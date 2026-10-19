@@ -5,7 +5,7 @@ migrate_sceptre_object <- function(object) {
     if (!methods::is(object, "sceptre_object")) stop("Expected a `sceptre_object`.")
     saved <- attributes(object)
     version <- if (is.null(saved$schema_version)) 1L else saved$schema_version
-    if (identical(version, 3L)) return(object)
+    if (identical(version, 3L)) return(normalize_saved_run_plans(object))
     if (!version %in% c(1L, 2L)) stop("Unsupported sceptre saved-object schema version.")
     if (version == 1L && !all(c("response_matrix", "grna_matrix", "functs_called") %in% names(saved))) {
         stop("Unrecognized legacy sceptre saved-object layout.")
@@ -107,6 +107,30 @@ migrate_sceptre_object <- function(object) {
     }
     validObject(out)
     out
+}
+
+# The outer schema and canonical input identities do not change when the
+# existing plan value is promoted from a named list to its typed representation.
+# Normalize the nested boundary value without recomputing or blessing identity.
+#' @noRd
+normalize_saved_run_plans <- function(object) {
+    normalize_record <- function(record) {
+        if (!is.list(record)) return(record)
+        if (is.list(record$provenance) && !is.null(record$provenance$plan)) {
+            saved_plan <- record$provenance$plan
+            converted <- tryCatch(as_run_plan(saved_plan), error = identity)
+            if (inherits(converted, "error")) {
+                record$provenance$plan <- NULL
+                record$provenance$unrecognized_plan <- list(
+                    source = "saved-schema3", error = conditionMessage(converted), payload = saved_plan)
+                record$invalidated_by <- unique(c(record$invalidated_by, "unrecognized saved run plan"))
+            } else record$provenance$plan <- converted
+        }
+        if (is.list(record$history)) record$history <- lapply(record$history, normalize_record)
+        record
+    }
+    object@results@records <- lapply(object@results@records, normalize_record)
+    object
 }
 
 # Recover multiplicity from the historical left-join traversal, rather than

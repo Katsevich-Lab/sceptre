@@ -22,9 +22,9 @@ test_that("completed results freeze effective budgets and preserve historical ta
     expect_identical(get_result(object, "run_discovery_analysis")$p_value, 0.2)
     alternate <- make_run_plan(object, "run_discovery_analysis",
         budgets = c(B1 = 2L, B2 = 3L, B3 = 99L))
-    expect_identical(alternate$B3, 99L)
+    expect_identical(alternate@B3, 99L)
     expect_true(result_record_is_current(object, "run_discovery_analysis"))
-    expect_identical(object@results@records$run_discovery_analysis$provenance$plan$B3, 5L)
+    expect_identical(object@results@records$run_discovery_analysis$provenance$plan@B3, 5L)
     object <- invalidate_result_records(object, "design changed")
     expect_error(get_result(object, "run_discovery_analysis"), "No completed current result")
     expect_warning(old <- get_result(object, "run_discovery_analysis", historical = TRUE), "historical")
@@ -98,7 +98,7 @@ test_that("public calibration preparation stays incomplete and failed execution 
         n_calibration_pairs = 2L, calibration_group_size = 1L))
     expect_false(workflow_status(prepared$object)[["run_calibration_check"]])
     expect_null(prepared$object@results@records$run_calibration_check)
-    expect_gt(nrow(prepared$plan$pairs), 0L)
+    expect_gt(nrow(prepared$plan@pairs), 0L)
     before <- serialize(prepared, NULL)
     testthat::local_mocked_bindings(analyze_association_pairs = function(...) stop("worker failure"))
     expect_error(run_calibration_check_pt_2(prepared$object, prepared$plan, print_progress = FALSE), "worker failure")
@@ -111,14 +111,14 @@ test_that("calibration working budget does not leak into power or discovery", {
     inputs <- readRDS(test_path("fixtures", "refactor", "inputs.rds"))
     case <- readRDS(test_path("fixtures", "refactor", "cases.rds"))$low_complement_perm
     object <- suppressMessages(refactor_prepare(inputs, case))
-    expected <- make_run_plan(object, "run_discovery_analysis")$B3
+    expected <- make_run_plan(object, "run_discovery_analysis")@B3
     prepared <- suppressMessages(run_calibration_check_pt_1(object,
         n_calibration_pairs = 1L, calibration_group_size = 1L))
-    expect_false(identical(prepared$plan$B3, expected))
+    expect_false(identical(prepared$plan@B3, expected))
     object <- prepared$object
     observed <- list()
     testthat::local_mocked_bindings(analyze_association_pairs = function(sceptre_object, ..., plan) {
-        observed[[length(observed) + 1L]] <<- plan$B3
+        observed[[length(observed) + 1L]] <<- plan@B3
         stop("budget observed")
     })
     expect_error(suppressMessages(run_power_check(object, print_progress = FALSE)), "budget observed")

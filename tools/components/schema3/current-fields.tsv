@@ -49,6 +49,14 @@ ResponseFitCache	entries	list	Named response fits: each contains fitted_coefs an
 ResponseFitCache	identity	list	Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for all cached entries.
 ResultRecord	records	list	Completed run entries keyed by analysis name. Each owns its table, frozen spec/run plan, scope, identity and previous run history; invalidated_by explains historical status.
 ResultRecord	import_metadata	list	Boundary-only migration diagnostics, such as old schema version, discarded fit count or a temporary legacy reopen hint; not workflow state.
+RunPlan	analysis	character	Canonical scalar analysis mode: run_calibration_check, run_power_check or run_discovery_analysis.
+RunPlan	pairs	data.frame	Owned prepared hypothesis rows and complete logical QC status, preserving order, failed-QC rows, repeated requests and table representation. Public result commits require the complete prepared family.
+RunPlan	B1	integer	Realized scalar nonnegative integer stage-one resampling budget.
+RunPlan	B2	integer	Realized scalar nonnegative integer stage-two resampling budget; the total budget is checked before native execution.
+RunPlan	B3	integer	Realized scalar nonnegative integer stage-three resampling budget, frozen for this run independently of later calibration or reporting choices.
+RunPlan	n_calibration_pairs	integer	Requested positive scalar count for calibration, which may exceed the selected qualifying family; integer(0) for other analyses.
+RunPlan	calibration_group_size	integer	Positive scalar number of NT guides per calibration group; integer(0) for other analyses.
+RunPlan	identity	list	Frozen data, ordered cells, actual design, assignments, choices and canonical execution-payload identity; object-context matching is validated separately.
 CellView	fit_to_analysis	integer	Ordered positions in the selected analysis cells used for this fit.
 CellView	source_cells	integer	The corresponding ordered original count-matrix columns.
 CellView	trt_fit_pos	integer	Treatment positions within this fit.

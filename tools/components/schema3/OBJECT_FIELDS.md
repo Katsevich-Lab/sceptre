@@ -87,6 +87,19 @@ an optional dependency class; loading the package does not load ondisc.
 | `records` | `list` | Completed run entries keyed by analysis name. Each owns its table, frozen spec/run plan, scope, identity and previous run history; invalidated_by explains historical status. |
 | `import_metadata` | `list` | Boundary-only migration diagnostics, such as old schema version, discarded fit count or a temporary legacy reopen hint; not workflow state. |
 
+## RunPlan
+
+| Field | Exact declared type | Meaning |
+|---|---|---|
+| `analysis` | `character` | Canonical scalar analysis mode: run_calibration_check, run_power_check or run_discovery_analysis. |
+| `pairs` | `data.frame` | Owned prepared hypothesis rows and complete logical QC status, preserving order, failed-QC rows, repeated requests and table representation. Public result commits require the complete prepared family. |
+| `B1` | `integer` | Realized scalar nonnegative integer stage-one resampling budget. |
+| `B2` | `integer` | Realized scalar nonnegative integer stage-two resampling budget; the total budget is checked before native execution. |
+| `B3` | `integer` | Realized scalar nonnegative integer stage-three resampling budget, frozen for this run independently of later calibration or reporting choices. |
+| `n_calibration_pairs` | `integer` | Requested positive scalar count for calibration, which may exceed the selected qualifying family; integer(0) for other analyses. |
+| `calibration_group_size` | `integer` | Positive scalar number of NT guides per calibration group; integer(0) for other analyses. |
+| `identity` | `list` | Frozen data, ordered cells, actual design, assignments, choices and canonical execution-payload identity; object-context matching is validated separately. |
+
 ## CellView
 
 | Field | Exact declared type | Meaning |

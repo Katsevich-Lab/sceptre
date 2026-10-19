@@ -145,7 +145,7 @@ test_that("public high-MOI calibration accepts overlapping NT unions", {
     result <- suppressMessages(sceptre::run_calibration_check(object,
         calibration_group_size = 2L, n_calibration_pairs = 1L, print_progress = FALSE))
     expect_equal(nrow(result@results@records[["run_calibration_check"]]$table), 1L)
-    pairs <- result@results@records[["run_calibration_check"]]$provenance$plan$pairs
+    pairs <- result@results@records[["run_calibration_check"]]$provenance$plan@pairs
     guides <- strsplit(pairs$grna_group[[1L]], "&", fixed = TRUE)[[1L]]
     selected <- unique(unlist(assignments[guides], use.names = FALSE))
     source <- object@preparation@analysis_cells[selected]

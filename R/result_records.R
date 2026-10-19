@@ -37,7 +37,7 @@ run_plan_identity <- function(object, plan) {
         design = digest::digest(object@preparation@design_matrix, algo = "sha256"),
         assignments = digest::digest(object@preparation@analysis_groups, algo = "sha256"),
         choices = stats::setNames(lapply(options, function(name) methods::slot(object@spec, name)), options),
-        execution = digest::digest(plan[setdiff(names(plan), "identity")], algo = "sha256"))
+        execution = digest::digest(run_plan_payload(plan), algo = "sha256"))
 }
 
 run_resampling_budget <- function(object, analysis, n_calibration_pairs = NULL) {
@@ -65,23 +65,6 @@ make_run_plan <- function(object, analysis, pairs = NULL,
     analysis <- analysis_record_name(analysis)
     calibration <- identical(analysis, "run_calibration_check")
     if (is.null(pairs)) pairs <- analysis_pairs(object, analysis)
-    if (!is.data.frame(pairs) || !all(c("response_id", "grna_group", "pass_qc") %in% names(pairs))) {
-        stop("A run plan requires a prepared hypothesis family with QC status.")
-    }
-    if (!is.logical(pairs$pass_qc) || anyNA(pairs$pass_qc)) {
-        stop("Run-plan QC status must be complete logical values.")
-    }
-    # Count-store row names are canonical IDs. response_names is a display
-    # annotation and may contain symbols unrelated to the tested feature IDs.
-    # BackedCountStore exposes these labels from its descriptor while closed.
-    response_ids <- rownames(object@data@response_matrix)
-    if (anyNA(pairs$response_id) || !all(pairs$response_id %in% response_ids)) {
-        stop("Run-plan responses must belong to the imported screen.")
-    }
-    if (!calibration && !all(pairs$grna_group[pairs$pass_qc] %in%
-        names(object@preparation@analysis_groups$grna_group_idxs))) {
-        stop("Eligible run-plan guide groups must have prepared assignments.")
-    }
     if (calibration) {
         if (is.null(n_calibration_pairs)) n_calibration_pairs <- nrow(pairs)
         if (is.null(calibration_group_size)) {
@@ -89,37 +72,42 @@ make_run_plan <- function(object, analysis, pairs = NULL,
             if (!length(sizes) || length(unique(sizes)) != 1L) stop("Calibration groups must have one common size.")
             calibration_group_size <- sizes[[1L]]
         }
-        check_native_scalar_count(n_calibration_pairs, "n_calibration_pairs")
-        check_native_scalar_count(calibration_group_size, "calibration_group_size")
-        if (n_calibration_pairs < 1L || calibration_group_size < 1L) stop("Calibration sizes must be positive.")
-        if (nrow(pairs) > n_calibration_pairs ||
-            any(lengths(strsplit(pairs$grna_group, "&", fixed = TRUE)) != calibration_group_size)) {
-            stop("Selected calibration pairs do not match the requested run scope.")
-        }
-        guides <- unlist(strsplit(pairs$grna_group, "&", fixed = TRUE), use.names = FALSE)
-        if (!all(guides %in% names(object@preparation@analysis_groups$indiv_nt_grna_idxs))) {
-            stop("Calibration run-plan groups must use prepared non-targeting guides.")
-        }
+        check_native_scalar_count(n_calibration_pairs, "n_calibration_pairs", minimum = 1L)
+        check_native_scalar_count(calibration_group_size, "calibration_group_size", minimum = 1L)
+    } else if (!is.null(n_calibration_pairs) || !is.null(calibration_group_size)) {
+        stop("Calibration-only RunPlan sizes must be absent for other analyses.")
     }
     if (is.null(budgets)) budgets <- run_resampling_budget(object, analysis, n_calibration_pairs)
     if (!all(c("B1", "B2", "B3") %in% names(budgets))) stop("Run budgets require B1, B2 and B3.")
     checked_resampling_total(budgets[["B1"]], budgets[["B2"]], budgets[["B3"]])
-    plan <- list(analysis = analysis, pairs = pairs,
+    plan <- list(analysis = analysis, pairs = copy_run_plan_pairs(pairs),
         B1 = as.integer(budgets[["B1"]]), B2 = as.integer(budgets[["B2"]]),
         B3 = as.integer(budgets[["B3"]]),
         n_calibration_pairs = if (calibration) as.integer(n_calibration_pairs) else NULL,
         calibration_group_size = if (calibration) as.integer(calibration_group_size) else NULL)
     plan$identity <- run_plan_identity(object, plan)
-    plan
+    validate_run_plan(object, as_run_plan(plan))
 }
 
 validate_run_plan <- function(object, plan) {
-    if (!is.list(plan) || !all(c("analysis", "pairs", "B1", "B2", "B3", "identity") %in% names(plan))) {
-        stop("Expected a validated run plan.")
+    plan <- as_run_plan(plan)
+    # Structural validity belongs to RunPlan. Membership and matching actual
+    # screen/design/cell/assignment inputs require this contextual boundary.
+    pairs <- plan@pairs
+    response_ids <- rownames(object@data@response_matrix)
+    if (!all(pairs$response_id %in% response_ids)) {
+        stop("Run-plan responses must belong to the imported screen.")
     }
-    analysis_record_name(plan$analysis)
-    checked_resampling_total(plan$B1, plan$B2, plan$B3)
-    if (!identical(plan$identity, run_plan_identity(object, plan))) {
+    if (identical(plan@analysis, "run_calibration_check")) {
+        guides <- unlist(strsplit(pairs$grna_group, "&", fixed = TRUE), use.names = FALSE)
+        if (!all(guides %in% names(object@preparation@analysis_groups$indiv_nt_grna_idxs))) {
+            stop("Calibration run-plan groups must use prepared non-targeting guides.")
+        }
+    } else if (!all(pairs$grna_group[pairs$pass_qc] %in%
+        names(object@preparation@analysis_groups$grna_group_idxs))) {
+        stop("Eligible run-plan guide groups must have prepared assignments.")
+    }
+    if (!identical(plan@identity, run_plan_identity(object, plan))) {
         stop("The run plan no longer matches its data, design, assignments, choices or execution scope.")
     }
     invisible(plan)
@@ -129,7 +117,9 @@ result_input_identity <- function(object, analysis, plan = NULL) {
     analysis <- analysis_record_name(analysis)
     if (is.null(plan)) plan <- object@results@records[[analysis]]$provenance$plan
     if (is.null(plan)) return(NULL)
-    if (!identical(analysis, "run_calibration_check")) plan$pairs <- analysis_pairs(object, analysis)
+    plan <- tryCatch(as_run_plan(plan), error = function(error) NULL)
+    if (is.null(plan)) return(NULL)
+    if (!identical(analysis, "run_calibration_check")) plan@pairs <- analysis_pairs(object, analysis)
     run_plan_identity(object, plan)
 }
 
@@ -154,8 +144,8 @@ invalidate_result_records <- function(object, reason) {
 # Check the complete finalized hypothesis family, including failed-QC rows and
 # legitimate repeated requests. This uses labels only, never statistical kernels.
 validate_result_family <- function(object, result, plan) {
-    expected <- data.frame(response_id = plan$pairs$response_id,
-        grna_group = plan$pairs$grna_group, stringsAsFactors = FALSE)
+    expected <- data.frame(response_id = plan@pairs$response_id,
+        grna_group = plan@pairs$grna_group, stringsAsFactors = FALSE)
     strategy <- object@spec@grna_integration_strategy
     if (identical(strategy, "union")) {
         names(expected)[names(expected) == "grna_group"] <- "grna_target"
@@ -164,7 +154,7 @@ validate_result_family <- function(object, result, plan) {
         expected <- dplyr::left_join(expected,
             object@data@grna_target_data_frame[c("grna_id", "grna_target")], by = "grna_id")
         if (identical(strategy, "bonferroni") &&
-            !identical(plan$analysis, "run_calibration_check")) {
+            !identical(plan@analysis, "run_calibration_check")) {
             expected <- unique(as.data.frame(expected[c("response_id", "grna_target")]))
         }
     }
@@ -190,12 +180,12 @@ commit_result_record <- function(object, analysis, result, pairs, output_amount,
         stop("A completed analysis requires a nonempty result table with p-values.")
     }
     if (is.null(plan)) plan <- make_run_plan(object, analysis, pairs)
-    validate_run_plan(object, plan)
-    if (!identical(plan$analysis, analysis) || !identical(plan$pairs, pairs)) {
+    plan <- validate_run_plan(object, plan)
+    if (!identical(plan@analysis, analysis) || !identical(plan@pairs, pairs)) {
         stop("The completed result does not match its run plan.")
     }
     if (!identical(analysis, "run_calibration_check") &&
-        !identical(plan$pairs, analysis_pairs(object, analysis))) {
+        !identical(plan@pairs, analysis_pairs(object, analysis))) {
         stop("Only the complete prepared hypothesis family can be committed.")
     }
     validate_result_family(object, result, plan)
@@ -216,7 +206,7 @@ commit_result_record <- function(object, analysis, result, pairs, output_amount,
     history <- if (is.null(previous)) list() else c(previous$history,
         list(previous[setdiff(names(previous), "history")]))
     object@results@records[[analysis]] <- list(table = result,
-        scope = "complete_family", identity = plan$identity,
+        scope = "complete_family", identity = plan@identity,
         provenance = list(schema_version = object@schema_version,
             package_version = as.character(utils::packageVersion("sceptre")),
             spec = analysis_spec_snapshot(object), plan = plan,

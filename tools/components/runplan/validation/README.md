@@ -1,0 +1,30 @@
+# RunPlan checkpoint qualification
+
+The source suite passed **189 cases and 4,921 expectations**, with no failures,
+errors, warnings or skips. This snapshot includes the typed RunPlan and its
+original-payload certificate check. It precedes the requested perturbation-fit
+cache work.
+
+All seven reference workflows match exactly at tolerance zero across 231
+comparisons: actual calibration/power/discovery tables, available preparation
+values, compact response-fit values, warnings and R RNG state. The archived
+flat-slot numerical reference uses matched budgets: its accidental calibration
+B3 overwrite is reset to the prepared discovery/power budget before those runs.
+This is not a claim of parity with that old overwrite behavior.
+
+`source-suite-summary.json` contains machine-readable totals; `source-suite.log`
+and `source-suite-results.rds` preserve the full source-suite result. Earlier targeted
+RunPlan/public-workflow tests are recorded separately as preliminary diagnostics;
+the final complete suite supersedes that pre-certificate check. `parity.log`,
+`parity-summary.json`, `parity-checks.rds` and `parity-current.rds` preserve exact
+comparison outcomes and current observations. The reference artifact is retained
+unchanged under `../../schema3/validation/`; `provenance.json` records its hash,
+all tested source hashes and artifact hashes.
+
+From the repository root, run `Rscript tools/components/runplan/validation/run-source-suite.R`
+or `Rscript tools/components/runplan/validation/run-parity.R`. These scripts
+require the local compiled native library and developer test dependencies.
+`compare-parity.R` can repeat comparison of the saved observations without
+rerunning workflows. Native samplers and statistical kernels were not modified
+for this checkpoint. Nextflow adaptation and large-screen performance
+qualification remain outside this evidence.

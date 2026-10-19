@@ -14,6 +14,7 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
         all_nt_idxs = c(4L, 1L, 5L))
     object@spec@side_code <- 1L
     object@spec@resampling_approximation <- "no_approximation"
+    object <- refactor_private("initialize_screen_identity")(object)
 
     # Write the original matrix columns explicitly, without using the selection
     # helpers to calculate expected values. Calibration uses NT cells (8,2,11);
@@ -39,7 +40,8 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
             object@spec@run_permutations <- permutations
             before <- serialize(object, NULL)
             plan <- refactor_private("make_run_plan")(object, role, pairs,
-                calibration_group_size = 1L, budgets = c(B1 = 9L, B2 = 0L, B3 = 0L))
+                calibration_group_size = if (calibration) 1L else NULL,
+                budgets = c(B1 = 9L, B2 = 0L, B3 = 0L))
             context <- refactor_private("prepare_analysis_context")(object, role, pairs,
                 plan = plan)
             expect_identical(dim(context$design), c(length(source), 1L))
@@ -169,13 +171,13 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
                 if (mechanism == "permutations") {
                     expect_identical(events$read, nr)
                     expect_identical(events$assignment, 0L)
-                    expect_equal(events$permutation, sum(as.double(unlist(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan[c("B1", "B2", "B3")]))))
+                    expect_equal(events$permutation, sum(as.double(unlist(refactor_private("run_plan_payload")(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan)[c("B1", "B2", "B3")]))))
                     expect_length(events$crt, 0L)
                 } else {
                     expect_identical(events$read, np + if (control == "complement") nr else 0L)
                     expect_identical(events$assignment, ng)
                     expect_length(events$permutation, 0L)
-                    expect_equal(events$crt, rep(sum(as.double(unlist(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan[c("B1", "B2", "B3")]))), ng))
+                    expect_equal(events$crt, rep(sum(as.double(unlist(refactor_private("run_plan_payload")(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan)[c("B1", "B2", "B3")]))), ng))
                 }
                 if (warm) expect_equal(before_seed@results@records[["run_discovery_analysis"]]$table,
                                        object@results@records[["run_discovery_analysis"]]$table, tolerance = 1e-8)

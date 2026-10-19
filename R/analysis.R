@@ -26,9 +26,9 @@ analyze_association_pairs <- function(
     plan = NULL
 ) {
     if (is.null(plan)) plan <- make_run_plan(sceptre_object, analysis_type, response_grna_group_pairs)
-    validate_run_plan(sceptre_object, plan)
-    if (!identical(plan$analysis, analysis_record_name(analysis_type)) ||
-        !identical(plan$pairs, response_grna_group_pairs)) {
+    plan <- validate_run_plan(sceptre_object, plan)
+    if (!identical(plan@analysis, analysis_record_name(analysis_type)) ||
+        !identical(plan@pairs, response_grna_group_pairs)) {
         stop("Association inputs do not match the run plan.")
     }
     context <- prepare_analysis_context(
@@ -51,7 +51,7 @@ analyze_association_pairs <- function(
             B = context$test_options$total_resamples,
             calibration_check = context$index$calibration_check,
             control_group_complement = context$index$control_group_complement,
-            calibration_group_size = if (is.null(plan$calibration_group_size)) 1L else plan$calibration_group_size,
+            calibration_group_size = if (!length(plan@calibration_group_size)) 1L else plan@calibration_group_size,
             n_cells = length(context$index$analysis_to_source)
         )
         message(crayon::green(" \u2713"))
