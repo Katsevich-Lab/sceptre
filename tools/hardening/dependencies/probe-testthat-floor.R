@@ -1,7 +1,11 @@
 # Run in a fresh R process with R_LIBS_USER pointing at the isolated floor lib.
 # Never load latest testthat then change .libPaths: namespaces are process-wide.
 stopifnot(identical(as.character(packageVersion("testthat")), "3.1.8"))
-api <- readLines("tools/hardening/dependencies/testthat-apis.txt")
+inventory <- "tools/hardening/dependencies/testthat-apis.txt"
+if (!file.exists(inventory)) {
+    source("tools/hardening/dependencies/inventory-testthat.R", local = new.env())
+}
+api <- readLines(inventory)
 stopifnot(all(api %in% getNamespaceExports("testthat")))
 forms <- lapply(api, function(name) names(formals(getExportedValue("testthat", name))))
 names(forms) <- api

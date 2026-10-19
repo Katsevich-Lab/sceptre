@@ -1,0 +1,15 @@
+{
+  "source_commit": "169c16e4ba00c687c1f03fe37e9d79a11d01cd8f",
+  "base_commit": "8cbecfb88afdfbb3b45a991f63def7bcef8c8848",
+  "clean_checkout_probe_exit": 1,
+  "generated_inventory_probe_exit": 0,
+  "files": {
+    "source-169c16e.tar": "92f8c155a1a70f7c818c73d93a28064d5470d2842af2de7a5f4ef31522b1079a",
+    "clean-checkout-probe.log": "005ba6d0af77ae7ff525eed6e7e8d635dcd5daae3fbf266c2ee0983968f9754d",
+    "generated-inventory-probe.log": "a29d99e2231bda4000d94626030787bae127a6430c9c9b0523365e3ef56406da",
+    "probe-output/floor-probe-session.txt": "895918d98aeab34bdd30e02d48b3a23f085be00a9d67bc11af6c56e3068971b7",
+    "probe-output/testthat-floor-formals.rds": "5d00a12094d2c21b31a20bff868f9888f5302fdef3dcaba0eaa42f82a2b046c3",
+    "RECHECK.md": "6c8e5a6d2082e7cb5ea43aa62f470a4fa17e08ccfaad0c06a7802717dce4d799"
+  },
+  "subsequent_owner_working_tree_fix": "Inventory generation inserted before floor probe; uncommitted at HEAD 169c16e"
+}

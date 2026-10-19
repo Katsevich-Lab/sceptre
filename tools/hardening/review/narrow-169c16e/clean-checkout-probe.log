@@ -1,0 +1,6 @@
+Error in file(con, "r") : cannot open the connection
+Calls: source -> withVisible -> eval -> eval -> readLines -> file
+In addition: Warning message:
+In file(con, "r") :
+  cannot open file 'tools/hardening/dependencies/testthat-apis.txt': No such file or directory
+Execution halted

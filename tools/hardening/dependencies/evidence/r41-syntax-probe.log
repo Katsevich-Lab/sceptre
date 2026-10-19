@@ -1,0 +1,6 @@
+Unable to find image 'r-base@sha256:6511b580c48b285bef5082c7f17ac57edb7af926f5168985056952c08c4bd401' locally
+docker.io/library/r-base@sha256:6511b580c48b285bef5082c7f17ac57edb7af926f5168985056952c08c4bd401: Pulling from library/r-base
+Digest: sha256:6511b580c48b285bef5082c7f17ac57edb7af926f5168985056952c08c4bd401
+Status: Downloaded newer image for r-base@sha256:6511b580c48b285bef5082c7f17ac57edb7af926f5168985056952c08c4bd401
+R version 4.1.3 (2022-03-10) 
+108 R source and test files parse under R4.1

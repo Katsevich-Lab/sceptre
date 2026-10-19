@@ -1,0 +1,53 @@
+{
+  "cases": 253,
+  "expectations": 5515,
+  "passed": 5505,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skipped": 10,
+  "elapsed_seconds": 59.06,
+  "failures": [],
+  "skips": [
+    {
+      "file": "test-backed-content-identity.R",
+      "test": "backed save preserves imported descriptors and reopen verifies content"
+    },
+    {
+      "file": "test-distributed-execution.R",
+      "test": "backed permutation work reopens counts in a fresh process before collection"
+    },
+    {
+      "file": "test-ondisc_paths.R",
+      "test": "import_data can create ondisc-backed objects in a normalized directory"
+    },
+    {
+      "file": "test-ondisc-capabilities.R",
+      "test": "the installed optional backend exposes the required operations"
+    },
+    {
+      "file": "test-output-resources.R",
+      "test": "public export of a saved closed backing cannot leak a sink"
+    },
+    {
+      "file": "test-refactor-contracts.R",
+      "test": "backed permutation workflows and independent reattachment match sparse"
+    },
+    {
+      "file": "test-refactor-storage.R",
+      "test": "legacy matrix conversion agrees with the selected ondisc copy"
+    },
+    {
+      "file": "test-refactor-storage.R",
+      "test": "legacy backed storage coerces fractions and retains stored positions"
+    },
+    {
+      "file": "test-refactor-storage.R",
+      "test": "backed storage has the same ordered count and ownership contracts"
+    },
+    {
+      "file": "test-schema-migration.R",
+      "test": "backed descriptors reopen relocated identical stores and reject changed descriptors"
+    }
+  ]
+}

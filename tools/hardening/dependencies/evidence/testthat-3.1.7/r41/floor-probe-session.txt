@@ -1,0 +1,26 @@
+testthat 3.1.7
+library /opt/sceptre-floor-library/testthat
+R version 4.1.3 (2022-03-10)
+Platform: aarch64-unknown-linux-gnu (64-bit)
+Running under: Debian GNU/Linux bookworm/sid
+
+Matrix products: default
+BLAS:   /usr/lib/aarch64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/aarch64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] compiler_4.1.3  ellipsis_0.3.2  magrittr_2.0.3  R6_2.5.1       
+ [5] rprojroot_2.0.4 cli_3.6.2       withr_3.0.0     glue_1.7.0     
+ [9] waldo_0.5.2     desc_1.4.3      pkgload_1.3.4   brio_1.1.4     
+[13] testthat_3.1.7  rlang_1.1.3    

@@ -1,0 +1,235 @@
+* installing *source* package ‘sceptre’ ...
+** using staged installation
+** libs
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c RcppExports.cpp -o RcppExports.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c compute_nb_size_param_functions.cpp -o compute_nb_size_param_functions.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c generate_samples_functions.cpp -o generate_samples_functions.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c inference_scores.cpp -o inference_scores.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c inference_stages.cpp -o inference_stages.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c inference_tail.cpp -o inference_tail.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c low_level_full_test.cpp -o low_level_full_test.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c mixture_functs.cpp -o mixture_functs.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c negative_control_functions.cpp -o negative_control_functions.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c pair_construction_functs.cpp -o pair_construction_functs.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c pair_eligibility.cpp -o pair_eligibility.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c sparse_counts.cpp -o sparse_counts.o
+g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG  -I'/opt/sceptre-floor-library/Rcpp/include' -I'/opt/sceptre-floor-library/BH/include'    -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c sparse_matrix_functs.cpp -o sparse_matrix_functs.o
+g++ -std=gnu++14 -shared -L/usr/lib/R/lib -Wl,-z,relro -o sceptre.so RcppExports.o compute_nb_size_param_functions.o generate_samples_functions.o inference_scores.o inference_stages.o inference_tail.o low_level_full_test.o mixture_functs.o negative_control_functions.o pair_construction_functs.o pair_eligibility.o sparse_counts.o sparse_matrix_functs.o -L/usr/lib/R/lib -lR
+installing to /opt/sceptre-floor-library/00LOCK-sceptre-floor-source/00new/sceptre/libs
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (sceptre)
+R version 4.1.3 (2022-03-10) 
+Empty/nonempty AnalysisSpec guard passes without attached methods.
+All 28 inventory APIs exported; focused API behavior passed.
+analysis-spec-validation: ........................................................................................................................................................................................................
+assign_grnas: ......................Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Performing gRNA-to-cell assignments for gRNA grna_1 (1 of 4)
+....Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+.Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+.Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+...
+aux_functions: ......................................
+backed-content-identity: S
+check_functions: ....................................
+closure-capture: .
+component-model: ..................................................................
+component-results: ...............................Constructing negative control pairs.
+ ✓
+..........................
+data: ....
+distributed-execution: .........................................................................S............................
+fit-cache-families: .........................................................................................
+fit-cache-migration: .................
+formula-boundary: ...................................................................................................
+import_functs: .................
+mock-data-functions: .................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+ondisc_paths: ......S
+ondisc-capabilities: .............S
+output-resources: .....................S
+pair_constructor_functs: ...
+parallel_mac: Constructing negative control pairs.
+ ✓
+Note: Unable to generate the number of negative control pairs (1406) requested. Generating as many negative control pairs (1000) as possible.
+Running calibration_check in parallel.
+Change directories to /tmp/Rtmp21w1ss/sceptre_logs/ and view the files calibration_check_*.out for progress updates.
+ ✓
+Running power_check in parallel.
+Change directories to /tmp/Rtmp21w1ss/sceptre_logs/ and view the files power_check_*.out for progress updates.
+ ✓
+Running discovery_analysis in parallel.
+Change directories to /tmp/Rtmp21w1ss/sceptre_logs/ and view the files discovery_analysis_*.out for progress updates.
+ ✓
+.......Running gRNA assignments in parallel.
+Change directories to /tmp/Rtmp21w1ss/sceptre_logs/ and view the files assign_grnas_*.out for progress updates.
+..
+parallel_windows: ......
+perturbation-model: ...................................
+plotting_functions: Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 4)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 3)
+................................................................
+preprocessing_functs: ...................................
+refactor-assignment-getter: ........................
+refactor-cache: .................
+refactor-calibration-safety: ................................................................................................
+refactor-context-execution: .....................................................................................................................
+refactor-contracts: ......................................................................................................................................................................................................................................S.......
+refactor-file-lifetimes: ......
+refactor-fitting: .............
+refactor-import-coordinates: ..............................................
+refactor-indexing: ...............................................................
+refactor-legacy-boundaries: ..........................................................
+refactor-native-retirement: ..................
+refactor-native: ....................................................................................................................................
+refactor-pair-construction: .............................................................
+refactor-plot-diagnostic-na: ...................................................................................................
+refactor-qc: ........
+refactor-results: .................
+refactor-state: ........
+refactor-storage-boundaries: .......
+refactor-storage-dense: ..............................
+refactor-storage-ownership: .......................................................................................................
+refactor-storage: ..........SS..........................................................S
+refactor-vector-aggregation: ....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+result-ownership: .........................
+run_qc: ......................................
+run-plan-migration: ..........................................................
+run-plans: ............................................................................
+s4_analysis_functs_1: ..............................
+s4_analysis_functs_2: Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_1 (1 of 9)
+Running precomputation on response response_37 (5 of 9)
+Analyzing pairs containing gRNA group nt1 (1 of 6)
+Analyzing pairs containing gRNA group nt5 (5 of 6)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_3 (1 of 9)
+Running precomputation on response response_28 (5 of 9)
+Analyzing pairs containing gRNA group nt3&nt4&nt5 (1 of 9)
+Analyzing pairs containing gRNA group nt1&nt7&nt8 (5 of 9)
+......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t3 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_10 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the power check.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+....Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 2)
+...
+s4_helpers: ..........
+saved-spec-admission: ........................................................Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+.................
+schema-migration: .................................................................................................................................................S.......................................
+structured-workers: ......................
+worker-errors: ................
+
+══ Skipped ═════════════════════════════════════════════════════════════════════
+1. backed save preserves imported descriptors and reopen verifies content ('test-backed-content-identity.R:2:5') - Reason: ondisc cannot be loaded
+
+2. backed permutation work reopens counts in a fresh process before collection ('test-distributed-execution.R:261:5') - Reason: ondisc cannot be loaded
+
+3. import_data can create ondisc-backed objects in a normalized directory ('test-ondisc_paths.R:36:5') - Reason: ondisc cannot be loaded
+
+4. the installed optional backend exposes the required operations ('test-ondisc-capabilities.R:58:5') - Reason: ondisc cannot be loaded
+
+5. public export of a saved closed backing cannot leak a sink ('test-output-resources.R:71:5') - Reason: ondisc cannot be loaded
+
+6. backed permutation workflows and independent reattachment match sparse ('test-refactor-contracts.R:53:5') - Reason: ondisc cannot be loaded
+
+7. legacy matrix conversion agrees with the selected ondisc copy ('test-refactor-storage.R:33:5') - Reason: ondisc cannot be loaded
+
+8. legacy backed storage coerces fractions and retains stored positions ('test-refactor-storage.R:58:5') - Reason: ondisc cannot be loaded
+
+9. backed storage has the same ordered count and ownership contracts ('test-refactor-storage.R:166:5') - Reason: ondisc cannot be loaded
+
+10. backed descriptors reopen relocated identical stores and reject changed descriptors ('test-schema-migration.R:118:5') - Reason: ondisc cannot be loaded
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+Your tests are polished!
+No deferred expressions to run
+$cases
+[1] 253
+
+$expectations
+[1] 5515
+
+$passed
+[1] 5505
+
+$failed
+[1] 0
+
+$errors
+[1] 0
+
+$warnings
+[1] 0
+
+$skipped
+[1] 10
+
+$elapsed_seconds
+[1] 57.082
+

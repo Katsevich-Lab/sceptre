@@ -1,0 +1,5 @@
+"workload","input_size_bytes","median_seconds","min_seconds","max_seconds","allocated_bytes","allocations","copy_size_bytes","samples","copies_per_sample"
+"actual_five_row_table",4880,0,0,0.000100000000000033,11328,3,4880,20,10
+"actual_record_with_history",48464,9.9999999999989e-05,0,0.000100000000000033,25880,7,48464,20,10
+"actual_crt_output3_record",1264216,0.00150000000000001,0.00139999999999998,0.002,566288,8,1264216,20,10
+"bounded_nested_draw_graph",591264,0.000749999999999984,0.000699999999999967,0.00260000000000002,1091048,507,591264,20,10

@@ -1,0 +1,37 @@
+current FALSE 
+Error in as_run_plan(plan) : 
+  The run plan no longer matches its frozen execution payload.
+[1] "Error in as_run_plan(plan) : \n  The run plan no longer matches its frozen execution payload.\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in as_run_plan(plan): The run plan no longer matches its frozen execution payload.>
+[1] "Modes: list, NULL"                   
+[2] "Lengths: 6, 0"                       
+[3] "names for target but not for current"
+[4] "current is not list-like"            
+List of 6
+ $ data       : chr "3f0dc839a9874ff6a2206b3bfb80e03072cc36c45078bef1fee9aa39e7c7fcbb"
+ $ cells      : int [1:155] 1 3 4 5 6 7 8 9 10 11 ...
+ $ design     : chr "53f8bdd8ad0b8f301dd34a8ce9c49901e0641ee02b79fde475479a78a127b5f0"
+ $ assignments: chr "577087373d41cde65cfa0bc073ffe80c9acf22c732347e25b340ce212b2e703f"
+ $ choices    :List of 7
+  ..$ side_code                : int -1
+  ..$ resampling_approximation : chr "no_approximation"
+  ..$ control_group_complement : logi TRUE
+  ..$ run_permutations         : logi TRUE
+  ..$ grna_integration_strategy: chr "union"
+  ..$ multiple_testing_alpha   : num 0.1
+  ..$ multiple_testing_method  : chr "BH"
+ $ execution  : chr "98f860e8b84d4bec77735c1479bd88cb06da8fca3e83c27ef8fb1c3fd180a1e1"
+ NULL
+before 98f860e8b84d4bec77735c1479bd88cb06da8fca3e83c27ef8fb1c3fd180a1e1 98f860e8b84d4bec77735c1479bd88cb06da8fca3e83c27ef8fb1c3fd180a1e1 
+after 98f860e8b84d4bec77735c1479bd88cb06da8fca3e83c27ef8fb1c3fd180a1e1 0e46de4ad8298cc2286814e7202ac838d22b85174f97c3de80b2fe77d9f8c305 
+[1] TRUE
+response_id TRUE 
+grna_group TRUE 
+n_nonzero_trt TRUE 
+n_nonzero_cntrl TRUE 
+pass_qc TRUE 
+pairattrs FALSE 
+rownames NA -1  ->  NA -1 

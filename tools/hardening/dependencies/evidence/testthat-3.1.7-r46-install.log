@@ -1,0 +1,32 @@
+* installing *source* package ‘testthat’ ...
+** this is package ‘testthat’ version ‘3.1.7’
+** package ‘testthat’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+using C compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using C++ compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using SDK: ‘MacOSX26.5.sdk’
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c init.c -o init.o
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c reassign.c -o reassign.o
+reassign.c:14:3: error: call to undeclared function 'SET_FORMALS'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   14 |   SET_FORMALS(old_fun, FORMALS(new_fun));
+      |   ^
+reassign.c:14:24: error: call to undeclared function 'FORMALS'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   14 |   SET_FORMALS(old_fun, FORMALS(new_fun));
+      |                        ^
+reassign.c:15:3: error: call to undeclared function 'SET_BODY'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   15 |   SET_BODY(old_fun, BODY(new_fun));
+      |   ^
+reassign.c:15:21: error: call to undeclared function 'BODY'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   15 |   SET_BODY(old_fun, BODY(new_fun));
+      |                     ^
+reassign.c:16:3: error: call to undeclared function 'SET_CLOENV'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   16 |   SET_CLOENV(old_fun, CLOENV(new_fun));
+      |   ^
+reassign.c:16:23: error: call to undeclared function 'CLOENV'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   16 |   SET_CLOENV(old_fun, CLOENV(new_fun));
+      |                       ^
+6 errors generated.
+make: *** [reassign.o] Error 1
+ERROR: compilation failed for package ‘testthat’
+* removing ‘/private/tmp/sceptre-testthat-floor-library/testthat’

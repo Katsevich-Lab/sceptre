@@ -14,3 +14,12 @@ tests/testthat/fixtures/aggregation-inputs-6a43fa5.rds -text
 # Relocated historical suite keeps the same byte-level contracts on all OSes.
 tools/refactor/consistency/testthat/fixtures/** -text
 tools/refactor/consistency/testthat/helper-refactor.R text eol=lf
+
+# Keep captured hardening receipts and their recorded hashes byte-for-byte.
+tools/hardening/dependencies/evidence/** -text -whitespace
+tools/hardening/benchmark/results/** -text -whitespace
+tools/hardening/review/** -text -whitespace
+tools/hardening/validation/*.log -text -whitespace
+tools/hardening/validation/*.Rout -text -whitespace
+tools/hardening/validation/intermediate/*.log -text -whitespace
+tools/hardening/validation/installed-parity/*.log -text -whitespace

@@ -31,6 +31,7 @@ jobs:
         run: |
           R CMD build . --no-manual
           R CMD INSTALL sceptre_*.tar.gz
+          Rscript --vanilla tools/hardening/dependencies/inventory-testthat.R
           Rscript --vanilla tools/hardening/dependencies/probe-testthat-floor.R
           R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
       - name: Require clean package check status

@@ -1,0 +1,83 @@
+# Dependency floors and support checks
+
+`DESCRIPTION` declares **testthat >= 3.1.8**, the first genuinely qualified
+candidate for the current tests. R >= 4.1 is retained.
+
+The former 3.0.0 claim omitted unconditional newer APIs. A full inventory and
+real installation showed that 3.1.7 exports all 28 APIs used, but this is not
+sufficient: its namespace-only `local_mocked_bindings()` cannot mock the
+imported S4 `print` binding required by the public sink error/interrupt regression.
+Both full 3.1.7 runs (macOS R4.4.1 and Linux R4.1.3) produced the same sole error:
+253 cases, 5,495 passes, zero failed expectations/warnings, ten explicit skips.
+Those rejected-candidate receipts remain under `evidence/testthat-3.1.7/`.
+
+The official v3.1.8 implementation adds imported-binding rebinding. Genuine,
+unmodified archived 3.1.8 was installed in the isolated Mac library and in a
+Linux container. The direct imported-print error probe passes. Final exact-source full suites
+pass on both runtimes: **253 cases, 5,505 passing expectations, zero failures,
+errors or warnings, and ten explicit optional/backend skips each**. Receipts
+are in `evidence/r44/` and `evidence/r41/`.
+`testthat-floor-primary-evidence.json` binds the source URLs/archive hashes.
+The final tested source is `169c16e4ba00c687c1f03fe37e9d79a11d01cd8f`,
+including the final qualified `methods::slotNames` call. The declared-namespace
+probe passes with `R_DEFAULT_PACKAGES=NULL` in both runtimes. The earlier clean
+8c checkpoint remains separate under `evidence/core-8c-testthat-3.1.8/`.
+No error/interrupt/ownership test was weakened to retain the earlier floor.
+
+`inventory-testthat.R` parses every tests/tools R script. It records all
+syntactic exported calls, including conditional sites, in `testthat-calls.tsv`;
+future conventional expectation/skip/local/with/capture APIs are detected even
+when absent from the running floor, while project assertion helpers are excluded.
+API/argument columns are complete and call excerpts are capped at 300 characters.
+`testthat-api-arguments.json` summarizes named arguments. Qualified namespace
+references were also cross-checked by text search. CI regenerates the inventory
+before probing; the standalone probe generates it if missing. A clean temporary
+checkout without generated files passed, and an unknown future API was detected.
+`probe-testthat-floor.R`
+checks every export at exactly 3.1.8, representative regexp/fixed/ignore.case/
+tolerance/info argument forms, namespace mocks, and the required imported-print
+behavior against an installed package. `run-floor-suite.R` asserts the actual R
+minor version, testthat version and isolated package locations before testing.
+
+Mac installations went only into `/private/tmp/sceptre-r44-floor-library`;
+ordinary R4.4 libraries were read as fallback dependency locations. Genuine
+R4.4.1 arm64 and R4.6.0 arm64 are locally installed. Old testthat3.1.7 failed to
+compile on R4.6 because it uses removed R internals; the log is preserved.
+Current R checks use current testthat rather than pinning that old combination.
+
+An initial Docker probe found no socket. A later sandbox probe was denied;
+escalated read-only inspection confirmed Docker29.4.3 Linux/aarch64. The pinned
+official native-arm64 R4.1.3 image then parsed all 108 package/test R files.
+Compatible snapshot dependencies and genuine testthat were built inside
+isolated images; package compilation and tests use a disposable container,
+read-only source mount, network disabled, and one writable evidence mount.
+`Dockerfile.r41` and `run-r41-container.sh` make that setup reviewable. The
+derivative 3.1.8 image preserves the initial 3.1.7 image/diagnostic receipts.
+
+The R4.1 setup resolves from the coherent 2024-03-01 CRAN source snapshot,
+avoiding impossible newest-dependency combinations. Snapshot audit identified
+79 recursively required repository entries compatible with R4.1.0, including
+Matrix1.6-5 (R>=3.5) and MASS7.3-60.0.1 (R>=4.0), then pins exact testthat3.1.8.
+The index contains multiple R-specific Recommended rows; the audit applies
+R-version filtering before selecting them, as `available.packages()` does.
+`base-image-installed.tsv` is the initial dependency image's historical receipt;
+final floor session/package tables identify the actually executed testthat3.1.8.
+
+The existing OS/release/oldrel and ondisc-absent jobs remain. The standard matrix
+adds R-devel. `check-support.yaml` adds R4.1 with the compatible snapshot, exact
+testthat floor, installed import-mock probe and R CMD check; and official
+Bioconductor release (`latest`) / `devel` containers using their matching repos,
+R CMD check and BiocCheck. BiocCheck's quit status fails for errors; existing
+warnings/notes remain reviewable, including the infrastructure-dependency warning.
+No meaningless dependency is added to hide it. Optional ondisc stays absent in
+these new support jobs; the existing pinned-backed job retains its separate
+contract. All new hosted checks are configured but unexecuted: no workflow was
+pushed or dispatched. Windows, R-devel and Bioconductor-container success are not
+inferred from local Mac/Linux evidence.
+
+Primary references: [testthat3.1.7 mocking source](https://github.com/r-lib/testthat/blob/v3.1.7/R/mock2.R),
+[testthat3.1.8 mocking source](https://github.com/r-lib/testthat/blob/v3.1.8/R/mock2.R),
+[official3.1.8 archive](https://cran.r-project.org/src/contrib/Archive/testthat/testthat_3.1.8.tar.gz),
+[r-lib setup-r inputs](https://github.com/r-lib/actions/tree/v2/setup-r),
+[r-lib dependency action](https://github.com/r-lib/actions/tree/v2/setup-r-dependencies),
+and [Bioconductor containers](https://bioconductor.org/help/docker/).

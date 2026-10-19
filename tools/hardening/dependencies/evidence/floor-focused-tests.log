@@ -1,0 +1,18 @@
+component-results: ...............................Constructing negative control pairs.
+ ✓
+..........................
+refactor-storage: ..........SS..........................................................S
+result-ownership: .....................
+worker-errors: ................
+
+══ Skipped ═════════════════════════════════════════════════════════════════════
+1. legacy matrix conversion agrees with the selected ondisc copy ('test-refactor-storage.R:33:5') - Reason: ondisc cannot be loaded
+
+2. legacy backed storage coerces fractions and retains stored positions ('test-refactor-storage.R:58:5') - Reason: ondisc cannot be loaded
+
+3. backed storage has the same ordered count and ownership contracts ('test-refactor-storage.R:166:5') - Reason: ondisc cannot be loaded
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+No deferred expressions to run
+   cases   passed   failed   errors warnings    skips 
+      25      162        0        0        0        3 

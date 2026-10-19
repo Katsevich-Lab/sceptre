@@ -1,0 +1,7 @@
+low_nt_perm : EXACT MATCH 
+low_complement_perm : EXACT MATCH 
+high_complement_crt : EXACT MATCH 
+low_complement_crt : EXACT MATCH 
+high_perm : EXACT MATCH 
+low_bonferroni : EXACT MATCH 
+low_singleton : EXACT MATCH 

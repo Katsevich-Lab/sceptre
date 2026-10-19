@@ -1,0 +1,80 @@
+"Package"	"Version"	"Depends"	"Imports"	"LinkingTo"
+"base64enc"	"0.1-3"	"R (>= 2.9.0)"	NA	NA
+"BH"	"1.84.0-0"	NA	NA	NA
+"brio"	"1.1.4"	"R (>= 3.6)"	NA	NA
+"bslib"	"0.6.1"	"R (>= 2.10)"	"base64enc, cachem, grDevices, htmltools (>= 0.5.7), jquerylib (>= 0.1.3), jsonlite, lifecycle, memoise (>= 2.0.1), mime, rlang, sass (>= 0.4.0)"	NA
+"cachem"	"1.0.8"	NA	"rlang, fastmap (>= 1.1.1)"	NA
+"callr"	"3.7.5"	"R (>= 3.4)"	"processx (>= 3.6.1), R6, utils"	NA
+"cli"	"3.6.2"	"R (>= 3.4)"	"utils"	NA
+"colorspace"	"2.1-0"	"R (>= 3.0.0), methods"	"graphics, grDevices, stats"	NA
+"cowplot"	"1.1.3"	"R (>= 3.5.0)"	"ggplot2 (>= 3.4.0), grid, gtable, grDevices, methods, rlang, scales"	NA
+"crayon"	"1.5.2"	NA	"grDevices, methods, utils"	NA
+"data.table"	"1.15.2"	"R (>= 3.1.0)"	"methods"	NA
+"desc"	"1.4.3"	"R (>= 3.4)"	"cli, R6, utils"	NA
+"diffobj"	"0.3.5"	"R (>= 3.1.0)"	"crayon (>= 1.3.2), tools, methods, utils, stats"	NA
+"digest"	"0.6.34"	"R (>= 3.3.0)"	"utils"	NA
+"dplyr"	"1.1.4"	"R (>= 3.5.0)"	"cli (>= 3.4.0), generics, glue (>= 1.3.2), lifecycle (>= 1.0.3), magrittr (>= 1.5), methods, pillar (>= 1.9.0), R6, rlang (>= 1.1.0), tibble (>= 3.2.0), tidyselect (>= 1.2.0), utils, vctrs (>= 0.6.4)"	NA
+"ellipsis"	"0.3.2"	"R (>= 3.2)"	"rlang (>= 0.3.0)"	NA
+"evaluate"	"0.23"	"R (>= 3.0.2)"	"methods"	NA
+"fansi"	"1.0.6"	"R (>= 3.1.0)"	"grDevices, utils"	NA
+"farver"	"2.1.1"	NA	NA	NA
+"fastmap"	"1.1.1"	NA	NA	NA
+"fontawesome"	"0.5.2"	"R (>= 3.3.0)"	"rlang (>= 1.0.6), htmltools (>= 0.5.1.1)"	NA
+"fs"	"1.6.3"	"R (>= 3.4)"	"methods"	NA
+"generics"	"0.1.3"	"R (>= 3.2)"	"methods"	NA
+"ggplot2"	"3.5.0"	"R (>= 3.5)"	"cli, glue, grDevices, grid, gtable (>= 0.1.1), isoband, lifecycle (> 1.0.1), MASS, mgcv, rlang (>= 1.1.0), scales (>= 1.3.0), stats, tibble, vctrs (>= 0.5.0), withr (>= 2.5.0)"	NA
+"glue"	"1.7.0"	"R (>= 3.6)"	"methods"	NA
+"gtable"	"0.3.4"	"R (>= 3.5)"	"cli, glue, grid, lifecycle, rlang (>= 1.1.0)"	NA
+"highr"	"0.10"	"R (>= 3.3.0)"	"xfun (>= 0.18)"	NA
+"htmltools"	"0.5.7"	"R (>= 2.14.1)"	"base64enc, digest, ellipsis, fastmap (>= 1.1.0), grDevices, rlang (>= 1.0.0), utils"	NA
+"isoband"	"0.2.7"	NA	"grid, utils"	NA
+"jquerylib"	"0.1.4"	NA	"htmltools"	NA
+"jsonlite"	"1.8.8"	"methods"	NA	NA
+"knitr"	"1.45"	"R (>= 3.3.0)"	"evaluate (>= 0.15), highr, methods, tools, xfun (>= 0.39), yaml (>= 2.1.19)"	NA
+"labeling"	"0.4.3"	NA	"stats, graphics"	NA
+"lattice"	"0.22-5"	"R (>= 4.0.0)"	"grid, grDevices, graphics, stats, utils"	NA
+"lifecycle"	"1.0.4"	"R (>= 3.6)"	"cli (>= 3.4.0), glue, rlang (>= 1.1.0)"	NA
+"magrittr"	"2.0.3"	"R (>= 3.4.0)"	NA	NA
+"MASS"	"7.3-60.0.1"	"R (>= 4.0), grDevices, graphics, stats, utils"	"methods"	NA
+"Matrix"	"1.6-5"	"R (>= 3.5.0), methods"	"grDevices, graphics, grid, lattice, stats, utils"	NA
+"memoise"	"2.0.1"	NA	"rlang (>= 0.4.10), cachem"	NA
+"mgcv"	"1.9-1"	"R (>= 3.6.0), nlme (>= 3.1-64)"	"methods, stats, graphics, Matrix, splines, utils"	NA
+"mime"	"0.12"	NA	"tools"	NA
+"munsell"	"0.5.0"	NA	"colorspace, methods"	NA
+"nlme"	"3.1-164"	"R (>= 3.5.0)"	"graphics, stats, utils, lattice"	NA
+"parallelly"	"1.37.1"	NA	"parallel, tools, utils"	NA
+"pillar"	"1.9.0"	NA	"cli (>= 2.3.0), fansi, glue, lifecycle, rlang (>= 1.0.2), utf8 (>= 1.1.0), utils, vctrs (>= 0.5.0)"	NA
+"pkgbuild"	"1.4.3"	"R (>= 3.5)"	"callr (>= 3.2.0), cli (>= 3.4.0), desc, processx, R6"	NA
+"pkgconfig"	"2.0.3"	NA	"utils"	NA
+"pkgload"	"1.3.4"	"R (>= 3.4.0)"	"cli (>= 3.3.0), crayon, desc, fs, glue, methods, pkgbuild, rlang (>= 1.1.1), rprojroot, utils, withr (>= 2.4.3)"	NA
+"praise"	"1.0.0"	NA	NA	NA
+"processx"	"3.8.3"	"R (>= 3.4.0)"	"ps (>= 1.2.0), R6, utils"	NA
+"ps"	"1.7.6"	"R (>= 3.4)"	"utils"	NA
+"purrr"	"1.0.2"	"R (>= 3.5.0)"	"cli (>= 3.6.1), lifecycle (>= 1.0.3), magrittr (>= 1.5.0), rlang (>= 1.1.1), vctrs (>= 0.6.3)"	"cli"
+"R.methodsS3"	"1.8.2"	"R (>= 2.13.0)"	"utils"	NA
+"R.oo"	"1.26.0"	"R (>= 2.13.0), R.methodsS3 (>= 1.8.2)"	"methods, utils"	NA
+"R.utils"	"2.12.3"	"R (>= 2.14.0), R.oo"	"methods, utils, tools, R.methodsS3"	NA
+"R6"	"2.5.1"	"R (>= 3.0)"	NA	NA
+"rappdirs"	"0.3.3"	"R (>= 3.2)"	NA	NA
+"RColorBrewer"	"1.1-3"	"R (>= 2.0.0)"	NA	NA
+"Rcpp"	"1.0.12"	NA	"methods, utils"	NA
+"rematch2"	"2.1.2"	NA	"tibble"	NA
+"rlang"	"1.1.3"	"R (>= 3.5.0)"	"utils"	NA
+"rmarkdown"	"2.25"	"R (>= 3.0)"	"bslib (>= 0.2.5.1), evaluate (>= 0.13), fontawesome (>= 0.5.0), htmltools (>= 0.5.1), jquerylib, jsonlite, knitr (>= 1.22), methods, stringr (>= 1.2.0), tinytex (>= 0.31), tools, utils, xfun (>= 0.36), yaml (>= 2.1.19)"	NA
+"rprojroot"	"2.0.4"	"R (>= 3.0.0)"	NA	NA
+"sass"	"0.4.8"	NA	"fs (>= 1.2.4), rlang (>= 0.4.10), htmltools (>= 0.5.1), R6, rappdirs"	NA
+"scales"	"1.3.0"	"R (>= 3.6)"	"cli, farver (>= 2.0.3), glue, labeling, lifecycle, munsell (>= 0.5), R6, RColorBrewer, rlang (>= 1.0.0), viridisLite"	NA
+"sessioninfo"	"1.2.2"	"R (>= 2.10)"	"cli (>= 3.1.0), tools, utils"	NA
+"stringi"	"1.8.3"	"R (>= 3.4)"	"tools, utils, stats"	NA
+"stringr"	"1.5.1"	"R (>= 3.6)"	"cli, glue (>= 1.6.1), lifecycle (>= 1.0.3), magrittr, rlang (>= 1.0.0), stringi (>= 1.5.3), vctrs (>= 0.4.0)"	NA
+"testthat"	"3.2.1"	"R (>= 3.6.0)"	"brio (>= 1.1.3), callr (>= 3.7.3), cli (>= 3.6.1), desc (>= 1.4.2), digest (>= 0.6.33), evaluate (>= 0.21), jsonlite (>= 1.8.7), lifecycle (>= 1.0.3), magrittr (>= 2.0.3), methods, pkgload (>= 1.3.2.1), praise (>= 1.0.0), processx (>= 3.8.2), ps (>= 1.7.5), R6 (>= 2.5.1), rlang (>= 1.1.1), utils, waldo (>= 0.5.1), withr (>= 2.5.0)"	NA
+"tibble"	"3.2.1"	"R (>= 3.4.0)"	"fansi (>= 0.4.0), lifecycle (>= 1.0.0), magrittr, methods, pillar (>= 1.8.1), pkgconfig, rlang (>= 1.0.2), utils, vctrs (>= 0.4.2)"	NA
+"tidyselect"	"1.2.0"	"R (>= 3.4)"	"cli (>= 3.3.0), glue (>= 1.3.0), lifecycle (>= 1.0.3), rlang (>= 1.0.4), vctrs (>= 0.4.1), withr"	NA
+"tinytex"	"0.49"	NA	"xfun (>= 0.29)"	NA
+"utf8"	"1.2.4"	"R (>= 2.10)"	NA	NA
+"vctrs"	"0.6.5"	"R (>= 3.5.0)"	"cli (>= 3.4.0), glue, lifecycle (>= 1.0.3), rlang (>= 1.1.0)"	NA
+"viridisLite"	"0.4.2"	"R (>= 2.10)"	NA	NA
+"waldo"	"0.5.2"	"R (>= 3.6)"	"cli, diffobj (>= 0.3.4), fansi, glue, methods, rematch2, rlang (>= 1.0.0), tibble"	NA
+"withr"	"3.0.0"	"R (>= 3.5.0)"	"graphics, grDevices"	NA
+"xfun"	"0.42"	NA	"grDevices, stats, tools"	NA
+"yaml"	"2.3.8"	NA	NA	NA

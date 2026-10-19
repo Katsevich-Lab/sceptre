@@ -1,0 +1,9 @@
+# Official r-base:4.1.3 Linux arm64 image, pinned to its platform manifest.
+# Build with DESCRIPTION and install-r-floor-dependencies.R in a small context.
+FROM r-base@sha256:6511b580c48b285bef5082c7f17ac57edb7af926f5168985056952c08c4bd401
+ENV R_LIBS_USER=/opt/sceptre-floor-library LC_ALL=""
+WORKDIR /opt/sceptre-floor
+RUN mkdir -p /opt/sceptre-floor-library
+COPY DESCRIPTION ./DESCRIPTION
+COPY install-r-floor-dependencies.R ./install-r-floor-dependencies.R
+RUN Rscript --vanilla install-r-floor-dependencies.R

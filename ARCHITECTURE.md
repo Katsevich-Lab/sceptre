@@ -216,8 +216,11 @@ pointers cannot be serialized into worker payloads.
 covers direct/protocol numerical and RNG comparisons, calibration/power,
 serialization/ownership, collection rejection and failure atomicity. Local
 qualification passes 17 cases / 105 assertions, including fresh R workers with
-in-memory and reopened backed counts, and implementation certificate checks. Broader package checks and the separately adapting
-Nextflow pipeline remain pending; this is not scheduler or Nextflow qualification.
+in-memory and reopened backed counts, and implementation certificate checks.
+[Package qualification](tools/hardening/QUALIFICATION.md) records the exact
+archive, full suite, dependency floors, parity and remaining diagnostics. The
+separately adapting Nextflow pipeline requires its own source/container/scheduler
+qualification; R-package checks do not establish that compatibility.
 
 ## Saved objects, pipeline status and checking
 
@@ -233,8 +236,9 @@ the entire stale preparation graph. Unknown or malformed layouts cannot gain
 currentness by being re-signed. Keep original RDS files for
 metadata outside the documented retention guarantee.
 
-Pipeline adaptation is actively being developed in a separate worktree and is
-**not yet qualified against the current package candidate**. The package has no
+Pipeline adaptation and its qualification are maintained in a separate worktree.
+Its evidence must bind the exact archive identified in
+[package qualification](tools/hardening/QUALIFICATION.md). The package has no
 flat-slot compatibility facade, `nf_pipeline`/`nuclear` mode or saved shard scope.
 Private phase signatures/intermediate formats are implementation details for
 that adaptation. Earlier flat-layout pipeline/parity documents and companion
