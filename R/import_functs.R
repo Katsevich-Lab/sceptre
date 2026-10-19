@@ -222,7 +222,6 @@ import_data_use_ondisc <- function(
     )
 
     # add integer id
-    sceptre_object@data@integer_id <- integer_id
     return(sceptre_object)
 }
 
@@ -688,7 +687,6 @@ import_data_from_cellranger_use_ondisc <- function(
         grna_target_data_frame = grna_target_data_frame
     )
 
-    sceptre_object@data@integer_id <- out$gene@integer_id
     return(sceptre_object)
 }
 
@@ -884,18 +882,11 @@ init_sceptre_object <- function(
     sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
     sceptre_object@data@covariate_data_frame <- covariate_data_frame
     sceptre_object@data@low_moi <- (moi == "low")
-    sceptre_object@data@covariate_names <- sort(colnames(covariate_data_frame))
-    sceptre_object@preparation@grna_target_data_frame <- grna_target_data_frame |>
+    sceptre_object@data@grna_target_data_frame <- grna_target_data_frame |>
         dplyr::mutate(
             grna_id = as.character(grna_id),
             grna_target = as.character(grna_target)
         )
-    sceptre_object@data@grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
-    sceptre_object@elements_to_analyze <- NA_character_
-    sceptre_object@nf_pipeline <- FALSE
-    sceptre_object@nuclear <- FALSE
-    sceptre_object@last_function_called <- "import_data"
-    sceptre_object@functs_called <- workflow_initial_state()
     sceptre_object <- initialize_screen_identity(sceptre_object)
     validObject(sceptre_object)
     return(sceptre_object)

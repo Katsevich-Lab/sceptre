@@ -188,7 +188,7 @@ finalize_association_result <- function(
 
 # Nextflow scripts call these internal function names directly. Read settings
 # from the object, then process the collected results. Standard analyses adjust
-# p-values after collection; nuclear tasks keep their partial outputs raw.
+# p-values over the complete family.
 #' Finish collected calibration results using the object's settings
 #'
 #' Called both by the package and directly by Nextflow scripts. Combine guides and
@@ -200,7 +200,7 @@ process_calibration_result <- function(result, sceptre_object) {
     finalize_association_result(
         result,
         sceptre_object@spec@grna_integration_strategy,
-        sceptre_object@preparation@grna_target_data_frame,
+        guide_group_metadata(sceptre_object),
         sceptre_object@spec@multiple_testing_method,
         sceptre_object@spec@multiple_testing_alpha,
         TRUE
@@ -217,7 +217,7 @@ process_discovery_result <- function(result, sceptre_object) {
     finalize_association_result(
         result,
         sceptre_object@spec@grna_integration_strategy,
-        sceptre_object@preparation@grna_target_data_frame,
+        guide_group_metadata(sceptre_object),
         sceptre_object@spec@multiple_testing_method,
         sceptre_object@spec@multiple_testing_alpha
     )
@@ -228,7 +228,7 @@ process_discovery_result <- function(result, sceptre_object) {
 #' Read guide metadata and the integration strategy from the object. The explicit
 #' calibration flag determines whether calibration-specific grouping rules apply.
 #' Return the grouped table. Power uses this step without the across-pair
-#' significance calculation; nuclear pipeline tasks keep their raw-output rules.
+#' significance calculation.
 #' @noRd
 apply_grouping_to_result <- function(
     result,
@@ -238,7 +238,7 @@ apply_grouping_to_result <- function(
     integrate_guides(
         result,
         sceptre_object@spec@grna_integration_strategy,
-        sceptre_object@preparation@grna_target_data_frame,
+        guide_group_metadata(sceptre_object),
         is_calibration_check
     )
 }

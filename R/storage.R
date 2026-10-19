@@ -88,9 +88,6 @@ storage_owned_groups <- function(groups) {
 #'   `source_cells`. Low-MOI callers supply their NT groups for a summary across
 #'   all genes. These lists are counted as supplied, without removing overlaps.
 #'   NULL requests pair counts without retaining that summary.
-#' @param nuclear Whether this is a nuclear pipeline task. For ondisc, skip the
-#'   all-gene summary and read only requested gene rows. The in-memory summary
-#'   still shares a scan with the pair counts when requested.
 #' @return `n_nonzero_trt` and `n_nonzero_cntrl`, integer vectors in request order.
 #'   When retained, `n_nonzero_mat` has NT groups in rows and all genes in columns;
 #'   `n_nonzero_tot` has a total per gene. Otherwise these two fields contain the
@@ -109,8 +106,7 @@ storage_pair_counts <- function(
     groups,
     source_cells,
     controls,
-    nt_groups = NULL,
-    nuclear = FALSE
+    nt_groups = NULL
 ) {
     complement <- is.character(controls) && identical(controls, "complement")
     all_nt_idxs <- if (complement) integer() else as.integer(controls)
@@ -150,7 +146,7 @@ storage_pair_counts <- function(
             control_group_complement = complement,
             cells_in_use = source_cells
         )
-        if (nuclear || !summarize) {
+        if (!summarize) {
             out <- do.call(
                 ondisc:::compute_n_ok_pairs_ondisc,
                 c(

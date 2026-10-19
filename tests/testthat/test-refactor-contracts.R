@@ -10,7 +10,7 @@ test_that("supported workflows produce valid complete results reproducibly", {
         expect_identical(actual, repeat_run, info = name)
         expect_workflow_results(actual, inputs, cases[[name]])
         final <- actual$value$final
-        expect_equal(length(final$cells_in_use), ncol(inputs$response_matrix) - length(inputs$remove_cells))
+        expect_equal(length(final$analysis_cells), ncol(inputs$response_matrix) - length(inputs$remove_cells))
         expect_identical(serialize(inputs, NULL), before)
     }
 })
@@ -24,7 +24,7 @@ test_that("repeated analyses and cache invalidation preserve current fit views",
     expect_identical(actual$value$retained_side_cache, actual$value$cold$response_precomputations)
     expect_length(actual$value$formula_cache, 0L)
     expect_length(actual$value$changed_qc_cache, 0L)
-    expect_false(identical(actual$value$reassigned$grna_assignments, actual$value$cold$grna_assignments))
+    expect_false(identical(actual$value$reassigned$analysis_groups, actual$value$cold$analysis_groups))
     expect_equal(actual$value$reassigned$discovery_result, actual$value$reassigned_cold$discovery_result, tolerance = 1e-8)
 })
 

@@ -4,18 +4,15 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
     object <- methods::new("sceptre_object")
     store <- methods::as(Matrix::Matrix(counts, sparse = TRUE), "RsparseMatrix")
     object <- refactor_private("set_response_matrix")(object, store)
-    object@preparation@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
-    object@preparation@covariate_matrix <- matrix(1, 12L, 1L,
+    object@preparation@analysis_cells <- c(2L, 4L, 5L, 8L, 11L)
+    object@preparation@design_matrix <- matrix(1, 12L, 1L,
                                       dimnames = list(NULL, "(Intercept)"))
     object@data@low_moi <- TRUE
     object@spec@control_group_complement <- FALSE
-    object@preparation@grna_assignments <- list(grna_group_idxs = list(A = c(2L, 3L)),
+    object@preparation@analysis_groups <- list(grna_group_idxs = list(A = c(2L, 3L)),
         indiv_nt_grna_idxs = list(ntA = 1L, ntB = c(2L, 3L)),
         all_nt_idxs = c(4L, 1L, 5L))
-    object@spec@B1 <- 9L
-    object@spec@B2 <- object@spec@B3 <- 0L
     object@spec@side_code <- 1L
-    object@spec@calibration_group_size <- 1L
     object@spec@resampling_approximation <- "no_approximation"
 
     # Write the original matrix columns explicitly, without using the selection
@@ -41,17 +38,20 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
         for (permutations in c(TRUE, FALSE)) {
             object@spec@run_permutations <- permutations
             before <- serialize(object, NULL)
-            context <- refactor_private("prepare_analysis_context")(object, role, pairs)
+            plan <- refactor_private("make_run_plan")(object, role, pairs,
+                calibration_group_size = 1L, budgets = c(B1 = 9L, B2 = 0L, B3 = 0L))
+            context <- refactor_private("prepare_analysis_context")(object, role, pairs,
+                plan = plan)
             expect_identical(dim(context$design), c(length(source), 1L))
             expect_identical(context$common_view$source_cells,
-                if (calibration) source else object@preparation@cells_in_use)
+                if (calibration) source else object@preparation@analysis_cells)
             actual <- suppressMessages(refactor_private("analyze_association_pairs")(
                 object, pairs, role, output_amount = 3L, print_progress = FALSE,
-                parallel = FALSE, n_processors = 1L, log_dir = tempdir()))
+                parallel = FALSE, n_processors = 1L, log_dir = tempdir(), plan = plan))
             expect_equal(actual$result$z_orig, expected_z, tolerance = 1e-8)
             expect_identical(actual$result$response_id, "r")
             expect_identical(actual$result$grna_group, pairs$grna_group)
-            expect_identical(dim(object@preparation@covariate_matrix), c(12L, 1L))
+            expect_identical(dim(object@preparation@design_matrix), c(12L, 1L))
             expect_identical(serialize(object, NULL), before)
             expect_length(actual$response_precomputations, if (calibration) 1L else 0L)
         }
@@ -169,16 +169,16 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
                 if (mechanism == "permutations") {
                     expect_identical(events$read, nr)
                     expect_identical(events$assignment, 0L)
-                    expect_equal(events$permutation, sum(as.double(c(object@spec@B1, object@spec@B2, object@spec@B3))))
+                    expect_equal(events$permutation, sum(as.double(unlist(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan[c("B1", "B2", "B3")]))))
                     expect_length(events$crt, 0L)
                 } else {
                     expect_identical(events$read, np + if (control == "complement") nr else 0L)
                     expect_identical(events$assignment, ng)
                     expect_length(events$permutation, 0L)
-                    expect_equal(events$crt, rep(sum(as.double(c(object@spec@B1, object@spec@B2, object@spec@B3))), ng))
+                    expect_equal(events$crt, rep(sum(as.double(unlist(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan[c("B1", "B2", "B3")]))), ng))
                 }
-                if (warm) expect_equal(before_seed@results@discovery_result,
-                                       object@results@discovery_result, tolerance = 1e-8)
+                if (warm) expect_equal(before_seed@results@records[["run_discovery_analysis"]]$table,
+                                       object@results@records[["run_discovery_analysis"]]$table, tolerance = 1e-8)
                 object <- before_seed
             }
         }

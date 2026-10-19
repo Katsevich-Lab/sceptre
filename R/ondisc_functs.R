@@ -70,27 +70,26 @@ read_ondisc_backed_sceptre_object <- function(
         "`grna_odm_file_fp`"
     )
     sceptre_object <- migrate_sceptre_object(readRDS(sceptre_object_fp))
-    matrices <- storage_reopen_backed_pair(
-        response_odm_file_fp,
-        grna_odm_file_fp,
-        sceptre_object@data@integer_id
-    )
-    if (length(sceptre_object@data@backend)) {
-        validate_backed_descriptor(matrices$response_matrix, sceptre_object@data@backend$response)
-        validate_backed_descriptor(matrices$grna_matrix, sceptre_object@data@backend$grna)
-    } else if (is.null(sceptre_object@results@records$legacy)) {
+    response_descriptor <- count_store_descriptor(sceptre_object@data@response_matrix)
+    grna_descriptor <- count_store_descriptor(sceptre_object@data@grna_matrix)
+    expected_id <- response_descriptor$integer_id
+    if (is.null(expected_id)) expected_id <- sceptre_object@results@import_metadata$legacy_backend_id
+    if (!length(expected_id)) stop("Backing store has no saved import ID; reimport the screen.")
+    matrices <- storage_reopen_backed_pair(response_odm_file_fp, grna_odm_file_fp, expected_id)
+    if ((is.null(response_descriptor) || is.null(grna_descriptor)) &&
+        is.null(sceptre_object@results@import_metadata$legacy_backend_id)) {
         stop("Backing store has no anchored content descriptor; reimport the screen.")
     }
-    # Reattachment is a process-local handle change after verified identity;
-    # it must not be treated as a mutation of the scientific data.
-    sceptre_object@data@response_matrix <- list(matrices$response_matrix)
-    sceptre_object@data@grna_matrix <- list(matrices$grna_matrix)
-    if (!length(sceptre_object@data@backend)) {
+    # Verified relocation changes only the descriptor path and process handle.
+    sceptre_object@data@response_matrix <- as_count_store(matrices$response_matrix, response_descriptor)
+    sceptre_object@data@grna_matrix <- as_count_store(matrices$grna_matrix, grna_descriptor)
+    if (is.null(response_descriptor) || is.null(grna_descriptor)) {
         sceptre_object <- initialize_screen_identity(sceptre_object)
+        for (stage in names(sceptre_object@preparation@stages)) {
+            sceptre_object@preparation@stages[[stage]]$identity <- stage_input_identity(sceptre_object, stage)
+        }
     }
-    sceptre_object@data@backend <- list(
-        response = backed_store_descriptor(matrices$response_matrix),
-        grna = backed_store_descriptor(matrices$grna_matrix))
+    sceptre_object@results@import_metadata$legacy_backend_id <- NULL
     return(sceptre_object)
 }
 
@@ -106,39 +105,11 @@ write_ondisc_backed_sceptre_object <- function(
     # Keep the imported descriptor identity. Only the location may change after
     # verified reattachment; never bless changed content by writing fresh hashes.
     # Persist descriptors, never process-local live HDF5 handles.
-    sceptre_object@data@grna_matrix <- list()
-    sceptre_object@data@response_matrix <- list()
+    sceptre_object@data@grna_matrix <- close_count_store(sceptre_object@data@grna_matrix)
+    sceptre_object@data@response_matrix <- close_count_store(sceptre_object@data@response_matrix)
     # check that dir exists
     directory_to_write <- prepare_directory_to_write(directory_to_write)
     saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))
 }
 
 
-#' Label consecutive pipeline work items with approximate task numbers
-#'
-#' Nextflow supplies an ordered vector and a positive target number of items per
-#' task (pod). Return an integer task label for each item, keeping item order.
-#' The number of tasks is rounded, so task size is approximate. Empty input gives
-#' integer(). No random splitting is used.
-#' @noRd
-get_id_vect <- function(v, pod_size) {
-    n_elements <- length(v)
-    breaks <- round(n_elements / pod_size)
-    if (breaks >= 2) {
-        as.integer(cut(seq(1, n_elements), breaks))
-    } else {
-        rep(1L, n_elements)
-    }
-}
-
-#' Write pipeline items as unquoted text lines in their supplied order
-#'
-#' Convert values to text, keeping repeats, and replace the destination file.
-#' Close the connection on error as well as success. Return invisible NULL.
-#' Nextflow scripts call this helper directly.
-#' @noRd
-write_vector <- function(vector, file_name) {
-    file_con <- file(file_name)
-    on.exit(close(file_con), add = TRUE)
-    writeLines(as.character(vector), file_con)
-}

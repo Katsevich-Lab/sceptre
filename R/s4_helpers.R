@@ -2,12 +2,12 @@
 setMethod("show", signature = signature("sceptre_object"), function(object) {
     object <- migrate_sceptre_object(object)
     # 0. determine the functions that have been run
-    funct_run_vect <- object@functs_called
+    funct_run_vect <- workflow_status(object)
 
     # 1. obtain the basic information
     n_cells <- ncol(get_response_matrix(object))
     n_responses <- nrow(get_response_matrix(object))
-    grna_target_data_frame <- object@preparation@grna_target_data_frame
+    grna_target_data_frame <- guide_group_metadata(object)
     n_nt_grnas <- grna_target_data_frame |>
         dplyr::filter(grna_target == "non-targeting") |>
         nrow()
@@ -15,8 +15,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         dplyr::filter(grna_target != "non-targeting")
     n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
     n_targeting_grnas <- nrow(targeting_grnas_df)
-    n_covariates <- length(object@data@covariate_names)
-    covariates <- paste0(object@data@covariate_names, collapse = ", ")
+    n_covariates <- length(names(object@data@covariate_data_frame))
+    covariates <- paste0(sort(names(object@data@covariate_data_frame)), collapse = ", ")
     moi <- ifelse(object@data@low_moi, "Low", "High")
     cat(paste0(
         "An object of class ",
@@ -27,7 +27,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         if (funct_run_vect["run_qc"]) {
             paste0(
                 " (",
-                crayon::blue(length(object@preparation@cells_in_use)),
+                crayon::blue(length(object@preparation@analysis_cells)),
                 " after cellwise QC)"
             )
         } else {
@@ -86,7 +86,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     show(x)
 
     # 1. print analysis status
-    funct_run_vect <- workflow_status(x@functs_called)
+    funct_run_vect <- workflow_status(x)
     get_mark <- function(bool) {
         ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
     }
@@ -102,16 +102,11 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     }
 
     # 2. print analysis parameters
-    n_discovery_pairs <- x@preparation@n_discovery_pairs
-    disc_pair_qc_performed <- length(x@preparation@n_ok_discovery_pairs) >= 1
-    n_pc_pairs <- x@preparation@n_positive_control_pairs
-    pc_pair_qc_performed <- length(x@preparation@n_ok_positive_control_pairs) >= 1
+    n_discovery_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) pair_count(x, "discovery") else integer()
+    n_pc_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) pair_count(x, "positive_control") else integer()
     cat(paste0(
         "\nAnalysis parameters: \n",
         "\t\U2022 Discovery pairs:",
-        if (x@nuclear) {
-            " trans"
-        } else {
             if (length(n_discovery_pairs) == 0) {
                 " not specified"
             } else {
@@ -122,15 +117,14 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                     if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
                         paste0(
                             " (",
-                            crayon::blue(x@preparation@n_ok_discovery_pairs),
+                            crayon::blue(pair_count(x, "discovery", passing = TRUE)),
                             " after pairwise QC)"
                         )
                     } else {
                         NULL
                     }
                 )
-            }
-        },
+            },
         "\n\t\U2022 Positive control pairs:",
         if (length(n_pc_pairs) == 0) {
             " not specified"
@@ -142,7 +136,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) {
                     paste0(
                         " (",
-                        crayon::blue(x@preparation@n_ok_positive_control_pairs),
+                        crayon::blue(pair_count(x, "positive_control", passing = TRUE)),
                         " after pairwise QC)"
                     )
                 } else {
@@ -200,7 +194,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             ))
         },
         "\n\t\U2022 Multiple testing adjustment: ",
-        if (x@nuclear || length(x@spec@multiple_testing_method) == 0L) {
+        if (length(x@spec@multiple_testing_method) == 0L) {
             "none"
         } else {
             paste0(
@@ -232,7 +226,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     # 3. print the gRNA-to-cell assignment information
     grna_assignment_run <- funct_run_vect[["assign_grnas"]]
     if (grna_assignment_run) {
-        mean_cells_per_grna <- x@preparation@mean_cells_per_grna
+        mean_cells_per_grna <- mean_assignment_size(x)
         cat(
             paste0(
                 "\n\ngRNA-to-cell assignment information:",
@@ -244,7 +238,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (x@spec@grna_assignment_method == "maximum") {
                     "not computed when using \"maximum\" assignment method"
                 } else {
-                    crayon::blue(x@preparation@grnas_per_cell |> mean() |> round(2))
+                    crayon::blue(x@preparation@guide_counts_per_cell |> mean() |> round(2))
                 }
             ),
             if (x@spec@grna_assignment_method == "mixture") {
@@ -264,13 +258,13 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     calib_check_run <- nrow(current_result(x, "run_calibration_check", required = FALSE)) > 0L
     discovery_analysis_run <- nrow(current_result(x, "run_discovery_analysis", required = FALSE)) > 0L
     power_check_run <- nrow(current_result(x, "run_power_check", required = FALSE)) > 0L
-    if (calib_check_run || discovery_analysis_run) {
+    if (calib_check_run || discovery_analysis_run || power_check_run) {
         cat("\n\nSummary of results:")
     }
     if (calib_check_run) {
-        n_false_rejections <- sum(x@results@calibration_result$significant)
-        mean_lfc <- signif(mean(x@results@calibration_result$log_2_fold_change), 2)
-        n_calib_pairs <- nrow(x@results@calibration_result)
+        n_false_rejections <- sum(current_result(x, "run_calibration_check")$significant)
+        mean_lfc <- signif(mean(current_result(x, "run_calibration_check")$log_2_fold_change), 2)
+        n_calib_pairs <- nrow(current_result(x, "run_calibration_check"))
         cat(paste0(
             "\n\t\U2022 N",
             crayon::red(" negative control "),
@@ -283,7 +277,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (power_check_run) {
-        median_pc_p_value <- stats::median(x@results@power_result$p_value, na.rm = TRUE)
+        median_pc_p_value <- stats::median(current_result(x, "run_power_check")$p_value, na.rm = TRUE)
         cat(paste0(
             "\n\t\U2022 Median",
             crayon::green(" positive control "),
@@ -292,8 +286,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (discovery_analysis_run) {
-        n_discoveries <- sum(x@results@discovery_result$significant, na.rm = TRUE)
-        n_discovery_pairs <- x@preparation@n_ok_discovery_pairs
+        n_discoveries <- sum(current_result(x, "run_discovery_analysis")$significant, na.rm = TRUE)
+        n_discovery_pairs <- pair_count(x, "discovery", passing = TRUE)
         cat(paste0(
             "\n\t\U2022 N",
             crayon::yellow(" discovery pairs "),
@@ -309,11 +303,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' `plot()` creates a plot depicting the current state of a `sceptre_object`.
 #'
 #' `plot()` is "generic" in the sense that it dispatches a specific plotting
-#' function based on the pipeline function that was most recently called on the
-#' `sceptre_object`. For example, if `assign_grnas()` is the most recently
-#' called pipeline function, then `plot()` dispatches `plot_assign_grnas()`.
-#' Similarly, if `run_power_check()` is the most recently called pipeline
-#' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
+#' function based on completed current components. It prefers discovery,
+#' power, then calibration results, followed by QC and guide assignments.
+#' Historical results do not select a plot. Users
 #' can pass arguments to the function dispatched by `plot()` as named arguments
 #' to `plot()`.
 #'
@@ -348,16 +340,14 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
     args <- list(...)
     args[["sceptre_object"]] <- x
 
-    last_function_called <- x@last_function_called
-    if (last_function_called %in% c("import_data", "set_analysis_parameters")) {
-        stop(
-            "There is no generic plot function configured for the ",
-            last_function_called,
-            "() step."
-        )
+    status <- workflow_status(x)
+    candidates <- c("run_discovery_analysis", "run_power_check",
+        "run_calibration_check", "run_qc", "assign_grnas")
+    available <- candidates[status[candidates]]
+    if (!length(available)) {
+        stop("There is no generic plot configured for the current prepared state.")
     }
-
-    funct_to_call <- paste0("plot_", last_function_called)
+    funct_to_call <- paste0("plot_", available[[1L]])
     p <- do.call(what = funct_to_call, args = args)
     return(p)
 })

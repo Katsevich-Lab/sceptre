@@ -69,11 +69,11 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
         assign_grnas(method = "maximum")
 
     # every cell here should look like it has multiple GRNAs
-    expect_equal(scep_low_all_1@preparation@cells_w_zero_or_twoplus_grnas, 1:num_cells)
+    expect_equal(scep_low_all_1@preparation@assignment_exclusions, 1:num_cells)
 
     # first element should have all idx
     expect_equal(
-        scep_low_all_1@preparation@initial_grna_assignment_list,
+        scep_low_all_1@preparation@guide_assignments,
         # every cell is assigned to the first grna_id that appears since they are all tied
         # plus all of these cells will be removed anyway in qc so the assignment doesn't matter
         lapply(
@@ -108,14 +108,14 @@ test_that("assign_grnas method=maximum moi=low grna_matrix all 1", {
         setNames(nt_guides)
 
     expect_equal(
-        scep_low_all_1@preparation@grna_assignments_raw,
+        scep_low_all_1@preparation@source_groups,
         list(
             grna_group_idxs = guide_part_all_1,
             indiv_nt_grna_idxs = nt_part_all_1
         )
     )
     # should be empty for maximum assignment
-    expect_equal(scep_low_all_1@preparation@grnas_per_cell, integer(0))
+    expect_equal(scep_low_all_1@preparation@guide_counts_per_cell, integer(0))
 })
 
 test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
@@ -155,18 +155,18 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
     }) |>
         setNames(test_data_list$grna_target_data_frame$grna_id)
     expect_equal(
-        scep_low_clear_max@preparation@initial_grna_assignment_list,
+        scep_low_clear_max@preparation@guide_assignments,
         expected_initial_assignment_list
     )
     # all cells from idx `num_grnas+1` onward have no UMI counts at all, so they
     # all are considered to have multiple grnas
     expect_equal(
-        scep_low_clear_max@preparation@cells_w_zero_or_twoplus_grnas,
+        scep_low_clear_max@preparation@assignment_exclusions,
         (num_grnas + 1):num_cells
     )
 
     expect_equal(
-        scep_low_clear_max@preparation@grna_assignments_raw,
+        scep_low_clear_max@preparation@source_groups,
         list(
             grna_group_idxs = list(
                 t1_c1_d1 = c(
@@ -194,7 +194,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix clear max", {
         )
     )
     # should be empty for maximum assignment
-    expect_equal(scep_low_clear_max@preparation@grnas_per_cell, integer(0))
+    expect_equal(scep_low_clear_max@preparation@guide_counts_per_cell, integer(0))
 })
 
 test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_threshold", {
@@ -230,7 +230,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
         assign_grnas(method = "maximum", umi_fraction_threshold = .8 - .001)
 
     expect_equal(
-        scep_low_with_low_frac@preparation@cells_w_zero_or_twoplus_grnas,
+        scep_low_with_low_frac@preparation@assignment_exclusions,
         integer(0)
     )
 
@@ -246,7 +246,7 @@ test_that("assign_grnas method=maximum moi=low grna_matrix varying umi_fraction_
         ) |>
         assign_grnas(method = "maximum", umi_fraction_threshold = .8 + .001)
 
-    expect_equal(scep_low_with_high_frac@preparation@cells_w_zero_or_twoplus_grnas, 1)
+    expect_equal(scep_low_with_high_frac@preparation@assignment_exclusions, 1)
 })
 
 test_that("assign_grnas method=threshold moi=low", {
@@ -282,12 +282,12 @@ test_that("assign_grnas method=threshold moi=low", {
         assign_grnas(method = "thresholding", threshold = 25)
 
     expect_equal(
-        scep_low_with_low_thresh@preparation@cells_w_zero_or_twoplus_grnas,
+        scep_low_with_low_thresh@preparation@assignment_exclusions,
         1:num_cells
     )
 
     expect_equal(
-        scep_low_with_low_thresh@preparation@initial_grna_assignment_list,
+        scep_low_with_low_thresh@preparation@guide_assignments,
         lapply(1:num_grnas, function(i) {
             if (i %in% expressed_grna_ids) 1:num_cells else integer(0)
         }) |>
@@ -303,14 +303,14 @@ test_that("assign_grnas method=threshold moi=low", {
         setNames(nt_guides)
 
     expect_equal(
-        scep_low_with_low_thresh@preparation@grna_assignments_raw,
+        scep_low_with_low_thresh@preparation@source_groups,
         list(
             grna_group_idxs = guide_part,
             indiv_nt_grna_idxs = nt_part
         )
     )
 
-    expect_equal(scep_low_with_low_thresh@preparation@grnas_per_cell, rep(2, num_cells))
+    expect_equal(scep_low_with_low_thresh@preparation@guide_counts_per_cell, rep(2, num_cells))
 
     # no cell is flagged as expressing multiple grnas ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     scep_low_with_high_thresh <- import_data(
@@ -325,13 +325,13 @@ test_that("assign_grnas method=threshold moi=low", {
         assign_grnas(method = "thresholding", threshold = 26)
 
     expect_equal(
-        scep_low_with_high_thresh@preparation@cells_w_zero_or_twoplus_grnas,
+        scep_low_with_high_thresh@preparation@assignment_exclusions,
         integer(0)
     )
 
     # `i == 5` is used because g1_t1_c3_d1 is the 5th grna_id and is what all these cells are assigned to
     expect_equal(
-        scep_low_with_high_thresh@preparation@initial_grna_assignment_list,
+        scep_low_with_high_thresh@preparation@guide_assignments,
         lapply(1:num_grnas, function(i) {
             if (i == 5) 1:num_cells else integer(0)
         }) |>
@@ -347,13 +347,13 @@ test_that("assign_grnas method=threshold moi=low", {
         setNames(nt_guides)
 
     expect_equal(
-        scep_low_with_high_thresh@preparation@grna_assignments_raw,
+        scep_low_with_high_thresh@preparation@source_groups,
         list(
             grna_group_idxs = guide_part,
             indiv_nt_grna_idxs = nt_part
         )
     )
-    expect_equal(scep_low_with_high_thresh@preparation@grnas_per_cell, rep(1, num_cells))
+    expect_equal(scep_low_with_high_thresh@preparation@guide_counts_per_cell, rep(1, num_cells))
 })
 
 test_that("assign_grnas method=threshold moi=high", {
@@ -388,10 +388,10 @@ test_that("assign_grnas method=threshold moi=high", {
         ) |>
         assign_grnas(method = "thresholding", threshold = 25)
 
-    expect_equal(scep_high_with_low_thresh@preparation@grnas_per_cell, rep(2, num_cells))
+    expect_equal(scep_high_with_low_thresh@preparation@guide_counts_per_cell, rep(2, num_cells))
 
     expect_equal(
-        scep_high_with_low_thresh@preparation@initial_grna_assignment_list,
+        scep_high_with_low_thresh@preparation@guide_assignments,
         lapply(1:num_grnas, function(i) {
             if (i <= 2) 1:num_cells else integer(0)
         }) |>
@@ -410,10 +410,10 @@ test_that("assign_grnas method=threshold moi=high", {
         ) |>
         assign_grnas(method = "thresholding", threshold = 55)
 
-    expect_equal(scep_high_with_high_thresh@preparation@grnas_per_cell, rep(1, num_cells))
+    expect_equal(scep_high_with_high_thresh@preparation@guide_counts_per_cell, rep(1, num_cells))
 
     expect_equal(
-        scep_high_with_high_thresh@preparation@initial_grna_assignment_list,
+        scep_high_with_high_thresh@preparation@guide_assignments,
         lapply(1:num_grnas, function(i) {
             if (i == 1) 1:num_cells else integer(0)
         }) |>
@@ -473,19 +473,19 @@ test_that("assign_grnas method=mixture moi=high", {
         assign_grnas(method = "mixture")
 
     expect_equal(
-        scep_high_mixture@preparation@initial_grna_assignment_list$grna_1,
+        scep_high_mixture@preparation@guide_assignments$grna_1,
         cells_getting_grna_1
     )
     expect_equal(
-        scep_high_mixture@preparation@initial_grna_assignment_list$grna_2,
+        scep_high_mixture@preparation@guide_assignments$grna_2,
         cells_getting_grna_2
     )
     expect_equal(
-        scep_high_mixture@preparation@initial_grna_assignment_list$grna_3,
+        scep_high_mixture@preparation@guide_assignments$grna_3,
         cells_getting_grna_3
     )
     expect_equal(
-        scep_high_mixture@preparation@initial_grna_assignment_list$nt_1,
+        scep_high_mixture@preparation@guide_assignments$nt_1,
         cells_getting_nt_1
     )
 })

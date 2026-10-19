@@ -12,8 +12,8 @@ refactor_pair_object <- function() {
         end = c(100L, 120L, 110L, 110L, 30L, 1800000020L)
     )
     methods::new("sceptre_object", data = methods::new("ScreenData",
-                 response_matrix = list(response), grna_target_data_frame = metadata),
-        preparation = methods::new("PreparationRecord", grna_target_data_frame = metadata))
+                 response_matrix = set_matrix_accessibility(response), grna_target_data_frame = metadata),
+        preparation = methods::new("PreparationRecord", guide_groups = metadata$grna_target))
 }
 
 test_that("cis native positions follow the inclusive predicate in supplied order", {

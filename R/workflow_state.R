@@ -1,101 +1,107 @@
-# The saved object records which workflow steps have finished. Define their
-# order and prerequisites here. Calibration, power and discovery are separate
-# final analyses: finishing one does not mark either of the others as finished.
-#' List the workflow steps and the order in which they may run
-#' @return Named integer vector for the seven saved workflow flags. Import,
-#'   parameters, assignment and QC have increasing step numbers. Calibration,
-#'   power and discovery all have number 5: none requires another final analysis.
-#' @noRd
-workflow_steps <- function() {
-    c(
-        import_data = 1L,
-        set_analysis_parameters = 2L,
-        assign_grnas = 3L,
-        run_qc = 4L,
-        run_calibration_check = 5L,
-        run_power_check = 5L,
-        run_discovery_analysis = 5L
-    )
+# A preparation stage exists only after successful validation. Results are
+# completed records with their own scientific input identity. No call journal or
+# duplicate workflow flags are saved in the public coordinator.
+# Formula environments are execution contexts, not stable value identities. The
+# actual compiled design and durable assignment values are fingerprinted below.
+identity_value <- function(x) {
+    if (inherits(x, "formula")) return(list(formula = paste(deparse(x), collapse = "")))
+    if (is.list(x) && !is.data.frame(x)) return(lapply(x, identity_value))
+    x
 }
 
-#' Mark import as complete and all later workflow steps as incomplete
-#' @return Named logical vector in workflow order, ready to save in the object.
-#' @noRd
-workflow_initial_state <- function() {
-    steps <- workflow_steps()
-    stats::setNames(steps == 1L, names(steps))
+preparation_stage_names <- function() c("design", "assignment", "cell_qc", "pair_qc")
+
+stage_input_identity <- function(object, stage) {
+    p <- object@preparation
+    s <- object@spec
+    inputs <- switch(stage,
+        design = list(object@data@identity, s@formula_object, s@grna_integration_strategy,
+            s@discovery_pairs, s@positive_control_pairs, p@design_matrix,
+            p@guide_groups, p@discovery_pairs, p@positive_control_pairs),
+        assignment = list(object@data@identity, s@grna_assignment_method,
+            s@grna_assignment_hyperparameters, p@guide_groups,
+            p@guide_assignments, p@source_groups,
+            p@assignment_exclusions),
+        cell_qc = list(object@data@identity, p@stages$assignment$identity,
+            s@cellwise_qc_thresholds, s@additional_cells_to_remove,
+            p@analysis_cells, p@cell_removal_metrics, p@analysis_groups),
+        pair_qc = list(object@data@identity, p@stages$cell_qc$identity,
+            s@grna_integration_strategy, s@n_nonzero_trt_thresh,
+            s@n_nonzero_cntrl_thresh, p@discovery_pairs, p@positive_control_pairs,
+            p@discovery_pairs_with_info, p@positive_control_pairs_with_info,
+            p@nt_nonzero_matrix, p@control_nonzero_totals),
+        stop("Unknown preparation stage: ", stage))
+    digest::digest(identity_value(inputs), algo = "sha256")
 }
 
-#' Check that prerequisites finished and mark the requested step as complete
-#' @param functs_called Named logical vector containing all seven workflow flags.
-#' @param curr_funct Name of the workflow function being called.
-#' @return Updated flags: the current step becomes TRUE and steps later in the
-#'   workflow become FALSE. Other final analyses at the same step number, and
-#'   any extra unrecognized flags, retain their values.
-#' @details Require all steps at the immediately preceding number. For example,
-#'   QC requires guide assignment. Repeating discovery does not clear calibration
-#'   or power, since all three share the final step number. This updates flags
-#'   only; the caller runs the analysis and handles saved fits separately.
-#' @noRd
-workflow_transition <- function(functs_called, curr_funct) {
-    steps <- workflow_steps()
-    curr_rank <- steps[[curr_funct]]
-    prerequisites <- names(steps)[steps == curr_rank - 1L]
-    if (!all(functs_called[prerequisites])) {
-        stop(paste0(
-            "The function",
-            if (length(prerequisites) >= 2L) "s " else " ",
-            paste0("`", prerequisites, "()`", collapse = ", "),
-            " must be called before `",
-            curr_funct,
-            "()` is called."
-        ))
+stage_complete <- function(object, stage) {
+    if (stage == "import_data") return(length(object@data@identity) == 1L)
+    stage <- switch(stage, set_analysis_parameters = "design", assign_grnas = "assignment", stage)
+    if (stage == "run_qc") return(stage_complete(object, "cell_qc") && stage_complete(object, "pair_qc"))
+    if (!stage %in% preparation_stage_names()) stop("Unknown preparation stage: ", stage)
+    record <- object@preparation@stages[[stage]]
+    if (!is.list(record) || is.null(record$identity)) return(FALSE)
+    dependency <- switch(stage, design = "import_data", assignment = "design",
+        cell_qc = "assignment", pair_qc = "cell_qc")
+    stage_complete(object, dependency) && identical(record$identity, stage_input_identity(object, stage))
+}
+
+require_stage <- function(object, stage) {
+    if (!stage_complete(object, stage)) {
+        public <- switch(stage, design = "set_analysis_parameters", assignment = "assign_grnas",
+            cell_qc = "run_qc", pair_qc = "run_qc", stage)
+        stop("The function `", public, "()` must be called successfully before this stage.")
     }
-    functs_called[curr_funct] <- TRUE
-    functs_called[names(steps)[steps > curr_rank]] <- FALSE
-    functs_called
+    invisible(NULL)
 }
 
-#' Put saved workflow flags in the order used for display
-#' @param functs_called Named logical vector of saved workflow flags.
-#' @return Known flags in workflow order, followed by unrecognized flags in their
-#'   original order. Values are unchanged; displaying a flag does not check
-#'   prerequisites or decide whether a step is complete.
-#' @noRd
-workflow_status <- function(functs_called) {
-    # Keep extra flags from saved objects in the display, after known steps,
-    # so showing status does not silently discard that information.
-    order <- c(
-        intersect(names(workflow_steps()), names(functs_called)),
-        setdiff(names(functs_called), names(workflow_steps()))
-    )
-    functs_called[order]
+begin_preparation_stage <- function(object, stage) {
+    stage <- switch(stage, set_analysis_parameters = "design", assign_grnas = "assignment", run_qc = "cell_qc", stage)
+    dependency <- switch(stage, design = "import_data", assignment = "design",
+        cell_qc = "assignment", pair_qc = "cell_qc")
+    if (is.null(dependency)) stop("Unknown preparation stage: ", stage)
+    require_stage(object, dependency)
+    downstream <- switch(stage, design = preparation_stage_names(),
+        assignment = c("assignment", "cell_qc", "pair_qc"),
+        cell_qc = c("cell_qc", "pair_qc"), pair_qc = "pair_qc")
+    object@preparation@stages[downstream] <- NULL
+    invalidate_result_records(object, paste(stage, "inputs changed"))
 }
 
-#' Validate prerequisites and begin a preparation stage
-#' @param sceptre_object Sceptre object; the caller must keep the returned object.
-#' @param curr_funct Name of the workflow function being called.
-#' @return Object with downstream flags cleared and the requested stage incomplete.
-#'   The coordinator commits completion only after validated successful work.
-#' @noRd
-perform_status_check_and_update <- function(sceptre_object, curr_funct) {
-    sceptre_object@functs_called <- workflow_transition(
-        sceptre_object@functs_called,
-        curr_funct
-    )
-    sceptre_object@functs_called[curr_funct] <- FALSE
-    sceptre_object
+commit_preparation_stage <- function(object, stage) {
+    validObject(object)
+    p <- object@preparation
+    if (stage == "design") {
+        if (nrow(p@design_matrix) != ncol(get_response_matrix(object)) ||
+            length(p@guide_groups) != nrow(object@data@grna_target_data_frame)) {
+            stop("Design and guide mapping must align with imported data.")
+        }
+    } else if (stage == "assignment") {
+        if (!all(c("grna_group_idxs", "indiv_nt_grna_idxs") %in% names(p@source_groups))) {
+            stop("Source guide groups must be prepared before assignment is committed.")
+        }
+    } else if (stage == "cell_qc") {
+        if (!length(p@analysis_cells) || !is.list(p@analysis_groups$grna_group_idxs)) {
+            stop("Cell QC must produce retained cells and aligned guide groups.")
+        }
+    } else if (stage == "pair_qc") {
+        for (type in c("discovery", "positive_control")) {
+            pairs <- methods::slot(p, paste0(type, "_pairs_with_info"))
+            if (nrow(pairs) != nrow(methods::slot(p, paste0(type, "_pairs"))) ||
+                (nrow(pairs) && (!all(c("response_id", "grna_group", "n_nonzero_trt",
+                    "n_nonzero_cntrl", "pass_qc") %in% names(pairs)) || anyNA(pairs$pass_qc)))) {
+                stop("Pair QC must cover the complete prepared hypothesis family.")
+            }
+        }
+    } else stop("Unknown preparation stage: ", stage)
+    object@preparation@stages[[stage]] <- list(identity = stage_input_identity(object, stage))
+    object
 }
 
-# Preparation may be returned independently of execution. It must never be
-# mistaken for a completed analysis, even when rerunning a previous analysis.
-begin_analysis_stage <- function(sceptre_object, curr_funct) {
-    flags <- workflow_transition(sceptre_object@functs_called, curr_funct)
-    flags[curr_funct] <- FALSE
-    sceptre_object@functs_called <- flags
-    if (!is.null(sceptre_object@results@records[[curr_funct]])) {
-        sceptre_object@results@records[[curr_funct]]$status <- "historical"
-        sceptre_object@results@records[[curr_funct]]$invalidation_reason <- "analysis prepared for rerun"
-    }
-    sceptre_object
+workflow_status <- function(object) {
+    preparation <- c(import_data = stage_complete(object, "import_data"),
+        set_analysis_parameters = stage_complete(object, "design"),
+        assign_grnas = stage_complete(object, "assignment"), run_qc = stage_complete(object, "run_qc"))
+    analyses <- names(result_analysis_fields())
+    c(preparation, stats::setNames(vapply(analyses, function(name) result_record_is_current(object, name), logical(1)), analyses))
 }

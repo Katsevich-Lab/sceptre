@@ -52,9 +52,9 @@ determine_cells_to_retain <- function(
 
     # 4. compute cells to retain based on cells containing multiple grnas (if in
     # low MOI)
-    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@preparation@cells_w_zero_or_twoplus_grnas
+    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@preparation@assignment_exclusions
     n_cells_rm_zero_twoplus_grnas <- length(
-        sceptre_object@preparation@cells_w_zero_or_twoplus_grnas
+        sceptre_object@preparation@assignment_exclusions
     )
 
     # 5. finally, determine the set of cells to retain, and update the
@@ -73,7 +73,7 @@ determine_cells_to_retain <- function(
     } else {
         seq(1L, n_cells)[-cells_to_exclude]
     }
-    sceptre_object@preparation@cells_in_use <- cells_to_retain
+    sceptre_object@preparation@analysis_cells <- cells_to_retain
     n_cells_rm_total <- n_cells - length(cells_to_retain)
     cell_removal_metrics <- c(
         n_cells_rm_n_umis = n_cells_rm_n_umis,
@@ -99,8 +99,8 @@ determine_cells_to_retain <- function(
 #' @noRd
 update_grna_assignments_given_qc <- function(sceptre_object) {
     # Read the saved original-cell assignments and the cells retained by QC.
-    cells_in_use <- sceptre_object@preparation@cells_in_use
-    grna_assignments_raw <- sceptre_object@preparation@grna_assignments_raw
+    cells_in_use <- sceptre_object@preparation@analysis_cells
+    grna_assignments_raw <- sceptre_object@preparation@source_groups
     n_cells <- ncol(get_response_matrix(sceptre_object))
 
     analysis_to_source <- prepare_cell_map(cells_in_use, n_cells)
@@ -138,6 +138,6 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     }
 
     # 4. update the sceptre_object and return
-    sceptre_object@preparation@grna_assignments <- grna_assignments
+    sceptre_object@preparation@analysis_groups <- grna_assignments
     return(sceptre_object)
 }

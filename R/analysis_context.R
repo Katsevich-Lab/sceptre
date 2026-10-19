@@ -256,6 +256,7 @@ make_treatment_index_lookup <- function(index) {
 #'   response fits that are still valid for its current settings.
 #' @param analysis One of `calibration_check`, `power_check`, `discovery_analysis`.
 #' @param pairs Validated gene-guide pairs that passed QC, in request order.
+#' @param plan Optional validated transient run plan.
 #' @return A temporary list containing the count matrix (`response_store`), cell
 #'   and pair lookups (`index`), shared cell selection (`common_view`), and design
 #'   rows selected in the same order (`design`). It also contains the requested
@@ -267,13 +268,19 @@ make_treatment_index_lookup <- function(index) {
 #'   when the formula contains only an intercept. The saved object and its full
 #'   design matrix are left unchanged.
 #' @noRd
-prepare_analysis_context <- function(object, analysis, pairs) {
-    total_resamples <- checked_resampling_total(object@spec@B1, object@spec@B2, object@spec@B3)
+prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
+    if (is.null(plan)) plan <- make_run_plan(object, analysis, pairs)
+    validate_run_plan(object, plan)
+    if (!identical(plan$analysis, analysis_record_name(analysis))) stop("Analysis type does not match run plan.")
+    analysis <- sub("^run_", "", analysis)
+    expected <- dplyr::filter(plan$pairs, pass_qc)
+    if (!identical(lapply(pairs, identity), lapply(expected, identity))) stop("Analysis pairs do not match the run plan's eligible family.")
+    total_resamples <- checked_resampling_total(plan$B1, plan$B2, plan$B3)
     store <- get_response_matrix(object)
     index <- prepare_index_context(
-        object@preparation@cells_in_use,
+        object@preparation@analysis_cells,
         ncol(store),
-        object@preparation@grna_assignments,
+        object@preparation@analysis_groups,
         pairs,
         rownames(store),
         identical(analysis, "calibration_check"),
@@ -283,15 +290,15 @@ prepare_analysis_context <- function(object, analysis, pairs) {
     common_view <- make_fit_view(index)
     identity <- response_fit_identity(object, common_view@source_cells)
     cache <- if (identical(object@fits@identity, identity)) {
-        object@fits@response_precomputations
+        object@fits@entries
     } else list()
     list(
         fit_identity = identity,
         response_store = store,
         index = index,
         common_view = common_view,
-        design = object@preparation@covariate_matrix[
-            common_view$source_cells,
+        design = object@preparation@design_matrix[
+            common_view@source_cells,
             ,
             drop = FALSE
         ],
@@ -300,9 +307,9 @@ prepare_analysis_context <- function(object, analysis, pairs) {
         shared_response_fit = index$calibration_check ||
             index$control_group_complement,
         test_options = list(
-            B1 = object@spec@B1,
-            B2 = object@spec@B2,
-            B3 = object@spec@B3,
+            B1 = plan$B1,
+            B2 = plan$B2,
+            B3 = plan$B3,
             total_resamples = total_resamples,
             side_code = object@spec@side_code,
             fit_parametric_curve = object@spec@resampling_approximation ==

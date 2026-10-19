@@ -36,7 +36,8 @@
 #' cell_covariates <- get_cell_covariates(sceptre_object)
 get_response_matrix <- function(sceptre_object) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    return(sceptre_object@data@response_matrix[[1]])
+    store <- sceptre_object@data@response_matrix
+    return(count_store_value(store))
 }
 
 #' Get gRNA matrix
@@ -45,7 +46,8 @@ get_response_matrix <- function(sceptre_object) {
 #' @export
 get_grna_matrix <- function(sceptre_object) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    return(sceptre_object@data@grna_matrix[[1]])
+    store <- sceptre_object@data@grna_matrix
+    return(count_store_value(store))
 }
 
 #' Get cell covariates
@@ -110,12 +112,12 @@ get_cell_covariates <- function(sceptre_object) {
 #' )
 get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    if (!sceptre_object@functs_called[["assign_grnas"]]) {
+    if (!stage_complete(sceptre_object, "assignment")) {
         stop(
             "`assign_grnas()` has not yet been called on the `sceptre_object`."
         )
     }
-    initial_grna_assignment_list <- sceptre_object@preparation@initial_grna_assignment_list
+    initial_grna_assignment_list <- sceptre_object@preparation@guide_assignments
     grna_ids <- names(initial_grna_assignment_list)
     names(initial_grna_assignment_list) <- NULL
     # Saved assignments are original cell columns starting at 1. Subtracting
@@ -133,34 +135,32 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     )
     rownames(mat) <- grna_ids
     if (apply_cellwise_qc) {
-        if (!sceptre_object@functs_called[["run_qc"]]) {
+        if (!stage_complete(sceptre_object, "run_qc")) {
             stop("QC has not yet been called on this sceptre_object.")
         }
         # Keep Matrix's usual subsetting: a single remaining row/column may
         # become a vector rather than a matrix.
-        mat <- mat[, sceptre_object@preparation@cells_in_use]
+        mat <- mat[, sceptre_object@preparation@analysis_cells]
     }
     return(mat)
 }
 
 #' Replace the response matrix stored in the object
 #'
-#' Keep the one-element list used by the saved-object format. Its element may be
-#' an in-memory matrix, an ondisc matrix, or the empty list used when saving an
-#' object without open file handles. Return the updated object; do not read or
-#' convert the supplied matrix here.
+#' Normalize a replacement count store and refresh its imported summaries.
+#' Return the updated object after dependent preparation and fits are cleared.
 #' @noRd
 set_response_matrix <- function(sceptre_object, response_matrix) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     previous <- sceptre_object@data@response_matrix
-    if (length(sceptre_object@data@identity) && !methods::is(response_matrix, "odm") &&
+    if (length(sceptre_object@data@identity) && !inherits(response_matrix, "odm") && !methods::is(response_matrix, "BackedCountStore") &&
         !is.null(dim(response_matrix))) {
         response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
     }
-    if (length(previous) && !identical(dimnames(previous[[1L]]), dimnames(response_matrix))) {
+    if (length(previous) && !identical(dimnames(previous), dimnames(response_matrix))) {
         stop("Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.")
     }
-    sceptre_object@data@response_matrix <- list(response_matrix)
+    sceptre_object@data@response_matrix <- as_count_store(response_matrix)
     validObject(sceptre_object@data)
     if (length(sceptre_object@data@identity) &&
         !identical(previous, sceptre_object@data@response_matrix)) {
@@ -172,20 +172,19 @@ set_response_matrix <- function(sceptre_object, response_matrix) {
 
 #' Replace the guide matrix stored in the object
 #'
-#' As with set_response_matrix(), keep the saved format's one-element list and
-#' return the updated object. The caller supplies the matrix or empty placeholder.
+#' Replace normalized guide counts and refresh the assignment summaries.
 #' @noRd
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     previous <- sceptre_object@data@grna_matrix
-    if (length(sceptre_object@data@identity) && !methods::is(grna_matrix, "odm") &&
+    if (length(sceptre_object@data@identity) && !inherits(grna_matrix, "odm") && !methods::is(grna_matrix, "BackedCountStore") &&
         !is.null(dim(grna_matrix))) {
         grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
     }
-    if (length(previous) && !identical(dimnames(previous[[1L]]), dimnames(grna_matrix))) {
+    if (length(previous) && !identical(dimnames(previous), dimnames(grna_matrix))) {
         stop("Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.")
     }
-    sceptre_object@data@grna_matrix <- list(grna_matrix)
+    sceptre_object@data@grna_matrix <- as_count_store(grna_matrix)
     validObject(sceptre_object@data)
     if (length(sceptre_object@data@identity) &&
         !identical(previous, sceptre_object@data@grna_matrix)) {
@@ -198,8 +197,8 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
 # Content replacement is atomic with its imported summaries. Backing relocation
 # uses verified descriptors instead; replacing backed content requires reimport.
 refresh_imported_summaries <- function(object, modality) {
-    store <- methods::slot(object@data, paste0(modality, "_matrix"))[[1L]]
-    if (methods::is(store, "odm") || is.null(dim(store))) {
+    store <- methods::slot(object@data, paste0(modality, "_matrix"))
+    if (methods::is(store, "BackedCountStore") || is.null(dim(store))) {
         stop("Use import_data() to replace backed screen content and its import summaries.")
     }
     labels <- object@data@response_names
@@ -219,6 +218,5 @@ refresh_imported_summaries <- function(object, modality) {
     for (field in names(summaries)) {
         object@data@covariate_data_frame[[paste0(modality, "_", field)]] <- summaries[[field]]
     }
-    object@data@covariate_names <- sort(names(object@data@covariate_data_frame))
     object
 }

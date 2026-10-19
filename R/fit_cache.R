@@ -14,7 +14,7 @@
 #'   not remove fits from the object.
 #' @noRd
 response_cache_parameters_changed <- function(object, design, complement) {
-    !identical(object@preparation@covariate_matrix, design) ||
+    !identical(object@preparation@design_matrix, design) ||
         !identical(object@spec@control_group_complement, complement)
 }
 
@@ -49,7 +49,7 @@ invalidate_response_cache <- function(object, event, changed) {
     # clear the same saved-fit list.
     stopifnot(event %in% c("parameters", "assignments", "analysis_cells"))
     if (changed) {
-        object@fits@response_precomputations <- list()
+        object@fits@entries <- list()
         object@fits@identity <- list()
     }
     object
@@ -75,7 +75,11 @@ lookup_response_fit <- function(cache, response_id) cache[[response_id]]
 merge_response_fits <- function(cache, updates) {
     # Each worker returns only newly fitted genes. Keep the old fits first,
     # followed by the new coefficients and dispersion estimates.
-    c(cache, updates)
+    combined <- c(cache, updates)
+    if (length(combined) && (is.null(names(combined)) || anyDuplicated(names(combined)))) {
+        stop("Response fit identifiers must be unique.")
+    }
+    combined
 }
 
 #' Save response fits after an analysis finishes successfully
@@ -88,8 +92,13 @@ merge_response_fits <- function(cache, updates) {
 commit_response_fits <- function(object, cache) {
     identity <- attr(cache, "fit_identity")
     attr(cache, "fit_identity") <- NULL
-    object@fits@identity <- if (is.null(identity)) list() else identity
-    object@fits@response_precomputations <- cache
+    candidate <- new("ResponseFitCache", entries = cache,
+        identity = if (is.null(identity)) list() else identity)
+    if (length(cache) && !identical(identity, response_fit_identity(object, identity$cells))) {
+        stop("Response fits do not match the actual fitting inputs.")
+    }
+    object@fits <- candidate
+    validObject(object)
     object
 }
 
@@ -98,7 +107,8 @@ commit_response_fits <- function(object, cache) {
 # the current Poisson-fit/dispersion algorithm.
 response_fit_identity <- function(object, source_cells) {
     list(data = object@data@identity, cells = as.integer(source_cells),
-        design = digest::digest(object@preparation@covariate_matrix[
+        columns = colnames(object@preparation@design_matrix),
+        design = digest::digest(object@preparation@design_matrix[
             source_cells, , drop = FALSE], algo = "sha256"),
         method = "poisson-glm.fit-then-dispersion-v1")
 }
@@ -107,10 +117,7 @@ response_fit_identity <- function(object, source_cells) {
 # backing descriptor uses a separate path and does not call this mutator.
 invalidate_screen_dependents <- function(object) {
     object <- invalidate_result_records(object, "screen content replaced")
-    object@fits <- new("FitRecord")
-    object@preparation <- new("PreparationRecord",
-        grna_target_data_frame = object@data@grna_target_data_frame)
-    object@functs_called <- workflow_initial_state()
-    object@last_function_called <- "import_data"
+    object@fits <- new("ResponseFitCache")
+    object@preparation <- new("PreparationRecord")
     initialize_screen_identity(object)
 }

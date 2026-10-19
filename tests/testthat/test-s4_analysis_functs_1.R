@@ -34,15 +34,14 @@ test_that("import_data", {
     )
 
     expect_identical(slotNames(sceptre_object_high_with_ec),
-        c("data", "spec", "preparation", "fits", "results", "last_function_called",
-          "functs_called", "nuclear", "nf_pipeline", "elements_to_analyze", "schema_version"))
+        c("data", "spec", "preparation", "fits", "results", "schema_version"))
     for (object in list(sceptre_object_low_no_ec_with_response_names,
                         sceptre_object_high_with_ec)) {
-        expect_identical(object@schema_version, 2L)
+        expect_identical(object@schema_version, 3L)
         expect_s4_class(object@data, "ScreenData")
         expect_s4_class(object@spec, "AnalysisSpec")
         expect_s4_class(object@preparation, "PreparationRecord")
-        expect_s4_class(object@fits, "FitRecord")
+        expect_s4_class(object@fits, "ResponseFitCache")
         expect_s4_class(object@results, "ResultRecord")
     }
 
@@ -93,11 +92,7 @@ test_that("import_data", {
 
     ##### slots set in section 5 of `import_data`
     expect_equal(
-        sceptre_object_high_with_ec@last_function_called,
-        "import_data"
-    )
-    expect_equal(
-        names(sceptre_object_high_with_ec@functs_called),
+        names(refactor_private("workflow_status")(sceptre_object_high_with_ec)),
         c(
             "import_data",
             "set_analysis_parameters",
@@ -109,7 +104,7 @@ test_that("import_data", {
         )
     )
     expect_equal(
-        sceptre_object_high_with_ec@functs_called |> as.logical(),
+        refactor_private("workflow_status")(sceptre_object_high_with_ec) |> as.logical(),
         rep(c(TRUE, FALSE), c(1, 6))
     )
 })

@@ -15,13 +15,13 @@ construct_negative_control_pairs <- function(
     calibration_group_size
 ) {
     message("Constructing negative control pairs.")
-    grna_assignments <- sceptre_object@preparation@grna_assignments
+    grna_assignments <- sceptre_object@preparation@analysis_groups
     response_matrix <- get_response_matrix(sceptre_object)
     n_nonzero_trt_thresh <- sceptre_object@spec@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@spec@n_nonzero_cntrl_thresh
-    n_nonzero_m <- sceptre_object@preparation@M_matrix
-    n_nonzero_tot <- sceptre_object@preparation@n_nonzero_tot_vector
-    cells_in_use <- sceptre_object@preparation@cells_in_use
+    n_nonzero_m <- sceptre_object@preparation@nt_nonzero_matrix
+    n_nonzero_tot <- sceptre_object@preparation@control_nonzero_totals
+    cells_in_use <- sceptre_object@preparation@analysis_cells
     discovery_pairs_with_info <- sceptre_object@preparation@discovery_pairs_with_info
 
     N_POSSIBLE_GROUPS_THRESHOLD <- 100L
@@ -40,7 +40,7 @@ construct_negative_control_pairs <- function(
         )
     } else {
         # sample from the set of combinations
-        p_hat <- if (sceptre_object@preparation@n_discovery_pairs == 0L) {
+        p_hat <- if (pair_count(sceptre_object, "discovery") == 0L) {
             0.1
         } else {
             mean(discovery_pairs_with_info$pass_qc)

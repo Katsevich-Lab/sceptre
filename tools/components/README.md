@@ -1,77 +1,43 @@
 # Component object model
 
-The public `sceptre_object` coordinates five persistent S4 components and a
-schema version. Numerical kernels continue to use ordinary matrices, vectors
-and lists. `ScreenData` owns imported counts, aligned canonical cells,
-covariates, guide metadata and backend identity. `AnalysisSpec` owns requested
-choices; result records freeze the effective settings used by each run.
-`PreparationRecord` owns assignment, QC, compiled design and pair eligibility,
-with separate preparation stage status. Imported guide metadata remains canonical
-in `ScreenData`; derived guide groups belong to `PreparationRecord`. `FitRecord` owns response fits and
-identities. `ResultRecord` owns tables and their run provenance. `CellView` is
-a temporary, small index mapping used during computation.
+The final schema is version 3. `sceptre_object` coordinates five persistent
+components: imported `ScreenData`, requested `AnalysisSpec`, compiled
+`PreparationRecord`, compact `ResponseFitCache`, and entry-owned `ResultRecord`.
+`CellView` and run plans are temporary computation values.
 
-Assignments use original source-cell coordinates before QC. Analysis and fit
-views validate their ordered mappings rather than copying full count matrices
-per pair. Response-fit identity includes data identity, actual design values
-and ordered fitting cells; guide probabilities and CRT draws remain transient.
-A working-spec change can make a result historical without erasing its table.
-Plots, getters and output writers must check current result validity.
+- [Exact per-object fields and declared types](schema3/OBJECT_FIELDS.md), generated
+  from the current S4 class definitions with exhaustive description checks.
+- [Architecture and nested payload contracts](schema3/ARCHITECTURE.md).
+- [Exhaustive legacy-field ownership decisions](schema3/FIELD_DECISIONS.md).
+- [Schema 3 qualification](schema3/VALIDATION.md).
+- [Earlier schema 2 qualification](validation/README.md), preserved as historical evidence.
 
-Computation returns a proposal before the coordinator commits completion.
-Preparing an analysis does not mark it completed; failed computation cannot
-commit new results or a completed flag. Worker blocks retain their original
-order and sampler behavior. Both association and mixture assignment collection
-reject failed workers or lost replies before joining their output.
+Canonical requested target-response pairs stay in `AnalysisSpec`. Expanded guide
+families, design, assignment and QC payloads belong to preparation. Preparation
+stage presence plus its validated input identity establishes completion; status
+and plot selection are derived. Cheap counters and last-called flags are absent.
+Run budgets, realized calibration families and execution choices are transient;
+a completed result freezes its effective plan and requested-spec snapshot.
+Each result entry owns its table, identity, scope, provenance and history.
 
-Schema 2 removes the legacy flat slots rather than maintaining a second copy.
-`migrate_sceptre_object()` reads actual serialized legacy attributes and moves
-known fields to their component owners. Legacy tables remain readable; unknown
-fit and run provenance must not be treated as proof of reusable computations.
-Save/read tests cover the real versioned fixture and current round trips.
-Backed storage persists descriptors and validates identity when reopening live
-handles. Backend location alone is not data content identity.
+Count slots use the `CountStore` union of `dgRMatrix`, `BackedCountStore` and
+`NULL`. The small backed adapter owns one descriptor and an optional live
+external pointer. It does not name any optional class in its type definition.
+Package loading, in-memory workflows and closed descriptor inspection do not
+load `ondisc`; only backed numerical access requires it. Save closes the handle
+while retaining the anchored descriptor. Reopen verifies content identity and
+allows relocation of unchanged files.
 
-Nextflow adaptation and compatibility qualification are deferred. Its direct
-slot and private-function accesses are not a constraint on this R schema.
+Active backing files must remain unchanged during an analysis. Getters, plots,
+reporting and per-gene loops do not hash them. In-memory replacement preserves
+feature/cell identities, refreshes import summaries and invalidates dependent
+preparation, fits and results. Replacing backed content requires reimport.
+Schema 1/2 migration reads physical saved attributes only at the boundary;
+unknown results remain historical and unverified fits are discarded.
 
-The installed ondisc dependency has two preexisting native boundary bugs.
-The SCEPTRE pair-count adapter supplies an inert sentinel beyond the feature
-row domain to keep an older native helper's final lookahead inside its request
-vector; it trims that unused output before restoring request order. Independent
-backed count, empty-request and workflow tests assert warning-free results.
-The test-only matrix-conversion comparison still calls ondisc's independent
-oracle and explicitly accepts its two known pointer-boundary warning messages;
-it also accepts zero warnings from a fixed dependency. Other warnings remain
-visible and fail that oracle check. These are dependency qualification limits,
-not a change to stored-entry counting or statistical algorithms.
-
-
-Active backing files must remain unchanged for the lifetime of an analysis.
-After an in-memory import, the original input files are independent of the
-object. Arbitrary external edits to active backing files are unsupported;
-getters, plots, reporting and per-gene loops do not monitor or hash the files.
-Import anchors file identity, shape, feature/cell names and import ID in
-`ScreenData`. Reopen verifies the descriptor and may change the path after
-verification. Save preserves the original descriptor and checks it rather than
-silently rebaselining claimed original provenance with a fresh hash. Wrong-file
-reopen and relocation of unchanged files are covered by regression tests.
-
-In-memory replacement through the internal setters preserves feature and cell
-identity, normalizes row access, recomputes count-derived cell summaries and
-maximum-guide information, and invalidates preparation/fits/current results.
-Replacing backed content or changing feature/cell identities requires a fresh
-`import_data()`; legacy mitochondrial feature labels can be unknown, in which
-case response replacement also requires reimport. Imported guide metadata stays
-canonical while working grouping columns live in preparation.
-
-Requested settings and effective settings are distinct: the original public
-parameter arguments are retained, each result freezes its realized budget and
-family, and legacy requests are explicitly unknown. Changing the working B3 for
-calibration does not alter an earlier run. Power/discovery reconstruct the same
-QC budget policy used before this migration. Raw tests are conservatively rerun
-on working-spec changes; this implementation does not introduce a raw-test cache.
-The response fitter remains Poisson `glm.fit` followed by dispersion estimation,
-with a versioned algorithm key that must change when the fitter changes.
-
-New qualification evidence and exact scope are in [validation/README.md](validation/README.md).
+The existing ondisc pair-count boundary uses an inert sentinel to accommodate
+an older native helper's final lookahead. Production tests require warning-free
+results. The independent matrix-conversion oracle accepts only its two known
+pointer-boundary warning messages, or zero warnings from a fixed dependency.
+Native statistical kernels and samplers are unchanged. Nextflow adaptation,
+large-screen benchmarking and cross-platform qualification remain separate work.

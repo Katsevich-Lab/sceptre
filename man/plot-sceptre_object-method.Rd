@@ -23,11 +23,9 @@ panels (if \code{return_indiv_plots} is set to \code{TRUE})
 }
 \details{
 \code{plot()} is "generic" in the sense that it dispatches a specific plotting
-function based on the pipeline function that was most recently called on the
-\code{sceptre_object}. For example, if \code{assign_grnas()} is the most recently
-called pipeline function, then \code{plot()} dispatches \code{plot_assign_grnas()}.
-Similarly, if \code{run_power_check()} is the most recently called pipeline
-function, then \code{plot()} dispatches \code{plot_run_power_check()}, and so on. Users
+function based on completed current components. It prefers discovery,
+power, then calibration results, followed by QC and guide assignments.
+Historical results do not select a plot. Users
 can pass arguments to the function dispatched by \code{plot()} as named arguments
 to \code{plot()}.
 }

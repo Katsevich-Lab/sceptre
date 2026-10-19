@@ -101,17 +101,20 @@ storage_test_contract <- function(mat) {
                         group_idx = c(2L, 1L, 1L, 1L))
     original <- serialize(list(cells, groups, nt_groups, controls, pairs), NULL)
     for (control in list("complement", controls)) {
-        for (nuclear in c(FALSE, TRUE)) {
+        for (summarize in c(TRUE, FALSE)) {
             out <- expect_no_warning(storage_pair_counts(mat, pairs, groups, cells,
-                control, nt_groups, nuclear))
+                control, if (summarize) nt_groups else NULL))
             expect_identical(out$n_nonzero_trt, c(2L, 1L, 1L, 1L))
             expect_identical(out$n_nonzero_cntrl,
                              if (identical(control, "complement")) c(1L, 2L, 2L, 2L)
                              else rep(2L, 4L))
-            if (!(nuclear && methods::is(mat, "odm"))) {
+            if (summarize) {
                 expect_identical(out$n_nonzero_mat, matrix(rep(1L, 4L), 2L))
                 expect_identical(out$n_nonzero_tot,
                                  if (identical(control, "complement")) c(3L, 3L) else c(2L, 2L))
+            } else {
+                expect_identical(out$n_nonzero_mat, matrix())
+                expect_identical(out$n_nonzero_tot, integer())
             }
         }
         # Pair-only API must agree without constructing unused NT summaries.

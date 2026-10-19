@@ -267,7 +267,7 @@ check_set_analysis_parameters <- function(
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     response_matrix <- get_response_matrix(sceptre_object)
     covariate_data_frame <- sceptre_object@data@covariate_data_frame
-    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+    grna_target_data_frame <- guide_group_metadata(sceptre_object)
 
     # if response_grna_target_pairs has been supplied, check its
     # characteristics
@@ -756,7 +756,7 @@ check_calibration_check_inputs <- function(
     control_group_complement <- sceptre_object@spec@control_group_complement
     # QC can remove every cell assigned to a guide while its metadata remains.
     n_nt_grnas <- sum(
-        lengths(sceptre_object@preparation@grna_assignments$indiv_nt_grna_idxs) > 0L
+        lengths(sceptre_object@preparation@analysis_groups$indiv_nt_grna_idxs) > 0L
     )
     # check number of gRNAS
     if (!control_group_complement) {

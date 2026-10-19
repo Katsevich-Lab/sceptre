@@ -7,11 +7,11 @@
 #' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
     # extract basic information from sceptre_object
-    cells_in_use <- sceptre_object@preparation@cells_in_use
-    grna_assignments <- sceptre_object@preparation@grna_assignments
+    cells_in_use <- sceptre_object@preparation@analysis_cells
+    grna_assignments <- sceptre_object@preparation@analysis_groups
     response_matrix <- get_response_matrix(sceptre_object)
-    discovery_pairs <- sceptre_object@spec@discovery_pairs
-    positive_control_pairs <- sceptre_object@spec@positive_control_pairs
+    discovery_pairs <- sceptre_object@preparation@discovery_pairs
+    positive_control_pairs <- sceptre_object@preparation@positive_control_pairs
     control_group_complement <- sceptre_object@spec@control_group_complement
     grna_group_idxs <- grna_assignments$grna_group_idxs
 
@@ -55,8 +55,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         groups = grna_group_idxs,
         source_cells = cells_in_use,
         controls = controls,
-        nt_groups = nt_groups,
-        nuclear = sceptre_object@nuclear
+        nt_groups = nt_groups
     )
 
     # process results and update sceptre_object
@@ -70,8 +69,8 @@ compute_pairwise_qc_information <- function(sceptre_object) {
         !dt$discovery,
         c("response_id", "grna_group", "n_nonzero_trt", "n_nonzero_cntrl")
     ]
-    sceptre_object@preparation@M_matrix <- out$n_nonzero_mat
-    sceptre_object@preparation@n_nonzero_tot_vector <- out$n_nonzero_tot
+    sceptre_object@preparation@nt_nonzero_matrix <- out$n_nonzero_mat
+    sceptre_object@preparation@control_nonzero_totals <- out$n_nonzero_tot
     return(sceptre_object)
 }
 
@@ -91,10 +90,8 @@ compute_qc_metrics <- function(sceptre_object) {
         "discovery_pairs_with_info",
         "positive_control_pairs_with_info"
     )
-    n_ok_pair_names <- c("n_ok_discovery_pairs", "n_ok_positive_control_pairs")
     for (i in c(1L, 2L)) {
         data_frame_name <- data_frame_names[i]
-        n_ok_pairs_name <- n_ok_pair_names[i]
         if (nrow(methods::slot(sceptre_object@preparation, data_frame_name)) >= 1L) {
             methods::slot(sceptre_object@preparation, data_frame_name) <- methods::slot(
                 sceptre_object@preparation,
@@ -112,29 +109,7 @@ compute_qc_metrics <- function(sceptre_object) {
                         )
                     )
                 )
-            if (sceptre_object@spec@grna_integration_strategy == "bonferroni") {
-                grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame |>
-                    dplyr::select(grna_id, grna_target)
-                n_ok_pairs <- methods::slot(sceptre_object@preparation, data_frame_name) |>
-                    dplyr::select(
-                        "grna_id" = "grna_group",
-                        pass_qc,
-                        response_id
-                    ) |>
-                    dplyr::left_join(grna_target_data_frame, by = "grna_id") |>
-                    dplyr::group_by(response_id, grna_target) |>
-                    dplyr::summarize(
-                        any_pass_qc = any(pass_qc),
-                        .groups = "drop"
-                    ) |>
-                    dplyr::pull(any_pass_qc) |>
-                    sum()
-            } else {
-                n_ok_pairs <- sum(
-                    methods::slot(sceptre_object@preparation, data_frame_name)$pass_qc
-                )
-            }
-            methods::slot(sceptre_object@preparation, n_ok_pairs_name) <- n_ok_pairs
+
         }
     }
     return(sceptre_object)

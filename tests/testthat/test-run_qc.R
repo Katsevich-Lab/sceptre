@@ -100,7 +100,7 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
     # the only cells in use are those with a single grna UMI count exceeding
     # the threshold
     expect_equal(
-        scep_low@preparation@cells_in_use,
+        scep_low@preparation@analysis_cells,
         (1:num_grnas)[-locs_of_extra_expression]
     )
 })
@@ -149,7 +149,7 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
         ) |>
         assign_grnas(method = "thresholding", threshold = 5)
 
-    expect_equal(run_qc(scep_high_pre_qc)@preparation@cells_in_use, 1:num_cells) # all here
+    expect_equal(run_qc(scep_high_pre_qc)@preparation@analysis_cells, 1:num_cells) # all here
 
     cells_to_remove <- c(1, 3, 5)
 
@@ -157,7 +157,7 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
         scep_high_pre_qc,
         additional_cells_to_remove = cells_to_remove
     )
-    expect_equal(scep_qc@preparation@cells_in_use, (1:num_cells)[-cells_to_remove])
+    expect_equal(scep_qc@preparation@analysis_cells, (1:num_cells)[-cells_to_remove])
 })
 
 
@@ -204,35 +204,35 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_all@preparation@cells_in_use, 1:100) # all remain currently
+    expect_identical(scep_all@preparation@analysis_cells, 1:100) # all remain currently
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0.02, 1),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_qc@preparation@cells_in_use, (1:100)[-zero_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-zero_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, .97),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_qc@preparation@cells_in_use, (1:100)[-high_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-high_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0.03, 1)
         )
-    expect_identical(scep_qc@preparation@cells_in_use, (1:100)[-zero_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-zero_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, .02)
         )
-    expect_equal(scep_qc@preparation@cells_in_use, zero_umi_count_idx)
+    expect_equal(scep_qc@preparation@analysis_cells, zero_umi_count_idx)
 })
 
 test_that("run_qc remove cells with `p_mito_threshold` high moi", {
@@ -282,7 +282,7 @@ test_that("run_qc remove cells with `p_mito_threshold` high moi", {
             p_mito_threshold = .93
         )
 
-    expect_identical(scep_qc@preparation@cells_in_use, (1:100)[-high_p_mito_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-high_p_mito_idx])
 })
 
 test_that("run_qc test positive control pairs", {
@@ -750,7 +750,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
 
     # making sure that the only cells removed are the ones intended to be removed
     expect_setequal(
-        scep_low@preparation@cells_in_use,
+        scep_low@preparation@analysis_cells,
         all_cells[
             -c(
                 cells_to_remove_low_umi,
@@ -858,7 +858,7 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
         )
 
     expect_setequal(
-        scep_high@preparation@cells_in_use,
+        scep_high@preparation@analysis_cells,
         all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
     )
 

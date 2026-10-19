@@ -15,8 +15,7 @@ collect_pair_qc_metrics <- function(
     groups,
     source_cells,
     controls,
-    nt_groups = NULL,
-    nuclear = FALSE
+    nt_groups = NULL
 ) {
     storage_pair_counts(
         store,
@@ -24,8 +23,7 @@ collect_pair_qc_metrics <- function(
         groups,
         source_cells,
         controls,
-        nt_groups,
-        nuclear
+        nt_groups
     )
 }
 

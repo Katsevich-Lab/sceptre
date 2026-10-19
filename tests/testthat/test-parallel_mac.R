@@ -45,12 +45,12 @@ test_that("full pipeline runs end-to-end with parallel = TRUE", {
         run_discovery_analysis(parallel = TRUE, n_processors = 2)
 
     expect_s4_class(scep, "sceptre_object")
-    expect_true(scep@functs_called[["run_calibration_check"]])
-    expect_true(scep@functs_called[["run_power_check"]])
-    expect_true(scep@functs_called[["run_discovery_analysis"]])
-    expect_gt(nrow(scep@results@calibration_result), 0)
-    expect_gt(nrow(scep@results@power_result), 0)
-    expect_gt(nrow(scep@results@discovery_result), 0)
+    expect_true(refactor_private("workflow_status")(scep)[["run_calibration_check"]])
+    expect_true(refactor_private("workflow_status")(scep)[["run_power_check"]])
+    expect_true(refactor_private("workflow_status")(scep)[["run_discovery_analysis"]])
+    expect_gt(nrow(scep@results@records[["run_calibration_check"]]$table), 0)
+    expect_gt(nrow(scep@results@records[["run_power_check"]]$table), 0)
+    expect_gt(nrow(scep@results@records[["run_discovery_analysis"]]$table), 0)
 })
 
 
@@ -81,6 +81,6 @@ test_that("assign_grnas mixture method runs with parallel = TRUE", {
             positive_control_pairs = positive_control_pairs
         ) |>
         assign_grnas(method = "mixture", parallel = TRUE, n_processors = 2)
-    expect_true(scep@functs_called[["assign_grnas"]])
-    expect_true(length(scep@preparation@initial_grna_assignment_list) > 0)
+    expect_true(refactor_private("workflow_status")(scep)[["assign_grnas"]])
+    expect_true(length(scep@preparation@guide_assignments) > 0)
 })

@@ -83,14 +83,14 @@ construct_cis_pairs <- function(
     if (
         !all(
             c("chr", "start", "end") %in%
-                colnames(sceptre_object@preparation@grna_target_data_frame)
+                colnames(guide_group_metadata(sceptre_object))
         )
     ) {
         stop(
             "`grna_target_data_frame` must contain columns 'chr', 'start', and 'end'."
         )
     }
-    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+    grna_target_data_frame <- guide_group_metadata(sceptre_object)
     grna_target_data_frame <- data.table::as.data.table(grna_target_data_frame)
     response_ids <- rownames(get_response_matrix(sceptre_object))
     distance_threshold <- as.integer(distance_threshold)
@@ -263,7 +263,7 @@ construct_trans_pairs <- function(
             NULL
         }
     )
-    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+    grna_target_data_frame <- guide_group_metadata(sceptre_object)
     grna_targets <- grna_target_data_frame |>
         dplyr::filter(!(grna_target %in% grna_targets_to_exclude)) |>
         dplyr::pull(grna_target) |>
@@ -323,7 +323,7 @@ construct_trans_pairs <- function(
 #' positive_control_pairs <- construct_positive_control_pairs(sceptre_object)
 construct_positive_control_pairs <- function(sceptre_object) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+    grna_target_data_frame <- guide_group_metadata(sceptre_object)
     response_ids <- rownames(get_response_matrix(sceptre_object))
     pc_grna_targets <- grna_target_data_frame$grna_target[
         grna_target_data_frame$grna_target %in% response_ids

@@ -291,12 +291,12 @@ plot_assign_grnas <- function(
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     n_points_to_plot_per_umi <- 1000
     n_grnas_to_plot_panel_b <- 1000
-    if (!sceptre_object@functs_called["assign_grnas"]) {
+    if (!stage_complete(sceptre_object, "assignment")) {
         stop(
             "This `sceptre_object` has not yet had `assign_grnas` called on it."
         )
     }
-    init_assignments <- sceptre_object@preparation@initial_grna_assignment_list
+    init_assignments <- sceptre_object@preparation@guide_assignments
     grna_matrix <- get_grna_matrix(sceptre_object) |>
         set_matrix_accessibility(make_row_accessible = TRUE)
     grna_ids <- names(init_assignments)
@@ -324,7 +324,7 @@ plot_assign_grnas <- function(
         ) # logical vecs w/ one entry per cell
         assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
         cells_w_zero_or_twoplus_grnas[
-            sceptre_object@preparation@cells_w_zero_or_twoplus_grnas
+            sceptre_object@preparation@assignment_exclusions
         ] <- TRUE # indicates which cells have 0/2+ grnas
         g <- load_row(grna_matrix, curr_grna_id)
         df <- data.frame(
@@ -426,7 +426,7 @@ plot_assign_grnas <- function(
         p_c <- ggplot2::ggplot() +
             ggplot2::theme_void()
     } else {
-        n_grnas_per_cell <- sceptre_object@preparation@grnas_per_cell
+        n_grnas_per_cell <- sceptre_object@preparation@guide_counts_per_cell
         moi <- mean(n_grnas_per_cell)
         p_c <- ggplot2::ggplot(
             data = data.frame(x = n_grnas_per_cell),
@@ -540,11 +540,6 @@ plot_run_calibration_check <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     current_result(sceptre_object, "run_calibration_check") |> invisible()
-    if (!sceptre_object@functs_called["run_calibration_check"]) {
-        stop(
-            "This `sceptre_object` has not yet had `run_calibration_check` called on it."
-        )
-    }
     calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
     my_theme <- get_my_theme()
 
@@ -866,14 +861,9 @@ plot_run_discovery_analysis <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     current_result(sceptre_object, "run_discovery_analysis") |> invisible()
-    if (!sceptre_object@functs_called["run_discovery_analysis"]) {
-        stop(
-            "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
-        )
-    }
     # Optional stage diagnostics and padded null draws can be missing for valid
     # tests. Exclude only rows missing the scientific fields these plots use.
-    discovery_result <- sceptre_object@results@discovery_result
+    discovery_result <- current_result(sceptre_object, "run_discovery_analysis")
     discovery_result <- discovery_result[
         stats::complete.cases(
             discovery_result$p_value,
@@ -1033,7 +1023,7 @@ plot_covariates <- function(
     return_indiv_plots = FALSE
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    if (sceptre_object@functs_called[["run_qc"]]) {
+    if (stage_complete(sceptre_object, "cell_qc")) {
         response_n_umis_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_umis_range
         response_n_nonzero_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_nonzero_range
         p_mito_threshold <- sceptre_object@spec@cellwise_qc_thresholds$p_mito_threshold
@@ -1184,7 +1174,7 @@ plot_run_qc <- function(
     return_indiv_plots = FALSE
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    if (!sceptre_object@functs_called["run_qc"]) {
+    if (!stage_complete(sceptre_object, "pair_qc")) {
         stop("This `sceptre_object` has not yet had `run_qc` called on it.")
     }
     p_a <- plot_cellwise_qc(sceptre_object)
@@ -1386,11 +1376,6 @@ plot_run_power_check <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     current_result(sceptre_object, "run_power_check") |> invisible()
-    if (!sceptre_object@functs_called["run_power_check"]) {
-        stop(
-            "This `sceptre_object` has not yet had `run_power_check` called on it."
-        )
-    }
     my_theme <- get_my_theme()
     my_cols <- c("mediumseagreen", "firebrick1")
 
@@ -1519,7 +1504,7 @@ plot_response_grna_target_pair <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     # check that grnas have been assigned and qc has been called
-    functs_called <- sceptre_object@functs_called
+    functs_called <- workflow_status(sceptre_object)
     # Preserve singleton-ID versus target-ID annotation lookup. A Bonferroni
     # guide-to-target plotting interpretation is separately deferred.
     singleton_integration_strategy <- sceptre_object@spec@grna_integration_strategy ==
@@ -1533,10 +1518,10 @@ plot_response_grna_target_pair <- function(
 
     # get grna integration strategy, control group
     control_group_complement <- sceptre_object@spec@control_group_complement
-    cells_in_use <- sceptre_object@preparation@cells_in_use
+    cells_in_use <- sceptre_object@preparation@analysis_cells
 
     # check that grna_target is present in grna_assignments
-    grna_group_idxs <- sceptre_object@preparation@grna_assignments$grna_group_idxs
+    grna_group_idxs <- sceptre_object@preparation@analysis_groups$grna_group_idxs
     grna_group_names <- names(grna_group_idxs)
     if (!grna_target %in% grna_group_names) {
         stop(
@@ -1570,7 +1555,7 @@ plot_response_grna_target_pair <- function(
         cntrl_cells <- normalized_counts[-grna_group_idxs[[grna_target]]]
     } else {
         # nt cells
-        nt_idxs <- sceptre_object@preparation@grna_assignments$all_nt_idxs
+        nt_idxs <- sceptre_object@preparation@analysis_groups$all_nt_idxs
         cntrl_cells <- normalized_counts[nt_idxs]
     }
 

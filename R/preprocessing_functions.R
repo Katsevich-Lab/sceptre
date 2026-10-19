@@ -213,50 +213,21 @@ get_synthetic_permutation_idxs <- function(
 #'   reserved group label non-targeting.
 #' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
-    grouping_strategy <- sceptre_object@spec@grna_integration_strategy
-    if (grouping_strategy == "union") {
-        sceptre_object@preparation@grna_target_data_frame$grna_group <- sceptre_object@preparation@grna_target_data_frame$grna_target
-        sceptre_object@spec@discovery_pairs$grna_group <- sceptre_object@spec@discovery_pairs$grna_target
-        sceptre_object@spec@positive_control_pairs$grna_group <- sceptre_object@spec@positive_control_pairs$grna_target
-    }
-    if (grouping_strategy %in% c("singleton", "bonferroni")) {
-        grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
-        discovery_pairs <- sceptre_object@spec@discovery_pairs
-        positive_control_pairs <- sceptre_object@spec@positive_control_pairs
-
-        # function to update targeting pairs
-        update_targeting_pairs <- function(
-            targeting_pairs,
-            updated_grna_target_data_frame
-        ) {
-            targeting_pairs$grna_group <- NULL
-            dplyr::left_join(
-                targeting_pairs,
-                updated_grna_target_data_frame |>
-                    dplyr::select(grna_target, grna_group),
-                by = "grna_target",
-                relationship = "many-to-many"
-            )
+    metadata <- sceptre_object@data@grna_target_data_frame
+    strategy <- sceptre_object@spec@grna_integration_strategy
+    groups <- if (strategy == "union") metadata$grna_target else ifelse(
+        metadata$grna_target == "non-targeting", "non-targeting", metadata$grna_id)
+    sceptre_object@preparation@guide_groups <- groups
+    compile <- function(requested) {
+        requested$grna_group <- NULL
+        if (strategy == "union") {
+            requested$grna_group <- requested$grna_target
+            return(requested)
         }
-
-        # update each data frame, appending a grna group column
-        updated_grna_target_data_frame <- grna_target_data_frame |>
-            dplyr::mutate(
-                grna_group = ifelse(
-                    grna_target == "non-targeting",
-                    "non-targeting",
-                    grna_id
-                )
-            )
-        sceptre_object@preparation@grna_target_data_frame <- updated_grna_target_data_frame
-        sceptre_object@spec@discovery_pairs <- update_targeting_pairs(
-            discovery_pairs,
-            updated_grna_target_data_frame
-        )
-        sceptre_object@spec@positive_control_pairs <- update_targeting_pairs(
-            positive_control_pairs,
-            updated_grna_target_data_frame
-        )
+        mapping <- data.frame(grna_target = metadata$grna_target, grna_group = groups)
+        dplyr::left_join(requested, mapping, by = "grna_target", relationship = "many-to-many")
     }
-    return(sceptre_object)
+    sceptre_object@preparation@discovery_pairs <- compile(sceptre_object@spec@discovery_pairs)
+    sceptre_object@preparation@positive_control_pairs <- compile(sceptre_object@spec@positive_control_pairs)
+    sceptre_object
 }
