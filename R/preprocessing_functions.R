@@ -215,8 +215,15 @@ get_synthetic_permutation_idxs <- function(
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
     metadata <- sceptre_object@data@grna_target_data_frame
     strategy <- sceptre_object@spec@grna_integration_strategy
-    groups <- if (strategy == "union") metadata$grna_target else ifelse(
-        metadata$grna_target == "non-targeting", "non-targeting", metadata$grna_id)
+    groups <- if (strategy == "union") {
+        metadata$grna_target
+    } else {
+        ifelse(
+            metadata$grna_target == "non-targeting",
+            "non-targeting",
+            metadata$grna_id
+        )
+    }
     sceptre_object@preparation@guide_groups <- groups
     compile <- function(requested) {
         requested$grna_group <- NULL
@@ -224,10 +231,22 @@ update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
             requested$grna_group <- requested$grna_target
             return(requested)
         }
-        mapping <- data.frame(grna_target = metadata$grna_target, grna_group = groups)
-        dplyr::left_join(requested, mapping, by = "grna_target", relationship = "many-to-many")
+        mapping <- data.frame(
+            grna_target = metadata$grna_target,
+            grna_group = groups
+        )
+        dplyr::left_join(
+            requested,
+            mapping,
+            by = "grna_target",
+            relationship = "many-to-many"
+        )
     }
-    sceptre_object@preparation@discovery_pairs <- compile(sceptre_object@spec@discovery_pairs)
-    sceptre_object@preparation@positive_control_pairs <- compile(sceptre_object@spec@positive_control_pairs)
+    sceptre_object@preparation@discovery_pairs <- compile(
+        sceptre_object@spec@discovery_pairs
+    )
+    sceptre_object@preparation@positive_control_pairs <- compile(
+        sceptre_object@spec@positive_control_pairs
+    )
     sceptre_object
 }

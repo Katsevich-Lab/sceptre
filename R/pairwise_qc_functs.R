@@ -92,8 +92,14 @@ compute_qc_metrics <- function(sceptre_object) {
     )
     for (i in c(1L, 2L)) {
         data_frame_name <- data_frame_names[i]
-        if (nrow(methods::slot(sceptre_object@preparation, data_frame_name)) >= 1L) {
-            methods::slot(sceptre_object@preparation, data_frame_name) <- methods::slot(
+        if (
+            nrow(methods::slot(sceptre_object@preparation, data_frame_name)) >=
+                1L
+        ) {
+            methods::slot(
+                sceptre_object@preparation,
+                data_frame_name
+            ) <- methods::slot(
                 sceptre_object@preparation,
                 data_frame_name
             ) |>
@@ -109,7 +115,6 @@ compute_qc_metrics <- function(sceptre_object) {
                         )
                     )
                 )
-
         }
     }
     return(sceptre_object)

@@ -9,14 +9,24 @@
 #' @noRd
 reconstruct_perturbation_probabilities <- function(fit, design) {
     coefficients <- fit$fitted_coefs
-    if (!is.matrix(design) || !is.numeric(design) ||
-        !is.numeric(coefficients) || length(coefficients) != ncol(design) ||
-        any(!is.finite(coefficients))) {
-        stop("A compact perturbation fit requires finite coefficients aligned to its design.")
+    if (
+        !is.matrix(design) ||
+            !is.numeric(design) ||
+            !is.numeric(coefficients) ||
+            length(coefficients) != ncol(design) ||
+            any(!is.finite(coefficients))
+    ) {
+        stop(
+            "A compact perturbation fit requires finite coefficients aligned to its design."
+        )
     }
-    if (!is.null(colnames(design)) &&
-        !identical(names(coefficients), colnames(design))) {
-        stop("Perturbation fit coefficients do not match the ordered design columns.")
+    if (
+        !is.null(colnames(design)) &&
+            !identical(names(coefficients), colnames(design))
+    ) {
+        stop(
+            "Perturbation fit coefficients do not match the ordered design columns."
+        )
     }
     # Match glm.fit's arithmetic and C inverse-link, including its clipping.
     # plogis() and ad hoc clipping do not reproduce the fitted probabilities.
@@ -46,15 +56,22 @@ fit_perturbation_model <- function(trt_idxs, design) {
     if (!is.numeric(coefficients) || any(!is.finite(coefficients))) {
         return(list(probabilities = probabilities, fit = NULL))
     }
-    compact <- list(fitted_coefs = coefficients,
-        diagnostics = list(rank = logistic_fit$rank,
+    compact <- list(
+        fitted_coefs = coefficients,
+        diagnostics = list(
+            rank = logistic_fit$rank,
             converged = logistic_fit$converged,
             boundary = logistic_fit$boundary,
-            iterations = logistic_fit$iter, warnings = warnings))
+            iterations = logistic_fit$iter,
+            warnings = warnings
+        )
+    )
     reconstructed <- tryCatch(
         reconstruct_perturbation_probabilities(compact, design),
         error = function(condition) NULL
     )
-    if (!identical(reconstructed, probabilities)) compact <- NULL
+    if (!identical(reconstructed, probabilities)) {
+        compact <- NULL
+    }
     list(probabilities = probabilities, fit = compact)
 }

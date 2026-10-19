@@ -174,7 +174,8 @@ process_initial_assignment_list <- function(sceptre_object) {
     grna_target_data_frame <- guide_group_metadata(sceptre_object)
     low_moi <- sceptre_object@data@low_moi
     n_cells <- ncol(get_grna_matrix(sceptre_object))
-    maximum_assignment <- sceptre_object@spec@grna_assignment_method == "maximum"
+    maximum_assignment <- sceptre_object@spec@grna_assignment_method ==
+        "maximum"
     # if not using maximum assignment, compute n grnas per cell and cells
     # with multiple grnas
     if (!maximum_assignment) {
@@ -183,7 +184,9 @@ process_initial_assignment_list <- function(sceptre_object) {
             n_cells
         )
         if (low_moi) {
-            cells_w_multiple_grnas <- which(sceptre_object@preparation@guide_counts_per_cell >= 2L)
+            cells_w_multiple_grnas <- which(
+                sceptre_object@preparation@guide_counts_per_cell >= 2L
+            )
             cells_w_zero_grnas <- seq(1, n_cells)[
                 -sort(unique(unlist(initial_assignment_list)))
             ]

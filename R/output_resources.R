@@ -6,9 +6,15 @@ write_analysis_summary <- function(object, path) {
     on.exit(close(connection), add = TRUE)
     depth <- sink.number(type = "output")
     sink(connection, type = "output")
-    on.exit({
-        while (sink.number(type = "output") > depth) sink(type = "output")
-    }, add = TRUE, after = FALSE)
+    on.exit(
+        {
+            while (sink.number(type = "output") > depth) {
+                sink(type = "output")
+            }
+        },
+        add = TRUE,
+        after = FALSE
+    )
     print(object)
     invisible(NULL)
 }

@@ -83,7 +83,10 @@ set_analysis_parameters <- function(
     multiple_testing_method = "BH",
     multiple_testing_alpha = 0.1
 ) {
-    validate_correction_settings(multiple_testing_alpha, multiple_testing_method)
+    validate_correction_settings(
+        multiple_testing_alpha,
+        multiple_testing_method
+    )
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     # verify that function called in correct order
     sceptre_object <- begin_preparation_stage(
@@ -328,7 +331,10 @@ assign_grnas <- function(
         log_dir
     )
 
-    sceptre_object <- invalidate_result_records(sceptre_object, "guide assignments changed")
+    sceptre_object <- invalidate_result_records(
+        sceptre_object,
+        "guide assignments changed"
+    )
     sceptre_object <- commit_preparation_stage(sceptre_object, "assignment")
     return(sceptre_object)
 }
@@ -466,14 +472,18 @@ run_qc_pt_1 <- function(
         p_mito_threshold = p_mito_threshold
     )
 
-    sceptre_object@spec@additional_cells_to_remove <- as.integer(additional_cells_to_remove)
+    sceptre_object@spec@additional_cells_to_remove <- as.integer(
+        additional_cells_to_remove
+    )
 
     # obtain previous cells_in_use for caching purposes
     current_cells_in_use <- sceptre_object@preparation@analysis_cells
 
     # update uncached fields of the sceptre object
     sceptre_object@spec@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
-    sceptre_object@spec@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
+    sceptre_object@spec@n_nonzero_cntrl_thresh <- as.integer(
+        n_nonzero_cntrl_thresh
+    )
 
     # determine the cells to retain after cellwise qc
     sceptre_object <- determine_cells_to_retain(
@@ -510,7 +520,10 @@ run_qc_pt_1 <- function(
     sceptre_object <- invalidate_fit_caches(
         sceptre_object,
         "analysis_cells",
-        !identical(current_cells_in_use, sceptre_object@preparation@analysis_cells)
+        !identical(
+            current_cells_in_use,
+            sceptre_object@preparation@analysis_cells
+        )
     )
 
     # update the grna assignments given the cellwise qc

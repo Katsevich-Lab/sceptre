@@ -5,15 +5,21 @@
 # revision. Deparsing excludes source references, bytecode and closure environments
 # (which contain process paths); the function expressions themselves are retained.
 execution_function_code <- function(fun) {
-    if (is.primitive(fun)) return(list(primitive = deparse(fun)))
-    list(formals = deparse(formals(fun), width.cutoff = 500L),
-        body = deparse(body(fun), width.cutoff = 500L))
+    if (is.primitive(fun)) {
+        return(list(primitive = deparse(fun)))
+    }
+    list(
+        formals = deparse(formals(fun), width.cutoff = 500L),
+        body = deparse(body(fun), width.cutoff = 500L)
+    )
 }
 
 execution_native_certificate <- function() {
     dll <- getLoadedDLLs()[["sceptre"]]
     if (is.null(dll) || !file.exists(dll[["path"]])) {
-        stop("Cannot certify execution: the loaded sceptre native library is unavailable.")
+        stop(
+            "Cannot certify execution: the loaded sceptre native library is unavailable."
+        )
     }
     digest::digest(file = dll[["path"]], algo = "sha256")
 }
@@ -21,89 +27,205 @@ execution_native_certificate <- function() {
 execution_build_certificate <- function() {
     namespace <- asNamespace("sceptre")
     bindings <- sort(ls(namespace, all.names = TRUE), method = "radix")
-    functions <- lapply(bindings, function(name) get(name, envir = namespace, inherits = FALSE))
+    functions <- lapply(bindings, function(name) {
+        get(name, envir = namespace, inherits = FALSE)
+    })
     names(functions) <- bindings
     functions <- lapply(Filter(is.function, functions), execution_function_code)
-    classes <- lapply(sort(methods::getClasses(where = namespace), method = "radix"), function(name) {
-        definition <- methods::getClassDef(name, where = namespace)
-        if (!identical(definition@package, "sceptre")) return(NULL)
-        list(name = name, slots = methods::getSlots(definition), prototype = definition@prototype,
-            contains = sort(as.character(names(definition@contains)), method = "radix"), virtual = definition@virtual,
-            validity = if (is.null(definition@validity)) NULL else execution_function_code(definition@validity))
-    })
+    classes <- lapply(
+        sort(methods::getClasses(where = namespace), method = "radix"),
+        function(name) {
+            definition <- methods::getClassDef(name, where = namespace)
+            if (!identical(definition@package, "sceptre")) {
+                return(NULL)
+            }
+            list(
+                name = name,
+                slots = methods::getSlots(definition),
+                prototype = definition@prototype,
+                contains = sort(
+                    as.character(names(definition@contains)),
+                    method = "radix"
+                ),
+                virtual = definition@virtual,
+                validity = if (is.null(definition@validity)) {
+                    NULL
+                } else {
+                    execution_function_code(definition@validity)
+                }
+            )
+        }
+    )
     classes <- Filter(Negate(is.null), classes)
-    generics <- sort(unique(as.character(methods::getGenerics(where = namespace))), method = "radix")
-    registered <- stats::setNames(lapply(generics, function(generic) {
-        implementations <- methods::findMethods(generic, where = namespace)
-        implementations <- Filter(function(method) identical(environment(method), namespace), as.list(implementations))
-        ordered <- sort(as.character(names(implementations)), method = "radix")
-        stats::setNames(lapply(ordered, function(signature) {
-            method <- implementations[[signature]]
-            # Include the effective implementation for each package signature too:
-            # a redefinition outside this namespace can change actual dispatch.
-            selected <- methods::selectMethod(generic, as.character(method@target))
-            list(target = as.character(method@target), defined = as.character(method@defined),
-                code = execution_function_code(method), selected = execution_function_code(selected))
-        }), ordered)
-    }), generics)
-    list(R = execution_digest(list(functions = functions, classes = classes, methods = registered)),
-        native = execution_native_certificate())
+    generics <- sort(
+        unique(as.character(methods::getGenerics(where = namespace))),
+        method = "radix"
+    )
+    registered <- stats::setNames(
+        lapply(generics, function(generic) {
+            implementations <- methods::findMethods(generic, where = namespace)
+            implementations <- Filter(
+                function(method) identical(environment(method), namespace),
+                as.list(implementations)
+            )
+            ordered <- sort(
+                as.character(names(implementations)),
+                method = "radix"
+            )
+            stats::setNames(
+                lapply(ordered, function(signature) {
+                    method <- implementations[[signature]]
+                    # Include the effective implementation for each package signature too:
+                    # a redefinition outside this namespace can change actual dispatch.
+                    selected <- methods::selectMethod(
+                        generic,
+                        as.character(method@target)
+                    )
+                    list(
+                        target = as.character(method@target),
+                        defined = as.character(method@defined),
+                        code = execution_function_code(method),
+                        selected = execution_function_code(selected)
+                    )
+                }),
+                ordered
+            )
+        }),
+        generics
+    )
+    list(
+        R = execution_digest(list(
+            functions = functions,
+            classes = classes,
+            methods = registered
+        )),
+        native = execution_native_certificate()
+    )
 }
 
-execution_runtime_certificate <- function(object) list(
-    R = as.character(getRversion()), platform = R.version$platform,
-    package = as.character(getNamespaceVersion(asNamespace("sceptre"))),
-    build = execution_build_certificate(),
-    stats = as.character(utils::packageVersion("stats")),
-    Matrix = as.character(utils::packageVersion("Matrix")),
-    Rcpp = as.character(utils::packageVersion("Rcpp")),
-    ondisc = if (any(vapply(list(object@data@response_matrix, object@data@grna_matrix),
-        function(store) methods::is(store, "BackedCountStore"), logical(1)))) {
-        if ("ondisc" %in% loadedNamespaces()) as.character(getNamespaceVersion(asNamespace("ondisc"))) else "unloaded"
-    } else NULL,
-    BLAS = unname(extSoftVersion()["BLAS"]), matprod = getOption("matprod"),
-    RNGkind = RNGkind())
+execution_runtime_certificate <- function(object) {
+    list(
+        R = as.character(getRversion()),
+        platform = R.version$platform,
+        package = as.character(getNamespaceVersion(asNamespace("sceptre"))),
+        build = execution_build_certificate(),
+        stats = as.character(utils::packageVersion("stats")),
+        Matrix = as.character(utils::packageVersion("Matrix")),
+        Rcpp = as.character(utils::packageVersion("Rcpp")),
+        ondisc = if (
+            any(vapply(
+                list(object@data@response_matrix, object@data@grna_matrix),
+                function(store) methods::is(store, "BackedCountStore"),
+                logical(1)
+            ))
+        ) {
+            if ("ondisc" %in% loadedNamespaces()) {
+                as.character(getNamespaceVersion(asNamespace("ondisc")))
+            } else {
+                "unloaded"
+            }
+        } else {
+            NULL
+        },
+        BLAS = unname(extSoftVersion()["BLAS"]),
+        matprod = getOption("matprod"),
+        RNGkind = RNGkind()
+    )
+}
 
-execution_method_certificate <- function() list(response = response_fit_method_id(),
-    perturbation = perturbation_fit_method_id(), resampling = "global-native-draw-sharing-v1")
+execution_method_certificate <- function() {
+    list(
+        response = response_fit_method_id(),
+        perturbation = perturbation_fit_method_id(),
+        resampling = "global-native-draw-sharing-v1"
+    )
+}
 
 execution_digest <- function(value) digest::digest(value, algo = "sha256")
 execution_row_column <- function() ".sceptre_global_pair_row"
 
 require_execution_backend <- function(object) {
-    if (!isTRUE(object@spec@run_permutations) && any(vapply(
-        list(object@data@response_matrix, object@data@grna_matrix),
-        function(store) methods::is(store, "BackedCountStore"), logical(1)))) {
-        stop("Backed CRT remains unsupported; use permutation resampling or in-memory counts.")
+    if (
+        !isTRUE(object@spec@run_permutations) &&
+            any(vapply(
+                list(object@data@response_matrix, object@data@grna_matrix),
+                function(store) methods::is(store, "BackedCountStore"),
+                logical(1)
+            ))
+    ) {
+        stop(
+            "Backed CRT remains unsupported; use permutation resampling or in-memory counts."
+        )
     }
     invisible(NULL)
 }
 
-execution_context_certificate <- function(object) list(data = object@data@identity,
-    stages = lapply(object@preparation@stages, function(stage) stage$identity))
+execution_context_certificate <- function(object) {
+    list(
+        data = object@data@identity,
+        stages = lapply(object@preparation@stages, function(stage) {
+            stage$identity
+        })
+    )
+}
 
 execution_units <- function(context, plan, n_work_units, permutations) {
     field <- if (permutations) "response_idx" else "group_idx"
     keys <- unique(context$index$pair_rows[[field]])
-    if (!length(keys)) stop("Distributed execution requires eligible hypothesis rows.")
+    if (!length(keys)) {
+        stop("Distributed execution requires eligible hypothesis rows.")
+    }
     n <- min(as.integer(n_work_units), length(keys))
-    chunks <- split(keys, as.integer(floor((seq_along(keys) - 1L) * n / length(keys))) + 1L)
+    chunks <- split(
+        keys,
+        as.integer(floor((seq_along(keys) - 1L) * n / length(keys))) + 1L
+    )
     eligible <- which(plan@pairs$pass_qc)
     lapply(seq_along(chunks), function(i) {
         selected <- as.integer(chunks[[i]])
-        rows <- unlist(lapply(selected, function(key) eligible[which(context$index$pair_rows[[field]] == key)]), use.names = FALSE)
-        list(id = sprintf("unit-%06d", i), keys = selected, row_ids = as.integer(rows))
+        rows <- unlist(
+            lapply(selected, function(key) {
+                eligible[which(context$index$pair_rows[[field]] == key)]
+            }),
+            use.names = FALSE
+        )
+        list(
+            id = sprintf("unit-%06d", i),
+            keys = selected,
+            row_ids = as.integer(rows)
+        )
     })
 }
 
 execution_full_context <- function(object, plan) {
-    context <- prepare_analysis_context(object, plan@analysis,
-        dplyr::filter(plan@pairs, pass_qc), plan = plan)
+    context <- prepare_analysis_context(
+        object,
+        plan@analysis,
+        dplyr::filter(plan@pairs, pass_qc),
+        plan = plan
+    )
     column <- execution_row_column()
-    if (column %in% names(plan@pairs)) stop("The hypothesis family uses a reserved execution row column.")
-    numerical <- c("p_value", "fold_change", "se_fold_change", "log_2_fold_change", "stage", "z_orig", "xi", "omega", "alpha")
-    if (any(names(plan@pairs) %in% numerical) || any(grepl("^z_null_", names(plan@pairs)))) {
-        stop("Prepared hypothesis metadata collides with generated numerical output columns.")
+    if (column %in% names(plan@pairs)) {
+        stop("The hypothesis family uses a reserved execution row column.")
+    }
+    numerical <- c(
+        "p_value",
+        "fold_change",
+        "se_fold_change",
+        "log_2_fold_change",
+        "stage",
+        "z_orig",
+        "xi",
+        "omega",
+        "alpha"
+    )
+    if (
+        any(names(plan@pairs) %in% numerical) ||
+            any(grepl("^z_null_", names(plan@pairs)))
+    ) {
+        stop(
+            "Prepared hypothesis metadata collides with generated numerical output columns."
+        )
     }
     # Append after the canonical plan/context comparison; never subset the index,
     # assignments, design, fitting view or global permutation dimensions.
@@ -114,28 +236,71 @@ execution_full_context <- function(object, plan) {
 validate_execution_manifest <- function(object, execution) {
     require_stage(object, "run_qc")
     require_execution_backend(object)
-    fields <- c("protocol", "runtime", "methods", "context", "plan", "output_amount", "units", "identity")
-    if (!is.list(execution) || anyDuplicated(names(execution)) || !setequal(names(execution), fields) ||
-        !identical(execution$protocol, 1L) ||
-        !identical(execution$runtime, execution_runtime_certificate(object)) ||
-        !identical(execution$methods, execution_method_certificate())) {
-        stop("Execution manifest protocol, runtime or method certificate is incompatible.")
+    fields <- c(
+        "protocol",
+        "runtime",
+        "methods",
+        "context",
+        "plan",
+        "output_amount",
+        "units",
+        "identity"
+    )
+    if (
+        !is.list(execution) ||
+            anyDuplicated(names(execution)) ||
+            !setequal(names(execution), fields) ||
+            !identical(execution$protocol, 1L) ||
+            !identical(
+                execution$runtime,
+                execution_runtime_certificate(object)
+            ) ||
+            !identical(execution$methods, execution_method_certificate())
+    ) {
+        stop(
+            "Execution manifest protocol, runtime or method certificate is incompatible."
+        )
     }
-    if (!identical(execution$identity, execution_digest(execution[setdiff(names(execution), "identity")]))) {
+    if (
+        !identical(
+            execution$identity,
+            execution_digest(execution[setdiff(names(execution), "identity")])
+        )
+    ) {
         stop("Execution manifest certificate does not match its payload.")
     }
     if (!identical(execution$context, execution_context_certificate(object))) {
-        stop("Execution manifest no longer matches the full prepared screen context.")
+        stop(
+            "Execution manifest no longer matches the full prepared screen context."
+        )
     }
     plan <- validate_run_plan(object, execution$plan)
-    if (!plan@analysis %in% "run_calibration_check" && !identical(plan@pairs, analysis_pairs(object, plan@analysis))) {
+    if (
+        !plan@analysis %in% "run_calibration_check" &&
+            !identical(plan@pairs, analysis_pairs(object, plan@analysis))
+    ) {
         stop("Execution plan does not cover the complete prepared family.")
     }
-    if (!identical(execution$output_amount, as.integer(execution$output_amount)) ||
-        length(execution$output_amount) != 1L || !execution$output_amount %in% 1:3) stop("Invalid execution output level.")
+    if (
+        !identical(
+            execution$output_amount,
+            as.integer(execution$output_amount)
+        ) ||
+            length(execution$output_amount) != 1L ||
+            !execution$output_amount %in% 1:3
+    ) {
+        stop("Invalid execution output level.")
+    }
     context <- execution_full_context(object, plan)
-    units <- execution_units(context, plan, length(execution$units), object@spec@run_permutations)
-    if (!identical(execution$units, units)) stop("Execution work units do not match canonical whole-key traversal.")
+    units <- execution_units(
+        context,
+        plan,
+        length(execution$units),
+        object@spec@run_permutations
+    )
+    if (!identical(execution$units, units)) {
+        stop("Execution work units do not match canonical whole-key traversal.")
+    }
     list(plan = plan, context = context)
 }
 
@@ -158,28 +323,57 @@ validate_execution_manifest <- function(object, execution) {
 #'   reuse generated numerical output column names. It contains no counts or live
 #'   handles. This is a value artifact, not a saved completed analysis.
 #' @export
-prepare_execution <- function(sceptre_object, analysis, n_work_units = 1L,
-    output_amount = 1L, n_calibration_pairs = NULL, calibration_group_size = NULL) {
+prepare_execution <- function(
+    sceptre_object,
+    analysis,
+    n_work_units = 1L,
+    output_amount = 1L,
+    n_calibration_pairs = NULL,
+    calibration_group_size = NULL
+) {
     object <- migrate_sceptre_object(sceptre_object)
     require_stage(object, "run_qc")
     require_execution_backend(object)
     analysis <- analysis_record_name(analysis)
     check_native_scalar_count(n_work_units, "n_work_units")
-    if (n_work_units < 1L || length(output_amount) != 1L || is.na(output_amount) ||
-        !output_amount %in% 1:3) stop("Use positive work-unit count and output_amount 1, 2 or 3.")
+    if (
+        n_work_units < 1L ||
+            length(output_amount) != 1L ||
+            is.na(output_amount) ||
+            !output_amount %in% 1:3
+    ) {
+        stop("Use positive work-unit count and output_amount 1, 2 or 3.")
+    }
     plan <- if (identical(analysis, "run_calibration_check")) {
-        run_calibration_check_pt_1(object, n_calibration_pairs, calibration_group_size,
-            parallel = FALSE, n_processors = 2L)$plan
+        run_calibration_check_pt_1(
+            object,
+            n_calibration_pairs,
+            calibration_group_size,
+            parallel = FALSE,
+            n_processors = 2L
+        )$plan
     } else {
         pairs <- analysis_pairs(object, analysis)
-        if (!nrow(pairs) || !any(pairs$pass_qc)) stop("The analysis has no eligible hypotheses.")
+        if (!nrow(pairs) || !any(pairs$pass_qc)) {
+            stop("The analysis has no eligible hypotheses.")
+        }
         make_run_plan(object, analysis, pairs)
     }
     context <- execution_full_context(object, plan)
-    manifest <- list(protocol = 1L, runtime = execution_runtime_certificate(object),
-        methods = execution_method_certificate(), context = execution_context_certificate(object),
-        plan = plan, output_amount = as.integer(output_amount),
-        units = execution_units(context, plan, n_work_units, object@spec@run_permutations))
+    manifest <- list(
+        protocol = 1L,
+        runtime = execution_runtime_certificate(object),
+        methods = execution_method_certificate(),
+        context = execution_context_certificate(object),
+        plan = plan,
+        output_amount = as.integer(output_amount),
+        units = execution_units(
+            context,
+            plan,
+            n_work_units,
+            object@spec@run_permutations
+        )
+    )
     manifest$identity <- execution_digest(manifest)
     owned_result_value(manifest)
 }
@@ -196,69 +390,177 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
     object <- migrate_sceptre_object(sceptre_object)
     prepared <- validate_execution_manifest(object, execution)
     ids <- vapply(execution$units, function(unit) unit$id, character(1))
-    if (!is.character(unit_id) || length(unit_id) != 1L || is.na(unit_id) || !unit_id %in% ids) stop("Unknown execution unit ID.")
+    if (
+        !is.character(unit_id) ||
+            length(unit_id) != 1L ||
+            is.na(unit_id) ||
+            !unit_id %in% ids
+    ) {
+        stop("Unknown execution unit ID.")
+    }
     unit <- execution$units[[match(unit_id, ids)]]
     context <- prepared$context
-    controls <- list(output_amount = execution$output_amount, print_progress = FALSE,
-        parallel = FALSE, n_processors = 1L, log_dir = tempdir(), work_keys = unit$keys)
+    controls <- list(
+        output_amount = execution$output_amount,
+        print_progress = FALSE,
+        parallel = FALSE,
+        n_processors = 1L,
+        log_dir = tempdir(),
+        work_keys = unit$keys
+    )
     output <- if (object@spec@run_permutations) {
-        draws <- get_synthetic_permutation_idxs(object@preparation@analysis_groups,
-            B = context$test_options$total_resamples, calibration_check = context$index$calibration_check,
+        draws <- get_synthetic_permutation_idxs(
+            object@preparation@analysis_groups,
+            B = context$test_options$total_resamples,
+            calibration_check = context$index$calibration_check,
             control_group_complement = context$index$control_group_complement,
-            calibration_group_size = if (length(prepared$plan@calibration_group_size)) prepared$plan@calibration_group_size else 1L,
-            n_cells = length(context$index$analysis_to_source))
+            calibration_group_size = if (
+                length(prepared$plan@calibration_group_size)
+            ) {
+                prepared$plan@calibration_group_size
+            } else {
+                1L
+            },
+            n_cells = length(context$index$analysis_to_source)
+        )
         run_permutation_analysis(context, controls, draws)
-    } else run_crt_analysis(context, controls)
-    response_ids <- unique(as.character(prepared$plan@pairs$response_id[unit$row_ids]))
-    response_fits <- if (context$shared_response_fit) output$response_precomputations[
-        intersect(names(output$response_precomputations), response_ids)] else list()
-    groups <- if (object@spec@run_permutations) character() else as.character(context$index$group_ids[unit$keys])
-    perturbation_fits <- if (is.null(output$perturbation_fits)) NULL else
-        stats::setNames(lapply(groups, function(id) output$perturbation_fits[[id]]), groups)
-    proposal <- list(protocol = execution$protocol, runtime = execution$runtime,
-        methods = execution$methods, execution = execution$identity, unit_id = unit$id,
-        result = output$result, response_fits = response_fits,
-        response_identity = if (context$shared_response_fit) context$fit_identity else NULL,
+    } else {
+        run_crt_analysis(context, controls)
+    }
+    response_ids <- unique(as.character(prepared$plan@pairs$response_id[
+        unit$row_ids
+    ]))
+    response_fits <- if (context$shared_response_fit) {
+        output$response_precomputations[
+            intersect(names(output$response_precomputations), response_ids)
+        ]
+    } else {
+        list()
+    }
+    groups <- if (object@spec@run_permutations) {
+        character()
+    } else {
+        as.character(context$index$group_ids[unit$keys])
+    }
+    perturbation_fits <- if (is.null(output$perturbation_fits)) {
+        NULL
+    } else {
+        stats::setNames(
+            lapply(groups, function(id) output$perturbation_fits[[id]]),
+            groups
+        )
+    }
+    proposal <- list(
+        protocol = execution$protocol,
+        runtime = execution$runtime,
+        methods = execution$methods,
+        execution = execution$identity,
+        unit_id = unit$id,
+        result = output$result,
+        response_fits = response_fits,
+        response_identity = if (context$shared_response_fit) {
+            context$fit_identity
+        } else {
+            NULL
+        },
         perturbation_fits = perturbation_fits,
-        perturbation_identity = if (is.null(perturbation_fits)) NULL else context$perturbation_identity)
+        perturbation_identity = if (is.null(perturbation_fits)) {
+            NULL
+        } else {
+            context$perturbation_identity
+        }
+    )
     proposal$identity <- execution_digest(proposal)
     owned_result_value(proposal)
 }
 
 validate_execution_proposal <- function(proposal, unit, execution, context) {
-    fields <- c("protocol", "runtime", "methods", "execution", "unit_id", "result", "response_fits", "response_identity", "perturbation_fits", "perturbation_identity", "identity")
-    if (!is.list(proposal) || anyDuplicated(names(proposal)) || !setequal(names(proposal), fields) ||
-        !identical(proposal$protocol, execution$protocol) || !identical(proposal$runtime, execution$runtime) ||
-        !identical(proposal$methods, execution$methods) || !identical(proposal$execution, execution$identity) ||
-        !identical(proposal$unit_id, unit$id) ||
-        !identical(proposal$identity, execution_digest(proposal[setdiff(names(proposal), "identity")]))) {
-        stop("Work proposal certificate does not match the execution or payload.")
+    fields <- c(
+        "protocol",
+        "runtime",
+        "methods",
+        "execution",
+        "unit_id",
+        "result",
+        "response_fits",
+        "response_identity",
+        "perturbation_fits",
+        "perturbation_identity",
+        "identity"
+    )
+    if (
+        !is.list(proposal) ||
+            anyDuplicated(names(proposal)) ||
+            !setequal(names(proposal), fields) ||
+            !identical(proposal$protocol, execution$protocol) ||
+            !identical(proposal$runtime, execution$runtime) ||
+            !identical(proposal$methods, execution$methods) ||
+            !identical(proposal$execution, execution$identity) ||
+            !identical(proposal$unit_id, unit$id) ||
+            !identical(
+                proposal$identity,
+                execution_digest(proposal[setdiff(names(proposal), "identity")])
+            )
+    ) {
+        stop(
+            "Work proposal certificate does not match the execution or payload."
+        )
     }
     result <- proposal$result
     column <- execution_row_column()
-    if (!is.data.frame(result) || !all(c(column, names(execution$plan@pairs)) %in% names(result)) ||
-        !identical(result[[column]], unit$row_ids) || anyDuplicated(result[[column]])) {
-        stop("Work proposal has missing, duplicated or reordered global hypothesis rows.")
+    if (
+        !is.data.frame(result) ||
+            !all(c(column, names(execution$plan@pairs)) %in% names(result)) ||
+            !identical(result[[column]], unit$row_ids) ||
+            anyDuplicated(result[[column]])
+    ) {
+        stop(
+            "Work proposal has missing, duplicated or reordered global hypothesis rows."
+        )
     }
     expected <- execution$plan@pairs[unit$row_ids, , drop = FALSE]
-    if (!identical(lapply(as.list(result)[names(expected)], identity), lapply(expected, identity))) {
+    if (
+        !identical(
+            lapply(as.list(result)[names(expected)], identity),
+            lapply(expected, identity)
+        )
+    ) {
         stop("Work proposal changed hypothesis labels or QC metadata.")
     }
     response_ids <- unique(as.character(expected$response_id))
-    if (!is.list(proposal$response_fits) || anyDuplicated(names(proposal$response_fits)) ||
-        (context$shared_response_fit && (!setequal(names(proposal$response_fits), response_ids) ||
-            !identical(proposal$response_identity, context$fit_identity))) ||
-        (!context$shared_response_fit && (length(proposal$response_fits) || !is.null(proposal$response_identity)))) stop("Work proposal response fit scope is incompatible.")
+    if (
+        !is.list(proposal$response_fits) ||
+            anyDuplicated(names(proposal$response_fits)) ||
+            (context$shared_response_fit &&
+                (!setequal(names(proposal$response_fits), response_ids) ||
+                    !identical(
+                        proposal$response_identity,
+                        context$fit_identity
+                    ))) ||
+            (!context$shared_response_fit &&
+                (length(proposal$response_fits) ||
+                    !is.null(proposal$response_identity)))
+    ) {
+        stop("Work proposal response fit scope is incompatible.")
+    }
     invisible(NULL)
 }
 
 execution_perturbation_identity <- function(context, group) {
     if (context$shared_response_fit) {
         trt <- make_treatment_index_lookup(context$index)(group)$trt_idxs
-        perturbation_fit_identity(context$common_view@source_cells, context$design, trt)
+        perturbation_fit_identity(
+            context$common_view@source_cells,
+            context$design,
+            trt
+        )
     } else {
         view <- make_fit_view(context$index, group)
-        perturbation_fit_identity(view@source_cells, context$design[view@fit_to_analysis, , drop = FALSE], view@trt_fit_pos)
+        perturbation_fit_identity(
+            view@source_cells,
+            context$design[view@fit_to_analysis, , drop = FALSE],
+            view@trt_fit_pos
+        )
     }
 }
 
@@ -274,59 +576,143 @@ execution_perturbation_identity <- function(context, group) {
 collect_execution <- function(sceptre_object, execution, proposals) {
     object <- migrate_sceptre_object(sceptre_object)
     prepared <- validate_execution_manifest(object, execution)
-    if (!is.list(proposals) || length(proposals) != length(execution$units)) stop("Collection requires every expected work unit exactly once.")
+    if (!is.list(proposals) || length(proposals) != length(execution$units)) {
+        stop("Collection requires every expected work unit exactly once.")
+    }
     # Own caller-retained fits and raw tables before any cache admission.
     proposals <- owned_result_value(proposals)
-    expected_ids <- vapply(execution$units, function(unit) unit$id, character(1))
-    ids <- vapply(proposals, function(proposal) {
-        if (!is.list(proposal) || !is.character(proposal$unit_id) || length(proposal$unit_id) != 1L) stop("Malformed work proposal.")
-        proposal$unit_id
-    }, character(1))
-    if (anyNA(ids) || anyDuplicated(ids) || !setequal(ids, expected_ids)) stop("Collection has duplicate, missing or unexpected unit IDs.")
+    expected_ids <- vapply(
+        execution$units,
+        function(unit) unit$id,
+        character(1)
+    )
+    ids <- vapply(
+        proposals,
+        function(proposal) {
+            if (
+                !is.list(proposal) ||
+                    !is.character(proposal$unit_id) ||
+                    length(proposal$unit_id) != 1L
+            ) {
+                stop("Malformed work proposal.")
+            }
+            proposal$unit_id
+        },
+        character(1)
+    )
+    if (anyNA(ids) || anyDuplicated(ids) || !setequal(ids, expected_ids)) {
+        stop("Collection has duplicate, missing or unexpected unit IDs.")
+    }
     proposals <- proposals[match(expected_ids, ids)]
     context <- prepared$context
-    responses <- if (context$shared_response_fit) context$response_fits else object@fits@response_fits
+    responses <- if (context$shared_response_fit) {
+        context$response_fits
+    } else {
+        object@fits@response_fits
+    }
     perturbations <- context$perturbation_fits
     for (i in seq_along(proposals)) {
         proposal <- proposals[[i]]
         unit <- execution$units[[i]]
         validate_execution_proposal(proposal, unit, execution, context)
         for (id in names(proposal$response_fits)) {
-            if (!is.null(responses[[id]]) && !identical(responses[[id]], proposal$response_fits[[id]])) stop("Conflicting response fits across work units.")
+            if (
+                !is.null(responses[[id]]) &&
+                    !identical(responses[[id]], proposal$response_fits[[id]])
+            ) {
+                stop("Conflicting response fits across work units.")
+            }
             responses[id] <- proposal$response_fits[id]
         }
-        groups <- if (object@spec@run_permutations || context$index$calibration_check) character() else
+        groups <- if (
+            object@spec@run_permutations || context$index$calibration_check
+        ) {
+            character()
+        } else {
             as.character(context$index$group_ids[unit$keys])
+        }
         if (length(groups)) {
-            if (!is.list(proposal$perturbation_fits) || !setequal(names(proposal$perturbation_fits), groups) ||
-                anyDuplicated(names(proposal$perturbation_fits)) ||
-                !identical(proposal$perturbation_identity, context$perturbation_identity)) stop("Work proposal perturbation scope is incompatible.")
+            if (
+                !is.list(proposal$perturbation_fits) ||
+                    !setequal(names(proposal$perturbation_fits), groups) ||
+                    anyDuplicated(names(proposal$perturbation_fits)) ||
+                    !identical(
+                        proposal$perturbation_identity,
+                        context$perturbation_identity
+                    )
+            ) {
+                stop("Work proposal perturbation scope is incompatible.")
+            }
             for (group in groups) {
                 fit <- proposal$perturbation_fits[[group]]
-                if (!is.null(fit) && !identical(fit$identity, execution_perturbation_identity(context, group))) stop("Work proposal perturbation fit does not match its actual ordered inputs.")
+                if (
+                    !is.null(fit) &&
+                        !identical(
+                            fit$identity,
+                            execution_perturbation_identity(context, group)
+                        )
+                ) {
+                    stop(
+                        "Work proposal perturbation fit does not match its actual ordered inputs."
+                    )
+                }
             }
-            perturbations <- merge_perturbation_fits(perturbations, proposal$perturbation_fits)
-        } else if (!is.null(proposal$perturbation_fits)) stop("Unexpected perturbation cache in this execution mode.")
+            perturbations <- merge_perturbation_fits(
+                perturbations,
+                proposal$perturbation_fits
+            )
+        } else if (!is.null(proposal$perturbation_fits)) {
+            stop("Unexpected perturbation cache in this execution mode.")
+        }
     }
     # Cache insertion order follows the direct global response traversal, even
     # when one response was fitted independently by several CRT guide units.
     if (context$shared_response_fit) {
         existing <- names(context$response_fits)
-        global <- as.character(context$index$response_ids[unique(context$index$pair_rows$response_idx)])
+        global <- as.character(context$index$response_ids[unique(
+            context$index$pair_rows$response_idx
+        )])
         responses <- responses[c(existing, setdiff(global, existing))]
     }
-    attr(responses, "fit_identity") <- if (context$shared_response_fit) context$fit_identity else object@fits@response_identity
-    raw <- bind_analysis_results(lapply(proposals, function(proposal) proposal$result))
+    attr(responses, "fit_identity") <- if (context$shared_response_fit) {
+        context$fit_identity
+    } else {
+        object@fits@response_identity
+    }
+    raw <- bind_analysis_results(lapply(proposals, function(proposal) {
+        proposal$result
+    }))
     raw[[execution_row_column()]] <- NULL
     assembled <- assemble_pair_results(raw, prepared$plan@pairs)
-    result <- switch(prepared$plan@analysis,
+    result <- switch(
+        prepared$plan@analysis,
         run_calibration_check = process_calibration_result(assembled, object),
         run_power_check = apply_grouping_to_result(assembled, object),
-        run_discovery_analysis = process_discovery_result(assembled, object))
-    output <- list(response_precomputations = responses,
-        perturbation_fits = if (object@spec@run_permutations || context$index$calibration_check) NULL else perturbations)
-    if (!is.null(output$perturbation_fits)) attr(output$perturbation_fits, "fit_identity") <- context$perturbation_identity
-    object <- commit_result_record(object, prepared$plan@analysis, result, prepared$plan@pairs,
-        execution$output_amount, plan = prepared$plan)
+        run_discovery_analysis = process_discovery_result(assembled, object)
+    )
+    output <- list(
+        response_precomputations = responses,
+        perturbation_fits = if (
+            object@spec@run_permutations || context$index$calibration_check
+        ) {
+            NULL
+        } else {
+            perturbations
+        }
+    )
+    if (!is.null(output$perturbation_fits)) {
+        attr(
+            output$perturbation_fits,
+            "fit_identity"
+        ) <- context$perturbation_identity
+    }
+    object <- commit_result_record(
+        object,
+        prepared$plan@analysis,
+        result,
+        prepared$plan@pairs,
+        execution$output_amount,
+        plan = prepared$plan
+    )
     commit_analysis_fits(object, output)
 }

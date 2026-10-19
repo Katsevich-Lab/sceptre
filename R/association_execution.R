@@ -14,7 +14,11 @@
 run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     index <- context$index
     treatment_lookup <- make_treatment_index_lookup(index)
-    response_rows <- if (is.null(execution$work_keys)) unique(index$pair_rows$response_idx) else execution$work_keys
+    response_rows <- if (is.null(execution$work_keys)) {
+        unique(index$pair_rows$response_idx)
+    } else {
+        execution$work_keys
+    }
 
     # Analyze a block of response genes assigned to one worker
     # block_rows: Original count-matrix gene rows, in the order to process.
@@ -107,7 +111,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
         blocks,
         analyze_response_block,
         execution$parallel,
-        analysis = context$analysis, phase = "response_tests"
+        analysis = context$analysis,
+        phase = "response_tests"
     )
     if (execution$parallel) {
         message(crayon::green(" \u2713"))
@@ -182,9 +187,15 @@ run_crt_analysis <- function(context, execution) {
         updates
     }
 
-    work_groups <- if (is.null(execution$work_keys)) unique(index$pair_rows$group_idx) else execution$work_keys
+    work_groups <- if (is.null(execution$work_keys)) {
+        unique(index$pair_rows$group_idx)
+    } else {
+        execution$work_keys
+    }
     if (context$shared_response_fit) {
-        response_rows <- unique(index$pair_rows$response_idx[index$pair_rows$group_idx %in% work_groups])
+        response_rows <- unique(index$pair_rows$response_idx[
+            index$pair_rows$group_idx %in% work_groups
+        ])
         blocks <- partition_response_ids(
             response_rows,
             execution$parallel,
@@ -201,7 +212,8 @@ run_crt_analysis <- function(context, execution) {
             blocks,
             prepare_response_block,
             execution$parallel,
-            analysis = context$analysis, phase = "response_fits"
+            analysis = context$analysis,
+            phase = "response_fits"
         )
         response_fits <- merge_response_fits(
             response_fits,
@@ -241,23 +253,58 @@ run_crt_analysis <- function(context, execution) {
             request_rows <- index$rows_by_group[[as.character(group_idx)]]
             pairs <- context$pairs[request_rows, , drop = FALSE]
             response_rows <- index$pair_rows$response_idx[request_rows]
-            treatment <- if (context$shared_response_fit) treatment_lookup(id) else NULL
-            view <- if (!context$shared_response_fit) make_fit_view(index, id) else NULL
+            treatment <- if (context$shared_response_fit) {
+                treatment_lookup(id)
+            } else {
+                NULL
+            }
+            view <- if (!context$shared_response_fit) {
+                make_fit_view(index, id)
+            } else {
+                NULL
+            }
             probabilities <- NULL
             if (!index$calibration_check) {
-                fit_design <- if (context$shared_response_fit) context$design else
+                fit_design <- if (context$shared_response_fit) {
+                    context$design
+                } else {
                     context$design[view$fit_to_analysis, , drop = FALSE]
-                fit_cells <- if (context$shared_response_fit) context$common_view$source_cells else view$source_cells
-                trt <- if (context$shared_response_fit) treatment$trt_idxs else view$trt_fit_pos
-                fit_identity <- perturbation_fit_identity(fit_cells, fit_design, trt)
-                saved <- lookup_perturbation_fit(context$perturbation_fits, id, fit_identity)
+                }
+                fit_cells <- if (context$shared_response_fit) {
+                    context$common_view$source_cells
+                } else {
+                    view$source_cells
+                }
+                trt <- if (context$shared_response_fit) {
+                    treatment$trt_idxs
+                } else {
+                    view$trt_fit_pos
+                }
+                fit_identity <- perturbation_fit_identity(
+                    fit_cells,
+                    fit_design,
+                    trt
+                )
+                saved <- lookup_perturbation_fit(
+                    context$perturbation_fits,
+                    id,
+                    fit_identity
+                )
                 if (is.null(saved)) {
                     proposed <- fit_perturbation_model(trt, fit_design)
                     probabilities <- proposed$probabilities
-                    perturbation_updates[id] <- list(if (is.null(proposed$fit)) NULL else
-                        c(proposed$fit, list(identity = fit_identity)))
+                    perturbation_updates[id] <- list(
+                        if (is.null(proposed$fit)) {
+                            NULL
+                        } else {
+                            c(proposed$fit, list(identity = fit_identity))
+                        }
+                    )
                 } else {
-                    probabilities <- reconstruct_perturbation_probabilities(saved, fit_design)
+                    probabilities <- reconstruct_perturbation_probabilities(
+                        saved,
+                        fit_design
+                    )
                 }
             }
             if (context$shared_response_fit) {
@@ -292,7 +339,10 @@ run_crt_analysis <- function(context, execution) {
             )
             if (!index$calibration_check) rm(fit_design)
         }
-        list(result = bind_analysis_results(results), perturbation_updates = perturbation_updates)
+        list(
+            result = bind_analysis_results(results),
+            perturbation_updates = perturbation_updates
+        )
     }
 
     blocks <- partition_response_ids(
@@ -304,19 +354,27 @@ run_crt_analysis <- function(context, execution) {
         blocks,
         analyze_guide_block,
         execution$parallel,
-        analysis = context$analysis, phase = "guide_tests"
+        analysis = context$analysis,
+        phase = "guide_tests"
     )
     if (execution$parallel) {
         message(crayon::green(" \u2713"))
     }
-    perturbation_fits <- if (index$calibration_check) NULL else {
-        updates <- do.call(c, unname(lapply(chunks, function(chunk) chunk$perturbation_updates)))
+    perturbation_fits <- if (index$calibration_check) {
+        NULL
+    } else {
+        updates <- do.call(
+            c,
+            unname(lapply(chunks, function(chunk) chunk$perturbation_updates))
+        )
         cache <- merge_perturbation_fits(context$perturbation_fits, updates)
         attr(cache, "fit_identity") <- context$perturbation_identity
         cache
     }
     list(
-        result = bind_analysis_results(lapply(chunks, function(chunk) chunk$result)),
+        result = bind_analysis_results(lapply(chunks, function(chunk) {
+            chunk$result
+        })),
         response_precomputations = response_fits,
         perturbation_fits = perturbation_fits
     )

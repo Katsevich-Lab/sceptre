@@ -126,7 +126,10 @@ test_crt_shared_fit <- function(
     probabilities = NULL
 ) {
     if (is.null(probabilities)) {
-        probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
+        probabilities <- fit_assignment_probabilities(
+            treatment$trt_idxs,
+            design
+        )
     }
     synthetic_idxs <- sample_crt_indices(
         probabilities,

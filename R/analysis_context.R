@@ -219,10 +219,13 @@ make_fit_view <- function(index, group_id = NULL) {
         fit_to_analysis <- c(treatment, index$nt_to_analysis)
         trt_fit_pos <- seq_along(treatment)
     }
-    view <- new("CellView",
+    view <- new(
+        "CellView",
         fit_to_analysis = as.integer(fit_to_analysis),
         source_cells = as.integer(index$analysis_to_source[fit_to_analysis]),
-        trt_fit_pos = as.integer(trt_fit_pos), n_trt = as.integer(length(trt_fit_pos)))
+        trt_fit_pos = as.integer(trt_fit_pos),
+        n_trt = as.integer(length(trt_fit_pos))
+    )
     validObject(view)
     view
 }
@@ -270,12 +273,18 @@ make_treatment_index_lookup <- function(index) {
 #'   design matrix are left unchanged.
 #' @noRd
 prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
-    if (is.null(plan)) plan <- make_run_plan(object, analysis, pairs)
+    if (is.null(plan)) {
+        plan <- make_run_plan(object, analysis, pairs)
+    }
     plan <- validate_run_plan(object, plan)
-    if (!identical(plan@analysis, analysis_record_name(analysis))) stop("Analysis type does not match run plan.")
+    if (!identical(plan@analysis, analysis_record_name(analysis))) {
+        stop("Analysis type does not match run plan.")
+    }
     analysis <- sub("^run_", "", analysis)
     expected <- dplyr::filter(plan@pairs, pass_qc)
-    if (!identical(lapply(pairs, identity), lapply(expected, identity))) stop("Analysis pairs do not match the run plan's eligible family.")
+    if (!identical(lapply(pairs, identity), lapply(expected, identity))) {
+        stop("Analysis pairs do not match the run plan's eligible family.")
+    }
     total_resamples <- checked_resampling_total(plan@B1, plan@B2, plan@B3)
     store <- get_response_matrix(object)
     index <- prepare_index_context(
@@ -293,7 +302,9 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
     perturbation_identity <- perturbation_cache_identity(object)
     cache <- if (identical(object@fits@response_identity, identity)) {
         object@fits@response_fits
-    } else list()
+    } else {
+        list()
+    }
     list(
         fit_identity = identity,
         response_store = store,
@@ -319,9 +330,16 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
         ),
         response_fits = cache,
         perturbation_identity = perturbation_identity,
-        perturbation_fits = if (!index$calibration_check &&
-            identical(object@fits@perturbation_identity, perturbation_identity)) {
+        perturbation_fits = if (
+            !index$calibration_check &&
+                identical(
+                    object@fits@perturbation_identity,
+                    perturbation_identity
+                )
+        ) {
             object@fits@perturbation_fits
-        } else list()
+        } else {
+            list()
+        }
     )
 }

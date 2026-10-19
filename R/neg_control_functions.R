@@ -49,8 +49,9 @@ construct_negative_control_pairs <- function(
             # Discovery targets can all fail QC even when NT groups qualify.
             # Use the necessary total-count condition as a proposal rate; the
             # native pair sampler still checks actual treatment/control counts.
-            p_hat <- mean(n_nonzero_tot >=
-                n_nonzero_trt_thresh + n_nonzero_cntrl_thresh)
+            p_hat <- mean(
+                n_nonzero_tot >= n_nonzero_trt_thresh + n_nonzero_cntrl_thresh
+            )
             if (!is.finite(p_hat) || p_hat <= 0) {
                 stop("No negative control pair passes pairwise QC.")
             }

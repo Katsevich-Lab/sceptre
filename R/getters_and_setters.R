@@ -153,17 +153,31 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
 set_response_matrix <- function(sceptre_object, response_matrix) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     previous <- sceptre_object@data@response_matrix
-    if (length(sceptre_object@data@identity) && !inherits(response_matrix, "odm") && !methods::is(response_matrix, "BackedCountStore") &&
-        !is.null(dim(response_matrix))) {
-        response_matrix <- set_matrix_accessibility(response_matrix, make_row_accessible = TRUE)
+    if (
+        length(sceptre_object@data@identity) &&
+            !inherits(response_matrix, "odm") &&
+            !methods::is(response_matrix, "BackedCountStore") &&
+            !is.null(dim(response_matrix))
+    ) {
+        response_matrix <- set_matrix_accessibility(
+            response_matrix,
+            make_row_accessible = TRUE
+        )
     }
-    if (length(previous) && !identical(dimnames(previous), dimnames(response_matrix))) {
-        stop("Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.")
+    if (
+        length(previous) &&
+            !identical(dimnames(previous), dimnames(response_matrix))
+    ) {
+        stop(
+            "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen."
+        )
     }
     sceptre_object@data@response_matrix <- as_count_store(response_matrix)
     validObject(sceptre_object@data)
-    if (length(sceptre_object@data@identity) &&
-        !identical(previous, sceptre_object@data@response_matrix)) {
+    if (
+        length(sceptre_object@data@identity) &&
+            !identical(previous, sceptre_object@data@response_matrix)
+    ) {
         sceptre_object <- refresh_imported_summaries(sceptre_object, "response")
         sceptre_object <- invalidate_screen_dependents(sceptre_object)
     }
@@ -177,17 +191,31 @@ set_response_matrix <- function(sceptre_object, response_matrix) {
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     previous <- sceptre_object@data@grna_matrix
-    if (length(sceptre_object@data@identity) && !inherits(grna_matrix, "odm") && !methods::is(grna_matrix, "BackedCountStore") &&
-        !is.null(dim(grna_matrix))) {
-        grna_matrix <- set_matrix_accessibility(grna_matrix, make_row_accessible = TRUE)
+    if (
+        length(sceptre_object@data@identity) &&
+            !inherits(grna_matrix, "odm") &&
+            !methods::is(grna_matrix, "BackedCountStore") &&
+            !is.null(dim(grna_matrix))
+    ) {
+        grna_matrix <- set_matrix_accessibility(
+            grna_matrix,
+            make_row_accessible = TRUE
+        )
     }
-    if (length(previous) && !identical(dimnames(previous), dimnames(grna_matrix))) {
-        stop("Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.")
+    if (
+        length(previous) &&
+            !identical(dimnames(previous), dimnames(grna_matrix))
+    ) {
+        stop(
+            "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen."
+        )
     }
     sceptre_object@data@grna_matrix <- as_count_store(grna_matrix)
     validObject(sceptre_object@data)
-    if (length(sceptre_object@data@identity) &&
-        !identical(previous, sceptre_object@data@grna_matrix)) {
+    if (
+        length(sceptre_object@data@identity) &&
+            !identical(previous, sceptre_object@data@grna_matrix)
+    ) {
         sceptre_object <- refresh_imported_summaries(sceptre_object, "grna")
         sceptre_object <- invalidate_screen_dependents(sceptre_object)
     }
@@ -199,24 +227,39 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
 refresh_imported_summaries <- function(object, modality) {
     store <- methods::slot(object@data, paste0(modality, "_matrix"))
     if (methods::is(store, "BackedCountStore") || is.null(dim(store))) {
-        stop("Use import_data() to replace backed screen content and its import summaries.")
+        stop(
+            "Use import_data() to replace backed screen content and its import summaries."
+        )
     }
     labels <- object@data@response_names
-    if (modality == "response" && !length(labels) &&
-        "response_p_mito" %in% names(object@data@covariate_data_frame)) {
-        stop("Original mitochondrial feature labels are unknown; use import_data() to replace response counts.")
+    if (
+        modality == "response" &&
+            !length(labels) &&
+            "response_p_mito" %in% names(object@data@covariate_data_frame)
+    ) {
+        stop(
+            "Original mitochondrial feature labels are unknown; use import_data() to replace response counts."
+        )
     }
-    summaries <- compute_cell_covariates(store,
+    summaries <- compute_cell_covariates(
+        store,
         feature_names = if (modality == "response") labels else character(),
-        compute_p_mito = modality == "response", compute_max_feature = modality == "grna")
+        compute_p_mito = modality == "response",
+        compute_max_feature = modality == "grna"
+    )
     if (modality == "grna") {
         object@data@import_grna_assignment_info <- list(
             max_grna = summaries$feature_w_max_expression,
-            max_grna_frac_umis = summaries$frac_umis_max_feature)
+            max_grna_frac_umis = summaries$frac_umis_max_feature
+        )
         summaries$feature_w_max_expression <- summaries$frac_umis_max_feature <- NULL
     }
     for (field in names(summaries)) {
-        object@data@covariate_data_frame[[paste0(modality, "_", field)]] <- summaries[[field]]
+        object@data@covariate_data_frame[[paste0(
+            modality,
+            "_",
+            field
+        )]] <- summaries[[field]]
     }
     object
 }

@@ -24,21 +24,35 @@ auto_construct_formula_object <- function(
     terms <- lapply(cell_covariate_names, function(curr_name) {
         # Dot and dots-position names have special evaluation semantics even
         # when represented as symbols. A literal lookup preserves their column.
-        variable <- if (curr_name %in% c(".", "...") || grepl("^\\.\\.[0-9]+$", curr_name)) {
+        variable <- if (
+            curr_name %in% c(".", "...") || grepl("^\\.\\.[0-9]+$", curr_name)
+        ) {
             call("get", curr_name)
-        } else as.name(curr_name)
+        } else {
+            as.name(curr_name)
+        }
         count_based_covariate <- grepl("n_umis|n_nonzero", curr_name)
         if (count_based_covariate) {
             argument <- if (any(cell_covariates[[curr_name]] == 0)) {
                 call("+", variable, 1)
-            } else variable
+            } else {
+                variable
+            }
             call("log", argument)
-        } else if (length(unique(cell_covariates[[curr_name]])) < MAX_N_LEVELS_ALLOWED) {
+        } else if (
+            length(unique(cell_covariates[[curr_name]])) < MAX_N_LEVELS_ALLOWED
+        ) {
             variable
-        } else NULL
+        } else {
+            NULL
+        }
     })
     terms <- Filter(Negate(is.null), terms)
-    rhs <- if (length(terms)) Reduce(function(left, right) call("+", left, right), terms) else 1
+    rhs <- if (length(terms)) {
+        Reduce(function(left, right) call("+", left, right), terms)
+    } else {
+        1
+    }
     # Only generated formulas use this minimal environment. Caller-supplied
     # formulas keep their own environments, including local transformations.
     form <- stats::as.formula(call("~", rhs), env = baseenv())

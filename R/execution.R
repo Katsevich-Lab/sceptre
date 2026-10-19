@@ -46,16 +46,39 @@ announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
 }
 
 # Base conditions retain the original cause and useful execution context.
-analysis_worker_error <- function(block, cause = NULL, analysis = NULL,
-    phase = NULL, reason = "error", detail = NULL) {
-    if (is.null(detail) && inherits(cause, "condition")) detail <- conditionMessage(cause)
+analysis_worker_error <- function(
+    block,
+    cause = NULL,
+    analysis = NULL,
+    phase = NULL,
+    reason = "error",
+    detail = NULL
+) {
+    if (is.null(detail) && inherits(cause, "condition")) {
+        detail <- conditionMessage(cause)
+    }
     message <- if (identical(reason, "lost_reply")) {
-        paste0("Analysis worker ", block,
-            " returned no result; it may have exited unexpectedly.")
-    } else paste0("Analysis worker ", block, " failed: ", detail)
-    structure(list(message = message, call = NULL, block = as.integer(block),
-        analysis = analysis, phase = phase, reason = reason, cause = cause,
-        parent = cause), class = c("sceptre_worker_error", "error", "condition"))
+        paste0(
+            "Analysis worker ",
+            block,
+            " returned no result; it may have exited unexpectedly."
+        )
+    } else {
+        paste0("Analysis worker ", block, " failed: ", detail)
+    }
+    structure(
+        list(
+            message = message,
+            call = NULL,
+            block = as.integer(block),
+            analysis = analysis,
+            phase = phase,
+            reason = reason,
+            cause = cause,
+            parent = cause
+        ),
+        class = c("sceptre_worker_error", "error", "condition")
+    )
 }
 
 #' Run each work block serially or in a separate forked worker
@@ -70,18 +93,30 @@ analysis_worker_error <- function(block, cause = NULL, analysis = NULL,
 #'   error message, before callers combine results or report success. Blocks and
 #'   random seeds are not rearranged; `mclapply()` keeps its default behavior.
 #' @noRd
-execute_analysis_blocks <- function(blocks, worker, parallel, analysis = NULL, phase = NULL) {
+execute_analysis_blocks <- function(
+    blocks,
+    worker,
+    parallel,
+    analysis = NULL,
+    phase = NULL
+) {
     # A successful worker can return NULL for an empty block. Put its result
     # inside a list so that this differs from a child exiting without replying.
     invoke_worker <- function(i, proc_id) {
         # Errors acquire execution context. A child interrupt is transported to
         # the parent and re-signalled unchanged; a parent interrupt escapes.
-        tryCatch(list(value = worker(blocks[[i]], proc_id)), error = function(cause) {
-            stop(analysis_worker_error(i, cause, analysis, phase))
-        }, interrupt = function(cause) {
-            if (!parallel) stop(cause)
-            list(interrupt = cause)
-        })
+        tryCatch(
+            list(value = worker(blocks[[i]], proc_id)),
+            error = function(cause) {
+                stop(analysis_worker_error(i, cause, analysis, phase))
+            },
+            interrupt = function(cause) {
+                if (!parallel) {
+                    stop(cause)
+                }
+                list(interrupt = cause)
+            }
+        )
     }
     replies <- if (!parallel) {
         lapply(seq_along(blocks), function(i) invoke_worker(i, NULL))
@@ -98,17 +133,29 @@ execute_analysis_blocks <- function(blocks, worker, parallel, analysis = NULL, p
         result <- replies[[i]]
         if (inherits(result, "try-error")) {
             cause <- attr(result, "condition")
-            if (inherits(cause, "sceptre_worker_error")) stop(cause)
+            if (inherits(cause, "sceptre_worker_error")) {
+                stop(cause)
+            }
             detail <- if (inherits(cause, "condition")) {
                 conditionMessage(cause)
             } else {
                 as.character(result)
             }
-            stop(analysis_worker_error(i, cause, analysis, phase, detail = detail))
+            stop(analysis_worker_error(
+                i,
+                cause,
+                analysis,
+                phase,
+                detail = detail
+            ))
         }
         if (is.null(result)) {
-            stop(analysis_worker_error(i, analysis = analysis, phase = phase,
-                reason = "lost_reply"))
+            stop(analysis_worker_error(
+                i,
+                analysis = analysis,
+                phase = phase,
+                reason = "lost_reply"
+            ))
         }
         if (inherits(result$interrupt, "interrupt")) stop(result$interrupt)
     }

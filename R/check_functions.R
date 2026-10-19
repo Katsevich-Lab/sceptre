@@ -756,7 +756,8 @@ check_calibration_check_inputs <- function(
     control_group_complement <- sceptre_object@spec@control_group_complement
     # QC can remove every cell assigned to a guide while its metadata remains.
     n_nt_grnas <- sum(
-        lengths(sceptre_object@preparation@analysis_groups$indiv_nt_grna_idxs) > 0L
+        lengths(sceptre_object@preparation@analysis_groups$indiv_nt_grna_idxs) >
+            0L
     )
     # check number of gRNAS
     if (!control_group_complement) {
@@ -866,11 +867,19 @@ check_discovery_analysis_inputs <- function(
 # Detect actual offset calls rather than covariate labels containing the word.
 #' @noRd
 formula_contains_offset_call <- function(expression) {
-    if (!is.call(expression)) return(FALSE)
+    if (!is.call(expression)) {
+        return(FALSE)
+    }
     head <- expression[[1L]]
     offset <- identical(head, as.name("offset")) ||
-        (is.call(head) && length(head) == 3L &&
+        (is.call(head) &&
+            length(head) == 3L &&
             as.character(head[[1L]]) %in% c("::", ":::") &&
             identical(head[[3L]], as.name("offset")))
-    offset || any(vapply(as.list(expression)[-1L], formula_contains_offset_call, logical(1)))
+    offset ||
+        any(vapply(
+            as.list(expression)[-1L],
+            formula_contains_offset_call,
+            logical(1)
+        ))
 }

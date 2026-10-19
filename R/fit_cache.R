@@ -33,7 +33,10 @@ response_cache_assignments_changed <- function(
 ) {
     object@data@low_moi &&
         (!identical(object@spec@grna_assignment_method, method) ||
-            !identical(object@spec@grna_assignment_hyperparameters, hyperparameters))
+            !identical(
+                object@spec@grna_assignment_hyperparameters,
+                hyperparameters
+            ))
 }
 
 #' Invalidate the response and perturbation families according to their inputs
@@ -79,7 +82,10 @@ merge_response_fits <- function(cache, updates) {
     # Each worker returns only newly fitted genes. Keep the old fits first,
     # followed by the new coefficients and dispersion estimates.
     combined <- c(cache, updates)
-    if (length(combined) && (is.null(names(combined)) || anyDuplicated(names(combined)))) {
+    if (
+        length(combined) &&
+            (is.null(names(combined)) || anyDuplicated(names(combined)))
+    ) {
         stop("Response fit identifiers must be unique.")
     }
     combined
@@ -99,7 +105,10 @@ commit_response_fits <- function(object, cache) {
     candidate@response_fits <- cache
     candidate@response_identity <- if (is.null(identity)) list() else identity
     validObject(candidate)
-    if (length(cache) && !identical(identity, response_fit_identity(object, identity$cells))) {
+    if (
+        length(cache) &&
+            !identical(identity, response_fit_identity(object, identity$cells))
+    ) {
         stop("Response fits do not match the actual fitting inputs.")
     }
     object@fits <- candidate
@@ -111,11 +120,20 @@ commit_response_fits <- function(object, cache) {
 # content identity is computed once, never once per response. Coefficients retain
 # the current Poisson-fit/dispersion algorithm.
 response_fit_identity <- function(object, source_cells) {
-    list(data = object@data@identity, cells = as.integer(source_cells),
+    list(
+        data = object@data@identity,
+        cells = as.integer(source_cells),
         columns = colnames(object@preparation@design_matrix),
-        design = digest::digest(object@preparation@design_matrix[
-            source_cells, , drop = FALSE], algo = "sha256"),
-        method = response_fit_method_id())
+        design = digest::digest(
+            object@preparation@design_matrix[
+                source_cells,
+                ,
+                drop = FALSE
+            ],
+            algo = "sha256"
+        ),
+        method = response_fit_method_id()
+    )
 }
 
 # A content replacement invalidates every derived stage. Reopening a verified
@@ -143,35 +161,58 @@ invalidate_screen_dependents <- function(object) {
 
 perturbation_cache_identity <- function(object) {
     cells <- object@preparation@analysis_cells
-    list(cells = cells, columns = colnames(object@preparation@design_matrix),
-        design = digest::digest(object@preparation@design_matrix[cells, , drop = FALSE], algo = "sha256"),
+    list(
+        cells = cells,
+        columns = colnames(object@preparation@design_matrix),
+        design = digest::digest(
+            object@preparation@design_matrix[cells, , drop = FALSE],
+            algo = "sha256"
+        ),
         method = perturbation_fit_method_id(),
-        runtime = list(R = as.character(getRversion()),
+        runtime = list(
+            R = as.character(getRversion()),
             stats = as.character(utils::packageVersion("stats")),
-            BLAS = unname(extSoftVersion()["BLAS"]), matprod = getOption("matprod")))
+            BLAS = unname(extSoftVersion()["BLAS"]),
+            matprod = getOption("matprod")
+        )
+    )
 }
 
 perturbation_fit_identity <- function(source_cells, design, trt_idxs) {
     indicator <- integer(nrow(design))
     indicator[trt_idxs] <- 1L
-    list(cells = digest::digest(as.integer(source_cells), algo = "sha256"),
+    list(
+        cells = digest::digest(as.integer(source_cells), algo = "sha256"),
         design = digest::digest(design, algo = "sha256"),
-        treatment = digest::digest(indicator, algo = "sha256"))
+        treatment = digest::digest(indicator, algo = "sha256")
+    )
 }
 
 lookup_perturbation_fit <- function(cache, group, identity) {
     fit <- cache[[group]]
-    if (is.null(fit) || !identical(fit$identity, identity)) return(NULL)
+    if (is.null(fit) || !identical(fit$identity, identity)) {
+        return(NULL)
+    }
     fit
 }
 
 merge_perturbation_fits <- function(cache, updates) {
     ids <- names(updates)
-    if (length(updates) && (is.null(ids) || anyNA(ids) || any(!nzchar(ids)) || anyDuplicated(ids))) {
+    if (
+        length(updates) &&
+            (is.null(ids) ||
+                anyNA(ids) ||
+                any(!nzchar(ids)) ||
+                anyDuplicated(ids))
+    ) {
         stop("Perturbation fit updates must be named and unique.")
     }
     for (id in ids) {
-        if (is.null(updates[[id]])) cache[id] <- NULL else cache[id] <- updates[id]
+        if (is.null(updates[[id]])) {
+            cache[id] <- NULL
+        } else {
+            cache[id] <- updates[id]
+        }
     }
     cache
 }
@@ -179,15 +220,31 @@ merge_perturbation_fits <- function(cache, updates) {
 commit_perturbation_fits <- function(object, cache) {
     identity <- attr(cache, "fit_identity")
     attr(cache, "fit_identity") <- NULL
-    if (length(cache) && !identical(identity, perturbation_cache_identity(object))) {
-        stop("Perturbation fits do not match the actual analysis design and cells.")
+    if (
+        length(cache) &&
+            !identical(identity, perturbation_cache_identity(object))
+    ) {
+        stop(
+            "Perturbation fits do not match the actual analysis design and cells."
+        )
     }
-    if (length(cache) && !all(names(cache) %in%
-        names(object@preparation@analysis_groups$grna_group_idxs))) {
-        stop("Perturbation fit identifiers must belong to the prepared guide groups.")
+    if (
+        length(cache) &&
+            !all(
+                names(cache) %in%
+                    names(object@preparation@analysis_groups$grna_group_idxs)
+            )
+    ) {
+        stop(
+            "Perturbation fit identifiers must belong to the prepared guide groups."
+        )
     }
     object@fits@perturbation_fits <- cache
-    object@fits@perturbation_identity <- if (is.null(identity)) list() else identity
+    object@fits@perturbation_identity <- if (is.null(identity)) {
+        list()
+    } else {
+        identity
+    }
     validObject(object)
     object
 }

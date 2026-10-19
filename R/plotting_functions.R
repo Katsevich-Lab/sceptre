@@ -540,7 +540,11 @@ plot_run_calibration_check <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     current_result(sceptre_object, "run_calibration_check") |> invisible()
-    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
+    calibration_result <- current_result(
+        sceptre_object,
+        "run_calibration_check",
+        required = FALSE
+    )
     my_theme <- get_my_theme()
 
     # compute n rejections
@@ -873,7 +877,11 @@ plot_run_discovery_analysis <- function(
         ,
         drop = FALSE
     ]
-    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
+    calibration_result <- current_result(
+        sceptre_object,
+        "run_calibration_check",
+        required = FALSE
+    )
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
         max(discovery_set$p_value)
@@ -1293,7 +1301,9 @@ plot_pairwise_qc <- function(
         ggplot2::geom_hline(
             yintercept = sceptre_object@spec@n_nonzero_cntrl_thresh
         ) +
-        ggplot2::geom_vline(xintercept = sceptre_object@spec@n_nonzero_trt_thresh) +
+        ggplot2::geom_vline(
+            xintercept = sceptre_object@spec@n_nonzero_trt_thresh
+        ) +
         ggplot2::xlab("N nonzero trt. cells") +
         ggplot2::ylab("N nonzero cntrl. cells") +
         ggplot2::theme(legend.position = "bot") +
@@ -1379,8 +1389,16 @@ plot_run_power_check <- function(
     my_theme <- get_my_theme()
     my_cols <- c("mediumseagreen", "firebrick1")
 
-    pos_ctrl_pvals <- current_result(sceptre_object, "run_power_check")$p_value |> stats::na.omit()
-    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
+    pos_ctrl_pvals <- current_result(
+        sceptre_object,
+        "run_power_check"
+    )$p_value |>
+        stats::na.omit()
+    calibration_result <- current_result(
+        sceptre_object,
+        "run_calibration_check",
+        required = FALSE
+    )
     neg_ctrl_pval_sub <- if (nrow(calibration_result) >= 1) {
         downsample_result_data_frame(
             result_df = calibration_result
@@ -1577,7 +1595,9 @@ plot_response_grna_target_pair <- function(
         } else {
             NULL
         },
-        if (result_record_is_current(sceptre_object, "run_discovery_analysis")) {
+        if (
+            result_record_is_current(sceptre_object, "run_discovery_analysis")
+        ) {
             current_result(sceptre_object, "run_discovery_analysis")
         } else {
             NULL

@@ -16,7 +16,10 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
     n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
     n_targeting_grnas <- nrow(targeting_grnas_df)
     n_covariates <- length(names(object@data@covariate_data_frame))
-    covariates <- paste0(sort(names(object@data@covariate_data_frame)), collapse = ", ")
+    covariates <- paste0(
+        sort(names(object@data@covariate_data_frame)),
+        collapse = ", "
+    )
     moi <- ifelse(object@data@low_moi, "Low", "High")
     cat(paste0(
         "An object of class ",
@@ -102,29 +105,41 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     }
 
     # 2. print analysis parameters
-    n_discovery_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) pair_count(x, "discovery") else integer()
-    n_pc_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) pair_count(x, "positive_control") else integer()
+    n_discovery_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) {
+        pair_count(x, "discovery")
+    } else {
+        integer()
+    }
+    n_pc_pairs <- if (funct_run_vect[["set_analysis_parameters"]]) {
+        pair_count(x, "positive_control")
+    } else {
+        integer()
+    }
     cat(paste0(
         "\nAnalysis parameters: \n",
         "\t\U2022 Discovery pairs:",
-            if (length(n_discovery_pairs) == 0) {
-                " not specified"
-            } else {
-                paste0(
-                    " data frame with ",
-                    crayon::blue(n_discovery_pairs),
-                    " pairs",
-                    if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
-                        paste0(
-                            " (",
-                            crayon::blue(pair_count(x, "discovery", passing = TRUE)),
-                            " after pairwise QC)"
-                        )
-                    } else {
-                        NULL
-                    }
-                )
-            },
+        if (length(n_discovery_pairs) == 0) {
+            " not specified"
+        } else {
+            paste0(
+                " data frame with ",
+                crayon::blue(n_discovery_pairs),
+                " pairs",
+                if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
+                    paste0(
+                        " (",
+                        crayon::blue(pair_count(
+                            x,
+                            "discovery",
+                            passing = TRUE
+                        )),
+                        " after pairwise QC)"
+                    )
+                } else {
+                    NULL
+                }
+            )
+        },
         "\n\t\U2022 Positive control pairs:",
         if (length(n_pc_pairs) == 0) {
             " not specified"
@@ -136,7 +151,11 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) {
                     paste0(
                         " (",
-                        crayon::blue(pair_count(x, "positive_control", passing = TRUE)),
+                        crayon::blue(pair_count(
+                            x,
+                            "positive_control",
+                            passing = TRUE
+                        )),
                         " after pairwise QC)"
                     )
                 } else {
@@ -238,7 +257,11 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (x@spec@grna_assignment_method == "maximum") {
                     "not computed when using \"maximum\" assignment method"
                 } else {
-                    crayon::blue(x@preparation@guide_counts_per_cell |> mean() |> round(2))
+                    crayon::blue(
+                        x@preparation@guide_counts_per_cell |>
+                            mean() |>
+                            round(2)
+                    )
                 }
             ),
             if (x@spec@grna_assignment_method == "mixture") {
@@ -255,15 +278,35 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     }
 
     # 4. print the results summary
-    calib_check_run <- nrow(current_result(x, "run_calibration_check", required = FALSE)) > 0L
-    discovery_analysis_run <- nrow(current_result(x, "run_discovery_analysis", required = FALSE)) > 0L
-    power_check_run <- nrow(current_result(x, "run_power_check", required = FALSE)) > 0L
+    calib_check_run <- nrow(current_result(
+        x,
+        "run_calibration_check",
+        required = FALSE
+    )) >
+        0L
+    discovery_analysis_run <- nrow(current_result(
+        x,
+        "run_discovery_analysis",
+        required = FALSE
+    )) >
+        0L
+    power_check_run <- nrow(current_result(
+        x,
+        "run_power_check",
+        required = FALSE
+    )) >
+        0L
     if (calib_check_run || discovery_analysis_run || power_check_run) {
         cat("\n\nSummary of results:")
     }
     if (calib_check_run) {
-        n_false_rejections <- sum(current_result(x, "run_calibration_check")$significant)
-        mean_lfc <- signif(mean(current_result(x, "run_calibration_check")$log_2_fold_change), 2)
+        n_false_rejections <- sum(
+            current_result(x, "run_calibration_check")$significant
+        )
+        mean_lfc <- signif(
+            mean(current_result(x, "run_calibration_check")$log_2_fold_change),
+            2
+        )
         n_calib_pairs <- nrow(current_result(x, "run_calibration_check"))
         cat(paste0(
             "\n\t\U2022 N",
@@ -277,7 +320,10 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (power_check_run) {
-        median_pc_p_value <- stats::median(current_result(x, "run_power_check")$p_value, na.rm = TRUE)
+        median_pc_p_value <- stats::median(
+            current_result(x, "run_power_check")$p_value,
+            na.rm = TRUE
+        )
         cat(paste0(
             "\n\t\U2022 Median",
             crayon::green(" positive control "),
@@ -286,7 +332,10 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (discovery_analysis_run) {
-        n_discoveries <- sum(current_result(x, "run_discovery_analysis")$significant, na.rm = TRUE)
+        n_discoveries <- sum(
+            current_result(x, "run_discovery_analysis")$significant,
+            na.rm = TRUE
+        )
         n_discovery_pairs <- pair_count(x, "discovery", passing = TRUE)
         cat(paste0(
             "\n\t\U2022 N",
@@ -341,11 +390,18 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
     args[["sceptre_object"]] <- x
 
     status <- workflow_status(x)
-    candidates <- c("run_discovery_analysis", "run_power_check",
-        "run_calibration_check", "run_qc", "assign_grnas")
+    candidates <- c(
+        "run_discovery_analysis",
+        "run_power_check",
+        "run_calibration_check",
+        "run_qc",
+        "assign_grnas"
+    )
     available <- candidates[status[candidates]]
     if (!length(available)) {
-        stop("There is no generic plot configured for the current prepared state.")
+        stop(
+            "There is no generic plot configured for the current prepared state."
+        )
     }
     funct_to_call <- paste0("plot_", available[[1L]])
     p <- do.call(what = funct_to_call, args = args)

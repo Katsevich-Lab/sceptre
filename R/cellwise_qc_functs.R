@@ -39,7 +39,10 @@ determine_cells_to_retain <- function(
     n_cells_rm_n_responses <- length(cells_to_exclude_n_responses)
 
     # 3. compute cells to retain based on p_mito
-    if ("response_p_mito" %in% colnames(sceptre_object@data@covariate_data_frame)) {
+    if (
+        "response_p_mito" %in%
+            colnames(sceptre_object@data@covariate_data_frame)
+    ) {
         cells_to_exclude_p_mito <- which(
             sceptre_object@data@covariate_data_frame$response_p_mito >
                 p_mito_threshold

@@ -69,13 +69,22 @@ run_calibration_check <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
-    prepared <- run_calibration_check_pt_1(sceptre_object,
+    prepared <- run_calibration_check_pt_1(
+        sceptre_object,
         n_calibration_pairs = n_calibration_pairs,
         calibration_group_size = calibration_group_size,
-        parallel = parallel, n_processors = n_processors)
-    run_calibration_check_pt_2(prepared$object, prepared$plan,
-        output_amount = output_amount, print_progress = print_progress,
-        parallel = parallel, n_processors = n_processors, log_dir = log_dir)
+        parallel = parallel,
+        n_processors = n_processors
+    )
+    run_calibration_check_pt_2(
+        prepared$object,
+        prepared$plan,
+        output_amount = output_amount,
+        print_progress = print_progress,
+        parallel = parallel,
+        n_processors = n_processors,
+        log_dir = log_dir
+    )
 }
 
 
@@ -95,32 +104,62 @@ run_calibration_check_pt_1 <- function(
     n_processors = "auto"
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
+    sceptre_object <- skip_assign_grnas_and_run_qc(
+        sceptre_object,
+        parallel,
+        n_processors
+    )
     require_stage(sceptre_object, "run_qc")
     if (!parallel) {
         message(crayon::red(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
-    if (pair_count(sceptre_object, "discovery") == 0L &&
-        (is.null(n_calibration_pairs) || is.null(calibration_group_size))) {
-        stop("`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified.")
+    if (
+        pair_count(sceptre_object, "discovery") == 0L &&
+            (is.null(n_calibration_pairs) || is.null(calibration_group_size))
+    ) {
+        stop(
+            "`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified."
+        )
     }
     if (is.null(calibration_group_size)) {
-        calibration_group_size <- compute_calibration_group_size(guide_group_metadata(sceptre_object))
+        calibration_group_size <- compute_calibration_group_size(guide_group_metadata(
+            sceptre_object
+        ))
     }
     if (is.null(n_calibration_pairs)) {
-        n_calibration_pairs <- pair_count(sceptre_object, "discovery", passing = TRUE)
+        n_calibration_pairs <- pair_count(
+            sceptre_object,
+            "discovery",
+            passing = TRUE
+        )
     }
-    check_calibration_check_inputs(sceptre_object, n_calibration_pairs,
-        n_processors, calibration_group_size) |> invisible()
-    budgets <- run_resampling_budget(sceptre_object, "run_calibration_check", n_calibration_pairs)
-    pairs <- construct_negative_control_pairs(sceptre_object,
+    check_calibration_check_inputs(
+        sceptre_object,
+        n_calibration_pairs,
+        n_processors,
+        calibration_group_size
+    ) |>
+        invisible()
+    budgets <- run_resampling_budget(
+        sceptre_object,
+        "run_calibration_check",
+        n_calibration_pairs
+    )
+    pairs <- construct_negative_control_pairs(
+        sceptre_object,
         n_calibration_pairs = n_calibration_pairs,
-        calibration_group_size = calibration_group_size)
-    plan <- make_run_plan(sceptre_object, "run_calibration_check", pairs,
+        calibration_group_size = calibration_group_size
+    )
+    plan <- make_run_plan(
+        sceptre_object,
+        "run_calibration_check",
+        pairs,
         n_calibration_pairs = n_calibration_pairs,
-        calibration_group_size = calibration_group_size, budgets = budgets)
+        calibration_group_size = calibration_group_size,
+        budgets = budgets
+    )
     list(object = sceptre_object, plan = plan)
 }
 
@@ -145,15 +184,29 @@ run_calibration_check_pt_2 <- function(
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     require_stage(sceptre_object, "run_qc")
     plan <- validate_run_plan(sceptre_object, plan)
-    if (!identical(plan@analysis, "run_calibration_check")) stop("Expected a calibration run plan.")
-    out <- analyze_association_pairs(sceptre_object,
-        response_grna_group_pairs = plan@pairs, analysis_type = "calibration_check",
-        output_amount = output_amount, print_progress = print_progress,
-        parallel = parallel, n_processors = n_processors, log_dir = log_dir,
-        plan = plan)
+    if (!identical(plan@analysis, "run_calibration_check")) {
+        stop("Expected a calibration run plan.")
+    }
+    out <- analyze_association_pairs(
+        sceptre_object,
+        response_grna_group_pairs = plan@pairs,
+        analysis_type = "calibration_check",
+        output_amount = output_amount,
+        print_progress = print_progress,
+        parallel = parallel,
+        n_processors = n_processors,
+        log_dir = log_dir,
+        plan = plan
+    )
     result <- process_calibration_result(out$result, sceptre_object)
-    sceptre_object <- commit_result_record(sceptre_object, "run_calibration_check",
-        result, plan@pairs, output_amount, plan = plan)
+    sceptre_object <- commit_result_record(
+        sceptre_object,
+        "run_calibration_check",
+        result,
+        plan@pairs,
+        output_amount,
+        plan = plan
+    )
     commit_analysis_fits(sceptre_object, out)
 }
 
@@ -207,7 +260,11 @@ run_power_check <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
-    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
+    sceptre_object <- skip_assign_grnas_and_run_qc(
+        sceptre_object,
+        parallel,
+        n_processors
+    )
     require_stage(sceptre_object, "run_qc")
     if (!parallel) {
         message(crayon::red(
@@ -220,18 +277,44 @@ run_power_check <- function(
         control_group_complement = sceptre_object@spec@control_group_complement,
         grna_target_data_frame = guide_group_metadata(sceptre_object),
         pc_analysis = TRUE,
-        calibration_result = current_result(sceptre_object, "run_calibration_check", required = FALSE),
-        n_ok_pairs = pair_count(sceptre_object, "positive_control", passing = TRUE),
-        n_processors = n_processors) |> invisible()
-    plan <- make_run_plan(sceptre_object, "run_power_check", response_grna_group_pairs)
-    out <- analyze_association_pairs(sceptre_object,
+        calibration_result = current_result(
+            sceptre_object,
+            "run_calibration_check",
+            required = FALSE
+        ),
+        n_ok_pairs = pair_count(
+            sceptre_object,
+            "positive_control",
+            passing = TRUE
+        ),
+        n_processors = n_processors
+    ) |>
+        invisible()
+    plan <- make_run_plan(
+        sceptre_object,
+        "run_power_check",
+        response_grna_group_pairs
+    )
+    out <- analyze_association_pairs(
+        sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        analysis_type = "power_check", output_amount = output_amount,
-        print_progress = print_progress, parallel = parallel,
-        n_processors = n_processors, log_dir = log_dir, plan = plan)
+        analysis_type = "power_check",
+        output_amount = output_amount,
+        print_progress = print_progress,
+        parallel = parallel,
+        n_processors = n_processors,
+        log_dir = log_dir,
+        plan = plan
+    )
     result <- apply_grouping_to_result(out$result, sceptre_object)
-    sceptre_object <- commit_result_record(sceptre_object, "run_power_check",
-        result, plan@pairs, output_amount, plan = plan)
+    sceptre_object <- commit_result_record(
+        sceptre_object,
+        "run_power_check",
+        result,
+        plan@pairs,
+        output_amount,
+        plan = plan
+    )
     commit_analysis_fits(sceptre_object, out)
 }
 
@@ -285,7 +368,11 @@ run_discovery_analysis <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
-    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, parallel, n_processors)
+    sceptre_object <- skip_assign_grnas_and_run_qc(
+        sceptre_object,
+        parallel,
+        n_processors
+    )
     require_stage(sceptre_object, "run_qc")
     if (!parallel) {
         message(crayon::red(
@@ -298,18 +385,40 @@ run_discovery_analysis <- function(
         control_group_complement = sceptre_object@spec@control_group_complement,
         grna_target_data_frame = guide_group_metadata(sceptre_object),
         pc_analysis = FALSE,
-        calibration_result = current_result(sceptre_object, "run_calibration_check", required = FALSE),
+        calibration_result = current_result(
+            sceptre_object,
+            "run_calibration_check",
+            required = FALSE
+        ),
         n_ok_pairs = pair_count(sceptre_object, "discovery", passing = TRUE),
-        n_processors = n_processors) |> invisible()
-    plan <- make_run_plan(sceptre_object, "run_discovery_analysis", response_grna_group_pairs)
-    out <- analyze_association_pairs(sceptre_object,
+        n_processors = n_processors
+    ) |>
+        invisible()
+    plan <- make_run_plan(
+        sceptre_object,
+        "run_discovery_analysis",
+        response_grna_group_pairs
+    )
+    out <- analyze_association_pairs(
+        sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
-        analysis_type = "discovery_analysis", output_amount = output_amount,
-        print_progress = print_progress, parallel = parallel,
-        n_processors = n_processors, log_dir = log_dir, plan = plan)
+        analysis_type = "discovery_analysis",
+        output_amount = output_amount,
+        print_progress = print_progress,
+        parallel = parallel,
+        n_processors = n_processors,
+        log_dir = log_dir,
+        plan = plan
+    )
     result <- process_discovery_result(out$result, sceptre_object)
-    sceptre_object <- commit_result_record(sceptre_object, "run_discovery_analysis",
-        result, plan@pairs, output_amount, plan = plan)
+    sceptre_object <- commit_result_record(
+        sceptre_object,
+        "run_discovery_analysis",
+        result,
+        plan@pairs,
+        output_amount,
+        plan = plan
+    )
     commit_analysis_fits(sceptre_object, out)
 }
 
@@ -372,19 +481,30 @@ run_discovery_analysis <- function(
 #'   get_result("run_power_check")
 get_result <- function(sceptre_object, analysis, historical = FALSE) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    if (!is.character(analysis) || length(analysis) != 1L || is.na(analysis) ||
-        !analysis %in% analysis_names()) {
+    if (
+        !is.character(analysis) ||
+            length(analysis) != 1L ||
+            is.na(analysis) ||
+            !analysis %in% analysis_names()
+    ) {
         stop(
             "`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`."
         )
     }
-    if (!isTRUE(historical)) return(owned_result_value(current_result(sceptre_object, analysis)))
+    if (!isTRUE(historical)) {
+        return(owned_result_value(current_result(sceptre_object, analysis)))
+    }
     record <- owned_result_value(sceptre_object@results@records[[analysis]])
     result <- record$table
-    if (is.null(record) || !is.data.frame(result)) stop(analysis, " has no saved result.")
+    if (is.null(record) || !is.data.frame(result)) {
+        stop(analysis, " has no saved result.")
+    }
     attr(result, "sceptre_result_record") <- record
     if (!result_record_is_current(sceptre_object, analysis)) {
-        warning("Returning historical results; they do not represent the current analysis settings.", call. = FALSE)
+        warning(
+            "Returning historical results; they do not represent the current analysis settings.",
+            call. = FALSE
+        )
     }
     result
 }

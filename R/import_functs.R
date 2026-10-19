@@ -1110,7 +1110,11 @@ process_covariates_and_matrices <- function(
         make_row_accessible = TRUE
     )
     return(list(
-        response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names,
+        response_names = if (identical(response_names, NA_character_)) {
+            rownames(response_matrix)
+        } else {
+            response_names
+        },
         covariate_data_frame = covariate_data_frame,
         response_matrix = response_matrix,
         grna_matrix = grna_matrix
