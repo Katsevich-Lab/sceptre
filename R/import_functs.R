@@ -155,6 +155,7 @@ import_data_memory <- function(
         response_matrix = processed_inputs$response_matrix,
         grna_matrix = processed_inputs$grna_matrix,
         covariate_data_frame = processed_inputs$covariate_data_frame,
+        response_names = processed_inputs$response_names,
         moi = moi,
         grna_target_data_frame = grna_target_data_frame
     )
@@ -215,12 +216,13 @@ import_data_use_ondisc <- function(
         response_matrix = out$response_matrix,
         grna_matrix = out$grna_matrix,
         covariate_data_frame = covariate_data_frame,
+        response_names = processed_inputs$response_names,
         moi = moi,
         grna_target_data_frame = grna_target_data_frame
     )
 
     # add integer id
-    sceptre_object@integer_id <- integer_id
+    sceptre_object@data@integer_id <- integer_id
     return(sceptre_object)
 }
 
@@ -686,7 +688,7 @@ import_data_from_cellranger_use_ondisc <- function(
         grna_target_data_frame = grna_target_data_frame
     )
 
-    sceptre_object@integer_id <- out$gene@integer_id
+    sceptre_object@data@integer_id <- out$gene@integer_id
     return(sceptre_object)
 }
 
@@ -863,13 +865,15 @@ init_sceptre_object <- function(
     grna_matrix,
     covariate_data_frame,
     moi,
-    grna_target_data_frame
+    grna_target_data_frame,
+    response_names = character()
 ) {
     # create sceptre_object
     sceptre_object <- methods::new("sceptre_object")
 
+    sceptre_object@data@response_names <- as.character(response_names)
     # process the covariate data frame
-    sceptre_object@import_grna_assignment_info <- list(
+    sceptre_object@data@import_grna_assignment_info <- list(
         max_grna = covariate_data_frame$grna_feature_w_max_expression,
         max_grna_frac_umis = covariate_data_frame$grna_frac_umis_max_feature
     )
@@ -878,19 +882,22 @@ init_sceptre_object <- function(
     # set data fields
     sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
     sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
-    sceptre_object@covariate_data_frame <- covariate_data_frame
-    sceptre_object@low_moi <- (moi == "low")
-    sceptre_object@covariate_names <- sort(colnames(covariate_data_frame))
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame |>
+    sceptre_object@data@covariate_data_frame <- covariate_data_frame
+    sceptre_object@data@low_moi <- (moi == "low")
+    sceptre_object@data@covariate_names <- sort(colnames(covariate_data_frame))
+    sceptre_object@preparation@grna_target_data_frame <- grna_target_data_frame |>
         dplyr::mutate(
             grna_id = as.character(grna_id),
             grna_target = as.character(grna_target)
         )
+    sceptre_object@data@grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
     sceptre_object@elements_to_analyze <- NA_character_
     sceptre_object@nf_pipeline <- FALSE
     sceptre_object@nuclear <- FALSE
     sceptre_object@last_function_called <- "import_data"
     sceptre_object@functs_called <- workflow_initial_state()
+    sceptre_object <- initialize_screen_identity(sceptre_object)
+    validObject(sceptre_object)
     return(sceptre_object)
 }
 
@@ -1108,6 +1115,7 @@ process_covariates_and_matrices <- function(
         make_row_accessible = TRUE
     )
     return(list(
+        response_names = if (identical(response_names, NA_character_)) rownames(response_matrix) else response_names,
         covariate_data_frame = covariate_data_frame,
         response_matrix = response_matrix,
         grna_matrix = grna_matrix

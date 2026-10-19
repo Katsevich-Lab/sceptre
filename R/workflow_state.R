@@ -72,18 +72,30 @@ workflow_status <- function(functs_called) {
     functs_called[order]
 }
 
-#' Update the object's saved workflow status for the requested function
+#' Validate prerequisites and begin a preparation stage
 #' @param sceptre_object Sceptre object; the caller must keep the returned object.
 #' @param curr_funct Name of the workflow function being called.
-#' @return The object with `functs_called` updated by `workflow_transition()` and
-#'   `last_function_called` set to this function. Other fields are unchanged.
-#'   This helper records status; it does not run the numerical analysis.
+#' @return Object with downstream flags cleared and the requested stage incomplete.
+#'   The coordinator commits completion only after validated successful work.
 #' @noRd
 perform_status_check_and_update <- function(sceptre_object, curr_funct) {
     sceptre_object@functs_called <- workflow_transition(
         sceptre_object@functs_called,
         curr_funct
     )
-    sceptre_object@last_function_called <- curr_funct
+    sceptre_object@functs_called[curr_funct] <- FALSE
+    sceptre_object
+}
+
+# Preparation may be returned independently of execution. It must never be
+# mistaken for a completed analysis, even when rerunning a previous analysis.
+begin_analysis_stage <- function(sceptre_object, curr_funct) {
+    flags <- workflow_transition(sceptre_object@functs_called, curr_funct)
+    flags[curr_funct] <- FALSE
+    sceptre_object@functs_called <- flags
+    if (!is.null(sceptre_object@results@records[[curr_funct]])) {
+        sceptre_object@results@records[[curr_funct]]$status <- "historical"
+        sceptre_object@results@records[[curr_funct]]$invalidation_reason <- "analysis prepared for rerun"
+    }
     sceptre_object
 }

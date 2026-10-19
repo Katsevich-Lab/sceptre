@@ -83,6 +83,10 @@ set_analysis_parameters <- function(
     multiple_testing_method = "BH",
     multiple_testing_alpha = 0.1
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    # Requested inputs survive calibration's changes to the working budget.
+    requested <- as.list(environment())
+    requested$sceptre_object <- NULL
     # verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
@@ -90,11 +94,11 @@ set_analysis_parameters <- function(
     )
 
     # handle default arguments
-    if (!sceptre_object@low_moi) {
+    if (!sceptre_object@data@low_moi) {
         control_group <- "complement"
         if (resampling_mechanism == "default") resampling_mechanism <- "crt"
     }
-    if (sceptre_object@low_moi) {
+    if (sceptre_object@data@low_moi) {
         if (control_group == "default") {
             control_group <- "nt_cells"
         }
@@ -104,8 +108,8 @@ set_analysis_parameters <- function(
     }
     if (identical(formula_object, "default")) {
         formula_object <- auto_construct_formula_object(
-            cell_covariates = sceptre_object@covariate_data_frame,
-            include_grna_covariates = !sceptre_object@low_moi
+            cell_covariates = sceptre_object@data@covariate_data_frame,
+            include_grna_covariates = !sceptre_object@data@low_moi
         )
     }
     B1 <- 499L
@@ -128,7 +132,7 @@ set_analysis_parameters <- function(
         control_group = control_group,
         resampling_mechanism = resampling_mechanism,
         side = side,
-        low_moi = sceptre_object@low_moi,
+        low_moi = sceptre_object@data@low_moi,
         grna_integration_strategy = grna_integration_strategy,
         resampling_approximation = resampling_approximation
     ) |>
@@ -136,7 +140,7 @@ set_analysis_parameters <- function(
 
     # determine whether to reset response precomputations
     design <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = sceptre_object@covariate_data_frame,
+        covariate_data_frame = sceptre_object@data@covariate_data_frame,
         formula_object = formula_object
     )
     reset_response_precomps <- response_cache_parameters_changed(
@@ -149,32 +153,32 @@ set_analysis_parameters <- function(
     side_code <- which(side == c("left", "both", "right")) - 2L
     control_group_complement <- control_group == "complement"
     run_permutations <- resampling_mechanism == "permutations"
-    sceptre_object@discovery_pairs <- discovery_pairs |>
+    sceptre_object@spec@discovery_pairs <- discovery_pairs |>
         dplyr::mutate(
             grna_target = as.character(grna_target),
             response_id = as.character(response_id)
         )
-    sceptre_object@positive_control_pairs <- positive_control_pairs |>
+    sceptre_object@spec@positive_control_pairs <- positive_control_pairs |>
         dplyr::mutate(
             grna_target = as.character(grna_target),
             response_id = as.character(response_id)
         )
-    sceptre_object@n_discovery_pairs <- nrow(sceptre_object@discovery_pairs)
-    sceptre_object@n_positive_control_pairs <- nrow(
-        sceptre_object@positive_control_pairs
+    sceptre_object@preparation@n_discovery_pairs <- nrow(sceptre_object@spec@discovery_pairs)
+    sceptre_object@preparation@n_positive_control_pairs <- nrow(
+        sceptre_object@spec@positive_control_pairs
     )
-    sceptre_object@formula_object <- formula_object
-    sceptre_object@side_code <- side_code
-    sceptre_object@resampling_approximation <- resampling_approximation
-    sceptre_object@control_group_complement <- control_group_complement
-    sceptre_object@run_permutations <- run_permutations
-    sceptre_object@B1 <- B1
-    sceptre_object@B2 <- B2
-    sceptre_object@B3 <- B3
-    sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
-    sceptre_object@multiple_testing_method <- multiple_testing_method
-    sceptre_object@grna_integration_strategy <- grna_integration_strategy
-    sceptre_object@covariate_matrix <- design
+    sceptre_object@spec@formula_object <- formula_object
+    sceptre_object@spec@side_code <- side_code
+    sceptre_object@spec@resampling_approximation <- resampling_approximation
+    sceptre_object@spec@control_group_complement <- control_group_complement
+    sceptre_object@spec@run_permutations <- run_permutations
+    sceptre_object@spec@B1 <- B1
+    sceptre_object@spec@B2 <- B2
+    sceptre_object@spec@B3 <- B3
+    sceptre_object@spec@multiple_testing_alpha <- multiple_testing_alpha
+    sceptre_object@spec@multiple_testing_method <- multiple_testing_method
+    sceptre_object@spec@grna_integration_strategy <- grna_integration_strategy
+    sceptre_object@preparation@covariate_matrix <- design
 
     # modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
@@ -186,7 +190,16 @@ set_analysis_parameters <- function(
         reset_response_precomps
     )
 
-    # return
+    sceptre_object@functs_called["set_analysis_parameters"] <- TRUE
+    sceptre_object@last_function_called <- "set_analysis_parameters"
+    sceptre_object@spec@requested <- requested
+    sceptre_object <- invalidate_result_records(sceptre_object, "analysis parameters changed")
+    sceptre_object@preparation@stages$design <- list(complete = TRUE,
+        identity = digest::digest(sceptre_object@preparation@covariate_matrix, algo = "sha256"))
+    sceptre_object@preparation@stages$assignment <- list(complete = FALSE)
+    sceptre_object@preparation@stages$cell_qc <- list(complete = FALSE)
+    sceptre_object@preparation@stages$pair_qc <- list(complete = FALSE)
+    validObject(sceptre_object)
     return(sceptre_object)
 }
 
@@ -265,6 +278,7 @@ assign_grnas <- function(
     log_dir = tempdir(),
     ...
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     # verify that function called in correct order
     check_parallel_supported(parallel) |> invisible()
     sceptre_object <- perform_status_check_and_update(
@@ -274,7 +288,7 @@ assign_grnas <- function(
 
     # handle the default arguments
     if (identical(method, "default")) {
-        method <- if (sceptre_object@low_moi) "maximum" else "mixture"
+        method <- if (sceptre_object@data@low_moi) "maximum" else "mixture"
     }
     hyperparameters_default <- if (method == "maximum") {
         list(
@@ -292,7 +306,7 @@ assign_grnas <- function(
             backup_threshold = 5L,
             probability_threshold = 0.8,
             formula_object = auto_construct_formula_object(
-                cell_covariates = sceptre_object@covariate_data_frame,
+                cell_covariates = sceptre_object@data@covariate_data_frame,
                 include_grna_covariates = TRUE
             )
         )
@@ -329,8 +343,8 @@ assign_grnas <- function(
     )
 
     # update uncached fields
-    sceptre_object@grna_assignment_method <- method
-    sceptre_object@grna_assignment_hyperparameters <- hyperparameters
+    sceptre_object@spec@grna_assignment_method <- method
+    sceptre_object@spec@grna_assignment_hyperparameters <- hyperparameters
 
     # assign the grnas
     sceptre_object <- assign_grnas_to_cells(
@@ -341,7 +355,15 @@ assign_grnas <- function(
         log_dir
     )
 
-    # return
+    sceptre_object <- invalidate_result_records(sceptre_object, "guide assignments changed")
+    sceptre_object@functs_called["assign_grnas"] <- TRUE
+    sceptre_object@last_function_called <- "assign_grnas"
+    sceptre_object@preparation@stages$assignment <- list(complete = TRUE,
+        coordinates = "source", identity = digest::digest(
+            sceptre_object@preparation@initial_grna_assignment_list, algo = "sha256"))
+    sceptre_object@preparation@stages$cell_qc <- list(complete = FALSE)
+    sceptre_object@preparation@stages$pair_qc <- list(complete = FALSE)
+    validObject(sceptre_object)
     return(sceptre_object)
 }
 
@@ -421,6 +443,7 @@ run_qc <- function(
     p_mito_threshold = 0.2,
     additional_cells_to_remove = integer()
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     run_qc_pt_1(
         sceptre_object,
         n_nonzero_trt_thresh,
@@ -455,6 +478,7 @@ run_qc_pt_1 <- function(
     p_mito_threshold = 0.2,
     additional_cells_to_remove = integer()
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     # cellwise start
     # verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(sceptre_object, "run_qc")
@@ -465,23 +489,23 @@ run_qc_pt_1 <- function(
         n_nonzero_cntrl_thresh,
         response_n_umis_range,
         response_n_nonzero_range,
-        sceptre_object@initial_grna_assignment_list
+        sceptre_object@preparation@initial_grna_assignment_list
     ) |>
         invisible()
 
     # 5 update fields of sceptre_object
-    sceptre_object@cellwise_qc_thresholds <- list(
+    sceptre_object@spec@cellwise_qc_thresholds <- list(
         response_n_umis_range = response_n_umis_range,
         response_n_nonzero_range = response_n_nonzero_range,
         p_mito_threshold = p_mito_threshold
     )
 
     # obtain previous cells_in_use for caching purposes
-    current_cells_in_use <- sceptre_object@cells_in_use
+    current_cells_in_use <- sceptre_object@preparation@cells_in_use
 
     # update uncached fields of the sceptre object
-    sceptre_object@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
-    sceptre_object@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
+    sceptre_object@spec@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
+    sceptre_object@spec@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
 
     # determine the cells to retain after cellwise qc
     sceptre_object <- determine_cells_to_retain(
@@ -492,21 +516,21 @@ run_qc_pt_1 <- function(
         additional_cells_to_remove
     )
     # informative error/warning messages
-    frac_cells_removed_2p_grna <- sceptre_object@cell_removal_metrics[[
+    frac_cells_removed_2p_grna <- sceptre_object@preparation@cell_removal_metrics[[
         "n_cells_rm_zero_twoplus_grnas"
     ]] /
-        nrow(sceptre_object@covariate_data_frame)
-    if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@low_moi) {
+        nrow(sceptre_object@data@covariate_data_frame)
+    if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@data@low_moi) {
         warning(
             "A large percentage of cells (",
             round(100 * frac_cells_removed_2p_grna, 3),
             "%) contain two or more gRNAs. Consider switching from a low-MOI to a high-MOI analysis."
         )
     }
-    if (length(sceptre_object@cells_in_use) == 0) {
+    if (length(sceptre_object@preparation@cells_in_use) == 0) {
         stop(
             "All cells were removed as part of cellwise QC. Consider relaxing the cellwise QC thresholds (`response_n_umis_range`, `response_n_nonzero_range`, `p_mito_threshold`).",
-            if (sceptre_object@low_moi) {
+            if (sceptre_object@data@low_moi) {
                 " Additionally, consider switching from a low-MOI to high-MOI analysis."
             } else {
                 ""
@@ -518,11 +542,16 @@ run_qc_pt_1 <- function(
     sceptre_object <- invalidate_response_cache(
         sceptre_object,
         "analysis_cells",
-        !identical(current_cells_in_use, sceptre_object@cells_in_use)
+        !identical(current_cells_in_use, sceptre_object@preparation@cells_in_use)
     )
 
     # update the grna assignments given the cellwise qc
     sceptre_object <- update_grna_assignments_given_qc(sceptre_object)
+    sceptre_object@functs_called["run_qc"] <- FALSE
+    sceptre_object <- invalidate_result_records(sceptre_object, "QC selection or eligibility changed")
+    sceptre_object@preparation@stages$cell_qc <- list(complete = TRUE,
+        cells = sceptre_object@preparation@cells_in_use)
+    sceptre_object@preparation@stages$pair_qc <- list(complete = FALSE)
     return(sceptre_object)
 }
 
@@ -535,6 +564,7 @@ run_qc_pt_1 <- function(
 #'   tasks can call this phase separately.
 #' @noRd
 run_qc_pt_2 <- function(sceptre_object) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     # pairwise start
     # compute (i) the NT M matrix, (ii), n nonzero total vector, (iii)
     # n_nonzero_trt, and (iv) n_nonzero_cntrl vectors
@@ -547,22 +577,25 @@ run_qc_pt_2 <- function(sceptre_object) {
     # update B3, the number of resamples to draw, if resampling_approximation is
     # no_approximation
     if (
-        sceptre_object@resampling_approximation == "no_approximation" &&
-            (length(sceptre_object@n_ok_discovery_pairs) >= 1L ||
-                length(sceptre_object@n_ok_positive_control_pairs) >= 1L)
+        sceptre_object@spec@resampling_approximation == "no_approximation" &&
+            (length(sceptre_object@preparation@n_ok_discovery_pairs) >= 1L ||
+                length(sceptre_object@preparation@n_ok_positive_control_pairs) >= 1L)
     ) {
-        sceptre_object@B3 <- compute_empirical_budget(
+        sceptre_object@spec@B3 <- compute_empirical_budget(
             max(
-                sceptre_object@n_ok_discovery_pairs,
-                sceptre_object@n_ok_positive_control_pairs
+                sceptre_object@preparation@n_ok_discovery_pairs,
+                sceptre_object@preparation@n_ok_positive_control_pairs
             ),
-            sceptre_object@multiple_testing_alpha,
-            sceptre_object@side_code,
-            sceptre_object@B1,
-            sceptre_object@B2
+            sceptre_object@spec@multiple_testing_alpha,
+            sceptre_object@spec@side_code,
+            sceptre_object@spec@B1,
+            sceptre_object@spec@B2
         )
     }
 
-    # return
+    sceptre_object@preparation@stages$pair_qc <- list(complete = TRUE)
+    sceptre_object@functs_called["run_qc"] <- TRUE
+    sceptre_object@last_function_called <- "run_qc"
+    validObject(sceptre_object)
     return(sceptre_object)
 }

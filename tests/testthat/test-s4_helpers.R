@@ -21,10 +21,10 @@ test_that("perform_status_check_and_update", {
         blank_object,
         "set_analysis_parameters"
     )
-    expect_equal(results@last_function_called, "set_analysis_parameters")
+    expect_identical(results@last_function_called, blank_object@last_function_called)
     expect_equal(
         results@functs_called |> as.logical(),
-        rep(c(TRUE, FALSE), c(2, 5))
+        rep(c(TRUE, FALSE), c(1, 6))
     )
 
     ## try to use a function before calling the downstream ones
@@ -33,20 +33,25 @@ test_that("perform_status_check_and_update", {
         regex = "The function `assign_grnas\\(\\)` must be called before `run_qc\\(\\)` is called"
     )
 
-    ## chaining some together
-    results <- blank_object |>
-        perform_status_check_and_update("set_analysis_parameters") |>
-        perform_status_check_and_update("assign_grnas") |>
-        perform_status_check_and_update("run_qc")
+    ## Beginning a stage is insufficient to unlock a dependent stage.
+    expect_error(perform_status_check_and_update(results, "assign_grnas"),
+        "set_analysis_parameters")
+    # Model completed computation explicitly; public-stage success paths are
+    # exercised by the workflow tests and component lifecycle regressions.
+    results <- blank_object
+    for (stage in c("set_analysis_parameters", "assign_grnas", "run_qc")) {
+        results <- perform_status_check_and_update(results, stage)
+        expect_false(results@functs_called[[stage]])
+        results@functs_called[stage] <- TRUE
+        results@last_function_called <- stage
+    }
     expect_equal(results@last_function_called, "run_qc")
-    expect_equal(
-        results@functs_called |> as.logical(),
-        rep(c(TRUE, FALSE), c(4, 3))
-    )
+    expect_equal(results@functs_called |> as.logical(), rep(c(TRUE, FALSE), c(4, 3)))
 
     ## confirming if we rerun a lower level one after having run a higher level one
     results <- results |> perform_status_check_and_update("assign_grnas")
-    expect_equal(results@last_function_called, "assign_grnas")
+    expect_equal(results@last_function_called, "run_qc")
+    expect_false(results@functs_called["assign_grnas"])
     expect_false(results@functs_called["run_qc"]) # this was TRUE before
     expect_true(results@functs_called["set_analysis_parameters"]) # this should still be TRUE
 })

@@ -1,12 +1,13 @@
 # Show the original matrix dimensions and which workflow steps have finished.
 setMethod("show", signature = signature("sceptre_object"), function(object) {
+    object <- migrate_sceptre_object(object)
     # 0. determine the functions that have been run
     funct_run_vect <- object@functs_called
 
     # 1. obtain the basic information
     n_cells <- ncol(get_response_matrix(object))
     n_responses <- nrow(get_response_matrix(object))
-    grna_target_data_frame <- object@grna_target_data_frame
+    grna_target_data_frame <- object@preparation@grna_target_data_frame
     n_nt_grnas <- grna_target_data_frame |>
         dplyr::filter(grna_target == "non-targeting") |>
         nrow()
@@ -14,9 +15,9 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         dplyr::filter(grna_target != "non-targeting")
     n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
     n_targeting_grnas <- nrow(targeting_grnas_df)
-    n_covariates <- length(object@covariate_names)
-    covariates <- paste0(object@covariate_names, collapse = ", ")
-    moi <- ifelse(object@low_moi, "Low", "High")
+    n_covariates <- length(object@data@covariate_names)
+    covariates <- paste0(object@data@covariate_names, collapse = ", ")
+    moi <- ifelse(object@data@low_moi, "Low", "High")
     cat(paste0(
         "An object of class ",
         crayon::blue("sceptre_object"),
@@ -26,7 +27,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         if (funct_run_vect["run_qc"]) {
             paste0(
                 " (",
-                crayon::blue(length(object@cells_in_use)),
+                crayon::blue(length(object@preparation@cells_in_use)),
                 " after cellwise QC)"
             )
         } else {
@@ -81,6 +82,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 #' )
 #' print(sceptre_object)
 setMethod("print", signature = signature("sceptre_object"), function(x) {
+    x <- migrate_sceptre_object(x)
     show(x)
 
     # 1. print analysis status
@@ -100,10 +102,10 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     }
 
     # 2. print analysis parameters
-    n_discovery_pairs <- x@n_discovery_pairs
-    disc_pair_qc_performed <- length(x@n_ok_discovery_pairs) >= 1
-    n_pc_pairs <- x@n_positive_control_pairs
-    pc_pair_qc_performed <- length(x@n_ok_positive_control_pairs) >= 1
+    n_discovery_pairs <- x@preparation@n_discovery_pairs
+    disc_pair_qc_performed <- length(x@preparation@n_ok_discovery_pairs) >= 1
+    n_pc_pairs <- x@preparation@n_positive_control_pairs
+    pc_pair_qc_performed <- length(x@preparation@n_ok_positive_control_pairs) >= 1
     cat(paste0(
         "\nAnalysis parameters: \n",
         "\t\U2022 Discovery pairs:",
@@ -120,7 +122,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                     if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
                         paste0(
                             " (",
-                            crayon::blue(x@n_ok_discovery_pairs),
+                            crayon::blue(x@preparation@n_ok_discovery_pairs),
                             " after pairwise QC)"
                         )
                     } else {
@@ -140,7 +142,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) {
                     paste0(
                         " (",
-                        crayon::blue(x@n_ok_positive_control_pairs),
+                        crayon::blue(x@preparation@n_ok_positive_control_pairs),
                         " after pairwise QC)"
                     )
                 } else {
@@ -149,21 +151,21 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             )
         },
         "\n\t\U2022 Sidedness of test: ",
-        if (length(x@side_code) == 0L) {
+        if (length(x@spec@side_code) == 0L) {
             "not specified"
         } else {
-            crayon::blue(c("left", "both", "right")[x@side_code + 2L])
+            crayon::blue(c("left", "both", "right")[x@spec@side_code + 2L])
         },
-        if (!x@low_moi) {
+        if (!x@data@low_moi) {
             NULL
         } else {
             paste0(
                 "\n\t\U2022 Control group: ",
-                if (length(x@control_group_complement) == 0L) {
+                if (length(x@spec@control_group_complement) == 0L) {
                     "not specified"
                 } else {
                     crayon::blue(ifelse(
-                        x@control_group_complement,
+                        x@spec@control_group_complement,
                         "complement set",
                         "non-targeting cells"
                     ))
@@ -171,85 +173,85 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             )
         },
         "\n\t\U2022 Resampling mechanism: ",
-        if (length(x@run_permutations) == 0L) {
+        if (length(x@spec@run_permutations) == 0L) {
             "not specified"
         } else {
             crayon::blue(ifelse(
-                x@run_permutations,
+                x@spec@run_permutations,
                 "permutations",
                 "conditional resampling"
             ))
         },
         "\n\t\U2022 gRNA integration strategy: ",
-        if (length(x@grna_integration_strategy) == 0L) {
+        if (length(x@spec@grna_integration_strategy) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@grna_integration_strategy)
+            crayon::blue(x@spec@grna_integration_strategy)
         },
         "\n\t\U2022 Resampling approximation: ",
-        if (length(x@resampling_approximation) == 0L) {
+        if (length(x@spec@resampling_approximation) == 0L) {
             "not specified"
         } else {
             crayon::blue(gsub(
                 pattern = "_",
                 replacement = " ",
                 fixed = TRUE,
-                x = x@resampling_approximation
+                x = x@spec@resampling_approximation
             ))
         },
         "\n\t\U2022 Multiple testing adjustment: ",
-        if (x@nuclear || length(x@multiple_testing_method) == 0L) {
+        if (x@nuclear || length(x@spec@multiple_testing_method) == 0L) {
             "none"
         } else {
             paste0(
-                crayon::blue(x@multiple_testing_method),
+                crayon::blue(x@spec@multiple_testing_method),
                 " at level ",
-                crayon::blue(x@multiple_testing_alpha)
+                crayon::blue(x@spec@multiple_testing_alpha)
             )
         },
         "\n\t\U2022 N nonzero treatment cells threshold: ",
-        if (length(x@n_nonzero_trt_thresh) == 0L) {
+        if (length(x@spec@n_nonzero_trt_thresh) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@n_nonzero_trt_thresh)
+            crayon::blue(x@spec@n_nonzero_trt_thresh)
         },
         "\n\t\U2022 N nonzero control cells threshold: ",
-        if (length(x@n_nonzero_cntrl_thresh) == 0L) {
+        if (length(x@spec@n_nonzero_cntrl_thresh) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@n_nonzero_cntrl_thresh)
+            crayon::blue(x@spec@n_nonzero_cntrl_thresh)
         },
         "\n\t\U2022 Formula object: ",
-        if (length(x@formula_object) == 0L) {
+        if (length(x@spec@formula_object) == 0L) {
             "not specified"
         } else {
-            crayon::blue(as.character(x@formula_object)[2])
+            crayon::blue(as.character(x@spec@formula_object)[2])
         }
     ))
 
     # 3. print the gRNA-to-cell assignment information
     grna_assignment_run <- funct_run_vect[["assign_grnas"]]
     if (grna_assignment_run) {
-        mean_cells_per_grna <- x@mean_cells_per_grna
+        mean_cells_per_grna <- x@preparation@mean_cells_per_grna
         cat(
             paste0(
                 "\n\ngRNA-to-cell assignment information:",
                 "\n\t\U2022 Assignment method: ",
-                crayon::blue(x@grna_assignment_method),
+                crayon::blue(x@spec@grna_assignment_method),
                 "\n\t\U2022 Mean N cells per gRNA: ",
                 crayon::blue(mean_cells_per_grna |> round(2)),
                 "\n\t\U2022 Mean N gRNAs per cell (MOI): ",
-                if (x@grna_assignment_method == "maximum") {
+                if (x@spec@grna_assignment_method == "maximum") {
                     "not computed when using \"maximum\" assignment method"
                 } else {
-                    crayon::blue(x@grnas_per_cell |> mean() |> round(2))
+                    crayon::blue(x@preparation@grnas_per_cell |> mean() |> round(2))
                 }
             ),
-            if (x@grna_assignment_method == "mixture") {
+            if (x@spec@grna_assignment_method == "mixture") {
                 paste0(
                     "\n\t\U2022 gRNA assignment formula object: ",
                     crayon::blue(as.character(
-                        x@grna_assignment_hyperparameters$formula_object
+                        x@spec@grna_assignment_hyperparameters$formula_object
                     )[2])
                 )
             } else {
@@ -259,16 +261,16 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     }
 
     # 4. print the results summary
-    calib_check_run <- funct_run_vect[["run_calibration_check"]]
-    discovery_analysis_run <- funct_run_vect[["run_discovery_analysis"]]
-    power_check_run <- funct_run_vect[["run_power_check"]]
+    calib_check_run <- nrow(current_result(x, "run_calibration_check", required = FALSE)) > 0L
+    discovery_analysis_run <- nrow(current_result(x, "run_discovery_analysis", required = FALSE)) > 0L
+    power_check_run <- nrow(current_result(x, "run_power_check", required = FALSE)) > 0L
     if (calib_check_run || discovery_analysis_run) {
         cat("\n\nSummary of results:")
     }
     if (calib_check_run) {
-        n_false_rejections <- sum(x@calibration_result$significant)
-        mean_lfc <- signif(mean(x@calibration_result$log_2_fold_change), 2)
-        n_calib_pairs <- nrow(x@calibration_result)
+        n_false_rejections <- sum(x@results@calibration_result$significant)
+        mean_lfc <- signif(mean(x@results@calibration_result$log_2_fold_change), 2)
+        n_calib_pairs <- nrow(x@results@calibration_result)
         cat(paste0(
             "\n\t\U2022 N",
             crayon::red(" negative control "),
@@ -281,7 +283,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (power_check_run) {
-        median_pc_p_value <- stats::median(x@power_result$p_value, na.rm = TRUE)
+        median_pc_p_value <- stats::median(x@results@power_result$p_value, na.rm = TRUE)
         cat(paste0(
             "\n\t\U2022 Median",
             crayon::green(" positive control "),
@@ -290,8 +292,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         ))
     }
     if (discovery_analysis_run) {
-        n_discoveries <- sum(x@discovery_result$significant, na.rm = TRUE)
-        n_discovery_pairs <- x@n_ok_discovery_pairs
+        n_discoveries <- sum(x@results@discovery_result$significant, na.rm = TRUE)
+        n_discovery_pairs <- x@preparation@n_ok_discovery_pairs
         cat(paste0(
             "\n\t\U2022 N",
             crayon::yellow(" discovery pairs "),
@@ -342,6 +344,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'   assign_grnas(method = "thresholding") |>
 #'   plot()
 setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
+    x <- migrate_sceptre_object(x)
     args <- list(...)
     args[["sceptre_object"]] <- x
 

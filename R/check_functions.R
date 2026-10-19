@@ -264,9 +264,10 @@ check_set_analysis_parameters <- function(
     grna_integration_strategy,
     resampling_approximation
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     response_matrix <- get_response_matrix(sceptre_object)
-    covariate_data_frame <- sceptre_object@covariate_data_frame
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+    covariate_data_frame <- sceptre_object@data@covariate_data_frame
+    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
 
     # if response_grna_target_pairs has been supplied, check its
     # characteristics
@@ -491,6 +492,7 @@ check_assign_grna_inputs <- function(
     hyperparameters,
     n_processors
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
         stop(
             "`assignment_method` must be `mixture`, `maximum`, or `thresholding`."
@@ -498,7 +500,7 @@ check_assign_grna_inputs <- function(
     }
 
     # check that assignment method is OK for high MOI
-    if (!sceptre_object@low_moi && assignment_method == "maximum") {
+    if (!sceptre_object@data@low_moi && assignment_method == "maximum") {
         stop("`assignment_method` cannot be `maximum` in high-MOI.")
     }
 
@@ -750,10 +752,11 @@ check_calibration_check_inputs <- function(
     n_processors,
     calibration_group_size
 ) {
-    control_group_complement <- sceptre_object@control_group_complement
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    control_group_complement <- sceptre_object@spec@control_group_complement
     # QC can remove every cell assigned to a guide while its metadata remains.
     n_nt_grnas <- sum(
-        lengths(sceptre_object@grna_assignments$indiv_nt_grna_idxs) > 0L
+        lengths(sceptre_object@preparation@grna_assignments$indiv_nt_grna_idxs) > 0L
     )
     # check number of gRNAS
     if (!control_group_complement) {

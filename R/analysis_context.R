@@ -219,12 +219,12 @@ make_fit_view <- function(index, group_id = NULL) {
         fit_to_analysis <- c(treatment, index$nt_to_analysis)
         trt_fit_pos <- seq_along(treatment)
     }
-    list(
-        fit_to_analysis = fit_to_analysis,
-        source_cells = index$analysis_to_source[fit_to_analysis],
-        trt_fit_pos = trt_fit_pos,
-        n_trt = length(trt_fit_pos)
-    )
+    view <- new("CellView",
+        fit_to_analysis = as.integer(fit_to_analysis),
+        source_cells = as.integer(index$analysis_to_source[fit_to_analysis]),
+        trt_fit_pos = as.integer(trt_fit_pos), n_trt = as.integer(length(trt_fit_pos)))
+    validObject(view)
+    view
 }
 
 #' Make a function that finds treated cells in the shared model-fitting data
@@ -268,24 +268,29 @@ make_treatment_index_lookup <- function(index) {
 #'   design matrix are left unchanged.
 #' @noRd
 prepare_analysis_context <- function(object, analysis, pairs) {
-    total_resamples <- checked_resampling_total(object@B1, object@B2, object@B3)
+    total_resamples <- checked_resampling_total(object@spec@B1, object@spec@B2, object@spec@B3)
     store <- get_response_matrix(object)
     index <- prepare_index_context(
-        object@cells_in_use,
+        object@preparation@cells_in_use,
         ncol(store),
-        object@grna_assignments,
+        object@preparation@grna_assignments,
         pairs,
         rownames(store),
         identical(analysis, "calibration_check"),
-        object@control_group_complement,
-        object@low_moi
+        object@spec@control_group_complement,
+        object@data@low_moi
     )
     common_view <- make_fit_view(index)
+    identity <- response_fit_identity(object, common_view@source_cells)
+    cache <- if (identical(object@fits@identity, identity)) {
+        object@fits@response_precomputations
+    } else list()
     list(
+        fit_identity = identity,
         response_store = store,
         index = index,
         common_view = common_view,
-        design = object@covariate_matrix[
+        design = object@preparation@covariate_matrix[
             common_view$source_cells,
             ,
             drop = FALSE
@@ -295,14 +300,14 @@ prepare_analysis_context <- function(object, analysis, pairs) {
         shared_response_fit = index$calibration_check ||
             index$control_group_complement,
         test_options = list(
-            B1 = object@B1,
-            B2 = object@B2,
-            B3 = object@B3,
+            B1 = object@spec@B1,
+            B2 = object@spec@B2,
+            B3 = object@spec@B3,
             total_resamples = total_resamples,
-            side_code = object@side_code,
-            fit_parametric_curve = object@resampling_approximation ==
+            side_code = object@spec@side_code,
+            fit_parametric_curve = object@spec@resampling_approximation ==
                 "skew_normal"
         ),
-        response_fits = object@response_precomputations
+        response_fits = cache
     )
 }

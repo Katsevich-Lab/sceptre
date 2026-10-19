@@ -124,12 +124,8 @@ assign_grnas_to_cells_mixture <- function(
             parallel,
             n_processors
         )
-        res <- parallel::mclapply(
-            seq_along(grna_ids_partitioned),
-            function(proc_id) {
-                assign_guide_block(grna_ids_partitioned[[proc_id]], proc_id)
-            },
-            mc.cores = length(grna_ids_partitioned)
+        res <- execute_analysis_blocks(
+            grna_ids_partitioned, assign_guide_block, parallel = TRUE
         )
         initial_assignment_list <- res |> purrr::flatten()
     }

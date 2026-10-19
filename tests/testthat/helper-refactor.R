@@ -118,7 +118,11 @@ refactor_observe <- function(object) {
         "B1", "B2", "B3", "side_code", "functs_called", "last_function_called",
         "response_precomputations", "calibration_result", "power_result", "discovery_result"
     )
-    stats::setNames(lapply(selected, function(name) refactor_plain(methods::slot(object, name))), selected)
+    stats::setNames(lapply(selected, function(name) refactor_plain({
+        owner <- unname(refactor_private("component_slot_owners")()[name])
+        if (is.na(owner)) methods::slot(object, name) else
+            methods::slot(methods::slot(object, owner), name)
+    })), selected)
 }
 
 refactor_capture <- function(code) {
@@ -209,7 +213,7 @@ refactor_cache_observations <- function(inputs, case) {
         cold <- sceptre::run_discovery_analysis(object, print_progress = FALSE, output_amount = 2L)
         warm <- sceptre::run_discovery_analysis(cold, print_progress = FALSE, output_amount = 2L)
         cleared <- cold
-        cleared@response_precomputations <- list()
+        cleared@fits@response_precomputations <- list()
         cleared <- sceptre::run_discovery_analysis(cleared, print_progress = FALSE, output_amount = 2L)
         changed <- sceptre::set_analysis_parameters(cold,
             discovery_pairs = inputs$discovery_pairs[rev(seq_len(nrow(inputs$discovery_pairs))), ],
@@ -217,14 +221,14 @@ refactor_cache_observations <- function(inputs, case) {
             formula_object = stats::as.formula("~ batch + z", env = baseenv()),
             control_group = case$control, resampling_mechanism = case$mechanism,
             resampling_approximation = case$approximation, side = "right")
-        side_cache <- changed@response_precomputations
+        side_cache <- changed@fits@response_precomputations
         changed <- sceptre::run_discovery_analysis(changed, print_progress = FALSE, output_amount = 2L)
         formula_changed <- sceptre::set_analysis_parameters(cold,
             discovery_pairs = inputs$discovery_pairs,
             formula_object = stats::as.formula("~ batch", env = baseenv()),
             control_group = case$control, resampling_mechanism = case$mechanism)
         reassigned <- sceptre::assign_grnas(cold, method = "thresholding", threshold = 45, print_progress = FALSE)
-        reassigned_cache <- reassigned@response_precomputations
+        reassigned_cache <- reassigned@fits@response_precomputations
         reassigned <- sceptre::run_qc(reassigned,
             response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
             n_nonzero_trt_thresh = 7L, n_nonzero_cntrl_thresh = 7L,
@@ -239,35 +243,35 @@ refactor_cache_observations <- function(inputs, case) {
         list(cold = refactor_observe(cold), warm = refactor_observe(warm),
              cleared = refactor_observe(cleared), changed_side = refactor_observe(changed),
              retained_side_cache = side_cache,
-             formula_cache = formula_changed@response_precomputations,
+             formula_cache = formula_changed@fits@response_precomputations,
              reassigned_cache = reassigned_cache,
              reassigned = refactor_observe(reassigned), reassigned_cold = refactor_observe(reassigned_cold),
-             changed_qc_cache = qc_changed@response_precomputations)
+             changed_qc_cache = qc_changed@fits@response_precomputations)
     })
 }
 
 refactor_index_observations <- function() {
     object <- methods::new("sceptre_object")
     object <- refactor_private("set_response_matrix")(object, matrix(101:112, nrow = 1L))
-    object@low_moi <- TRUE
-    object@control_group_complement <- FALSE
-    object@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
+    object@data@low_moi <- TRUE
+    object@spec@control_group_complement <- FALSE
+    object@preparation@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
     raw <- list(grna_group_idxs = list(A = c(5L, 4L)),
                 indiv_nt_grna_idxs = list(ntA = 8L, ntB = c(2L, 11L)))
     # Use the saved assignment format; build the combined NT-cell list below.
-    object@grna_assignments_raw <- raw
+    object@preparation@grna_assignments_raw <- raw
     before <- serialize(raw, NULL)
     out <- refactor_private("update_grna_assignments_given_qc")(object)
     again <- refactor_private("update_grna_assignments_given_qc")(object)
-    groups <- out@grna_assignments
+    groups <- out@preparation@grna_assignments
     combined <- c(groups$grna_group_idxs$A, groups$all_nt_idxs)
-    list(assignments = groups, repeated = again@grna_assignments,
+    list(assignments = groups, repeated = again@preparation@grna_assignments,
          caller_unchanged = identical(serialize(raw, NULL), before),
-         treatment_source = object@cells_in_use[groups$grna_group_idxs$A],
-         nt_source = object@cells_in_use[groups$all_nt_idxs],
-         combined_source = object@cells_in_use[combined],
-         extracted_response = (101:112)[object@cells_in_use][combined],
-         extracted_covariates = cbind(intercept = 1, cell = 101:112)[object@cells_in_use, , drop = FALSE][combined, , drop = FALSE])
+         treatment_source = object@preparation@cells_in_use[groups$grna_group_idxs$A],
+         nt_source = object@preparation@cells_in_use[groups$all_nt_idxs],
+         combined_source = object@preparation@cells_in_use[combined],
+         extracted_response = (101:112)[object@preparation@cells_in_use][combined],
+         extracted_covariates = cbind(intercept = 1, cell = 101:112)[object@preparation@cells_in_use, , drop = FALSE][combined, , drop = FALSE])
 }
 
 refactor_edge_observations <- function(inputs, case) {

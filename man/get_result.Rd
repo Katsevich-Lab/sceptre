@@ -4,7 +4,7 @@
 \alias{get_result}
 \title{Get result}
 \usage{
-get_result(sceptre_object, analysis)
+get_result(sceptre_object, analysis, historical = FALSE)
 }
 \arguments{
 \item{sceptre_object}{a \code{sceptre_object}}
@@ -12,6 +12,9 @@ get_result(sceptre_object, analysis)
 \item{analysis}{a string indicating the name of the analysis whose results we
 are querying, one of \code{"run_calibration_check"}, \code{"run_power_check"}, or
 \code{"run_discovery_analysis"}.}
+
+\item{historical}{Return the saved table even when its provenance is historical.
+The returned table carries its saved record as an attribute.}
 }
 \value{
 a data frame containing the results of the analysis

@@ -129,6 +129,14 @@ storage_pair_counts <- function(
         }
         groups <- storage_owned_groups(groups)
         nt_groups <- storage_owned_groups(nt_groups)
+        # Some installed ondisc binaries inspect the next requested row before
+        # checking whether the final pair was consumed. Keep an inert request
+        # beyond the gene domain so that lookahead remains within the vector.
+        # Neither native loop visits this row; discard its unused output below.
+        # The original unique rows are still the only rows requested for reading.
+        n_requested <- length(response_idxs)
+        native_response_idxs <- c(response_idxs, as.integer(nrow(store) + 1L))
+        native_group_idxs <- c(group_idxs, 1L)
         common <- list(
             file_name_in = store@h5_file,
             f_row_ptr = store@ptr,
@@ -137,8 +145,8 @@ storage_pair_counts <- function(
             n_cells_sub = length(source_cells),
             grna_group_idxs = groups,
             all_nt_idxs = all_nt_idxs,
-            to_analyze_response_idxs = response_idxs,
-            to_analyze_grna_idxs = group_idxs,
+            to_analyze_response_idxs = native_response_idxs,
+            to_analyze_grna_idxs = native_group_idxs,
             control_group_complement = complement,
             cells_in_use = source_cells
         )
@@ -160,6 +168,8 @@ storage_pair_counts <- function(
                 c(common, list(indiv_nt_grna_idxs = nt_groups))
             )
         }
+        out$n_nonzero_trt <- out$n_nonzero_trt[seq_len(n_requested)]
+        out$n_nonzero_cntrl <- out$n_nonzero_cntrl[seq_len(n_requested)]
     } else {
         out <- sparse_pair_counts(
             j = store@j,

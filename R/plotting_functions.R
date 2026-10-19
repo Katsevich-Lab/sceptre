@@ -73,6 +73,7 @@ plot_grna_count_distributions <- function(
     threshold = NULL,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     grna_matrix <- get_grna_matrix(sceptre_object)
     # rounding just in case the user provides a non-integer one
     if (!is.null(threshold)) {
@@ -287,6 +288,7 @@ plot_assign_grnas <- function(
     transparency = 0.8,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     n_points_to_plot_per_umi <- 1000
     n_grnas_to_plot_panel_b <- 1000
     if (!sceptre_object@functs_called["assign_grnas"]) {
@@ -294,7 +296,7 @@ plot_assign_grnas <- function(
             "This `sceptre_object` has not yet had `assign_grnas` called on it."
         )
     }
-    init_assignments <- sceptre_object@initial_grna_assignment_list
+    init_assignments <- sceptre_object@preparation@initial_grna_assignment_list
     grna_matrix <- get_grna_matrix(sceptre_object) |>
         set_matrix_accessibility(make_row_accessible = TRUE)
     grna_ids <- names(init_assignments)
@@ -322,7 +324,7 @@ plot_assign_grnas <- function(
         ) # logical vecs w/ one entry per cell
         assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially
         cells_w_zero_or_twoplus_grnas[
-            sceptre_object@cells_w_zero_or_twoplus_grnas
+            sceptre_object@preparation@cells_w_zero_or_twoplus_grnas
         ] <- TRUE # indicates which cells have 0/2+ grnas
         g <- load_row(grna_matrix, curr_grna_id)
         df <- data.frame(
@@ -332,7 +334,7 @@ plot_assign_grnas <- function(
             cells_w_zero_or_twoplus_grnas = cells_w_zero_or_twoplus_grnas
         )
         # if assignment method maximum, remove cells with 0/2+ grnas
-        if (sceptre_object@grna_assignment_method == "maximum") {
+        if (sceptre_object@spec@grna_assignment_method == "maximum") {
             df <- df |> dplyr::filter(!cells_w_zero_or_twoplus_grnas)
         }
         return(df)
@@ -420,11 +422,11 @@ plot_assign_grnas <- function(
         )
 
     # plot c
-    if (sceptre_object@grna_assignment_method == "maximum") {
+    if (sceptre_object@spec@grna_assignment_method == "maximum") {
         p_c <- ggplot2::ggplot() +
             ggplot2::theme_void()
     } else {
-        n_grnas_per_cell <- sceptre_object@grnas_per_cell
+        n_grnas_per_cell <- sceptre_object@preparation@grnas_per_cell
         moi <- mean(n_grnas_per_cell)
         p_c <- ggplot2::ggplot(
             data = data.frame(x = n_grnas_per_cell),
@@ -536,19 +538,21 @@ plot_run_calibration_check <- function(
     transparency = 0.8,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    current_result(sceptre_object, "run_calibration_check") |> invisible()
     if (!sceptre_object@functs_called["run_calibration_check"]) {
         stop(
             "This `sceptre_object` has not yet had `run_calibration_check` called on it."
         )
     }
-    calibration_result <- sceptre_object@calibration_result
+    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
     my_theme <- get_my_theme()
 
     # compute n rejections
     n_rejections <- sum(calibration_result$significant)
     str1 <- paste0(
         "Number of\nfalse discoveries\n(at alpha ",
-        signif(sceptre_object@multiple_testing_alpha, 1),
+        signif(sceptre_object@spec@multiple_testing_alpha, 1),
         "): ",
         n_rejections
     )
@@ -860,6 +864,8 @@ plot_run_discovery_analysis <- function(
     transparency = 0.8,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    current_result(sceptre_object, "run_discovery_analysis") |> invisible()
     if (!sceptre_object@functs_called["run_discovery_analysis"]) {
         stop(
             "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
@@ -867,7 +873,7 @@ plot_run_discovery_analysis <- function(
     }
     # Optional stage diagnostics and padded null draws can be missing for valid
     # tests. Exclude only rows missing the scientific fields these plots use.
-    discovery_result <- sceptre_object@discovery_result
+    discovery_result <- sceptre_object@results@discovery_result
     discovery_result <- discovery_result[
         stats::complete.cases(
             discovery_result$p_value,
@@ -877,7 +883,7 @@ plot_run_discovery_analysis <- function(
         ,
         drop = FALSE
     ]
-    calibration_result <- sceptre_object@calibration_result
+    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
         max(discovery_set$p_value)
@@ -927,7 +933,7 @@ plot_run_discovery_analysis <- function(
     n_pairs <- nrow(discovery_result)
     str <- paste0(
         "Number of discovery pairs\ncalled as significant\n(at alpha ",
-        signif(sceptre_object@multiple_testing_alpha, 1),
+        signif(sceptre_object@spec@multiple_testing_alpha, 1),
         "): ",
         n_rejections,
         " of ",
@@ -1026,12 +1032,13 @@ plot_covariates <- function(
     p_mito_threshold = 0.2,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     if (sceptre_object@functs_called[["run_qc"]]) {
-        response_n_umis_range <- sceptre_object@cellwise_qc_thresholds$response_n_umis_range
-        response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
-        p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
+        response_n_umis_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_umis_range
+        response_n_nonzero_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_nonzero_range
+        p_mito_threshold <- sceptre_object@spec@cellwise_qc_thresholds$p_mito_threshold
     }
-    covariate_data_frame <- sceptre_object@covariate_data_frame
+    covariate_data_frame <- sceptre_object@data@covariate_data_frame
     # Plot one covariate across original cells with candidate QC cutoff lines
     # v: Covariate values before cell removal; curr_range gives quantiles or
     #   direct value cutoffs.
@@ -1176,11 +1183,12 @@ plot_run_qc <- function(
     transparency = 0.8,
     return_indiv_plots = FALSE
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     if (!sceptre_object@functs_called["run_qc"]) {
         stop("This `sceptre_object` has not yet had `run_qc` called on it.")
     }
     p_a <- plot_cellwise_qc(sceptre_object)
-    if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
+    if (nrow(sceptre_object@preparation@discovery_pairs_with_info) >= 1L) {
         p_b <- plot_pairwise_qc(
             sceptre_object,
             downsample_pairs = downsample_pairs,
@@ -1206,7 +1214,8 @@ plot_run_qc <- function(
 #'   multiple-guide bar. Read the saved counts rather than rerunning QC.
 #' @noRd
 plot_cellwise_qc <- function(sceptre_object) {
-    cell_removal_metrics <- sceptre_object@cell_removal_metrics
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    cell_removal_metrics <- sceptre_object@preparation@cell_removal_metrics
     n_orig_cells <- ncol(get_response_matrix(sceptre_object))
     cell_removal_metrics_frac <- cell_removal_metrics / n_orig_cells * 100
     df <- data.frame(
@@ -1220,7 +1229,7 @@ plot_cellwise_qc <- function(sceptre_object) {
             "Any filter"
         )
     )
-    if (!sceptre_object@low_moi) {
+    if (!sceptre_object@data@low_moi) {
         df <- df |> dplyr::filter(Filter != "Zero or 2+ gRNAs")
     }
     # make a barplot. remove x-axis text
@@ -1260,9 +1269,10 @@ plot_pairwise_qc <- function(
     point_size = 0.55,
     transparency = 0.8
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     my_cols <- c("mediumseagreen", "indianred2")
     my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
-    discovery_pairs <- sceptre_object@discovery_pairs_with_info |>
+    discovery_pairs <- sceptre_object@preparation@discovery_pairs_with_info |>
         dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
         dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
     if (nrow(discovery_pairs) >= downsample_pairs) {
@@ -1291,9 +1301,9 @@ plot_pairwise_qc <- function(
             breaks = my_breaks
         ) +
         ggplot2::geom_hline(
-            yintercept = sceptre_object@n_nonzero_cntrl_thresh
+            yintercept = sceptre_object@spec@n_nonzero_cntrl_thresh
         ) +
-        ggplot2::geom_vline(xintercept = sceptre_object@n_nonzero_trt_thresh) +
+        ggplot2::geom_vline(xintercept = sceptre_object@spec@n_nonzero_trt_thresh) +
         ggplot2::xlab("N nonzero trt. cells") +
         ggplot2::ylab("N nonzero cntrl. cells") +
         ggplot2::theme(legend.position = "bot") +
@@ -1374,6 +1384,8 @@ plot_run_power_check <- function(
     transparency = 0.8,
     clip_to = 1e-20
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    current_result(sceptre_object, "run_power_check") |> invisible()
     if (!sceptre_object@functs_called["run_power_check"]) {
         stop(
             "This `sceptre_object` has not yet had `run_power_check` called on it."
@@ -1382,10 +1394,11 @@ plot_run_power_check <- function(
     my_theme <- get_my_theme()
     my_cols <- c("mediumseagreen", "firebrick1")
 
-    pos_ctrl_pvals <- sceptre_object@power_result$p_value |> stats::na.omit()
-    neg_ctrl_pval_sub <- if (nrow(sceptre_object@calibration_result) >= 1) {
+    pos_ctrl_pvals <- current_result(sceptre_object, "run_power_check")$p_value |> stats::na.omit()
+    calibration_result <- current_result(sceptre_object, "run_calibration_check", required = FALSE)
+    neg_ctrl_pval_sub <- if (nrow(calibration_result) >= 1) {
         downsample_result_data_frame(
-            result_df = sceptre_object@calibration_result
+            result_df = calibration_result
         ) |>
             dplyr::pull(p_value)
     } else {
@@ -1504,11 +1517,12 @@ plot_response_grna_target_pair <- function(
     response_id,
     grna_target
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     # check that grnas have been assigned and qc has been called
     functs_called <- sceptre_object@functs_called
     # Preserve singleton-ID versus target-ID annotation lookup. A Bonferroni
     # guide-to-target plotting interpretation is separately deferred.
-    singleton_integration_strategy <- sceptre_object@grna_integration_strategy ==
+    singleton_integration_strategy <- sceptre_object@spec@grna_integration_strategy ==
         "singleton"
     if (!functs_called[["assign_grnas"]]) {
         stop("`assign_grnas()` must be called on the `sceptre_object`.")
@@ -1518,11 +1532,11 @@ plot_response_grna_target_pair <- function(
     }
 
     # get grna integration strategy, control group
-    control_group_complement <- sceptre_object@control_group_complement
-    cells_in_use <- sceptre_object@cells_in_use
+    control_group_complement <- sceptre_object@spec@control_group_complement
+    cells_in_use <- sceptre_object@preparation@cells_in_use
 
     # check that grna_target is present in grna_assignments
-    grna_group_idxs <- sceptre_object@grna_assignments$grna_group_idxs
+    grna_group_idxs <- sceptre_object@preparation@grna_assignments$grna_group_idxs
     grna_group_names <- names(grna_group_idxs)
     if (!grna_target %in% grna_group_names) {
         stop(
@@ -1542,7 +1556,7 @@ plot_response_grna_target_pair <- function(
     y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
 
     # get the sequencing depths; filter for cells in use
-    response_n_umis <- sceptre_object@covariate_data_frame$response_n_umis[
+    response_n_umis <- sceptre_object@data@covariate_data_frame$response_n_umis[
         cells_in_use
     ]
 
@@ -1556,7 +1570,7 @@ plot_response_grna_target_pair <- function(
         cntrl_cells <- normalized_counts[-grna_group_idxs[[grna_target]]]
     } else {
         # nt cells
-        nt_idxs <- sceptre_object@grna_assignments$all_nt_idxs
+        nt_idxs <- sceptre_object@preparation@grna_assignments$all_nt_idxs
         cntrl_cells <- normalized_counts[nt_idxs]
     }
 
@@ -1573,13 +1587,13 @@ plot_response_grna_target_pair <- function(
     # obtain the p-value (if available); deal with the singleton situation
     p_val <- 1.5
     df_list <- list(
-        if (functs_called[["run_power_check"]]) {
-            sceptre_object@power_result
+        if (result_record_is_current(sceptre_object, "run_power_check")) {
+            current_result(sceptre_object, "run_power_check")
         } else {
             NULL
         },
-        if (functs_called[["run_discovery_analysis"]]) {
-            sceptre_object@discovery_result
+        if (result_record_is_current(sceptre_object, "run_discovery_analysis")) {
+            current_result(sceptre_object, "run_discovery_analysis")
         } else {
             NULL
         }

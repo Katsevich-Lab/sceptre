@@ -199,10 +199,10 @@ finalize_association_result <- function(
 process_calibration_result <- function(result, sceptre_object) {
     finalize_association_result(
         result,
-        sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame,
-        sceptre_object@multiple_testing_method,
-        sceptre_object@multiple_testing_alpha,
+        sceptre_object@spec@grna_integration_strategy,
+        sceptre_object@preparation@grna_target_data_frame,
+        sceptre_object@spec@multiple_testing_method,
+        sceptre_object@spec@multiple_testing_alpha,
         TRUE
     )
 }
@@ -216,10 +216,10 @@ process_calibration_result <- function(result, sceptre_object) {
 process_discovery_result <- function(result, sceptre_object) {
     finalize_association_result(
         result,
-        sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame,
-        sceptre_object@multiple_testing_method,
-        sceptre_object@multiple_testing_alpha
+        sceptre_object@spec@grna_integration_strategy,
+        sceptre_object@preparation@grna_target_data_frame,
+        sceptre_object@spec@multiple_testing_method,
+        sceptre_object@spec@multiple_testing_alpha
     )
 }
 
@@ -237,8 +237,8 @@ apply_grouping_to_result <- function(
 ) {
     integrate_guides(
         result,
-        sceptre_object@grna_integration_strategy,
-        sceptre_object@grna_target_data_frame,
+        sceptre_object@spec@grna_integration_strategy,
+        sceptre_object@preparation@grna_target_data_frame,
         is_calibration_check
     )
 }

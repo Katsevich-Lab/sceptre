@@ -35,24 +35,32 @@ analyze_association_pairs <- function(
         n_processors = n_processors,
         log_dir = log_dir
     )
-    if (sceptre_object@run_permutations) {
+    if (sceptre_object@spec@run_permutations) {
         message("Generating permutation resamples.")
         synthetic_idxs <- get_synthetic_permutation_idxs(
-            grna_assignments = sceptre_object@grna_assignments,
+            grna_assignments = sceptre_object@preparation@grna_assignments,
             B = context$test_options$total_resamples,
             calibration_check = context$index$calibration_check,
             control_group_complement = context$index$control_group_complement,
-            calibration_group_size = sceptre_object@calibration_group_size,
+            calibration_group_size = sceptre_object@spec@calibration_group_size,
             n_cells = length(context$index$analysis_to_source)
         )
         message(crayon::green(" \u2713"))
     }
     gc() |> invisible()
-    out <- if (sceptre_object@run_permutations) {
+    out <- if (sceptre_object@spec@run_permutations) {
         run_permutation_analysis(context, execution, synthetic_idxs)
     } else {
         run_crt_analysis(context, execution)
     }
+    if (!context$shared_response_fit) {
+        # Group-specific NT fits are transient. Preserve an existing shared
+        # calibration cache with its own identity; do not relabel it all-QC.
+        out$response_precomputations <- sceptre_object@fits@response_precomputations
+    }
+    attr(out$response_precomputations, "fit_identity") <- if (context$shared_response_fit) {
+        context$fit_identity
+    } else sceptre_object@fits@identity
     out$result <- assemble_pair_results(out$result, response_grna_group_pairs)
     out
 }

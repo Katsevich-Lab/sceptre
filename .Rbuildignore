@@ -24,3 +24,5 @@
 ^tools/checks$
 ^tools/fixtures$
 ^tools/architecture$
+^tools/components$
+^sceptre\.BiocCheck$

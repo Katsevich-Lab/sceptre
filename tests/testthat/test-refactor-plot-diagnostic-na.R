@@ -1,8 +1,8 @@
 refactor_plot_diagnostic_object <- function(output_amount = 1L, as_data_table = FALSE) {
     object <- methods::new("sceptre_object")
     object@functs_called <- c(run_discovery_analysis = TRUE)
-    object@multiple_testing_alpha <- 0.1
-    object@discovery_result <- data.frame(
+    object@spec@multiple_testing_alpha <- 0.1
+    object@results@discovery_result <- data.frame(
         response_id = c("response_a", "response_b"),
         grna_target = c("target_a", "target_b"),
         n_nonzero_trt = c(15L, 18L), n_nonzero_cntrl = c(20L, 21L),
@@ -10,22 +10,29 @@ refactor_plot_diagnostic_object <- function(output_amount = 1L, as_data_table = 
         fold_change = c(0.5, 1.1), se_fold_change = c(0.1, 0.2),
         log_2_fold_change = log2(c(0.5, 1.1)), significant = c(TRUE, FALSE)
     )
-    object@calibration_result <- data.frame(p_value = c(0.1, 0.8))
+    object@results@calibration_result <- data.frame(p_value = c(0.1, 0.8))
     if (output_amount >= 2L) {
         # Stage 1 and empirical stage 3 legitimately have no fitted SN curve.
-        object@discovery_result$stage <- c(1L, 3L)
-        object@discovery_result$z_orig <- c(-4, 0.25)
-        object@discovery_result$xi <- NA_real_
-        object@discovery_result$omega <- NA_real_
-        object@discovery_result$alpha <- NA_real_
+        object@results@discovery_result$stage <- c(1L, 3L)
+        object@results@discovery_result$z_orig <- c(-4, 0.25)
+        object@results@discovery_result$xi <- NA_real_
+        object@results@discovery_result$omega <- NA_real_
+        object@results@discovery_result$alpha <- NA_real_
     }
     if (output_amount >= 3L) {
-        object@discovery_result$z_null_1 <- c(-1.1, 0.8)
-        object@discovery_result$z_null_2 <- c(NA_real_, -0.2)
+        object@results@discovery_result$z_null_1 <- c(-1.1, 0.8)
+        object@results@discovery_result$z_null_2 <- c(NA_real_, -0.2)
     }
     if (as_data_table) {
-        object@discovery_result <- data.table::as.data.table(object@discovery_result)
+        object@results@discovery_result <- data.table::as.data.table(object@results@discovery_result)
     }
+    object@nf_pipeline <- FALSE
+    object <- refactor_private("commit_result_record")(object,
+        "run_discovery_analysis", object@results@discovery_result, data.frame(),
+        output_amount = output_amount)
+    object <- refactor_private("commit_result_record")(object,
+        "run_calibration_check", object@results@calibration_result, data.frame(),
+        output_amount = output_amount)
     object
 }
 
@@ -58,13 +65,13 @@ test_that("diagnostic output amounts retain the same discovery plot family", {
     withr::local_seed(581L)
     seed <- .Random.seed
     plot_discovery <- refactor_private("plot_run_discovery_analysis")
-    core <- refactor_plot_diagnostic_object()@discovery_result
+    core <- refactor_plot_diagnostic_object()@results@discovery_result
     built_by_class <- list()
     for (as_data_table in c(FALSE, TRUE)) {
         built <- vector("list", 3L)
         for (amount in 1:3) {
             object <- refactor_plot_diagnostic_object(amount, as_data_table)
-            retained_result <- object@discovery_result
+            retained_result <- object@results@discovery_result
             before <- serialize(object, NULL)
             result_before <- serialize(retained_result, NULL)
             panels <- plot_discovery(object, return_indiv_plots = TRUE)
@@ -86,7 +93,7 @@ test_that("diagnostic output amounts retain the same discovery plot family", {
 test_that("missing primary plot fields still exclude unplottable discovery rows", {
     withr::local_seed(852L)
     seed <- .Random.seed
-    core <- refactor_plot_diagnostic_object(3L)@discovery_result
+    core <- refactor_plot_diagnostic_object(3L)@results@discovery_result
     extra <- core[rep(2L, 4L), ]
     extra$response_id <- c("missing_p", "missing_effect", "missing_flag", "failed_qc")
     extra$p_value[c(1L, 4L)] <- NA_real_
@@ -95,11 +102,11 @@ test_that("missing primary plot fields still exclude unplottable discovery rows"
     extra$pass_qc[4L] <- FALSE
     for (as_data_table in c(FALSE, TRUE)) {
         object <- refactor_plot_diagnostic_object(3L)
-        object@discovery_result <- rbind(core, extra)
+        object@results@discovery_result <- rbind(core, extra)
         if (as_data_table) {
-            object@discovery_result <- data.table::as.data.table(object@discovery_result)
+            object@results@discovery_result <- data.table::as.data.table(object@results@discovery_result)
         }
-        retained_result <- object@discovery_result
+        retained_result <- object@results@discovery_result
         before <- serialize(object, NULL)
         result_before <- serialize(retained_result, NULL)
         panels <- refactor_private("plot_run_discovery_analysis")(

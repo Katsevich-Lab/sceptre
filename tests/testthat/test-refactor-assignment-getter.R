@@ -3,10 +3,12 @@ test_that("assignment getter owns zero-based slots and preserves saved membershi
                              list(first = c(2L, 5L), second = c(1L, 4L)),
                              list(first = integer(), second = c(1L, 4L)))) {
         object <- methods::new("sceptre_object",
-            grna_matrix = list(matrix(0, length(assignments), 5L)),
-            initial_grna_assignment_list = assignments,
-            functs_called = c(assign_grnas = TRUE, run_qc = TRUE),
-            cells_in_use = c(2L, 4L, 5L))
+            data = methods::new("ScreenData",
+                grna_matrix = list(matrix(0, length(assignments), 5L))),
+            preparation = methods::new("PreparationRecord",
+                initial_grna_assignment_list = assignments,
+                cells_in_use = c(2L, 4L, 5L)),
+            functs_called = c(assign_grnas = TRUE, run_qc = TRUE))
         before <- serialize(object, NULL)
         expected <- matrix(FALSE, length(assignments), 5L,
                            dimnames = list(names(assignments), NULL))

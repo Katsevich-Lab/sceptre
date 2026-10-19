@@ -20,9 +20,9 @@ assign_grnas_to_cells <- function(
 ) {
     # extract pieces from sceptre_object
     grna_matrix <- get_grna_matrix(sceptre_object)
-    grna_assignment_method <- sceptre_object@grna_assignment_method
-    cell_covariate_data_frame <- sceptre_object@covariate_data_frame
-    grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
+    grna_assignment_method <- sceptre_object@spec@grna_assignment_method
+    cell_covariate_data_frame <- sceptre_object@data@covariate_data_frame
+    grna_assignment_hyperparameters <- sceptre_object@spec@grna_assignment_hyperparameters
 
     # determine the gRNAs to analyze
     if (sceptre_object@nf_pipeline) {
@@ -34,7 +34,7 @@ assign_grnas_to_cells <- function(
     # assign grnas via the selected strategy; obtain the grna
     # assignments and cells containing multiple grnas
     if (grna_assignment_method == "mixture") {
-        sceptre_object@initial_grna_assignment_list <- assign_grnas_to_cells_mixture(
+        sceptre_object@preparation@initial_grna_assignment_list <- assign_grnas_to_cells_mixture(
             grna_matrix = grna_matrix,
             cell_covariate_data_frame = cell_covariate_data_frame,
             grna_assignment_hyperparameters = grna_assignment_hyperparameters,
@@ -46,7 +46,7 @@ assign_grnas_to_cells <- function(
         )
     }
     if (grna_assignment_method == "thresholding") {
-        sceptre_object@initial_grna_assignment_list <- assign_grnas_to_cells_thresholding(
+        sceptre_object@preparation@initial_grna_assignment_list <- assign_grnas_to_cells_thresholding(
             grna_matrix = grna_matrix,
             grna_assign_threshold = grna_assignment_hyperparameters$threshold,
             grna_ids = grnas_in_use
@@ -54,22 +54,22 @@ assign_grnas_to_cells <- function(
     }
     if (grna_assignment_method == "maximum") {
         max_result <- assign_grnas_to_cells_maximum(
-            max_grna = sceptre_object@import_grna_assignment_info$max_grna,
-            max_grna_frac_umis = sceptre_object@import_grna_assignment_info$max_grna_frac_umis,
+            max_grna = sceptre_object@data@import_grna_assignment_info$max_grna,
+            max_grna_frac_umis = sceptre_object@data@import_grna_assignment_info$max_grna_frac_umis,
             umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,
             grna_n_umis = cell_covariate_data_frame$grna_n_umis,
             min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
             grna_ids = grnas_in_use
         )
-        sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
+        sceptre_object@preparation@initial_grna_assignment_list <- max_result$initial_assignment_list
         # set cells w/ multiple gRNAs for max method
-        sceptre_object@cells_w_zero_or_twoplus_grnas <- max_result$cells_w_zero_or_twoplus_grnas
+        sceptre_object@preparation@cells_w_zero_or_twoplus_grnas <- max_result$cells_w_zero_or_twoplus_grnas
     }
     # check that at least some gRNAs were assigned
     if (
         all(
             vapply(
-                sceptre_object@initial_grna_assignment_list,
+                sceptre_object@preparation@initial_grna_assignment_list,
                 length,
                 FUN.VALUE = integer(1)
             ) ==
@@ -178,24 +178,24 @@ assign_grnas_to_cells_maximum <- function(
 #' @noRd
 process_initial_assignment_list <- function(sceptre_object) {
     # set variables
-    initial_assignment_list <- sceptre_object@initial_grna_assignment_list
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-    low_moi <- sceptre_object@low_moi
+    initial_assignment_list <- sceptre_object@preparation@initial_grna_assignment_list
+    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+    low_moi <- sceptre_object@data@low_moi
     n_cells <- ncol(get_grna_matrix(sceptre_object))
-    maximum_assignment <- sceptre_object@grna_assignment_method == "maximum"
+    maximum_assignment <- sceptre_object@spec@grna_assignment_method == "maximum"
     # if not using maximum assignment, compute n grnas per cell and cells
     # with multiple grnas
     if (!maximum_assignment) {
-        sceptre_object@grnas_per_cell <- compute_n_grnas_per_cell_vector(
+        sceptre_object@preparation@grnas_per_cell <- compute_n_grnas_per_cell_vector(
             initial_assignment_list,
             n_cells
         )
         if (low_moi) {
-            cells_w_multiple_grnas <- which(sceptre_object@grnas_per_cell >= 2L)
+            cells_w_multiple_grnas <- which(sceptre_object@preparation@grnas_per_cell >= 2L)
             cells_w_zero_grnas <- seq(1, n_cells)[
                 -sort(unique(unlist(initial_assignment_list)))
             ]
-            sceptre_object@cells_w_zero_or_twoplus_grnas <- union(
+            sceptre_object@preparation@cells_w_zero_or_twoplus_grnas <- union(
                 cells_w_multiple_grnas,
                 cells_w_zero_grnas
             )
@@ -231,10 +231,10 @@ process_initial_assignment_list <- function(sceptre_object) {
         indiv_nt_grna_idxs = indiv_nt_grna_idxs
     )
     # initialize output
-    sceptre_object@grna_assignments_raw <- grna_assignments_raw
+    sceptre_object@preparation@grna_assignments_raw <- grna_assignments_raw
     # save mean cells per grna
-    sceptre_object@mean_cells_per_grna <- vapply(
-        sceptre_object@initial_grna_assignment_list,
+    sceptre_object@preparation@mean_cells_per_grna <- vapply(
+        sceptre_object@preparation@initial_grna_assignment_list,
         length,
         FUN.VALUE = integer(1)
     ) |>
@@ -254,12 +254,12 @@ process_initial_assignment_list <- function(sceptre_object) {
 #'   Nextflow's `output_grna_info` uses this restricted mode for trial runs.
 #' @noRd
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+    grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
     if (restricted_grnas) {
         if (!sceptre_object@nuclear) {
             all_grna_targets <- unique(c(
-                sceptre_object@positive_control_pairs$grna_target,
-                sceptre_object@discovery_pairs$grna_target,
+                sceptre_object@spec@positive_control_pairs$grna_target,
+                sceptre_object@spec@discovery_pairs$grna_target,
                 "non-targeting"
             ))
         } else {

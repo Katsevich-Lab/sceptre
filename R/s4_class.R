@@ -1,78 +1,148 @@
+# Version two: each persisted value has one domain owner. Numerical kernels
+# continue to accept ordinary matrices, vectors and lists.
 #' @import Matrix
-# Users and Nextflow save objects with these 56 fields (S4 slots). Matrix fields
-# use one-element lists. Keep this saved format compatible; temporary analysis
-# lists are built during a run and are not added to the saved object.
-setClass(
-    "sceptre_object",
-    slots = list(
-        # raw data
-        response_matrix = "list",
-        grna_matrix = "list",
-        covariate_data_frame = "data.frame",
-        covariate_matrix = "matrix",
-        grna_target_data_frame = "data.frame",
-        low_moi = "logical",
-        covariate_names = "character",
+#' @importFrom methods new slot validObject
+component_slot_owners <- function() c(
+    response_matrix = "data",
+    grna_matrix = "data",
+    covariate_data_frame = "data",
+    grna_target_data_frame = "data",
+    low_moi = "data",
+    covariate_names = "data",
+    mitochondrial_gene = "data",
+    import_grna_assignment_info = "data",
+    integer_id = "data",
+    discovery_pairs = "spec",
+    positive_control_pairs = "spec",
+    formula_object = "spec",
+    side_code = "spec",
+    resampling_approximation = "spec",
+    control_group_complement = "spec",
+    run_permutations = "spec",
+    n_nonzero_trt_thresh = "spec",
+    n_nonzero_cntrl_thresh = "spec",
+    B1 = "spec",
+    B2 = "spec",
+    B3 = "spec",
+    grna_integration_strategy = "spec",
+    grna_assignment_method = "spec",
+    grna_assignment_hyperparameters = "spec",
+    multiple_testing_alpha = "spec",
+    multiple_testing_method = "spec",
+    cellwise_qc_thresholds = "spec",
+    calibration_group_size = "spec",
+    n_calibration_pairs = "spec",
+    negative_control_pairs = "spec",
+    covariate_matrix = "preparation",
+    M_matrix = "preparation",
+    n_nonzero_tot_vector = "preparation",
+    discovery_pairs_with_info = "preparation",
+    positive_control_pairs_with_info = "preparation",
+    initial_grna_assignment_list = "preparation",
+    grna_assignments_raw = "preparation",
+    grna_assignments = "preparation",
+    grnas_per_cell = "preparation",
+    cells_w_zero_or_twoplus_grnas = "preparation",
+    cells_in_use = "preparation",
+    n_discovery_pairs = "preparation",
+    n_ok_discovery_pairs = "preparation",
+    n_positive_control_pairs = "preparation",
+    n_ok_positive_control_pairs = "preparation",
+    cell_removal_metrics = "preparation",
+    mean_cells_per_grna = "preparation",
+    response_precomputations = "fits",
+    calibration_result = "results",
+    power_result = "results",
+    discovery_result = "results")
 
-        # analysis parameters
-        discovery_pairs = "data.frame",
-        positive_control_pairs = "data.frame",
-        formula_object = "formula",
-        side_code = "integer",
-        resampling_approximation = "character",
-        control_group_complement = "logical",
-        run_permutations = "logical",
-        n_nonzero_trt_thresh = "integer",
-        n_nonzero_cntrl_thresh = "integer",
-        B1 = "integer",
-        B2 = "integer",
-        B3 = "integer",
-        grna_integration_strategy = "character",
-        grna_assignment_method = "character",
-        grna_assignment_hyperparameters = "list",
-        multiple_testing_alpha = "numeric",
-        multiple_testing_method = "character",
-        cell_removal_metrics = "integer",
-        cellwise_qc_thresholds = "list",
+setClass("ScreenData", slots = c(
+    response_names = "character",
+    response_matrix = "list",
+    grna_matrix = "list",
+    covariate_data_frame = "data.frame",
+    grna_target_data_frame = "data.frame",
+    low_moi = "logical",
+    covariate_names = "character",
+    mitochondrial_gene = "logical",
+    import_grna_assignment_info = "list",
+    integer_id = "integer",
+    identity = "character",
+    backend = "list"
+))
+setClass("AnalysisSpec", slots = c(
+    discovery_pairs = "data.frame",
+    positive_control_pairs = "data.frame",
+    formula_object = "formula",
+    side_code = "integer",
+    resampling_approximation = "character",
+    control_group_complement = "logical",
+    run_permutations = "logical",
+    n_nonzero_trt_thresh = "integer",
+    n_nonzero_cntrl_thresh = "integer",
+    B1 = "integer",
+    B2 = "integer",
+    B3 = "integer",
+    grna_integration_strategy = "character",
+    grna_assignment_method = "character",
+    grna_assignment_hyperparameters = "list",
+    multiple_testing_alpha = "numeric",
+    multiple_testing_method = "character",
+    cellwise_qc_thresholds = "list",
+    calibration_group_size = "integer",
+    n_calibration_pairs = "integer",
+    negative_control_pairs = "data.frame",
+    requested = "list"
+))
+setClass("PreparationRecord", slots = c(
+    grna_target_data_frame = "data.frame",
+    covariate_matrix = "matrix",
+    M_matrix = "matrix",
+    n_nonzero_tot_vector = "integer",
+    discovery_pairs_with_info = "data.frame",
+    positive_control_pairs_with_info = "data.frame",
+    initial_grna_assignment_list = "list",
+    grna_assignments_raw = "list",
+    grna_assignments = "list",
+    grnas_per_cell = "integer",
+    cells_w_zero_or_twoplus_grnas = "integer",
+    cells_in_use = "integer",
+    n_discovery_pairs = "integer",
+    n_ok_discovery_pairs = "integer",
+    n_positive_control_pairs = "integer",
+    n_ok_positive_control_pairs = "integer",
+    cell_removal_metrics = "integer",
+    mean_cells_per_grna = "numeric",
+    stages = "list"
+))
+setClass("FitRecord", slots = c(
+    response_precomputations = "list",
+    identity = "list"
+))
+setClass("ResultRecord", slots = c(
+    calibration_result = "data.frame",
+    power_result = "data.frame",
+    discovery_result = "data.frame",
+    records = "list"
+))
 
-        # computed objects
-        mitochondrial_gene = "logical",
-        M_matrix = "matrix",
-        n_nonzero_tot_vector = "integer",
-        discovery_pairs_with_info = "data.frame",
-        positive_control_pairs_with_info = "data.frame",
-        negative_control_pairs = "data.frame",
-        initial_grna_assignment_list = "list",
-        grna_assignments_raw = "list",
-        grna_assignments = "list",
-        grnas_per_cell = "integer",
-        cells_w_zero_or_twoplus_grnas = "integer",
-        cells_in_use = "integer",
-        n_discovery_pairs = "integer",
-        n_ok_discovery_pairs = "integer",
-        n_positive_control_pairs = "integer",
-        n_ok_positive_control_pairs = "integer",
-        calibration_group_size = "integer",
-        n_calibration_pairs = "integer",
-        import_grna_assignment_info = "list",
-        mean_cells_per_grna = "numeric",
-
-        # cached objects
-        response_precomputations = "list",
-
-        # flags
-        last_function_called = "character",
-        functs_called = "logical",
-
-        # results
-        calibration_result = "data.frame",
-        power_result = "data.frame",
-        discovery_result = "data.frame",
-
-        # odm-related entries
-        nuclear = "logical",
-        nf_pipeline = "logical",
-        integer_id = "integer",
-        elements_to_analyze = "character"
-    )
-)
+setClass("CellView", slots = c(fit_to_analysis = "integer",
+    source_cells = "integer", trt_fit_pos = "integer", n_trt = "integer"))
+# The coordinator owns workflow transitions and references, never duplicate data.
+setClass("sceptre_object", slots = c(
+    data = "ScreenData",
+    spec = "AnalysisSpec",
+    preparation = "PreparationRecord",
+    fits = "FitRecord",
+    results = "ResultRecord",
+    last_function_called = "character",
+    functs_called = "logical",
+    nuclear = "logical",
+    nf_pipeline = "logical",
+    elements_to_analyze = "character",
+    schema_version = "integer"), prototype = list(
+    data = new("ScreenData"),
+    spec = new("AnalysisSpec"),
+    preparation = new("PreparationRecord"),
+    fits = new("FitRecord"),
+    results = new("ResultRecord"),
+    schema_version = 2L))

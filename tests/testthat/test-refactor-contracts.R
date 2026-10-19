@@ -106,7 +106,8 @@ test_that("current saved objects resume without changing discovery results", {
 test_that("a versioned saved object remains a supported input", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_complement_perm
-    restored <- readRDS(test_path("fixtures", "saved-objects", "sceptre-0.99.0-21f9ea0.rds"))
+    restored <- refactor_private("migrate_sceptre_object")(readRDS(
+        test_path("fixtures", "saved-objects", "sceptre-0.99.0-21f9ea0.rds")))
     before <- serialize(restored, NULL)
     current <- refactor_capture(refactor_prepare(inputs, case))
     old_run <- refactor_capture(sceptre::run_discovery_analysis(restored, print_progress = FALSE))

@@ -3,11 +3,11 @@ legacy_plot_object <- function() {
     object <- refactor_private("set_grna_matrix")(object,
         matrix(c(0, 1, 11, 15), 1L, dimnames = list("g", NULL)))
     object <- refactor_private("set_response_matrix")(object, matrix(1, 1L, 4L))
-    object@low_moi <- FALSE
-    object@cell_removal_metrics <- rep(0L, 6L)
+    object@data@low_moi <- FALSE
+    object@preparation@cell_removal_metrics <- rep(0L, 6L)
     object@functs_called <- c(run_qc = TRUE)
-    object@n_nonzero_cntrl_thresh <- object@n_nonzero_trt_thresh <- 7L
-    object@discovery_pairs_with_info <- data.frame(response_id = paste0("r", 1:6),
+    object@spec@n_nonzero_cntrl_thresh <- object@spec@n_nonzero_trt_thresh <- 7L
+    object@preparation@discovery_pairs_with_info <- data.frame(response_id = paste0("r", 1:6),
         grna_group = "g", pass_qc = rep(c(TRUE, FALSE), 3L),
         n_nonzero_trt = 1:6, n_nonzero_cntrl = 6:1)
     object
@@ -59,7 +59,7 @@ test_that("QC forwards nondefaults while retaining default and single-plot retur
     expect_length(panels, 2L)
     expected_rows <- withr::with_seed(4, sample.int(6L, 2L))
     expect_identical(panels[[2L]]$data$response_id,
-                     object@discovery_pairs_with_info$response_id[expected_rows])
+                     object@preparation@discovery_pairs_with_info$response_id[expected_rows])
     expect_identical(panels[[2L]]$layers[[1L]]$aes_params$size, 3)
     expect_identical(panels[[2L]]$layers[[1L]]$aes_params$alpha, .2)
     default <- sceptre::plot_run_qc(object, return_indiv_plots = TRUE)[[2L]]
@@ -67,11 +67,11 @@ test_that("QC forwards nondefaults while retaining default and single-plot retur
     expect_identical(default$data, direct$data)
     expect_identical(default$layers[[1L]]$aes_params, direct$layers[[1L]]$aes_params)
     expect_identical(nrow(default$data), 6L)
-    object@discovery_pairs_with_info <- object@discovery_pairs_with_info[FALSE, ]
+    object@preparation@discovery_pairs_with_info <- object@preparation@discovery_pairs_with_info[FALSE, ]
     single <- sceptre::plot_run_qc(object, return_indiv_plots = TRUE)
     expect_s3_class(single, "ggplot")
     expect_identical(.Random.seed, seed)
-    object@discovery_pairs_with_info <- unserialize(before)@discovery_pairs_with_info
+    object@preparation@discovery_pairs_with_info <- unserialize(before)@preparation@discovery_pairs_with_info
     expect_identical(serialize(object, NULL), before)
 })
 
@@ -137,8 +137,8 @@ test_that("shared processor validation keeps existing predicates and error order
     object <- legacy_plot_object()
     expect_error(refactor_private("check_assign_grna_inputs")(object, "invalid",
         list(), 1L), "`assignment_method` must be", fixed = TRUE)
-    object@control_group_complement <- FALSE
-    object@grna_assignments <- list(indiv_nt_grna_idxs = list(nt1 = 1L, nt2 = 2L))
+    object@spec@control_group_complement <- FALSE
+    object@preparation@grna_assignments <- list(indiv_nt_grna_idxs = list(nt1 = 1L, nt2 = 2L))
     expect_error(refactor_private("check_calibration_check_inputs")(object,
         n_calibration_pairs = 0L, n_processors = 1L, calibration_group_size = 1L),
         "Cannot run a calibration check on zero negative control pairs.", fixed = TRUE)

@@ -69,17 +69,28 @@ read_ondisc_backed_sceptre_object <- function(
         grna_odm_file_fp,
         "`grna_odm_file_fp`"
     )
-    sceptre_object <- readRDS(sceptre_object_fp)
+    sceptre_object <- migrate_sceptre_object(readRDS(sceptre_object_fp))
     matrices <- storage_reopen_backed_pair(
         response_odm_file_fp,
         grna_odm_file_fp,
-        sceptre_object@integer_id
+        sceptre_object@data@integer_id
     )
-    sceptre_object <- set_response_matrix(
-        sceptre_object,
-        matrices$response_matrix
-    )
-    sceptre_object <- set_grna_matrix(sceptre_object, matrices$grna_matrix)
+    if (length(sceptre_object@data@backend)) {
+        validate_backed_descriptor(matrices$response_matrix, sceptre_object@data@backend$response)
+        validate_backed_descriptor(matrices$grna_matrix, sceptre_object@data@backend$grna)
+    } else if (is.null(sceptre_object@results@records$legacy)) {
+        stop("Backing store has no anchored content descriptor; reimport the screen.")
+    }
+    # Reattachment is a process-local handle change after verified identity;
+    # it must not be treated as a mutation of the scientific data.
+    sceptre_object@data@response_matrix <- list(matrices$response_matrix)
+    sceptre_object@data@grna_matrix <- list(matrices$grna_matrix)
+    if (!length(sceptre_object@data@backend)) {
+        sceptre_object <- initialize_screen_identity(sceptre_object)
+    }
+    sceptre_object@data@backend <- list(
+        response = backed_store_descriptor(matrices$response_matrix),
+        grna = backed_store_descriptor(matrices$grna_matrix))
     return(sceptre_object)
 }
 
@@ -90,8 +101,13 @@ write_ondisc_backed_sceptre_object <- function(
     sceptre_object,
     directory_to_write
 ) {
-    sceptre_object <- set_grna_matrix(sceptre_object, list())
-    sceptre_object <- set_response_matrix(sceptre_object, list())
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    validate_backing_for_save(sceptre_object)
+    # Keep the imported descriptor identity. Only the location may change after
+    # verified reattachment; never bless changed content by writing fresh hashes.
+    # Persist descriptors, never process-local live HDF5 handles.
+    sceptre_object@data@grna_matrix <- list()
+    sceptre_object@data@response_matrix <- list()
     # check that dir exists
     directory_to_write <- prepare_directory_to_write(directory_to_write)
     saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))

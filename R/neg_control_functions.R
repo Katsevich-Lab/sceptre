@@ -15,14 +15,14 @@ construct_negative_control_pairs <- function(
     calibration_group_size
 ) {
     message("Constructing negative control pairs.")
-    grna_assignments <- sceptre_object@grna_assignments
+    grna_assignments <- sceptre_object@preparation@grna_assignments
     response_matrix <- get_response_matrix(sceptre_object)
-    n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
-    n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
-    n_nonzero_m <- sceptre_object@M_matrix
-    n_nonzero_tot <- sceptre_object@n_nonzero_tot_vector
-    cells_in_use <- sceptre_object@cells_in_use
-    discovery_pairs_with_info <- sceptre_object@discovery_pairs_with_info
+    n_nonzero_trt_thresh <- sceptre_object@spec@n_nonzero_trt_thresh
+    n_nonzero_cntrl_thresh <- sceptre_object@spec@n_nonzero_cntrl_thresh
+    n_nonzero_m <- sceptre_object@preparation@M_matrix
+    n_nonzero_tot <- sceptre_object@preparation@n_nonzero_tot_vector
+    cells_in_use <- sceptre_object@preparation@cells_in_use
+    discovery_pairs_with_info <- sceptre_object@preparation@discovery_pairs_with_info
 
     N_POSSIBLE_GROUPS_THRESHOLD <- 100L
     nt_grna_names <- names(grna_assignments[["indiv_nt_grna_idxs"]])
@@ -40,10 +40,20 @@ construct_negative_control_pairs <- function(
         )
     } else {
         # sample from the set of combinations
-        p_hat <- if (sceptre_object@n_discovery_pairs == 0L) {
+        p_hat <- if (sceptre_object@preparation@n_discovery_pairs == 0L) {
             0.1
         } else {
             mean(discovery_pairs_with_info$pass_qc)
+        }
+        if (!is.finite(p_hat) || p_hat <= 0) {
+            # Discovery targets can all fail QC even when NT groups qualify.
+            # Use the necessary total-count condition as a proposal rate; the
+            # native pair sampler still checks actual treatment/control counts.
+            p_hat <- mean(n_nonzero_tot >=
+                n_nonzero_trt_thresh + n_nonzero_cntrl_thresh)
+            if (!is.finite(p_hat) || p_hat <= 0) {
+                stop("No negative control pair passes pairwise QC.")
+            }
         }
         possible_groups_m <- sample_calibration_groups(
             calibration_group_size,
@@ -56,7 +66,7 @@ construct_negative_control_pairs <- function(
         )
     }
 
-    calculate_ess_using_m_matrix <- sceptre_object@low_moi ||
+    calculate_ess_using_m_matrix <- sceptre_object@data@low_moi ||
         calibration_group_size == 1L
     if (calculate_ess_using_m_matrix) {
         samp <- sample_calibration_pairs(

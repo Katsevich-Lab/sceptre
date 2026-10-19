@@ -48,9 +48,9 @@ test_that("full pipeline runs end-to-end with parallel = TRUE", {
     expect_true(scep@functs_called[["run_calibration_check"]])
     expect_true(scep@functs_called[["run_power_check"]])
     expect_true(scep@functs_called[["run_discovery_analysis"]])
-    expect_gt(nrow(scep@calibration_result), 0)
-    expect_gt(nrow(scep@power_result), 0)
-    expect_gt(nrow(scep@discovery_result), 0)
+    expect_gt(nrow(scep@results@calibration_result), 0)
+    expect_gt(nrow(scep@results@power_result), 0)
+    expect_gt(nrow(scep@results@discovery_result), 0)
 })
 
 
@@ -82,5 +82,5 @@ test_that("assign_grnas mixture method runs with parallel = TRUE", {
         ) |>
         assign_grnas(method = "mixture", parallel = TRUE, n_processors = 2)
     expect_true(scep@functs_called[["assign_grnas"]])
-    expect_true(length(scep@initial_grna_assignment_list) > 0)
+    expect_true(length(scep@preparation@initial_grna_assignment_list) > 0)
 })

@@ -213,16 +213,16 @@ get_synthetic_permutation_idxs <- function(
 #'   reserved group label non-targeting.
 #' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
-    grouping_strategy <- sceptre_object@grna_integration_strategy
+    grouping_strategy <- sceptre_object@spec@grna_integration_strategy
     if (grouping_strategy == "union") {
-        sceptre_object@grna_target_data_frame$grna_group <- sceptre_object@grna_target_data_frame$grna_target
-        sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target
-        sceptre_object@positive_control_pairs$grna_group <- sceptre_object@positive_control_pairs$grna_target
+        sceptre_object@preparation@grna_target_data_frame$grna_group <- sceptre_object@preparation@grna_target_data_frame$grna_target
+        sceptre_object@spec@discovery_pairs$grna_group <- sceptre_object@spec@discovery_pairs$grna_target
+        sceptre_object@spec@positive_control_pairs$grna_group <- sceptre_object@spec@positive_control_pairs$grna_target
     }
     if (grouping_strategy %in% c("singleton", "bonferroni")) {
-        grna_target_data_frame <- sceptre_object@grna_target_data_frame
-        discovery_pairs <- sceptre_object@discovery_pairs
-        positive_control_pairs <- sceptre_object@positive_control_pairs
+        grna_target_data_frame <- sceptre_object@preparation@grna_target_data_frame
+        discovery_pairs <- sceptre_object@spec@discovery_pairs
+        positive_control_pairs <- sceptre_object@spec@positive_control_pairs
 
         # function to update targeting pairs
         update_targeting_pairs <- function(
@@ -248,12 +248,12 @@ update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
                     grna_id
                 )
             )
-        sceptre_object@grna_target_data_frame <- updated_grna_target_data_frame
-        sceptre_object@discovery_pairs <- update_targeting_pairs(
+        sceptre_object@preparation@grna_target_data_frame <- updated_grna_target_data_frame
+        sceptre_object@spec@discovery_pairs <- update_targeting_pairs(
             discovery_pairs,
             updated_grna_target_data_frame
         )
-        sceptre_object@positive_control_pairs <- update_targeting_pairs(
+        sceptre_object@spec@positive_control_pairs <- update_targeting_pairs(
             positive_control_pairs,
             updated_grna_target_data_frame
         )
