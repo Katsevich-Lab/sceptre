@@ -1,0 +1,7 @@
+{
+  "command": "R CMD build .",
+  "result": "passed, including vignette generation",
+  "source_tarball": "/private/tmp/sceptre-schema3-final-check/sceptre_0.99.0.tar.gz",
+  "source_tarball_sha256": "b209a1deadfccf4941aade5d4b79c3ebbbbfe1d00d4adda5d2f365229fd1de6e",
+  "saved_schema": 3
+}

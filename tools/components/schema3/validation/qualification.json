@@ -1,0 +1,48 @@
+{
+  "implementation_commit": "6b1bee05a3fbb922415dc3774c63add2ad2a6b08",
+  "previous_qualification_commit": "4aad80b",
+  "saved_schema": 3,
+  "platform": "macOS arm64",
+  "R": "4.6.0",
+  "ondisc": "1.2.0",
+  "BiocCheck": "1.47.26",
+  "source_tarball_sha256": "b209a1deadfccf4941aade5d4b79c3ebbbbfe1d00d4adda5d2f365229fd1de6e",
+  "R_CMD_build": "passed including vignettes",
+  "R_CMD_check": "OK",
+  "installed_tests": {
+    "pass": 4848,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "source_tests": {
+    "cases": 181,
+    "expectations": 4848,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skipped": 0,
+    "passed": 4848,
+    "elapsed_seconds": 46.335,
+    "failures": []
+  },
+  "BiocCheck_results": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 6
+  },
+  "BiocCheck_disabled": [
+    "R-version recommendation",
+    "interactive bioc-help check"
+  ],
+  "parity": {
+    "cases": 7,
+    "comparisons": 231,
+    "tolerance": 0,
+    "all_equal": true,
+    "scope": "computed tables, available preparation payloads, compact response fits, warnings, R RNG; equal realized budgets"
+  },
+  "native_source_changes": 0,
+  "optional_dependency_probe": "passed without loading ondisc",
+  "review": "no additional material public-path correctness findings in final read-only integration review"
+}
