@@ -60,7 +60,7 @@ test_that("count replacement refreshes summaries and invalidates all derived sta
     expect_s4_class(get_response_matrix(changed), "dgRMatrix")
     expect_equal(changed@data@covariate_data_frame$response_n_umis, as.numeric(Matrix::colSums(counts)))
     expect_false(identical(changed@data@identity, object@data@identity))
-    expect_length(changed@fits@entries, 0L)
+    expect_length(changed@fits@response_fits, 0L)
     expect_identical(changed@preparation@stages, list())
     expect_false(workflow_status(changed)[["set_analysis_parameters"]])
     expect_error(get_result(changed, "run_discovery_analysis"), "No completed current")
@@ -74,28 +74,28 @@ test_that("response cache rejects malformed coefficients, dispersion and input s
     object <- component_workflow()
     object <- suppressMessages(run_discovery_analysis(object, print_progress = FALSE))
     cache <- object@fits
-    expect_s4_class(cache, "ResponseFitCache")
-    expect_gt(length(cache@entries), 0L)
-    expect_error(new("ResponseFitCache", entries = cache@entries, identity = list()), "ordered fitting identity")
-    malformed <- cache@entries
+    expect_s4_class(cache, "FitCache")
+    expect_gt(length(cache@response_fits), 0L)
+    expect_error(new("FitCache", response_fits = cache@response_fits, response_identity = list()), "ordered fitting identity")
+    malformed <- cache@response_fits
     malformed[[1]]$theta <- NA_real_
-    expect_error(new("ResponseFitCache", entries = malformed, identity = cache@identity), "dispersion")
-    malformed <- cache@entries
+    expect_error(new("FitCache", response_fits = malformed, response_identity = cache@response_identity), "dispersion")
+    malformed <- cache@response_fits
     names(malformed[[1]]$fitted_coefs) <- rev(names(malformed[[1]]$fitted_coefs))
-    expect_error(new("ResponseFitCache", entries = malformed, identity = cache@identity), "coefficients")
-    malformed <- cache@entries
+    expect_error(new("FitCache", response_fits = malformed, response_identity = cache@response_identity), "coefficients")
+    malformed <- cache@response_fits
     names(malformed)[1] <- "nonexistent-response"
     expect_error(new("sceptre_object", data = object@data, spec = object@spec,
-        preparation = object@preparation, fits = new("ResponseFitCache", entries = malformed,
-            identity = cache@identity)), "identifiers must exist")
+        preparation = object@preparation, fits = new("FitCache", response_fits = malformed,
+            response_identity = cache@response_identity)), "identifiers must exist")
     pairs <- object@preparation@discovery_pairs_with_info
     pairs <- dplyr::filter(pairs, pass_qc)
     expect_gt(length(prepare_analysis_context(object, "discovery_analysis", pairs)$response_fits), 0L)
     changed <- object
     changed@preparation@design_matrix[1, 1] <- 9
     expect_length(prepare_analysis_context(changed, "discovery_analysis", pairs)$response_fits, 0L)
-    entries <- cache@entries
-    attr(entries, "fit_identity") <- cache@identity
+    entries <- cache@response_fits
+    attr(entries, "fit_identity") <- cache@response_identity
     expect_error(commit_response_fits(changed, entries), "actual fitting inputs")
 })
 
@@ -104,18 +104,18 @@ test_that("assignment and pair eligibility invalidation preserve compatible resp
     for (name in c("high_complement_crt", "low_complement_perm")) {
         object <- component_workflow(name)
         object <- suppressMessages(run_discovery_analysis(object, print_progress = FALSE))
-        cached <- object@fits@entries
+        cached <- object@fits@response_fits
         changed <- suppressMessages(assign_grnas(object, method = "thresholding", threshold = 41, print_progress = FALSE))
         expect_true(stage_complete(changed, "assignment"))
         expect_false(stage_complete(changed, "cell_qc"))
         expect_false(result_record_is_current(changed, "run_discovery_analysis"))
-        if (object@data@low_moi) expect_length(changed@fits@entries, 0L)
-        else expect_identical(changed@fits@entries, cached)
+        if (object@data@low_moi) expect_length(changed@fits@response_fits, 0L)
+        else expect_identical(changed@fits@response_fits, cached)
         changed <- suppressMessages(run_qc(object, response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, 1), n_nonzero_trt_thresh = 8L, n_nonzero_cntrl_thresh = 8L,
             additional_cells_to_remove = inputs$remove_cells))
         expect_identical(changed@preparation@analysis_cells, object@preparation@analysis_cells)
-        expect_identical(changed@fits@entries, cached)
+        expect_identical(changed@fits@response_fits, cached)
         expect_true(stage_complete(changed, "run_qc"))
         expect_false(result_record_is_current(changed, "run_discovery_analysis"))
     }

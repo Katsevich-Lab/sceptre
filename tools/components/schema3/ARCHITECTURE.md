@@ -18,7 +18,7 @@ schema 1 and schema 2 fixtures, including removed fields and migration limits.
 | `ScreenData` | Normalized response/guide counts, source cell covariates, canonical guide metadata, display response names, MOI, imported assignment summaries, content identity | Count-store row names are canonical response IDs; `response_names` is display annotation. Modalities share aligned cells, not features. |
 | `AnalysisSpec` | Resolved scientific choices, canonical requested discovery/positive-control pairs, assignment and QC settings | No second `requested` snapshot, budgets, sampled calibration family or worker settings. |
 | `PreparationRecord` | Compiled design/pairs/groups, durable guide assignments, selected cells and QC payloads, stage identities | Distinct source and analysis coordinates; assignments exist before QC. |
-| `ResponseFitCache` | Compact response coefficients/dispersion plus actual fitting identity | No CRT assignment-model draws or cell-length fitted vectors. |
+| `FitCache` | Compact response and CRT perturbation model fits with independent identities | No cell-length fitted vectors or sampled draws. |
 | `ResultRecord` | Completed entries owning their table, provenance, scope, identity and history; legacy import metadata | A saved table can remain readable while historical. |
 | `CellView` | Ordered source/analysis/fit mappings and treatment positions | Built on demand, without copied full count matrices or an eager view per group. |
 
@@ -112,13 +112,13 @@ Formula environments are excluded from stable identity values; compiled design
 values, dimensions, contrasts/attributes and ordering still participate in the
 relevant fingerprints. Failed calls return no partially committed object.
 
-The response cache has a single explicit fitting scope:
+The response family has one explicit fitting scope:
 
 ```text
-ResponseFitCache.entries
+FitCache.response_fits
   <canonical response ID>: list(fitted_coefs = named numeric vector,
                                 theta = positive numeric scalar)
-ResponseFitCache.identity
+FitCache.response_identity
   data: imported content identity
   cells: ordered integer source cells actually fitted
   columns: ordered design column names
@@ -135,8 +135,45 @@ clears preparation and fits and invalidates results.
 
 The algorithm remains Poisson `glm.fit` followed by dispersion estimation at
 Poisson means; the method identifier does not claim a negative-binomial refit.
-Workers return result/fit proposals. The coordinator validates completed outputs
-and commits the resulting value only after success.
+
+The independent perturbation family stores actual CRT logistic models:
+
+```text
+FitCache.perturbation_fits
+  <prepared guide group>: list(
+    fitted_coefs = named numeric vector,
+    diagnostics = list(rank, converged, boundary, iterations, warnings),
+    identity = list(cells = SHA-256, design = SHA-256, treatment = SHA-256))
+FitCache.perturbation_identity
+  cells: ordered analysis source cells (stored once)
+  columns, design: common design columns and actual selected values fingerprint
+  method: "binomial-glm.fit-linkinv-v1"
+  runtime: R, stats, BLAS, matprod
+```
+
+The per-group hashes bind the ordered cells actually fitted, their actual design
+and binary treatment indicator. In low-MOI NT mode these are treatment plus NT
+cells in their numerical order; a group label or common context alone cannot
+certify a hit. Neither entries nor common NT metadata repeat per-group cell
+vectors. Cache admission requires finite coefficients and bit-exact reproduction
+of the original fitted probabilities using the original matrix product, zero
+offset and binomial inverse link. Aliased, nonfinite or inexact fits still execute
+once and remain uncached. Warnings occur on actual fits and are not replayed on
+warm hits. Every run draws a fresh full CRT bank; no random draws are cached.
+
+Assignment reruns clear perturbation fits at either MOI. Actual fitting-cell or
+design changes invalidate the corresponding family; reporting choices can retain
+both families. Calibration bypasses perturbation cache reads and writes, retaining
+existing discovery fits. Workers return fit proposals; no family is committed before all workers and
+result finalization succeed.
+
+[PR #233](https://github.com/Katsevich-Lab/sceptre/pull/233), reviewed at head
+`3f1ff0650078b382662ee70b72ea5c72fa15b031`, supplies the precedent for compact
+coefficients, exact inverse-link reconstruction, fresh draws, calibration bypass
+and cold-fit warnings. This model places both families in one typed owner with
+independent identities, uses shared NT context plus per-entry actual-input
+hashes, and handles old physical layouts explicitly at migration boundaries.
+It does not adopt the PR's flat cache slot or legacy forwarding accessors.
 
 ## Transient run plans and committed results
 

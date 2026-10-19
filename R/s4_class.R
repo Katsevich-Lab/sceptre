@@ -52,9 +52,9 @@ setClass("PreparationRecord", slots = c(
     discovery_pairs = "data.frame",
     positive_control_pairs = "data.frame"
 ))
-setClass("ResponseFitCache", slots = c(
-    entries = "list",
-    identity = "list"
+setClass("FitCache", slots = c(
+    response_fits = "list", response_identity = "list",
+    perturbation_fits = "list", perturbation_identity = "list"
 ))
 setClass("ResultRecord", slots = c(records = "list", import_metadata = "list"))
 
@@ -71,12 +71,12 @@ setClass("sceptre_object", slots = c(
     data = "ScreenData",
     spec = "AnalysisSpec",
     preparation = "PreparationRecord",
-    fits = "ResponseFitCache",
+    fits = "FitCache",
     results = "ResultRecord",
     schema_version = "integer"), prototype = list(
     data = new("ScreenData"),
     spec = new("AnalysisSpec"),
     preparation = new("PreparationRecord"),
-    fits = new("ResponseFitCache"),
+    fits = new("FitCache"),
     results = new("ResultRecord"),
     schema_version = 3L))

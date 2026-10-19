@@ -50,8 +50,10 @@ test_that("real schema one and two fixtures migrate to one current authority", {
         }
         expect_false("grna_group" %in% names(migrated@data@grna_target_data_frame))
         expect_identical(migrated@preparation@guide_groups, physical$preparation$grna_target_data_frame$grna_group)
-        expect_length(migrated@fits@entries, 0L)
-        expect_length(migrated@fits@identity, 0L)
+        expect_length(migrated@fits@response_fits, 0L)
+        expect_length(migrated@fits@response_identity, 0L)
+        expect_length(migrated@fits@perturbation_fits, 0L)
+        expect_length(migrated@fits@perturbation_identity, 0L)
         expect_identical(migrated@results@import_metadata$migrated_from_schema, version)
         expect_identical(migrated@results@import_metadata$provenance, "unknown")
         expect_false(any(c("B1", "B2", "B3", "requested", "negative_control_pairs") %in% slotNames(migrated@spec)))

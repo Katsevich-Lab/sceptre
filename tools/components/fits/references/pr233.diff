@@ -1,0 +1,904 @@
+diff --git a/NEWS.md b/NEWS.md
+index a77f747d..7f383a80 100644
+--- a/NEWS.md
++++ b/NEWS.md
+@@ -2,6 +2,8 @@
+ 
+ This release prepares `sceptre` for submission to Bioconductor.
+ 
++-   The gRNA precomputation is now cached on the `sceptre_object`, in a new `grna_precomputations` slot symmetric with `response_precomputations`. The gRNA precomputation is a logistic regression of the gRNA-presence indicator onto the covariate matrix; it does not depend on the response counts, so analyses that share a set of cells and a set of gRNA assignments now share the fit instead of repeating it. This matters most for workflows that run many analyses over the same assignments while varying only the counts, such as a power simulation. The cache is populated and reused automatically, is reset by `set_analysis_parameters()`, `assign_grnas()`, and `run_qc()`, and applies only when `resampling_mechanism` is `"crt"`. Results are unchanged: the resamples of the conditional randomization test are redrawn on every call as before. Note that any warning the gRNA regression raises (for example, about fitted probabilities numerically equal to zero or one) is now emitted on the call that performs the fit rather than on every call that uses it.
++
+ -   On Windows, setting `parallel = TRUE` now raises a clear error explaining that sceptre's parallel mode is unsupported on Windows (it is fork-based). `ondisc`/HDF5 file paths are also normalized to avoid Windows-specific issues.
+ 
+ -   Core detection for parallel processing now uses the `parallelly` package instead of `parallel::detectCores()`, giving more reliable core counts in containers and on computing clusters.
+diff --git a/R/association_testing_functions_v2.R b/R/association_testing_functions_v2.R
+index 08c2b96a..7ba655e5 100644
+--- a/R/association_testing_functions_v2.R
++++ b/R/association_testing_functions_v2.R
+@@ -172,20 +172,29 @@ crt_glm_factored_out <- function(
+     all_nt_idxs,
+     response_matrix,
+     side_code,
+-    cells_in_use
++    cells_in_use,
++    grna_precomputations = list()
+ ) {
+     result_list_inner <- vector(mode = "list", length = length(response_ids))
+     # precomputation on grna
+     idxs <- get_idx_f(curr_grna_group)
+     trt_idxs <- idxs$trt_idxs
+     n_trt <- idxs$n_trt
+-    fitted_probabilities <- perform_grna_precomputation(
++    # the regression spans every cell in use, so the treated cells alone
++    # identify the fit
++    grna_precomp <- get_grna_fitted_probabilities(
++        grna_precomputations = grna_precomputations,
++        curr_grna_group = curr_grna_group,
+         trt_idxs = trt_idxs,
+         covariate_matrix = covariate_matrix,
+-        return_fitted_values = TRUE
++        fit_idxs = trt_idxs
+     )
++    # NOTE: only the logistic fit above may be cached across calls. The
++    # synthetic indices below are random draws from that fit and must be
++    # redrawn on every call; caching them would freeze the resampling
++    # distribution and invalidate the conditional randomization test.
+     synthetic_idxs <- crt_index_sampler_fast(
+-        fitted_probabilities = fitted_probabilities,
++        fitted_probabilities = grna_precomp$fitted_probabilities,
+         B = B1 + B2 + B3
+     )
+     # loop over genes
+@@ -232,7 +241,10 @@ crt_glm_factored_out <- function(
+         )
+         result_list_inner[[i]] <- result
+     }
+-    return(result_list_inner)
++    return(list(
++        result_list_inner = result_list_inner,
++        to_cache = grna_precomp$to_cache
++    ))
+ }
+ 
+ # workhorse function 4: crt, glm run inside
+@@ -249,7 +261,8 @@ discovery_ntcells_crt <- function(
+     all_nt_idxs,
+     response_matrix,
+     side_code,
+-    cells_in_use
++    cells_in_use,
++    grna_precomputations = list()
+ ) {
+     result_list_inner <- vector(mode = "list", length = length(response_ids))
+     # initialize the idxs
+@@ -258,15 +271,23 @@ discovery_ntcells_crt <- function(
+     combined_idxs <- c(idxs$trt_idxs, all_nt_idxs)
+     trt_idxs <- seq(1L, n_trt)
+     # subset the covariate matrix for this gRNA
+-    curr_covariate_matrix <- covariate_matrix[combined_idxs, ]
+-    # perform the grna precomputation
+-    fitted_probabilities <- perform_grna_precomputation(
++    curr_covariate_matrix <- covariate_matrix[combined_idxs, , drop = FALSE]
++    # perform the grna precomputation. `trt_idxs` is `seq(1L, n_trt)` here, so
++    # it is the combined treated and non-targeting cell set that identifies the
++    # fit
++    grna_precomp <- get_grna_fitted_probabilities(
++        grna_precomputations = grna_precomputations,
++        curr_grna_group = curr_grna_group,
+         trt_idxs = trt_idxs,
+         covariate_matrix = curr_covariate_matrix,
+-        return_fitted_values = TRUE
++        fit_idxs = combined_idxs
+     )
++    # NOTE: only the logistic fit above may be cached across calls. The
++    # synthetic indices below are random draws from that fit and must be
++    # redrawn on every call; caching them would freeze the resampling
++    # distribution and invalidate the conditional randomization test.
+     synthetic_idxs <- crt_index_sampler_fast(
+-        fitted_probabilities = fitted_probabilities,
++        fitted_probabilities = grna_precomp$fitted_probabilities,
+         B = B1 + B2 + B3
+     )
+     # loop over the response ids
+@@ -314,5 +335,8 @@ discovery_ntcells_crt <- function(
+         )
+         result_list_inner[[i]] <- result
+     }
+-    return(result_list_inner)
++    return(list(
++        result_list_inner = result_list_inner,
++        to_cache = grna_precomp$to_cache
++    ))
+ }
+diff --git a/R/medium_level_functs_v2.R b/R/medium_level_functs_v2.R
+index 6f7fe14d..ca402d0e 100644
+--- a/R/medium_level_functs_v2.R
++++ b/R/medium_level_functs_v2.R
+@@ -277,7 +277,8 @@ run_crt_in_memory_v2 <- function(
+     parallel,
+     n_processors,
+     log_dir,
+-    analysis_type
++    analysis_type,
++    grna_precomputations = list()
+ ) {
+     # 0. define several variables
+     subset_to_nt_cells <- calibration_check && !control_group_complement
+@@ -298,6 +299,12 @@ run_crt_in_memory_v2 <- function(
+     )
+     response_ids <- unique(response_grna_group_pairs$response_id)
+     fit_parametric_curve <- (resampling_approximation == "skew_normal")
++    # the calibration check analyzes randomly chosen groups of non-targeting
++    # gRNAs, resampled on every call, so it has nothing durable to cache; it
++    # neither reads from nor writes to the gRNA precomputations
++    if (calibration_check) {
++        grna_precomputations <- list()
++    }
+ 
+     # 1. subset covariate matrix to cells_in_use and then to nt cells (if
+     # applicable)
+@@ -411,6 +418,7 @@ run_crt_in_memory_v2 <- function(
+             mode = "list",
+             length = length(curr_grna_groups)
+         )
++        grna_precomp_out_list <- list()
+         f_name <- if (parallel && print_progress) {
+             paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
+         } else {
+@@ -434,7 +442,7 @@ run_crt_in_memory_v2 <- function(
+ 
+             # 8. call the low-level analysis function
+             if (run_outer_regression) {
+-                curr_response_result <- crt_glm_factored_out(
++                curr_out <- crt_glm_factored_out(
+                     B1,
+                     B2,
+                     B3,
+@@ -449,10 +457,11 @@ run_crt_in_memory_v2 <- function(
+                     all_nt_idxs,
+                     response_matrix,
+                     side_code,
+-                    cells_in_use
++                    cells_in_use,
++                    grna_precomputations = grna_precomputations
+                 )
+             } else {
+-                curr_response_result <- discovery_ntcells_crt(
++                curr_out <- discovery_ntcells_crt(
+                     B1,
+                     B2,
+                     B3,
+@@ -465,17 +474,26 @@ run_crt_in_memory_v2 <- function(
+                     all_nt_idxs,
+                     response_matrix,
+                     side_code,
+-                    cells_in_use
++                    cells_in_use,
++                    grna_precomputations = grna_precomputations
+                 )
+             }
++            # NULL when the fit was served from the cache or cannot be cached
++            if (!is.null(curr_out$to_cache)) {
++                grna_precomp_out_list[[curr_grna_group]] <- curr_out$to_cache
++            }
+             result_out_list[[grna_group_idx]] <- construct_data_frame_v2(
+                 curr_df,
+-                curr_response_result,
++                curr_out$result_list_inner,
+                 output_amount
+             )
+         }
+         # 9. prepare output
+         ret_pass_qc <- data.table::rbindlist(result_out_list, fill = TRUE)
++        return(list(
++            ret_pass_qc = ret_pass_qc,
++            grna_precomp_out_list = grna_precomp_out_list
++        ))
+     }
+ 
+     # 10. perform the association analyses
+@@ -500,10 +518,31 @@ run_crt_in_memory_v2 <- function(
+         )
+         message(crayon::green(" \u2713"))
+     }
+-    result <- res |> data.table::rbindlist(fill = TRUE)
++    result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
++        data.table::rbindlist(fill = TRUE)
++
++    # 11. collect the gRNA precomputations. The gRNA loop may run under
++    # `parallel::mclapply()`, so the fits the workers computed are returned
++    # alongside their results and merged here, as the response precomputations
++    # are above. We assign by name rather than concatenating so that an entry
++    # refit because it was stale replaces its predecessor.
++    grna_precomp_out_list <- lapply(res, function(chunk) {
++        chunk[["grna_precomp_out_list"]]
++    }) |>
++        purrr::flatten()
++    grna_precomputations[
++        names(grna_precomp_out_list)
++    ] <- grna_precomp_out_list
+ 
+     return(list(
+         result = result,
+-        response_precomputations = response_precomputations
++        response_precomputations = response_precomputations,
++        # a calibration check leaves the cache alone; `NULL` signals the caller
++        # to retain whatever the `sceptre_object` already holds
++        grna_precomputations = if (calibration_check) {
++            NULL
++        } else {
++            grna_precomputations
++        }
+     ))
+ }
+diff --git a/R/precomputation_functions.R b/R/precomputation_functions.R
+index 80a92605..33a1a9ab 100644
+--- a/R/precomputation_functions.R
++++ b/R/precomputation_functions.R
+@@ -64,6 +64,163 @@ perform_grna_precomputation <- function(
+ }
+ 
+ 
++#' Obtain the gRNA fitted probabilities, reusing a cached fit when available
++#'
++#' The logistic regression underlying the gRNA precomputation depends only on
++#' which cells contain the gRNA target and on the covariate matrix; it does not
++#' depend on the response counts. Analyses that share a set of cells and a set
++#' of gRNA assignments can therefore share the fit, in the same way that they
++#' already share the response precomputations.
++#'
++#' We cache the coefficients rather than the fitted values. The latter carry one
++#' entry per cell, which for a large screen would make the cache far bigger than
++#' the data it summarizes, whereas the coefficients are a handful of numbers per
++#' gRNA target. Nothing is lost: [reconstruct_grna_fitted_probabilities()]
++#' recovers the fitted values from the coefficients exactly.
++#'
++#' @param grna_precomputations the named list of cached precomputations
++#' @param curr_grna_group the gRNA target being analyzed
++#' @param trt_idxs the indices of the treated cells, into the rows of
++#' `covariate_matrix`
++#' @param covariate_matrix the covariate matrix to regress on
++#' @param fit_idxs the index vector that identifies this fit; see
++#' [grna_precomputation_is_current()]
++#'
++#' @return a list containing the following elements: (i) "fitted_probabilities":
++#' the fitted probabilities, one per row of `covariate_matrix`; (ii) "to_cache":
++#' the precomputation to add to the cache, or `NULL` if the cache already holds
++#' it or the fit cannot be cached.
++#' @noRd
++get_grna_fitted_probabilities <- function(
++    grna_precomputations,
++    curr_grna_group,
++    trt_idxs,
++    covariate_matrix,
++    fit_idxs
++) {
++    # `NULL[["x"]]` is NULL, so an absent cache falls through to the fit
++    grna_precomp <- grna_precomputations[[curr_grna_group]]
++    if (grna_precomputation_is_current(grna_precomp, covariate_matrix, fit_idxs)) {
++        return(list(
++            fitted_probabilities = reconstruct_grna_fitted_probabilities(
++                fitted_coefs = grna_precomp$fitted_coefs,
++                covariate_matrix = covariate_matrix
++            ),
++            to_cache = NULL
++        ))
++    }
++    fitted_coefs <- perform_grna_precomputation(
++        trt_idxs = trt_idxs,
++        covariate_matrix = covariate_matrix,
++        return_fitted_values = FALSE
++    )
++    # a rank-deficient fit yields NA coefficients for the aliased columns while
++    # still producing valid fitted values, so it cannot be replayed from its
++    # coefficients; fall back to the fitted values and decline to cache
++    if (anyNA(fitted_coefs)) {
++        return(list(
++            fitted_probabilities = perform_grna_precomputation(
++                trt_idxs = trt_idxs,
++                covariate_matrix = covariate_matrix,
++                return_fitted_values = TRUE
++            ),
++            to_cache = NULL
++        ))
++    }
++    list(
++        fitted_probabilities = reconstruct_grna_fitted_probabilities(
++            fitted_coefs = fitted_coefs,
++            covariate_matrix = covariate_matrix
++        ),
++        to_cache = list(
++            fitted_coefs = fitted_coefs,
++            fit_idxs = as.integer(fit_idxs),
++            covariate_names = colnames(covariate_matrix)
++        )
++    )
++}
++
++
++#' Recover the gRNA fitted probabilities from the fitted coefficients
++#'
++#' `stats::glm.fit()` computes the fitted values it returns as
++#' `linkinv(drop(x %*% coefficients))` with a zero offset, and then strips the
++#' names of the result. Reproducing both steps here makes the reconstruction
++#' bit-identical to a fresh fit; without the `unname()` the values still agree
++#' but `identical()` does not, because `drop(x %*% coefs)` inherits the row names
++#' of the covariate matrix. Exactness matters: a one-ulp difference here would
++#' flip a Bernoulli draw in `crt_index_sampler_fast()` and change a p-value.
++#'
++#' @param fitted_coefs the fitted coefficients of the logistic regression
++#' @param covariate_matrix the covariate matrix the fit was performed on
++#'
++#' @return a numeric vector of fitted probabilities, one per cell
++#' @noRd
++reconstruct_grna_fitted_probabilities <- function(
++    fitted_coefs,
++    covariate_matrix
++) {
++    linear_predictor <- drop(covariate_matrix %*% fitted_coefs)
++    unname(stats::binomial()$linkinv(linear_predictor))
++}
++
++
++#' Determine whether a cached gRNA precomputation applies to the current fit
++#'
++#' A cached fit is valid only for the design it was produced on, and the two CRT
++#' workhorse functions use different row spaces: `crt_glm_factored_out()`
++#' regresses on every cell in use, whereas `discovery_ntcells_crt()` regresses on
++#' the treated cells followed by the non-targeting cells. An entry cached by one
++#' is silently wrong in the other, and the two analyses share a cache, so a
++#' length check alone would not separate them.
++#'
++#' We therefore fingerprint each entry with `fit_idxs`, the index vector that
++#' determines the fit: the treated cells for `crt_glm_factored_out()`, and the
++#' treated-plus-non-targeting cells for `discovery_ntcells_crt()`. Comparing it
++#' identifies the code path, the gRNA assignment, and the cell set in a single
++#' check. A stale entry is refit and replaced rather than raising an error, since
++#' the cache is maintained by the package rather than supplied by the user.
++#'
++#' @param grna_precomp one element of a `grna_precomputations` list, or `NULL`
++#' @param covariate_matrix the covariate matrix for the current fit
++#' @param fit_idxs the index vector identifying the current fit
++#'
++#' @return `TRUE` if the cached entry can be replayed, and `FALSE` otherwise
++#' @noRd
++grna_precomputation_is_current <- function(
++    grna_precomp,
++    covariate_matrix,
++    fit_idxs
++) {
++    !is.null(grna_precomp) &&
++        identical(
++            grna_precomp$covariate_names,
++            colnames(covariate_matrix)
++        ) &&
++        identical(grna_precomp$fit_idxs, as.integer(fit_idxs))
++}
++
++
++#' Read the gRNA precomputations from a `sceptre_object`
++#'
++#' The `grna_precomputations` slot was added to the class after the first
++#' release, so a `sceptre_object` deserialized from an earlier version does not
++#' carry it. Reading through this accessor lets such an object be analyzed as
++#' usual; the slot is created the first time it is assigned.
++#'
++#' @param sceptre_object a `sceptre_object`
++#'
++#' @return the named list of cached gRNA precomputations
++#' @noRd
++get_grna_precomputations <- function(sceptre_object) {
++    if (methods::.hasSlot(sceptre_object, "grna_precomputations")) {
++        sceptre_object@grna_precomputations
++    } else {
++        list()
++    }
++}
++
++
+ compute_D_matrix <- function(Zt_wZ, wZ) {
+     P_decomp <- eigen(Zt_wZ, symmetric = TRUE)
+     U <- P_decomp$vectors
+diff --git a/R/s4_analysis_functs_1.R b/R/s4_analysis_functs_1.R
+index 67b8d0d7..b071920c 100644
+--- a/R/s4_analysis_functs_1.R
++++ b/R/s4_analysis_functs_1.R
+@@ -175,9 +175,11 @@ set_analysis_parameters <- function(
+     # 5. modify the grna target df and response grna target dfs
+     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
+ 
+-    # 6. update cached fields
++    # 6. update cached fields. Both precomputations regress onto the covariate
++    # matrix, so a change to the formula invalidates both.
+     if (reset_response_precomps) {
+         sceptre_object@response_precomputations <- list()
++        sceptre_object@grna_precomputations <- list()
+     }
+ 
+     # return
+@@ -311,16 +313,26 @@ assign_grnas <- function(
+     ) |>
+         invisible()
+ 
+-    # 3. determine whether to reset response precomputations
+-    reset_response_precomps <- sceptre_object@low_moi &&
+-        (!identical(sceptre_object@grna_assignment_method, method) ||
+-            !identical(
+-                sceptre_object@grna_assignment_hyperparameters,
+-                hyperparameters
+-            ))
++    # 3. determine whether to reset the precomputations
++    reset_grna_precomps <- !identical(
++        sceptre_object@grna_assignment_method,
++        method
++    ) ||
++        !identical(
++            sceptre_object@grna_assignment_hyperparameters,
++            hyperparameters
++        )
++    # the response precomputation depends on the assignments only through the
++    # cells in use, which reassignment changes in low MOI alone; the gRNA
++    # precomputation regresses on the assignments themselves, so it is
++    # invalidated in either MOI
++    reset_response_precomps <- sceptre_object@low_moi && reset_grna_precomps
+     if (reset_response_precomps) {
+         sceptre_object@response_precomputations <- list()
+     }
++    if (reset_grna_precomps) {
++        sceptre_object@grna_precomputations <- list()
++    }
+ 
+     # 4. update uncached fields
+     sceptre_object@grna_assignment_method <- method
+@@ -496,9 +508,10 @@ run_qc_pt_1 <- function(
+         )
+     }
+ 
+-    # 6. determine whether to reset response precomputation
++    # 6. determine whether to reset the precomputations
+     if (!identical(current_cells_in_use, sceptre_object@cells_in_use)) {
+         sceptre_object@response_precomputations <- list()
++        sceptre_object@grna_precomputations <- list()
+     }
+ 
+     # 7. update the grna assignments given the cellwise qc
+diff --git a/R/s4_analysis_functs_2.R b/R/s4_analysis_functs_2.R
+index 966a27e4..54a2dd53 100644
+--- a/R/s4_analysis_functs_2.R
++++ b/R/s4_analysis_functs_2.R
+@@ -190,7 +190,7 @@ run_calibration_check_pt_2 <- function(
+     } else {
+         out$result
+     }
+-    sceptre_object@response_precomputations <- out$response_precomputations
++    sceptre_object <- update_precomputation_caches(sceptre_object, out)
+     return(sceptre_object)
+ }
+ 
+@@ -306,7 +306,7 @@ run_power_check <- function(
+     } else {
+         out$result
+     }
+-    sceptre_object@response_precomputations <- out$response_precomputations
++    sceptre_object <- update_precomputation_caches(sceptre_object, out)
+     return(sceptre_object)
+ }
+ 
+@@ -409,7 +409,7 @@ run_discovery_analysis <- function(
+     } else {
+         out$result
+     }
+-    sceptre_object@response_precomputations <- out$response_precomputations
++    sceptre_object <- update_precomputation_caches(sceptre_object, out)
+     return(sceptre_object)
+ }
+ 
+@@ -427,6 +427,28 @@ process_discovery_result <- function(result, sceptre_object) {
+ }
+ 
+ 
++#' Write the precomputations an analysis produced back onto the object
++#'
++#' The gRNA precomputations are absent from `out` when the analysis had none to
++#' contribute: `run_perm_test_in_memory()` performs no logistic fit, and
++#' `run_crt_in_memory_v2()` withholds them for a calibration check, whose gRNA
++#' groups are randomly chosen sets of non-targeting gRNAs that are resampled on
++#' every call. In both cases the cache the object already holds is left intact.
++#'
++#' @param sceptre_object a `sceptre_object`
++#' @param out the list returned by the core analysis function
++#'
++#' @return the updated `sceptre_object`
++#' @noRd
++update_precomputation_caches <- function(sceptre_object, out) {
++    sceptre_object@response_precomputations <- out$response_precomputations
++    if (!is.null(out$grna_precomputations)) {
++        sceptre_object@grna_precomputations <- out$grna_precomputations
++    }
++    return(sceptre_object)
++}
++
++
+ run_sceptre_analysis_high_level <- function(
+     sceptre_object,
+     response_grna_group_pairs,
+@@ -480,11 +502,18 @@ run_sceptre_analysis_high_level <- function(
+         analysis_type = analysis_type
+     )
+ 
+-    # run the method
++    # run the method. The gRNA precomputations are injected only on the CRT
++    # branch, in the same way as `synthetic_idxs` on the permutation branch: the
++    # two core functions share a single `args_to_pass` list, and the permutation
++    # path draws its resamples without a logistic fit, so it has no gRNA
++    # precomputation to reuse.
+     out <- if (sceptre_object@run_permutations) {
+         args_to_pass$synthetic_idxs <- synthetic_idxs
+         do.call(what = "run_perm_test_in_memory", args = args_to_pass)
+     } else {
++        args_to_pass$grna_precomputations <- get_grna_precomputations(
++            sceptre_object
++        )
+         do.call(what = "run_crt_in_memory_v2", args = args_to_pass)
+     }
+ 
+diff --git a/R/s4_class.R b/R/s4_class.R
+index b15b958c..6fd074a9 100644
+--- a/R/s4_class.R
++++ b/R/s4_class.R
+@@ -63,6 +63,7 @@ setClass(
+ 
+         # cached objects
+         response_precomputations = "list",
++        grna_precomputations = "list",
+ 
+         # flags
+         last_function_called = "character",
+diff --git a/tests/testthat/test-grna_precomputations.R b/tests/testthat/test-grna_precomputations.R
+new file mode 100644
+index 00000000..653592cb
+--- /dev/null
++++ b/tests/testthat/test-grna_precomputations.R
+@@ -0,0 +1,330 @@
++####################################################################
++##            Caching of the gRNA precomputation                  ##
++####################################################################
++
++# a small, well-conditioned design on which the logistic regression converges
++make_mock_grna_design <- function(n_cells = 200L, seed = 5L) {
++    set.seed(seed)
++    covariate_matrix <- cbind(
++        "(Intercept)" = rep(1, n_cells),
++        n_umis = rnorm(n_cells),
++        p_mito = rnorm(n_cells)
++    )
++    list(
++        covariate_matrix = covariate_matrix,
++        trt_idxs = sort(sample.int(n_cells, size = 60L))
++    )
++}
++
++
++test_that("the fitted values are recovered exactly from the coefficients", {
++    design <- make_mock_grna_design()
++
++    from_fit <- perform_grna_precomputation(
++        trt_idxs = design$trt_idxs,
++        covariate_matrix = design$covariate_matrix,
++        return_fitted_values = TRUE
++    )
++    from_coefs <- reconstruct_grna_fitted_probabilities(
++        fitted_coefs = perform_grna_precomputation(
++            trt_idxs = design$trt_idxs,
++            covariate_matrix = design$covariate_matrix,
++            return_fitted_values = FALSE
++        ),
++        covariate_matrix = design$covariate_matrix
++    )
++
++    # `identical()`, not `equal()`: a one-ulp difference would flip a Bernoulli
++    # draw in `crt_index_sampler_fast()` and change a p-value
++    expect_identical(from_coefs, from_fit)
++})
++
++
++test_that("a cache hit and a cache miss produce the same probabilities", {
++    design <- make_mock_grna_design()
++
++    miss <- get_grna_fitted_probabilities(
++        grna_precomputations = list(),
++        curr_grna_group = "t1",
++        trt_idxs = design$trt_idxs,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs
++    )
++    expect_false(is.null(miss$to_cache))
++
++    hit <- get_grna_fitted_probabilities(
++        grna_precomputations = list(t1 = miss$to_cache),
++        curr_grna_group = "t1",
++        trt_idxs = design$trt_idxs,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs
++    )
++    # nothing to add: the cache already holds this fit
++    expect_null(hit$to_cache)
++    expect_identical(hit$fitted_probabilities, miss$fitted_probabilities)
++
++    # the cached fit is a handful of coefficients rather than one value per cell
++    expect_length(
++        miss$to_cache$fitted_coefs,
++        ncol(design$covariate_matrix)
++    )
++})
++
++
++test_that("a stale cache entry is refit rather than replayed", {
++    design <- make_mock_grna_design()
++    entry <- get_grna_fitted_probabilities(
++        grna_precomputations = list(),
++        curr_grna_group = "t1",
++        trt_idxs = design$trt_idxs,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs
++    )$to_cache
++
++    # a different set of treated cells, as after a rerun of `assign_grnas()`
++    expect_false(grna_precomputation_is_current(
++        grna_precomp = entry,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs[-1]
++    ))
++    # a different set of covariates, as after a change to `formula_object`
++    expect_false(grna_precomputation_is_current(
++        grna_precomp = entry,
++        covariate_matrix = design$covariate_matrix[, 1:2, drop = FALSE],
++        fit_idxs = design$trt_idxs
++    ))
++    # an absent entry is a cache miss, not an error
++    expect_false(grna_precomputation_is_current(
++        grna_precomp = NULL,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs
++    ))
++    expect_true(grna_precomputation_is_current(
++        grna_precomp = entry,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = design$trt_idxs
++    ))
++
++    # a stale entry yields the fit for the design actually in hand
++    refit_idxs <- design$trt_idxs[-1]
++    refit <- get_grna_fitted_probabilities(
++        grna_precomputations = list(t1 = entry),
++        curr_grna_group = "t1",
++        trt_idxs = refit_idxs,
++        covariate_matrix = design$covariate_matrix,
++        fit_idxs = refit_idxs
++    )
++    expect_identical(
++        refit$fitted_probabilities,
++        perform_grna_precomputation(
++            trt_idxs = refit_idxs,
++            covariate_matrix = design$covariate_matrix,
++            return_fitted_values = TRUE
++        )
++    )
++    expect_identical(refit$to_cache$fit_idxs, as.integer(refit_idxs))
++})
++
++
++test_that("a rank-deficient fit is not cached", {
++    design <- make_mock_grna_design()
++    # an aliased column makes the fit rank deficient; the fitted values are
++    # still valid, but the coefficients contain an NA and cannot be replayed
++    covariate_matrix <- cbind(
++        design$covariate_matrix,
++        n_umis_copy = design$covariate_matrix[, "n_umis"]
++    )
++
++    out <- suppressWarnings(get_grna_fitted_probabilities(
++        grna_precomputations = list(),
++        curr_grna_group = "t1",
++        trt_idxs = design$trt_idxs,
++        covariate_matrix = covariate_matrix,
++        fit_idxs = design$trt_idxs
++    ))
++
++    expect_null(out$to_cache)
++    expect_identical(
++        out$fitted_probabilities,
++        suppressWarnings(perform_grna_precomputation(
++            trt_idxs = design$trt_idxs,
++            covariate_matrix = covariate_matrix,
++            return_fitted_values = TRUE
++        ))
++    )
++})
++
++
++test_that("`get_grna_precomputations()` tolerates an object without the slot", {
++    # a `sceptre_object` deserialized from a version predating the slot
++    old_object <- structure(list(), class = "sceptre_object")
++    expect_identical(get_grna_precomputations(old_object), list())
++})
++
++
++####################################################################
++##                     End-to-end behavior                        ##
++####################################################################
++
++# a minimal high-MOI CRT setup; `control_group` selects which of the two CRT
++# workhorse functions, and hence which row space, the analysis uses
++make_mock_crt_object <- function(control_group, seed = 3L) {
++    set.seed(seed)
++    num_cells <- 150L
++    num_responses <- 8L
++
++    grna_target_data_frame <- make_mock_grna_target_data(c(2, 2, 2), 1, 1, 10)
++    grna_matrix <- rpois(num_cells * nrow(grna_target_data_frame), 5) |>
++        matrix(nrow = nrow(grna_target_data_frame), ncol = num_cells) |>
++        `rownames<-`(grna_target_data_frame$grna_id)
++    response_matrix <- rpois(num_cells * num_responses, 5) |>
++        matrix(nrow = num_responses, ncol = num_cells) |>
++        `rownames<-`(paste0("response_", seq_len(num_responses)))
++    discovery_pairs <- expand.grid(
++        grna_target = c("t1_c1_d1", "t1_c2_d1"),
++        response_id = rownames(response_matrix),
++        stringsAsFactors = FALSE
++    )
++
++    import_data(
++        grna_matrix = grna_matrix,
++        response_matrix = response_matrix,
++        grna_target_data_frame = grna_target_data_frame,
++        moi = "high"
++    ) |>
++        set_analysis_parameters(
++            discovery_pairs = discovery_pairs,
++            control_group = control_group,
++            resampling_mechanism = "crt"
++        ) |>
++        assign_grnas(method = "thresholding", threshold = 5) |>
++        run_qc(
++            response_n_umis_range = c(0, 1),
++            response_n_nonzero_range = c(0, 1),
++            n_nonzero_trt_thresh = 0,
++            n_nonzero_cntrl_thresh = 0
++        )
++}
++
++
++for (control_group in c("complement", "nt_cells")) {
++    test_that(
++        paste0(
++            "the gRNA cache is populated and reused (control_group = ",
++            control_group,
++            ")"
++        ),
++        {
++            scep <- make_mock_crt_object(control_group)
++            expect_length(scep@grna_precomputations, 0L)
++
++            # the mock design is small enough that the logistic fit separates,
++            # which is incidental here but see the warning test below
++            first <- suppressWarnings(
++                run_discovery_analysis(scep, print_progress = FALSE)
++            )
++            # one entry per gRNA target analyzed
++            expect_setequal(
++                names(first@grna_precomputations),
++                c("t1_c1_d1", "t1_c2_d1")
++            )
++
++            # a second run serves every fit from the cache and must agree with
++            # the first to the last bit
++            second <- run_discovery_analysis(first, print_progress = FALSE)
++            expect_identical(
++                second@discovery_result,
++                first@discovery_result
++            )
++            expect_identical(
++                second@grna_precomputations,
++                first@grna_precomputations
++            )
++        }
++    )
++}
++
++
++test_that("a warning from the fit is raised only when the fit is performed", {
++    scep <- make_mock_crt_object("complement")
++
++    # this mock design separates, so the first run warns
++    expect_warning(
++        first <- run_discovery_analysis(scep, print_progress = FALSE),
++        "fitted probabilities numerically 0 or 1"
++    )
++    # the cached run performs no logistic fit, so it has nothing to warn about.
++    # Any warning the gRNA regression raises is therefore emitted on the run
++    # that fits, not on the runs that reuse the fit.
++    expect_length(
++        testthat::capture_warnings(
++            run_discovery_analysis(first, print_progress = FALSE)
++        ),
++        0L
++    )
++})
++
++
++test_that("a cache built for one control group is not replayed in the other", {
++    complement <- suppressWarnings(
++        make_mock_crt_object("complement") |>
++            run_discovery_analysis(print_progress = FALSE)
++    )
++    nt_cells <- make_mock_crt_object("nt_cells")
++
++    # the two analyses regress on different row spaces, so transplanting the
++    # cache must change nothing: every entry is stale and is refit
++    poisoned <- nt_cells
++    poisoned@grna_precomputations <- complement@grna_precomputations
++    expect_identical(
++        suppressWarnings(
++            run_discovery_analysis(poisoned, print_progress = FALSE)
++        )@discovery_result,
++        suppressWarnings(
++            run_discovery_analysis(nt_cells, print_progress = FALSE)
++        )@discovery_result
++    )
++})
++
++
++test_that("the calibration check leaves the gRNA cache untouched", {
++    scep <- suppressWarnings(
++        make_mock_crt_object("complement") |>
++            run_discovery_analysis(print_progress = FALSE)
++    )
++    cache <- scep@grna_precomputations
++    expect_gt(length(cache), 0L)
++
++    # the calibration check's gRNA groups are randomly chosen sets of
++    # non-targeting gRNAs, resampled on every call: nothing durable to cache
++    calib <- run_calibration_check(
++        scep,
++        calibration_group_size = 1,
++        print_progress = FALSE
++    )
++    expect_identical(calib@grna_precomputations, cache)
++})
++
++
++test_that("the gRNA cache is reset when its inputs change", {
++    scep <- make_mock_crt_object("complement")
++    scep@grna_precomputations <- list(t1_c1_d1 = "stale")
++
++    # rerunning the gRNA assignment changes which cells are treated
++    expect_length(
++        assign_grnas(
++            scep,
++            method = "thresholding",
++            threshold = 6
++        )@grna_precomputations,
++        0L
++    )
++    # rerunning QC can change the cells in use
++    expect_length(
++        run_qc(
++            scep,
++            response_n_umis_range = c(0.05, 0.95)
++        )@grna_precomputations,
++        0L
++    )
++})
+diff --git a/tests/testthat/test-s4_analysis_functs_1.R b/tests/testthat/test-s4_analysis_functs_1.R
+index a47d7fba..363a93e1 100644
+--- a/tests/testthat/test-s4_analysis_functs_1.R
++++ b/tests/testthat/test-s4_analysis_functs_1.R
+@@ -83,6 +83,7 @@ test_that("import_data", {
+         "import_grna_assignment_info",
+         "mean_cells_per_grna",
+         "response_precomputations",
++        "grna_precomputations",
+         "last_function_called",
+         "functs_called",
+         "calibration_result",

@@ -65,11 +65,11 @@ analyze_association_pairs <- function(
     if (!context$shared_response_fit) {
         # Group-specific NT fits are transient. Preserve an existing shared
         # calibration cache with its own identity; do not relabel it all-QC.
-        out$response_precomputations <- sceptre_object@fits@entries
+        out$response_precomputations <- sceptre_object@fits@response_fits
     }
     attr(out$response_precomputations, "fit_identity") <- if (context$shared_response_fit) {
         context$fit_identity
-    } else sceptre_object@fits@identity
+    } else sceptre_object@fits@response_identity
     out$result <- assemble_pair_results(out$result, response_grna_group_pairs)
     out
 }

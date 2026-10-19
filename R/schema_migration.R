@@ -5,7 +5,7 @@ migrate_sceptre_object <- function(object) {
     if (!methods::is(object, "sceptre_object")) stop("Expected a `sceptre_object`.")
     saved <- attributes(object)
     version <- if (is.null(saved$schema_version)) 1L else saved$schema_version
-    if (identical(version, 3L)) return(normalize_saved_run_plans(object))
+    if (identical(version, 3L)) return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
     if (!version %in% c(1L, 2L)) stop("Unsupported sceptre saved-object schema version.")
     if (version == 1L && !all(c("response_matrix", "grna_matrix", "functs_called") %in% names(saved))) {
         stop("Unrecognized legacy sceptre saved-object layout.")
@@ -107,6 +107,31 @@ migrate_sceptre_object <- function(object) {
     }
     validObject(out)
     out
+}
+
+# A cache representation changes no scientific input or result certificate.
+# Accept only the documented old response cache, whose actual scope still
+# validates, and the current unified representation. Never infer unknown fields.
+#' @noRd
+normalize_saved_fit_cache <- function(object) {
+    saved <- attributes(object)$fits
+    if (methods::is(saved, "FitCache")) {
+        validObject(saved)
+        return(object)
+    }
+    physical <- attributes(saved)
+    if (!identical(as.character(physical$class)[1L], "ResponseFitCache") ||
+        !setequal(names(physical), c("entries", "identity", "class"))) {
+        stop("Unrecognized schema-three fit-cache layout; cached provenance cannot be verified.")
+    }
+    cache <- methods::new("FitCache", response_fits = physical$entries,
+        response_identity = physical$identity)
+    if (length(cache@response_fits) && !identical(cache@response_identity,
+        response_fit_identity(object, cache@response_identity$cells))) {
+        stop("Saved response fits do not match the actual data and design inputs.")
+    }
+    object@fits <- cache
+    object
 }
 
 # The outer schema and canonical input identities do not change when the

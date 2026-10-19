@@ -12,7 +12,7 @@ test_that("backed save preserves imported descriptors and reopen verifies conten
         expect_false(is.null(store@handle))
     } # Descriptor authority is anchored in each store at import, before save.
     object <- suppressMessages(run_discovery_analysis(object, print_progress = FALSE))
-    expect_gt(length(object@fits@entries), 0L)
+    expect_gt(length(object@fits@response_fits), 0L)
     expect_true(result_record_is_current(object, "run_discovery_analysis"))
     write_ondisc_backed_sceptre_object(object, directory)
     original_file <- readBin(file.path(directory, "sceptre_object.rds"), "raw",
@@ -50,5 +50,5 @@ test_that("backed save preserves imported descriptors and reopen verifies conten
         file.path(moved, "response.odm"), file.path(moved, "grna.odm"))
     expect_identical(relocated@data@identity, reopened@data@identity)
     expect_true(result_record_is_current(relocated, "run_discovery_analysis"))
-    expect_identical(relocated@fits@entries, reopened@fits@entries)
+    expect_identical(relocated@fits@response_fits, reopened@fits@response_fits)
 })

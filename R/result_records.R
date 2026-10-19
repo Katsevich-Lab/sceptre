@@ -211,7 +211,8 @@ commit_result_record <- function(object, analysis, result, pairs, output_amount,
             package_version = as.character(utils::packageVersion("sceptre")),
             spec = analysis_spec_snapshot(object), plan = plan,
             output_amount = output_amount,
-            response_fit_method = "poisson-glm.fit-then-dispersion-v1"),
+            response_fit_method = "poisson-glm.fit-then-dispersion-v1",
+            perturbation_fit_method = "binomial-glm.fit-linkinv-v1"),
         history = history)
     object
 }

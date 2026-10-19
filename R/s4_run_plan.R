@@ -57,7 +57,7 @@ as_run_plan <- function(plan) {
         plan <- do.call(methods::new, c(list(Class = "RunPlan"), payload))
         # Initialization can coerce a data.table subclass to data.frame. Keep
         # the original validated payload so conversion never changes its hash.
-        slot(plan, "pairs", check = FALSE) <- pairs
+        methods::slot(plan, "pairs", check = FALSE) <- pairs
         validObject(plan)
     }
     # Verify the original payload certificate before any contextual substitution

@@ -2,7 +2,7 @@
 
 The final schema is version 3. `sceptre_object` coordinates five persistent
 components: imported `ScreenData`, requested `AnalysisSpec`, compiled
-`PreparationRecord`, compact `ResponseFitCache`, and entry-owned `ResultRecord`.
+`PreparationRecord`, unified compact `FitCache`, and entry-owned `ResultRecord`.
 `CellView` is a temporary computation value. A typed per-run `RunPlan` is created
 for execution and retained with completed result provenance.
 
@@ -43,3 +43,11 @@ results. The independent matrix-conversion oracle accepts only its two known
 pointer-boundary warning messages, or zero warnings from a fixed dependency.
 Native statistical kernels and samplers are unchanged. Nextflow adaptation,
 large-screen benchmarking and cross-platform qualification remain separate work.
+
+The final [fit-cache qualification](fits/validation/README.md) covers independent
+response/CRT perturbation families. Compact logistic coefficients reconstruct
+exact fitted probabilities, while group-specific input hashes protect actual
+low-MOI NT fitting scopes. Calibration bypasses this cache, assignment clears it,
+and warm discovery still generates fresh draws. See the
+[cache contract](schema3/ARCHITECTURE.md#preparation-lifecycle-and-fitting) for
+invalidation, diagnostics and the PR #233 comparison.

@@ -220,6 +220,7 @@ run_crt_analysis <- function(context, execution) {
             initialize = FALSE
         )
         results <- vector("list", length(block_groups))
+        perturbation_updates <- list()
         for (position in seq_along(block_groups)) {
             group_idx <- block_groups[position]
             id <- as.character(index$group_ids[group_idx])
@@ -236,6 +237,25 @@ run_crt_analysis <- function(context, execution) {
             request_rows <- index$rows_by_group[[as.character(group_idx)]]
             pairs <- context$pairs[request_rows, , drop = FALSE]
             response_rows <- index$pair_rows$response_idx[request_rows]
+            treatment <- if (context$shared_response_fit) treatment_lookup(id) else NULL
+            view <- if (!context$shared_response_fit) make_fit_view(index, id) else NULL
+            probabilities <- NULL
+            if (!index$calibration_check) {
+                fit_design <- if (context$shared_response_fit) context$design else
+                    context$design[view$fit_to_analysis, , drop = FALSE]
+                fit_cells <- if (context$shared_response_fit) context$common_view$source_cells else view$source_cells
+                trt <- if (context$shared_response_fit) treatment$trt_idxs else view$trt_fit_pos
+                fit_identity <- perturbation_fit_identity(fit_cells, fit_design, trt)
+                saved <- lookup_perturbation_fit(context$perturbation_fits, id, fit_identity)
+                if (is.null(saved)) {
+                    proposed <- fit_perturbation_model(trt, fit_design)
+                    probabilities <- proposed$probabilities
+                    perturbation_updates[id] <- list(if (is.null(proposed$fit)) NULL else
+                        c(proposed$fit, list(identity = fit_identity)))
+                } else {
+                    probabilities <- reconstruct_perturbation_probabilities(saved, fit_design)
+                }
+            }
             if (context$shared_response_fit) {
                 native_results <- test_crt_shared_fit(
                     context$response_store,
@@ -243,20 +263,22 @@ run_crt_analysis <- function(context, execution) {
                     as.character(pairs$response_id),
                     context$design,
                     context$common_view$source_cells,
-                    treatment_lookup(id),
+                    treatment,
                     response_fits,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    probabilities = probabilities
                 )
             } else {
-                view <- make_fit_view(index, id)
                 native_results <- test_crt_group_fit(
                     context$response_store,
                     response_rows,
                     context$design,
                     view,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    probabilities = probabilities,
+                    group_design = fit_design
                 )
             }
             results[[position]] <- pair_results_from_native(
@@ -264,8 +286,9 @@ run_crt_analysis <- function(context, execution) {
                 native_results,
                 execution$output_amount
             )
+            if (!index$calibration_check) rm(fit_design)
         }
-        bind_analysis_results(results)
+        list(result = bind_analysis_results(results), perturbation_updates = perturbation_updates)
     }
 
     blocks <- partition_response_ids(
@@ -281,8 +304,15 @@ run_crt_analysis <- function(context, execution) {
     if (execution$parallel) {
         message(crayon::green(" \u2713"))
     }
+    perturbation_fits <- if (index$calibration_check) NULL else {
+        updates <- do.call(c, unname(lapply(chunks, function(chunk) chunk$perturbation_updates)))
+        cache <- merge_perturbation_fits(context$perturbation_fits, updates)
+        attr(cache, "fit_identity") <- context$perturbation_identity
+        cache
+    }
     list(
-        result = bind_analysis_results(chunks),
-        response_precomputations = response_fits
+        result = bind_analysis_results(lapply(chunks, function(chunk) chunk$result)),
+        response_precomputations = response_fits,
+        perturbation_fits = perturbation_fits
     )
 }

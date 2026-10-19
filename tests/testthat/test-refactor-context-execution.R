@@ -121,7 +121,7 @@ test_that("progress bytes and periodic maintenance retain independent cadences",
 test_that("public workflows retain fit, bank and row-read sharing scopes", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     base_case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_nt_perm
-    originals <- lapply(c("fit_response", "fit_assignment_probabilities",
+    originals <- lapply(c("fit_response", "fit_perturbation_glm",
         "sample_crt_indices", "get_synthetic_permutation_idxs",
         "storage_read_response"), refactor_private)
     names(originals) <- c("fit", "assignment", "crt", "permutation", "read")
@@ -134,7 +134,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
         fit_response = function(...) {
             events$fit <- events$fit + 1L; originals$fit(...)
         },
-        fit_assignment_probabilities = function(...) {
+        fit_perturbation_glm = function(...) {
             events$assignment <- events$assignment + 1L; originals$assignment(...)
         },
         sample_crt_indices = function(fitted_probabilities, B) {
@@ -175,7 +175,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
                     expect_length(events$crt, 0L)
                 } else {
                     expect_identical(events$read, np + if (control == "complement") nr else 0L)
-                    expect_identical(events$assignment, ng)
+                    expect_identical(events$assignment, if (warm) 0L else ng)
                     expect_length(events$permutation, 0L)
                     expect_equal(events$crt, rep(sum(as.double(unlist(refactor_private("run_plan_payload")(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan)[c("B1", "B2", "B3")]))), ng))
                 }

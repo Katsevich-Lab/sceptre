@@ -2,7 +2,7 @@ class	field	description
 sceptre_object	data	Imported screen data and backing-store identity.
 sceptre_object	spec	Resolved requested scientific and configuration choices.
 sceptre_object	preparation	Durable design, source assignments, QC payloads and completed preparation records.
-sceptre_object	fits	Compact reusable response fits for one actual fitting scope.
+sceptre_object	fits	Compact response and CRT perturbation fits with independently validated actual fitting identities.
 sceptre_object	results	Completed tables with their own provenance, validity identity and history.
 sceptre_object	schema_version	Saved schema version; scalar integer 3.
 ScreenData	response_names	Original response labels aligned with response rows, used for mitochondrial summaries; empty when legacy labels are unknown.
@@ -45,8 +45,10 @@ PreparationRecord	stages	Completed design/assignment/cell_qc/pair_qc records. An
 PreparationRecord	guide_groups	Derived group labels aligned one-for-one with canonical guide metadata rows; no duplicated metadata table.
 PreparationRecord	discovery_pairs	Compiled discovery target-to-guide-group expansion, preserving requested row multiplicity.
 PreparationRecord	positive_control_pairs	Compiled positive-control target-to-guide-group expansion.
-ResponseFitCache	entries	Named response fits: each contains fitted_coefs and scalar theta. Identifiers, coefficient/design compatibility and dispersion are validated.
-ResponseFitCache	identity	Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for all cached entries.
+FitCache	response_fits	Named response fits: each contains fitted_coefs and scalar theta. Identifiers, coefficient/design compatibility and dispersion are validated.
+FitCache	response_identity	Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for response fits.
+FitCache	perturbation_fits	Named CRT logistic fits: compact fitted_coefs, five fit diagnostics and three hashes of actual ordered fit cells, group design and binary treatment. No cell-length vectors or sampled draws.
+FitCache	perturbation_identity	Shared ordered analysis source cells, design columns/value hash, logistic fitter method and arithmetic runtime. NT group-specific fitting inputs are certified by each entry without repeated cell vectors.
 ResultRecord	records	Completed run entries keyed by analysis name. Each owns its table, frozen spec/run plan, scope, identity and previous run history; invalidated_by explains historical status.
 ResultRecord	import_metadata	Boundary-only migration diagnostics, such as old schema version, discarded fit count or a temporary legacy reopen hint; not workflow state.
 CellView	fit_to_analysis	Ordered positions in the selected analysis cells used for this fit.

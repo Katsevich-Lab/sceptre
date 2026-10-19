@@ -107,6 +107,8 @@ test_permutation_group_fit <- function(
 #'   their count.
 #' @param response_fits Previously prepared response fits for these same cells/design.
 #' @param test_options,output_amount Validated test settings and output level.
+#' @param probabilities Optional probabilities reconstructed from a compatible
+#'   compact perturbation fit. NULL follows the original one-fit cold path.
 #' @return C++ results in requested gene order. Fit assignment probabilities and
 #'   generate B1+B2+B3 CRT draws once for this guide, then read each gene and use
 #'   its saved response fit. This worker does not add new response fits.
@@ -120,9 +122,12 @@ test_crt_shared_fit <- function(
     treatment,
     response_fits,
     test_options,
-    output_amount
+    output_amount,
+    probabilities = NULL
 ) {
-    probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
+    if (is.null(probabilities)) {
+        probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
+    }
     synthetic_idxs <- sample_crt_indices(
         probabilities,
         B = test_options$total_resamples
@@ -168,6 +173,10 @@ test_crt_shared_fit <- function(
 #'   design rows; `source_cells` selects original count-matrix columns;
 #'   `trt_fit_pos` locates treatment cells within the selected data, starting at 1.
 #' @param test_options,output_amount Validated test settings and output level.
+#' @param probabilities Optional probabilities reconstructed from a compatible
+#'   compact perturbation fit. NULL follows the original one-fit cold path.
+#' @param group_design Optional existing slice of design in fit_view order.
+#'   NULL constructs the same slice locally.
 #' @return C++ results in requested gene order. Fit assignment probabilities and
 #'   generate a full set of CRT draws once for this guide. Then read, fit and test
 #'   each gene using the selected cells. These response fits belong only to this
@@ -179,13 +188,19 @@ test_crt_group_fit <- function(
     design,
     fit_view,
     test_options,
-    output_amount
+    output_amount,
+    probabilities = NULL,
+    group_design = NULL
 ) {
-    group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
-    probabilities <- fit_assignment_probabilities(
-        fit_view$trt_fit_pos,
-        group_design
-    )
+    if (is.null(group_design)) {
+        group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
+    }
+    if (is.null(probabilities)) {
+        probabilities <- fit_assignment_probabilities(
+            fit_view$trt_fit_pos,
+            group_design
+        )
+    }
     synthetic_idxs <- sample_crt_indices(
         probabilities,
         B = test_options$total_resamples

@@ -1,8 +1,14 @@
 # sceptre (development version)
 
+- Repeated CRT analyses can reuse compact treatment-model fits when ordered
+  cells, design and treatment membership agree. Calibration bypasses this cache
+  and CRT resamples stay fresh. Fitting warnings occur on actual fits; warm
+  reuse retains their diagnostics without re-emitting them.
+
 - Internal analysis code now has shared cell-coordinate and storage boundaries,
   separate fitting, score, QC policy, inference and result-processing modules,
-  and common worker utilities. The public API and saved S4 layout are unchanged.
+  and common worker utilities. Public workflows retain their API; saved objects
+  use schema 3 components with explicit migration from earlier layouts.
 - Response fits are invalidated when the actual design or control-cell view
   changes. This prevents NT-only calibration fits from being reused for a later
   complement-control analysis and preserves agreement with a fresh fit.

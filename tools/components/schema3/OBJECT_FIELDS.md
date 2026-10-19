@@ -14,7 +14,7 @@ an optional dependency class; loading the package does not load ondisc.
 | `data` | `ScreenData` | Imported screen data and backing-store identity. |
 | `spec` | `AnalysisSpec` | Resolved requested scientific and configuration choices. |
 | `preparation` | `PreparationRecord` | Durable design, source assignments, QC payloads and completed preparation records. |
-| `fits` | `ResponseFitCache` | Compact reusable response fits for one actual fitting scope. |
+| `fits` | `FitCache` | Compact response and CRT perturbation fits with independently validated actual fitting identities. |
 | `results` | `ResultRecord` | Completed tables with their own provenance, validity identity and history. |
 | `schema_version` | `integer` | Saved schema version; scalar integer 3. |
 
@@ -73,12 +73,14 @@ an optional dependency class; loading the package does not load ondisc.
 | `discovery_pairs` | `data.frame` | Compiled discovery target-to-guide-group expansion, preserving requested row multiplicity. |
 | `positive_control_pairs` | `data.frame` | Compiled positive-control target-to-guide-group expansion. |
 
-## ResponseFitCache
+## FitCache
 
 | Field | Exact declared type | Meaning |
 |---|---|---|
-| `entries` | `list` | Named response fits: each contains fitted_coefs and scalar theta. Identifiers, coefficient/design compatibility and dispersion are validated. |
-| `identity` | `list` | Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for all cached entries. |
+| `response_fits` | `list` | Named response fits: each contains fitted_coefs and scalar theta. Identifiers, coefficient/design compatibility and dispersion are validated. |
+| `response_identity` | `list` | Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for response fits. |
+| `perturbation_fits` | `list` | Named CRT logistic fits: compact fitted_coefs, five fit diagnostics and three hashes of actual ordered fit cells, group design and binary treatment. No cell-length vectors or sampled draws. |
+| `perturbation_identity` | `list` | Shared ordered analysis source cells, design columns/value hash, logistic fitter method and arithmetic runtime. NT group-specific fitting inputs are certified by each entry without repeated cell vectors. |
 
 ## ResultRecord
 

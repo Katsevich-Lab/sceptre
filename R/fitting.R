@@ -49,12 +49,14 @@ fit_response <- function(expressions, covariate_matrix) {
 #'   helper adds no separate convergence check.
 #' @noRd
 fit_assignment_probabilities <- function(trt_idxs, covariate_matrix) {
-    indicator <- integer(length = nrow(covariate_matrix))
+    fit_perturbation_glm(trt_idxs, covariate_matrix)$fitted.values
+}
+
+# Fit exactly once with the established indicator encoding and glm defaults.
+# The caller may retain compact coefficients; the full glm object is transient.
+#' @noRd
+fit_perturbation_glm <- function(trt_idxs, design) {
+    indicator <- integer(length = nrow(design))
     indicator[trt_idxs] <- 1L
-    logistic_fit <- stats::glm.fit(
-        y = indicator,
-        x = covariate_matrix,
-        family = stats::binomial()
-    )
-    logistic_fit$fitted.values
+    stats::glm.fit(y = indicator, x = design, family = stats::binomial())
 }

@@ -165,7 +165,7 @@ set_analysis_parameters <- function(
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
 
     # update cached fields
-    sceptre_object <- invalidate_response_cache(
+    sceptre_object <- invalidate_fit_caches(
         sceptre_object,
         "parameters",
         reset_response_precomps
@@ -304,7 +304,7 @@ assign_grnas <- function(
         invisible()
 
     # determine whether to reset response precomputations
-    sceptre_object <- invalidate_response_cache(
+    sceptre_object <- invalidate_fit_caches(
         sceptre_object,
         "assignments",
         response_cache_assignments_changed(
@@ -506,7 +506,7 @@ run_qc_pt_1 <- function(
     }
 
     # determine whether to reset response precomputation
-    sceptre_object <- invalidate_response_cache(
+    sceptre_object <- invalidate_fit_caches(
         sceptre_object,
         "analysis_cells",
         !identical(current_cells_in_use, sceptre_object@preparation@analysis_cells)

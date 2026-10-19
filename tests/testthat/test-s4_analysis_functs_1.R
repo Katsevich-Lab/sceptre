@@ -41,7 +41,7 @@ test_that("import_data", {
         expect_s4_class(object@data, "ScreenData")
         expect_s4_class(object@spec, "AnalysisSpec")
         expect_s4_class(object@preparation, "PreparationRecord")
-        expect_s4_class(object@fits, "ResponseFitCache")
+        expect_s4_class(object@fits, "FitCache")
         expect_s4_class(object@results, "ResultRecord")
     }
 

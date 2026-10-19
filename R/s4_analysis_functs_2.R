@@ -154,7 +154,7 @@ run_calibration_check_pt_2 <- function(
     result <- process_calibration_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_calibration_check",
         result, plan@pairs, output_amount, plan = plan)
-    commit_response_fits(sceptre_object, out$response_precomputations)
+    commit_analysis_fits(sceptre_object, out)
 }
 
 
@@ -232,7 +232,7 @@ run_power_check <- function(
     result <- apply_grouping_to_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_power_check",
         result, plan@pairs, output_amount, plan = plan)
-    commit_response_fits(sceptre_object, out$response_precomputations)
+    commit_analysis_fits(sceptre_object, out)
 }
 
 
@@ -310,7 +310,7 @@ run_discovery_analysis <- function(
     result <- process_discovery_result(out$result, sceptre_object)
     sceptre_object <- commit_result_record(sceptre_object, "run_discovery_analysis",
         result, plan@pairs, output_amount, plan = plan)
-    commit_response_fits(sceptre_object, out$response_precomputations)
+    commit_analysis_fits(sceptre_object, out)
 }
 
 

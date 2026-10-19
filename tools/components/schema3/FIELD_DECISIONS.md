@@ -68,7 +68,7 @@ result provenance only, never a working setting or reusable cache identity.
 | `n_calibration_pairs` | S.n_calibration_pairs | Removed working slot; requested count belongs to the calibration plan, distinct from the number of available sampled pairs. Old value historical only. |
 | `import_grna_assignment_info` | D.import_grna_assignment_info | Retained max_grna/max_grna_frac_umis import summaries aligned to source cells. |
 | `mean_cells_per_grna` | P.mean_cells_per_grna | Removed redundant scalar. mean_assignment_size() derives mean lengths of durable guide_assignments. |
-| `response_precomputations` | F.response_precomputations | New F.entries cache has explicit actual fitting identity. Old entries are discarded as unverified; only discarded_unverified_fit_count is recorded. |
+| `response_precomputations` | F.response_precomputations | New F.response_fits cache has explicit actual fitting identity. Old entries are discarded as unverified; only discarded_unverified_fit_count is recorded. |
 | `last_function_called` | last_function_called | Removed call journal; not retained as live state or used to infer completion. |
 | `functs_called` | functs_called | Removed Boolean authority. Used only as evidence when reconstructing preparation stages whose durable payloads validate. Never certifies old results/fits; raw flag vector is not retained. |
 | `calibration_result` | R.calibration_result | R.records$run_calibration_check$table. Import as historical, preserve recognized history/provenance, invalidate currentness. |
@@ -86,7 +86,7 @@ result provenance only, never a working setting or reusable cache identity.
 | `data` | Retained coordinator reference, now strictly ScreenData. |
 | `spec` | Retained coordinator reference, now resolved scientific choices only. |
 | `preparation` | Retained coordinator reference with renamed domain payloads and rebuilt stage identities. |
-| `fits` | Reference now typed ResponseFitCache, replacing FitRecord; old fits not reused. |
+| `fits` | Reference now typed FitCache, replacing FitRecord; old fits not reused. |
 | `results` | Retained ResultRecord reference; its entries now own tables rather than referring to separate sibling slots. |
 | `schema_version` | Set to 3L by explicit migration. Unknown versions/layouts error; no implicit slot-based upgrade. |
 | `D.response_names` | Retained display annotations when saved. Schema 1 lacked them; leave unknown/empty instead of substituting canonical count IDs as biological labels. |
@@ -145,7 +145,7 @@ Nextflow compatibility, historical RNG replay or verified old per-run budgets.
 
 New schema 3 additions have one authority: S.additional_cells_to_remove;
 P.guide_groups and canonical-to-compiled pair tables; typed backing descriptors;
-ResponseFitCache entries/identity; result entries/provenance/history and
+FitCache response_fits/response_identity and perturbation_fits/perturbation_identity; result entries/provenance/history and
 import_metadata. Transient plans/CellViews are not separate persisted working
 fields. See OBJECT_FIELDS.md for the exhaustive current slot/type listing.
 
@@ -160,3 +160,15 @@ at the same boundary. Unknown fields or malformed values are retained as
 unrecognized historical provenance, with a diagnostic, rather than silently
 dropped or re-signed as a valid plan. No legacy list-field forwarding layer or
 `RunPlan` dollar-access generic is installed.
+
+
+## Earlier schema 3 response cache
+
+The recognized physical `ResponseFitCache(entries, identity)` layout maps into
+`FitCache(response_fits, response_identity)` without changing numerical values.
+Its saved actual-input identity must still match the current data and design;
+unknown fields or a mismatched certificate are rejected. The new perturbation
+family starts empty. This differs from schema 1/2 unverified legacy response
+precomputations, which are discarded rather than promoted to certified fits.
+The coordinator schema remains 3 because these nested representation conversions
+preserve scientific inputs and existing valid result certificates.

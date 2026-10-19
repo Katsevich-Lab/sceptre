@@ -289,8 +289,9 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
     )
     common_view <- make_fit_view(index)
     identity <- response_fit_identity(object, common_view@source_cells)
-    cache <- if (identical(object@fits@identity, identity)) {
-        object@fits@entries
+    perturbation_identity <- perturbation_cache_identity(object)
+    cache <- if (identical(object@fits@response_identity, identity)) {
+        object@fits@response_fits
     } else list()
     list(
         fit_identity = identity,
@@ -315,6 +316,11 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
             fit_parametric_curve = object@spec@resampling_approximation ==
                 "skew_normal"
         ),
-        response_fits = cache
+        response_fits = cache,
+        perturbation_identity = perturbation_identity,
+        perturbation_fits = if (!index$calibration_check &&
+            identical(object@fits@perturbation_identity, perturbation_identity)) {
+            object@fits@perturbation_fits
+        } else list()
     )
 }
