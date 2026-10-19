@@ -21,36 +21,27 @@ auto_construct_formula_object <- function(
             !(cell_covariate_names %in% c("grna_n_umis", "grna_n_nonzero"))
         ]
     }
-    form_str <- vapply(
-        cell_covariate_names,
-        function(curr_name) {
-            count_based_covariate <- grepl(
-                pattern = "n_umis|n_nonzero",
-                x = curr_name
-            )
-            if (count_based_covariate) {
-                if (any(cell_covariates[[curr_name]] == 0)) {
-                    out <- paste0("log(", curr_name, "+1)")
-                } else {
-                    out <- paste0("log(", curr_name, ")")
-                }
-            } else {
-                if (
-                    length(unique(cell_covariates[[curr_name]])) >=
-                        MAX_N_LEVELS_ALLOWED
-                ) {
-                    out <- NA_character_
-                } else {
-                    out <- curr_name
-                }
-            }
-            return(out)
-        },
-        FUN.VALUE = character(1)
-    ) |>
-        stats::na.omit() |>
-        paste0(collapse = " + ")
-    form <- paste0("~ ", form_str) |> stats::as.formula()
+    terms <- lapply(cell_covariate_names, function(curr_name) {
+        # Dot and dots-position names have special evaluation semantics even
+        # when represented as symbols. A literal lookup preserves their column.
+        variable <- if (curr_name %in% c(".", "...") || grepl("^\\.\\.[0-9]+$", curr_name)) {
+            call("get", curr_name)
+        } else as.name(curr_name)
+        count_based_covariate <- grepl("n_umis|n_nonzero", curr_name)
+        if (count_based_covariate) {
+            argument <- if (any(cell_covariates[[curr_name]] == 0)) {
+                call("+", variable, 1)
+            } else variable
+            call("log", argument)
+        } else if (length(unique(cell_covariates[[curr_name]])) < MAX_N_LEVELS_ALLOWED) {
+            variable
+        } else NULL
+    })
+    terms <- Filter(Negate(is.null), terms)
+    rhs <- if (length(terms)) Reduce(function(left, right) call("+", left, right), terms) else 1
+    # Only generated formulas use this minimal environment. Caller-supplied
+    # formulas keep their own environments, including local transformations.
+    form <- stats::as.formula(call("~", rhs), env = baseenv())
     return(form)
 }
 

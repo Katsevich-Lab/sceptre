@@ -70,7 +70,7 @@ as_run_plan <- function(plan) {
 }
 
 setValidity("RunPlan", function(object) {
-    analyses <- c("run_calibration_check", "run_power_check", "run_discovery_analysis")
+    analyses <- analysis_names()
     if (length(object@analysis) != 1L || is.na(object@analysis) ||
         !object@analysis %in% analyses) return("RunPlan requires one canonical analysis mode")
     pairs <- object@pairs

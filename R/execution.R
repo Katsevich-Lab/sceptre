@@ -45,27 +45,51 @@ announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
     }
 }
 
+# Base conditions retain the original cause and useful execution context.
+analysis_worker_error <- function(block, cause = NULL, analysis = NULL,
+    phase = NULL, reason = "error", detail = NULL) {
+    if (is.null(detail) && inherits(cause, "condition")) detail <- conditionMessage(cause)
+    message <- if (identical(reason, "lost_reply")) {
+        paste0("Analysis worker ", block,
+            " returned no result; it may have exited unexpectedly.")
+    } else paste0("Analysis worker ", block, " failed: ", detail)
+    structure(list(message = message, call = NULL, block = as.integer(block),
+        analysis = analysis, phase = phase, reason = reason, cause = cause,
+        parent = cause), class = c("sceptre_worker_error", "error", "condition"))
+}
+
 #' Run each work block serially or in a separate forked worker
 #' @param blocks Input blocks, already divided and ordered by the caller.
 #' @param worker Function accepting a block and a worker number; serial work
 #'   receives NULL instead of a number.
 #' @param parallel Whether to use `mclapply()`, with one worker per block.
+#' @param analysis,phase Optional scientific analysis and execution phase labels.
 #' @return Worker results in input-block order, including legitimate NULL results.
 #'   Stop if a worker fails
 #'   or exits without returning a result. Include its block number and original
 #'   error message, before callers combine results or report success. Blocks and
 #'   random seeds are not rearranged; `mclapply()` keeps its default behavior.
 #' @noRd
-execute_analysis_blocks <- function(blocks, worker, parallel) {
+execute_analysis_blocks <- function(blocks, worker, parallel, analysis = NULL, phase = NULL) {
     # A successful worker can return NULL for an empty block. Put its result
     # inside a list so that this differs from a child exiting without replying.
+    invoke_worker <- function(i, proc_id) {
+        # Errors acquire execution context. A child interrupt is transported to
+        # the parent and re-signalled unchanged; a parent interrupt escapes.
+        tryCatch(list(value = worker(blocks[[i]], proc_id)), error = function(cause) {
+            stop(analysis_worker_error(i, cause, analysis, phase))
+        }, interrupt = function(cause) {
+            if (!parallel) stop(cause)
+            list(interrupt = cause)
+        })
+    }
     replies <- if (!parallel) {
-        lapply(blocks, function(block) list(value = worker(block, NULL)))
+        lapply(seq_along(blocks), function(i) invoke_worker(i, NULL))
     } else {
         parallel::mclapply(
             seq_along(blocks),
             function(proc_id) {
-                list(value = worker(blocks[[proc_id]], proc_id))
+                invoke_worker(proc_id, proc_id)
             },
             mc.cores = length(blocks)
         )
@@ -74,21 +98,19 @@ execute_analysis_blocks <- function(blocks, worker, parallel) {
         result <- replies[[i]]
         if (inherits(result, "try-error")) {
             cause <- attr(result, "condition")
+            if (inherits(cause, "sceptre_worker_error")) stop(cause)
             detail <- if (inherits(cause, "condition")) {
                 conditionMessage(cause)
             } else {
                 as.character(result)
             }
-            stop("Analysis worker ", i, " failed: ", detail, call. = FALSE)
+            stop(analysis_worker_error(i, cause, analysis, phase, detail = detail))
         }
         if (is.null(result)) {
-            stop(
-                "Analysis worker ",
-                i,
-                " returned no result; it may have exited unexpectedly.",
-                call. = FALSE
-            )
+            stop(analysis_worker_error(i, analysis = analysis, phase = phase,
+                reason = "lost_reply"))
         }
+        if (inherits(result$interrupt, "interrupt")) stop(result$interrupt)
     }
     lapply(replies, function(reply) reply$value)
 }

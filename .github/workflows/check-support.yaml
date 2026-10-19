@@ -1,0 +1,106 @@
+# Support checks complement the existing OS matrix and ondisc-absent job.
+# These definitions are qualification gates; adding them is not a hosted pass.
+name: R-floor-and-Bioconductor
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  advertised-r-floor:
+    runs-on: ubuntu-latest
+    env:
+      # testthat 3.1.7 scopes LC_MESSAGES; a forced LC_ALL would prevent that.
+      LC_ALL: ""
+      _R_CHECK_FORCE_SUGGESTS_: false
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.1'
+          use-public-rspm: false
+      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Install coherent R-floor dependencies and exact testthat floor
+        run: Rscript --vanilla tools/hardening/dependencies/install-r-floor-dependencies.R
+      - name: Assert exact floor API behavior
+        run: Rscript --vanilla tools/hardening/dependencies/probe-testthat-floor.R
+      - name: Build and check installed package without optional ondisc
+        shell: bash
+        run: |
+          R CMD build . --no-manual
+          R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
+      - name: Require clean package check status
+        shell: Rscript {0}
+        run: |
+          status <- readLines("sceptre.Rcheck/00check.log")
+          stopifnot(!any(grepl("Status:.*(ERROR|WARNING)", status)))
+      - name: Retain exact support environment and check output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: advertised-r-4.1-testthat-3.1.7
+          path: |
+            r-floor-dependencies.txt
+            r-floor-installed.tsv
+            sceptre.Rcheck
+
+  bioconductor:
+    runs-on: ubuntu-latest
+    container:
+      image: bioconductor/bioconductor_docker:${{ matrix.bioc }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The upstream latest tag tracks the current release; devel tracks its
+        # matching R development ecosystem. Record actual versions per run.
+        bioc: [latest, devel]
+    env:
+      _R_CHECK_FORCE_SUGGESTS_: false
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies from the matching Bioconductor ecosystem
+        shell: Rscript {0}
+        run: |
+          options(repos = BiocManager::repositories())
+          description <- read.dcf("DESCRIPTION")
+          fields <- intersect(c("Imports", "LinkingTo", "Suggests"), colnames(description))
+          deps <- unique(unlist(lapply(description[1L, fields], function(x)
+            names(tools:::.split_dependencies(x)))))
+          deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
+          BiocManager::install(c(deps, "BiocCheck"), ask = FALSE, update = FALSE)
+          writeLines(c(paste("Bioconductor", BiocManager::version()),
+            capture.output(sessionInfo())), "bioconductor-environment.txt")
+          write.table(installed.packages()[, c("Package", "Version", "Built")],
+            "bioconductor-installed.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+      - name: Build and check package
+        shell: bash
+        run: |
+          R CMD build . --no-manual
+          R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
+      - name: Require clean package check status
+        shell: Rscript {0}
+        run: |
+          status <- readLines("sceptre.Rcheck/00check.log")
+          stopifnot(!any(grepl("Status:.*(ERROR|WARNING)", status)))
+      - name: Run Bioconductor package diagnostics
+        shell: Rscript {0}
+        run: |
+          BiocCheck::BiocCheck(dir(pattern = "^sceptre_.*\\.tar\\.gz$")[1L],
+            `quit-with-status` = TRUE)
+      - name: Retain Bioconductor environment and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bioconductor-${{ matrix.bioc }}
+          path: |
+            bioconductor-environment.txt
+            bioconductor-installed.tsv
+            sceptre.Rcheck
+            sceptre.BiocCheck

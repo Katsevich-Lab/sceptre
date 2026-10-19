@@ -31,9 +31,9 @@
 #' mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying
 #' the multiple testing correction method to use; see `p.adjust.methods` for
-#' options
-#' @param multiple_testing_alpha (optional; default `0.1`) a numeric specifying
-#' the nominal level of the multiple testing correction method
+#' options. Supported aliases and unambiguous abbreviations follow `p.adjust()`.
+#' @param multiple_testing_alpha (optional; default `0.1`) a single finite numeric
+#' value in `(0, 1]` specifying the nominal level of the multiple testing correction method
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set
@@ -83,6 +83,7 @@ set_analysis_parameters <- function(
     multiple_testing_method = "BH",
     multiple_testing_alpha = 0.1
 ) {
+    validate_correction_settings(multiple_testing_alpha, multiple_testing_method)
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     # verify that function called in correct order
     sceptre_object <- begin_preparation_stage(

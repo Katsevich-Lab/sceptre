@@ -88,11 +88,13 @@ sceptre_object <- import_data_from_cellranger(
 )
 
 # 2. create an ondisc-backed sceptre_object from Cell Ranger output
-sceptre_object <- import_data_from_cellranger(
-  directories = directories,
-  moi = "high",
-  grna_target_data_frame = grna_target_data_frame_highmoi,
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
-)
+if (requireNamespace("ondisc", quietly = TRUE)) {
+  sceptre_object <- import_data_from_cellranger(
+    directories = directories,
+    moi = "high",
+    grna_target_data_frame = grna_target_data_frame_highmoi,
+    use_ondisc = TRUE,
+    directory_to_write = tempdir()
+  )
+}
 }

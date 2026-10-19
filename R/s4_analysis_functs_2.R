@@ -344,7 +344,8 @@ run_discovery_analysis <- function(
 #'
 #' @param historical Return the saved table even when its provenance is historical.
 #'   The returned table carries its saved record as an attribute.
-#' @returns a data frame containing the results of the analysis
+#' @returns An owned data frame containing the results of the analysis. Editing
+#'   it, including nested historical provenance, does not change the object.
 #' @export
 #' @examples
 #' data(highmoi_example_data)
@@ -371,20 +372,14 @@ run_discovery_analysis <- function(
 #'   get_result("run_power_check")
 get_result <- function(sceptre_object, analysis, historical = FALSE) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
-    if (
-        !(analysis %in%
-            c(
-                "run_calibration_check",
-                "run_power_check",
-                "run_discovery_analysis"
-            ))
-    ) {
+    if (!is.character(analysis) || length(analysis) != 1L || is.na(analysis) ||
+        !analysis %in% analysis_names()) {
         stop(
             "`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`."
         )
     }
-    if (!isTRUE(historical)) return(current_result(sceptre_object, analysis))
-    record <- sceptre_object@results@records[[analysis]]
+    if (!isTRUE(historical)) return(owned_result_value(current_result(sceptre_object, analysis)))
+    record <- owned_result_value(sceptre_object@results@records[[analysis]])
     result <- record$table
     if (is.null(record) || !is.data.frame(result)) stop(analysis, " has no saved result.")
     attr(result, "sceptre_result_record") <- record
@@ -478,9 +473,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 
     # 1. create analysis_summary.txt file
     summary_file_fp <- paste0(directory, "/analysis_summary.txt")
-    sink(file = summary_file_fp, append = FALSE)
-    print(sceptre_object)
-    sink(NULL)
+    write_analysis_summary(sceptre_object, summary_file_fp)
 
     # 2. determine the functions that have been called
     plotting_params <- list(

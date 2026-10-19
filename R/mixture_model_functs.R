@@ -125,7 +125,8 @@ assign_grnas_to_cells_mixture <- function(
             n_processors
         )
         res <- execute_analysis_blocks(
-            grna_ids_partitioned, assign_guide_block, parallel = TRUE
+            grna_ids_partitioned, assign_guide_block, parallel = TRUE,
+            analysis = "assign_grnas", phase = "guide_assignment"
         )
         initial_assignment_list <- res |> purrr::flatten()
     }

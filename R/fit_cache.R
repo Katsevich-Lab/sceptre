@@ -115,7 +115,7 @@ response_fit_identity <- function(object, source_cells) {
         columns = colnames(object@preparation@design_matrix),
         design = digest::digest(object@preparation@design_matrix[
             source_cells, , drop = FALSE], algo = "sha256"),
-        method = "poisson-glm.fit-then-dispersion-v1")
+        method = response_fit_method_id())
 }
 
 # A content replacement invalidates every derived stage. Reopening a verified
@@ -145,7 +145,7 @@ perturbation_cache_identity <- function(object) {
     cells <- object@preparation@analysis_cells
     list(cells = cells, columns = colnames(object@preparation@design_matrix),
         design = digest::digest(object@preparation@design_matrix[cells, , drop = FALSE], algo = "sha256"),
-        method = "binomial-glm.fit-linkinv-v1",
+        method = perturbation_fit_method_id(),
         runtime = list(R = as.character(getRversion()),
             stats = as.character(utils::packageVersion("stats")),
             BLAS = unname(extSoftVersion()["BLAS"]), matprod = getOption("matprod")))

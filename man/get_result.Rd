@@ -17,7 +17,8 @@ are querying, one of \code{"run_calibration_check"}, \code{"run_power_check"}, o
 The returned table carries its saved record as an attribute.}
 }
 \value{
-a data frame containing the results of the analysis
+An owned data frame containing the results of the analysis. Editing
+it, including nested historical provenance, does not change the object.
 }
 \description{
 \code{get_result()} returns a data frame containing the result of a calibration

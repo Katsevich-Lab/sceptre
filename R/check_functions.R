@@ -354,7 +354,7 @@ check_set_analysis_parameters <- function(
     }
 
     # check that there are no offsets in the formula object
-    if (grepl("offset", as.character(formula_object)[2])) {
+    if (formula_contains_offset_call(formula_object)) {
         stop("Offsets are not currently supported in formula objects.")
     }
 
@@ -861,4 +861,16 @@ check_discovery_analysis_inputs <- function(
     check_processor_count(n_processors)
 
     return(NULL)
+}
+
+# Detect actual offset calls rather than covariate labels containing the word.
+#' @noRd
+formula_contains_offset_call <- function(expression) {
+    if (!is.call(expression)) return(FALSE)
+    head <- expression[[1L]]
+    offset <- identical(head, as.name("offset")) ||
+        (is.call(head) && length(head) == 3L &&
+            as.character(head[[1L]]) %in% c("::", ":::") &&
+            identical(head[[3L]], as.name("offset")))
+    offset || any(vapply(as.list(expression)[-1L], formula_contains_offset_call, logical(1)))
 }

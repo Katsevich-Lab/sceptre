@@ -1,16 +1,15 @@
 # Resolved scientific choices live in AnalysisSpec. Execution settings and the
 # realized family belong to a transient plan and are frozen only with a result.
-result_analysis_fields <- function() c(
-    run_calibration_check = "run_calibration_check",
-    run_power_check = "run_power_check",
-    run_discovery_analysis = "run_discovery_analysis"
-)
+result_analysis_fields <- function() stats::setNames(analysis_names(), analysis_names())
 
 analysis_record_name <- function(analysis) {
     aliases <- c(calibration_check = "run_calibration_check",
         power_check = "run_power_check", discovery_analysis = "run_discovery_analysis")
+    if (!is.character(analysis) || length(analysis) != 1L || is.na(analysis)) {
+        stop("Unknown analysis type.")
+    }
     if (analysis %in% names(aliases)) analysis <- aliases[[analysis]]
-    if (length(analysis) != 1L || !analysis %in% names(result_analysis_fields())) {
+    if (!analysis %in% analysis_names()) {
         stop("Unknown analysis type.")
     }
     analysis
@@ -205,15 +204,15 @@ commit_result_record <- function(object, analysis, result, pairs, output_amount,
     previous <- object@results@records[[analysis]]
     history <- if (is.null(previous)) list() else c(previous$history,
         list(previous[setdiff(names(previous), "history")]))
-    object@results@records[[analysis]] <- list(table = result,
+    object@results@records[[analysis]] <- owned_result_value(list(table = result,
         scope = "complete_family", identity = plan@identity,
         provenance = list(schema_version = object@schema_version,
             package_version = as.character(utils::packageVersion("sceptre")),
             spec = analysis_spec_snapshot(object), plan = plan,
             output_amount = output_amount,
-            response_fit_method = "poisson-glm.fit-then-dispersion-v1",
-            perturbation_fit_method = "binomial-glm.fit-linkinv-v1"),
-        history = history)
+            response_fit_method = response_fit_method_id(),
+            perturbation_fit_method = perturbation_fit_method_id()),
+        history = history))
     object
 }
 

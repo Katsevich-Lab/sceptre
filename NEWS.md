@@ -1,5 +1,31 @@
 # sceptre (development version)
 
+- Public result extraction and completed-result admission now own nested tables
+  and historical provenance. Editing returned data.tables cannot change saved
+  results, earlier objects or later history; original RunPlan certificates are
+  preserved. Failed or interrupted summary export restores the caller's sinks.
+- Generated default formulas support nonsyntactic covariate names and use a
+  minimal environment. User-supplied formula environments remain intact.
+  Correction settings are validated before analysis: alpha must be one finite
+  number in `(0, 1]`, and the method must be supported by `stats::p.adjust()`.
+- Calibration now derives its resampling budget from its own requested family.
+  In the empirical path this intentionally corrects the former leakage of
+  discovery/power budgets into calibration. Scientific parity comparisons use
+  the same explicit budgets when comparing the old and current implementations.
+- Worker failures now signal `sceptre_worker_error` with block, analysis, phase
+  and original cause metadata. Interrupts retain their condition; missing child
+  replies remain failures and cannot produce partial completed results.
+- Experimental `prepare_execution()`, `execute_work_unit()` and
+  `collect_execution()` support complete-family distributed work without legacy
+  pipeline slots. Global plans and draw scopes remain frozen; validated raw
+  proposals are integrated and adjusted once. Runtime certificates bind actual
+  R functions, S4 definitions/dispatch and loaded native library bytes.
+- Backed operations diagnose incompatible optional ondisc interfaces before
+  file/native work. Saved-object help explains closed readRDS inspection,
+  process-local reopening, verified relocation and immutable active backing.
+  The declared testthat minimum is now 3.1.7; additional R/Bioconductor support
+  gates retain separate ondisc-free checks.
+
 - Repeated CRT analyses can reuse compact treatment-model fits when ordered
   cells, design and treatment membership agree. Calibration bypasses this cache
   and CRT resamples stay fresh. Fitting warnings occur on actual fits; warm

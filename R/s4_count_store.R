@@ -42,9 +42,7 @@ count_store_value <- function(x) {
     if (is.null(x@handle) || identical(x@handle, methods::new("externalptr"))) {
         stop("Count store is closed; reopen its backing files.")
     }
-    if (!requireNamespace("ondisc", quietly = TRUE)) {
-        stop("Install the optional `ondisc` package to access backed counts.")
-    }
+    require_ondisc_capabilities()
     d <- x@descriptor
     methods::new("odm", h5_file = d$path, dimension = as.integer(d$dimensions),
         feature_ids = as.character(d$dimnames[[1L]]), integer_id = as.integer(d$integer_id),

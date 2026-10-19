@@ -80,13 +80,15 @@ sceptre_object <- import_data(
 )
 
 # 2. initialize an ondisc-backed sceptre_object from R objects
-sceptre_object <- import_data(
-  response_matrix = lowmoi_example_data$response_matrix,
-  grna_matrix = lowmoi_example_data$grna_matrix,
-  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-  extra_covariates = lowmoi_example_data$extra_covariates,
-  moi = "low",
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
-)
+if (requireNamespace("ondisc", quietly = TRUE)) {
+  sceptre_object <- import_data(
+    response_matrix = lowmoi_example_data$response_matrix,
+    grna_matrix = lowmoi_example_data$grna_matrix,
+    grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+    extra_covariates = lowmoi_example_data$extra_covariates,
+    moi = "low",
+    use_ondisc = TRUE,
+    directory_to_write = tempdir()
+  )
+}
 }

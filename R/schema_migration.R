@@ -5,7 +5,13 @@ migrate_sceptre_object <- function(object) {
     if (!methods::is(object, "sceptre_object")) stop("Expected a `sceptre_object`.")
     saved <- attributes(object)
     version <- if (is.null(saved$schema_version)) 1L else saved$schema_version
-    if (identical(version, 3L)) return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
+    if (identical(version, 3L)) {
+        # readRDS() does not invoke S4 validity. Admit the working scientific
+        # settings before consuming saved plans or caches, without requiring
+        # historical preparation/results to satisfy current object validity.
+        validate_analysis_spec(object@spec)
+        return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
+    }
     if (!version %in% c(1L, 2L)) stop("Unsupported sceptre saved-object schema version.")
     if (version == 1L && !all(c("response_matrix", "grna_matrix", "functs_called") %in% names(saved))) {
         stop("Unrecognized legacy sceptre saved-object layout.")
@@ -89,7 +95,8 @@ migrate_sceptre_object <- function(object) {
         old <- old_records[[analysis]]
         if (is.null(table)) table <- data.frame()
         if (nrow(table) || !is.null(old)) {
-            out@results@records[[analysis]] <- migrate_historical_record(table, old, version, effective)
+            out@results@records[[analysis]] <- owned_result_value(
+                migrate_historical_record(table, old, version, effective))
         }
     }
     fit_count <- length(components$fits$response_precomputations)

@@ -238,6 +238,7 @@ make_fit_view <- function(index, group_id = NULL) {
 #'   every requested pair.
 #' @noRd
 make_treatment_index_lookup <- function(index) {
+    force(index)
     function(group_id) {
         trt_analysis_pos <- group_treatment_analysis(index, group_id)
         trt_fit_pos <- if (

@@ -14,7 +14,7 @@
 run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     index <- context$index
     treatment_lookup <- make_treatment_index_lookup(index)
-    response_rows <- unique(index$pair_rows$response_idx)
+    response_rows <- if (is.null(execution$work_keys)) unique(index$pair_rows$response_idx) else execution$work_keys
 
     # Analyze a block of response genes assigned to one worker
     # block_rows: Original count-matrix gene rows, in the order to process.
@@ -106,7 +106,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
     chunks <- execute_analysis_blocks(
         blocks,
         analyze_response_block,
-        execution$parallel
+        execution$parallel,
+        analysis = context$analysis, phase = "response_tests"
     )
     if (execution$parallel) {
         message(crayon::green(" \u2713"))
@@ -181,9 +182,11 @@ run_crt_analysis <- function(context, execution) {
         updates
     }
 
+    work_groups <- if (is.null(execution$work_keys)) unique(index$pair_rows$group_idx) else execution$work_keys
     if (context$shared_response_fit) {
+        response_rows <- unique(index$pair_rows$response_idx[index$pair_rows$group_idx %in% work_groups])
         blocks <- partition_response_ids(
-            unique(index$pair_rows$response_idx),
+            response_rows,
             execution$parallel,
             execution$n_processors
         )
@@ -197,7 +200,8 @@ run_crt_analysis <- function(context, execution) {
         chunks <- execute_analysis_blocks(
             blocks,
             prepare_response_block,
-            execution$parallel
+            execution$parallel,
+            analysis = context$analysis, phase = "response_fits"
         )
         response_fits <- merge_response_fits(
             response_fits,
@@ -292,14 +296,15 @@ run_crt_analysis <- function(context, execution) {
     }
 
     blocks <- partition_response_ids(
-        unique(index$pair_rows$group_idx),
+        work_groups,
         execution$parallel,
         execution$n_processors
     )
     chunks <- execute_analysis_blocks(
         blocks,
         analyze_guide_block,
-        execution$parallel
+        execution$parallel,
+        analysis = context$analysis, phase = "guide_tests"
     )
     if (execution$parallel) {
         message(crayon::green(" \u2713"))

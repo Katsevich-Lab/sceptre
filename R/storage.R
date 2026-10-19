@@ -24,6 +24,7 @@ storage_response_index <- function(store, id) {
 #' @noRd
 storage_read_response <- function(store, response_idx, source_cells = NULL) {
     y <- if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         as.numeric(store[response_idx, ])
     } else {
         load_csr_row(store@j, store@p, store@x, response_idx, ncol(store))
@@ -43,6 +44,7 @@ storage_read_response <- function(store, response_idx, source_cells = NULL) {
 #' @noRd
 storage_threshold_row <- function(store, feature_idx, threshold) {
     if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         ondisc:::threshold_count_matrix_cpp(
             file_name_in = store@h5_file,
             f_row_ptr = store@ptr,
@@ -118,6 +120,7 @@ storage_pair_counts <- function(
     response_idxs <- as.integer(pair_index$response_idx[scan_order])
     group_idxs <- as.integer(pair_index$group_idx[scan_order])
     if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         if (!complement) {
             nt_groups <- lapply(nt_groups, function(group) {
                 match(group, all_nt_idxs)
@@ -201,6 +204,7 @@ storage_pair_counts <- function(
 #' @noRd
 storage_group_counts <- function(store, response_idxs, groups, source_cells) {
     if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         groups <- storage_owned_groups(groups)
         out <- ondisc:::compute_n_trt_cells_matrix_ondisc(
             file_name_in = store@h5_file,
@@ -240,6 +244,7 @@ storage_create_backed_pair <- function(
     directory_to_write,
     integer_id
 ) {
+    require_ondisc_capabilities()
     # Both files must retain the caller's shared import ID so reopening can
     # check that they belong to this object. The public constructor uses zero.
     response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
@@ -263,6 +268,7 @@ storage_create_backed_pair <- function(
 #'   saved ID. A mismatch raises the existing error. No files are rewritten.
 #' @noRd
 storage_reopen_backed_pair <- function(response_file, grna_file, integer_id) {
+    require_ondisc_capabilities()
     response <- ondisc::initialize_odm_from_backing_file(response_file)
     grna <- ondisc::initialize_odm_from_backing_file(grna_file)
     if (integer_id != response@integer_id) {

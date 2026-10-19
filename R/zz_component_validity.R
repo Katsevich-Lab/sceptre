@@ -43,6 +43,8 @@ setValidity("ScreenData", function(object) {
 
 setValidity("sceptre_object", function(object) {
     if (!identical(object@schema_version, 3L)) return("Unsupported sceptre schema version")
+    valid_spec <- validObject(object@spec, test = TRUE)
+    if (!isTRUE(valid_spec)) return(valid_spec)
     valid_fit <- validObject(object@fits, test = TRUE)
     if (!isTRUE(valid_fit)) return(valid_fit)
     if (length(object@fits@response_fits)) {
@@ -107,7 +109,7 @@ validate_perturbation_fit_entries <- function(entries, identity) {
     if (!all(c("cells", "columns", "design", "method", "runtime") %in% names(identity)) ||
         !is.integer(identity$cells) || anyNA(identity$cells) || anyDuplicated(identity$cells) ||
         any(identity$cells < 1L) || !length(identity$columns) ||
-        !identical(identity$method, "binomial-glm.fit-linkinv-v1") ||
+        !identical(identity$method, perturbation_fit_method_id()) ||
         !is.list(identity$runtime)) {
         return("Perturbation fit cache requires an ordered analysis identity")
     }
