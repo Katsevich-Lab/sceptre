@@ -11,7 +11,7 @@ jobs:
   advertised-r-floor:
     runs-on: ubuntu-latest
     env:
-      # testthat 3.1.7 scopes LC_MESSAGES; a forced LC_ALL would prevent that.
+      # testthat 3.1.8 scopes LC_MESSAGES; a forced LC_ALL would prevent that.
       LC_ALL: ""
       _R_CHECK_FORCE_SUGGESTS_: false
       OMP_NUM_THREADS: 1
@@ -26,12 +26,12 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
       - name: Install coherent R-floor dependencies and exact testthat floor
         run: Rscript --vanilla tools/hardening/dependencies/install-r-floor-dependencies.R
-      - name: Assert exact floor API behavior
-        run: Rscript --vanilla tools/hardening/dependencies/probe-testthat-floor.R
       - name: Build and check installed package without optional ondisc
         shell: bash
         run: |
           R CMD build . --no-manual
+          R CMD INSTALL sceptre_*.tar.gz
+          Rscript --vanilla tools/hardening/dependencies/probe-testthat-floor.R
           R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
       - name: Require clean package check status
         shell: Rscript {0}
@@ -42,7 +42,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: advertised-r-4.1-testthat-3.1.7
+          name: advertised-r-4.1-testthat-3.1.8
           path: |
             r-floor-dependencies.txt
             r-floor-installed.tsv

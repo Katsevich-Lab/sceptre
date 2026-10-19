@@ -192,14 +192,19 @@ freezes one full-family RunPlan and canonical contiguous work units, each spanni
 whole response keys for permutations or whole guide-group keys for CRT. Its
 owned manifest contains protocol/runtime/method/context certificates and global
 row IDs; it contains no counts or live handles. Calibration groups are sampled
-once during preparation. Runtime certificates include R, package/stats versions,
-platform, BLAS, matrix-product option and RNG kind; deployments must additionally
-pin one exact package artifact. Hashes detect accidental mismatch, not forgery.
+once during preparation. Runtime certificates include R, package/stats/Matrix/Rcpp
+versions, backed-path ondisc version, platform, BLAS, matrix-product option and RNG
+kind. A build fingerprint hashes actual loaded R functions, schema definitions,
+validity functions and registered method implementations, plus the loaded native
+DLL bytes. Deployments must additionally pin one exact package artifact. Hashes
+detect accidental mismatch, not forgery.
 
 `execute_work_unit()` receives the full matching prepared screen with live local
 count stores. It reconstructs the full ordered context and native draw resources
 locally, restricts execution to its whole keys and returns raw globally indexed
-rows plus compact fit proposals. It performs no family integration or completion.
+rows plus compact fit proposals. Proposal scope headers are digests of the
+full expected fit identities, so they do not repeat fitting cells/design arrays.
+It performs no family integration or completion.
 `collect_execution()` accepts all units in any arrival order, validates certificates,
 coverage, row order/labels and fit scopes, restores canonical order and finalizes
 the complete family once before committing results/cache proposals. Missing,
@@ -209,9 +214,10 @@ pointers cannot be serialized into worker payloads.
 
 [`test-distributed-execution.R`](tests/testthat/test-distributed-execution.R)
 covers direct/protocol numerical and RNG comparisons, calibration/power,
-serialization/ownership, collection rejection and failure atomicity. Initial
-local smoke checks pass; final protocol qualification is pending. This is not a
-claim of separate-process, scheduler or Nextflow qualification.
+serialization/ownership, collection rejection and failure atomicity. Local
+qualification passes 17 cases / 105 assertions, including fresh R workers with
+in-memory and reopened backed counts, and implementation certificate checks. Broader package checks and the separately adapting
+Nextflow pipeline remain pending; this is not scheduler or Nextflow qualification.
 
 ## Saved objects, pipeline status and checking
 

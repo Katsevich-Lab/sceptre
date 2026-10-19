@@ -52,7 +52,7 @@ Suggests:
     sessioninfo,
     rmarkdown,
     knitr,
-    testthat (>= 3.1.7),
+    testthat (>= 3.1.8),
     MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3

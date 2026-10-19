@@ -57,7 +57,7 @@ validate_correction_settings <- function(alpha, method) {
 
 analysis_spec_is_empty <- function(object) {
     # An untouched constructor prototype has neither a formula nor any payload.
-    fields <- setdiff(slotNames(object), "formula_object")
+    fields <- setdiff(methods::slotNames(object), "formula_object")
     !is.call(object@formula_object) &&
         all(vapply(
             fields,

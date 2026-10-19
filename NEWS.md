@@ -23,7 +23,7 @@
 - Backed operations diagnose incompatible optional ondisc interfaces before
   file/native work. Saved-object help explains closed readRDS inspection,
   process-local reopening, verified relocation and immutable active backing.
-  The declared testthat minimum is now 3.1.7; additional R/Bioconductor support
+  The declared testthat minimum is now 3.1.8; additional R/Bioconductor support
   gates retain separate ondisc-free checks.
 
 - Repeated CRT analyses can reuse compact treatment-model fits when ordered
