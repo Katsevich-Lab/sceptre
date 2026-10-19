@@ -29,7 +29,8 @@ Calibration groups are sampled only during preparation.}
 }
 \value{
 An owned serializable manifest containing a frozen RunPlan, ordered
-work units and protocol/runtime certificates. It contains no counts or live
+work units and protocol/runtime certificates. Prepared metadata must not
+reuse generated numerical output column names. It contains no counts or live
 handles. This is a value artifact, not a saved completed analysis.
 }
 \description{

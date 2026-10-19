@@ -14,6 +14,8 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
         all_nt_idxs = c(4L, 1L, 5L))
     object@spec@side_code <- 1L
     object@spec@resampling_approximation <- "no_approximation"
+    object@spec@multiple_testing_alpha <- 0.1
+    object@spec@multiple_testing_method <- "BH"
     object <- refactor_private("initialize_screen_identity")(object)
 
     # Write the original matrix columns explicitly, without using the selection

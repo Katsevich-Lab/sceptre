@@ -341,3 +341,59 @@ test_that("redefining a dispatched package S4 method changes its build certifica
     methods::setMethod("dim", "BackedCountStore", original)
     expect_identical(manifest$runtime$build, refactor_private("execution_build_certificate")())
 })
+
+
+test_that("valid warm perturbation fits cannot be changed or removed by proposals", {
+    object <- distributed_fixture("high_complement_crt")
+    object <- refactor_capture(run_discovery_analysis(object, print_progress = FALSE,
+        output_amount = 2L))$value
+    manifest <- prepare_execution(object, "run_discovery_analysis", 3L, 2L)
+    proposals <- distributed_proposals(object, manifest)
+    group <- names(proposals[[1L]]$perturbation_fits)[[1L]]
+    expect_identical(proposals[[1L]]$perturbation_fits[[group]],
+        object@fits@perturbation_fits[[group]])
+    before <- serialize(object, NULL)
+    for (change in c("coefficient", "diagnostics", "remove")) {
+        bad <- proposals
+        if (change == "coefficient") {
+            bad[[1L]]$perturbation_fits[[group]]$fitted_coefs[[1L]] <-
+                bad[[1L]]$perturbation_fits[[group]]$fitted_coefs[[1L]] + 1
+        } else if (change == "diagnostics") {
+            bad[[1L]]$perturbation_fits[[group]]$diagnostics$iterations <-
+                bad[[1L]]$perturbation_fits[[group]]$diagnostics$iterations + 1L
+        } else bad[[1L]]$perturbation_fits[group] <- list(NULL)
+        bad[[1L]] <- distributed_resign(bad[[1L]])
+        expect_error(collect_execution(object, manifest, bad), "Conflicting perturbation fit")
+        expect_identical(serialize(object, NULL), before)
+    }
+    stale <- object
+    stale@fits@perturbation_fits[[group]]$identity$treatment <- strrep("0", 64L)
+    manifest <- prepare_execution(stale, "run_discovery_analysis", 3L, 2L)
+    fresh <- collect_execution(stale, manifest, distributed_proposals(stale, manifest))
+    expect_identical(fresh@fits@perturbation_fits[[group]], object@fits@perturbation_fits[[group]])
+    direct <- refactor_capture(run_discovery_analysis(stale, print_progress = FALSE,
+        output_amount = 2L))$value
+    expect_identical(distributed_observe(fresh, "run_discovery_analysis"),
+        distributed_observe(direct, "run_discovery_analysis"))
+})
+
+test_that("many CRT work units carry compact scope digests rather than cell vectors", {
+    object <- distributed_fixture("high_complement_crt")
+    manifest <- prepare_execution(object, "run_discovery_analysis", 100L, 2L)
+    proposals <- distributed_proposals(object, manifest)
+    expect_gt(length(proposals), 1L)
+    context <- refactor_private("validate_execution_manifest")(object, manifest)$context
+    expected <- list(response_identity = refactor_private("execution_digest")(context$fit_identity),
+        perturbation_identity = refactor_private("execution_digest")(context$perturbation_identity))
+    for (proposal in proposals) {
+        headers <- proposal[names(expected)]
+        expect_identical(headers, expected)
+        expect_true(all(vapply(headers, function(value) is.character(value) &&
+            length(value) == 1L && grepl("^[[:xdigit:]]{64}$", value), logical(1))))
+        expect_lt(as.numeric(object.size(headers)), as.numeric(object.size(list(
+            response_identity = context$fit_identity, perturbation_identity = context$perturbation_identity))))
+    }
+    collected <- collect_execution(object, manifest, proposals)
+    expect_identical(collected@fits@response_identity, context$fit_identity)
+    expect_identical(collected@fits@perturbation_identity, context$perturbation_identity)
+})

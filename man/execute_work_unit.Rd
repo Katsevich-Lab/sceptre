@@ -15,7 +15,9 @@ execute_work_unit(sceptre_object, execution, unit_id)
 }
 \value{
 An owned serializable proposal containing global row IDs, raw tests,
-compact fits and certificates. No guide integration or family correction is
+compact fits and digest certificates of their full context scopes. Ordered
+cell vectors are retained in the manifest, not repeated in proposals.
+No guide integration or family correction is
 performed. Workers must return all proposals to \code{collect_execution()}.
 }
 \description{

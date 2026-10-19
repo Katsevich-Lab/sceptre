@@ -7,6 +7,8 @@ indexing_screen <- function() {
     object <- refactor_private("set_response_matrix")(object, store)
     object@data@low_moi <- TRUE
     object@spec@control_group_complement <- FALSE
+    object@spec@multiple_testing_alpha <- 0.1
+    object@spec@multiple_testing_method <- "BH"
     object@preparation@analysis_cells <- c(2L, 4L, 5L, 8L, 11L)
     object@preparation@source_groups <- list(
         grna_group_idxs = list(A = c(5L, 4L)),

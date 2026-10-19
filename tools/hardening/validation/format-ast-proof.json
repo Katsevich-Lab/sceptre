@@ -1,6 +1,7 @@
 {
   "formatter": "air 0.9.0",
   "reference": "74a421a",
+  "formatted_revision": "f9f8142bd404c6da1dc39eca2c993f78cb6e5eb1",
   "files": 46,
   "raw_ast_changed_files": ["R/analysis_context.R", "R/analysis.R", "R/association_execution.R", "R/aux_functions.R", "R/check_functions.R", "R/distributed_execution.R", "R/domain_summaries.R", "R/execution.R", "R/fit_cache.R", "R/import_functs.R", "R/ondisc_capabilities.R", "R/ondisc_functs.R", "R/output_resources.R", "R/perturbation_fits.R", "R/preprocessing_functions.R", "R/result_records.R", "R/s4_analysis_functs_2.R", "R/s4_count_store.R", "R/s4_helpers.R", "R/s4_run_plan.R", "R/schema_migration.R", "R/scientific_identifiers.R", "R/workflow_state.R", "R/zz_component_validity.R", "R/zz_spec_validity.R"],
   "normalization": "single-expression brace blocks only",

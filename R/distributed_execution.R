@@ -383,7 +383,9 @@ prepare_execution <- function(
 #' @param execution Manifest returned by `prepare_execution()`.
 #' @param unit_id One exact stable unit ID from `execution$units`.
 #' @return An owned serializable proposal containing global row IDs, raw tests,
-#'   compact fits and certificates. No guide integration or family correction is
+#'   compact fits and digest certificates of their full context scopes. Ordered
+#'   cell vectors are retained in the manifest, not repeated in proposals.
+#'   No guide integration or family correction is
 #'   performed. Workers must return all proposals to `collect_execution()`.
 #' @export
 execute_work_unit <- function(sceptre_object, execution, unit_id) {
@@ -459,7 +461,7 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
         result = output$result,
         response_fits = response_fits,
         response_identity = if (context$shared_response_fit) {
-            context$fit_identity
+            execution_digest(context$fit_identity)
         } else {
             NULL
         },
@@ -467,7 +469,7 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
         perturbation_identity = if (is.null(perturbation_fits)) {
             NULL
         } else {
-            context$perturbation_identity
+            execution_digest(context$perturbation_identity)
         }
     )
     proposal$identity <- execution_digest(proposal)
@@ -535,7 +537,7 @@ validate_execution_proposal <- function(proposal, unit, execution, context) {
                 (!setequal(names(proposal$response_fits), response_ids) ||
                     !identical(
                         proposal$response_identity,
-                        context$fit_identity
+                        execution_digest(context$fit_identity)
                     ))) ||
             (!context$shared_response_fit &&
                 (length(proposal$response_fits) ||
@@ -638,18 +640,32 @@ collect_execution <- function(sceptre_object, execution, proposals) {
                     anyDuplicated(names(proposal$perturbation_fits)) ||
                     !identical(
                         proposal$perturbation_identity,
-                        context$perturbation_identity
+                        execution_digest(context$perturbation_identity)
                     )
             ) {
                 stop("Work proposal perturbation scope is incompatible.")
             }
             for (group in groups) {
                 fit <- proposal$perturbation_fits[[group]]
+                actual_identity <- execution_perturbation_identity(
+                    context,
+                    group
+                )
+                existing <- perturbations[[group]]
+                if (
+                    !is.null(existing) &&
+                        identical(existing$identity, actual_identity) &&
+                        !identical(existing, fit)
+                ) {
+                    stop(
+                        "Conflicting perturbation fit for an existing valid warm cache entry."
+                    )
+                }
                 if (
                     !is.null(fit) &&
                         !identical(
                             fit$identity,
-                            execution_perturbation_identity(context, group)
+                            actual_identity
                         )
                 ) {
                     stop(
