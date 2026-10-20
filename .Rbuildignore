@@ -29,3 +29,4 @@
 ^sceptre\.BiocCheck$
 ^tools/validation$
 ^tools/qualification$
+^tools/coverage$
