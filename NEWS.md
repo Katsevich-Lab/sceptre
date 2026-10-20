@@ -1,5 +1,12 @@
 # sceptre (development version)
 
+- Experimental `run_wilcoxon()` supports direct serial, in-memory, low-MOI
+  analyses with non-targeting controls. It uses explicitly unadjusted normalized
+  ranks and descriptive mean ratios, preserves QC/guide/family contracts, and
+  labels results and reports. Parallel, backed and distributed modes reject
+  before execution; `get_result_methods()` exposes current inference provenance.
+  CONTRIBUTING now includes setup, validation tiers and a worked extension.
+
 - Association tests now stop with response/guide context when the observed score
   is nonfinite. Previously undefined scores could produce small empirical
   p-values, including when treatment was exactly represented by covariates.
