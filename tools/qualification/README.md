@@ -73,8 +73,10 @@ system path. Install the preserved checker into a new temporary library if
 needed, preserving its version/source identity. BiocCheck may need network for
 repository metadata; log environmental errors rather than suppressing them.
 
-The gate verifies the exact original archive hash and accepted cleanup archive
-hash. It rejects new diagnostic categories and new practice diagnostics within
+The checker requires a fresh output directory and binds the diagnostic-summary
+bytes into its invocation. The gate verifies that summary digest, the exact
+candidate archive digest, checker/target/options, and the original and accepted
+cleanup reference archive hashes. It rejects new diagnostic categories and new practice diagnostics within
 an inherited category, reuses the actual-checker function scanner and complete
 individual long-function/line lineage gate, and compares all flagged display
 source lines by file/text with multiplicity against the reviewed cleanup. That

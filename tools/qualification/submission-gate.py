@@ -16,6 +16,16 @@ for path, expected in [
     assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, "Reference archive changed"
 old = json.loads((accepted / "diagnostics-summary.json").read_text())
 new = json.loads(summary.read_text())
+invocation_path = summary.with_name("invocation.json")
+invocation = json.loads(invocation_path.read_text())
+archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
+assert invocation["archive_sha256"] == archive_hash, "Summary/archive identity mismatch"
+assert invocation["diagnostics_summary_sha256"] == hashlib.sha256(summary.read_bytes()).hexdigest(), \
+    "Diagnostic summary bytes do not match invocation"
+assert invocation["checker"] == "1.49.30", "Wrong invocation checker"
+assert str(invocation["Bioconductor"]) == "3.24", "Wrong invocation Bioconductor"
+assert sorted(invocation["flags"]) == ["no-check-R-ver", "no-check-bioc-help"], \
+    "Wrong checker options"
 assert new["metadata"]["BiocCheckVersion"] == "1.49.30", "Wrong checker"
 assert str(new["metadata"]["BiocVersion"]) == "3.24", "Wrong Bioconductor target"
 # No new category or raised severity. The accepted cleanup already maps to the
@@ -73,7 +83,11 @@ def display(doc, source):
 prior = display(old, out / "accepted/sceptre")
 current = display(new, candidate)
 extra = current - prior
-result = dict(passed=not extra, display_calls=sum(current.values()),
+result = dict(passed=not extra,
+    candidate_archive_sha256=archive_hash,
+    diagnostics_summary_sha256=hashlib.sha256(summary.read_bytes()).hexdigest(),
+    invocation_sha256=hashlib.sha256(invocation_path.read_bytes()).hexdigest(),
+    display_calls=sum(current.values()),
     new_display_lines=[list(k) + [v] for k, v in extra.items()],
     matched_checker="1.49.30", flags=["no-check-R-ver", "no-check-bioc-help"],
     authority="21f9ea0 original submission via reviewed 01bb39c cleanup lineage",
