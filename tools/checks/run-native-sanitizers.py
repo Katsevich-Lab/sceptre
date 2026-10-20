@@ -60,6 +60,16 @@ for lane in args.lanes:
                 summary["lanes"][lane] = {"status": "unsupported", "reason": str(runtime) + " missing"}
                 continue
             env["DYLD_INSERT_LIBRARIES"] = str(runtime)
+    def r_call(script, *arguments):
+        if lane == "address" and sys.platform == "darwin":
+            # Rscript launches R through a shell on this host; macOS strips
+            # DYLD variables at that boundary. Inject into the Mach-O R binary
+            # itself, before libR/Rcpp are loaded, rather than loading ASan late.
+            home = subprocess.check_output(["R", "RHOME"], text=True).strip()
+            env["R_HOME"] = home
+            return [str(Path(home) / "bin/exec/R"), "--no-echo", "--no-restore",
+                    "--file=" + str(script), "--args", *arguments]
+        return [rscript, str(script), *arguments]
     # This negative control is separate from all production probes.
     bridge = directory / "negative.cpp"
     if lane == "undefined":
@@ -69,7 +79,7 @@ for lane in args.lanes:
     bridge.write_text("#include <Rcpp.h>\n// [[Rcpp::export]]\nint sanitizer_negative() { " + body + " }\n")
     runner = directory / "negative.R"
     runner.write_text("Rcpp::sourceCpp(commandArgs(TRUE)[[1L]], rebuild=TRUE)\nsanitizer_negative()\n")
-    negative = run([rscript, str(runner), str(bridge)], env, directory / "negative.log")
+    negative = run(r_call(runner, str(bridge)), env, directory / "negative.log")
     text = (directory / "negative.log").read_text(errors="replace")
     detected = negative != 0 and (("runtime error: signed integer overflow" in text) if lane == "undefined"
                                  else ("ERROR: AddressSanitizer: heap-use-after-free" in text))
@@ -80,7 +90,7 @@ for lane in args.lanes:
         continue
     for name in ("native-components", "sampling-ownership", "count-ownership",
                  "dispersion-exceptions", "result-ownership"):
-        command = [rscript, str(root / ("tools/checks/test-" + name + ".R")), str(root)]
+        command = r_call(root / ("tools/checks/test-" + name + ".R"), str(root))
         if name != "native-components":
             command.append(str(directory / name))
         code = run(command, env, directory / (name + ".log"))
