@@ -86,9 +86,14 @@ validation_replicate <- function(case, replicate, seed, n = 600L) {
     value <- tryCatch(withCallingHandlers(suppressMessages({
         object <- validation_prepare(input, case)
         # Preserve the public resampling policy, including adaptive stage exits.
-        fitted <- withr::with_seed(seed + 1L, sceptre::run_discovery_analysis(object,
-            print_progress = FALSE, output_amount = 2L, parallel = FALSE))
-        sceptre::get_result(fitted, "run_discovery_analysis")
+        runner <- getOption("sceptre.validation.run")
+        withr::with_seed(seed + 1L, {
+            if (is.null(runner)) {
+                fitted <- sceptre::run_discovery_analysis(object,
+                    print_progress = FALSE, output_amount = 2L, parallel = FALSE)
+                sceptre::get_result(fitted, "run_discovery_analysis")
+            } else runner(object, case)
+        })
     }), warning = function(w) {
         warnings <<- c(warnings, conditionMessage(w)); invokeRestart("muffleWarning")
     }), error = function(e) e)

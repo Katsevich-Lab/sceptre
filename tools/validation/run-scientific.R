@@ -23,9 +23,14 @@ dir.create(out, recursive = TRUE)
 revision <- function() paste(system2("git", c("rev-parse", "HEAD"), stdout = TRUE), collapse = "")
 installed <- find.package("sceptre")
 installed_files <- list.files(installed, recursive = TRUE, full.names = TRUE)
+source_files <- c("DESCRIPTION", "NAMESPACE",
+    list.files("R", pattern = "[.]R$", full.names = TRUE),
+    list.files("src", pattern = "[.](cpp|h)$", full.names = TRUE))
 manifest <- list(started_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
     source_revision = revision(), source_status = system2("git", c("status", "--porcelain"), stdout = TRUE),
     source_root = getwd(), installed_package = installed,
+    source_sha256 = stats::setNames(vapply(source_files, digest::digest, character(1),
+        algo = "sha256", file = TRUE), source_files),
     installed_sha256 = stats::setNames(vapply(installed_files, digest::digest, character(1),
         algo = "sha256", file = TRUE), substring(installed_files, nchar(installed) + 2L)),
     harness_sha256 = vapply(c("tools/validation/scientific-harness.R", "tools/validation/run-scientific.R"),
@@ -36,6 +41,7 @@ manifest <- list(started_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
     replication_unit = "One independently regenerated cell dataset per case and replicate; endpoints never pooled for binomial precision",
     interval = "Pointwise exact Clopper-Pearson 95% conditional on valid p-values; failures/QC and per-attempt rejection separately reported",
     session = utils::sessionInfo())
+if (!is.null(setup)) file.copy(setup, file.path(out, "candidate-setup.R"))
 saveRDS(manifest, file.path(out, "manifest.rds"))
 capture.output(str(manifest), file = file.path(out, "manifest.txt"))
 all_rows <- list()

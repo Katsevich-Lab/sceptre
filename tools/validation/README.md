@@ -33,7 +33,12 @@ Existing output directories are rejected. A setup file can set the option
 `sceptre.validation.configure` to a function of `(object, case)` returning an
 object with an explicitly selected experimental method. The script records the
 setup hash; candidate APIs/unsupported cases must be documented with that setup.
-It must not change the truth generator or replace returned p-values.
+For a separate experimental entry point, set
+`sceptre.validation.run` to a function of `(object, case)` returning its actual
+result table with `response_id`, `pass_qc`, `p_value`, and optional `stage` columns.
+The harness controls the test seed. This hook invokes a real alternative test;
+it must not synthesize or modify returned p-values or change the truth generator.
+The setup is copied into the output directory for reproducibility.
 
 `check-harness.R` verifies generator replay/change of seeds, low/high MOI structure,
 truth values, and aggregation of errors, QC exclusions and out-of-range p-values.
@@ -93,7 +98,7 @@ Intervals are pointwise; multiple cases/tails are not simultaneous confidence
 claims. Inspect invalid p-values/errors before interpreting rejection rates.
 Do not threshold the whole suite into a green statistical-validity badge.
 
-The manifest preserves git revision/dirty status, installed-file SHA256 hashes,
+The manifest preserves git revision/dirty status, installed-file and source-file SHA256 hashes,
 harness/setup hashes, settings, RNG kind/seed rule, R session and terminal time.
 Each replicate preserves input SHA256, true effects, treated count, p/QC/stage,
 warnings/errors and elapsed time. CSV checkpoints survive interruptions; only
