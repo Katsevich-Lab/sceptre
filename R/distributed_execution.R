@@ -195,7 +195,8 @@ execution_context_certificate <- function(object) {
 
 execution_units <- function(context, plan, n_work_units, permutations) {
     field <- if (permutations) "response_idx" else "group_idx"
-    keys <- unique(context$index$pair_rows[[field]])
+    pair_keys <- context$index$pair_rows[[field]]
+    keys <- unique(pair_keys)
     if (!length(keys)) {
         stop("Distributed execution requires eligible hypothesis rows.")
     }
@@ -205,12 +206,13 @@ execution_units <- function(context, plan, n_work_units, permutations) {
         as.integer(floor((seq_along(keys) - 1L) * n / length(keys))) + 1L
     )
     eligible <- which(plan@pairs$pass_qc)
+    # Index once, retaining first-seen key order and original within-key rows.
+    # Repeated which(pair_keys == key) scans cost O(keys * eligible rows).
+    rows_by_key <- split(eligible, factor(pair_keys, levels = keys))
     lapply(seq_along(chunks), function(i) {
         selected <- as.integer(chunks[[i]])
         rows <- unlist(
-            lapply(selected, function(key) {
-                eligible[which(context$index$pair_rows[[field]] == key)]
-            }),
+            rows_by_key[as.character(selected)],
             use.names = FALSE
         )
         list(
