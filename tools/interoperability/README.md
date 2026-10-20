@@ -39,3 +39,26 @@ their existing required dependencies.
 Implementation support is limited to in-memory raw-count SCE assays. AnnData,
 Seurat, delayed/backed SCE import, upstream-normalization detection, and recovery
 of upstream-filtered feature libraries are outside this slice.
+
+## W05 terminal evidence
+
+`validation.json` records the exact measured source/runtime and dependency
+versions. The isolated install passed; all 56 targeted assertions passed without
+failures or warnings. Pipeline preservation, explicit override, stale-call and
+design-reset rejection passed with SCE absent. The fresh-process example retained
+all 100 input response rows and 50 guide rows across 1,000 source cells, retained
+986 cells after QC, returned two requested pair rows, and matched direct results
+at tolerance zero. Optional-SCE absence checks passed.
+
+The installed API source was `22087ac`; the subsequently reviewed source change
+`a4431c8` spells one loop as `seq_len(2L)` to avoid a BiocCheck coding-practice
+instance. The separately committed driver fix `9a01650` corrects subprocess
+stdout/stderr logging; it does not change installed package code. An initial
+driver run incorrectly interpreted captured stdout as a process status; its
+replacement run completed with exit zero. All generated RDS/log artifacts remain
+local under `/private/tmp/sceptre-w05-*`.
+
+The final integrated archive/vignette build, matched BiocCheck category/instance
+gate, scheduler/container qualification and independent scientific validation
+remain program gates. These local API/serialization receipts do not supersede
+them or qualify the foundation positivity issue reported by W02.
