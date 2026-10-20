@@ -2,7 +2,6 @@
 source("tools/validation/scientific-harness.R")
 root <- tempfile("batch-integrity-")
 dir.create(root)
-on.exit <- NULL
 make_fixture <- function(name, replicate, binary = "same") {
     path <- file.path(root, name)
     dir.create(path)
