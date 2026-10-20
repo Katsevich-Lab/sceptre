@@ -1,0 +1,420 @@
+[
+  {
+    "file": "R/analysis_context.R",
+    "line_before": 26,
+    "head": "stop",
+    "raw": "Analysis source cells must be unique integer positions within the response store.",
+    "chunks": [
+      "Analysis source cells must be unique integer positions within ",
+      "the response store."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/check_functions.R",
+    "line_before": 806,
+    "head": "stop",
+    "raw": "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+    "chunks": [
+      "`calibration_group_size` exceeds the active non-targeting gRNA ",
+      "count after QC ("
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/fit_cache.R",
+    "line_before": 239,
+    "head": "stop",
+    "raw": "Perturbation fits do not match the actual analysis design and cells.",
+    "chunks": [
+      "Perturbation fits do not match the actual analysis design and ",
+      "cells."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/fit_cache.R",
+    "line_before": 250,
+    "head": "stop",
+    "raw": "Perturbation fit identifiers must belong to the prepared guide groups.",
+    "chunks": [
+      "Perturbation fit identifiers must belong to the prepared guide ",
+      "groups."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/getters_and_setters.R",
+    "line_before": 172,
+    "head": "stop",
+    "raw": "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.",
+    "chunks": [
+      "Replacement counts must preserve aligned cells and feature ",
+      "identities; use import_data() for a new screen."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/getters_and_setters.R",
+    "line_before": 210,
+    "head": "stop",
+    "raw": "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.",
+    "chunks": [
+      "Replacement counts must preserve aligned cells and feature ",
+      "identities; use import_data() for a new screen."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/getters_and_setters.R",
+    "line_before": 231,
+    "head": "stop",
+    "raw": "Use import_data() to replace backed screen content and its import summaries.",
+    "chunks": [
+      "Use import_data() to replace backed screen content and its ",
+      "import summaries."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/getters_and_setters.R",
+    "line_before": 241,
+    "head": "stop",
+    "raw": "Original mitochondrial feature labels are unknown; use import_data() to replace response counts.",
+    "chunks": [
+      "Original mitochondrial feature labels are unknown; use ",
+      "import_data() to replace response counts."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/import_functs.R",
+    "line_before": 932,
+    "head": "stop",
+    "raw": "The imported cell count leaves no room for its final sparse pointer.",
+    "chunks": [
+      "The imported cell count leaves no room for its final sparse ",
+      "pointer."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/import_functs.R",
+    "line_before": 945,
+    "head": "stop",
+    "raw": "Imported cell or feature coordinates are outside the matrix dimensions.",
+    "chunks": [
+      "Imported cell or feature coordinates are outside the matrix ",
+      "dimensions."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/import_functs.R",
+    "line_before": 953,
+    "head": "stop",
+    "raw": "Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique.",
+    "chunks": [
+      "Repeated (cell, feature) coordinates in imported count file; ",
+      "each coordinate must be unique."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/ondisc_capabilities.R",
+    "line_before": 139,
+    "head": "c",
+    "raw": "incompatible `odm` slots (path, dimensions, feature IDs, handle or shared import ID)",
+    "chunks": [
+      "incompatible `odm` slots (path, dimensions, feature IDs, ",
+      "handle or shared import ID)"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/ondisc_capabilities.R",
+    "line_before": 174,
+    "head": "stop",
+    "raw": ". Install the qualified source `timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c`",
+    "chunks": [
+      ". Install the qualified source ",
+      "`timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c`"
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/ondisc_capabilities.R",
+    "line_before": 175,
+    "head": "stop",
+    "raw": " and restart R. See the optional disk-backed setup in SCEPTRE's README.",
+    "chunks": [
+      " and restart R. See the optional disk-backed setup in SCEPTRE's ",
+      "README."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/ondisc_functs.R",
+    "line_before": 121,
+    "head": "stop",
+    "raw": "Backing store has no anchored content descriptor; reimport the screen.",
+    "chunks": [
+      "Backing store has no anchored content descriptor; reimport the ",
+      "screen."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/preprocessing_functions.R",
+    "line_before": 149,
+    "head": "stop",
+    "raw": "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+    "chunks": [
+      "`calibration_group_size` exceeds the active non-targeting ",
+      "gRNA count after QC ("
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 183,
+    "head": "stop",
+    "raw": "Calibration run-plan groups must use prepared non-targeting guides.",
+    "chunks": [
+      "Calibration run-plan groups must use prepared non-targeting ",
+      "guides."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 196,
+    "head": "stop",
+    "raw": "The run plan no longer matches its data, design, assignments, choices or execution scope.",
+    "chunks": [
+      "The run plan no longer matches its data, design, assignments, ",
+      "choices or execution scope."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 301,
+    "head": "stop",
+    "raw": "A completed analysis requires a nonempty result table with p-values.",
+    "chunks": [
+      "A completed analysis requires a nonempty result table with ",
+      "p-values."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 343,
+    "head": "stop",
+    "raw": "`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.",
+    "chunks": [
+      "`. Rerun the analysis or use get_result(..., historical = TRUE) ",
+      "to inspect saved results."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 415,
+    "head": "stop",
+    "raw": "Completed result p-values must be numeric probabilities or missing.",
+    "chunks": [
+      "Completed result p-values must be numeric probabilities or ",
+      "missing."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/result_records.R",
+    "line_before": 432,
+    "head": "stop",
+    "raw": "Discovery and calibration results must be adjusted across the complete hypothesis family.",
+    "chunks": [
+      "Discovery and calibration results must be adjusted across ",
+      "the complete hypothesis family."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/s4_analysis_functs_2.R",
+    "line_before": 508,
+    "head": "warning",
+    "raw": "Returning historical results; they do not represent the current analysis settings.",
+    "chunks": [
+      "Returning historical results; they do not represent the current ",
+      "analysis settings."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/s4_count_store.R",
+    "line_before": 20,
+    "head": "stop",
+    "raw": "Count store descriptor differs from its authoritative descriptor.",
+    "chunks": [
+      "Count store descriptor differs from its authoritative ",
+      "descriptor."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/s4_count_store.R",
+    "line_before": 56,
+    "head": "stop",
+    "raw": "Count stores must be normalized row-accessible Matrix or ondisc objects.",
+    "chunks": [
+      "Count stores must be normalized row-accessible Matrix or ondisc ",
+      "objects."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/s4_count_store.R",
+    "line_before": 142,
+    "head": "return",
+    "raw": "Backed count-store labels must align with descriptor dimensions",
+    "chunks": [
+      "Backed count-store labels must align with descriptor ",
+      "dimensions"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/s4_helpers.R",
+    "line_before": 397,
+    "head": "stop",
+    "raw": "There is no generic plot configured for the current prepared state.",
+    "chunks": [
+      "There is no generic plot configured for the current prepared ",
+      "state."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/s4_run_plan.R",
+    "line_before": 116,
+    "head": "return",
+    "raw": "RunPlan requires prepared hypothesis columns and complete logical QC status",
+    "chunks": [
+      "RunPlan requires prepared hypothesis columns and complete ",
+      "logical QC status"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/s4_run_plan.R",
+    "line_before": 123,
+    "head": "return",
+    "raw": "RunPlan hypothesis identifiers must be nonmissing character values",
+    "chunks": [
+      "RunPlan hypothesis identifiers must be nonmissing ",
+      "character values"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/s4_run_plan.R",
+    "line_before": 166,
+    "head": "return",
+    "raw": "Selected calibration pairs do not match the requested run scope",
+    "chunks": [
+      "Selected calibration pairs do not match the requested ",
+      "run scope"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/workflow_state.R",
+    "line_before": 169,
+    "head": "stop",
+    "raw": "Source guide groups must be prepared before assignment is committed.",
+    "chunks": [
+      "Source guide groups must be prepared before assignment is ",
+      "committed."
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/zz_component_validity.R",
+    "line_before": 32,
+    "head": "return",
+    "raw": "CellView has inconsistent ordered source, analysis or treatment positions",
+    "chunks": [
+      "CellView has inconsistent ordered source, analysis or ",
+      "treatment positions"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/zz_component_validity.R",
+    "line_before": 46,
+    "head": "return",
+    "raw": "Count stores must be normalized row-accessible Matrix or typed backed stores",
+    "chunks": [
+      "Count stores must be normalized row-accessible Matrix or ",
+      "typed backed stores"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/zz_component_validity.R",
+    "line_before": 104,
+    "head": "return",
+    "raw": "Response cache identity must match actual data and design inputs",
+    "chunks": [
+      "Response cache identity must match actual data and ",
+      "design inputs"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/zz_component_validity.R",
+    "line_before": 188,
+    "head": "return",
+    "raw": "Response fit coefficients or dispersion do not match their design",
+    "chunks": [
+      "Response fit coefficients or dispersion do not match ",
+      "their design"
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/zz_spec_validity.R",
+    "line_before": 18,
+    "head": "",
+    "raw": "`multiple_testing_alpha` must be one finite numeric value in (0, 1].",
+    "chunks": [
+      "`multiple_testing_alpha` must be one finite numeric value in ",
+      "(0, 1]."
+    ],
+    "direct_signal_or_paste": false
+  },
+  {
+    "file": "R/zz_spec_validity.R",
+    "line_before": 35,
+    "head": "paste0",
+    "raw": "`multiple_testing_method` must be one supported stats::p.adjust method: ",
+    "chunks": [
+      "`multiple_testing_method` must be one supported stats::p.adjust ",
+      "method: "
+    ],
+    "direct_signal_or_paste": true
+  },
+  {
+    "file": "R/zz_component_validity.R",
+    "head": "return",
+    "raw": "Perturbation fit coefficients or compact input identity are invalid",
+    "chunks": [
+      "Perturbation fit coefficients or compact input ",
+      "identity are invalid"
+    ],
+    "direct_signal_or_paste": false,
+    "note": "root prior helper extraction changed indentation; found by final width sweep"
+  }
+]

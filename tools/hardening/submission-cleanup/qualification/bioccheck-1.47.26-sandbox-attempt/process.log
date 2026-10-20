@@ -1,0 +1,27 @@
+Could not detect number of cores, defaulting to 1.
+── Installing sceptre ──────────────────────────────────────────────────────────
+✔ Package installed successfully
+── sceptre session metadata ────────────────────────────────────────────────────
+→ sourceDir: /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpbwTRWs/file3afc101904c1/sceptre
+→ BiocVersion: 3.23
+→ Package: sceptre
+→ PackageVersion: 0.99.0
+→ BiocCheckDir: /private/tmp/sceptre-bioc-cleaned-01bb39c/bioccheck-1.47.26/sceptre.BiocCheck
+→ BiocCheckVersion: 1.47.26
+→ sourceDir: /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpbwTRWs/file3afc101904c1/sceptre
+→ installDir: /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpbwTRWs/file3afc5a872328
+→ isTarBall: TRUE
+→ platform: unix
+── Running BiocCheck on sceptre ────────────────────────────────────────────────
+* Checking for deprecated package usage...
+Warning in download.file(..., destfile = tmp_config, quiet = TRUE) :
+  URL 'https://bioconductor.org/config.yaml': status was 'Couldn't resolve host name'
+Warning in download.file(..., destfile = tmp_config, quiet = TRUE) :
+  URL 'http://bioconductor.org/config.yaml': status was 'Couldn't resolve host name'
+Error in lock(.sql_lock_path(dbfile), exclusive = exclusive) : 
+  Cannot open lock file: Operation not permitted
+Calls: <Anonymous> ... tryCatch -> tryCatchList -> .sql_connect_RO -> .lock2 -> lock
+Error in h(simpleError(msg, call)) : 
+  error in evaluating the argument 'conn' in selecting a method for function 'dbDisconnect': object 'info' not found
+Calls: <Anonymous> ... .sql_disconnect -> dbDisconnect -> .handleSimpleError -> h
+Execution halted

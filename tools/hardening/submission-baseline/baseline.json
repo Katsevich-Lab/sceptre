@@ -1,0 +1,97 @@
+{
+  "captured_at_utc": "2026-10-20T00:27:53.966743+00:00",
+  "official_submission": {
+    "issue": "https://github.com/Bioconductor/BiocContributions/issues/176",
+    "submitted_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+    "source_tree": "492275ebe28078863bdf789da6a5575b12582a90",
+    "first_run_url": "https://github.com/r-universe/biocstaging/actions/runs/33438717492",
+    "bioc_job_id": 99642866650,
+    "source_job_id": 99641478053,
+    "bioccheck_version": "1.49.30",
+    "bioconductor_version": "3.24",
+    "R_version": "4.6.1",
+    "errors": 0,
+    "warnings": 1,
+    "notes": 3,
+    "long_functions": 49,
+    "long_lines": 145,
+    "wrapper_commit": "e859fe2adc2553a5c8b0b2ec6044215d60d3d9c7"
+  },
+  "local_comparison": {
+    "R_version": "4.6.0",
+    "platform": "aarch64-apple-darwin23",
+    "matched_1_47_26": {
+      "Bioconductor": "3.23",
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3,
+      "long_functions": 48,
+      "long_lines": 145
+    },
+    "matched_1_49_30": {
+      "Bioconductor": "3.24",
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3,
+      "long_functions": 49,
+      "long_lines": 145
+    },
+    "disabled_checks": [
+      "no-check-R-ver",
+      "no-check-bioc-help"
+    ],
+    "disabled_check_scope": "Exactly the two options used by the original official R-universe wrapper. No coding, formatting, documentation or dependency check disabled."
+  },
+  "pre_cleanup_qualified_source": {
+    "packaged_commit": "169c16e4ba00c687c1f03fe37e9d79a11d01cd8f",
+    "archive_sha256": "fb6c3ad20da63c2d2595e08b54a8916e8eed9002e50fa62e877867718afa11b4",
+    "long_functions_1_47_26": 69,
+    "long_functions_1_49_30": 70,
+    "long_lines": 473,
+    "unchanged_submission_long_line_instances": 110,
+    "new_or_modified_long_line_instances": 363,
+    "semantic_long_function_lineage_1_47_26": {
+      "inherited_sites": 44,
+      "new_sites": 22,
+      "threshold_crossings": 3
+    },
+    "errors_1_49_30": 0,
+    "warnings_1_49_30": 1,
+    "notes_1_49_30": 7
+  },
+  "status": "Actual submission baseline and frozen cleanup candidate comparison complete; remaining source diagnostic instances all inherit from the submission. Scientific/R CMD qualification recorded separately.",
+  "limits": [
+    "Original hosted R4.6.1 Linux runtime is preserved in official artifacts but local matched-checker runs use R4.6.0 macOS ARM64.",
+    "Semantic long-function lineage is source-reviewed provenance, not an assertion that refactored bodies are AST-identical.",
+    "Original build archive differs in DESCRIPTION only because of normal R CMD build wrapping and R-universe metadata. All75 other checked packaged R/native/man/vignette/NAMESPACE source files match the exact submitted Git revision.",
+    "The legacy planning qmd states5notes but the actual submitted official build has3; the official build and exact source are the baseline."
+  ],
+  "external_audit_unsuppressed_comparison": {
+    "checker": "1.47.26",
+    "errors": 1,
+    "warnings": 1,
+    "notes": 5,
+    "disabled_checks": [],
+    "scope": "Independent external audit against unchanged original source; support-site HTTP timeout is an environmental error, not source failure. Two additional notes concern R minimum and mailing-list checks. This result is not clean and is retained separately from official-wrapper matched comparisons."
+  },
+  "final_candidate_comparison": {
+    "candidate_source": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+    "candidate_archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+    "checker": "1.49.30",
+    "Bioconductor": "3.24",
+    "local_R": "4.6.0",
+    "local_platform": "aarch64-apple-darwin23",
+    "candidate_result": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3
+    },
+    "instance_gate": {
+      "new_function_sites": 0,
+      "new_long_lines": 0,
+      "long_functions": 45,
+      "long_lines": 108,
+      "display_calls": 9
+    }
+  }
+}

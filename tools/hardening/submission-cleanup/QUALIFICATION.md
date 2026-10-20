@@ -1,0 +1,85 @@
+# Submission-diagnostic cleanup
+
+Qualified source: **01bb39ccf8373ae8965a2679ee4813a63ea2d85d**.
+Archive: `/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre_0.99.0.tar.gz`.
+SHA-256: **606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7**.
+A byte-identical [archive copy](qualification/bioccheck-1.49.30/sceptre_0.99.0.tar.gz)
+is retained with the qualification evidence.
+The default `R CMD build` rebuilt the vignette successfully. The
+[artifact manifest](qualification/artifact-source-manifest.json) proves all 176
+tracked R/native/help/test files match the committed source byte for byte.
+
+The authority is the actual [Bioconductor submission baseline](../submission-baseline/README.md),
+source **21f9ea098b69c444a884a49bc254de711968e3b5**, rather than a later refactor
+checkpoint or the local planning tracker's five-note header. Original official
+logs, source archive, checker source and matched-checker reruns remain preserved.
+
+## Diagnostic comparison
+
+| Exact artifact | BiocCheck | Errors / warnings / notes | Long functions | Long lines |
+| --- | --- | --- | --- | --- |
+| Original official submitted artifact | 1.49.30 | 0 / 1 / 3 | 49 | 145 |
+| Same submitted artifact, local matched environment | 1.49.30 | 0 / 1 / 3 | 49 | 145 |
+| Cleaned candidate archive above | 1.49.30 | **0 / 1 / 3** | **45** | **108** |
+
+The [exact-archive instance gate](qualification/instance-gate/instance-gate.json)
+finds **zero new long-function sites and zero new or modified long lines**.
+It retains duplicate function names, maps reviewed renames and enclosing S4
+methods, and requires exact submitted line-text reuse with multiplicity.
+The gate passes the original submission and rejects the pre-cleanup archive's
+25 new/crossing function sites and 363 new/modified long lines. Counts alone
+are not the acceptance criterion.
+
+All nine remaining `cat`/`print` sites have documented submitted counterparts,
+including the summary-serialization print moved into `write_analysis_summary()`.
+The existing warning remains absence of a direct Bioconductor dependency.
+No unused dependency was introduced. The three notes concern inherited display
+calls, inherited long functions and inherited long lines. The new literal-range,
+paste-in-signal, superassignment and missing-example notes are gone.
+
+The original checker was installed into an isolated library from official source
+commit `ca5c23e019dd695b7a5e29286f593a0e9b13639a`. Local baseline and candidate
+use macOS ARM64 / R 4.6.0 / Bioconductor 3.24, with the original hosted wrapper's
+`no-check-R-ver` and `no-check-bioc-help` settings. This does not recreate the
+official Linux x86_64 / R 4.6.1 environment or claim submission acceptance.
+The separately preserved unsuppressed baseline includes a support-site timeout
+and version/subscription diagnostics; it is not reported as a clean default run.
+The [reproduction script](qualification/run-bioccheck.R) records flags, cache,
+checker, platform and archive hashes and isolates each checker's output copy.
+
+## Implementation and validation
+
+New helpers separate validation, ordered identity construction, storage backend
+dispatch, migration phases, proposal admission and complete-family commitment.
+They retain validation order and the collector's all-or-nothing result/cache
+admission. A local environment captures fitting warnings without superassignment;
+migration explicitly returns the updated object. The distributed API has real
+public import/setup/assignment/QC/prepare/execute/collect examples on bundled data.
+Formatting preserves emitted strings and computational expressions, with
+separate proofs for mechanical changes and substantive helper review.
+
+No `src/`, tests, DESCRIPTION or NAMESPACE files changed from the preceding
+qualified source. Native algorithms, scientific traversal, full-family correction
+and resampling policy were not changed by this cleanup. Runtime build certificates
+continue to bind the actual implementation, so the new R source requires a new
+pinned pipeline artifact even though the package version remains 0.99.0.
+
+| Validation | Result |
+| --- | --- |
+| Full frozen source suite | **253 cases, 5,641 passes, zero failures/errors/warnings/skips**; all 190 source/test file hashes identical before and after. |
+| Exact installed archive, R CMD check | **Status: OK** with `--no-manual --no-build-vignettes`, including **5,641 installed assertions, zero failures/warnings/skips**, all examples and running vignette code. The vignette was built separately by default build; PDF manual compilation and rebuilding the vignette inside check are outside this invocation. |
+| Exact installed archive, historical matched-budget parity | **Seven workflows, 231 tolerance-zero comparisons pass**, including warnings, post-run RNG, all public results, preparation and reusable response fits. The saved historical reference is compared with matched budgets; it is not a new fit of that reference. |
+| Three actual installed API examples | **All three pass** in a fresh process using the installed archive's Rd database and namespace. |
+| Independent helper comparison using extracted exact archive | **40 checks pass** across low-MOI complement permutation, NT permutation and high-MOI complement CRT: identity payloads, plans, contexts, manifests, unit/collected payloads, RNG, caller immutability and errors. This uses isolated source-function environments over the same prior installed classes; installed qualification is reported separately. |
+| Formatting and generated R wrapper equivalence | **35-file proof passes**: 19 raw AST matches and 16 matches after documented constant-string/local-alias normalization; 38 emitted literal/signal texts and parsed roxygen descriptions match. The post-generator formatter reproduces all 11 changed Rcpp wrapper lines byte for byte. All 98 monitored source/help/vignette/metadata files remain unchanged. The later substantive count-store helper extraction is explicitly outside this mechanical proof. See [formatting](formatting/README.md). |
+| Local older-checker comparison, 1.47.26 | **0 errors, 1 warning, 3 notes**, matching its submitted-source baseline; 44 inherited long functions and 108 inherited long lines. |
+
+Full source results and before/after hashes are in [qualification/source](qualification/source/).
+The initial older-checker attempt failed before reaching a diagnostic result
+because the sandbox blocked the metadata-cache lock and network lookup; its
+receipt is retained separately from the isolated-cache rerun.
+
+Earlier package floor/platform receipts and the pipeline's 38-case/container
+receipts bind their stated older artifacts. They are not relabelled as checks of
+this candidate. No push, merge, release, registry publishing or hosted workflow
+dispatch was performed. Pipeline/container refresh is coordinated separately.

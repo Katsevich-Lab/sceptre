@@ -1,0 +1,76 @@
+{
+  "captured_at_utc": "2026-10-20T00:34:18.374351+00:00",
+  "git_commit_at_capture": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "proof_scope_R_files": [
+    "R/RcppExports.R",
+    "R/analysis.R",
+    "R/analysis_context.R",
+    "R/assign_grna_functions.R",
+    "R/association_execution.R",
+    "R/association_workers.R",
+    "R/aux_functions.R",
+    "R/cellwise_qc_functs.R",
+    "R/check_functions.R",
+    "R/domain_summaries.R",
+    "R/fit_cache.R",
+    "R/fitting.R",
+    "R/getters_and_setters.R",
+    "R/import_functs.R",
+    "R/mixture_model_functs.R",
+    "R/neg_control_functions.R",
+    "R/ondisc_capabilities.R",
+    "R/ondisc_functs.R",
+    "R/pair_qc.R",
+    "R/pairwise_qc_functs.R",
+    "R/plotting_functions.R",
+    "R/preprocessing_functions.R",
+    "R/qq_plot_helpers.R",
+    "R/result_processing.R",
+    "R/result_records.R",
+    "R/s4_analysis_functs_1.R",
+    "R/s4_analysis_functs_2.R",
+    "R/s4_class.R",
+    "R/s4_helpers.R",
+    "R/s4_run_plan.R",
+    "R/score_preparation.R",
+    "R/storage.R",
+    "R/workflow_state.R",
+    "R/zz_component_validity.R",
+    "R/zz_spec_validity.R"
+  ],
+  "raw_AST_identical": 19,
+  "normalized_AST_identical": 16,
+  "parsed_roxygen_semantics_identical_files": 35,
+  "split_literals": 38,
+  "wrapped_new_comment_lines": 259,
+  "excluded_later_structural_change": "R/s4_count_store.R: parent-owned axis-label validator extraction after formatting phase; three original split literals retain exact text in string-wrap-manifest.json",
+  "not_touched_by_this_agent": [
+    "R/distributed_execution.R",
+    "R/execution.R",
+    "R/perturbation_fits.R",
+    "R/schema_migration.R"
+  ],
+  "AST_normalizations": [
+    "fold scalar constant paste0 calls",
+    "merge adjacent unnamed scalar character arguments to stop, warning, message or paste0",
+    "alpha-rename first assignment function local grna_params to its original name",
+    "inline branch-local assignment_info pure slot alias and remove that binding",
+    "remove parent-approved dead issues <- character() immediately overwritten by ondisc_api_argument_issues(snapshot)"
+  ],
+  "baseline_scope": "Before snapshots are the parent helper-decomposition state immediately preceding this formatting phase, not the originally submitted package.",
+  "source_unchanged_during_reproduction": true,
+  "source_hashes_checked_before_after": 98,
+  "reproduction_passed": true,
+  "generated_binding_reproduction": {
+    "new_long_lines": 11,
+    "byte_identical": true,
+    "raw_AST_identical": true
+  },
+  "Rd_regeneration": {
+    "changed": [
+      "man/prepare_execution.Rd"
+    ],
+    "rendered_text_identical": true,
+    "proof": "rd-render-proof.log"
+  }
+}

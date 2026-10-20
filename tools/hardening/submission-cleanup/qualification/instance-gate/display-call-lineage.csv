@@ -1,0 +1,10 @@
+diagnostic,submitted_file,submitted_line,qualified_file,qualified_line,lineage,candidate_file,candidate_line,status
+cat outside show,R/s4_helpers.R,91,R/s4_helpers.R,96,analysis-status heading in the same S4 print(sceptre_object) method,R/s4_helpers.R,90,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,93,R/s4_helpers.R,98,analysis-status per-stage row in the same S4 print(sceptre_object) method,R/s4_helpers.R,92,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,107,R/s4_helpers.R,118,analysis parameters in the same S4 print(sceptre_object) method,R/s4_helpers.R,112,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,234,R/s4_helpers.R,249,gRNA assignment summary in the same S4 print(sceptre_object) method,R/s4_helpers.R,243,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,266,R/s4_helpers.R,300,result-summary heading in the same S4 print(sceptre_object) method,R/s4_helpers.R,294,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,272,R/s4_helpers.R,311,calibration result summary in the same S4 print(sceptre_object) method,R/s4_helpers.R,305,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,285,R/s4_helpers.R,327,power result summary in the same S4 print(sceptre_object) method,R/s4_helpers.R,321,inherited_submitted_display_or_summary_site
+cat outside show,R/s4_helpers.R,295,R/s4_helpers.R,340,discovery result summary in the same S4 print(sceptre_object) method,R/s4_helpers.R,334,inherited_submitted_display_or_summary_site
+print outside show,R/s4_analysis_functs_2.R,723,R/output_resources.R,18,write_outputs_to_directory summary serialization moved into write_analysis_summary; same S4 print dispatch under sink with added guaranteed connection/sink cleanup,R/output_resources.R,18,inherited_submitted_display_or_summary_site

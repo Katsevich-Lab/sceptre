@@ -1,0 +1,146 @@
+file,line,width,text
+R/RcppExports.R,9,106,#' @description This function draws a without replacement sample using the Fisher-Yates sampling algorithm
+R/RcppExports.R,19,199,"#' @description This function draws an inductive without replacement sample using the hybrid Fisher-Yates/IWOR sampling algorithm (developed by Barry et al, to be described in a forthcoming preprint)"
+R/RcppExports.R,37,173,"run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {"
+R/RcppExports.R,38,181,"    .Call(`_sceptre_run_low_level_test_full_v4`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)"
+R/RcppExports.R,41,98,"run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {"
+R/RcppExports.R,42,106,"    .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)"
+R/RcppExports.R,45,157,"sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {"
+R/RcppExports.R,46,165,"    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)"
+R/RcppExports.R,49,93,"iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {"
+R/RcppExports.R,50,101,"    .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)"
+R/RcppExports.R,57,163,"sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {"
+R/RcppExports.R,58,171,"    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)"
+R/RcppExports.R,61,116,"compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {"
+R/RcppExports.R,62,124,"    .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)"
+R/RcppExports.R,65,90,"compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {"
+R/RcppExports.R,66,98,"    .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)"
+R/RcppExports.R,69,228,"compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {"
+R/RcppExports.R,70,236,"    .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)"
+R/RcppExports.R,81,119,"compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {"
+R/RcppExports.R,82,127,"    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)"
+R/assign_grna_functions.R,15,85,    grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
+R/assign_grna_functions.R,27,85,        sceptre_object@initial_grna_assignment_list <- assign_grnas_to_cells_mixture(
+R/assign_grna_functions.R,39,90,        sceptre_object@initial_grna_assignment_list <- assign_grnas_to_cells_thresholding(
+R/assign_grna_functions.R,48,92,"            umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,"
+R/assign_grna_functions.R,50,98,"            min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,"
+R/assign_grna_functions.R,53,89,        sceptre_object@initial_grna_assignment_list <- max_result$initial_assignment_list
+R/assign_grna_functions.R,55,96,        sceptre_object@cells_w_zero_or_twoplus_grnas <- max_result$cells_w_zero_or_twoplus_grnas
+R/assign_grna_functions.R,69,136,"            ""No gRNA was assigned to any cell. Consider setting `method` to 'thresholding' and `threshold` to a small, positive number."""
+R/cellwise_qc_functs.R,42,87,    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+R/cellwise_qc_functs.R,89,86,        v_updated <- which(v_log_sub) # determine the positions of the nonzero entries
+R/check_functions.R,14,183,"            ""The data frame `grna_target_data_frame` should have columns `grna_id` and `grna_target`. The `grna_target` column should specify the target of each individual `grna_id`."""
+R/check_functions.R,34,123,"            ""The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: "","
+R/check_functions.R,40,166,"            ""No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_target` column of the `grna_target_data_frame`."""
+R/check_functions.R,48,193,"            ""The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix. The row names of the grna expression matrix are as follows: "","
+R/check_functions.R,103,126,"            ""The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide."""
+R/check_functions.R,147,104,"                        ""`. These cell barcodes must be identical and in the same order across objects."""
+R/check_functions.R,165,205,"            ""The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame."""
+R/check_functions.R,181,105,"                ""` of the `extra_covariates` data frame should be of type numeric, character, or factor."""
+R/check_functions.R,189,226,"                    ""` is incorrectly formatted. The number of unique elements in this column must equal the number of factors in this column. Consider relabeling the factors or converting this column into a character vector."""
+R/check_functions.R,219,99,"            ""The `grna_id` or `grna_target` column of `grna_target_data_frame` contains NA values."""
+R/check_functions.R,272,81,"                    ""` must contain the columns `grna_target` and `response_id`."""
+R/check_functions.R,287,103,"                    ""` data frame must be a subset of the row names of the response expression matrix."""
+R/check_functions.R,302,113,"                    ""` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`."""
+R/check_functions.R,314,155,"                    ""` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs against responses, run the calibration check."""
+R/check_functions.R,338,147,"            ""The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: "","
+R/check_functions.R,346,83,"            ""`control_group` should set to `nt_cells`, `complement`, or `default`."""
+R/check_functions.R,354,87,"            ""`resampling_mechanism` should set to `permutations`, `crt`, or `default`."""
+R/check_functions.R,369,161,"                ""The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'."""
+R/check_functions.R,384,95,"            ""`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'."""
+R/check_functions.R,395,110,"            ""`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object."""
+R/check_functions.R,402,92,"            ""`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'."""
+R/check_functions.R,416,121,"            ""`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. "","
+R/check_functions.R,433,82,"            ""`assignment_method` must be `mixture`, `maximum`, or `thresholding`."""
+R/check_functions.R,453,123,"                ""The hyperparameter list must contain the fields `umi_fraction_threshold` and `min_grna_n_umis_threshold`."""
+R/check_functions.R,461,101,"                ""`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0."""
+R/check_functions.R,466,82,"                ""`min_grna_n_umis_threshold` should be an integer greater than 0."""
+R/check_functions.R,474,84,"                ""The hyperparameter list must contain the single entry `threshold`."""
+R/check_functions.R,498,185,"                ""The hyperparameter list must contain the fields `n_em_rep`, `pi_guess_range`, `g_pert_guess_range`, `n_nonzero_cells_cutoff`, `backup_threshold`, and `formula_object`."""
+R/check_functions.R,506,86,"                ""`n_em_rep` should be an integer greater than zero and less than 100."""
+R/check_functions.R,517,164,"                ""`pi_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,1]."""
+R/check_functions.R,528,169,"                ""`g_pert_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,20]."""
+R/check_functions.R,533,91,"                ""`n_nonzero_cells_cutoff` should be an integer greater than or equal to 1."""
+R/check_functions.R,538,85,"                ""`backup_threshold` should be an integer greater than or equal to 1."""
+R/check_functions.R,546,84,"                ""`probability_threshold` should be a numeric in the interval (0,1)."""
+R/check_functions.R,557,105,"            ""`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."""
+R/check_functions.R,574,104,"            ""`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero."""
+R/check_functions.R,604,89,"            ""At least one gRNA must be assigned to at least one cell to call `run_qc()`."""
+R/check_functions.R,625,259,"                ""Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`."""
+R/check_functions.R,631,214,"                ""At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`."""
+R/check_functions.R,645,105,"            ""`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."""
+R/check_functions.R,690,90,"            ""The calibration check (`run_calibration_check()`) should be run before the "","
+R/check_functions.R,708,105,"            ""`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."""
+R/import_functs.R,10,139,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual}
+R/import_functs.R,219,81,#' response and gRNA matrices and the row names of the cell covariate data frame.
+R/import_functs.R,226,120,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
+R/import_functs.R,228,82,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
+R/import_functs.R,415,87,"            ""The features.tsv file should contain the modality `CRISPR Guide Capture`."""
+R/import_functs.R,667,139,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual}
+R/import_functs.R,675,412,"#' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' ""Technical Performance of CRISPR Detect in Cell Lines"" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}."
+R/import_functs.R,828,113,    covariate_data_frame$grna_feature_w_max_expression <- covariate_data_frame$grna_frac_umis_max_feature <- NULL
+R/import_functs.R,963,86,"            ""inside a directory or file name. HDF5 misinterprets embedded tildes as "","
+R/import_functs.R,964,87,"            ""user-home expansion and produces a corrupted path. Please choose a path "","
+R/import_functs.R,965,86,"            ""where no directory or file name contains '~' (a leading '~/' is fine - "","
+R/mixture_model_functs.R,13,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."""
+R/mixture_model_functs.R,85,100,"                    n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,"
+R/mixture_model_functs.R,86,88,"                    backup_threshold = grna_assignment_hyperparameters$backup_threshold,"
+R/mixture_model_functs.R,87,97,                    probability_threshold = grna_assignment_hyperparameters$probability_threshold
+R/ondisc_functs.R,80,150,"            ""The `sceptre_object` and `response_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."""
+R/ondisc_functs.R,85,146,"            ""The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."""
+R/pair_constructor_functs.R,24,160,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2 of the manual}
+R/pair_constructor_functs.R,79,103,"            ""`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'."""
+R/pair_constructor_functs.R,89,86,"            ""`grna_target_data_frame` must contain columns 'chr', 'start', and 'end'."""
+R/pair_constructor_functs.R,112,308,"            ""The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `data(gene_position_data_frame_grch38); head(gene_position_data_frame_grch38)`."""
+R/pair_constructor_functs.R,191,162,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2 of the manual}
+R/pair_constructor_functs.R,248,101,"            ""`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'."""
+R/pair_constructor_functs.R,294,133,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#positive-control-pairs}{Section 2.2 in the manual}
+R/pairwise_qc_functs.R,137,82,                grna_target_data_frame <- sceptre_object@grna_target_data_frame |>
+R/plotting_functions.R,115,87,"        max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default"
+R/plotting_functions.R,321,136,"        assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially"
+R/plotting_functions.R,539,89,"            ""This `sceptre_object` has not yet had `run_calibration_check` called on it."""
+R/plotting_functions.R,845,90,"            ""This `sceptre_object` has not yet had `run_discovery_analysis` called on it."""
+R/plotting_functions.R,1000,92,        response_n_umis_range <- sceptre_object@cellwise_qc_thresholds$response_n_umis_range
+R/plotting_functions.R,1001,98,        response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
+R/plotting_functions.R,1002,82,        p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
+R/plotting_functions.R,1330,83,"            ""This `sceptre_object` has not yet had `run_power_check` called on it."""
+R/plotting_functions.R,1453,81,    singleton_integration_strategy <- sceptre_object@grna_integration_strategy ==
+R/precomputation_functions.R,35,119,"            ""The coefficients corresponding to the following covariates cannot be estimated in the regression model: "","
+R/precomputation_functions.R,37,128,"            "". Consider removing these covariates from the model (by updating `formula_object` in `set_analysis_parameters()`)."""
+R/preprocessing_functions.R,95,154,"            ""Some rows of `covariate_data_frame` were lost after applying the `formula object`. This is likely due to NAs, which should be removed first."""
+R/preprocessing_functions.R,104,159,"                ""` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries."""
+R/preprocessing_functions.R,112,528,"            ""The `formula_object` contains redundant information. This often occurs when one variable is `nested` inside another. For example, if the data frame contains a column `lane` with levels `lane_1`, `lane_2`, `lane_3`, and `lane_4` and a column `batch` with levels `batch_1` and `batch_2`, and if `lane_1` and `lane_2` are contained entirely within `batch_1` while `lane_3` and `lane_4` are contained entirely within `batch`2`, then `batch` is redundant. In this case `batch` should be removed from the formula object."""
+R/preprocessing_functions.R,233,109,        sceptre_object@grna_target_data_frame$grna_group <- sceptre_object@grna_target_data_frame$grna_target
+R/preprocessing_functions.R,234,95,        sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target
+R/preprocessing_functions.R,235,109,        sceptre_object@positive_control_pairs$grna_group <- sceptre_object@positive_control_pairs$grna_target
+R/qq_plot_helpers.R,25,93,"                    ""Within each panel, you must have the same number of points per QQ plot!"""
+R/qq_plot_helpers.R,29,97,"                    dplyr::select(y, PANEL, group) |> # remove attributes like color, shape, etc."
+R/qq_plot_helpers.R,30,92,                    dplyr::filter(group == min(group)) # keep only one of the groups to plot
+R/s4_analysis_functs_1.R,5,108,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual}
+R/s4_analysis_functs_1.R,199,97,#' \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual}
+R/s4_analysis_functs_1.R,357,91,#' \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual}
+R/s4_analysis_functs_1.R,485,101,"            ""%) contain two or more gRNAs. Consider switching from a low-MOI to a high-MOI analysis."""
+R/s4_analysis_functs_1.R,490,181,"            ""All cells were removed as part of cellwise QC. Consider relaxing the cellwise QC thresholds (`response_n_umis_range`, `response_n_nonzero_range`, `p_mito_threshold`)."","
+R/s4_analysis_functs_1.R,492,88,"                "" Additionally, consider switching from a low-MOI to high-MOI analysis."""
+R/s4_analysis_functs_2.R,9,106,#' \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual}
+R/s4_analysis_functs_2.R,108,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."""
+R/s4_analysis_functs_2.R,118,121,"            ""`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified."""
+R/s4_analysis_functs_2.R,217,123,#' \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual}
+R/s4_analysis_functs_2.R,271,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."""
+R/s4_analysis_functs_2.R,321,123,#' \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual}
+R/s4_analysis_functs_2.R,374,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."""
+R/s4_analysis_functs_2.R,580,159,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual}
+R/s4_analysis_functs_2.R,587,146,#' \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual}
+R/s4_analysis_functs_2.R,629,112,"            ""`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`."""
+R/s4_analysis_functs_2.R,656,159,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual}
+R/s4_analysis_functs_2.R,663,87,#' @return No return value; called for its side effect of writing files to `directory`.
+R/s4_analysis_functs_2.R,801,101,"                ""Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments."""
+vignettes/sceptre.Rmd,20,88,[frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html)
+vignettes/sceptre.Rmd,31,113,"```{r schematic, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Standard `sceptre` pipeline"")}"
+vignettes/sceptre.Rmd,354,135,"```{r plot-grna-counts, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Histograms of the gRNA count distributions"")}"
+vignettes/sceptre.Rmd,388,81,Chapter 3 of the manual for details. The default method in low-MOI is the simpler
+vignettes/sceptre.Rmd,412,117,"```{r plot-assignments, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""gRNA-to-cell assignments"")}"
+vignettes/sceptre.Rmd,485,121,"```{r plot-qc, out.width = ""450px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Cellwise and pairwise quality control"")}"
+vignettes/sceptre.Rmd,547,118,"```{r plot-calibration, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Calibration check results"")}"
+vignettes/sceptre.Rmd,610,106,"```{r plot-power, out.width = ""550px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Power check results"")}"
+vignettes/sceptre.Rmd,650,117,"```{r plot-discovery, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Discovery analysis results"")}"

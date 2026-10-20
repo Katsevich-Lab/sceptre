@@ -1,0 +1,6 @@
+options(width = 100)
+stopifnot(as.character(packageVersion('BiocCheck')) == '1.47.26')
+writeLines(c(R.version.string, capture.output(sessionInfo())), '/private/tmp/sceptre-submission-matched-check/session.txt')
+result <- BiocCheck::BiocCheck('/private/tmp/sceptre-submission-official/package-source/sceptre_0.99.0.tar.gz', checkDir='/private/tmp/sceptre-submission-matched-check', debug=TRUE, callr=FALSE, `no-check-R-ver`=TRUE, `no-check-bioc-help`=TRUE, `quit-with-status`=FALSE)
+saveRDS(result, '/private/tmp/sceptre-submission-matched-check/result.rds')
+str(result, max.level=2)

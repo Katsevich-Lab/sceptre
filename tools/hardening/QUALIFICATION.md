@@ -1,5 +1,10 @@
 # Hardening qualification, 2026-10-19
 
+This is the preserved qualification of source **169c16e**. The subsequent
+submission-diagnostic cleanup has a separate [qualification report](submission-cleanup/QUALIFICATION.md)
+and archive identity; the receipts below are historical and have not been
+relabelled as checks of that newer source.
+
 All ten recommendations are dispositioned in [DISPOSITION.md](DISPOSITION.md).
 The implementation is frozen at **169c16e4ba00c687c1f03fe37e9d79a11d01cd8f**.
 The later evidence commit changes only excluded tooling, CI and architecture

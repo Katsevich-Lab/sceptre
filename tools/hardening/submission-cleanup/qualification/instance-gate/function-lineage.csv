@@ -1,0 +1,46 @@
+file,name,length,startLine,endLine,codingLines,status,baseline_file,baseline_name,baseline_length,baseline_start_line,baseline_end_line,basis
+R/analysis.R,analyze_association_pairs,75,23,97,73,inherited_function_site,R/s4_analysis_functs_2.R,run_sceptre_analysis_high_level,74,430,503,reviewed rename or relocation
+R/assign_grna_functions.R,assign_grnas_to_cells,76,15,90,66,inherited_function_site,R/assign_grna_functions.R,assign_grnas_to_cells,75,4,78,same named site
+R/assign_grna_functions.R,process_initial_assignment_list,62,183,244,55,inherited_function_site,R/assign_grna_functions.R,process_initial_assignment_list,65,160,224,same named site
+R/association_execution.R,run_permutation_analysis,118,17,134,111,inherited_function_site,R/medium_level_functs_v2.R,run_perm_test_in_memory,212,43,254,reviewed rename or relocation
+R/association_execution.R,analyze_response_block,69,31,99,69,inherited_function_site,R/medium_level_functs_v2.R,analyze_given_response_ids,109,96,204,reviewed rename or relocation
+R/association_execution.R,run_crt_analysis,241,152,392,223,inherited_function_site,R/medium_level_functs_v2.R,run_crt_in_memory_v2,252,258,509,reviewed rename or relocation
+R/association_execution.R,analyze_guide_block,118,240,357,118,inherited_function_site,R/medium_level_functs_v2.R,perform_association_analysis,71,409,479,reviewed rename or relocation
+R/association_workers.R,test_crt_shared_fit,54,127,180,54,inherited_function_site,R/association_testing_functions_v2.R,crt_glm_factored_out,77,160,236,reviewed rename or relocation
+R/association_workers.R,test_crt_group_fit,52,203,254,52,inherited_function_site,R/association_testing_functions_v2.R,discovery_ntcells_crt,80,239,318,reviewed rename or relocation
+R/cellwise_qc_functs.R,determine_cells_to_retain,79,14,92,68,inherited_function_site,R/cellwise_qc_functs.R,determine_cells_to_retain,75,1,75,same named site
+R/check_functions.R,check_import_data_inputs,230,13,242,185,inherited_function_site,R/check_functions.R,check_import_data_inputs,224,1,224,same named site
+R/check_functions.R,check_set_analysis_parameters,181,263,443,142,inherited_function_site,R/check_functions.R,check_set_analysis_parameters,181,227,407,same named site
+R/check_functions.R,check_assign_grna_inputs,132,501,632,122,inherited_function_site,R/check_functions.R,check_assign_grna_inputs,138,425,562,same named site
+R/check_functions.R,check_discovery_analysis_inputs,54,833,886,43,inherited_function_site,R/check_functions.R,check_discovery_analysis_inputs,62,652,713,same named site
+R/import_functs.R,import_data_use_ondisc,54,184,237,44,inherited_function_site,R/import_functs.R,import_data_use_ondisc,54,152,205,same named site
+R/import_functs.R,import_data_from_cellranger_memory,276,364,639,260,inherited_function_site,R/import_functs.R,import_data_from_cellranger_memory,283,307,589,same named site
+R/import_functs.R,import_data_from_cellranger_use_ondisc,57,654,710,51,inherited_function_site,R/import_functs.R,import_data_from_cellranger_use_ondisc,65,593,657,same named site
+R/import_functs.R,import_data_from_parse,87,777,863,76,inherited_function_site,R/import_functs.R,import_data_from_parse,88,720,807,same named site
+R/mixture_model_functs.R,assign_grnas_to_cells_mixture,128,17,144,113,inherited_function_site,R/mixture_model_functs.R,assign_grnas_to_cells_mixture,126,1,126,same named site
+R/neg_control_functions.R,construct_negative_control_pairs,132,17,148,122,inherited_function_site,R/neg_control_functions.R,construct_negative_control_pairs_v2,143,1,143,reviewed rename or relocation
+R/pair_constructor_functs.R,construct_cis_pairs,109,58,166,96,inherited_function_site,R/pair_constructor_functs.R,construct_cis_pairs,104,58,161,same named site
+R/pairwise_qc_functs.R,compute_pairwise_qc_information,68,10,77,61,inherited_function_site,R/pairwise_qc_functs.R,compute_pairwise_qc_information,113,1,113,same named site
+R/plotting_functions.R,plot_grna_count_distributions,167,69,235,139,inherited_function_site,R/plotting_functions.R,plot_grna_count_distributions,167,65,231,same named site
+R/plotting_functions.R,_anonymous_.158,52,158,209,51,inherited_function_site,R/plotting_functions.R,_anonymous_.154,52,154,205,same grnas_to_plot lapply graph-construction site
+R/plotting_functions.R,plot_assign_grnas,190,284,473,180,inherited_function_site,R/plotting_functions.R,plot_assign_grnas,189,280,468,same named site
+R/plotting_functions.R,plot_run_calibration_check,111,536,646,104,inherited_function_site,R/plotting_functions.R,plot_run_calibration_check,110,531,640,same named site
+R/plotting_functions.R,compare_calibration_and_discovery_results,76,666,741,72,inherited_function_site,R/plotting_functions.R,compare_calibration_and_discovery_results,76,645,720,same named site
+R/plotting_functions.R,plot_run_discovery_analysis,109,867,975,99,inherited_function_site,R/plotting_functions.R,plot_run_discovery_analysis,98,836,933,same named site
+R/plotting_functions.R,plot_covariates,96,1034,1129,88,inherited_function_site,R/plotting_functions.R,plot_covariates,84,992,1075,same named site
+R/plotting_functions.R,plot_pairwise_qc,63,1279,1341,62,inherited_function_site,R/plotting_functions.R,plot_pairwise_qc,61,1207,1267,same named site
+R/plotting_functions.R,plot_run_power_check,70,1396,1465,67,inherited_function_site,R/plotting_functions.R,plot_run_power_check,64,1322,1385,same named site
+R/plotting_functions.R,plot_response_grna_target_pair,173,1536,1708,146,inherited_function_site,R/plotting_functions.R,plot_response_grna_target_pair,167,1446,1612,same named site
+R/preprocessing_functions.R,get_synthetic_permutation_idxs,83,128,210,80,inherited_function_site,R/preprocessing_functions.R,get_synthetic_permutation_idxs,62,166,227,same named site
+R/qq_plot_helpers.R,compute_group,52,57,108,46,inherited_function_site,R/qq_plot_helpers.R,compute_group,52,36,87,same named site
+R/result_processing.R,pair_results_from_native,60,12,71,60,inherited_function_site,R/aux_functions.R,construct_data_frame_v2,60,1,60,reviewed rename or relocation
+R/result_processing.R,integrate_guides,58,89,146,58,inherited_function_site,R/s4_analysis_functs_2.R,apply_grouping_to_result,58,506,563,reviewed rename or relocation
+R/s4_analysis_functs_1.R,set_analysis_parameters,114,69,182,101,inherited_function_site,R/s4_analysis_functs_1.R,set_analysis_parameters,119,67,185,same named site
+R/s4_analysis_functs_1.R,assign_grnas,93,250,342,81,inherited_function_site,R/s4_analysis_functs_1.R,assign_grnas,88,253,340,same named site
+R/s4_analysis_functs_1.R,run_qc_pt_1,91,456,546,73,inherited_function_site,R/s4_analysis_functs_1.R,run_qc_pt_1,77,431,507,same named site
+R/s4_analysis_functs_2.R,run_calibration_check_pt_1,67,100,166,67,inherited_function_site,R/s4_analysis_functs_2.R,run_calibration_check_pt_1,74,89,162,same named site
+R/s4_analysis_functs_2.R,run_power_check,68,256,323,68,inherited_function_site,R/s4_analysis_functs_2.R,run_power_check,62,250,311,same named site
+R/s4_analysis_functs_2.R,run_discovery_analysis,64,365,428,64,inherited_function_site,R/s4_analysis_functs_2.R,run_discovery_analysis,62,353,414,same named site
+R/s4_analysis_functs_2.R,write_outputs_to_directory,96,571,666,87,inherited_function_site,R/s4_analysis_functs_2.R,write_outputs_to_directory,92,696,787,same named site
+R/s4_helpers.R,_anonymous_.81,261,81,341,253,inherited_function_site,R/s4_helpers.R,_anonymous_.83,220,83,302,same S4 print(sceptre_object) method
+R/storage.R,set_matrix_accessibility,88,313,400,76,inherited_function_site,R/preprocessing_functions.R,set_matrix_accessibility,76,1,76,reviewed rename or relocation

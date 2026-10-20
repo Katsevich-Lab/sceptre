@@ -1,0 +1,21 @@
+{
+  "scope": "Pre-final owned-files cleanup checkpoint; not final built-package qualification",
+  "time_utc": "2026-10-20T00:28:27.081826+00:00",
+  "head": "a3433c71fd339932e4c2d366e5413e13ad8299c9",
+  "files": {
+    "R/execution.R": "805b9899ffc0c73339ded5ef70c4122bf130a803ad7b97351764270a534df5d9",
+    "R/perturbation_fits.R": "2fae6b9e47ba5e13bfc9faaec4b4ae56b689d6da2412599150fd09b22b4c7eda",
+    "R/schema_migration.R": "fa92db3796934acfc149904542f7eb6af86569afd357c4fcb58db31506c205f2",
+    "R/distributed_execution.R": "efb196b652c37ccb6f5c8f146b91a3f166ccb0f4df47b0777a70cdf404e5d362",
+    "man/prepare_execution.Rd": "a2bd421816bd70b70b691de9262ae5bb109e407a11d699a236273635bf938155",
+    "man/execute_work_unit.Rd": "0ad04853f49dd5a282c0a6f0f100e99726933ec0ffe0b2b26fd5317df9b1f68b",
+    "man/collect_execution.Rd": "a388f98f951d92d88f7e8cdb4e53103a803b7eaf3e23b77ed0c6d7ca3888680e"
+  },
+  "validation": {
+    "focused_six_file_tests_exit_code": 0,
+    "all_three_generated_examples_exit_code": 0,
+    "owned_source_sha256_unchanged_after_tests": true,
+    "all_owned_file_columns_at_most_80": true,
+    "all_owned_function_source_lines_at_most_50": true
+  }
+}

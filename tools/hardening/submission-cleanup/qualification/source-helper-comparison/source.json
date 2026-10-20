@@ -1,0 +1,8 @@
+{
+  "old_packaged_source": "169c16e4ba00c687c1f03fe37e9d79a11d01cd8f",
+  "new_packaged_source": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "new_archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "scope": "Exact frozen archive functions over the same pre-cleanup installed class/runtime; complements final installed tests and parity, does not replace them.",
+  "checks_passed": 40,
+  "passed": true
+}

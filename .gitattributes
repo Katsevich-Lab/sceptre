@@ -23,3 +23,5 @@ tools/hardening/validation/*.log -text -whitespace
 tools/hardening/validation/*.Rout -text -whitespace
 tools/hardening/validation/intermediate/*.log -text -whitespace
 tools/hardening/validation/installed-parity/*.log -text -whitespace
+tools/hardening/submission-baseline/** -text -whitespace
+tools/hardening/submission-cleanup/** -text -whitespace

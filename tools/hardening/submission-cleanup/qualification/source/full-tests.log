@@ -1,0 +1,187 @@
+ℹ Loading sceptre
+analysis-spec-validation: ........................................................................................................................................................................................................
+assign_grnas: ......................Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Performing gRNA-to-cell assignments for gRNA grna_1 (1 of 4)
+....Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+.Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+.Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+...
+aux_functions: ......................................
+backed-content-identity: .......................
+check_functions: ....................................
+closure-capture: .
+component-model: ..................................................................
+component-results: ...............................Constructing negative control pairs.
+ ✓
+..........................
+data: ....
+distributed-execution: .........................................................................................................
+fit-cache-families: .........................................................................................
+fit-cache-migration: .................
+formula-boundary: ...................................................................................................
+import_functs: .................
+mock-data-functions: .................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+ondisc_paths: ..........
+ondisc-capabilities: ...............
+output-resources: ..........................
+pair_constructor_functs: ...
+parallel_mac: Constructing negative control pairs.
+ ✓
+Note: Unable to generate the number of negative control pairs (1406) requested. Generating as many negative control pairs (1000) as possible.
+Running calibration_check in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpXZr873/sceptre_logs/ and view the files calibration_check_*.out for progress updates.
+ ✓
+Running power_check in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpXZr873/sceptre_logs/ and view the files power_check_*.out for progress updates.
+ ✓
+Running discovery_analysis in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpXZr873/sceptre_logs/ and view the files discovery_analysis_*.out for progress updates.
+ ✓
+.......Running gRNA assignments in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpXZr873/sceptre_logs/ and view the files assign_grnas_*.out for progress updates.
+..
+parallel_windows: ......
+perturbation-model: ...................................
+plotting_functions: Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 4)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 3)
+................................................................
+preprocessing_functs: ...................................
+refactor-assignment-getter: ........................
+refactor-cache: .................
+refactor-calibration-safety: ................................................................................................
+refactor-context-execution: .....................................................................................................................
+refactor-contracts: ....................................................................................................................................................................................................................................................
+refactor-file-lifetimes: ......
+refactor-fitting: .............
+refactor-import-coordinates: ..............................................
+refactor-indexing: ...............................................................
+refactor-legacy-boundaries: ..........................................................
+refactor-native-retirement: ..................
+refactor-native: ....................................................................................................................................
+refactor-pair-construction: .............................................................
+refactor-plot-diagnostic-na: ...................................................................................................
+refactor-qc: ........
+refactor-results: .................
+refactor-state: ........
+refactor-storage-boundaries: .......
+refactor-storage-dense: ..............................
+refactor-storage-ownership: .......................................................................................................
+refactor-storage: ...................................................................................................................................................
+refactor-vector-aggregation: ....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+result-ownership: .........................
+run_qc: ......................................
+run-plan-migration: ..........................................................
+run-plans: ............................................................................
+s4_analysis_functs_1: ..............................
+s4_analysis_functs_2: Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_1 (1 of 9)
+Running precomputation on response response_37 (5 of 9)
+Analyzing pairs containing gRNA group nt1 (1 of 6)
+Analyzing pairs containing gRNA group nt5 (5 of 6)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_3 (1 of 9)
+Running precomputation on response response_28 (5 of 9)
+Analyzing pairs containing gRNA group nt1&nt5&nt10 (1 of 9)
+Analyzing pairs containing gRNA group nt6&nt7&nt8 (5 of 9)
+......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t3 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_10 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the power check.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+....Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 2)
+...
+s4_helpers: ..........
+saved-spec-admission: ........................................................Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+..Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the discovery analysis.
+.................
+schema-migration: ....................................................................................................................................................................................................
+structured-workers: ......................
+worker-errors: ................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+$cases
+[1] 253
+
+$passed
+[1] 5641
+
+$failed
+[1] 0
+
+$errors
+[1] 0
+
+$warnings
+[1] 0
+
+$skips
+[1] 0
+
+$R
+[1] "R version 4.6.0 (2026-04-24)"
+
+$platform
+[1] "aarch64-apple-darwin23"
+
+$testthat
+[1] "3.3.2"
+
+$package_path
+[1] "/Users/ekatsevi/.codex/worktrees/ab6a/sceptre"
+
+$mode
+[1] "none"
+

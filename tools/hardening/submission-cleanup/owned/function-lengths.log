@@ -1,0 +1,5 @@
+Could not detect number of cores, defaulting to 1.
+R/execution.R : maximum  34  lines
+R/distributed_execution.R : maximum  47  lines
+R/schema_migration.R : maximum  49  lines
+R/perturbation_fits.R : maximum  36  lines

@@ -1,0 +1,28 @@
+{
+  "source_commit": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "archive_path": "/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre_0.99.0.tar.gz",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "installed_library": "/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre.Rcheck",
+  "parity_command": "Rscript --vanilla tools/hardening/validation/run-parity.R",
+  "parity_exit_code": 0,
+  "cases": 7,
+  "comparisons_per_case": [
+    33,
+    33,
+    33,
+    33,
+    33,
+    33,
+    33
+  ],
+  "tolerance": 0,
+  "all_equal": true,
+  "installed_examples_exit_code": 0,
+  "installed_examples": [
+    "prepare_execution",
+    "execute_work_unit",
+    "collect_execution"
+  ],
+  "source_sha256_still_matches_full_suite_before_manifest": true,
+  "completed_utc": "2026-10-20T00:34:29.600677+00:00"
+}
