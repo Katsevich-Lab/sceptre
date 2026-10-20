@@ -1,7 +1,13 @@
 test_that("replacing guide counts refreshes summaries and invalidates prepared state atomically", {
     inputs <- readRDS(test_path("fixtures", "refactor", "inputs.rds"))
-    case <- readRDS(test_path("fixtures", "refactor", "cases.rds"))$low_complement_perm
+    case <- readRDS(test_path("fixtures", "refactor", "cases.rds"))$high_complement_crt
     object <- suppressMessages(refactor_prepare(inputs, case))
+    object <- withr::with_seed(1901L, suppressMessages(run_discovery_analysis(
+        object, print_progress = FALSE, parallel = FALSE)))
+    # Nonempty real fits/result make the invalidation checks non-vacuous.
+    expect_gt(length(object@fits@response_fits), 0L)
+    expect_gt(length(object@fits@perturbation_fits), 0L)
+    expect_true(result_record_is_current(object, "run_discovery_analysis"))
     before <- serialize(object, NULL)
     original <- as.matrix(object@data@grna_matrix)
     replacement <- original
@@ -16,6 +22,7 @@ test_that("replacing guide counts refreshes summaries and invalidates prepared s
         unname(apply(replacement, 2L, max) / colSums(replacement)))
     expect_false(workflow_status(changed)[["assign_grnas"]])
     expect_false(workflow_status(changed)[["run_qc"]])
+    expect_false(result_record_is_current(changed, "run_discovery_analysis"))
     expect_length(changed@fits@response_fits, 0L)
     expect_length(changed@fits@perturbation_fits, 0L)
     expect_identical(changed@data@response_matrix, object@data@response_matrix)
