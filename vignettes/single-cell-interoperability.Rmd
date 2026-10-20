@@ -1,0 +1,139 @@
+---
+title: "SingleCellExperiment counts, external calls, and returned results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SingleCellExperiment interoperability}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+has_sce <- requireNamespace("SingleCellExperiment", quietly = TRUE)
+knitr::opts_chunk$set(eval = has_sce)
+```
+
+The optional `SingleCellExperiment` interface imports one complete raw response
+assay and one guide alternative experiment. It follows the raw UMI and ordered
+cell requirements in the
+[SCEPTRE book](https://timothy-barry.github.io/sceptre-book/import-data.html).
+Install `SingleCellExperiment` separately with BiocManager if needed. Ordinary
+SCEPTRE import and external assignments work without this optional package.
+
+Start with the complete unnormalized feature library. Import computes library
+size, detected-feature counts, and (with gene names) mitochondrial fractions
+from all supplied response features, before selecting test pairs or running QC.
+An SCE filtered upstream has already lost that information: this interface
+cannot
+recover original library depths. Do not pass a first feature subset as though
+it
+were the full library. No normalization, imputation, feature filtering, cell
+matching, or disk-assay realization occurs here. Dense numeric and dgC/dgR/dgT
+sparse raw-count assays are supported. Convert delayed assays explicitly only
+after checking the required memory.
+
+```{r}
+library(sceptre)
+library(SingleCellExperiment)
+data("lowmoi_example_data")
+x <- lowmoi_example_data
+sce <- SingleCellExperiment(
+    assays = list(counts = x$response_matrix),
+    colData = S4Vectors::DataFrame(x$extra_covariates))
+altExp(sce, "gRNA") <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(counts = x$grna_matrix))
+object <- import_from_sce(sce, x$grna_target_data_frame, "low",
+                          covariates = "batch")
+```
+
+Response features, guide features and cells need unique, nonempty IDs. Guide
+metadata must describe every guide in exactly its assay row order. Selected
+`colData` columns become additional covariates; unselected columns remain on
+the
+SCE. To compute mitochondrial fractions from symbols rather than feature IDs,
+name a `rowData` column using `response_name_column`. Use the `counts` assay,
+never `logcounts`, size-factor-adjusted counts, or an embedding. Integer-valued
+normalized data cannot be identified automatically; raw-count provenance
+remains
+the caller's responsibility. Alternative-experiment cell naming follows SCE's
+own construction rules, so check alignment when constructing that object too.
+
+External guide calls are a separate, explicit preparation operation. Configure
+the analysis first, then supply a binary guide-by-original-cell matrix.
+All-zero
+columns mean unassigned cells; overlapping guides remain overlapping calls.
+The usual low-MOI QC removes zero/multiple-guide cells. In multi-guide vector
+screens, import sums counts by `vector_id`, as in ordinary SCEPTRE import;
+external calls must then use those canonical **vector** IDs, with
+caller-defined
+vector-level calling rules. Individual guide calls are never silently
+collapsed.
+
+```{r}
+target <- x$grna_target_data_frame$grna_target[1L]
+pairs <- data.frame(grna_target = target, response_id = rownames(sce)[1L])
+object <- set_analysis_parameters(object, discovery_pairs = pairs,
+    formula_object = ~ log(response_n_umis), control_group = "complement",
+    resampling_approximation = "no_approximation", side = "left")
+# Transparent demonstration caller, not a universal recommended threshold.
+calls <- x$grna_matrix >= 5
+object <- set_grna_assignments(object, calls, "example caller: raw UMI >=5")
+object <- run_qc(object, response_n_umis_range = c(0, 1),
+    response_n_nonzero_range = c(0, 1), p_mito_threshold = 1,
+    n_nonzero_trt_thresh = 3L, n_nonzero_cntrl_thresh = 3L)
+object <- run_discovery_analysis(object, print_progress = FALSE)
+returned <- export_results_to_sce(object, sce)
+S4Vectors::metadata(returned)$sceptre$results$run_discovery_analysis
+```
+
+The wide QC ranges above keep the worked example simple; choose and report QC
+thresholds appropriate to your experiment. Assignment validity is not
+established
+by successful import. Evaluate the upstream caller scientifically and run a
+calibration check for the intended analysis. External calling does not alter
+SCEPTRE's inference, multiplicity correction, defaults, or resampling budgets.
+
+`set_grna_assignments()` rejects shuffled, missing or extra cell/guide IDs,
+nonbinary values and missing provenance. It accepts calls independently of
+guide
+UMI thresholds and leaves the raw guide count library untouched. Repeating it
+invalidates QC/results and applicable fit caches. Reconfigure parameters first
+if necessary, then reapply external calls and QC. Inputs are copied by R's
+normal
+value semantics; results crossing the export boundary are explicitly owned.
+
+Returned pair tables live in `metadata(returned)$sceptre`, with imported cell
+covariates, original and retained cell IDs, assignment provenance,
+schema/package
+version and import identity. A response can be tested against multiple targets,
+so putting one p-value in `rowData` would discard information. Export requires
+exactly the original imported response counts and IDs, rejects stale or missing
+results and existing `sceptre` metadata, and leaves the original SCE unchanged.
+Save/reopen the returned object with `saveRDS()`/`readRDS()`.
+
+For the schema-3 pipeline companion, serialize the configured, externally
+assigned
+object as the pipeline input. Keep `config$analysis` and `config$assignment`
+absent (`NULL`) to preserve its preparation; the assignment stage checks
+current
+identity, including actual memberships and provenance. An explicit assignment
+configuration requests reassignment; changing the analysis configuration
+requires
+reapplying external calls. A stale assignment fails before QC. Use the same
+exact
+candidate package in every pipeline process and regenerate the runtime lock.
+
+The source tree includes an executable full roundtrip:
+
+```{bash, eval=FALSE}
+R_LIBS=/absolute/isolated/library \
+  Rscript tools/interoperability/sce-roundtrip.R \
+  /absolute/schema3-pipeline-checkout /tmp/new-sce-roundtrip
+```
+
+It uses the full bundled 100-response, 1,000-cell example, launches the actual
+pipeline stage CLI in separate R processes, compares pipeline/direct results at
+tolerance zero, and writes `results-sce.rds` plus logs and dependency
+identities.
+This qualifies the pipeline's R-stage serialization/execution boundary; it is
+not a scheduler or container qualification. AnnData, Seurat, delayed-assay and
+Python interfaces remain outside this supported slice.

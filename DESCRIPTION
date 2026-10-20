@@ -46,6 +46,9 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
+    SingleCellExperiment,
+    SummarizedExperiment,
+    S4Vectors,
     BH,
     ondisc,
     rhdf5,
