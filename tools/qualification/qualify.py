@@ -22,8 +22,9 @@ def main():
     env.update({x: "1" for x in ["OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS",
         "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"]})
     # Existing dependency libraries are read-only fallbacks, never install targets.
-    env["R_LIBS"] = os.pathsep.join(filter(None,
-        [env.get("R_LIBS", ""), env.get("R_LIBS_USER", "")]))
+    dependencies = subprocess.check_output([a.rscript, "--vanilla", "-e",
+        'cat(.libPaths(), sep="\\n")'], text=True, env=env).splitlines()
+    env["R_LIBS"] = os.pathsep.join(dependencies)
     env.update(MAKEFLAGS="-j2", R_PROFILE_USER=os.devnull, R_ENVIRON_USER=os.devnull,
                R_LIBS_USER=str(out / "library"))
     (out / "library").mkdir()
@@ -57,7 +58,7 @@ def main():
                 "-o", out / "git-source.tar", revision], "git-archive.log")
             with tarfile.open(out / "git-source.tar") as t:
                 # git archive supplies repository paths, not an untrusted download.
-                t.extractall(out / "build-source", filter="data")
+                t.extractall(out / "build-source")
             run([a.r, "CMD", "build", out / "build-source/sceptre", "--no-manual"], "build.log")
             archives = list(out.glob("sceptre_*.tar.gz"))
             if len(archives) != 1:

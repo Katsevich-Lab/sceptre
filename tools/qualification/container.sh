@@ -18,6 +18,17 @@ docker run --rm --pull never --platform "$platform" --network none --cpus 2 \
   --mount "type=bind,src=$archive,dst=/input/package.tar.gz,readonly" \
   --mount "type=bind,src=$output,dst=/evidence" \
   --env _R_CHECK_FORCE_SUGGESTS_=false \
-  --entrypoint python3 "$image" /qualification/qualify.py \
-  --archive /input/package.tar.gz --output /evidence/run --ondisc "$backend" \
-  > "$output/process.log" 2>&1
+  --env SCEPTRE_BACKEND_POLICY="$backend" \
+  --env OMP_NUM_THREADS=1 --env OPENBLAS_NUM_THREADS=1 \
+  --env MKL_NUM_THREADS=1 --env MAKEFLAGS=-j2 \
+  --entrypoint bash "$image" -euo pipefail -c '
+    mkdir -p /evidence/run/library
+    trap '\''code=$?; printf "{\"status\":\"%s\",\"exit_code\":%d}\\n" \
+      "$([ "$code" = 0 ] && echo passed || echo failed)" "$code" > /evidence/run/receipt.json'\'' EXIT
+    cp /input/package.tar.gz /evidence/run/package.tar.gz
+    sha256sum /input/package.tar.gz > /evidence/run/archive-sha256.txt
+    R CMD INSTALL --preclean --install-tests --library=/evidence/run/library \
+      /input/package.tar.gz > /evidence/run/install.log 2>&1
+    Rscript --vanilla /qualification/installed-suite.R /evidence/run/library \
+      /evidence/run "$SCEPTRE_BACKEND_POLICY" > /evidence/run/tests.log 2>&1
+  ' > "$output/process.log" 2>&1

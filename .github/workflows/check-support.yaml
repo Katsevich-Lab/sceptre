@@ -61,9 +61,6 @@ jobs:
             sceptre.Rcheck
 
   bioconductor:
-    # Current/devel ecosystems are a costly compatibility tier. PRs keep the
-    # explicit R-floor and standard platform gates; run these weekly/on demand.
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
