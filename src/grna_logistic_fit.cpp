@@ -246,7 +246,7 @@ Rcpp::List solver_result(const VectorXd& beta,
                              ? original_score(evaluation.gradient, centers,
                                               scales, conditioned)
                              : VectorXd::Constant(beta.size(), kNaN);
-  return Rcpp::List::create(
+  Rcpp::List out = Rcpp::List::create(
       Rcpp::Named("coefficients") = Rcpp::wrap(coefficients),
       Rcpp::Named("fitted.values") = Rcpp::wrap(evaluation.fitted),
       Rcpp::Named("score") = Rcpp::wrap(score),
@@ -267,8 +267,9 @@ Rcpp::List solver_result(const VectorXd& beta,
       Rcpp::Named("full_cell_scans") = full_scans,
       Rcpp::Named("step_halvings") = step_halvings,
       Rcpp::Named("conditioned") = conditioned,
-      Rcpp::Named("separation_detected") = separation_detected,
-      Rcpp::Named("used_analytic_prevalence_state") = true);
+      Rcpp::Named("separation_detected") = separation_detected);
+  out.push_back(true, "used_analytic_prevalence_state");
+  return out;
 }
 
 }  // namespace
