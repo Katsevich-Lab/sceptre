@@ -44,7 +44,10 @@ test_that("Seurat imports complete raw v5 and legacy assays without source mutat
         )
         expect_identical(serialize(f$seurat, NULL), before)
         s <- f$seurat
-        s[["RNA"]][["symbol"]] <- c("MT-A", paste0("gene", 2:8))
+        s[["RNA"]][["symbol"]] <- stats::setNames(
+            c("MT-A", paste0("gene", 2:8)),
+            rownames(s[["RNA"]])
+        )
         named <- import_from_seurat(
             s,
             f$x$grna_target_data_frame,
