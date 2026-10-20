@@ -72,7 +72,6 @@ jobs:
         # matching R development ecosystem. Record actual versions per run.
         bioc: [latest, devel]
     env:
-      SCEPTRE_SUPPORT_EVIDENCE: ${{ runner.temp }}/bioconductor-evidence
       _R_CHECK_FORCE_SUGGESTS_: false
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
@@ -81,6 +80,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Prepare support evidence directory
+        shell: bash
+        run: |
+          support_evidence_root="$RUNNER_TEMP/bioconductor-evidence"
+          mkdir -p "$support_evidence_root"
+          echo "SCEPTRE_SUPPORT_EVIDENCE=$support_evidence_root" >> "$GITHUB_ENV"
       - name: Install dependencies from the matching Bioconductor ecosystem
         shell: Rscript {0}
         run: |
