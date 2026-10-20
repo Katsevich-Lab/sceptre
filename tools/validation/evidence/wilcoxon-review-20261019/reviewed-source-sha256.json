@@ -1,0 +1,5 @@
+{
+  "tools/examples/wilcoxon.R": "cbd44a99b76bfd4eb1d717d68925f3abe1fc6877aa502106a5715f3a662d18e1",
+  "tools/validation/wilcoxon-pilot.R": "98bc0523d547fb693be0c3c0aea1de9c8f1a6b8c2d7f3c5b378cb265d4da46de",
+  "R/wilcoxon.R": "66aed41d8c4a1becc7e66ce55d644a4aaf4845027882709cae10b9a59e5beb6f"
+}

@@ -222,7 +222,15 @@ validate_perturbation_fit_entries <- function(entries, identity) {
             anyDuplicated(identity$cells) ||
             any(identity$cells < 1L) ||
             !length(identity$columns) ||
-            !identical(identity$method, perturbation_fit_method_id()) ||
+            !is.character(identity$method) ||
+            length(identity$method) != 1L ||
+            anyNA(identity$method) ||
+            !identity$method %in%
+                vapply(
+                    c("glm.fit", "fast_logistic"),
+                    perturbation_fit_method_id,
+                    character(1)
+                ) ||
             !is.list(identity$runtime)
     ) {
         return("Perturbation fit cache requires an ordered analysis identity")
@@ -231,6 +239,14 @@ validate_perturbation_fit_entries <- function(entries, identity) {
         valid <- validate_perturbation_fit_record(fit, identity)
         if (!isTRUE(valid)) {
             return(valid)
+        }
+        candidate <- !identical(identity$method, perturbation_fit_method_id())
+        fields <- c("method_requested", "method_used", "fallback_reason")
+        if (
+            !identical(all(fields %in% names(fit$diagnostics)), candidate) ||
+                (!candidate && any(fields %in% names(fit$diagnostics)))
+        ) {
+            return("Perturbation diagnostics do not match the fitter identity")
         }
     }
     TRUE
@@ -299,10 +315,17 @@ validate_perturbation_fit_record <- function(fit, identity) {
 }
 
 validate_perturbation_diagnostics <- function(diagnostics) {
+    valid <- validate_experimental_perturbation_diagnostics(diagnostics)
+    if (!isTRUE(valid)) {
+        return(valid)
+    }
     if (
         !is.list(diagnostics) ||
             !setequal(
-                names(diagnostics),
+                setdiff(
+                    names(diagnostics),
+                    c("method_requested", "method_used", "fallback_reason")
+                ),
                 c("rank", "converged", "boundary", "iterations", "warnings")
             ) ||
             anyDuplicated(names(diagnostics)) ||
@@ -330,6 +353,31 @@ validate_perturbation_diagnostics <- function(diagnostics) {
             ))
     ) {
         return("Perturbation fit diagnostics are invalid")
+    }
+    TRUE
+}
+
+
+validate_experimental_perturbation_diagnostics <- function(diagnostics) {
+    fields <- c("method_requested", "method_used", "fallback_reason")
+    if (any(fields %in% names(diagnostics))) {
+        if (
+            !all(fields %in% names(diagnostics)) ||
+                !identical(diagnostics$method_requested, "fast_logistic") ||
+                !is.character(diagnostics$method_used) ||
+                length(diagnostics$method_used) != 1L ||
+                anyNA(diagnostics$method_used) ||
+                !diagnostics$method_used %in% c("glm.fit", "fast_logistic") ||
+                !is.character(diagnostics$fallback_reason) ||
+                length(diagnostics$fallback_reason) != 1L ||
+                (diagnostics$method_used == "glm.fit" &&
+                    (is.na(diagnostics$fallback_reason) ||
+                        !nzchar(diagnostics$fallback_reason))) ||
+                (diagnostics$method_used == "fast_logistic" &&
+                    !is.na(diagnostics$fallback_reason))
+        ) {
+            return("Experimental perturbation fitter diagnostics are invalid")
+        }
     }
     TRUE
 }

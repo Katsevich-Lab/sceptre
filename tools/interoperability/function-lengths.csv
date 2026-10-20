@@ -1,0 +1,16 @@
+"name","length","startLine","endLine","codingLines"
+"import_from_sce",44,34,77,44
+"sce_extra_covariates",29,79,107,29
+"sce_response_names",17,109,125,17
+"set_grna_assignments",43,151,193,43
+"_anonymous_.181",3,181,183,3
+"export_results_to_sce",48,235,282,48
+"_anonymous_.268",1,268,268,1
+"sce_result_metadata",20,284,303,20
+"_anonymous_.296",3,296,298,3
+"require_sce",13,306,318,13
+"check_interop_ids",12,320,331,12
+"sce_count_assay",34,333,366,33
+"_anonymous_.348",1,348,348,1
+"sce_check_assay_dimnames",12,368,379,12
+"check_binary_assignments",20,381,400,19

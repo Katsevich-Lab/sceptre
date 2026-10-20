@@ -1,0 +1,266 @@
+List of 20
+ $ started_utc      : chr "2026-10-20 01:40:18 UTC"
+ $ source_revision  : chr "d53166030b7784447a768d64d3bee385e046671e"
+ $ source_status    : chr(0) 
+ $ source_root      : chr "/Users/ekatsevi/.codex/worktrees/w03-scientific-validation/sceptre"
+ $ installed_package: chr "/private/tmp/w03-scientific-library/sceptre"
+ $ source_sha256    : Named chr [1:65] "eaea031d583cb11be8aad741d38e12677d39df948123d1c6884caf2c976a603e" "13f17007d8f88731579730dff6d7b9ad73b1f4506eab989f10a8f2227e5ce1ea" "96386d99955213c6d5eeaee846e660316bbf15d8e92db89e213e305448dd2272" "e70efb740231590511f3059b2274be2296390e2676795c6432ed162b46730635" ...
+  ..- attr(*, "names")= chr [1:65] "DESCRIPTION" "NAMESPACE" "R/analysis_context.R" "R/analysis.R" ...
+ $ installed_sha256 : Named chr [1:47] "b96ef70f0cc1e2f2181e52aaa88643a41468d643cb8bbda9fdb0e314b4e3b755" "e3bbe4e3f67539d9cf95a8afb2ccc5fff04fc6a50aa2c015c6cf2601dca19976" "2a96dfa8910245fd55e22c347645c779b1e01c5a747ca71dc25420468b414e63" "3c31b5825a1351e3e0711d248896d69ee50b118320458989f8a4ce2dd1edebbf" ...
+  ..- attr(*, "names")= chr [1:47] "CITATION" "data/gene_position_data_frame_grch37.rda" "data/gene_position_data_frame_grch38.rda" "data/grna_target_data_frame_highmoi.rda" ...
+ $ harness_sha256   : Named chr [1:2] "6fae02318d4086d209e9bbecf813abe29ee2b4d9b4b0afd8dcbb40d160b9bd18" "5bfbac346583d210135cd2820bebb30cb85c94a8c58cc06e8e66d29bd9b85028"
+  ..- attr(*, "names")= chr [1:2] "tools/validation/scientific-harness.R" "tools/validation/run-scientific.R"
+ $ setup            : NULL
+ $ setup_sha256     : NULL
+ $ cases            :'data.frame':	9 obs. of  9 variables:
+  ..$ id            : chr [1:9] "low_nt_empirical" "low_complement_empirical" "high_crt_empirical" "high_crt_skew" ...
+  ..$ moi           : chr [1:9] "low" "low" "high" "high" ...
+  ..$ control       : chr [1:9] "nt_cells" "complement" "complement" "complement" ...
+  ..$ mechanism     : chr [1:9] "permutations" "permutations" "crt" "crt" ...
+  ..$ approximation : chr [1:9] "no_approximation" "no_approximation" "no_approximation" "skew_normal" ...
+  ..$ confounding   : logi [1:9] FALSE FALSE FALSE FALSE FALSE TRUE ...
+  ..$ omit_z        : logi [1:9] FALSE FALSE FALSE FALSE FALSE FALSE ...
+  ..$ kind          : chr [1:9] "nb" "nb" "nb" "nb" ...
+  ..$ interpretation: chr [1:9] "modelled" "modelled" "modelled" "modelled" ...
+ $ replicates       : int 40
+ $ n_cells          : int 600
+ $ rng              : chr [1:3] "Mersenne-Twister" "Inversion" "Rejection"
+ $ seed_rule        : chr "20261000 + 1000 * index in validation_cases() + replicate * 2; testing seed = DGP seed + 1"
+ $ replication_unit : chr "One independently regenerated cell dataset per case and replicate; endpoints never pooled for binomial precision"
+ $ interval         : chr "Pointwise exact Clopper-Pearson 95% conditional on valid p-values; failures/QC and per-attempt rejection separately reported"
+ $ session          :List of 14
+  ..$ R.version  :List of 14
+  .. ..$ platform      : chr "aarch64-apple-darwin23"
+  .. ..$ arch          : chr "aarch64"
+  .. ..$ os            : chr "darwin23"
+  .. ..$ system        : chr "aarch64, darwin23"
+  .. ..$ status        : chr ""
+  .. ..$ major         : chr "4"
+  .. ..$ minor         : chr "6.0"
+  .. ..$ year          : chr "2026"
+  .. ..$ month         : chr "04"
+  .. ..$ day           : chr "24"
+  .. ..$ svn rev       : chr "89956"
+  .. ..$ language      : chr "R"
+  .. ..$ version.string: chr "R version 4.6.0 (2026-04-24)"
+  .. ..$ nickname      : chr "Because it was There"
+  ..$ platform   : chr "aarch64-apple-darwin23"
+  ..$ locale     : chr "C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8"
+  ..$ tzone      : chr "America/New_York"
+  ..$ tzcode_type: chr "internal"
+  ..$ running    : chr "macOS Tahoe 26.6.2"
+  ..$ RNGkind    : chr [1:3] "Mersenne-Twister" "Inversion" "Rejection"
+  ..$ basePkgs   : chr [1:7] "stats" "graphics" "grDevices" "utils" ...
+  ..$ otherPkgs  :List of 1
+  .. ..$ sceptre:List of 22
+  .. .. ..$ Package                : chr "sceptre"
+  .. .. ..$ Title                  : chr "Analysis of Single-Cell CRISPR Screen Data"
+  .. .. ..$ Version                : chr "0.99.0"
+  .. .. ..$ Authors@R              : chr "\n    c(person(given = \"Timothy\",\n           family = \"Barry\",\n           role = c(\"aut\", \"cre\"),\n  "| __truncated__
+  .. .. ..$ Description            : chr "Analysis of single-cell CRISPR screen data. `sceptre` is an R package for statistically rigorous, massively sca"| __truncated__
+  .. .. ..$ License                : chr "GPL-3"
+  .. .. ..$ Encoding               : chr "UTF-8"
+  .. .. ..$ Roxygen                : chr "list(markdown = TRUE)"
+  .. .. ..$ RoxygenNote            : chr "7.3.3"
+  .. .. ..$ LinkingTo              : chr "Rcpp, BH"
+  .. .. ..$ biocViews              : chr "CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget"
+  .. .. ..$ Imports                : chr "digest,\ncowplot,\ncrayon,\ndata.table,\ndplyr,\nggplot2,\nMatrix,\nmethods,\nRcpp (>= 1.0.9),\nscales,\nstats,"| __truncated__
+  .. .. ..$ Depends                : chr "R (>= 4.1)"
+  .. .. ..$ Suggests               : chr "BH,\nondisc,\nR.utils,\nsessioninfo,\nrmarkdown,\nknitr,\ntestthat (>= 3.1.8),\nMASS"
+  .. .. ..$ VignetteBuilder        : chr "knitr"
+  .. .. ..$ Config/testthat/edition: chr "3"
+  .. .. ..$ URL                    : chr "https://katsevich-lab.github.io/sceptre/,\nhttps://timothy-barry.github.io/sceptre-book/,\nhttps://github.com/K"| __truncated__
+  .. .. ..$ BugReports             : chr "https://github.com/Katsevich-Lab/sceptre/issues"
+  .. .. ..$ LazyData               : chr "false"
+  .. .. ..$ Author                 : chr "Timothy Barry [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-4356-627X>),\n  Louis Deutsch [aut],\n  Euge"| __truncated__
+  .. .. ..$ Maintainer             : chr "Timothy Barry <tbarry@hsph.harvard.edu>"
+  .. .. ..$ Built                  : chr "R 4.6.0; aarch64-apple-darwin23; 2026-10-20 01:39:59 UTC; unix"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/private/tmp/w03-scientific-library/sceptre/Meta/package.rds"
+  ..$ loadedOnly :List of 8
+  .. ..$ compiler  :List of 10
+  .. .. ..$ Package    : chr "compiler"
+  .. .. ..$ Version    : chr "4.6.0"
+  .. .. ..$ Priority   : chr "base"
+  .. .. ..$ Title      : chr "The R Compiler Package"
+  .. .. ..$ Author     : chr "Luke Tierney <luke-tierney@uiowa.edu>"
+  .. .. ..$ Maintainer : chr "R Core Team <do-use-Contact-address@r-project.org>"
+  .. .. ..$ Contact    : chr "R-help mailing list <r-help@r-project.org>"
+  .. .. ..$ Description: chr "Byte code compiler for R."
+  .. .. ..$ License    : chr "Part of R 4.6.0"
+  .. .. ..$ Built      : chr "R 4.6.0; ; 2026-04-25 08:58:01 UTC; unix"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/compiler/Meta/package.rds"
+  .. ..$ Matrix    :List of 28
+  .. .. ..$ Package         : chr "Matrix"
+  .. .. ..$ Version         : chr "1.7-5"
+  .. .. ..$ VersionNote     : chr "do also bump src/version.h, inst/include/Matrix/version.h"
+  .. .. ..$ Date            : chr "2026-03-20"
+  .. .. ..$ Priority        : chr "recommended"
+  .. .. ..$ Title           : chr "Sparse and Dense Matrix Classes and Methods"
+  .. .. ..$ Description     : chr "A rich hierarchy of sparse and dense matrix classes,\n\tincluding general, symmetric, triangular, and diagonal "| __truncated__
+  .. .. ..$ License         : chr "GPL (>= 2) | file LICENCE"
+  .. .. ..$ URL             : chr "https://Matrix.R-forge.R-project.org"
+  .. .. ..$ BugReports      : chr "https://R-forge.R-project.org/tracker/?atid=294&group_id=61"
+  .. .. ..$ Contact         : chr "Matrix-authors@R-project.org"
+  .. .. ..$ Authors@R       : chr "\n\tc(person(\"Douglas\", \"Bates\", role = \"aut\",\n\t         comment = c(ORCID = \"0000-0001-8316-9503\")),"| __truncated__
+  .. .. ..$ Depends         : chr "R (>= 4.4), methods"
+  .. .. ..$ Imports         : chr "grDevices, graphics, grid, lattice, stats, utils"
+  .. .. ..$ Suggests        : chr "MASS, datasets, sfsmisc, tools"
+  .. .. ..$ Enhances        : chr "SparseM, graph"
+  .. .. ..$ LazyData        : chr "no"
+  .. .. ..$ LazyDataNote    : chr "not possible, since we use data/*.R and our S4 classes"
+  .. .. ..$ BuildResaveData : chr "no"
+  .. .. ..$ Encoding        : chr "UTF-8"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Packaged        : chr "2026-03-20 19:40:14 UTC; maechler"
+  .. .. ..$ Author          : chr "Douglas Bates [aut] (ORCID: <https://orcid.org/0000-0001-8316-9503>),\n  Martin Maechler [aut, cre] (ORCID:\n  "| __truncated__
+  .. .. ..$ Maintainer      : chr "Martin Maechler <mmaechler+Matrix@gmail.com>"
+  .. .. ..$ Repository      : chr "CRAN"
+  .. .. ..$ Date/Publication: chr "2026-03-21 14:40:03 UTC"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 23:16:29 UTC; unix"
+  .. .. ..$ Archs           : chr "Matrix.so.dSYM"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/Matrix/Meta/package.rds"
+  .. ..$ tools     :List of 12
+  .. .. ..$ Package         : chr "tools"
+  .. .. ..$ Version         : chr "4.6.0"
+  .. .. ..$ Priority        : chr "base"
+  .. .. ..$ Title           : chr "Tools for Package Development"
+  .. .. ..$ Author          : chr "R Core Team"
+  .. .. ..$ Maintainer      : chr "R Core Team <do-use-Contact-address@r-project.org>"
+  .. .. ..$ Contact         : chr "R-help mailing list <r-help@r-project.org>"
+  .. .. ..$ Description     : chr "Tools for package development, administration and documentation."
+  .. .. ..$ License         : chr "Part of R 4.6.0"
+  .. .. ..$ Suggests        : chr "codetools, methods, xml2, curl, commonmark, knitr, xfun, mathjaxr, V8, bibtex"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 08:58:01 UTC; unix"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/tools/Meta/package.rds"
+  .. ..$ Rcpp      :List of 24
+  .. .. ..$ Package         : chr "Rcpp"
+  .. .. ..$ Title           : chr "Seamless R and C++ Integration"
+  .. .. ..$ Version         : chr "1.1.1-1.1"
+  .. .. ..$ Date            : chr "2026-04-19"
+  .. .. ..$ Authors@R       : chr "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\",\n                 "| __truncated__
+  .. .. ..$ Description     : chr "The 'Rcpp' package provides R functions as well as C++ classes which\n offer a seamless integration of R and C+"| __truncated__
+  .. .. ..$ Depends         : chr "R (>= 3.5.0)"
+  .. .. ..$ Imports         : chr "methods, utils"
+  .. .. ..$ Suggests        : chr "tinytest, inline, rbenchmark, pkgKitten (>= 0.1.2)"
+  .. .. ..$ URL             : chr "https://www.rcpp.org,\nhttps://dirk.eddelbuettel.com/code/rcpp.html,\nhttps://github.com/RcppCore/Rcpp"
+  .. .. ..$ License         : chr "GPL (>= 2)"
+  .. .. ..$ BugReports      : chr "https://github.com/RcppCore/Rcpp/issues"
+  .. .. ..$ MailingList     : chr "rcpp-devel@lists.r-forge.r-project.org"
+  .. .. ..$ RoxygenNote     : chr "6.1.1"
+  .. .. ..$ Encoding        : chr "UTF-8"
+  .. .. ..$ VignetteBuilder : chr "Rcpp"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Packaged        : chr "2026-04-23 14:12:31 UTC; edd"
+  .. .. ..$ Author          : chr "Dirk Eddelbuettel [aut, cre] (ORCID:\n    <https://orcid.org/0000-0001-6419-907X>),\n  Romain Francois [aut] (O"| __truncated__
+  .. .. ..$ Maintainer      : chr "Dirk Eddelbuettel <edd@debian.org>"
+  .. .. ..$ Repository      : chr "CRAN"
+  .. .. ..$ Date/Publication: chr "2026-04-24 05:30:02 UTC"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 15:39:45 UTC; unix"
+  .. .. ..$ Archs           : chr "Rcpp.so.dSYM"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Users/ekatsevi/Library/R/arm64/4.6/library/Rcpp/Meta/package.rds"
+  .. ..$ grid      :List of 13
+  .. .. ..$ Package         : chr "grid"
+  .. .. ..$ Version         : chr "4.6.0"
+  .. .. ..$ Priority        : chr "base"
+  .. .. ..$ Title           : chr "The Grid Graphics Package"
+  .. .. ..$ Author          : chr "Paul Murrell <paul@stat.auckland.ac.nz>"
+  .. .. ..$ Maintainer      : chr "R Core Team <do-use-Contact-address@r-project.org>"
+  .. .. ..$ Contact         : chr "R-help mailing list <r-help@r-project.org>"
+  .. .. ..$ Description     : chr "A rewrite of the graphics layout capabilities, plus some\n  support for interaction."
+  .. .. ..$ Imports         : chr "grDevices, utils"
+  .. .. ..$ License         : chr "Part of R 4.6.0"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Encoding        : chr "UTF-8"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 08:58:33 UTC; unix"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/grid/Meta/package.rds"
+  .. ..$ data.table:List of 22
+  .. .. ..$ Package         : chr "data.table"
+  .. .. ..$ Version         : chr "1.18.4"
+  .. .. ..$ Title           : chr "Extension of `data.frame`"
+  .. .. ..$ Depends         : chr "R (>= 3.4.0)"
+  .. .. ..$ Imports         : chr "methods"
+  .. .. ..$ Suggests        : chr "bit64 (>= 4.0.0), bit (>= 4.0.4), R.utils (>= 2.13.0), xts,\nzoo (>= 1.8-1), yaml, knitr, markdown"
+  .. .. ..$ Description     : chr "Fast aggregation of large data (e.g. 100GB in RAM), fast ordered joins, fast add/modify/delete of columns by gr"| __truncated__
+  .. .. ..$ License         : chr "MPL-2.0 | file LICENSE"
+  .. .. ..$ URL             : chr "https://r-datatable.com, https://Rdatatable.gitlab.io/data.table,\nhttps://github.com/Rdatatable/data.table"
+  .. .. ..$ BugReports      : chr "https://github.com/Rdatatable/data.table/issues"
+  .. .. ..$ VignetteBuilder : chr "knitr"
+  .. .. ..$ Encoding        : chr "UTF-8"
+  .. .. ..$ ByteCompile     : chr "TRUE"
+  .. .. ..$ Authors@R       : chr "c(\n  person(\"Tyson\",\"Barrett\",        role=c(\"aut\",\"cre\"), email=\"t.barrett88@gmail.com\", comment = "| __truncated__
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Packaged        : chr "2026-05-05 05:46:53 UTC; a00932230"
+  .. .. ..$ Author          : chr "Tyson Barrett [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-2137-1391>),\n  Matt Dowle [aut],\n  Arun Sr"| __truncated__
+  .. .. ..$ Maintainer      : chr "Tyson Barrett <t.barrett88@gmail.com>"
+  .. .. ..$ Repository      : chr "CRAN"
+  .. .. ..$ Date/Publication: chr "2026-05-06 05:10:20 UTC"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-05-06 07:00:46 UTC; unix"
+  .. .. ..$ Archs           : chr "data_table.so.dSYM"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/data.table/Meta/package.rds"
+  .. ..$ digest    :List of 22
+  .. .. ..$ Package         : chr "digest"
+  .. .. ..$ Authors@R       : chr "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\",\n                 "| __truncated__
+  .. .. ..$ Version         : chr "0.6.39"
+  .. .. ..$ Date            : chr "2025-11-19"
+  .. .. ..$ Title           : chr "Create Compact Hash Digests of R Objects"
+  .. .. ..$ Description     : chr "Implementation of a function 'digest()' for the creation of hash\n digests of arbitrary R objects (using the 'm"| __truncated__
+  .. .. ..$ URL             : chr "https://github.com/eddelbuettel/digest,\nhttps://eddelbuettel.github.io/digest/,\nhttps://dirk.eddelbuettel.com"| __truncated__
+  .. .. ..$ BugReports      : chr "https://github.com/eddelbuettel/digest/issues"
+  .. .. ..$ Depends         : chr "R (>= 3.3.0)"
+  .. .. ..$ Imports         : chr "utils"
+  .. .. ..$ License         : chr "GPL (>= 2)"
+  .. .. ..$ Suggests        : chr "tinytest, simplermarkdown, rbenchmark"
+  .. .. ..$ VignetteBuilder : chr "simplermarkdown"
+  .. .. ..$ Encoding        : chr "UTF-8"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Packaged        : chr "2025-11-19 11:55:09 UTC; edd"
+  .. .. ..$ Author          : chr "Dirk Eddelbuettel [aut, cre] (ORCID:\n    <https://orcid.org/0000-0001-6419-907X>),\n  Antoine Lucas [ctb] (ORC"| __truncated__
+  .. .. ..$ Maintainer      : chr "Dirk Eddelbuettel <edd@debian.org>"
+  .. .. ..$ Repository      : chr "CRAN"
+  .. .. ..$ Date/Publication: chr "2025-11-19 13:20:08 UTC"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 15:38:59 UTC; unix"
+  .. .. ..$ Archs           : chr "digest.so.dSYM"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/digest/Meta/package.rds"
+  .. ..$ lattice   :List of 24
+  .. .. ..$ Package         : chr "lattice"
+  .. .. ..$ Version         : chr "0.22-9"
+  .. .. ..$ Date            : chr "2026-02-03"
+  .. .. ..$ Priority        : chr "recommended"
+  .. .. ..$ Title           : chr "Trellis Graphics for R"
+  .. .. ..$ Authors@R       : chr "c(person(\"Deepayan\", \"Sarkar\", role = c(\"aut\", \"cre\"),\n\t            email = \"deepayan.sarkar@r-proje"| __truncated__
+  .. .. ..$ Description     : chr "A powerful and elegant high-level data visualization\n  system inspired by Trellis graphics, with an emphasis o"| __truncated__
+  .. .. ..$ Depends         : chr "R (>= 4.0.0)"
+  .. .. ..$ Suggests        : chr "KernSmooth, MASS, latticeExtra, colorspace"
+  .. .. ..$ Imports         : chr "grid, grDevices, graphics, stats, utils"
+  .. .. ..$ Enhances        : chr "chron, zoo"
+  .. .. ..$ LazyLoad        : chr "yes"
+  .. .. ..$ LazyData        : chr "yes"
+  .. .. ..$ License         : chr "GPL (>= 2)"
+  .. .. ..$ URL             : chr "https://lattice.r-forge.r-project.org/"
+  .. .. ..$ BugReports      : chr "https://github.com/deepayan/lattice/issues"
+  .. .. ..$ NeedsCompilation: chr "yes"
+  .. .. ..$ Packaged        : chr "2026-02-08 19:21:28 UTC; deepayan"
+  .. .. ..$ Author          : chr "Deepayan Sarkar [aut, cre] (ORCID:\n    <https://orcid.org/0000-0003-4107-1553>),\n  Felix Andrews [ctb],\n  Ke"| __truncated__
+  .. .. ..$ Maintainer      : chr "Deepayan Sarkar <deepayan.sarkar@r-project.org>"
+  .. .. ..$ Repository      : chr "CRAN"
+  .. .. ..$ Date/Publication: chr "2026-02-09 06:10:13 UTC"
+  .. .. ..$ Built           : chr "R 4.6.0; aarch64-apple-darwin23; 2026-04-25 15:42:18 UTC; unix"
+  .. .. ..$ Archs           : chr "lattice.so.dSYM"
+  .. .. ..- attr(*, "class")= chr "packageDescription"
+  .. .. ..- attr(*, "file")= chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/lattice/Meta/package.rds"
+  ..$ matprod    : chr "default"
+  ..$ BLAS       : chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib"
+  ..$ LAPACK     : chr "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib"
+  ..$ LA_version : chr "3.12.1"
+  ..- attr(*, "class")= chr "sessionInfo"
+ $ finished_utc     : chr "2026-10-20 01:40:53 UTC"
+ $ replicates_sha256: chr "c8fdbdee95e0d05fb7bc2e8a502981504daf26bb15110cfe7f236bae9f6d0d89"

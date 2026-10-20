@@ -76,7 +76,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
                     groups,
                     synthetic_idxs,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    response_id = id
                 )
             } else {
                 native_results <- test_permutation_group_fit(
@@ -86,7 +87,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
                     groups,
                     synthetic_idxs,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    response_id = id
                 )
             }
             results[[position]] <- pair_results_from_native(
@@ -230,6 +232,19 @@ run_crt_analysis <- function(context, execution) {
         )
     }
 
+    # Force design conditioning only on an actual candidate cache miss.
+    delayedAssign(
+        "prepared_logistic_design",
+        if (
+            identical(context$perturbation_fit_method, "fast_logistic") &&
+                context$shared_response_fit
+        ) {
+            prepare_grna_logistic_design(context$design)
+        } else {
+            NULL
+        }
+    )
+
     # Analyze a block of guide groups assigned to one worker
     # block_groups: Positions in the prepared guide-group list, starting at 1.
     # proc_id: Worker number used to append to its log, or NULL for serial work.
@@ -275,6 +290,19 @@ run_crt_analysis <- function(context, execution) {
                 NULL
             }
             probabilities <- NULL
+            if (
+                index$calibration_check &&
+                    identical(context$perturbation_fit_method, "fast_logistic")
+            ) {
+                # Calibration retains its cache bypass, but uses the selected
+                # fitter transiently so its method provenance is accurate.
+                probabilities <- fit_perturbation_model(
+                    treatment$trt_idxs,
+                    context$design,
+                    method = "fast_logistic",
+                    prepared_design = prepared_logistic_design
+                )$probabilities
+            }
             if (!index$calibration_check) {
                 fit_design <- if (context$shared_response_fit) {
                     context$design
@@ -302,7 +330,16 @@ run_crt_analysis <- function(context, execution) {
                     fit_identity
                 )
                 if (is.null(saved)) {
-                    proposed <- fit_perturbation_model(trt, fit_design)
+                    proposed <- fit_perturbation_model(
+                        trt,
+                        fit_design,
+                        method = context$perturbation_fit_method,
+                        prepared_design = if (context$shared_response_fit) {
+                            prepared_logistic_design
+                        } else {
+                            NULL
+                        }
+                    )
                     probabilities <- proposed$probabilities
                     perturbation_updates[id] <- list(
                         if (is.null(proposed$fit)) {
@@ -329,7 +366,8 @@ run_crt_analysis <- function(context, execution) {
                     response_fits,
                     context$test_options,
                     execution$output_amount,
-                    probabilities = probabilities
+                    probabilities = probabilities,
+                    grna_group = id
                 )
             } else {
                 native_results <- test_crt_group_fit(
@@ -340,7 +378,8 @@ run_crt_analysis <- function(context, execution) {
                     context$test_options,
                     execution$output_amount,
                     probabilities = probabilities,
-                    group_design = fit_design
+                    group_design = fit_design,
+                    grna_group = id
                 )
             }
             results[[position]] <- pair_results_from_native(

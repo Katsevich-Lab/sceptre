@@ -546,6 +546,7 @@ plot_run_calibration_check <- function(
         "run_calibration_check",
         required = FALSE
     )
+    calibration_result <- alternative_plot_probabilities(calibration_result)
     my_theme <- get_my_theme()
 
     # compute n rejections
@@ -642,7 +643,7 @@ plot_run_calibration_check <- function(
             rel_heights = c(0.55, 0.45)
         )
     }
-    return(out)
+    return(label_alternative_plot(out, sceptre_object, "run_calibration_check"))
 }
 
 ############################
@@ -875,7 +876,9 @@ plot_run_discovery_analysis <- function(
     current_result(sceptre_object, "run_discovery_analysis") |> invisible()
     # Optional stage diagnostics and padded null draws can be missing for valid
     # tests. Exclude only rows missing the scientific fields these plots use.
-    discovery_result <- current_result(sceptre_object, "run_discovery_analysis")
+    discovery_result <- alternative_plot_probabilities(
+        current_result(sceptre_object, "run_discovery_analysis")
+    )
     discovery_result <- discovery_result[
         stats::complete.cases(
             discovery_result$p_value,
@@ -890,6 +893,7 @@ plot_run_discovery_analysis <- function(
         "run_calibration_check",
         required = FALSE
     )
+    calibration_result <- alternative_plot_probabilities(calibration_result)
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
         max(discovery_set$p_value)
@@ -929,7 +933,10 @@ plot_run_discovery_analysis <- function(
     )
     p3 <- make_volcano_plot(
         discovery_result = discovery_result_downsample,
-        p_thresh = p_thresh,
+        p_thresh = alternative_volcano_threshold(
+            p_thresh,
+            discovery_result
+        ),
         transparency = transparency,
         point_size = point_size,
         x_limits = x_limits
@@ -971,7 +978,11 @@ plot_run_discovery_analysis <- function(
             nrow = 2
         )
     }
-    return(p_out)
+    return(label_alternative_plot(
+        p_out,
+        sceptre_object,
+        "run_discovery_analysis"
+    ))
 }
 
 ############
@@ -1461,7 +1472,7 @@ plot_run_power_check <- function(
         ) +
         my_theme
 
-    return(p)
+    return(label_alternative_plot(p, sceptre_object, "run_power_check"))
 }
 
 

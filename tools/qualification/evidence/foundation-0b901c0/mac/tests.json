@@ -1,0 +1,12 @@
+{
+  "cases": 254,
+  "expectations": 5645,
+  "passed": 5645,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skipped": 0,
+  "elapsed_seconds": 88.7,
+  "failures": [],
+  "skips": []
+}

@@ -44,9 +44,86 @@ testthat::test_that("effect and scores have independent explicit inputs", {
     testthat::expect_identical(serialize(list(a, w, D, treatment, draws), NULL), before)
 })
 
-testthat::test_that("empirical tails retain ties and the existing two-sided convention", {
+testthat::test_that("empirical tails include ties and bound doubled tails at one", {
     scores <- c(-1, 0, 0, 2)
     testthat::expect_equal(environment$component_empirical(scores, 0, -1L), 4/5)
     testthat::expect_equal(environment$component_empirical(scores, 0, 1L), 4/5)
-    testthat::expect_equal(environment$component_empirical(scores, 0, 0L), 8/5)
+    testthat::expect_equal(environment$component_empirical(scores, 0, 0L), 1)
+})
+
+# Independent tail-count oracle, deliberately including zero/one draw, all ties,
+# mixed ties, both extremes, and both tails. The bound changes no rejection for
+# alpha < 1 and does not use an RNG or mutate the scores.
+testthat::test_that("empirical bounds preserve counts, inputs, RNG and rejections", {
+    set.seed(237L)
+    seed <- .Random.seed
+    for (scores in list(numeric(), 0, rep(0, 101), c(-1, 0, 0, 2),
+                        seq(-3, 3, length.out = 100))) {
+        before <- serialize(scores, NULL)
+        for (observed in c(-100, -1, 0, 1, 100)) {
+            left <- (1 + sum(scores <= observed)) / (1 + length(scores))
+            right <- (1 + sum(scores >= observed)) / (1 + length(scores))
+            expected <- c(left, min(1, 2 * min(left, right)), right)
+            actual <- vapply(-1:1, function(side)
+                environment$component_empirical(scores, observed, side), numeric(1))
+            testthat::expect_identical(actual, expected)
+            testthat::expect_true(all(actual >= 0 & actual <= 1))
+            for (alpha in c(0, 0.01, 0.05, 0.1, 0.99)) {
+                testthat::expect_identical(actual[2] <= alpha,
+                                          2 * min(left, right) <= alpha)
+            }
+        }
+        testthat::expect_identical(serialize(scores, NULL), before)
+    }
+    testthat::expect_identical(.Random.seed, seed)
+})
+
+testthat::test_that("all-tied staged fallback preserves selected draws", {
+    a <- rep(0, 4)
+    w <- rep(1, 4)
+    D <- matrix(0, 1, 4)
+    draws <- rep(list(0L, 1L, 2L, 3L), 30)
+    before <- serialize(draws, NULL)
+    set.seed(238L)
+    seed <- .Random.seed
+    for (side in -1:1) {
+        out <- environment$component_tail_record(0, a, w, D, draws, 1L, FALSE,
+            10L, 100L, 10L, FALSE, side, 1, 0, TRUE)
+        testthat::expect_equal(out$p, 1)
+        testthat::expect_identical(out$stage, 1L)
+        testthat::expect_equal(out$resampling_dist, rep(0, 10))
+    }
+    testthat::expect_identical(serialize(draws, NULL), before)
+    testthat::expect_identical(.Random.seed, seed)
+})
+
+
+testthat::test_that("native segments reject overflow and invalid ranges before allocation", {
+    a <- c(1, -1)
+    w <- c(2, 2)
+    D <- matrix(numeric(), 0, 2)
+    segment <- function(start = 0L, count = 1L, size = 1L, bank = list(0L),
+                        weight = w, design = D, all = FALSE)
+        environment$component_segment(a, weight, design, bank, start, count, size, all)
+    testthat::expect_error(segment(start = -1L), "nonnegative")
+    testthat::expect_error(segment(count = NA_integer_), "nonnegative")
+    testthat::expect_error(segment(size = -1L), "nonnegative")
+    testthat::expect_error(segment(start = .Machine$integer.max, count = 1L), "capacity")
+    testthat::expect_error(segment(count = 2L), "bank length")
+    testthat::expect_error(segment(size = 2L), "shorter.*prefix")
+    testthat::expect_error(segment(weight = 1), "aligned cell dimensions")
+    testthat::expect_error(segment(design = matrix(0, 2, 1)), "aligned cell dimensions")
+    testthat::expect_length(segment(count = 0L, bank = list()), 0L)
+    testthat::expect_true(is.nan(segment(bank = list(integer()), all = TRUE)))
+    # Hybrid banks may have an unused larger-group suffix. Only the requested
+    # prefix belongs to this score view; no suffix cell may be read.
+    testthat::expect_equal(segment(bank = list(c(0L, 1000000L))), 1 / sqrt(2))
+})
+
+testthat::test_that("native degenerate variances preserve declared NaN and Inf arithmetic", {
+    D <- matrix(numeric(), 0, 2)
+    testthat::expect_true(is.nan(environment$component_observed(c(0, 0), c(0, 0), D, 0L)))
+    testthat::expect_identical(environment$component_observed(c(1, 0), c(0, 0), D, 0L), Inf)
+    testthat::expect_true(is.nan(environment$component_observed(c(1, 0), c(-1, 0), D, 0L)))
+    testthat::expect_true(is.nan(environment$component_effect(c(0, 0), c(0, 0), integer(), 0L)[1]))
 })

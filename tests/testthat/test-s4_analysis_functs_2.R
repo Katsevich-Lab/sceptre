@@ -404,8 +404,20 @@ test_that("run_power_check", {
             response_n_nonzero_range = c(0, 1), # don't want to remove any cells here
             n_nonzero_trt_thresh = 0,
             n_nonzero_cntrl_thresh = 0
-        ) |>
+        )
+
+    # Permissive QC cannot turn an absent treatment into completed inference.
+    expect_error(run_power_check(scep_power), "Observed association score is not finite",
+        fixed = TRUE)
+    # Explicit pair QC retains the untestable request with missing inference.
+    scep_power <- scep_power |>
+        run_qc(response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
+            n_nonzero_trt_thresh = 1, n_nonzero_cntrl_thresh = 0) |>
         run_power_check()
+    absent <- get_result(scep_power, "run_power_check")
+    absent <- absent[absent$grna_target == "t3", ]
+    expect_identical(absent$pass_qc, FALSE)
+    expect_true(is.na(absent$p_value))
 
     expect_equal(nrow(scep_power@results@records[["run_power_check"]]$table), nrow(positive_control_pairs))
     # this test is extremely significant
@@ -420,7 +432,7 @@ test_that("run_power_check", {
             dplyr::pull(p_value) >
             0.5
     )
-    # log fold change should be NA here because the response_matrix values are constant
+    # The absent-treatment request remains a failed-QC row with missing effect.
     expect_true(
         dplyr::filter(scep_power@results@records[["run_power_check"]]$table, response_id == "t3") |>
             dplyr::pull(log_2_fold_change) |>

@@ -26,4 +26,12 @@
 ^tools/architecture$
 ^tools/components$
 ^tools/hardening$
+^tools/interoperability$
 ^sceptre\.BiocCheck$
+^tools/validation$
+^tools/qualification$
+^tools/coverage$
+^data-raw$
+^tools/examples$
+
+^tools/experimental-fitters$

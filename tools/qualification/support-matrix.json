@@ -1,0 +1,262 @@
+{
+  "schema": 1,
+  "date": "2026-10-19",
+  "package_floor": "R>=4.1; testthat>=3.1.8",
+  "foundation_target": "0b901c059a9ce9e55234d672587cfd5d523e7383",
+  "lanes": [
+    {
+      "platform": "macOS arm64",
+      "R": "4.6.0",
+      "backend": "pinned ondisc589803e",
+      "scope": "Exact-source archive installation and full installed tests; R CMD check Status:OK, no manual build",
+      "status": "passed",
+      "tests": {
+        "cases": 254,
+        "expectations": 5645,
+        "passed": 5645,
+        "failed": 0,
+        "errors": 0,
+        "warnings": 0,
+        "skipped": 0,
+        "elapsed_seconds": 88.7,
+        "failures": [],
+        "skips": []
+      },
+      "environment": {
+        "R": "R version 4.6.0 (2026-04-24)",
+        "platform": "aarch64-apple-darwin23",
+        "library": "/private/tmp/sceptre-w04-foundation-0b901c0/mac/library/sceptre",
+        "ondisc": true,
+        "ondisc_policy": "present",
+        "optional_interoperability": {
+          "SingleCellExperiment": false,
+          "SummarizedExperiment": true,
+          "S4Vectors": true
+        },
+        "testthat": "3.3.2"
+      }
+    },
+    {
+      "platform": "Linux amd64 emulated on AppleSilicon",
+      "R": "4.5.1",
+      "backend": "pinned ondisc",
+      "scope": "Exact-source archive installation and full installed tests; no R CMD check in this lane",
+      "status": "passed",
+      "image": "sha256:af2fd7ec15407e89965b16e9469327a1daa1d108f069ace66dc679c3e558be92",
+      "tests": {
+        "cases": 254,
+        "expectations": 5623,
+        "passed": 5622,
+        "failed": 0,
+        "errors": 0,
+        "warnings": 0,
+        "skipped": 1,
+        "elapsed_seconds": 95.245,
+        "failures": [],
+        "skips": [
+          {
+            "file": "test-backed-content-identity.R",
+            "test": "backed save preserves imported descriptors and reopen verifies content"
+          }
+        ]
+      },
+      "environment": {
+        "R": "R version 4.5.1 (2025-06-13)",
+        "platform": "x86_64-pc-linux-gnu",
+        "library": "/evidence/run/library/sceptre",
+        "ondisc": true,
+        "ondisc_policy": "present",
+        "optional_interoperability": {
+          "SingleCellExperiment": false,
+          "SummarizedExperiment": false,
+          "S4Vectors": false
+        },
+        "testthat": "3.2.3"
+      },
+      "limit": "One rhdf5-dependent backing corruption fixture skipped; Mac covers this test. Emulated AMD64, not native host."
+    },
+    {
+      "platform": "Linux arm64 container",
+      "R": "4.1.3",
+      "testthat": "3.1.8",
+      "backend": "absent",
+      "scope": "Exact-source archive installation and full installed tests; no R CMD check in this lane",
+      "status": "passed",
+      "image": "sha256:707a616855761f837bb07992e48e31d5a2c7824bed00290f8eba0d869c502acf",
+      "tests": {
+        "cases": 254,
+        "expectations": 5519,
+        "passed": 5509,
+        "failed": 0,
+        "errors": 0,
+        "warnings": 0,
+        "skipped": 10,
+        "elapsed_seconds": 54.952,
+        "failures": [],
+        "skips": [
+          {
+            "file": "test-backed-content-identity.R",
+            "test": "backed save preserves imported descriptors and reopen verifies content"
+          },
+          {
+            "file": "test-distributed-execution.R",
+            "test": "backed permutation work reopens counts in a fresh process before collection"
+          },
+          {
+            "file": "test-ondisc_paths.R",
+            "test": "import_data can create ondisc-backed objects in a normalized directory"
+          },
+          {
+            "file": "test-ondisc-capabilities.R",
+            "test": "the installed optional backend exposes the required operations"
+          },
+          {
+            "file": "test-output-resources.R",
+            "test": "public export of a saved closed backing cannot leak a sink"
+          },
+          {
+            "file": "test-refactor-contracts.R",
+            "test": "backed permutation workflows and independent reattachment match sparse"
+          },
+          {
+            "file": "test-refactor-storage.R",
+            "test": "legacy matrix conversion agrees with the selected ondisc copy"
+          },
+          {
+            "file": "test-refactor-storage.R",
+            "test": "legacy backed storage coerces fractions and retains stored positions"
+          },
+          {
+            "file": "test-refactor-storage.R",
+            "test": "backed storage has the same ordered count and ownership contracts"
+          },
+          {
+            "file": "test-schema-migration.R",
+            "test": "backed descriptors reopen relocated identical stores and reject changed descriptors"
+          }
+        ]
+      },
+      "environment": {
+        "R": "R version 4.1.3 (2022-03-10)",
+        "platform": "aarch64-unknown-linux-gnu",
+        "library": "/evidence/run/library/sceptre",
+        "ondisc": false,
+        "ondisc_policy": "absent",
+        "optional_interoperability": {
+          "SingleCellExperiment": false,
+          "SummarizedExperiment": false,
+          "S4Vectors": false
+        },
+        "testthat": "3.1.8"
+      },
+      "limit": "Ten ondisc-dependent fixtures skipped; no backed or historical SCE support claimed."
+    },
+    {
+      "platform": "hosted Linux/macOS/Windows",
+      "R": "release,oldrel-1,devel per workflow",
+      "status": "configured_unexecuted",
+      "authority": ".github/workflows/check-standard.yaml"
+    },
+    {
+      "platform": "hosted Linuxamd64",
+      "R": "4.1",
+      "testthat": "3.1.8",
+      "backend": "absent",
+      "status": "configured_unexecuted",
+      "authority": ".github/workflows/check-support.yaml"
+    },
+    {
+      "platform": "Bioconductor release/devel official images",
+      "R": "image supplied; actual version recorded at execution",
+      "status": "not_scheduled_in_CI",
+      "authority": "Removed at Eugene's request; manual submission qualification remains separate"
+    },
+    {
+      "platform": "Linuxamd64 native host",
+      "status": "unqualified_in_W04",
+      "note": "New0b nativeAMD64/HPC unqualified; separate owner source01bb native SIF lowNTpermutation receipt retained in program BASELINE-HPC handoff"
+    },
+    {
+      "platform": "hosted Linux scientific artifact tier",
+      "status": "configured_unexecuted",
+      "authority": ".github/workflows/check-scientific.yaml",
+      "scope": "Dispatch-only40/200independent datasets,one case600cells; execution is not calibration certification"
+    }
+  ],
+  "historical_receipts": [
+    {
+      "source_commit": "169c16e4ba00c687c1f03fe37e9d79a11d01cd8f",
+      "platforms": [
+        "macOSarm64 R4.4.1",
+        "Linuxarm64 R4.1.3"
+      ],
+      "testthat": "3.1.8",
+      "passed": 5505,
+      "failed": 0,
+      "warnings": 0,
+      "skipped": 10,
+      "backend": "absent",
+      "path": "tools/hardening/dependencies/evidence/qualification-status.json",
+      "limit": "Historical exact source only; not relabelled for integrated foundation"
+    }
+  ],
+  "submission_boundary": {
+    "actual_source": "21f9ea098b69c444a884a49bc254de711968e3b5",
+    "checker": "1.49.30",
+    "Bioconductor": "3.24",
+    "flags": [
+      "no-check-R-ver",
+      "no-check-bioc-help"
+    ],
+    "original_counts": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3
+    },
+    "requires": "No new diagnostic categories or flagged instances; retain full lineages",
+    "unsuppressed_limit": "Original default1.47.26 receipt1E1W5N includes HTTP environmental error; matched pass is not all-default clean",
+    "foundation_result": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3,
+      "new_long_functions": 0,
+      "new_long_lines": 0,
+      "new_display_sites": 0,
+      "display_sites": 9,
+      "long_functions": 45,
+      "long_lines": 108,
+      "archive_summary_options_bound": true
+    },
+    "current_all_default": "Not rerun locally for0b; historical hosted default diagnostics remain distinct from the matched checker. Bioconductor CI is no longer scheduled."
+  },
+  "scientific_qualification": "Independent W03 work; not inferred from builds/installed-test or reference equality",
+  "source_archive_sha256": "f9172ba52aeab123d5473a0b189d877527704d86cc6019ff7b37fb69c2d45a6f",
+  "qualification_harness_commit": "7ddb4fd48390f86cbd78dd7372090c18b8cea3bf",
+  "evidence": "tools/qualification/evidence/foundation-0b901c0 (compact public-safe receipts); full logs/archive isolated libraries retained locally outside publication branch",
+  "hosted_baseline": {
+    "PR": "https://github.com/Katsevich-Lab/sceptre/pull/239",
+    "source": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+    "snapshot_utc": "2026-10-20T02:04:35.692923+00:00",
+    "passed": [
+      "R-format",
+      "in-memory-without-ondisc",
+      "bioconductor(devel)"
+    ],
+    "others": "floor and Linuxdevel in progress at snapshot",
+    "failed": [
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611606/job/118409564546"
+    ],
+    "failure_classification": "Default support-site HTTP connectivity failure; package check has0E0W1N. ExactR4.6.1/Bioc3.23/checker1.48.1; no source repair or check suppression.",
+    "standard_failures": [
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565466",
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565384",
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565265",
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565391"
+    ],
+    "source_repairs": [
+      "e922caa genuine rhdf5 Suggests + data-raw build exclusion"
+    ]
+  },
+  "strict_check_limit": "Foundation0b ordinary Mac check did not enable --as-cran. Actual baseline strict jobs exposed undeclared rhdf5/test and data-raw notes; source repair e922caa awaits exact new-revision strict rerun. --check --as-cran now available.",
+  "optional_backend_policy": "R4.1 snapshot intentionally omits ondisc/rhdf5/SCE/SE/S4Vectors/SeuratObject; current interoperability lanes separate"
+}

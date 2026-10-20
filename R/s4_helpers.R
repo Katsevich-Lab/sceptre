@@ -44,7 +44,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         crayon::blue(n_covariates),
         " covariates (",
         covariates,
-        ")"
+        ")",
+        alternative_inference_text(object)
     ))
 })
 

@@ -1,0 +1,10 @@
+{
+  "baseline_long_functions": 49,
+  "candidate_long_functions": 45,
+  "new_long_function_instances": 0,
+  "baseline_long_lines": 145,
+  "candidate_long_lines": 108,
+  "new_or_modified_long_line_instances": 0,
+  "scope": "Exact submitted source and checker function-length algorithm; explicit reviewed semantic rename/anonymous-method lineage; long-line reuse requires exact source-text multiplicity. This is not an algorithmic parity assertion.",
+  "passed": true
+}

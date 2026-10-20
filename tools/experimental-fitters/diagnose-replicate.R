@@ -1,0 +1,59 @@
+args<-commandArgs(TRUE);stopifnot(length(args)==2L)
+library(sceptre);data.table::setDTthreads(1L)
+source(normalizePath(args[2L],mustWork=TRUE))
+f<-function(n)getFromNamespace(n,'sceptre')
+case<-validation_cases()[validation_cases()$id=='high_crt_skew',,drop=FALSE]
+seed<-20261000L+4000L+56L
+input<-validation_input(case,seed,600L)
+options(sceptre.validation.configure=NULL)
+o<-suppressMessages(validation_prepare(input,case))
+pairs<-dplyr::filter(o@preparation@discovery_pairs_with_info,pass_qc)
+context<-f('prepare_analysis_context')(o,'discovery_analysis',pairs)
+D<-context$design
+trt<-f('make_treatment_index_lookup')(context$index)(unique(pairs$grna_group)[1])$trt_idxs
+reference<-f('fit_perturbation_glm')(trt,D)
+candidate<-f('fit_perturbation_model')(trt,D,'fast_logistic')
+y<-integer(nrow(D));y[trt]<-1L
+tight<-glm.fit(D,y,family=binomial(),control=glm.control(epsilon=1e-12,maxit=100L))
+public<-lapply(c('glm.fit','fast_logistic'),function(method){
+ selected<-set_perturbation_fit_method(o,method)
+ completed<-withr::with_seed(seed+1L,suppressMessages(run_discovery_analysis(selected,parallel=FALSE,print_progress=FALSE,output_amount=3L)))
+ get_result(completed,'run_discovery_analysis')
+})
+bridge<-new.env(parent=baseenv())
+bridge_source<-'tests/testthat/fixtures/refactor/native-bridge.cpp'
+Rcpp::sourceCpp(bridge_source,env=bridge,rebuild=FALSE,showOutput=FALSE)
+B<-context$test_options$total_resamples
+banks<-lapply(list(reference$fitted.values,candidate$probabilities),function(prob)f('sample_crt_indices')(prob,B))
+materialized<-lapply(banks,bridge$refactor_native_materialize)
+bank_different_rows<-which(!vapply(seq_len(B),function(i)identical(materialized[[1]][[i]],materialized[[2]][[i]]),logical(1)))
+score_diagnostics<-lapply(unique(pairs$response_id),function(id){
+ i<-match(id,context$index$response_ids)
+ y<-f('storage_read_response')(context$response_store,i,context$common_view@source_cells)
+ fit<-f('fit_response')(y,D)
+ score<-f('prepare_score_components')(y,D,fit)
+ native<-lapply(banks,function(bank)f('run_association_test')(y,score$mu,score$a,score$w,score$D,
+     trt,length(trt),TRUE,bank,context$test_options$B1,context$test_options$B2,
+     context$test_options$B3,context$test_options$fit_parametric_curve,TRUE,context$test_options$side_code))
+ list(response_id=id,p=vapply(native,function(x)x$p,numeric(1)),
+     stage=vapply(native,function(x)x$stage,integer(1)),
+     observed=vapply(native,function(x)x$z_orig,numeric(1)),
+     observed_identical=identical(native[[1]]$z_orig,native[[2]]$z_orig),
+     null_score_hashes=vapply(native,function(x)digest::digest(x$resampling_dist,algo='sha256'),character(1)),
+     null_scores_identical=identical(native[[1]]$resampling_dist,native[[2]]$resampling_dist),
+     score_input_hash=digest::digest(score,algo='sha256'))
+})
+saveRDS(list(seed=seed,input_hash=digest::digest(input,algo='sha256'),n=nrow(D),
+ candidate_diagnostics=candidate$fit$diagnostics,
+ reference_diagnostics=list(iter=reference$iter,converged=reference$converged),
+ max_probability_difference=max(abs(reference$fitted.values-candidate$probabilities)),
+ max_coefficient_difference=max(abs(reference$coefficients-candidate$fit$fitted_coefs)),
+ reference_to_tight_probability=max(abs(reference$fitted.values-tight$fitted.values)),
+ candidate_to_tight_probability=max(abs(candidate$probabilities-tight$fitted.values)),
+ expected_count_reference=sum(reference$fitted.values),expected_count_candidate=sum(candidate$probabilities),
+ bank_B=B,bank_hashes=vapply(materialized,digest::digest,character(1),algo='sha256'),
+ bank_identical=identical(materialized[[1]],materialized[[2]]),
+ bank_different_row_count=length(bank_different_rows),first_different_rows=head(bank_different_rows),
+ bridge_source_hash=digest::digest(bridge_source,file=TRUE,algo='sha256'),
+ score_diagnostics=score_diagnostics,public=public,session=sessionInfo()),args[1])
+cat('replicate diagnostic saved',args[1],'\n')

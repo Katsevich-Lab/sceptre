@@ -1,0 +1,27 @@
+{
+  "source_commit": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+  "PR": "https://github.com/Katsevich-Lab/sceptre/pull/239",
+  "job": "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611606/job/118409564546",
+  "status": "failure",
+  "R": "4.6.1",
+  "platform": "x86_64-pc-linux-gnu",
+  "Bioconductor": "3.23",
+  "BiocCheck": "1.48.1",
+  "R_CMD_check": {
+    "status": "1 NOTE",
+    "errors": 0,
+    "warnings": 0,
+    "note": "ondisc namespace unavailable at a ::: call; optional backend intentionally absent"
+  },
+  "BiocCheck_result": {
+    "errors": 1,
+    "warnings": 1,
+    "notes": 5
+  },
+  "failure": "All-default support-site registration lookup could not connect to support.bioconductor.org:443 within10000ms. Registration status unverified; not evidence that maintainer is unregistered.",
+  "source_repair": "None warranted for the external endpoint. Default check remains enabled/failing; retain environmental diagnostic. Matched original-wrapper/source-instance gate remains separate.",
+  "archive_sha256": null,
+  "archive_identity_limit": "Legacy hosted workflow did not retain archiveSHA; W04 updated artifact/source/hash retention for future integrated jobs.",
+  "full_job_log_sha256": "b53ff23711bdd3c93182323d51ef6c0f455c08c963f0be17a7c852a53ac07fb6",
+  "future": "Re-run exact final candidate after endpoint recovery; source/installation success cannot replace all-default diagnostic success."
+}

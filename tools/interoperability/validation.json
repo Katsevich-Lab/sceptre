@@ -1,0 +1,67 @@
+{
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "versions": {
+    "SingleCellExperiment": "1.34.0",
+    "SummarizedExperiment": "1.42.0",
+    "S4Vectors": "0.50.1",
+    "Matrix": "1.7.5",
+    "sceptre": "0.99.0"
+  },
+  "response_dimensions": [
+    100,
+    1000
+  ],
+  "guide_dimensions": [
+    50,
+    1000
+  ],
+  "retained_cells": 986,
+  "result_rows": 2,
+  "result_columns": [
+    "response_id",
+    "grna_target",
+    "n_nonzero_trt",
+    "n_nonzero_cntrl",
+    "pass_qc",
+    "p_value",
+    "fold_change",
+    "se_fold_change",
+    "log_2_fold_change",
+    "significant"
+  ],
+  "test_assertions": 56,
+  "pvalues_in_bounds": true,
+  "implementation_base": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+  "measured_installed_source": "22087ac45f5250f8d120be60bcec6f4540c47030",
+  "final_source_before_evidence": "a4431c8103942be50e31d8fb43a0ee5009587a96",
+  "final_difference_from_measured": "one loop changed from 1:2 to seq_len(2L) to avoid a new BiocCheck coding-practice instance; native/scientific code unchanged",
+  "pipeline_base": "8e3a7bda268c9f750913f894fa254f86896c1ef1",
+  "pipeline_commit": "f10823411d808dbea99ffc79523d9aa1d4482b34",
+  "tested_driver_commit": "9a01650",
+  "direct_pipeline_equality_tolerance": 0,
+  "checks": {
+    "isolated_install": "PASS",
+    "targeted_assertions": 56,
+    "failures": 0,
+    "warnings": 0,
+    "pipeline_external_preserve_override_stale_and_design_reset": "PASS with SingleCellExperiment absent",
+    "fresh_process_stage_cli_roundtrip": "PASS",
+    "optional_dependency_absence": "PASS",
+    "actual_vignette_archive_build": "NOT RUN in this slot",
+    "matched_submission_BiocCheck": "PENDING integrated candidate",
+    "Nextflow_scheduler_container": "NOT RUN by W05",
+    "scientific_calibration": "NOT ASSESSED by W05"
+  },
+  "artifact_policy": "source/docs/tests/compact aggregate metrics only committed; all generated counts/calls/fits/bundles/results RDS remain local",
+  "local_result_sce_sha256": "d97214728807b87adef5db9b8fd3c70b4fd6f60b93111e4559e4802082e05a88",
+  "native_library_sha256": "3cbf3893a3a042cb0bbe23781ef77400ae478f9f740b9da2dd2fa1a2dc3c0d5b",
+  "live_jobs": [],
+  "log_sha256": {
+    "sceptre-w05-install.log": "b9d1c2760c324d69723638e1f9c755a5b9ee2888b2a4f7e45dbd7e515df4eedf",
+    "sceptre-w05-tests.log": "36920f517bc48d293c088e01c9ab4b8a6c0f16485d84a0bf1352f3e94bac053a",
+    "sceptre-w05-pipeline-tests.log": "3b8b91d18a8c104d9f5ba5c6e674af7d9ecbb870e5b36a99411e59f799d3025f",
+    "sceptre-w05-roundtrip-fixed.log": "b036b0265fb9f78e99dbd2c82f013bfb73c1761ada6f8b42bb3873fe79a2915b",
+    "sceptre-w05-absence.log": "847d8d85047d8faf3d55ce4bdae96d4744e274e3bd60bd67432d9bc0d4f784da"
+  }
+}

@@ -26,7 +26,7 @@ License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-LinkingTo: Rcpp, BH
+LinkingTo: Rcpp, BH, RcppEigen
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
     digest,
@@ -46,8 +46,14 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
+    DelayedArray,
+    SeuratObject (>= 5.0.0),
+    SingleCellExperiment,
+    SummarizedExperiment,
+    S4Vectors,
     BH,
     ondisc,
+    rhdf5,
     R.utils,
     sessioninfo,
     rmarkdown,

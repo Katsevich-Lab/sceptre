@@ -1,0 +1,26 @@
+[
+  {
+    "probe": "archive",
+    "exit_code": 1,
+    "expected_rejection": "Summary/archive identity mismatch",
+    "passed": true
+  },
+  {
+    "probe": "summary",
+    "exit_code": 1,
+    "expected_rejection": "Diagnostic summary bytes do not match invocation",
+    "passed": true
+  },
+  {
+    "probe": "options",
+    "exit_code": 1,
+    "expected_rejection": "Wrong checker options",
+    "passed": true
+  },
+  {
+    "probe": "category",
+    "exit_code": 1,
+    "expected_rejection": "New diagnostic within inherited category",
+    "passed": true
+  }
+]

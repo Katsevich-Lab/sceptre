@@ -1,0 +1,17 @@
+{
+  "cases": 254,
+  "expectations": 5623,
+  "passed": 5622,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skipped": 1,
+  "elapsed_seconds": 95.245,
+  "failures": [],
+  "skips": [
+    {
+      "file": "test-backed-content-identity.R",
+      "test": "backed save preserves imported descriptors and reopen verifies content"
+    }
+  ]
+}

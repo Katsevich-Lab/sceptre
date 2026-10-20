@@ -1,0 +1,66 @@
+name: Scientific validation artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      replicates:
+        description: Independent datasets (pilot precision; inspect intervals)
+        type: choice
+        options: ['40', '200']
+        default: '40'
+      case:
+        description: One fixed public-method scenario
+        type: choice
+        options: [low_nt_empirical, low_complement_empirical, high_crt_empirical, high_crt_skew, high_permutation_skew, confounded_crt, omitted_confounder, sparse_qc, all_tied]
+        default: low_nt_empirical
+permissions:
+  contents: read
+concurrency:
+  group: scientific-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  generate-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      MAKEFLAGS: -j2
+      SCEPTRE_REPLICATES: ${{ inputs.replicates }}
+      SCEPTRE_CASE: ${{ inputs.case }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          dependencies: '"hard"'
+          extra-packages: |
+            any::jsonlite
+            any::knitr
+      - name: Install the exact archive into a fresh library
+        shell: bash
+        run: |
+          mkdir -p "${{ runner.temp }}/scientific/library"
+          git rev-parse HEAD > "${{ runner.temp }}/scientific/source-commit.txt"
+          R CMD build . --no-manual --no-build-vignettes > "${{ runner.temp }}/scientific/build.log" 2>&1
+          sha256sum sceptre_*.tar.gz > "${{ runner.temp }}/scientific/archive-sha256.txt"
+          R CMD INSTALL --preclean --library="${{ runner.temp }}/scientific/library" sceptre_*.tar.gz > "${{ runner.temp }}/scientific/install.log" 2>&1
+      - name: Generate actual outcome counts and record Monte Carlo intervals
+        shell: bash
+        run: |
+          export R_LIBS="${{ runner.temp }}/scientific/library:${R_LIBS_USER}"
+          Rscript --vanilla tools/validation/check-harness.R
+          Rscript --vanilla tools/validation/run-scientific.R "${{ runner.temp }}/scientific/results" "$SCEPTRE_REPLICATES" 600 "$SCEPTRE_CASE" > "${{ runner.temp }}/scientific/simulation.log" 2>&1
+      - name: Retain terminal evidence (execution success is not calibration certification)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scientific-${{ inputs.case }}-${{ inputs.replicates }}
+          path: |
+            ${{ runner.temp }}/scientific
+            sceptre_*.tar.gz

@@ -1,0 +1,9 @@
+{
+  "package_source_commit": "0b901c059a9ce9e55234d672587cfd5d523e7383",
+  "archive_sha256": "f9172ba52aeab123d5473a0b189d877527704d86cc6019ff7b37fb69c2d45a6f",
+  "initial_execution_harness_commit": "631d239",
+  "final_binding_tool_commit": "7ddb4fd48390f86cbd78dd7372090c18b8cea3bf",
+  "binding_sequence": "Original checker reached terminal before summary-hash finalizer was added. The exact finalizer statements were applied to those already terminal summary/invocation bytes without rerunning package science/install. Strengthened final gate and four rejecting negative probes then passed. Original unbound gate retained separately; use submission-gate-final for admission.",
+  "scope": "Foundation only; later integrated code and hosted lanes remain separate. No local or cluster jobs left by W04.",
+  "admission_gate": "submission-gate-final-lineage/submission-gate.json"
+}

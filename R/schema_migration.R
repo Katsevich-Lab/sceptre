@@ -208,6 +208,12 @@ migrate_sceptre_object <- function(object) {
         # readRDS() does not invoke S4 validity. Admit the working scientific
         # settings before consuming saved plans or caches, without requiring
         # historical preparation/results to satisfy current object validity.
+        # The optional experimental selector is empty for historical schema-3
+        # objects. Preserve their default snapshots and frozen identities.
+        selector <- attr(object@spec, "perturbation_fit_method", exact = TRUE)
+        if (is.null(selector)) {
+            object@spec@perturbation_fit_method <- character()
+        }
         validate_analysis_spec(object@spec)
         return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
     }

@@ -8,7 +8,12 @@ description <- read.dcf("DESCRIPTION")
 fields <- intersect(c("Imports", "LinkingTo", "Suggests"), colnames(description))
 deps <- unique(unlist(lapply(description[1L, fields], function(x)
     names(tools:::.split_dependencies(x)))))
-deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
+# Optional storage/interoperability has its own current-ecosystem lanes.
+# The advertised R-floor lane deliberately tests installation without it.
+optional_backends <- c("ondisc", "rhdf5", "DelayedArray",
+    "SingleCellExperiment", "SummarizedExperiment", "S4Vectors", "SeuratObject")
+deps <- setdiff(deps, c(optional_backends,
+    rownames(installed.packages(priority = "base"))))
 install.packages(deps, dependencies = NA)
 # Install the exact advertised test floor after dependencies, without allowing
 # any later dependency installation to replace it.

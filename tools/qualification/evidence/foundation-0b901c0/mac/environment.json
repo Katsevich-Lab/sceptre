@@ -1,0 +1,13 @@
+{
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "library": "/private/tmp/sceptre-w04-foundation-0b901c0/mac/library/sceptre",
+  "ondisc": true,
+  "ondisc_policy": "present",
+  "optional_interoperability": {
+    "SingleCellExperiment": false,
+    "SummarizedExperiment": true,
+    "S4Vectors": true
+  },
+  "testthat": "3.3.2"
+}

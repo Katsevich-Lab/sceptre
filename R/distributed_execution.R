@@ -143,10 +143,16 @@ execution_runtime_certificate <- function(object) {
     )
 }
 
-execution_method_certificate <- function() {
+execution_method_certificate <- function(object = NULL) {
     list(
         response = response_fit_method_id(),
-        perturbation = perturbation_fit_method_id(),
+        perturbation = perturbation_fit_method_id(
+            if (is.null(object)) {
+                "glm.fit"
+            } else {
+                get_perturbation_fit_method(object)
+            }
+        ),
         resampling = "global-native-draw-sharing-v1"
     )
 }
@@ -155,6 +161,13 @@ execution_digest <- function(value) digest::digest(value, algo = "sha256")
 execution_row_column <- function() ".sceptre_global_pair_row"
 
 require_execution_backend <- function(object) {
+    if (!identical(get_perturbation_fit_method(object), "glm.fit")) {
+        stop(
+            "Experimental fast_logistic is supported only by ",
+            "direct R execution; ",
+            "switch to glm.fit before preparing distributed or pipeline input."
+        )
+    }
     if (
         !isTRUE(object@spec@run_permutations) &&
             any(vapply(
@@ -182,7 +195,8 @@ execution_context_certificate <- function(object) {
 
 execution_units <- function(context, plan, n_work_units, permutations) {
     field <- if (permutations) "response_idx" else "group_idx"
-    keys <- unique(context$index$pair_rows[[field]])
+    pair_keys <- context$index$pair_rows[[field]]
+    keys <- unique(pair_keys)
     if (!length(keys)) {
         stop("Distributed execution requires eligible hypothesis rows.")
     }
@@ -192,12 +206,13 @@ execution_units <- function(context, plan, n_work_units, permutations) {
         as.integer(floor((seq_along(keys) - 1L) * n / length(keys))) + 1L
     )
     eligible <- which(plan@pairs$pass_qc)
+    # Index once, retaining first-seen key order and original within-key rows.
+    # Repeated which(pair_keys == key) scans cost O(keys * eligible rows).
+    rows_by_key <- split(eligible, factor(pair_keys, levels = keys))
     lapply(seq_along(chunks), function(i) {
         selected <- as.integer(chunks[[i]])
         rows <- unlist(
-            lapply(selected, function(key) {
-                eligible[which(context$index$pair_rows[[field]] == key)]
-            }),
+            rows_by_key[as.character(selected)],
             use.names = FALSE
         )
         list(
@@ -266,7 +281,7 @@ validate_execution_envelope <- function(object, execution) {
                 execution$runtime,
                 execution_runtime_certificate(object)
             ) ||
-            !identical(execution$methods, execution_method_certificate())
+            !identical(execution$methods, execution_method_certificate(object))
     ) {
         stop(
             "Execution manifest protocol, runtime or method certificate is ",
@@ -277,6 +292,7 @@ validate_execution_envelope <- function(object, execution) {
 }
 
 validate_execution_manifest <- function(object, execution) {
+    require_supported_distributed_inference(object)
     require_stage(object, "run_qc")
     require_execution_backend(object)
     validate_execution_envelope(object, execution)
@@ -403,6 +419,7 @@ prepare_execution <- function(
     calibration_group_size = NULL
 ) {
     object <- migrate_sceptre_object(sceptre_object)
+    require_supported_distributed_inference(object)
     require_stage(object, "run_qc")
     require_execution_backend(object)
     analysis <- analysis_record_name(analysis)
@@ -425,7 +442,7 @@ prepare_execution <- function(
     manifest <- list(
         protocol = 1L,
         runtime = execution_runtime_certificate(object),
-        methods = execution_method_certificate(),
+        methods = execution_method_certificate(object),
         context = execution_context_certificate(object),
         plan = plan,
         output_amount = as.integer(output_amount),
