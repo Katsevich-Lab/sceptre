@@ -69,6 +69,12 @@ p-values can be inaccurate for small or highly discrete samples. The usual
 assumptions of the chosen multiple-testing procedure still apply. A null
 control check is a diagnostic, not proof of FDR control.
 
+P-value arithmetic delegates to the installed version of R's stats package.
+Numerical cancellation or underflow can return zero even when a tail
+probability remains representable. Raw zeros are retained. Log-scale
+plots apply a display floor only; they do not repair the probabilities.
+Extreme-tail magnitudes and extreme-tail calibration remain unqualified.
+
 Resampling settings in the object are ignored: no permutations, CRT draws,
 regression, or tail fitting are performed. The saved run plan uses a zero
 resampling budget. Running a standard analysis function later selects

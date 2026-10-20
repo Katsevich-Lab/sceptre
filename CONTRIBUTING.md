@@ -134,6 +134,13 @@ and lifecycle sections of `ARCHITECTURE.md` before adding another method.
    distributed/Nextflow support is deferred and guarded. Do not advertise parity
    for that lane. See its example for method comparison using separate objects.
 
+The experimental Wilcoxon path delegates numerical p-values to the installed R
+stats version. Numerical cancellation or underflow can produce zero even when
+the tail probability is representable. Raw zeros remain in results; log-scale
+plots use a display floor only, without repairing probabilities. Extreme-tail
+magnitudes and extreme-tail calibration remain unqualified. Reference agreement
+with base R does not independently validate these tails.
+
 Exported functions documented in `man/` are the public interface. Component
 slots, `RunPlan`, views, fitters, caches and `sceptre:::` helpers are private;
 examples for contributors do not make these stable user APIs. The pipeline has

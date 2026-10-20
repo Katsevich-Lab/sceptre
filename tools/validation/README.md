@@ -174,3 +174,10 @@ its SHA256 is recorded too. The runtime and source identities are both retained,
 not inferred from package version alone. Every screen must have both expected
 responses, pass QC, and produce finite nonmissing probabilities in[0,1]; an
 unexpected eligibility or probability result stops the run with failed status.
+
+Base-R p-values can be numerically zero through cancellation or underflow, even
+when a mathematical tail probability remains representable. The implementation
+retains raw zeros and delegates version-specific arithmetic to R stats. The
+log-plot floor affects display only. These pilot rejection rates at raw.05 do
+not qualify extreme-tail magnitudes or extreme-tail calibration; base-R parity
+is not independent numerical validation of those tails.
