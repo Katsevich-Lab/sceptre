@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # Run from the repository root with an explicitly isolated installed library.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 2L) stop("Usage: Rscript tools/validation/run-scientific.R OUTPUT REPLICATES [N_CELLS] [CASE_IDS] [SETUP_R]")
+if (length(args) < 2L) stop("Usage: Rscript tools/validation/run-scientific.R OUTPUT REPLICATES [N_CELLS] [CASE_IDS] [SETUP_R_OR_DASH] [FIRST_REPLICATE]")
 out <- normalizePath(args[1L], mustWork = FALSE)
 reps <- as.integer(args[2L])
 n <- if (length(args) >= 3L) as.integer(args[3L]) else 600L
@@ -15,7 +15,10 @@ if (length(args) >= 4L && args[4L] != "all") {
     stopifnot(all(requested %in% cases$id))
     cases <- cases[match(requested, cases$id), , drop = FALSE]
 }
-setup <- if (length(args) >= 5L) normalizePath(args[5L], mustWork = TRUE) else NULL
+first <- if (length(args) >= 6L) as.integer(args[6L]) else 1L
+stopifnot(length(first) == 1L, !is.na(first), first >= 1L, first + reps - 1L <= 100000L)
+replicate_ids <- seq.int(first, length.out = reps)
+setup <- if (length(args) >= 5L && args[5L] != "-") normalizePath(args[5L], mustWork = TRUE) else NULL
 if (!is.null(setup)) source(setup)
 library(sceptre)
 if (requireNamespace("data.table", quietly = TRUE)) data.table::setDTthreads(1L)
@@ -36,7 +39,8 @@ manifest <- list(started_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
     harness_sha256 = vapply(c("tools/validation/scientific-harness.R", "tools/validation/run-scientific.R"),
                             digest::digest, character(1), algo = "sha256", file = TRUE),
     setup = setup, setup_sha256 = if (!is.null(setup)) digest::digest(setup, file = TRUE, algo = "sha256") else NULL,
-    cases = cases, replicates = reps, n_cells = n, rng = RNGkind(),
+    cases = cases, replicates = reps, first_replicate = first,
+    last_replicate = first + reps - 1L, n_cells = n, rng = RNGkind(),
     seed_rule = "20261000 + 1000 * index in validation_cases() + replicate * 2; testing seed = DGP seed + 1",
     replication_unit = "One independently regenerated cell dataset per case and replicate; endpoints never pooled for binomial precision",
     interval = "Pointwise exact Clopper-Pearson 95% conditional on valid p-values; failures/QC and per-attempt rejection separately reported",
@@ -48,13 +52,13 @@ all_rows <- list()
 for (i in seq_len(nrow(cases))) {
     case <- cases[i, , drop = FALSE]
     case_index <- match(case$id, validation_cases()$id)
-    for (r in seq_len(reps)) {
+    for (r in replicate_ids) {
         seed <- 20261000L + 1000L * case_index + 2L * r
         result <- validation_replicate(case, r, seed, n)
         all_rows[[length(all_rows) + 1L]] <- result
         utils::write.table(result, file.path(out, "replicates.csv"), sep = ",", row.names = FALSE,
                            col.names = length(all_rows) == 1L, append = length(all_rows) != 1L, na = "NA")
-        if (r %% 25L == 0L || r == reps) cat(case$id, r, "/", reps, "\n")
+        if (r %% 25L == 0L || r == tail(replicate_ids, 1L)) cat(case$id, r - first + 1L, "/", reps, "replicate", r, "\n")
     }
     utils::write.csv(validation_summary(do.call(rbind, all_rows)), file.path(out, "summary.csv"), row.names = FALSE)
 }

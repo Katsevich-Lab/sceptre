@@ -28,7 +28,13 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \
 ```
 
 Arguments are new output directory, positive replicate count, cell count (default
-600), comma-separated case IDs (default all), optional candidate setup R file.
+600), comma-separated case IDs (default all), optional candidate setup R file (or `-`),
+and optional first replicate index (default1). Non-overlapping bounded batches
+can use first indices1,201,401,601,801 with200 replicates each. Seeds and recorded
+replicate IDs use those global indices; each batch remains independently terminal.
+Never count the repeated first40 pilot seeds again when reporting the1000-dataset
+combined estimate. `summarize-batches.R` rejects duplicate case/replicate/endpoint
+identities and mismatched scientific source/binary/settings before aggregation.
 Existing output directories are rejected. A setup file can set the option
 `sceptre.validation.configure` to a function of `(object, case)` receiving the fully prepared object after QC and returning an
 object with an explicitly selected experimental method. The script records the
