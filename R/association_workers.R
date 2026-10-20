@@ -272,12 +272,23 @@ test_association_pair <- function(..., response_id = NULL, grna_group = NULL) {
     tryCatch(run_association_test(...), error = function(cause) {
         response <- if (is.null(response_id)) "<unknown>" else response_id
         group <- if (is.null(grna_group)) "<unknown>" else grna_group
-        stop(structure(list(
-            message = paste0("Association test for response '", response,
-                "' and guide group '", group, "' failed: ",
-                conditionMessage(cause)),
-            call = NULL, response_id = response_id, grna_group = grna_group,
-            cause = cause, parent = cause),
-            class = c("sceptre_pair_error", "error", "condition")))
+        stop(structure(
+            list(
+                message = paste0(
+                    "Association test for response '",
+                    response,
+                    "' and guide group '",
+                    group,
+                    "' failed: ",
+                    conditionMessage(cause)
+                ),
+                call = NULL,
+                response_id = response_id,
+                grna_group = grna_group,
+                cause = cause,
+                parent = cause
+            ),
+            class = c("sceptre_pair_error", "error", "condition")
+        ))
     })
 }
