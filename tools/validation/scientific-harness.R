@@ -20,6 +20,20 @@ validation_cases <- function() {
     )
 }
 
+# Version2 leaves room for every admitted global replicate index within a case.
+# Version1 used stride1000, overlapping adjacent case ranges beyond replicate500.
+validation_seed <- function(case_id, replicate) {
+    index <- match(case_id, validation_cases()$id)
+    stopifnot(length(index) == 1L, !is.na(index), length(replicate) > 0L,
+              all(is.finite(replicate)), all(replicate == floor(replicate)),
+              all(replicate >= 1 & replicate <= 100000L))
+    20261000L + 1000000L * index + 2L * as.integer(replicate)
+}
+
+validation_seed_rule <- function() {
+    "v2: 20261000 + 1000000 * index in validation_cases() + replicate * 2; testing seed = DGP seed + 1; max global replicate100000"
+}
+
 validation_input <- function(case, seed, n = 600L) {
     withr::with_seed(seed, {
         z <- stats::rnorm(n)

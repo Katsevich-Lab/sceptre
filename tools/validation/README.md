@@ -181,3 +181,20 @@ retains raw zeros and delegates version-specific arithmetic to R stats. The
 log-plot floor affects display only. These pilot rejection rates at raw.05 do
 not qualify extreme-tail magnitudes or extreme-tail calibration; base-R parity
 is not independent numerical validation of those tails.
+
+## Seed identity correction for precision studies
+
+Version1 used case stride1000 and therefore overlapped adjacent case ranges
+after replicate500. In the original1000-per-case a972 study, empirical-CRT
+replicates501..1000 reuse the same actual generated inputs as skew-CRT1..500.
+Per-case1000-dataset intervals remain valid;4000 case evaluations there contain
+3500 unique inputs and must not be called4000 independent datasets. Historical
+receipts retain their exact original seed/source identity.
+
+Version2 uses stride1000000, with at most100000 global replicate indices per
+case, so the case ranges are disjoint. Manifests explicitly record version2;
+batch aggregation also rejects repeated actual input hashes across datasets.
+This changes offline simulation seeds only, not package scientific methods,
+resampling budgets or defaults. Version1 pilots are never pooled into version2.
+Shared-input paired method comparisons must be analysed explicitly as paired,
+not passed through the independent-dataset batch aggregator.

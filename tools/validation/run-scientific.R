@@ -41,7 +41,7 @@ manifest <- list(started_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
     setup = setup, setup_sha256 = if (!is.null(setup)) digest::digest(setup, file = TRUE, algo = "sha256") else NULL,
     cases = cases, replicates = reps, first_replicate = first,
     last_replicate = first + reps - 1L, n_cells = n, rng = RNGkind(),
-    seed_rule = "20261000 + 1000 * index in validation_cases() + replicate * 2; testing seed = DGP seed + 1",
+    seed_version = "v2-disjoint-case-ranges", seed_rule = validation_seed_rule(),
     replication_unit = "One independently regenerated cell dataset per case and replicate; endpoints never pooled for binomial precision",
     interval = "Pointwise exact Clopper-Pearson 95% conditional on valid p-values; failures/QC and per-attempt rejection separately reported",
     session = utils::sessionInfo())
@@ -51,9 +51,8 @@ capture.output(str(manifest), file = file.path(out, "manifest.txt"))
 all_rows <- list()
 for (i in seq_len(nrow(cases))) {
     case <- cases[i, , drop = FALSE]
-    case_index <- match(case$id, validation_cases()$id)
     for (r in replicate_ids) {
-        seed <- 20261000L + 1000L * case_index + 2L * r
+        seed <- validation_seed(case$id, r)
         result <- validation_replicate(case, r, seed, n)
         all_rows[[length(all_rows) + 1L]] <- result
         utils::write.table(result, file.path(out, "replicates.csv"), sep = ",", row.names = FALSE,

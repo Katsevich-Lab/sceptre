@@ -22,3 +22,12 @@ stopifnot(s$attempted == 5L, s$valid == 2L, s$invalid_p == 1L,
           s$lower_95 < .5, s$upper_95 > .5)
 stopifnot(all(is.na(validation_interval(0L, 0L))))
 cat("Harness integrity checks passed.\n")
+
+# Pure seed checks, no fitting/simulation: all cases remain disjoint at admitted indices.
+seeds <- unlist(lapply(cases$id, validation_seed, replicate = 1:1000), use.names = FALSE)
+stopifnot(!anyDuplicated(seeds),
+          validation_seed("high_crt_empirical", 501L) != validation_seed("high_crt_skew", 1L),
+          identical(validation_seed("high_crt_empirical", 1L), 23261002L))
+for (i in seq_len(nrow(cases) - 1L))
+    stopifnot(validation_seed(cases$id[i], 100000L) < validation_seed(cases$id[i + 1L], 1L))
+cat("Version2 disjoint seed ranges verified through maximum admitted replicate index.\n")
