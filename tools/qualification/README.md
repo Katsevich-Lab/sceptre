@@ -137,3 +137,12 @@ CRAN-snapshot floor intentionally omits this optional Bioconductor test backend.
 The data-raw generator remains in Git but is excluded from the package archive;
 packaged data files and runtime code are unchanged. Actual hosted repair requires
 an exact new-revision --as-cran run; the old failing jobs remain historical facts.
+
+Gate-policy regressions are reproducible without compilation using
+`R_LIBS=CHECKER_LIBRARY python3 tools/qualification/check-submission-gate.py ARCHIVE SUMMARY NEW_OUTPUT`.
+The seven fixture cases include accepted warning removal and rejected new or
+duplicated messages, archive mismatch, stale summary and weakened options. Their
+mutated summaries are synthetic policy fixtures and must not be used for admission.
+Optional SeuratObject from W05's subsequent adapter scope is deliberately absent
+in the historical CRAN floor lane; current present/absent adapter qualification is
+separate. The installed-suite receipt records its availability on future runs.
