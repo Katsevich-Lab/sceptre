@@ -72,6 +72,7 @@ jobs:
         # matching R development ecosystem. Record actual versions per run.
         bioc: [latest, devel]
     env:
+      SCEPTRE_SUPPORT_EVIDENCE: ${{ runner.temp }}/bioconductor-evidence
       _R_CHECK_FORCE_SUGGESTS_: false
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
@@ -90,16 +91,18 @@ jobs:
             names(tools:::.split_dependencies(x)))))
           deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
           BiocManager::install(c(deps, "BiocCheck"), ask = FALSE, update = FALSE)
+          out <- Sys.getenv("SCEPTRE_SUPPORT_EVIDENCE")
+          dir.create(out, recursive = TRUE, showWarnings = FALSE)
           writeLines(c(paste("Bioconductor", BiocManager::version()),
-            capture.output(sessionInfo())), "bioconductor-environment.txt")
+            capture.output(sessionInfo())), file.path(out, "environment.txt"))
           write.table(installed.packages()[, c("Package", "Version", "Built")],
-            "bioconductor-installed.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+            file.path(out, "installed.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
       - name: Build and check package
         shell: bash
         run: |
-          git rev-parse HEAD > bioconductor-source-commit.txt
+          git rev-parse HEAD > "$SCEPTRE_SUPPORT_EVIDENCE/source-commit.txt"
           R CMD build . --no-manual
-          sha256sum sceptre_*.tar.gz > bioconductor-archive-sha256.txt
+          sha256sum sceptre_*.tar.gz > "$SCEPTRE_SUPPORT_EVIDENCE/archive-sha256.txt"
           R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
       - name: Require clean package check status
         shell: Rscript {0}
@@ -120,9 +123,6 @@ jobs:
           name: bioconductor-${{ matrix.bioc }}
           path: |
             sceptre_*.tar.gz
-            bioconductor-source-commit.txt
-            bioconductor-archive-sha256.txt
-            bioconductor-environment.txt
-            bioconductor-installed.tsv
+            ${{ runner.temp }}/bioconductor-evidence
             sceptre.Rcheck
             sceptre.BiocCheck
