@@ -33,7 +33,7 @@ data-only assays, noninteger/negative/nonfinite counts, backed matrices, and
 partial count layers are rejected. Integer-valued normalization cannot be
 identified automatically; the caller must establish raw-count provenance.
 
-```{r}
+```{r import-seurat}
 library(sceptre)
 library(SeuratObject)
 data("lowmoi_example_data")
@@ -71,14 +71,14 @@ with computed summaries reject. The shared external-assignment API accepts
 binary guide-by-original-cell calls, with the same canonical vector-ID and
 low/high-MOI rules described in the SingleCellExperiment vignette.
 
-```{r}
+```{r analyze-export-seurat}
 pairs <- data.frame(response_id = rownames(x$response_matrix)[1L],
                     grna_target = metadata$grna_target[1L])
 object <- set_analysis_parameters(object, discovery_pairs = pairs,
     formula_object = ~ log(response_n_umis), control_group = "complement",
     side = "left", resampling_approximation = "no_approximation")
 object <- set_grna_assignments(object, x$grna_matrix >= 5,
-                               "demonstration raw UMI >=5 caller")
+    "demonstration raw UMI >=5 caller")
 object <- run_qc(object, response_n_umis_range = c(0, 1),
     response_n_nonzero_range = c(0, 1), p_mito_threshold = 1,
     n_nonzero_trt_thresh = 3L, n_nonzero_cntrl_thresh = 3L)
@@ -103,10 +103,10 @@ RDS.
 
 For an actual fresh-process pipeline roundtrip from the full bundled example:
 
-```{bash, eval=FALSE}
+```{bash pipeline-seurat, eval=FALSE}
 R_LIBS=/absolute/isolated/library \
-  Rscript tools/interoperability/seurat-roundtrip.R \
-  /absolute/schema3-pipeline-checkout /tmp/new-seurat-roundtrip
+    Rscript tools/interoperability/seurat-roundtrip.R \
+    /absolute/schema3-pipeline-checkout /tmp/new-seurat-roundtrip
 ```
 
 The source helper uses the same pipeline external-assignment companion as SCE.
@@ -114,3 +114,9 @@ Both analysis and assignment configuration sections remain absent to preserve
 the prepared calls. It compares direct/pipeline results at tolerance zero,
 checks original-object ownership and saves a returned Seurat object locally.
 This exercises R-stage serialization/execution, not a scheduler or container.
+
+## Session information
+
+```{r session-information, eval=TRUE}
+sessionInfo()
+```

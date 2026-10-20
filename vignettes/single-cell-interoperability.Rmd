@@ -31,7 +31,7 @@ matching, or disk-assay realization occurs here. Dense numeric and dgC/dgR/dgT
 sparse raw-count assays are supported. Convert delayed assays explicitly only
 after checking the required memory.
 
-```{r}
+```{r import-sce}
 library(sceptre)
 library(SingleCellExperiment)
 data("lowmoi_example_data")
@@ -42,7 +42,7 @@ sce <- SingleCellExperiment(
 altExp(sce, "gRNA") <- SummarizedExperiment::SummarizedExperiment(
     assays = list(counts = x$grna_matrix))
 object <- import_from_sce(sce, x$grna_target_data_frame, "low",
-                          covariates = "batch")
+    covariates = "batch")
 ```
 
 Response features, guide features and cells need unique, nonempty IDs. Guide
@@ -72,7 +72,7 @@ caller-defined
 vector-level calling rules. Individual guide calls are never silently
 collapsed.
 
-```{r}
+```{r analyze-export-sce}
 target <- x$grna_target_data_frame$grna_target[1L]
 pairs <- data.frame(grna_target = target, response_id = rownames(sce)[1L])
 object <- set_analysis_parameters(object, discovery_pairs = pairs,
@@ -128,10 +128,10 @@ candidate package in every pipeline process and regenerate the runtime lock.
 
 The source tree includes an executable full roundtrip:
 
-```{bash, eval=FALSE}
+```{bash pipeline-sce, eval=FALSE}
 R_LIBS=/absolute/isolated/library \
-  Rscript tools/interoperability/sce-roundtrip.R \
-  /absolute/schema3-pipeline-checkout /tmp/new-sce-roundtrip
+    Rscript tools/interoperability/sce-roundtrip.R \
+    /absolute/schema3-pipeline-checkout /tmp/new-sce-roundtrip
 ```
 
 It uses the full bundled 100-response, 1,000-cell example, launches the actual
@@ -142,3 +142,9 @@ This qualifies the pipeline's R-stage serialization/execution boundary; it is
 not a scheduler or container qualification. See the separate Seurat
 interoperability vignette for its optional adapter. AnnData, delayed-assay and
 Python interfaces remain outside this supported slice.
+
+## Session information
+
+```{r session-information, eval=TRUE}
+sessionInfo()
+```
