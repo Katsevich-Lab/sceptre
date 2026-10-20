@@ -20,6 +20,7 @@
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
@@ -37,7 +38,7 @@
 
 <div id="sceptre-roadmap" class="section level1">
 
-<p>Last reviewed: August 2026</p>
+<p>Last reviewed: October 2026</p>
 <div class="section level2">
 <h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a></h2>
 <p><code>sceptre</code> is an open-source R package for statistically rigorous, scalable analysis of single-cell CRISPR screens. This roadmap describes the maintainers’ development priorities for the next two years. It is a living document: the maintainers review it at least annually and update it as priorities and capacity evolve. Each roadmap priority may encompass one or more GitHub issues, while issues also track work that is not currently prioritized on the roadmap.</p>
@@ -78,10 +79,9 @@
 </div>
 <div class="section level3">
 <h3 id="id_5-maintainable-and-extensible-software-architecture">5. Maintainable and extensible software architecture<a class="anchor" aria-label="anchor" href="#id_5-maintainable-and-extensible-software-architecture"></a></h3>
-<p><strong>Goal.</strong> We plan to refactor the <code>sceptre</code> code base around clearer, modular interfaces.</p>
-<p><strong>Rationale.</strong> As <code>sceptre</code> has grown, its internals have become more complex and more difficult to test, maintain, and extend. Clear interfaces for data access, statistical test execution, and result generation will make it easier to add capabilities such as power-aware outputs and distributed execution without coupling them tightly to the current implementation. The refactor will also make the code base easier for community contributors to understand and support stable reference outputs for downstream implementations in other languages or on other hardware.</p>
-<p><strong>Rough timing.</strong> 2027-2028, as capacity and funding permit.</p>
-<p><strong>Status.</strong> Planned.</p>
+<p><strong>Goal.</strong> Refactor the internals around clear responsibilities for cell selection, count access, model fitting, QC, inference, execution and result processing while preserving the public interface and saved-object format.</p>
+<p><strong>Rationale.</strong> These boundaries make the code easier to test and maintain and give future methods and storage integrations a concrete starting point. Extensions such as accelerated fitters, replacement QC and backed CRT remain separate work.</p>
+<p><strong>Status.</strong> Implemented on <code>codex/refactor</code> in <a href="https://github.com/Katsevich-Lab/sceptre/pull/234" class="external-link">PR #234</a>; validated and prepared for maintainer handoff. Maintainer review precedes merge and release. See the lasting <a href="ARCHITECTURE.html">architecture guide</a> for the resulting structure.</p>
 </div>
 <div class="section level3">
 <h3 id="id_6-improved-calibration-functionality">6. Improved calibration functionality<a class="anchor" aria-label="anchor" href="#id_6-improved-calibration-functionality"></a></h3>
@@ -112,3 +112,4 @@
 
 
   </body></html>
+

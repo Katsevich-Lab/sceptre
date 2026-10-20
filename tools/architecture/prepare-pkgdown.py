@@ -90,6 +90,11 @@ def destination(path):
     return 'articles/' + slug(path) + '.html'
 
 def rewrite(text, origin, current):
+    # Preserve historical evidence paths without turning private temporary
+    # artifacts into broken website download links.
+    text = re.sub(r'\[([^\]]+)\]\((/(?:private/)?tmp/[^\s)]+)\)',
+                  lambda m: m.group(1) + ' (`' + m.group(2) +
+                  '`; historical local artifact)', text)
     def link(match):
         prefix, url, suffix = match.groups()
         p, s = locate(origin, url)
@@ -136,6 +141,12 @@ for path, text in sources.items():
         text = re.sub(r'```\{r[^}]*\}', '```r', text)
         text = re.sub(r'(?m)^#\|.*\n', '', text)
         text = re.sub(r'\{width=[^}]+\}', '', text)
+    if rel == 'tools/components/schema3/FIELD_DECISIONS.md':
+        # These dollars denote R list paths, not TeX. Pandoc otherwise pairs
+        # them across cells/rows and consumes much of the migration table.
+        chunks = re.split(r'(`[^`]*`)', text)
+        text = ''.join(x if i % 2 else x.replace('$', r'\$')
+                       for i, x in enumerate(chunks))
     heading = re.search(r'^# (.+)$', text, re.M)
     title = heading.group(1) if heading else path.stem.replace('-', ' ').capitalize()
     if heading:

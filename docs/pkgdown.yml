@@ -2,8 +2,40 @@ pandoc: 3.9.0.2
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
+  articles/contributor-change-map: contributor-change-map.html
+  articles/contributor-legacy-fields: contributor-legacy-fields.html
+  articles/contributor-object-fields: contributor-object-fields.html
+  articles/contributor-schema-architecture: contributor-schema-architecture.html
+  articles/contributor-site-notes: contributor-site-notes.html
+  articles/contributor-tests-testthat-fixtures-readme: contributor-tests-testthat-fixtures-readme.html
+  articles/contributor-tools-architecture-readme: contributor-tools-architecture-readme.html
+  articles/contributor-tools-checks-readme: contributor-tools-checks-readme.html
+  articles/contributor-tools-components-fits-independent-review: contributor-tools-components-fits-independent-review.html
+  articles/contributor-tools-components-fits-pr233: contributor-tools-components-fits-pr233.html
+  articles/contributor-tools-components-fits-qualification: contributor-tools-components-fits-qualification.html
+  articles/contributor-tools-components-fits-validation-readme: contributor-tools-components-fits-validation-readme.html
+  articles/contributor-tools-components-runplan-decision: contributor-tools-components-runplan-decision.html
+  articles/contributor-tools-components-runplan-validation-readme: contributor-tools-components-runplan-validation-readme.html
+  articles/contributor-tools-components-schema3-validation: contributor-tools-components-schema3-validation.html
+  articles/contributor-tools-hardening-benchmark-readme: contributor-tools-hardening-benchmark-readme.html
+  articles/contributor-tools-hardening-dependencies-readme: contributor-tools-hardening-dependencies-readme.html
+  articles/contributor-tools-hardening-disposition: contributor-tools-hardening-disposition.html
+  articles/contributor-tools-hardening-ondisc-contract: contributor-tools-hardening-ondisc-contract.html
+  articles/contributor-tools-hardening-qualification: contributor-tools-hardening-qualification.html
+  articles/contributor-tools-hardening-review-installed-8cbecfb-recheck: contributor-tools-hardening-review-installed-8cbecfb-recheck.html
+  articles/contributor-tools-hardening-review-narrow-169c16e-recheck: contributor-tools-hardening-review-narrow-169c16e-recheck.html
+  articles/contributor-tools-hardening-submission-baseline-readme: contributor-tools-hardening-submission-baseline-readme.html
+  articles/contributor-tools-hardening-submission-cleanup-formatting-readme: contributor-tools-hardening-submission-cleanup-formatting-readme.html
+  articles/contributor-tools-hardening-submission-cleanup-independent-review-final-submission-delta-review: contributor-tools-hardening-submission-cleanup-independent-review-final-submission-delta-review.html
+  articles/contributor-tools-hardening-submission-cleanup-qualification: contributor-tools-hardening-submission-cleanup-qualification.html
+  articles/contributor-tools-refactor-bug-fixes: contributor-tools-refactor-bug-fixes.html
+  articles/contributor-tools-refactor-consistency-readme: contributor-tools-refactor-consistency-readme.html
+  articles/contributor-tools-refactor-readme: contributor-tools-refactor-readme.html
+  articles/contributor-tools-refactor-validation-readme: contributor-tools-refactor-validation-readme.html
+  articles/contributor-tools-refactor-walkthrough: contributor-tools-refactor-walkthrough.html
+  articles/contributor-walkthrough: contributor-walkthrough.html
   sceptre: sceptre.html
-last_built: 2026-08-31T16:15Z
+last_built: 2026-10-20T14:34Z
 urls:
   reference: https://katsevich-lab.github.io/sceptre/reference
   article: https://katsevich-lab.github.io/sceptre/articles

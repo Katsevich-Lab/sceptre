@@ -26,6 +26,7 @@ for more information about this function."><meta property="og:image" content="ht
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -116,31 +117,33 @@ subject to change. We expect the API to solidify as we learn more about the
 Parse platform and the structure of the Parse count matrix generation program
 output.</p>
 <p>The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See <a href="https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/" class="external-link">https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/</a>.</p>
+<p>Count-file entries may be unsorted, but each cell-feature coordinate must
+occur only once. Repeated coordinates cause an import error rather than being
+summed; repeated guide-metadata rows are a separate matter.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"/parse_example/"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gene_mat_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"gene_mat.mtx"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">grna_mat_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"grna_mat.mtx"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">all_genes_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"all_genes.csv"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">all_grnas_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"all_grnas.csv"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">grna_target_data_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  grna_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"guide_A"</span>, <span class="st">"guide_B"</span>, <span class="st">"guide_C"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  grna_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"target-A"</span>, <span class="st">"target-B"</span>, <span class="st">"non-targeting"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_parse</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  gene_mat_fp <span class="op">=</span> <span class="va">gene_mat_fp</span>,</span></span>
-<span class="r-in"><span>  grna_mat_fp <span class="op">=</span> <span class="va">grna_mat_fp</span>,</span></span>
-<span class="r-in"><span>  all_genes_fp <span class="op">=</span> <span class="va">all_genes_fp</span>,</span></span>
-<span class="r-in"><span>  all_grnas_fp <span class="op">=</span> <span class="va">all_grnas_fp</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"low"</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span>
+<span>  <span class="st">"/parse_example/"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">gene_mat_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"gene_mat.mtx"</span><span class="op">)</span></span>
+<span><span class="va">grna_mat_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"grna_mat.mtx"</span><span class="op">)</span></span>
+<span><span class="va">all_genes_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"all_genes.csv"</span><span class="op">)</span></span>
+<span><span class="va">all_grnas_fp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"all_grnas.csv"</span><span class="op">)</span></span>
+<span><span class="va">grna_target_data_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  grna_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"guide_A"</span>, <span class="st">"guide_B"</span>, <span class="st">"guide_C"</span><span class="op">)</span>,</span>
+<span>  grna_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"target-A"</span>, <span class="st">"target-B"</span>, <span class="st">"non-targeting"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_parse</span><span class="op">(</span></span>
+<span>  gene_mat_fp <span class="op">=</span> <span class="va">gene_mat_fp</span>,</span>
+<span>  grna_mat_fp <span class="op">=</span> <span class="va">grna_mat_fp</span>,</span>
+<span>  all_genes_fp <span class="op">=</span> <span class="va">all_genes_fp</span>,</span>
+<span>  all_grnas_fp <span class="op">=</span> <span class="va">all_grnas_fp</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"low"</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -78,12 +78,12 @@ result provenance only, never a working setting or reusable cache identity.
 | `response_precomputations` | F.response_precomputations | New F.response_fits cache has explicit actual fitting identity. Old entries are discarded as unverified; only discarded_unverified_fit_count is recorded. |
 | `last_function_called` | last_function_called | Removed call journal; not retained as live state or used to infer completion. |
 | `functs_called` | functs_called | Removed Boolean authority. Used only as evidence when reconstructing preparation stages whose durable payloads validate. Never certifies old results/fits; raw flag vector is not retained. |
-| `calibration_result` | R.calibration_result | R.records$run_calibration_check$table. Import as historical, preserve recognized history/provenance, invalidate currentness. |
-| `power_result` | R.power_result | R.records$run_power_check$table; same historical-only migration. |
-| `discovery_result` | R.discovery_result | R.records$run_discovery_analysis$table; same historical-only migration. |
+| `calibration_result` | R.calibration_result | R.records\$run_calibration_check\$table. Import as historical, preserve recognized history/provenance, invalidate currentness. |
+| `power_result` | R.power_result | R.records\$run_power_check\$table; same historical-only migration. |
+| `discovery_result` | R.discovery_result | R.records\$run_discovery_analysis\$table; same historical-only migration. |
 | `nuclear` | nuclear | Removed pipeline mode; no corresponding working field. Not retained separately. |
 | `nf_pipeline` | nf_pipeline | Removed pipeline/raw-result mode; public analyses finalize complete families. Old saved result scope may be retained as historical metadata only. |
-| `integer_id` | D.integer_id | No screen-level ID slot. Backed descriptors own import IDs; an unanchored old ID can temporarily enter R.import_metadata$legacy_backend_id for reopening. It never establishes immutable content. |
+| `integer_id` | D.integer_id | No screen-level ID slot. Backed descriptors own import IDs; an unanchored old ID can temporarily enter R.import_metadata\$legacy_backend_id for reopening. It never establishes immutable content. |
 | `elements_to_analyze` | elements_to_analyze | Removed pipeline subset scope. Current public result commits require their complete prepared family; no corresponding live slot. |
 
 ## All 14 additional schema 2 attributes
@@ -110,24 +110,24 @@ result provenance only, never a working setting or reusable cache identity.
 | Old nested field(s) | Retention or derivation decision |
 |---|---|
 | Count-store lists, element 1 | Unwrapped once; multiple-element wrappers error. Sparse normalized stores become direct dgRMatrix; ondisc objects/descriptors become BackedCountStore. Empty recognizable stores remain unavailable, not fabricated count data. |
-| D.backend$response / $grna | Descriptor path, content_md5, dimensions, dimnames and integer_id move together into each typed store. A live handle is process-local; serialized output closes it. |
-| D.import_grna_assignment_info$max_grna / $max_grna_frac_umis | Kept with their owning import summary list. |
-| S.requested$discovery_pairs / $positive_control_pairs | Prefer saved originals, strip derived grna_group, normalize ID columns to character. Preserve repeated requests. |
-| S.requested$side / $grna_integration_strategy / $formula_object / $resampling_approximation / $control_group / $resampling_mechanism / $multiple_testing_method / $multiple_testing_alpha | No independent working copies. Resolved S fields remain authoritative; retained old result provenance may contain these exact old snapshots. |
+| D.backend\$response / \$grna | Descriptor path, content_md5, dimensions, dimnames and integer_id move together into each typed store. A live handle is process-local; serialized output closes it. |
+| D.import_grna_assignment_info\$max_grna / \$max_grna_frac_umis | Kept with their owning import summary list. |
+| S.requested\$discovery_pairs / \$positive_control_pairs | Prefer saved originals, strip derived grna_group, normalize ID columns to character. Preserve repeated requests. |
+| S.requested\$side / \$grna_integration_strategy / \$formula_object / \$resampling_approximation / \$control_group / \$resampling_mechanism / \$multiple_testing_method / \$multiple_testing_alpha | No independent working copies. Resolved S fields remain authoritative; retained old result provenance may contain these exact old snapshots. |
 | S.grna_assignment_hyperparameters and S.cellwise_qc_thresholds entries | Retained method/QC settings in their existing lists; current signatures include their resolved values. See ARCHITECTURE.md for actual method-specific keys. |
-| P.initial_grna_assignment_list$<guide ID> | Retain under guide_assignments with source coordinates. |
-| P.grna_assignments_raw$grna_group_idxs / $indiv_nt_grna_idxs | Retain under source_groups. |
-| P.grna_assignments$grna_group_idxs / $indiv_nt_grna_idxs / optional $all_nt_idxs | Retain under analysis_groups, preserving source-to-analysis and NT-list ordering. |
-| P.stages$design / $assignment / $cell_qc / $pair_qc; their complete, coordinates, cells, identity members | Drop old completion/identity metadata and duplicate cells, then reconstruct validated current stage records. Current analysis_cells is the sole retained-cell authority. |
-| F.response_precomputations$<response ID>, fitted_coefs/theta | Not reused or archived as fits. Count discarded entries in import_metadata. New runs create independently validated entries. |
-| F.identity$data / $cells / $design / $method | Drop old cache certificate. Current identity additionally records explicit columns and actual selected design values. |
-| R.records$<analysis>$complete / $status / $identity / $invalidation_reason | Drop old completion/currentness assertions. New migrated identity is NULL and invalidated_by is legacy provenance unknown. |
-| R.records$<analysis>$scope | Keep old scope when supplied, otherwise unknown; migrated entries remain historical regardless. |
-| R.records$<analysis>$provenance | Preserve under provenance$saved_provenance, including its schema_version, package_version, requested/effective/pairs snapshots and any contained assignment/QC/method details. Do not reinterpret those snapshots as verified effective history. |
-| R.records$<analysis>$history, old history entry result/table | Recursively migrate recognized histories; preserve each historical table/provenance. Flattened current-entry history does not duplicate a nested history chain inside each old entry. |
-| S.B1/B2/B3/calibration_group_size/n_calibration_pairs/negative_control_pairs at import | Preserve recognizable values as each migrated result's provenance$effective_snapshot, explicitly unknown as evidence of that result's actual original run. |
+| P.initial_grna_assignment_list\$<guide ID> | Retain under guide_assignments with source coordinates. |
+| P.grna_assignments_raw\$grna_group_idxs / \$indiv_nt_grna_idxs | Retain under source_groups. |
+| P.grna_assignments\$grna_group_idxs / \$indiv_nt_grna_idxs / optional \$all_nt_idxs | Retain under analysis_groups, preserving source-to-analysis and NT-list ordering. |
+| P.stages\$design / \$assignment / \$cell_qc / \$pair_qc; their complete, coordinates, cells, identity members | Drop old completion/identity metadata and duplicate cells, then reconstruct validated current stage records. Current analysis_cells is the sole retained-cell authority. |
+| F.response_precomputations\$<response ID>, fitted_coefs/theta | Not reused or archived as fits. Count discarded entries in import_metadata. New runs create independently validated entries. |
+| F.identity\$data / \$cells / \$design / \$method | Drop old cache certificate. Current identity additionally records explicit columns and actual selected design values. |
+| R.records\$<analysis>\$complete / \$status / \$identity / \$invalidation_reason | Drop old completion/currentness assertions. New migrated identity is NULL and invalidated_by is legacy provenance unknown. |
+| R.records\$<analysis>\$scope | Keep old scope when supplied, otherwise unknown; migrated entries remain historical regardless. |
+| R.records\$<analysis>\$provenance | Preserve under provenance\$saved_provenance, including its schema_version, package_version, requested/effective/pairs snapshots and any contained assignment/QC/method details. Do not reinterpret those snapshots as verified effective history. |
+| R.records\$<analysis>\$history, old history entry result/table | Recursively migrate recognized histories; preserve each historical table/provenance. Flattened current-entry history does not duplicate a nested history chain inside each old entry. |
+| S.B1/B2/B3/calibration_group_size/n_calibration_pairs/negative_control_pairs at import | Preserve recognizable values as each migrated result's provenance\$effective_snapshot, explicitly unknown as evidence of that result's actual original run. |
 | Top-level and component class attributes | Read physical attributes and construct current registered classes; do not transplant obsolete class layouts. |
-| Unrecognized attributes or nonanalysis R.records entries (including an older records$legacy catch-all) | No generic lossless archive is implemented. These are not copied into a second live schema. Keep the original RDS if such implementation-specific metadata must be retained. |
+| Unrecognized attributes or nonanalysis R.records entries (including an older records\$legacy catch-all) | No generic lossless archive is implemented. These are not copied into a second live schema. Keep the original RDS if such implementation-specific metadata must be retained. |
 
 ## Migration guarantees and limits
 

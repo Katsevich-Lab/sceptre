@@ -46,6 +46,7 @@ for more detailed information about this function."><meta property="og:image" co
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -143,33 +144,32 @@ been applied</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># import data</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># set analysis parameters, assign grnas, run qc</span></span></span>
-<span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>    positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>    side <span class="op">=</span> <span class="st">"left"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">run_qc</span><span class="op">(</span><span class="op">)</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="co"># import data</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># set analysis parameters, assign grnas, run qc</span></span>
+<span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span>
+<span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span>
+<span>    positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>    side <span class="op">=</span> <span class="st">"left"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">run_qc</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

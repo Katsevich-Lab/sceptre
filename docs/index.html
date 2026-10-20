@@ -42,6 +42,7 @@
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -68,7 +69,7 @@
 <li>
 <strong>Statistical rigor.</strong> Association testing is built on a principled resampling-based methodology. Built-in calibration and power checks let you verify that false positives are controlled and that real effects are detectable — on your own data.</li>
 <li>
-<strong>Massive scalability.</strong> Optimized C++ routines improve performance. Optional <a href="https://cran.r-project.org/package=ondisc" class="external-link">disk-backed data structures</a> allow the analysis of datasets too large to fit in memory. The companion <a href="https://github.com/timothy-barry/sceptre-pipeline" class="external-link"><code>sceptre</code> Nextflow pipeline</a> distributes analyses across hundreds of processors on a cluster or cloud.</li>
+<strong>Massive scalability.</strong> Optimized C++ routines improve performance. Optional <a href="https://github.com/timothy-barry/ondisc" class="external-link">disk-backed data structures</a> allow the analysis of datasets too large to fit in memory. The companion <a href="https://github.com/timothy-barry/sceptre-pipeline" class="external-link"><code>sceptre</code> Nextflow pipeline</a> distributes analyses across hundreds of processors on a cluster or cloud.</li>
 <li>
 <strong>Ease of use.</strong> A small, pipe-friendly set of functions takes you from raw count matrices to results in a handful of steps.</li>
 </ul>
@@ -79,6 +80,21 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"Katsevich-Lab/sceptre"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="optional-disk-backed-analyses">Optional disk-backed analyses<a class="anchor" aria-label="anchor" href="#optional-disk-backed-analyses"></a>
+</h3>
+<p>Optional backed analyses are qualified with ondisc source commit <code>589803edea2a66ad15e7f07186bee16c7739ab8c</code>, which includes a pair-iteration bounds fix. The package version <code>1.3.5</code> alone does not identify that source; CRAN’s source with that version lacked the guard during qualification. In-memory SCEPTRE needs no ondisc installation. For the qualified backed setup, install a C++ toolchain and the HDF5 requirements for your platform, then run:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages(c("remotes", "BiocManager"))</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"Rhdf5lib"</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span></span>
+<span>    <span class="st">"timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c"</span>,</span>
+<span>    upgrade <span class="op">=</span> <span class="st">"never"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageDescription</a></span><span class="op">(</span><span class="st">"ondisc"</span><span class="op">)</span><span class="op">$</span><span class="va">RemoteSha</span>,</span>
+<span>    <span class="st">"589803edea2a66ad15e7f07186bee16c7739ab8c"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Backed CRT is still unsupported. Dependency release/distribution follow-up is separate from enabling any new backend or method.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>

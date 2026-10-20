@@ -38,6 +38,7 @@ for more information about this function."><meta property="og:image" content="ht
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -87,95 +88,42 @@ which to write the results</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>No return value; called for its side effect of writing files to <code>directory</code>.</p>
+    <p>No return value; called for its side effect of writing files to
+<code>directory</code>.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># import data</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    side <span class="op">=</span> <span class="st">"left"</span>,</span></span>
-<span class="r-in"><span>    resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span></span>
-<span class="r-in"><span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>    positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">write_outputs_to_directory</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_outputs"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Constructing negative control pairs.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253631 (1 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100053 (5 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100325 (10 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253963 (15 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100314 (20 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000177993 (25 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099956 (30 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253920 (35 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000203280 (40 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000187792 (45 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211666 (50 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000236611 (55 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253546 (60 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099917 (65 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253889 (70 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099889 (75 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000241973 (80 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000225783 (85 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000279548 (90 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100068 (95 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000224277 (1 of 5)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000226772 (5 of 5)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100218 (1 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099958 (5 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211638 (10 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211685 (15 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000220891 (20 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000187905 (25 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000235954 (30 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000244486 (35 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000225783 (40 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000224277 (45 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000286326 (50 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211672 (55 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000203280 (60 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000233521 (65 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100319 (70 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211674 (75 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099917 (80 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100053 (85 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000229770 (90 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253920 (95 of 97)</span>
-<span class="r-in"><span><span class="co"># files written to "sceptre_outputs" in tempdir()</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="co"># import data</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span>
+<span>    side <span class="op">=</span> <span class="st">"left"</span>,</span>
+<span>    resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span>
+<span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span>
+<span>    positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">write_outputs_to_directory</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_outputs"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># files written to "sceptre_outputs" in tempdir()</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

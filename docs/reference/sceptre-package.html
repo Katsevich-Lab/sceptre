@@ -22,6 +22,7 @@ emphasizing statistical rigor, massive scalability, and ease of use."><meta prop
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -63,815 +64,144 @@ emphasizing statistical rigor, massive scalability, and ease of use.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">##########################</span></span></span>
-<span class="r-in"><span><span class="co"># Low-MOI CRISPRko example</span></span></span>
-<span class="r-in"><span><span class="co">##########################</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 1. create the sceptre object</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"lowmoi_example_data"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"low"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: none</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: not specified</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 2. set the analysis parameters</span></span></span>
-<span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_trans_pairs.html">construct_trans_pairs</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  pairs_to_exclude <span class="op">=</span> <span class="st">"pc_pairs"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 3. assign grnas</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_grna_count_distributions.html">plot_grna_count_distributions</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">maximum</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">20</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): not computed when using "maximum" assignment method</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 4. run qc</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_covariates.html">plot_covariates</a></span><span class="op">(</span><span class="va">sceptre_object</span>, p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span>p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells (<span style="color: #0000BB;">811</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs (<span style="color: #0000BB;">1911</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs (<span style="color: #0000BB;">11</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">maximum</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">20</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): not computed when using "maximum" assignment method</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 5. run the calibration check</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Constructing negative control pairs.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000234860 (1 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000148482 (5 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000230789 (10 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100122 (15 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000285699 (20 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253141 (25 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000154803 (30 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000287671 (35 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000178199 (40 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000221937 (45 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000235335 (50 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000169992 (55 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000228008 (60 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000233251 (65 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000166482 (70 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000259269 (75 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000267009 (80 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000143314 (85 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000234580 (90 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000136997 (95 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000251187 (100 of 100)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells (<span style="color: #0000BB;">811</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs (<span style="color: #0000BB;">1911</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs (<span style="color: #0000BB;">11</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">maximum</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">20</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): not computed when using "maximum" assignment method</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1911</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">-0.03</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 6. run power check</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000287679 (1 of 11)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000147324 (5 of 11)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000181374 (10 of 11)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells (<span style="color: #0000BB;">811</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs (<span style="color: #0000BB;">1911</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs (<span style="color: #0000BB;">11</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">maximum</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">20</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): not computed when using "maximum" assignment method</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1911</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">-0.03</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Median<span style="color: #00BB00;"> positive control </span>p-value: <span style="color: #0000BB;">0.00048</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 7. run discovery analysis</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000230714 (1 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000258818 (5 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000178038 (10 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000261469 (15 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000164466 (20 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000259221 (25 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000181803 (30 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000266651 (35 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000267788 (40 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000169992 (45 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000166482 (50 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000105122 (55 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000271855 (60 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000251187 (65 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000169836 (70 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000131016 (75 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000198851 (80 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211767 (85 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000143314 (90 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000181374 (95 of 100)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000260003 (100 of 100)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-7.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">1000</span> cells (<span style="color: #0000BB;">811</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">Low</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">40</span> targeting gRNAs (distributed across <span style="color: #0000BB;">20</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1980</span> pairs (<span style="color: #0000BB;">1911</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">20</span> pairs (<span style="color: #0000BB;">11</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">both</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Control group: <span style="color: #0000BB;">non-targeting cells</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">permutations</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">maximum</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">20</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): not computed when using "maximum" assignment method</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1911</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">-0.03</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Median<span style="color: #00BB00;"> positive control </span>p-value: <span style="color: #0000BB;">0.00048</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BBBB00;"> discovery pairs </span>called as significant: <span style="color: #0000BB;">37/1911</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 8. write results to a directory. tempdir() is used so this example is</span></span></span>
-<span class="r-in"><span><span class="co"># self-contained; for a real analysis choose a directory you can find again.</span></span></span>
-<span class="r-in"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sceptre_outputs_lowmoi"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  directory <span class="op">=</span> <span class="va">output_dir</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"sceptre outputs written to a temporary directory; "</span>,</span></span>
-<span class="r-in"><span>  <span class="st">'open with `browseURL("'</span>, <span class="va">output_dir</span>, <span class="st">'")`'</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> sceptre outputs written to a temporary directory; open with `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpmflZHi/sceptre_outputs_lowmoi")`</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">##########################</span></span></span>
-<span class="r-in"><span><span class="co"># High-MOI CRISPRi example</span></span></span>
-<span class="r-in"><span><span class="co">##########################</span></span></span>
-<span class="r-in"><span><span class="co"># 1. create the sceptre object from cellranger output</span></span></span>
-<span class="r-in"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data_from_cellranger.html">import_data_from_cellranger</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  directories <span class="op">=</span> <span class="va">directories</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing directory 1.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing directory 2.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Combining matrices across directories.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating the sceptre object.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: none</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: not specified</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 2. set the analysis parameters</span></span></span>
-<span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  side <span class="op">=</span> <span class="st">"left"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 3. assign grnas</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_grna_count_distributions.html">plot_grna_count_distributions</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-8.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA ENSG00000224277_grna1 (1 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA ENSG00000226772_grna1 (5 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA ENSG00000286326_grna2 (10 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_3_grna1 (15 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_5_grna2 (20 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_8_grna1 (25 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_10_grna2 (30 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_13_grna1 (35 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_15_grna2 (40 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_18_grna1 (45 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA candidate_enh_20_grna2 (50 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA non-targeting_grna5 (55 of 60)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Performing gRNA-to-cell assignments for gRNA non-targeting_grna10 (60 of 60)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-9.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: not specified</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">mixture</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">58.35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): <span style="color: #0000BB;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA assignment formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 4. run qc</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_covariates.html">plot_covariates</a></span><span class="op">(</span><span class="va">sceptre_object</span>, p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-10.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span>p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-11.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells (<span style="color: #0000BB;">483</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs (<span style="color: #0000BB;">1314</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs (<span style="color: #0000BB;">5</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">mixture</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">58.35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): <span style="color: #0000BB;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA assignment formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 5. run the calibration check</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Constructing negative control pairs.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000253631 (1 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100053 (5 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100325 (10 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000253963 (15 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100314 (20 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000273343 (25 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000133475 (30 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000234503 (35 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000253126 (40 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000235786 (45 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000183765 (50 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000161133 (55 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000234208 (60 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211661 (65 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211672 (70 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000220891 (75 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000227838 (80 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000128271 (85 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000099958 (90 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000167037 (95 of 98)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna1&amp;non-targeting_grna6 (1 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna3&amp;non-targeting_grna5 (5 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna9&amp;non-targeting_grna10 (10 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna8&amp;non-targeting_grna10 (15 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna1&amp;non-targeting_grna5 (20 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna7&amp;non-targeting_grna10 (25 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna2&amp;non-targeting_grna9 (30 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna2&amp;non-targeting_grna4 (35 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna2&amp;non-targeting_grna5 (40 of 45)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group non-targeting_grna1&amp;non-targeting_grna2 (45 of 45)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-12.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells (<span style="color: #0000BB;">483</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs (<span style="color: #0000BB;">1314</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs (<span style="color: #0000BB;">5</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">mixture</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">58.35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): <span style="color: #0000BB;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA assignment formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1314</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">0.002</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 6. run the power check</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000224277 (1 of 5)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000226772 (5 of 5)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group ENSG00000224277 (1 of 5)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group ENSG00000226772 (5 of 5)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-13.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells (<span style="color: #0000BB;">483</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #BB0000;">✗</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs (<span style="color: #0000BB;">1314</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs (<span style="color: #0000BB;">5</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">mixture</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">58.35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): <span style="color: #0000BB;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA assignment formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1314</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">0.002</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Median<span style="color: #00BB00;"> positive control </span>p-value: <span style="color: #0000BB;">2.2e-10</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 7. run discovery analysis</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100218 (1 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000099958 (5 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211638 (10 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211685 (15 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000220891 (20 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000187905 (25 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000235954 (30 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000244486 (35 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000225783 (40 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000224277 (45 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000286326 (50 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211672 (55 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000203280 (60 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000233521 (65 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100319 (70 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000211674 (75 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000099917 (80 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000100053 (85 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000229770 (90 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running precomputation on response ENSG00000253920 (95 of 97)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group candidate_enh_1 (1 of 20)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group candidate_enh_5 (5 of 20)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group candidate_enh_12 (10 of 20)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group candidate_enh_19 (15 of 20)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing gRNA group candidate_enh_14 (20 of 20)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="sceptre-package-14.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class <span style="color: #0000BB;">sceptre_object</span>.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Attributes of the data:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">500</span> cells (<span style="color: #0000BB;">483</span> after cellwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">100</span> responses</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">High</span> multiplicity-of-infection </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">50</span> targeting gRNAs (distributed across <span style="color: #0000BB;">25</span> targets) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">10</span> non-targeting gRNAs </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• <span style="color: #0000BB;">5</span> covariates (batch, grna_n_nonzero, grna_n_umis, response_n_nonzero, response_n_umis)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis status:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> import_data()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> set_analysis_parameters()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> assign_grnas()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_qc()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_calibration_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_power_check()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	<span style="color: #00BB00;">✓</span> run_discovery_analysis()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Analysis parameters: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Discovery pairs: data frame with <span style="color: #0000BB;">1406</span> pairs (<span style="color: #0000BB;">1314</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Positive control pairs: data frame with <span style="color: #0000BB;">5</span> pairs (<span style="color: #0000BB;">5</span> after pairwise QC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Sidedness of test: <span style="color: #0000BB;">left</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling mechanism: <span style="color: #0000BB;">conditional resampling</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA integration strategy: <span style="color: #0000BB;">union</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Resampling approximation: <span style="color: #0000BB;">skew normal</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Multiple testing adjustment: <span style="color: #0000BB;">BH</span> at level <span style="color: #0000BB;">0.1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero treatment cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N nonzero control cells threshold: <span style="color: #0000BB;">7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gRNA-to-cell assignment information:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Assignment method: <span style="color: #0000BB;">mixture</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N cells per gRNA: <span style="color: #0000BB;">58.35</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean N gRNAs per cell (MOI): <span style="color: #0000BB;">7</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• gRNA assignment formula object: <span style="color: #0000BB;">log(response_n_nonzero) + log(response_n_umis) + log(grna_n_nonzero) + log(grna_n_umis) + batch</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Summary of results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BB0000;"> negative control </span>pairs called as significant: <span style="color: #0000BB;">0/1314</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Mean log-2 FC for<span style="color: #BB0000;"> negative control </span>pairs: <span style="color: #0000BB;">0.002</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• Median<span style="color: #00BB00;"> positive control </span>p-value: <span style="color: #0000BB;">2.2e-10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	• N<span style="color: #BBBB00;"> discovery pairs </span>called as significant: <span style="color: #0000BB;">10/1314</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 8. write results to a directory. tempdir() is used so this example is</span></span></span>
-<span class="r-in"><span><span class="co"># self-contained; for a real analysis choose a directory you can find again.</span></span></span>
-<span class="r-in"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sceptre_outputs_highmoi"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  directory <span class="op">=</span> <span class="va">output_dir</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="st">"sceptre outputs written to a temporary directory; "</span>,</span></span>
-<span class="r-in"><span>  <span class="st">'open by running `browseURL("'</span>, <span class="va">output_dir</span>, <span class="st">'")` in the console.'</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> sceptre outputs written to a temporary directory; open by running `browseURL("/var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//RtmpmflZHi/sceptre_outputs_highmoi")` in the console.</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co">##########################</span></span>
+<span><span class="co"># Low-MOI CRISPRko example</span></span>
+<span><span class="co">##########################</span></span>
+<span></span>
+<span><span class="co"># 1. create the sceptre object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"lowmoi_example_data"</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>  response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>  grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>  extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"low"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. set the analysis parameters</span></span>
+<span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_trans_pairs.html">construct_trans_pairs</a></span><span class="op">(</span></span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  pairs_to_exclude <span class="op">=</span> <span class="st">"pc_pairs"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. assign grnas</span></span>
+<span><span class="fu"><a href="plot_grna_count_distributions.html">plot_grna_count_distributions</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 4. run qc</span></span>
+<span><span class="fu"><a href="plot_covariates.html">plot_covariates</a></span><span class="op">(</span><span class="va">sceptre_object</span>, p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span>p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 5. run the calibration check</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 6. run power check</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 7. run discovery analysis</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 8. write results to a directory. tempdir() is used so this example is</span></span>
+<span><span class="co"># self-contained; for a real analysis choose a directory you can find again.</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sceptre_outputs_lowmoi"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  directory <span class="op">=</span> <span class="va">output_dir</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span></span>
+<span>  <span class="st">"sceptre outputs written to a temporary directory; "</span>,</span>
+<span>  <span class="st">'open with `browseURL("'</span>, <span class="va">output_dir</span>, <span class="st">'")`'</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##########################</span></span>
+<span><span class="co"># High-MOI CRISPRi example</span></span>
+<span><span class="co">##########################</span></span>
+<span><span class="co"># 1. create the sceptre object from cellranger output</span></span>
+<span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span>
+<span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data_from_cellranger.html">import_data_from_cellranger</a></span><span class="op">(</span></span>
+<span>  directories <span class="op">=</span> <span class="va">directories</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. set the analysis parameters</span></span>
+<span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  side <span class="op">=</span> <span class="st">"left"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. assign grnas</span></span>
+<span><span class="fu"><a href="plot_grna_count_distributions.html">plot_grna_count_distributions</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 4. run qc</span></span>
+<span><span class="fu"><a href="plot_covariates.html">plot_covariates</a></span><span class="op">(</span><span class="va">sceptre_object</span>, p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="va">sceptre_object</span> <span class="op">|&gt;</span> <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span>p_mito_threshold <span class="op">=</span> <span class="fl">0.075</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 5. run the calibration check</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_calibration_check.html">run_calibration_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 6. run the power check</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_power_check.html">run_power_check</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 7. run discovery analysis</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 8. write results to a directory. tempdir() is used so this example is</span></span>
+<span><span class="co"># self-contained; for a real analysis choose a directory you can find again.</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"sceptre_outputs_highmoi"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="write_outputs_to_directory.html">write_outputs_to_directory</a></span><span class="op">(</span></span>
+<span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>  directory <span class="op">=</span> <span class="va">output_dir</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span></span>
+<span>  <span class="st">"sceptre outputs written to a temporary directory; "</span>,</span>
+<span>  <span class="st">'open by running `browseURL("'</span>, <span class="va">output_dir</span>, <span class="st">'")` in the console.'</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
@@ -892,3 +222,4 @@ emphasizing statistical rigor, massive scalability, and ease of use.</p>
 
 
   </body></html>
+

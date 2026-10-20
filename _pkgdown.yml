@@ -40,6 +40,12 @@ reference:
   - run_power_check
   - run_discovery_analysis
 
+- title: "Experimental execution protocol"
+  contents:
+  - prepare_execution
+  - execute_work_unit
+  - collect_execution
+
 - title: "Plotting functions"
   desc: >
     Functions to visualize the analysis

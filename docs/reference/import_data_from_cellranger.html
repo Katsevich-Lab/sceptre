@@ -5,7 +5,8 @@ function should be in feature-barcode format, containing the files
 features.tsv.gz and matrix.mtx.gz (and optionally barcodes.tsv.gz).
 For standard in-memory objects, when every supplied directory contains a
 barcode file, the cell barcodes are retained as the column names of the
-response and gRNA matrices and the row names of the cell covariate data frame.
+response and gRNA matrices and the row names of the cell covariate data
+frame.
 When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, b1_ and b2_) to keep
 the cell IDs unique and stable across imports.
@@ -21,7 +22,8 @@ function should be in feature-barcode format, containing the files
 features.tsv.gz and matrix.mtx.gz (and optionally barcodes.tsv.gz).
 For standard in-memory objects, when every supplied directory contains a
 barcode file, the cell barcodes are retained as the column names of the
-response and gRNA matrices and the row names of the cell covariate data frame.
+response and gRNA matrices and the row names of the cell covariate data
+frame.
 When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, b1_ and b2_) to keep
 the cell IDs unique and stable across imports.
@@ -52,6 +54,7 @@ of the manual for more information about this function."><meta property="og:imag
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -75,7 +78,8 @@ function should be in feature-barcode format, containing the files
 <code>features.tsv.gz</code> and <code>matrix.mtx.gz</code> (and optionally <code>barcodes.tsv.gz</code>).
 For standard in-memory objects, when every supplied directory contains a
 barcode file, the cell barcodes are retained as the column names of the
-response and gRNA matrices and the row names of the cell covariate data frame.
+response and gRNA matrices and the row names of the cell covariate data
+frame.
 When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, <code>b1_</code> and <code>b2_</code>) to keep
 the cell IDs unique and stable across imports.
@@ -149,45 +153,40 @@ set to <code>TRUE</code>).</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>an initialized <code>sceptre_object</code></p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For in-memory import, count-file entries may be unsorted. Each cell-feature
+coordinate must occur only once; repeated coordinates cause an import error
+rather than being summed. This does not reject repeated guide-metadata rows.
+Backed Cell Ranger import delegates file parsing to ondisc, which has its own
+coordinate handling. See the README for the qualified ondisc installation.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 1. create a standard sceptre_object from Cell Ranger output</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_cellranger</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  directories <span class="op">=</span> <span class="va">directories</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing directory 1.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing directory 2.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Combining matrices across directories.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating the sceptre object.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 2. create an ondisc-backed sceptre_object from Cell Ranger output</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_cellranger</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  directories <span class="op">=</span> <span class="va">directories</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span>  use_ondisc <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Round 1/2 processing of the input files.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Processing file 1 of 2.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Processing file 2 of 2.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Round 2/2 processing of the input files.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Processing file 1 of 2. Computing cellwise covariates. Writing to disk.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	Processing file 2 of 2. Computing cellwise covariates. Writing to disk.</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="va">directories</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"sceptre"</span><span class="op">)</span>,</span>
+<span>  <span class="st">"/highmoi_example/gem_group_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 1. create a standard sceptre_object from Cell Ranger output</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_cellranger</span><span class="op">(</span></span>
+<span>  directories <span class="op">=</span> <span class="va">directories</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. create an ondisc-backed sceptre_object from Cell Ranger output</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ondisc"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">import_data_from_cellranger</span><span class="op">(</span></span>
+<span>    directories <span class="op">=</span> <span class="va">directories</span>,</span>
+<span>    moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>    grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span>    use_ondisc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

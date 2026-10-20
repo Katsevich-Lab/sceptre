@@ -6,7 +6,7 @@ close physical proximity to one another. construct_cis_pairs() is a useful
 pair constructor function for screens that aim to map noncoding regulatory
 elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 cis. construct_cis_pairs() assumes that the columns chr, start, and
-stop are present in the grna_target_data_frame, giving the chromosome,
+end are present in the grna_target_data_frame, giving the chromosome,
 start position, and end position, respectively, of the region that each gRNA
 targets. construct_cis_pairs() takes several arguments: sceptre_object
 (required), distance_threshold (optional), positive_control_pairs
@@ -28,7 +28,7 @@ close physical proximity to one another. construct_cis_pairs() is a useful
 pair constructor function for screens that aim to map noncoding regulatory
 elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 cis. construct_cis_pairs() assumes that the columns chr, start, and
-stop are present in the grna_target_data_frame, giving the chromosome,
+end are present in the grna_target_data_frame, giving the chromosome,
 start position, and end position, respectively, of the region that each gRNA
 targets. construct_cis_pairs() takes several arguments: sceptre_object
 (required), distance_threshold (optional), positive_control_pairs
@@ -64,6 +64,7 @@ for more detailed information about this function."><meta property="og:image" co
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -88,7 +89,7 @@ close physical proximity to one another. <code>construct_cis_pairs()</code> is a
 pair constructor function for screens that aim to map noncoding regulatory
 elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 <em>cis</em>. <code>construct_cis_pairs()</code> assumes that the columns <code>chr</code>, <code>start</code>, and
-<code>stop</code> are present in the <code>grna_target_data_frame</code>, giving the chromosome,
+<code>end</code> are present in the <code>grna_target_data_frame</code>, giving the chromosome,
 start position, and end position, respectively, of the region that each gRNA
 targets. <code>construct_cis_pairs()</code> takes several arguments: <code>sceptre_object</code>
 (required), <code>distance_threshold</code> (optional), <code>positive_control_pairs</code>
@@ -150,23 +151,22 @@ the <em>cis</em> pairs</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># import data</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu">construct_cis_pairs</span><span class="op">(</span><span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span></span>
-<span class="r-in"><span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="co"># import data</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">positive_control_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_positive_control_pairs.html">construct_positive_control_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu">construct_cis_pairs</span><span class="op">(</span><span class="va">sceptre_object</span>,</span>
+<span>  positive_control_pairs <span class="op">=</span> <span class="va">positive_control_pairs</span>,</span>
+<span>  distance_threshold <span class="op">=</span> <span class="fl">5e6</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

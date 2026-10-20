@@ -34,6 +34,7 @@ association also is displayed.'><meta property="og:image" content="https://katse
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -95,55 +96,31 @@ should be set to a gRNA ID.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># import data</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    side <span class="op">=</span> <span class="st">"left"</span>,</span></span>
-<span class="r-in"><span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span></span>
-<span class="r-in"><span>    resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">plot_response_grna_target_pair</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    response_id <span class="op">=</span> <span class="st">"ENSG00000211641"</span>,</span></span>
-<span class="r-in"><span>    grna_target <span class="op">=</span> <span class="st">"candidate_enh_15"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">The calibration check (`run_calibration_check()`) should be run before the discovery analysis.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Generating permutation resamples.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;"> ✓</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100218 (1 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099958 (5 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211638 (10 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000274422 (15 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000133475 (20 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000236003 (25 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000211661 (30 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000225783 (35 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000169548 (40 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253631 (45 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000286941 (50 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000286365 (55 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100325 (60 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000099956 (65 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100276 (70 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000234630 (75 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000253963 (80 of 85)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Analyzing pairs containing response ENSG00000100027 (85 of 85)</span>
-<span class="r-plt img"><img src="plot_response_grna_target_pair-1.png" alt="" width="700" height="433"></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">highmoi_example_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">grna_target_data_frame_highmoi</span><span class="op">)</span></span>
+<span><span class="co"># import data</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>  response_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>  grna_matrix <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>  grna_target_data_frame <span class="op">=</span> <span class="va">grna_target_data_frame_highmoi</span>,</span>
+<span>  moi <span class="op">=</span> <span class="st">"high"</span>,</span>
+<span>  extra_covariates <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>  response_names <span class="op">=</span> <span class="va">highmoi_example_data</span><span class="op">$</span><span class="va">gene_names</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">discovery_pairs</span> <span class="op">&lt;-</span> <span class="fu"><a href="construct_cis_pairs.html">construct_cis_pairs</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span><span class="va">sceptre_object</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="set_analysis_parameters.html">set_analysis_parameters</a></span><span class="op">(</span></span>
+<span>    side <span class="op">=</span> <span class="st">"left"</span>,</span>
+<span>    discovery_pairs <span class="op">=</span> <span class="va">discovery_pairs</span>,</span>
+<span>    resampling_mechanism <span class="op">=</span> <span class="st">"permutations"</span>,</span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="assign_grnas.html">assign_grnas</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"thresholding"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_qc.html">run_qc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="run_discovery_analysis.html">run_discovery_analysis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">plot_response_grna_target_pair</span><span class="op">(</span></span>
+<span>    response_id <span class="op">=</span> <span class="st">"ENSG00000211641"</span>,</span>
+<span>    grna_target <span class="op">=</span> <span class="st">"candidate_enh_15"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

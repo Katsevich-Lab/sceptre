@@ -1,0 +1,107 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SCEPTRE object and workflow map</title><style>body{margin:0;padding:12px;color:#223944;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--foreground:#223944;--muted-foreground:#617985;--border:#bfd0d8;--viz-series-1:#2b76af;--viz-series-2:#168074;--viz-series-3:#a16922}.text-small{font-size:13px;line-height:1.5}.text-muted{color:var(--muted-foreground)}button{font:inherit;cursor:pointer}.btn{background:white;border:1px solid #b7cbd3;border-radius:7px;padding:8px 11px;font-size:13px;color:#294e5e}.btn[aria-pressed=true]{background:#176e66;color:white;border-color:#176e66}.btn:hover{box-shadow:0 0 0 2px #16807422}*{box-sizing:border-box}</style></head><body><div id="sceptre-map-v3">
+  <h2>SCEPTRE: one object, a shared workflow</h2>
+  <div class="text-small text-muted">Schema 3 · conceptual illustration · not a runtime trace</div>
+  <div class="workflow" role="group" aria-label="Select a public operation">
+    <div class="viz-controls"><button class="btn" data-step="import" type="button">1 · Import</button><button class="btn" data-step="configure" type="button">2 · Configure</button><button class="btn" data-step="assign" type="button">3 · Assign guides</button><button class="btn" data-step="qc" type="button">4 · QC</button></div>
+    <div class="branches"><span class="text-small text-muted">Then choose any analysis</span><div class="viz-controls" aria-label="Sibling analyses"><button class="btn" data-step="calibration" type="button">Calibration</button><button class="btn" data-step="power" type="button">Power</button><button class="btn" data-step="discovery" type="button" aria-pressed="true">Discovery</button></div></div>
+    <div class="viz-controls"><button class="btn" data-step="inspect" type="button">Then inspect / plot / export</button></div>
+  </div>
+  <div class="legend text-small" aria-label="Diagram legend"><span><i class="key read"></i>Read</span><span><i class="key write"></i>Create / update</span><span><i class="key history"></i>Prior results become historical</span><span class="text-muted">Rectangles: data · Rounded: operations · Arrows: data flow</span></div>
+  <div class="map" role="group" aria-label="Persistent objects and temporary computation">
+    <svg class="connections" aria-hidden="true"><defs><marker id="sceptre-read-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8" fill="var(--viz-series-1)"/></marker><marker id="sceptre-write-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8" fill="var(--viz-series-2)"/></marker></defs><g class="paths"></g></svg>
+    <fieldset class="owner"><legend><strong>sceptre_object</strong> <span class="text-small text-muted">· persistent owner</span></legend><div class="text-small text-muted owner-meta">Five component references + schema_version</div>
+      <div class="object" data-object="data"><div class="object-head"><strong>ScreenData</strong><span class="effect text-small">Read</span></div><div class="text-small">Imported counts · source cells · covariates · guide metadata · data identity</div><div class="storage text-small text-muted">CountStore: sparse matrix or backed adapter<br>BackedCountStore: descriptor + local handle</div></div>
+      <div class="object" data-object="spec"><div class="object-head"><strong>AnalysisSpec</strong><span class="effect text-small">Read</span></div><div class="text-small">Requested hypotheses, scientific choices and configuration</div></div>
+      <div class="object" data-object="preparation"><div class="object-head"><strong>PreparationRecord</strong><span class="effect text-small">Read</span></div><div class="text-small">Compiled design · guide assignments · source / analysis groups · QC cells · eligible pairs · stage identities</div></div>
+      <div class="object" data-object="fits"><div class="object-head"><strong>FitCache</strong><span class="effect text-small">Reuse / add</span></div><div class="text-small">Response models + CRT perturbation models<br>Compact coefficients / dispersion; separate validity identities</div><div class="text-small text-muted">Response and perturbation caches</div></div>
+      <div class="object" data-object="results"><div class="object-head"><strong>ResultRecord</strong><span class="effect text-small">Update</span></div><div class="text-small">Each analysis: table + complete family + input identity + frozen spec / plan + history</div><div class="record-types text-small"><span>Calibration</span><span>Power</span><span data-result="discovery">Discovery</span></div></div>
+    </fieldset>
+    <div class="temporary"><div class="text-small text-muted">Outside the persistent object</div><div class="operation" data-object="operation"><span class="text-small text-muted">Selected public operation</span><strong class="operation-name">run_discovery_analysis()</strong></div>
+      <div class="transient" data-object="view"><div class="object-head"><strong>CellView</strong><span class="text-small effect">Create</span></div><div class="text-small">Temporary object<br>Ordered source → analysis → fit cells; treatment positions. References counts.</div></div>
+      <div class="transient" data-object="plan"><div class="object-head"><strong>RunPlan</strong><span class="text-small effect">Create</span></div><div class="text-small">Temporary S4 object<br>Analysis + pairs + resampling budgets + calibration sizes + identity; frozen in result provenance</div></div>
+      <div class="engine operation" data-object="engine"><span class="text-small text-muted">Analysis machinery · plain functions</span><strong>Shared fitting + testing</strong><span class="text-small engine-caption">Read prepared inputs; reuse or compute models; draw fresh resampling samples; test family.</span></div>
+      <div class="text-small text-muted success-label">Commit fits + result only on success</div>
+    </div>
+  </div>
+  <div class="selected-detail text-small" aria-live="polite">Discovery reads prepared inputs and commits its own completed result; calibration is not a prerequisite.</div>
+  <details><summary class="text-small cursor-interaction">Fit reuse, plan snapshots and result history</summary><div class="text-small">Upstream changes make previous results historical. Response fits depend on data, actual design, ordered fitting cells and fitter version; high-MOI assignment changes can preserve them. The perturbation cache additionally depends on actual guide treatment assignments. Calibration bypasses that perturbation cache; CRT draws stay fresh, and shared non-targeting controls are not duplicated. Group-specific non-targeting discovery response fits need not be saved. RunPlan is temporary during execution and saved as a frozen snapshot with the result.</div></details>
+</div>
+<style>
+#sceptre-map-v3{color:var(--foreground);width:100%}
+#sceptre-map-v3 h2{padding-right:90px;margin-bottom:4px}
+#sceptre-map-v3 strong{font-weight:500}
+#sceptre-map-v3 .workflow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:20px 0 16px}
+#sceptre-map-v3 .branches{display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--border);padding-left:14px}
+#sceptre-map-v3 .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:14px}
+#sceptre-map-v3 .legend span{display:flex;align-items:center;gap:6px}
+#sceptre-map-v3 .key{width:20px;display:inline-block;border-top:2px dashed var(--viz-series-1)}
+#sceptre-map-v3 .key.write{border-top:3px solid var(--viz-series-2)}
+#sceptre-map-v3 .key.history{border-top:2px dotted var(--viz-series-3)}
+#sceptre-map-v3 .map{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) 56px minmax(0,.9fr);align-items:stretch}
+#sceptre-map-v3 .connections{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+#sceptre-map-v3 .owner{grid-column:1;min-width:0;border:1px solid var(--border);padding:8px 14px 12px;margin:0;position:relative}
+#sceptre-map-v3 .owner legend{padding:0 6px;max-width:100%}
+#sceptre-map-v3 .owner-meta{margin-bottom:12px}
+#sceptre-map-v3 .object,#sceptre-map-v3 .transient{position:relative;border:1px solid var(--border);border-left-width:3px;padding:9px 10px;margin:0 0 10px;min-width:0;background:transparent}
+#sceptre-map-v3 [data-empty=true]>.payload{visibility:hidden}
+#sceptre-map-v3 .object:last-child{margin-bottom:0}
+#sceptre-map-v3 .object-head{display:flex;flex-direction:column;gap:3px;margin-bottom:3px}
+#sceptre-map-v3 .effect{color:var(--muted-foreground);min-height:1.5em}
+#sceptre-map-v3 .storage{margin-top:7px;padding-left:9px;border-left:1px solid var(--border)}
+#sceptre-map-v3 [data-effect=read]{border-left:3px dashed var(--viz-series-1);background:color-mix(in srgb,var(--viz-series-1) 5%,transparent)}
+#sceptre-map-v3 [data-effect=write],#sceptre-map-v3 [data-effect=both]{border-left:3px solid var(--viz-series-2);background:color-mix(in srgb,var(--viz-series-2) 7%,transparent)}
+#sceptre-map-v3 [data-effect=history]{border-left:3px dotted var(--viz-series-3);background:color-mix(in srgb,var(--viz-series-3) 6%,transparent)}
+#sceptre-map-v3 .temporary{grid-column:3;display:flex;flex-direction:column;justify-content:center;gap:12px;min-width:0;padding:14px 18px 14px 0}
+#sceptre-map-v3 .operation{display:flex;flex-direction:column;gap:4px;min-height:65px;overflow-wrap:anywhere;border:1px solid var(--border);border-radius:18px;padding:12px 10px}
+#sceptre-map-v3 .operation-name{min-height:3em}
+#sceptre-map-v3 .engine-caption{min-height:5em}
+#sceptre-map-v3 .transient{margin:0}
+#sceptre-map-v3 .transient[data-effect=write]{border-left-style:solid}
+#sceptre-map-v3 .engine{gap:5px}
+#sceptre-map-v3 .record-types{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px}
+#sceptre-map-v3 .record-types [data-active=true]{text-decoration:underline;text-underline-offset:4px;font-weight:500}
+#sceptre-map-v3 .selected-detail{margin:14px 0;min-height:3em}
+#sceptre-map-v3 details>div{margin-top:8px;color:var(--muted-foreground)}
+#sceptre-map-v3 .paths path{fill:none;stroke-width:1.5;stroke:var(--viz-series-1);stroke-dasharray:5 4;marker-end:url(#sceptre-read-arrow)}
+#sceptre-map-v3 .paths path.write{stroke:var(--viz-series-2);stroke-width:2;stroke-dasharray:none;marker-end:url(#sceptre-write-arrow)}
+@media(max-width:560px){#sceptre-map-v3 .map{grid-template-columns:minmax(0,1fr)}#sceptre-map-v3 .temporary{grid-column:1;padding:20px 14px 0}#sceptre-map-v3 .connections{display:none}#sceptre-map-v3 .branches{border-left:0;padding-left:0}#sceptre-map-v3 .operation{min-height:0}#sceptre-map-v3 .owner{padding:8px 10px 10px}}
+</style>
+<script>
+(()=>{
+ const root=document.getElementById('sceptre-map-v3');
+ const objects=Object.fromEntries([...root.querySelectorAll('[data-object]')].map(e=>[e.dataset.object,e]));
+ for(const e of root.querySelectorAll('.object')){const payload=document.createElement('div');payload.className='payload';while(e.children.length>1)payload.appendChild(e.children[1]);e.appendChild(payload);}
+ const stages={
+ import:{name:'import_data() / other importers',effects:{data:['write','Create screen data'],spec:['','Empty placeholder'],preparation:['','Empty placeholder'],fits:['','Empty placeholder'],results:['','Empty placeholder']},detail:'Import populates ScreenData only. The constructor allocates empty placeholders for the other four components.'},
+ configure:{name:'set_analysis_parameters()',effects:{data:['read','Read'],spec:['write','Update'],preparation:['write','Compile'],fits:['','Keep if compatible'],results:['history','Prior → historical']},detail:'Configure records scientific choices and compiles design / guide mapping; compatible response fits can survive.'},
+ assign:{name:'assign_grnas()',effects:{data:['read','Read'],spec:['read','Read'],preparation:['both','Read + assign'],fits:['','Check each family'],results:['history','Prior → historical']},detail:'Assign writes source-coordinate assignments: response fits may survive at high MOI; perturbation reuse also depends on treatments.'},
+ qc:{name:'run_qc()',effects:{data:['read','Read'],spec:['read','Read'],preparation:['both','Read + select'],fits:['','Keep if compatible'],results:['history','Prior → historical']},detail:'QC retains aligned analysis cells / groups and annotates pair eligibility; changed fitting cells invalidate fit reuse.'},
+ calibration:{name:'run_calibration_check()',analysis:true,family:'calibration',detail:'Calibration selects non-targeting guide pairs, uses the shared engine and commits its own completed result.'},
+ power:{name:'run_power_check()',analysis:true,family:'power',detail:'Power uses positive-control pairs and commits its own completed result; calibration is not a prerequisite.'},
+ discovery:{name:'run_discovery_analysis()',analysis:true,family:'discovery',detail:'Discovery reads prepared inputs and commits its own completed result; calibration is not a prerequisite.'},
+ inspect:{name:'get_result() · plot() · write_outputs_to_directory()',effects:{results:['read','Read current']},detail:'Inspect, plot and export read current completed results; historical results require explicit retrieval.'}
+ };
+ const analysisEffects={data:['read','Read'],spec:['read','Read'],preparation:['read','Read'],fits:['both','Reuse / add'],results:['write','Commit result'],view:['write','Create'],plan:['write','Create']};
+ let current='discovery';
+ const map=root.querySelector('.map'), paths=root.querySelector('.paths');
+ function connect(from,to,kind){const a=objects[from].getBoundingClientRect(),b=objects[to].getBoundingClientRect(),m=map.getBoundingClientRect();const forward=a.left<b.left;const shift=to==='fits'?5:from==='fits'?-5:0;const x1=(forward?a.right:a.left)-m.left,y1=a.top+a.height/2-m.top+shift,x2=(forward?b.left:b.right)-m.left,y2=b.top+b.height/2-m.top+shift;const mid=(x1+x2)/2;const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);if(kind==='write')p.classList.add('write');paths.appendChild(p);}
+ function localPath(from,to,around){const a=objects[from].getBoundingClientRect(),b=objects[to].getBoundingClientRect(),m=map.getBoundingClientRect(),p=document.createElementNS('http://www.w3.org/2000/svg','path');if(around){const x=a.right-m.left,y=a.top+a.height/2-m.top,z=b.top+b.height/2-m.top;p.setAttribute('d',`M ${x} ${y} H ${x+12} V ${z} H ${b.right-m.left}`);}else{const x=a.left+a.width/2-m.left;p.setAttribute('d',`M ${x} ${a.bottom-m.top} V ${b.top-m.top}`);}paths.appendChild(p);}
+ function draw(){paths.replaceChildren();if(!stages[current].analysis){const edges={import:[['operation','data','write']],configure:[['data','operation'],['operation','spec','write'],['operation','preparation','write']],assign:[['data','operation'],['spec','operation'],['preparation','operation'],['operation','preparation','write']],qc:[['data','operation'],['spec','operation'],['preparation','operation'],['operation','preparation','write']],inspect:[['results','operation']]};for(const edge of edges[current])connect(...edge);return;}connect('data','view');connect('preparation','view');connect('spec','plan');connect('preparation','plan');connect('fits','engine');connect('engine','fits','write');connect('engine','results','write');localPath('view','engine',true);localPath('plan','engine',false);}
+ function select(key,save=false){if(!stages[key])key='discovery';current=key;const s=stages[key],effects=s.analysis?analysisEffects:s.effects;
+ for(const [name,e] of Object.entries(objects)){const v=effects[name]||['','Unused at this step'];e.dataset.effect=v[0];e.dataset.empty=String(key==='import'&&['spec','preparation','fits','results'].includes(name));const label=e.querySelector('.effect');if(label)label.textContent=v[1];}
+ root.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.step===key)));
+ root.querySelector('.operation-name').textContent=s.name;
+ root.querySelector('.engine-caption').textContent=s.analysis?'Read prepared inputs; reuse or compute models; draw fresh resampling samples; test family.':'Shared engine is unused at this step.';
+ root.querySelector('.success-label').textContent=s.analysis?'Commit fits + result only on success':'CellView and RunPlan are unused at this step';
+ root.querySelectorAll('.record-types span').forEach(e=>e.dataset.active=String(s.family===e.textContent.toLowerCase()));
+ root.querySelector('.selected-detail').textContent=s.detail;
+ requestAnimationFrame(draw);
+ if(save&&window.openai?.setWidgetState)window.openai.setWidgetState({modelContent:{operation:key,design:'illustration draft, schema 3; RunPlan and FitCache'},privateContent:{step:key}}).catch(()=>{});
+ }
+ root.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.step,true)));
+ new ResizeObserver(draw).observe(map);
+ window.addEventListener('openai:set_globals',e=>{const s=e.detail?.globals?.widgetState;select(s?.privateContent?.step||s?.modelContent?.operation||'discovery');});
+ const initial=window.openai?.widgetState;select(initial?.privateContent?.step||initial?.modelContent?.operation||'discovery');
+})();
+</script>
+</body></html>

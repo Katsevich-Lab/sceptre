@@ -34,6 +34,7 @@ response.odm file, and grna.odm file stored on disk."><meta property="og:image" 
 <li class="nav-item"><a class="external-link nav-link" href="https://timothy-barry.github.io/sceptre-book/faq.html"><span class="fa fa-question-circle-o"></span> FAQ</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-code"></span> Functions</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html"><span class="fa fa-history"></span> Changelog</a></li>
+<li class="nav-item"><a class="nav-link" href="../CONTRIBUTING.html"><span class="fa fa-code-branch"></span> Contributing</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Katsevich-Lab/sceptre/discussions"><span class="fa fa-users"></span> Community</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -105,35 +106,66 @@ modality</p></dd>
 <code>read_ondisc_backed_sceptre_object()</code> returns an <code>ondisc</code>-backed
 <code>sceptre_object</code></p>
     </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The saved RDS contains anchored backing descriptors and closed handles,
+rather
+than live process-local file handles. Reading it with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> permits
+inspection of saved metadata and historical results, but does not reopen
+counts.
+Use <code>read_ondisc_backed_sceptre_object()</code> before continuing backed analyses
+or
+exporting reports that need counts. The optional ondisc installation is
+checked
+for the required API when backed counts are opened; in-memory analyses do not
+load ondisc.</p>
+<p>The response and guide files must be the original matching pair. Reopening
+checks their shared import ID, anchored file checksums, dimensions and
+feature
+order. Identical files may be moved or copied: pass their new paths to the
+reader. Verified relocation preserves compatible fits and saved result
+provenance. An import ID alone is not a content fingerprint.</p>
+<p>Active backing files are immutable: do not replace or edit them while an
+object
+is in use. Saving and reopening verify the existing content anchors; analysis
+getters do not repeatedly hash files. If count content or its imported
+summaries
+must change, create a new screen with <code><a href="import_data.html">import_data()</a></code> instead of overwriting
+the
+backing files. Old saved objects whose original feature labels are unknown
+may
+likewise require reimport before count replacement.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">lowmoi_example_data</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># 1. create ondisc-backed sceptre_object</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span></span>
-<span class="r-in"><span>  grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span></span>
-<span class="r-in"><span>  extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span></span>
-<span class="r-in"><span>  moi <span class="op">=</span> <span class="st">"low"</span>,</span></span>
-<span class="r-in"><span>  use_ondisc <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 2. write</span></span></span>
-<span class="r-in"><span><span class="fu">write_ondisc_backed_sceptre_object</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span></span>
-<span class="r-in"><span>  directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># 3. read</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">read_ondisc_backed_sceptre_object</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  sceptre_object_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_object.rds"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  response_odm_file_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/response.odm"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  grna_odm_file_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/grna.odm"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ondisc"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">lowmoi_example_data</span><span class="op">)</span></span>
+<span>  <span class="co"># 1. create ondisc-backed sceptre_object</span></span>
+<span>  <span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu"><a href="import_data.html">import_data</a></span><span class="op">(</span></span>
+<span>    response_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">response_matrix</span>,</span>
+<span>    grna_matrix <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_matrix</span>,</span>
+<span>    grna_target_data_frame <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">grna_target_data_frame</span>,</span>
+<span>    extra_covariates <span class="op">=</span> <span class="va">lowmoi_example_data</span><span class="op">$</span><span class="va">extra_covariates</span>,</span>
+<span>    moi <span class="op">=</span> <span class="st">"low"</span>,</span>
+<span>    use_ondisc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>    directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># 2. write</span></span>
+<span>  <span class="fu">write_ondisc_backed_sceptre_object</span><span class="op">(</span></span>
+<span>    sceptre_object <span class="op">=</span> <span class="va">sceptre_object</span>,</span>
+<span>    directory_to_write <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># 3. read</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">sceptre_object</span><span class="op">)</span></span>
+<span>  <span class="va">sceptre_object</span> <span class="op">&lt;-</span> <span class="fu">read_ondisc_backed_sceptre_object</span><span class="op">(</span></span>
+<span>    sceptre_object_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/sceptre_object.rds"</span><span class="op">)</span>,</span>
+<span>    response_odm_file_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/response.odm"</span><span class="op">)</span>,</span>
+<span>    grna_odm_file_fp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/grna.odm"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
