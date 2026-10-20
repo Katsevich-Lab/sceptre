@@ -1,9 +1,12 @@
 # Protocol certificates protect accidental mismatch/corruption, not adversarial
 # forgery. The implementation fingerprint binds loaded R/schema/method code and
-# native bytes; deployments must also pin one exact package artifact per process.
+# native bytes; deployments must also pin one exact package artifact per
+# process.
 # Fingerprint loaded implementations, rather than a declared version or source
-# revision. Deparsing excludes source references, bytecode and closure environments
-# (which contain process paths); the function expressions themselves are retained.
+# revision. Deparsing excludes source references, bytecode and closure
+# environments
+# (which contain process paths); the function expressions themselves are
+# retained.
 execution_function_code <- function(fun) {
     if (is.primitive(fun)) {
         return(list(primitive = deparse(fun)))
@@ -18,10 +21,64 @@ execution_native_certificate <- function() {
     dll <- getLoadedDLLs()[["sceptre"]]
     if (is.null(dll) || !file.exists(dll[["path"]])) {
         stop(
-            "Cannot certify execution: the loaded sceptre native library is unavailable."
+            "Cannot certify execution: the loaded sceptre native library is ",
+            "unavailable."
         )
     }
     digest::digest(file = dll[["path"]], algo = "sha256")
+}
+
+execution_class_certificate <- function(name, namespace) {
+    definition <- methods::getClassDef(name, where = namespace)
+    if (!identical(definition@package, "sceptre")) {
+        return(NULL)
+    }
+    list(
+        name = name,
+        slots = methods::getSlots(definition),
+        prototype = definition@prototype,
+        contains = sort(
+            as.character(names(definition@contains)),
+            method = "radix"
+        ),
+        virtual = definition@virtual,
+        validity = if (is.null(definition@validity)) {
+            NULL
+        } else {
+            execution_function_code(definition@validity)
+        }
+    )
+}
+
+execution_generic_certificate <- function(generic, namespace) {
+    implementations <- methods::findMethods(generic, where = namespace)
+    implementations <- Filter(
+        function(method) identical(environment(method), namespace),
+        as.list(implementations)
+    )
+    ordered <- sort(
+        as.character(names(implementations)),
+        method = "radix"
+    )
+    stats::setNames(
+        lapply(ordered, function(signature) {
+            method <- implementations[[signature]]
+            # Include the effective implementation for each package signature
+            # too:
+            # a redefinition outside this namespace can change actual dispatch.
+            selected <- methods::selectMethod(
+                generic,
+                as.character(method@target)
+            )
+            list(
+                target = as.character(method@target),
+                defined = as.character(method@defined),
+                code = execution_function_code(method),
+                selected = execution_function_code(selected)
+            )
+        }),
+        ordered
+    )
 }
 
 execution_build_certificate <- function() {
@@ -34,27 +91,8 @@ execution_build_certificate <- function() {
     functions <- lapply(Filter(is.function, functions), execution_function_code)
     classes <- lapply(
         sort(methods::getClasses(where = namespace), method = "radix"),
-        function(name) {
-            definition <- methods::getClassDef(name, where = namespace)
-            if (!identical(definition@package, "sceptre")) {
-                return(NULL)
-            }
-            list(
-                name = name,
-                slots = methods::getSlots(definition),
-                prototype = definition@prototype,
-                contains = sort(
-                    as.character(names(definition@contains)),
-                    method = "radix"
-                ),
-                virtual = definition@virtual,
-                validity = if (is.null(definition@validity)) {
-                    NULL
-                } else {
-                    execution_function_code(definition@validity)
-                }
-            )
-        }
+        execution_class_certificate,
+        namespace = namespace
     )
     classes <- Filter(Negate(is.null), classes)
     generics <- sort(
@@ -62,35 +100,7 @@ execution_build_certificate <- function() {
         method = "radix"
     )
     registered <- stats::setNames(
-        lapply(generics, function(generic) {
-            implementations <- methods::findMethods(generic, where = namespace)
-            implementations <- Filter(
-                function(method) identical(environment(method), namespace),
-                as.list(implementations)
-            )
-            ordered <- sort(
-                as.character(names(implementations)),
-                method = "radix"
-            )
-            stats::setNames(
-                lapply(ordered, function(signature) {
-                    method <- implementations[[signature]]
-                    # Include the effective implementation for each package signature too:
-                    # a redefinition outside this namespace can change actual dispatch.
-                    selected <- methods::selectMethod(
-                        generic,
-                        as.character(method@target)
-                    )
-                    list(
-                        target = as.character(method@target),
-                        defined = as.character(method@defined),
-                        code = execution_function_code(method),
-                        selected = execution_function_code(selected)
-                    )
-                }),
-                ordered
-            )
-        }),
+        lapply(generics, execution_generic_certificate, namespace = namespace),
         generics
     )
     list(
@@ -154,7 +164,8 @@ require_execution_backend <- function(object) {
             ))
     ) {
         stop(
-            "Backed CRT remains unsupported; use permutation resampling or in-memory counts."
+            "Backed CRT remains unsupported; use permutation resampling or ",
+            "in-memory counts."
         )
     }
     invisible(NULL)
@@ -224,18 +235,18 @@ execution_full_context <- function(object, plan) {
             any(grepl("^z_null_", names(plan@pairs)))
     ) {
         stop(
-            "Prepared hypothesis metadata collides with generated numerical output columns."
+            "Prepared hypothesis metadata collides with generated numerical ",
+            "output columns."
         )
     }
-    # Append after the canonical plan/context comparison; never subset the index,
+    # Append after the canonical plan/context comparison; never subset the
+    # index,
     # assignments, design, fitting view or global permutation dimensions.
     context$pairs[[column]] <- which(plan@pairs$pass_qc)
     context
 }
 
-validate_execution_manifest <- function(object, execution) {
-    require_stage(object, "run_qc")
-    require_execution_backend(object)
+validate_execution_envelope <- function(object, execution) {
     fields <- c(
         "protocol",
         "runtime",
@@ -258,9 +269,17 @@ validate_execution_manifest <- function(object, execution) {
             !identical(execution$methods, execution_method_certificate())
     ) {
         stop(
-            "Execution manifest protocol, runtime or method certificate is incompatible."
+            "Execution manifest protocol, runtime or method certificate is ",
+            "incompatible."
         )
     }
+    invisible(NULL)
+}
+
+validate_execution_manifest <- function(object, execution) {
+    require_stage(object, "run_qc")
+    require_execution_backend(object)
+    validate_execution_envelope(object, execution)
     if (
         !identical(
             execution$identity,
@@ -271,7 +290,8 @@ validate_execution_manifest <- function(object, execution) {
     }
     if (!identical(execution$context, execution_context_certificate(object))) {
         stop(
-            "Execution manifest no longer matches the full prepared screen context."
+            "Execution manifest no longer matches the full prepared screen ",
+            "context."
         )
     }
     plan <- validate_run_plan(object, execution$plan)
@@ -287,7 +307,7 @@ validate_execution_manifest <- function(object, execution) {
             as.integer(execution$output_amount)
         ) ||
             length(execution$output_amount) != 1L ||
-            !execution$output_amount %in% 1:3
+            !execution$output_amount %in% seq_len(3L)
     ) {
         stop("Invalid execution output level.")
     }
@@ -304,6 +324,29 @@ validate_execution_manifest <- function(object, execution) {
     list(plan = plan, context = context)
 }
 
+prepare_execution_plan <- function(
+    object,
+    analysis,
+    n_calibration_pairs,
+    calibration_group_size
+) {
+    if (identical(analysis, "run_calibration_check")) {
+        run_calibration_check_pt_1(
+            object,
+            n_calibration_pairs,
+            calibration_group_size,
+            parallel = FALSE,
+            n_processors = 2L
+        )$plan
+    } else {
+        pairs <- analysis_pairs(object, analysis)
+        if (!nrow(pairs) || !any(pairs$pass_qc)) {
+            stop("The analysis has no eligible hypotheses.")
+        }
+        make_run_plan(object, analysis, pairs)
+    }
+}
+
 #' Prepare serializable work units for one complete analysis
 #'
 #' Prepare once, transport the manifest with a separately saved/reopened screen,
@@ -316,12 +359,40 @@ validate_execution_manifest <- function(object, execution) {
 #' @param n_work_units Positive requested number of contiguous whole-key units.
 #'   At most one unit per eligible response (permutation) or guide group (CRT).
 #' @param output_amount Output level 1, 2 or 3, as in the public analyses.
-#' @param n_calibration_pairs,calibration_group_size Optional calibration choices.
+#' @param n_calibration_pairs,calibration_group_size Optional calibration
+#' choices.
 #'   Calibration groups are sampled only during preparation.
 #' @return An owned serializable manifest containing a frozen RunPlan, ordered
 #'   work units and protocol/runtime certificates. Prepared metadata must not
-#'   reuse generated numerical output column names. It contains no counts or live
+#'   reuse generated numerical output column names. It contains no counts or
+#'   live
 #'   handles. This is a value artifact, not a saved completed analysis.
+#' @examples
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high",
+#'   extra_covariates = highmoi_example_data$extra_covariates,
+#'   response_names = highmoi_example_data$gene_names
+#' )
+#' pairs <- construct_cis_pairs(object)
+#' object <- object |>
+#'   set_analysis_parameters(
+#'     side = "left", resampling_mechanism = "permutations",
+#'     discovery_pairs = pairs
+#'   ) |>
+#'   assign_grnas(method = "thresholding") |>
+#'   run_qc()
+#' execution <- prepare_execution(object, "run_discovery_analysis", 2L)
+#' # Each worker uses the same full prepared screen and one stable unit ID.
+#' proposals <- lapply(execution$units, function(unit) {
+#'   execute_work_unit(object, execution, unit$id)
+#' })
+#' completed <- collect_execution(object, execution, rev(proposals))
+#' head(get_result(completed, "run_discovery_analysis"))
 #' @export
 prepare_execution <- function(
     sceptre_object,
@@ -340,25 +411,16 @@ prepare_execution <- function(
         n_work_units < 1L ||
             length(output_amount) != 1L ||
             is.na(output_amount) ||
-            !output_amount %in% 1:3
+            !output_amount %in% seq_len(3L)
     ) {
         stop("Use positive work-unit count and output_amount 1, 2 or 3.")
     }
-    plan <- if (identical(analysis, "run_calibration_check")) {
-        run_calibration_check_pt_1(
-            object,
-            n_calibration_pairs,
-            calibration_group_size,
-            parallel = FALSE,
-            n_processors = 2L
-        )$plan
-    } else {
-        pairs <- analysis_pairs(object, analysis)
-        if (!nrow(pairs) || !any(pairs$pass_qc)) {
-            stop("The analysis has no eligible hypotheses.")
-        }
-        make_run_plan(object, analysis, pairs)
-    }
+    plan <- prepare_execution_plan(
+        object,
+        analysis,
+        n_calibration_pairs,
+        calibration_group_size
+    )
     context <- execution_full_context(object, plan)
     manifest <- list(
         protocol = 1L,
@@ -378,39 +440,9 @@ prepare_execution <- function(
     owned_result_value(manifest)
 }
 
-#' Execute one certified work unit without committing an analysis
-#' @param sceptre_object The full matching prepared screen, with live count stores.
-#' @param execution Manifest returned by `prepare_execution()`.
-#' @param unit_id One exact stable unit ID from `execution$units`.
-#' @return An owned serializable proposal containing global row IDs, raw tests,
-#'   compact fits and digest certificates of their full context scopes. Ordered
-#'   cell vectors are retained in the manifest, not repeated in proposals.
-#'   No guide integration or family correction is
-#'   performed. Workers must return all proposals to `collect_execution()`.
-#' @export
-execute_work_unit <- function(sceptre_object, execution, unit_id) {
-    object <- migrate_sceptre_object(sceptre_object)
-    prepared <- validate_execution_manifest(object, execution)
-    ids <- vapply(execution$units, function(unit) unit$id, character(1))
-    if (
-        !is.character(unit_id) ||
-            length(unit_id) != 1L ||
-            is.na(unit_id) ||
-            !unit_id %in% ids
-    ) {
-        stop("Unknown execution unit ID.")
-    }
-    unit <- execution$units[[match(unit_id, ids)]]
+execute_unit_analysis <- function(object, prepared, controls) {
     context <- prepared$context
-    controls <- list(
-        output_amount = execution$output_amount,
-        print_progress = FALSE,
-        parallel = FALSE,
-        n_processors = 1L,
-        log_dir = tempdir(),
-        work_keys = unit$keys
-    )
-    output <- if (object@spec@run_permutations) {
+    if (object@spec@run_permutations) {
         draws <- get_synthetic_permutation_idxs(
             object@preparation@analysis_groups,
             B = context$test_options$total_resamples,
@@ -429,6 +461,10 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
     } else {
         run_crt_analysis(context, controls)
     }
+}
+
+execution_unit_fits <- function(object, prepared, unit, output) {
+    context <- prepared$context
     response_ids <- unique(as.character(prepared$plan@pairs$response_id[
         unit$row_ids
     ]))
@@ -452,6 +488,49 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
             groups
         )
     }
+    list(response = response_fits, perturbation = perturbation_fits)
+}
+
+execution_unit_by_id <- function(execution, unit_id) {
+    ids <- vapply(execution$units, function(unit) unit$id, character(1))
+    if (
+        !is.character(unit_id) ||
+            length(unit_id) != 1L ||
+            is.na(unit_id) ||
+            !unit_id %in% ids
+    ) {
+        stop("Unknown execution unit ID.")
+    }
+    execution$units[[match(unit_id, ids)]]
+}
+
+#' Execute one certified work unit without committing an analysis
+#' @param sceptre_object The full matching prepared screen, with live count
+#' stores.
+#' @param execution Manifest returned by `prepare_execution()`.
+#' @param unit_id One exact stable unit ID from `execution$units`.
+#' @return An owned serializable proposal containing global row IDs, raw tests,
+#'   compact fits and digest certificates of their full context scopes. Ordered
+#'   cell vectors are retained in the manifest, not repeated in proposals.
+#'   No guide integration or family correction is
+#'   performed. Workers must return all proposals to `collect_execution()`.
+#' @inherit prepare_execution examples
+#' @export
+execute_work_unit <- function(sceptre_object, execution, unit_id) {
+    object <- migrate_sceptre_object(sceptre_object)
+    prepared <- validate_execution_manifest(object, execution)
+    unit <- execution_unit_by_id(execution, unit_id)
+    context <- prepared$context
+    controls <- list(
+        output_amount = execution$output_amount,
+        print_progress = FALSE,
+        parallel = FALSE,
+        n_processors = 1L,
+        log_dir = tempdir(),
+        work_keys = unit$keys
+    )
+    output <- execute_unit_analysis(object, prepared, controls)
+    fits <- execution_unit_fits(object, prepared, unit, output)
     proposal <- list(
         protocol = execution$protocol,
         runtime = execution$runtime,
@@ -459,14 +538,14 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
         execution = execution$identity,
         unit_id = unit$id,
         result = output$result,
-        response_fits = response_fits,
+        response_fits = fits$response,
         response_identity = if (context$shared_response_fit) {
             execution_digest(context$fit_identity)
         } else {
             NULL
         },
-        perturbation_fits = perturbation_fits,
-        perturbation_identity = if (is.null(perturbation_fits)) {
+        perturbation_fits = fits$perturbation,
+        perturbation_identity = if (is.null(fits$perturbation)) {
             NULL
         } else {
             execution_digest(context$perturbation_identity)
@@ -476,7 +555,7 @@ execute_work_unit <- function(sceptre_object, execution, unit_id) {
     owned_result_value(proposal)
 }
 
-validate_execution_proposal <- function(proposal, unit, execution, context) {
+validate_execution_proposal_envelope <- function(proposal, unit, execution) {
     fields <- c(
         "protocol",
         "runtime",
@@ -508,6 +587,11 @@ validate_execution_proposal <- function(proposal, unit, execution, context) {
             "Work proposal certificate does not match the execution or payload."
         )
     }
+    invisible(NULL)
+}
+
+validate_execution_proposal <- function(proposal, unit, execution, context) {
+    validate_execution_proposal_envelope(proposal, unit, execution)
     result <- proposal$result
     column <- execution_row_column()
     if (
@@ -517,7 +601,8 @@ validate_execution_proposal <- function(proposal, unit, execution, context) {
             anyDuplicated(result[[column]])
     ) {
         stop(
-            "Work proposal has missing, duplicated or reordered global hypothesis rows."
+            "Work proposal has missing, duplicated or reordered global ",
+            "hypothesis rows."
         )
     }
     expected <- execution$plan@pairs[unit$row_ids, , drop = FALSE]
@@ -566,18 +651,7 @@ execution_perturbation_identity <- function(context, group) {
     }
 }
 
-#' Collect every work proposal and commit one complete-family result
-#' @param sceptre_object The full matching prepared screen.
-#' @param execution Manifest returned by `prepare_execution()`.
-#' @param proposals List containing exactly one proposal per expected unit, in
-#'   any arrival order. Missing, duplicated or incompatible proposals are errors.
-#' @return Updated screen with one completed result and compatible compact fits.
-#'   Errors leave the caller unchanged. Family correction is performed once,
-#'   after restoring canonical traversal and adding failed-QC rows.
-#' @export
-collect_execution <- function(sceptre_object, execution, proposals) {
-    object <- migrate_sceptre_object(sceptre_object)
-    prepared <- validate_execution_manifest(object, execution)
+order_execution_proposals <- function(execution, proposals) {
     if (!is.list(proposals) || length(proposals) != length(execution$units)) {
         stop("Collection requires every expected work unit exactly once.")
     }
@@ -606,7 +680,91 @@ collect_execution <- function(sceptre_object, execution, proposals) {
         stop("Collection has duplicate, missing or unexpected unit IDs.")
     }
     proposals <- proposals[match(expected_ids, ids)]
-    context <- prepared$context
+    proposals
+}
+
+validate_execution_perturbation_fits <- function(
+    context,
+    groups,
+    perturbations,
+    proposed
+) {
+    for (group in groups) {
+        fit <- proposed[[group]]
+        actual_identity <- execution_perturbation_identity(
+            context,
+            group
+        )
+        existing <- perturbations[[group]]
+        if (
+            !is.null(existing) &&
+                identical(existing$identity, actual_identity) &&
+                !identical(existing, fit)
+        ) {
+            stop(
+                "Conflicting perturbation fit for an existing valid warm ",
+                "cache entry."
+            )
+        }
+        if (
+            !is.null(fit) &&
+                !identical(
+                    fit$identity,
+                    actual_identity
+                )
+        ) {
+            stop(
+                "Work proposal perturbation fit does not match its actual ",
+                "ordered inputs."
+            )
+        }
+    }
+    invisible(NULL)
+}
+
+collect_execution_perturbations <- function(
+    object,
+    context,
+    unit,
+    proposal,
+    perturbations
+) {
+    groups <- if (
+        object@spec@run_permutations || context$index$calibration_check
+    ) {
+        character()
+    } else {
+        as.character(context$index$group_ids[unit$keys])
+    }
+    if (length(groups)) {
+        if (
+            !is.list(proposal$perturbation_fits) ||
+                !setequal(names(proposal$perturbation_fits), groups) ||
+                anyDuplicated(names(proposal$perturbation_fits)) ||
+                !identical(
+                    proposal$perturbation_identity,
+                    execution_digest(context$perturbation_identity)
+                )
+        ) {
+            stop("Work proposal perturbation scope is incompatible.")
+        }
+        validate_execution_perturbation_fits(
+            context,
+            groups,
+            perturbations,
+            proposal$perturbation_fits
+        )
+        perturbations <- merge_perturbation_fits(
+            perturbations,
+            proposal$perturbation_fits
+        )
+    } else if (!is.null(proposal$perturbation_fits)) {
+        stop("Unexpected perturbation cache in this execution mode.")
+    }
+    perturbations
+}
+
+collect_execution_fits <- function(object, execution, proposals, context) {
     responses <- if (context$shared_response_fit) {
         context$response_fits
     } else {
@@ -626,61 +784,18 @@ collect_execution <- function(sceptre_object, execution, proposals) {
             }
             responses[id] <- proposal$response_fits[id]
         }
-        groups <- if (
-            object@spec@run_permutations || context$index$calibration_check
-        ) {
-            character()
-        } else {
-            as.character(context$index$group_ids[unit$keys])
-        }
-        if (length(groups)) {
-            if (
-                !is.list(proposal$perturbation_fits) ||
-                    !setequal(names(proposal$perturbation_fits), groups) ||
-                    anyDuplicated(names(proposal$perturbation_fits)) ||
-                    !identical(
-                        proposal$perturbation_identity,
-                        execution_digest(context$perturbation_identity)
-                    )
-            ) {
-                stop("Work proposal perturbation scope is incompatible.")
-            }
-            for (group in groups) {
-                fit <- proposal$perturbation_fits[[group]]
-                actual_identity <- execution_perturbation_identity(
-                    context,
-                    group
-                )
-                existing <- perturbations[[group]]
-                if (
-                    !is.null(existing) &&
-                        identical(existing$identity, actual_identity) &&
-                        !identical(existing, fit)
-                ) {
-                    stop(
-                        "Conflicting perturbation fit for an existing valid warm cache entry."
-                    )
-                }
-                if (
-                    !is.null(fit) &&
-                        !identical(
-                            fit$identity,
-                            actual_identity
-                        )
-                ) {
-                    stop(
-                        "Work proposal perturbation fit does not match its actual ordered inputs."
-                    )
-                }
-            }
-            perturbations <- merge_perturbation_fits(
-                perturbations,
-                proposal$perturbation_fits
-            )
-        } else if (!is.null(proposal$perturbation_fits)) {
-            stop("Unexpected perturbation cache in this execution mode.")
-        }
+        perturbations <- collect_execution_perturbations(
+            object,
+            context,
+            unit,
+            proposal,
+            perturbations
+        )
     }
+    list(responses = responses, perturbations = perturbations)
+}
+
+order_execution_response_fits <- function(object, context, responses) {
     # Cache insertion order follows the direct global response traversal, even
     # when one response was fitted independently by several CRT guide units.
     if (context$shared_response_fit) {
@@ -695,17 +810,44 @@ collect_execution <- function(sceptre_object, execution, proposals) {
     } else {
         object@fits@response_identity
     }
+    responses
+}
+
+assemble_execution_result <- function(object, plan, proposals) {
     raw <- bind_analysis_results(lapply(proposals, function(proposal) {
         proposal$result
     }))
     raw[[execution_row_column()]] <- NULL
-    assembled <- assemble_pair_results(raw, prepared$plan@pairs)
-    result <- switch(
-        prepared$plan@analysis,
+    assembled <- assemble_pair_results(raw, plan@pairs)
+    switch(
+        plan@analysis,
         run_calibration_check = process_calibration_result(assembled, object),
         run_power_check = apply_grouping_to_result(assembled, object),
         run_discovery_analysis = process_discovery_result(assembled, object)
     )
+}
+
+#' Collect every work proposal and commit one complete-family result
+#' @param sceptre_object The full matching prepared screen.
+#' @param execution Manifest returned by `prepare_execution()`.
+#' @param proposals List containing exactly one proposal per expected unit, in
+#'   any arrival order. Missing, duplicated or incompatible proposals are
+#'   errors.
+#' @return Updated screen with one completed result and compatible compact fits.
+#'   Errors leave the caller unchanged. Family correction is performed once,
+#'   after restoring canonical traversal and adding failed-QC rows.
+#' @inherit prepare_execution examples
+#' @export
+collect_execution <- function(sceptre_object, execution, proposals) {
+    object <- migrate_sceptre_object(sceptre_object)
+    prepared <- validate_execution_manifest(object, execution)
+    proposals <- order_execution_proposals(execution, proposals)
+    context <- prepared$context
+    fits <- collect_execution_fits(object, execution, proposals, context)
+    responses <- fits$responses
+    perturbations <- fits$perturbations
+    responses <- order_execution_response_fits(object, context, responses)
+    result <- assemble_execution_result(object, prepared$plan, proposals)
     output <- list(
         response_precomputations = responses,
         perturbation_fits = if (

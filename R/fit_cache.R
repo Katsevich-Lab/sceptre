@@ -10,7 +10,8 @@
 #' @param complement Proposed setting for whether to use complement controls.
 #' @return TRUE if the design or control setting differs from the saved value.
 #'   Compare the entire matrix, including attributes and row order, even if only
-#'   some of its cells are used in a fit. This function reports a change; it does
+#'   some of its cells are used in a fit. This function reports a change; it
+#'   does
 #'   not remove fits from the object.
 #' @noRd
 response_cache_parameters_changed <- function(object, design, complement) {
@@ -41,11 +42,13 @@ response_cache_assignments_changed <- function(
 
 #' Invalidate the response and perturbation families according to their inputs
 #' @param object Sceptre object; the caller must keep the returned object.
-#' @param event Reason for checking: `parameters`, `assignments` or `analysis_cells`.
+#' @param event Reason for checking: `parameters`, `assignments` or
+#'   `analysis_cells`.
 #' @param changed TRUE when design, control selection or retained cells changed,
 #'   or when a low-MOI assignment change can affect response-fitting cells.
 #' @return The updated object. Any assignment rerun clears perturbation fits;
-#'   response fits retain their existing low-MOI/design/cell invalidation policy.
+#'   response fits retain their existing low-MOI/design/cell invalidation
+#'   policy.
 #'   At lookup, each family also verifies its actual fitting-input identity.
 #' @noRd
 invalidate_fit_caches <- function(object, event, changed) {
@@ -75,8 +78,10 @@ lookup_response_fit <- function(cache, response_id) cache[[response_id]]
 #' @param updates New fits, named by gene. Callers must supply only previously
 #'   absent genes and ensure that workers have not fitted the same gene twice.
 #' @return One list containing the old fits followed by the new fits, in order.
-#'   This is simple concatenation: it does not replace or remove duplicate names.
-#'   Only coefficients and dispersion are stored, not cell-length fitted vectors.
+#'   This is simple concatenation: it does not replace or remove duplicate
+#'   names.
+#'   Only coefficients and dispersion are stored, not cell-length fitted
+#'   vectors.
 #' @noRd
 merge_response_fits <- function(cache, updates) {
     # Each worker returns only newly fitted genes. Keep the old fits first,
@@ -95,7 +100,8 @@ merge_response_fits <- function(cache, updates) {
 #' @param object Sceptre object; the caller must keep the returned object.
 #' @param cache Response fits valid for this object's current design and cells.
 #' @return The object with `response_precomputations` replaced by `cache`.
-#'   The public analysis functions call this after the tests finish successfully.
+#'   The public analysis functions call this after the tests finish
+#'   successfully.
 #'   It saves the supplied fits without fitting models or checking them again.
 #' @noRd
 commit_response_fits <- function(object, cache) {
@@ -117,7 +123,8 @@ commit_response_fits <- function(object, cache) {
 }
 
 # Hash only the actual design and ordered fitting cells; the immutable imported
-# content identity is computed once, never once per response. Coefficients retain
+# content identity is computed once, never once per response. Coefficients
+# retain
 # the current Poisson-fit/dispersion algorithm.
 response_fit_identity <- function(object, source_cells) {
     list(
@@ -150,10 +157,14 @@ invalidate_screen_dependents <- function(object) {
 # perturbation coefficients share the analysis context and each carry compact
 # hashes of their exact ordered fitting cells/design/binary treatment indicator.
 # Never repeat NT control vectors or save cell-length probabilities/CRT draws.
-# Guide labels select candidates, not validity. Lookup must compare actual inputs.
-# assign_grnas clears perturbation fits at either MOI; response invalidation keeps
-# its existing low-MOI/design/cell policy. Calibration bypasses perturbation fits
-# and preserves discovery entries. Commit only after all workers/results succeed.
+# Guide labels select candidates, not validity. Lookup must compare actual
+# inputs.
+# assign_grnas clears perturbation fits at either MOI; response invalidation
+# keeps
+# its existing low-MOI/design/cell policy. Calibration bypasses perturbation
+# fits
+# and preserves discovery entries. Commit only after all workers/results
+# succeed.
 # CRT draws remain freshly generated on every run. Fit warnings occur on actual
 # fits; warm reuse retains diagnostics without re-emitting those fit warnings.
 # Keep this note synchronized with invalidate_fit_caches(),
@@ -225,7 +236,8 @@ commit_perturbation_fits <- function(object, cache) {
             !identical(identity, perturbation_cache_identity(object))
     ) {
         stop(
-            "Perturbation fits do not match the actual analysis design and cells."
+            "Perturbation fits do not match the actual analysis design and ",
+            "cells."
         )
     }
     if (
@@ -236,7 +248,8 @@ commit_perturbation_fits <- function(object, cache) {
             )
     ) {
         stop(
-            "Perturbation fit identifiers must belong to the prepared guide groups."
+            "Perturbation fit identifiers must belong to the prepared guide ",
+            "groups."
         )
     }
     object@fits@perturbation_fits <- cache

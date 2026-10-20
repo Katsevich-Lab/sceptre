@@ -43,25 +43,34 @@ initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file,
 \code{response.odm} file, and \code{grna.odm} file stored on disk.
 }
 \details{
-The saved RDS contains anchored backing descriptors and closed handles, rather
+The saved RDS contains anchored backing descriptors and closed handles,
+rather
 than live process-local file handles. Reading it with \code{readRDS()} permits
-inspection of saved metadata and historical results, but does not reopen counts.
-Use \code{read_ondisc_backed_sceptre_object()} before continuing backed analyses or
-exporting reports that need counts. The optional ondisc installation is checked
+inspection of saved metadata and historical results, but does not reopen
+counts.
+Use \code{read_ondisc_backed_sceptre_object()} before continuing backed analyses
+or
+exporting reports that need counts. The optional ondisc installation is
+checked
 for the required API when backed counts are opened; in-memory analyses do not
 load ondisc.
 
 The response and guide files must be the original matching pair. Reopening
-checks their shared import ID, anchored file checksums, dimensions and feature
+checks their shared import ID, anchored file checksums, dimensions and
+feature
 order. Identical files may be moved or copied: pass their new paths to the
 reader. Verified relocation preserves compatible fits and saved result
 provenance. An import ID alone is not a content fingerprint.
 
-Active backing files are immutable: do not replace or edit them while an object
+Active backing files are immutable: do not replace or edit them while an
+object
 is in use. Saving and reopening verify the existing content anchors; analysis
-getters do not repeatedly hash files. If count content or its imported summaries
-must change, create a new screen with \code{import_data()} instead of overwriting the
-backing files. Old saved objects whose original feature labels are unknown may
+getters do not repeatedly hash files. If count content or its imported
+summaries
+must change, create a new screen with \code{import_data()} instead of overwriting
+the
+backing files. Old saved objects whose original feature labels are unknown
+may
 likewise require reimport before count replacement.
 }
 \examples{

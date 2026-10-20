@@ -29,7 +29,10 @@ setValidity("CellView", function(object) {
             !identical(object@n_trt, as.integer(length(object@trt_fit_pos)))
     ) {
         return(
-            "CellView has inconsistent ordered source, analysis or treatment positions"
+            paste0(
+                "CellView has inconsistent ordered source, analysis or ",
+                "treatment positions"
+            )
         )
     }
     TRUE
@@ -43,7 +46,10 @@ setValidity("ScreenData", function(object) {
                 !methods::is(store, "BackedCountStore")
         ) {
             return(
-                "Count stores must be normalized row-accessible Matrix or typed backed stores"
+                paste0(
+                    "Count stores must be normalized row-accessible Matrix or ",
+                    "typed backed stores"
+                )
             )
         }
     }
@@ -101,7 +107,10 @@ setValidity("sceptre_object", function(object) {
             )
         ) {
             return(
-                "Response cache identity must match actual data and design inputs"
+                paste0(
+                    "Response cache identity must match actual data and ",
+                    "design inputs"
+                )
             )
         }
     }
@@ -109,6 +118,10 @@ setValidity("sceptre_object", function(object) {
     if (!isTRUE(valid)) {
         return(valid)
     }
+    validate_prepared_cell_axes(object)
+})
+
+validate_prepared_cell_axes <- function(object) {
     if (
         length(object@data@response_matrix) &&
             !is.null(dim(object@data@response_matrix))
@@ -143,7 +156,7 @@ setValidity("sceptre_object", function(object) {
         }
     }
     TRUE
-})
+}
 
 
 # This is a homogeneous cache for one actual fitting scope. Each entry contains
@@ -181,7 +194,10 @@ validate_response_fit_entries <- function(entries, identity) {
                 fit$theta <= 0
         ) {
             return(
-                "Response fit coefficients or dispersion do not match their design"
+                paste0(
+                    "Response fit coefficients or dispersion do not match ",
+                    "their design"
+                )
             )
         }
     }
@@ -212,74 +228,9 @@ validate_perturbation_fit_entries <- function(entries, identity) {
         return("Perturbation fit cache requires an ordered analysis identity")
     }
     for (fit in entries) {
-        if (
-            !is.list(fit) ||
-                !setequal(
-                    names(fit),
-                    c("fitted_coefs", "diagnostics", "identity")
-                ) ||
-                anyDuplicated(names(fit))
-        ) {
-            return(
-                "Perturbation fit records require compact model and identity fields"
-            )
-        }
-        key <- fit$identity
-        diagnostics <- fit$diagnostics
-        if (
-            !is.list(diagnostics) ||
-                !setequal(
-                    names(diagnostics),
-                    c("rank", "converged", "boundary", "iterations", "warnings")
-                ) ||
-                anyDuplicated(names(diagnostics)) ||
-                !is.character(diagnostics$warnings) ||
-                anyNA(diagnostics$warnings) ||
-                any(vapply(
-                    diagnostics[c("converged", "boundary")],
-                    function(x) {
-                        !is.logical(x) || length(x) != 1L || anyNA(x)
-                    },
-                    logical(1)
-                )) ||
-                any(vapply(
-                    diagnostics[c("rank", "iterations")],
-                    function(x) {
-                        !is.numeric(x) ||
-                            length(x) != 1L ||
-                            anyNA(x) ||
-                            !is.finite(x) ||
-                            x < 0L ||
-                            x > .Machine$integer.max ||
-                            x != as.integer(x)
-                    },
-                    logical(1)
-                ))
-        ) {
-            return("Perturbation fit diagnostics are invalid")
-        }
-        if (
-            !is.list(fit) ||
-                !is.numeric(fit$fitted_coefs) ||
-                any(!is.finite(fit$fitted_coefs)) ||
-                !identical(names(fit$fitted_coefs), identity$columns) ||
-                !is.list(fit$diagnostics) ||
-                !setequal(names(key), c("cells", "design", "treatment")) ||
-                anyDuplicated(names(key)) ||
-                any(vapply(
-                    key,
-                    function(x) {
-                        !is.character(x) ||
-                            length(x) != 1L ||
-                            anyNA(x) ||
-                            !grepl("^[[:xdigit:]]{64}$", x)
-                    },
-                    logical(1)
-                ))
-        ) {
-            return(
-                "Perturbation fit coefficients or compact input identity are invalid"
-            )
+        valid <- validate_perturbation_fit_record(fit, identity)
+        if (!isTRUE(valid)) {
+            return(valid)
         }
     }
     TRUE
@@ -298,3 +249,87 @@ setValidity("FitCache", function(object) {
         object@perturbation_identity
     )
 })
+
+validate_perturbation_fit_record <- function(fit, identity) {
+    if (
+        !is.list(fit) ||
+            !setequal(
+                names(fit),
+                c("fitted_coefs", "diagnostics", "identity")
+            ) ||
+            anyDuplicated(names(fit))
+    ) {
+        return(
+            "Perturbation fit records require compact model and identity fields"
+        )
+    }
+    key <- fit$identity
+    diagnostics <- fit$diagnostics
+    valid <- validate_perturbation_diagnostics(diagnostics)
+    if (!isTRUE(valid)) {
+        return(valid)
+    }
+    if (
+        !is.list(fit) ||
+            !is.numeric(fit$fitted_coefs) ||
+            any(!is.finite(fit$fitted_coefs)) ||
+            !identical(names(fit$fitted_coefs), identity$columns) ||
+            !is.list(fit$diagnostics) ||
+            !setequal(names(key), c("cells", "design", "treatment")) ||
+            anyDuplicated(names(key)) ||
+            any(vapply(
+                key,
+                function(x) {
+                    !is.character(x) ||
+                        length(x) != 1L ||
+                        anyNA(x) ||
+                        !grepl("^[[:xdigit:]]{64}$", x)
+                },
+                logical(1)
+            ))
+    ) {
+        return(
+            paste0(
+                "Perturbation fit coefficients or compact input ",
+                "identity are invalid"
+            )
+        )
+    }
+    TRUE
+}
+
+validate_perturbation_diagnostics <- function(diagnostics) {
+    if (
+        !is.list(diagnostics) ||
+            !setequal(
+                names(diagnostics),
+                c("rank", "converged", "boundary", "iterations", "warnings")
+            ) ||
+            anyDuplicated(names(diagnostics)) ||
+            !is.character(diagnostics$warnings) ||
+            anyNA(diagnostics$warnings) ||
+            any(vapply(
+                diagnostics[c("converged", "boundary")],
+                function(x) {
+                    !is.logical(x) || length(x) != 1L || anyNA(x)
+                },
+                logical(1)
+            )) ||
+            any(vapply(
+                diagnostics[c("rank", "iterations")],
+                function(x) {
+                    !is.numeric(x) ||
+                        length(x) != 1L ||
+                        anyNA(x) ||
+                        !is.finite(x) ||
+                        x < 0L ||
+                        x > .Machine$integer.max ||
+                        x != as.integer(x)
+                },
+                logical(1)
+            ))
+    ) {
+        return("Perturbation fit diagnostics are invalid")
+    }
+    TRUE
+}

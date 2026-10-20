@@ -13,25 +13,34 @@
 #' `response.odm` file, and `grna.odm` file stored on disk.
 #'
 #' @details
-#' The saved RDS contains anchored backing descriptors and closed handles, rather
+#' The saved RDS contains anchored backing descriptors and closed handles,
+#' rather
 #' than live process-local file handles. Reading it with `readRDS()` permits
-#' inspection of saved metadata and historical results, but does not reopen counts.
-#' Use `read_ondisc_backed_sceptre_object()` before continuing backed analyses or
-#' exporting reports that need counts. The optional ondisc installation is checked
+#' inspection of saved metadata and historical results, but does not reopen
+#' counts.
+#' Use `read_ondisc_backed_sceptre_object()` before continuing backed analyses
+#' or
+#' exporting reports that need counts. The optional ondisc installation is
+#' checked
 #' for the required API when backed counts are opened; in-memory analyses do not
 #' load ondisc.
 #'
 #' The response and guide files must be the original matching pair. Reopening
-#' checks their shared import ID, anchored file checksums, dimensions and feature
+#' checks their shared import ID, anchored file checksums, dimensions and
+#' feature
 #' order. Identical files may be moved or copied: pass their new paths to the
 #' reader. Verified relocation preserves compatible fits and saved result
 #' provenance. An import ID alone is not a content fingerprint.
 #'
-#' Active backing files are immutable: do not replace or edit them while an object
+#' Active backing files are immutable: do not replace or edit them while an
+#' object
 #' is in use. Saving and reopening verify the existing content anchors; analysis
-#' getters do not repeatedly hash files. If count content or its imported summaries
-#' must change, create a new screen with `import_data()` instead of overwriting the
-#' backing files. Old saved objects whose original feature labels are unknown may
+#' getters do not repeatedly hash files. If count content or its imported
+#' summaries
+#' must change, create a new screen with `import_data()` instead of overwriting
+#' the
+#' backing files. Old saved objects whose original feature labels are unknown
+#' may
 #' likewise require reimport before count replacement.
 #'
 #' @param sceptre_object a `sceptre_object`
@@ -98,13 +107,7 @@ read_ondisc_backed_sceptre_object <- function(
         sceptre_object@data@response_matrix
     )
     grna_descriptor <- count_store_descriptor(sceptre_object@data@grna_matrix)
-    expected_id <- response_descriptor$integer_id
-    if (is.null(expected_id)) {
-        expected_id <- sceptre_object@results@import_metadata$legacy_backend_id
-    }
-    if (!length(expected_id)) {
-        stop("Backing store has no saved import ID; reimport the screen.")
-    }
+    expected_id <- saved_backing_import_id(sceptre_object, response_descriptor)
     matrices <- storage_reopen_backed_pair(
         response_odm_file_fp,
         grna_odm_file_fp,
@@ -115,9 +118,50 @@ read_ondisc_backed_sceptre_object <- function(
             is.null(sceptre_object@results@import_metadata$legacy_backend_id)
     ) {
         stop(
-            "Backing store has no anchored content descriptor; reimport the screen."
+            "Backing store has no anchored content descriptor; reimport the ",
+            "screen."
         )
     }
+    sceptre_object <- bind_reopened_count_stores(
+        sceptre_object,
+        matrices,
+        response_descriptor,
+        grna_descriptor
+    )
+    sceptre_object@results@import_metadata$legacy_backend_id <- NULL
+    return(sceptre_object)
+}
+
+
+#' @rdname read_ondisc_backed_sceptre_object
+#' @export
+write_ondisc_backed_sceptre_object <- function(
+    sceptre_object,
+    directory_to_write
+) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    validate_backing_for_save(sceptre_object)
+    # Keep the imported descriptor identity. Only the location may change after
+    # verified reattachment; never bless changed content by writing fresh
+    # hashes.
+    # Persist descriptors, never process-local live HDF5 handles.
+    sceptre_object@data@grna_matrix <- close_count_store(
+        sceptre_object@data@grna_matrix
+    )
+    sceptre_object@data@response_matrix <- close_count_store(
+        sceptre_object@data@response_matrix
+    )
+    # check that dir exists
+    directory_to_write <- prepare_directory_to_write(directory_to_write)
+    saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))
+}
+
+bind_reopened_count_stores <- function(
+    sceptre_object,
+    matrices,
+    response_descriptor,
+    grna_descriptor
+) {
     # Verified relocation changes only the descriptor path and process handle.
     sceptre_object@data@response_matrix <- as_count_store(
         matrices$response_matrix,
@@ -135,29 +179,16 @@ read_ondisc_backed_sceptre_object <- function(
             ]]$identity <- stage_input_identity(sceptre_object, stage)
         }
     }
-    sceptre_object@results@import_metadata$legacy_backend_id <- NULL
-    return(sceptre_object)
+    sceptre_object
 }
 
-
-#' @rdname read_ondisc_backed_sceptre_object
-#' @export
-write_ondisc_backed_sceptre_object <- function(
-    sceptre_object,
-    directory_to_write
-) {
-    sceptre_object <- migrate_sceptre_object(sceptre_object)
-    validate_backing_for_save(sceptre_object)
-    # Keep the imported descriptor identity. Only the location may change after
-    # verified reattachment; never bless changed content by writing fresh hashes.
-    # Persist descriptors, never process-local live HDF5 handles.
-    sceptre_object@data@grna_matrix <- close_count_store(
-        sceptre_object@data@grna_matrix
-    )
-    sceptre_object@data@response_matrix <- close_count_store(
-        sceptre_object@data@response_matrix
-    )
-    # check that dir exists
-    directory_to_write <- prepare_directory_to_write(directory_to_write)
-    saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))
+saved_backing_import_id <- function(sceptre_object, response_descriptor) {
+    expected_id <- response_descriptor$integer_id
+    if (is.null(expected_id)) {
+        expected_id <- sceptre_object@results@import_metadata$legacy_backend_id
+    }
+    if (!length(expected_id)) {
+        stop("Backing store has no saved import ID; reimport the screen.")
+    }
+    expected_id
 }

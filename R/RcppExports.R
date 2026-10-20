@@ -17,16 +17,66 @@ sample_crt_indices <- function(fitted_probabilities, B) {
     .Call(`_sceptre_sample_crt_indices`, fitted_probabilities, B)
 }
 
-run_association_test <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
-    .Call(`_sceptre_run_association_test`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)
+run_association_test <- function(
+    y,
+    mu,
+    a,
+    w,
+    D,
+    trt_idxs,
+    n_trt,
+    use_all_cells,
+    synthetic_idxs,
+    B1,
+    B2,
+    B3,
+    fit_parametric_curve,
+    return_resampling_dist,
+    side_code
+) {
+    .Call(
+        `_sceptre_run_association_test`,
+        y,
+        mu,
+        a,
+        w,
+        D,
+        trt_idxs,
+        n_trt,
+        use_all_cells,
+        synthetic_idxs,
+        B1,
+        B2,
+        B3,
+        fit_parametric_curve,
+        return_resampling_dist,
+        side_code
+    )
 }
 
 run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {
     .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
 }
 
-sample_calibration_groups <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
-    .Call(`_sceptre_sample_calibration_groups`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
+sample_calibration_groups <- function(
+    calibration_group_size,
+    n_calibration_pairs,
+    n_possible_groups,
+    n_nt_grnas,
+    n_genes,
+    N_POSSIBLE_GROUPS_THRESHOLD,
+    p_hat
+) {
+    .Call(
+        `_sceptre_sample_calibration_groups`,
+        calibration_group_size,
+        n_calibration_pairs,
+        n_possible_groups,
+        n_nt_grnas,
+        n_genes,
+        N_POSSIBLE_GROUPS_THRESHOLD,
+        p_hat
+    )
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
@@ -37,24 +87,80 @@ increment_group_indices_in_place <- function(m) {
     invisible(.Call(`_sceptre_increment_group_indices_in_place`, m))
 }
 
-sample_calibration_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-    .Call(`_sceptre_sample_calibration_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+sample_calibration_pairs <- function(
+    n_nonzero_m,
+    n_nonzero_tot,
+    possible_groups_m,
+    n_genes,
+    n_calibration_pairs,
+    n_nonzero_trt_thresh,
+    n_nonzero_cntrl_thresh
+) {
+    .Call(
+        `_sceptre_sample_calibration_pairs`,
+        n_nonzero_m,
+        n_nonzero_tot,
+        possible_groups_m,
+        n_genes,
+        n_calibration_pairs,
+        n_nonzero_trt_thresh,
+        n_nonzero_cntrl_thresh
+    )
 }
 
 compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
     .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }
 
-evaluate_pair_eligibility_cpp <- function(treatment, control, treatment_threshold, control_threshold) {
-    .Call(`_sceptre_evaluate_pair_eligibility_cpp`, treatment, control, treatment_threshold, control_threshold)
+evaluate_pair_eligibility_cpp <- function(
+    treatment,
+    control,
+    treatment_threshold,
+    control_threshold
+) {
+    .Call(
+        `_sceptre_evaluate_pair_eligibility_cpp`,
+        treatment,
+        control,
+        treatment_threshold,
+        control_threshold
+    )
 }
 
-sparse_pair_counts <- function(j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
-    .Call(`_sceptre_sparse_pair_counts`, j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
+sparse_pair_counts <- function(
+    j,
+    p,
+    n_cells_orig,
+    grna_group_idxs,
+    nt_groups_analysis,
+    to_analyze_response_idxs,
+    to_analyze_grna_idxs,
+    control_group_complement,
+    cells_in_use
+) {
+    .Call(
+        `_sceptre_sparse_pair_counts`,
+        j,
+        p,
+        n_cells_orig,
+        grna_group_idxs,
+        nt_groups_analysis,
+        to_analyze_response_idxs,
+        to_analyze_grna_idxs,
+        control_group_complement,
+        cells_in_use
+    )
 }
 
 sparse_group_counts <- function(j, p, n_cells_orig, groups, cells_in_use) {
-    .Call(`_sceptre_sparse_group_counts`, j, p, n_cells_orig, groups, cells_in_use)
+    .Call(
+        `_sceptre_sparse_group_counts`,
+        j,
+        p,
+        n_cells_orig,
+        groups,
+        cells_in_use
+    )
 }
 
 load_csr_row <- function(j, p, x, row_idx, n_cells) {

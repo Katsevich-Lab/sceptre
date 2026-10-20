@@ -123,34 +123,14 @@ make_run_plan <- function(
     if (is.null(pairs)) {
         pairs <- analysis_pairs(object, analysis)
     }
-    if (calibration) {
-        if (is.null(n_calibration_pairs)) {
-            n_calibration_pairs <- nrow(pairs)
-        }
-        if (is.null(calibration_group_size)) {
-            sizes <- lengths(strsplit(pairs$grna_group, "&", fixed = TRUE))
-            if (!length(sizes) || length(unique(sizes)) != 1L) {
-                stop("Calibration groups must have one common size.")
-            }
-            calibration_group_size <- sizes[[1L]]
-        }
-        check_native_scalar_count(
-            n_calibration_pairs,
-            "n_calibration_pairs",
-            minimum = 1L
-        )
-        check_native_scalar_count(
-            calibration_group_size,
-            "calibration_group_size",
-            minimum = 1L
-        )
-    } else if (
-        !is.null(n_calibration_pairs) || !is.null(calibration_group_size)
-    ) {
-        stop(
-            "Calibration-only RunPlan sizes must be absent for other analyses."
-        )
-    }
+    sizes <- resolve_calibration_plan_sizes(
+        calibration,
+        pairs,
+        n_calibration_pairs,
+        calibration_group_size
+    )
+    n_calibration_pairs <- sizes$n_calibration_pairs
+    calibration_group_size <- sizes$calibration_group_size
     if (is.null(budgets)) {
         budgets <- run_resampling_budget(object, analysis, n_calibration_pairs)
     }
@@ -200,7 +180,8 @@ validate_run_plan <- function(object, plan) {
             )
         ) {
             stop(
-                "Calibration run-plan groups must use prepared non-targeting guides."
+                "Calibration run-plan groups must use prepared non-targeting ",
+                "guides."
             )
         }
     } else if (
@@ -213,7 +194,8 @@ validate_run_plan <- function(object, plan) {
     }
     if (!identical(plan@identity, run_plan_identity(object, plan))) {
         stop(
-            "The run plan no longer matches its data, design, assignments, choices or execution scope."
+            "The run plan no longer matches its data, design, assignments, ",
+            "choices or execution scope."
         )
     }
     invisible(plan)
@@ -259,7 +241,8 @@ invalidate_result_records <- function(object, reason) {
 }
 
 # Check the complete finalized hypothesis family, including failed-QC rows and
-# legitimate repeated requests. This uses labels only, never statistical kernels.
+# legitimate repeated requests. This uses labels only, never statistical
+# kernels.
 validate_result_family <- function(object, result, plan) {
     expected <- data.frame(
         response_id = plan@pairs$response_id,
@@ -290,23 +273,12 @@ validate_result_family <- function(object, result, plan) {
     if (!all(keys %in% names(result))) {
         stop("The result lacks complete-family identity columns.")
     }
-    canonical_keys <- function(table) {
-        out <- as.data.frame(
-            stats::setNames(
-                lapply(keys, function(key) as.character(table[[key]])),
-                keys
-            ),
-            stringsAsFactors = FALSE
+    if (
+        !identical(
+            canonical_family_keys(expected, keys),
+            canonical_family_keys(result, keys)
         )
-        out <- out[
-            do.call(order, c(unname(out), list(na.last = TRUE))),
-            ,
-            drop = FALSE
-        ]
-        rownames(out) <- NULL
-        out
-    }
-    if (!identical(canonical_keys(expected), canonical_keys(result))) {
+    ) {
         stop(
             "The result does not cover the complete run-plan hypothesis family."
         )
@@ -328,7 +300,8 @@ commit_result_record <- function(
         !is.data.frame(result) || !nrow(result) || !"p_value" %in% names(result)
     ) {
         stop(
-            "A completed analysis requires a nonempty result table with p-values."
+            "A completed analysis requires a nonempty result table with ",
+            "p-values."
         )
     }
     if (is.null(plan)) {
@@ -345,6 +318,96 @@ commit_result_record <- function(
         stop("Only the complete prepared hypothesis family can be committed.")
     }
     validate_result_family(object, result, plan)
+    validate_completed_probabilities(object, analysis, result)
+    previous <- object@results@records[[analysis]]
+    history <- if (is.null(previous)) {
+        list()
+    } else {
+        c(previous$history, list(previous[setdiff(names(previous), "history")]))
+    }
+    object@results@records[[analysis]] <- owned_result_value(list(
+        table = result,
+        scope = "complete_family",
+        identity = plan@identity,
+        provenance = completed_result_provenance(object, plan, output_amount),
+        history = history
+    ))
+    object
+}
+
+current_result <- function(object, analysis, required = TRUE) {
+    if (!result_record_is_current(object, analysis)) {
+        if (!required) {
+            return(data.frame())
+        }
+        stop(
+            "No completed current result for `",
+            analysis,
+            "`. Rerun the analysis or use get_result(..., historical = TRUE) ",
+            "to inspect saved results."
+        )
+    }
+    object@results@records[[analysis]]$table
+}
+
+resolve_calibration_plan_sizes <- function(
+    calibration,
+    pairs,
+    n_calibration_pairs,
+    calibration_group_size
+) {
+    if (calibration) {
+        if (is.null(n_calibration_pairs)) {
+            n_calibration_pairs <- nrow(pairs)
+        }
+        if (is.null(calibration_group_size)) {
+            sizes <- lengths(strsplit(pairs$grna_group, "&", fixed = TRUE))
+            if (!length(sizes) || length(unique(sizes)) != 1L) {
+                stop("Calibration groups must have one common size.")
+            }
+            calibration_group_size <- sizes[[1L]]
+        }
+        check_native_scalar_count(
+            n_calibration_pairs,
+            "n_calibration_pairs",
+            minimum = 1L
+        )
+        check_native_scalar_count(
+            calibration_group_size,
+            "calibration_group_size",
+            minimum = 1L
+        )
+    } else if (
+        !is.null(n_calibration_pairs) || !is.null(calibration_group_size)
+    ) {
+        stop(
+            "Calibration-only RunPlan sizes must be absent for other analyses."
+        )
+    }
+    list(
+        n_calibration_pairs = n_calibration_pairs,
+        calibration_group_size = calibration_group_size
+    )
+}
+
+canonical_family_keys <- function(table, keys) {
+    out <- as.data.frame(
+        stats::setNames(
+            lapply(keys, function(key) as.character(table[[key]])),
+            keys
+        ),
+        stringsAsFactors = FALSE
+    )
+    out <- out[
+        do.call(order, c(unname(out), list(na.last = TRUE))),
+        ,
+        drop = FALSE
+    ]
+    rownames(out) <- NULL
+    out
+}
+
+validate_completed_probabilities <- function(object, analysis, result) {
     p <- result$p_value
     if (
         !is.numeric(p) ||
@@ -353,7 +416,8 @@ commit_result_record <- function(
             any(p < 0 | p > 1, na.rm = TRUE)
     ) {
         stop(
-            "Completed result p-values must be numeric probabilities or missing."
+            "Completed result p-values must be numeric probabilities or ",
+            "missing."
         )
     }
     if (analysis %in% c("run_calibration_check", "run_discovery_analysis")) {
@@ -370,44 +434,22 @@ commit_result_record <- function(
                 )
         ) {
             stop(
-                "Discovery and calibration results must be adjusted across the complete hypothesis family."
+                "Discovery and calibration results must be adjusted across ",
+                "the complete hypothesis family."
             )
         }
     }
-    previous <- object@results@records[[analysis]]
-    history <- if (is.null(previous)) {
-        list()
-    } else {
-        c(previous$history, list(previous[setdiff(names(previous), "history")]))
-    }
-    object@results@records[[analysis]] <- owned_result_value(list(
-        table = result,
-        scope = "complete_family",
-        identity = plan@identity,
-        provenance = list(
-            schema_version = object@schema_version,
-            package_version = as.character(utils::packageVersion("sceptre")),
-            spec = analysis_spec_snapshot(object),
-            plan = plan,
-            output_amount = output_amount,
-            response_fit_method = response_fit_method_id(),
-            perturbation_fit_method = perturbation_fit_method_id()
-        ),
-        history = history
-    ))
-    object
+    invisible(NULL)
 }
 
-current_result <- function(object, analysis, required = TRUE) {
-    if (!result_record_is_current(object, analysis)) {
-        if (!required) {
-            return(data.frame())
-        }
-        stop(
-            "No completed current result for `",
-            analysis,
-            "`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results."
-        )
-    }
-    object@results@records[[analysis]]$table
+completed_result_provenance <- function(object, plan, output_amount) {
+    list(
+        schema_version = object@schema_version,
+        package_version = as.character(utils::packageVersion("sceptre")),
+        spec = analysis_spec_snapshot(object),
+        plan = plan,
+        output_amount = output_amount,
+        response_fit_method = response_fit_method_id(),
+        perturbation_fit_method = perturbation_fit_method_id()
+    )
 }

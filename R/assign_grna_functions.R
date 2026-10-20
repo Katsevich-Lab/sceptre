@@ -2,10 +2,12 @@
 # TOP-LEVEL FUNCTION: ASSIGN GRNAS TO CELLS
 ###########################################
 #' Assign guides to cells, then combine assignments when appropriate
-#' @param sceptre_object Sceptre object with assignment method and settings chosen.
+#' @param sceptre_object Sceptre object with assignment method and settings
+#'   chosen.
 #' @param print_progress,parallel,n_processors,log_dir Mixture-model worker and
 #'   progress settings.
-#' @return Object with initial assignments as original matrix column numbers and,
+#' @return Object with initial assignments as original matrix column numbers
+#'   and,
 #'   for maximum assignment, cells flagged for exclusion. Standard runs also
 #'   combine assignments into groups across all canonical guides.
 #'   Warn if no guides were assigned. Mixture fitting can use workers and logs.
@@ -21,7 +23,8 @@ assign_grnas_to_cells <- function(
     grna_matrix <- get_grna_matrix(sceptre_object)
     grna_assignment_method <- sceptre_object@spec@grna_assignment_method
     cell_covariate_data_frame <- sceptre_object@data@covariate_data_frame
-    grna_assignment_hyperparameters <- sceptre_object@spec@grna_assignment_hyperparameters
+    grna_params <-
+        sceptre_object@spec@grna_assignment_hyperparameters
 
     # determine the gRNAs to analyze
     grnas_in_use <- determine_grnas_in_use(sceptre_object)
@@ -29,36 +32,41 @@ assign_grnas_to_cells <- function(
     # assign grnas via the selected strategy; obtain the grna
     # assignments and cells containing multiple grnas
     if (grna_assignment_method == "mixture") {
-        sceptre_object@preparation@guide_assignments <- assign_grnas_to_cells_mixture(
-            grna_matrix = grna_matrix,
-            cell_covariate_data_frame = cell_covariate_data_frame,
-            grna_assignment_hyperparameters = grna_assignment_hyperparameters,
-            print_progress = print_progress,
-            parallel = parallel,
-            n_processors = n_processors,
-            log_dir = log_dir,
-            grna_ids = grnas_in_use
-        )
+        sceptre_object@preparation@guide_assignments <-
+            assign_grnas_to_cells_mixture(
+                grna_matrix = grna_matrix,
+                cell_covariate_data_frame = cell_covariate_data_frame,
+                grna_assignment_hyperparameters = grna_params,
+                print_progress = print_progress,
+                parallel = parallel,
+                n_processors = n_processors,
+                log_dir = log_dir,
+                grna_ids = grnas_in_use
+            )
     }
     if (grna_assignment_method == "thresholding") {
-        sceptre_object@preparation@guide_assignments <- assign_grnas_to_cells_thresholding(
-            grna_matrix = grna_matrix,
-            grna_assign_threshold = grna_assignment_hyperparameters$threshold,
-            grna_ids = grnas_in_use
-        )
+        sceptre_object@preparation@guide_assignments <-
+            assign_grnas_to_cells_thresholding(
+                grna_matrix = grna_matrix,
+                grna_assign_threshold = grna_params$threshold,
+                grna_ids = grnas_in_use
+            )
     }
     if (grna_assignment_method == "maximum") {
+        assignment_info <- sceptre_object@data@import_grna_assignment_info
         max_result <- assign_grnas_to_cells_maximum(
             max_grna = sceptre_object@data@import_grna_assignment_info$max_grna,
-            max_grna_frac_umis = sceptre_object@data@import_grna_assignment_info$max_grna_frac_umis,
-            umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,
+            max_grna_frac_umis = assignment_info$max_grna_frac_umis,
+            umi_fraction_threshold = grna_params$umi_fraction_threshold,
             grna_n_umis = cell_covariate_data_frame$grna_n_umis,
-            min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,
+            min_grna_n_umis_threshold = grna_params$min_grna_n_umis_threshold,
             grna_ids = grnas_in_use
         )
-        sceptre_object@preparation@guide_assignments <- max_result$initial_assignment_list
+        sceptre_object@preparation@guide_assignments <-
+            max_result$initial_assignment_list
         # set cells w/ multiple gRNAs for max method
-        sceptre_object@preparation@assignment_exclusions <- max_result$cells_w_zero_or_twoplus_grnas
+        sceptre_object@preparation@assignment_exclusions <-
+            max_result$cells_w_zero_or_twoplus_grnas
     }
     # check that at least some gRNAs were assigned
     if (
@@ -119,8 +127,10 @@ assign_grnas_to_cells_thresholding <- function(
 #########
 #' Assign each cell to its highest-count guide and flag ambiguous cells
 #' @param max_grna Highest-count guide name for each original cell.
-#' @param max_grna_frac_umis Fraction of that cell's guide UMIs from its top guide.
-#' @param umi_fraction_threshold Flag cells whose top-guide fraction is at or below this.
+#' @param max_grna_frac_umis Fraction of that cell's guide UMIs from its top
+#'   guide.
+#' @param umi_fraction_threshold Flag cells whose top-guide fraction is at or
+#'   below this.
 #' @param grna_n_umis Total guide UMIs per original cell.
 #' @param min_grna_n_umis_threshold Flag cells whose total is below this.
 #' @param grna_ids Guide names, in desired output order.
@@ -159,11 +169,13 @@ assign_grnas_to_cells_maximum <- function(
 # HELPER FUNCTIONS
 ######################
 #' Combine individual guide assignments into the groups saved before QC
-#' @param sceptre_object Object with gathered guide assignments and guide metadata.
+#' @param sceptre_object Object with gathered guide assignments and guide
+#'   metadata.
 #' @return Object with source-coordinate grouped assignments. Methods
 #'   other than maximum also count guides per cell and flag low-MOI cells with
 #'   zero or multiple guides. Target groups follow first-seen metadata order;
-#'   their cells are combined without duplicates, in first-seen order. Individual
+#'   their cells are combined without duplicates, in first-seen order.
+#'   Individual
 #'   NT guide lists keep their original names and cell order. All cell numbers
 #'   still refer to original matrix columns; QC renumbers them later.
 #' @details The supplied source membership vectors are left unchanged.
@@ -179,10 +191,11 @@ process_initial_assignment_list <- function(sceptre_object) {
     # if not using maximum assignment, compute n grnas per cell and cells
     # with multiple grnas
     if (!maximum_assignment) {
-        sceptre_object@preparation@guide_counts_per_cell <- compute_n_grnas_per_cell_vector(
-            initial_assignment_list,
-            n_cells
-        )
+        sceptre_object@preparation@guide_counts_per_cell <-
+            compute_n_grnas_per_cell_vector(
+                initial_assignment_list,
+                n_cells
+            )
         if (low_moi) {
             cells_w_multiple_grnas <- which(
                 sceptre_object@preparation@guide_counts_per_cell >= 2L

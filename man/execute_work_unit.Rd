@@ -7,7 +7,8 @@
 execute_work_unit(sceptre_object, execution, unit_id)
 }
 \arguments{
-\item{sceptre_object}{The full matching prepared screen, with live count stores.}
+\item{sceptre_object}{The full matching prepared screen, with live count
+stores.}
 
 \item{execution}{Manifest returned by \code{prepare_execution()}.}
 
@@ -22,4 +23,31 @@ performed. Workers must return all proposals to \code{collect_execution()}.
 }
 \description{
 Execute one certified work unit without committing an analysis
+}
+\examples{
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+pairs <- construct_cis_pairs(object)
+object <- object |>
+  set_analysis_parameters(
+    side = "left", resampling_mechanism = "permutations",
+    discovery_pairs = pairs
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc()
+execution <- prepare_execution(object, "run_discovery_analysis", 2L)
+# Each worker uses the same full prepared screen and one stable unit ID.
+proposals <- lapply(execution$units, function(unit) {
+  execute_work_unit(object, execution, unit$id)
+})
+completed <- collect_execution(object, execution, rev(proposals))
+head(get_result(completed, "run_discovery_analysis"))
 }

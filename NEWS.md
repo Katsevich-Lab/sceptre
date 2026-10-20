@@ -1,5 +1,9 @@
 # sceptre (development version)
 
+- The distributed execution API now has runnable end-to-end examples. Internal
+  validation and migration helpers are shorter, and warning capture uses local
+  state without superassignment. These changes preserve numerical execution,
+  result ownership and runtime certification.
 - Public result extraction and completed-result admission now own nested tables
   and historical provenance. Editing returned data.tables cannot change saved
   results, earlier objects or later history; original RunPlan certificates are

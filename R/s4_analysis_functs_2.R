@@ -93,7 +93,8 @@ run_calibration_check <- function(
 #' Complete missing assignment/QC steps, record workflow status, choose defaults
 #' and check calibration sizes. For empirical p-values, calculate B3 for the
 #' requested calibration size before sampling the pairs.
-#' @return List with the object and a transient validated run plan. The plan owns
+#' @return List with the object and a transient validated run plan. The plan
+#'   owns
 #'   calibration settings and eligible pairs; no result is committed yet.
 #' @noRd
 run_calibration_check_pt_1 <- function(
@@ -124,9 +125,10 @@ run_calibration_check_pt_1 <- function(
         )
     }
     if (is.null(calibration_group_size)) {
-        calibration_group_size <- compute_calibration_group_size(guide_group_metadata(
-            sceptre_object
-        ))
+        calibration_group_size <-
+            compute_calibration_group_size(guide_group_metadata(
+                sceptre_object
+            ))
     }
     if (is.null(n_calibration_pairs)) {
         n_calibration_pairs <- pair_count(
@@ -166,7 +168,8 @@ run_calibration_check_pt_1 <- function(
 
 #' Test previously prepared calibration pairs and save their results
 #'
-#' Use the pairs chosen in phase one and the current cells and settings. Analysis
+#' Use the pairs chosen in phase one and the current cells and settings.
+#' Analysis
 #' helpers handle random draws, progress and serial/parallel work.
 #' @param plan Validated transient plan produced by calibration preparation.
 #' @return Object with a complete-family calibration record and reusable fits,
@@ -271,7 +274,8 @@ run_power_check <- function(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
-    response_grna_group_pairs <- sceptre_object@preparation@positive_control_pairs_with_info
+    response_grna_group_pairs <-
+        sceptre_object@preparation@positive_control_pairs_with_info
     check_discovery_analysis_inputs(
         response_grna_group_pairs = response_grna_group_pairs,
         control_group_complement = sceptre_object@spec@control_group_complement,
@@ -379,7 +383,8 @@ run_discovery_analysis <- function(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
-    response_grna_group_pairs <- sceptre_object@preparation@discovery_pairs_with_info
+    response_grna_group_pairs <-
+        sceptre_object@preparation@discovery_pairs_with_info
     check_discovery_analysis_inputs(
         response_grna_group_pairs = response_grna_group_pairs,
         control_group_complement = sceptre_object@spec@control_group_complement,
@@ -451,7 +456,8 @@ run_discovery_analysis <- function(
 #' are querying, one of `"run_calibration_check"`, `"run_power_check"`, or
 #' `"run_discovery_analysis"`.
 #'
-#' @param historical Return the saved table even when its provenance is historical.
+#' @param historical Return the saved table even when its provenance is
+#'   historical.
 #'   The returned table carries its saved record as an attribute.
 #' @returns An owned data frame containing the results of the analysis. Editing
 #'   it, including nested historical provenance, does not change the object.
@@ -502,7 +508,8 @@ get_result <- function(sceptre_object, analysis, historical = FALSE) {
     attr(result, "sceptre_result_record") <- record
     if (!result_record_is_current(sceptre_object, analysis)) {
         warning(
-            "Returning historical results; they do not represent the current analysis settings.",
+            "Returning historical results; they do not represent the current ",
+            "analysis settings.",
             call. = FALSE
         )
     }
@@ -662,10 +669,13 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 #' Run missing assignment and QC steps with their public defaults
 #'
 #' Calibration, power and discovery call this after checking parallel support.
-#' If data and parameters are ready, run assignment then QC when both are missing,
-#' or just QC when assignment is complete. Otherwise return the object unchanged;
+#' If data and parameters are ready, run assignment then QC when both are
+#' missing,
+#' or just QC when assignment is complete. Otherwise return the object
+#' unchanged;
 #' the later workflow check reports missing prerequisites. Forward parallel and
-#' n_processors to assignment. Its messages, randomness and logs, and QC's removal
+#' n_processors to assignment. Its messages, randomness and logs, and QC's
+#' removal
 #' of unusable saved fits, come from those normal public calls.
 #' @noRd
 skip_assign_grnas_and_run_qc <- function(

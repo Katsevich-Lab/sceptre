@@ -1,7 +1,9 @@
 #' Apply the model formula while keeping one design row per original cell
 #' @param covariate_data_frame Covariates with one row per original cell.
-#' @param formula_object Formula for model.matrix(), including intercept/contrasts.
-#' @return Numeric design matrix in input-cell order. Error if transformation drops
+#' @param formula_object Formula for model.matrix(), including
+#'   intercept/contrasts.
+#' @return Numeric design matrix in input-cell order. Error if transformation
+#'   drops
 #'   cells, creates missing/infinite values or gives redundant design columns.
 #' @noRd
 convert_covariate_df_to_design_matrix <- function(
@@ -40,7 +42,8 @@ convert_covariate_df_to_design_matrix <- function(
 
 
 #' Calculate cell summaries from an in-memory feature-by-cell count matrix
-#' @param matrix_in Count matrix, converted to column access for the calculation.
+#' @param matrix_in Count matrix, converted to column access for the
+#'   calculation.
 #' @param feature_names Labels matching feature rows. An empty vector disables
 #'   mitochondrial summaries even when requested.
 #' @param compute_p_mito,compute_max_feature Whether to include mitochondrial
@@ -100,12 +103,14 @@ compute_cell_covariates <- function(
 #' @param B Total number of draws, normally B1 + B2 + B3.
 #' @param calibration_check,control_group_complement Whether this is calibration
 #'   and whether controls are all other kept cells.
-#' @param calibration_group_size Number of NT guides combined per calibration group.
+#' @param calibration_group_size Number of NT guides combined per calibration
+#'   group.
 #' @param n_cells Number of cells kept after QC, used with complement controls.
 #' @return An R external pointer to C++ memory containing the complete draws.
 #'   Draws contain positions starting at 0 within the data used by a fit, not
 #'   original matrix column numbers. The pointer is temporary and must not be
-#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing R's
+#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing
+#'   R's
 #'   random-number stream.
 #' @details Complement discovery samples among all kept cells, drawing enough
 #'   positions for the largest treatment group. Calibration needs enough for a
@@ -141,7 +146,8 @@ get_synthetic_permutation_idxs <- function(
         )
         if (calibration_group_size > active_nt_count) {
             stop(
-                "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+                "`calibration_group_size` exceeds the active non-targeting ",
+                "gRNA count after QC (",
                 active_nt_count,
                 ")."
             )
@@ -205,7 +211,8 @@ get_synthetic_permutation_idxs <- function(
 
 
 #' Add the guide-group names used by the chosen integration strategy
-#' @param sceptre_object Object with guide/target metadata and requested pair tables.
+#' @param sceptre_object Object with guide/target metadata and requested pair
+#'   tables.
 #' @return Updated object. Union uses target names without expanding pairs.
 #'   Singleton and Bonferroni join each requested target to all matching guides,
 #'   so multiple guides or repeated metadata matches can create multiple rows.

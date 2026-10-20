@@ -1,22 +1,6 @@
 # Serialized S4 attributes are inspected directly: the registered class may
 # already have changed, so slotNames() cannot describe the physical old object.
-#' @noRd
-migrate_sceptre_object <- function(object) {
-    if (!methods::is(object, "sceptre_object")) {
-        stop("Expected a `sceptre_object`.")
-    }
-    saved <- attributes(object)
-    version <- if (is.null(saved$schema_version)) 1L else saved$schema_version
-    if (identical(version, 3L)) {
-        # readRDS() does not invoke S4 validity. Admit the working scientific
-        # settings before consuming saved plans or caches, without requiring
-        # historical preparation/results to satisfy current object validity.
-        validate_analysis_spec(object@spec)
-        return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
-    }
-    if (!version %in% c(1L, 2L)) {
-        stop("Unsupported sceptre saved-object schema version.")
-    }
+legacy_saved_components <- function(saved, version) {
     if (
         version == 1L &&
             !all(
@@ -46,6 +30,10 @@ migrate_sceptre_object <- function(object) {
             attributes
         )
     }
+    components
+}
+
+normalize_legacy_component_fields <- function(components) {
     # Boundary aliases are intentionally confined here; current objects use
     # domain names and direct count stores rather than schema-one/two wrappers.
     legacy_preparation_names <- c(
@@ -76,6 +64,10 @@ migrate_sceptre_object <- function(object) {
         descriptor <- components$data$backend[[sub("_matrix$", "", field)]]
         components$data[field] <- list(as_count_store(store, descriptor))
     }
+    components
+}
+
+copy_legacy_components <- function(components, version) {
     out <- methods::new("sceptre_object")
     # Only current component payloads cross the boundary; removed counters,
     # execution flags and working budgets do not become a parallel live schema.
@@ -98,6 +90,10 @@ migrate_sceptre_object <- function(object) {
     if (version == 1L) {
         out@data@grna_target_data_frame$grna_group <- NULL
     }
+    out
+}
+
+migrate_legacy_requests <- function(out, components) {
     # Prefer original schema-two requests when available. Earlier saved formats
     # only retain expanded left-join rows, whose ordered blocks can be reversed
     # without dropping repeated requests.
@@ -118,6 +114,10 @@ migrate_sceptre_object <- function(object) {
         methods::slot(out@spec, field) <- recovered$pairs
         request_certainty[field] <- recovered$certainty
     }
+    list(object = out, certainty = request_certainty)
+}
+
+migrate_legacy_guide_groups <- function(out, components) {
     metadata <- components$preparation$grna_target_data_frame
     groups <- metadata$grna_group
     if (is.null(groups) && length(out@spec@grna_integration_strategy)) {
@@ -135,9 +135,10 @@ migrate_sceptre_object <- function(object) {
     if (!is.null(groups)) {
         out@preparation@guide_groups <- as.character(groups)
     }
-    # Count row identifiers do not reveal the feature labels supplied at import
-    # (for example, Ensembl IDs can have separate mitochondrial gene labels).
-    # Schema one did not persist those labels; keep their provenance unknown.
+    out
+}
+
+migrate_legacy_results <- function(out, components, version) {
     previous_results <- components$results
     old_records <- previous_results$records
     effective_fields <- c(
@@ -169,6 +170,15 @@ migrate_sceptre_object <- function(object) {
             )
         }
     }
+    out
+}
+
+migrate_legacy_import_metadata <- function(
+    out,
+    components,
+    version,
+    request_certainty
+) {
     fit_count <- length(components$fits$response_precomputations)
     out@results@import_metadata <- list(
         migrated_from_schema = as.integer(version),
@@ -184,6 +194,43 @@ migrate_sceptre_object <- function(object) {
     ) {
         out@results@import_metadata$legacy_backend_id <- legacy_id
     }
+    out
+}
+
+#' @noRd
+migrate_sceptre_object <- function(object) {
+    if (!methods::is(object, "sceptre_object")) {
+        stop("Expected a `sceptre_object`.")
+    }
+    saved <- attributes(object)
+    version <- if (is.null(saved$schema_version)) 1L else saved$schema_version
+    if (identical(version, 3L)) {
+        # readRDS() does not invoke S4 validity. Admit the working scientific
+        # settings before consuming saved plans or caches, without requiring
+        # historical preparation/results to satisfy current object validity.
+        validate_analysis_spec(object@spec)
+        return(normalize_saved_run_plans(normalize_saved_fit_cache(object)))
+    }
+    if (!version %in% c(1L, 2L)) {
+        stop("Unsupported sceptre saved-object schema version.")
+    }
+    components <- legacy_saved_components(saved, version)
+    components <- normalize_legacy_component_fields(components)
+    out <- copy_legacy_components(components, version)
+    requests <- migrate_legacy_requests(out, components)
+    out <- requests$object
+    request_certainty <- requests$certainty
+    out <- migrate_legacy_guide_groups(out, components)
+    # Count row identifiers do not reveal the feature labels supplied at import
+    # (for example, Ensembl IDs can have separate mitochondrial gene labels).
+    # Schema one did not persist those labels; keep their provenance unknown.
+    out <- migrate_legacy_results(out, components, version)
+    out <- migrate_legacy_import_metadata(
+        out,
+        components,
+        version,
+        request_certainty
+    )
     out <- initialize_screen_identity(out)
     if (!any(request_certainty == "unknown")) {
         out@preparation@stages <- migrate_preparation_stages(
@@ -211,7 +258,8 @@ normalize_saved_fit_cache <- function(object) {
             !setequal(names(physical), c("entries", "identity", "class"))
     ) {
         stop(
-            "Unrecognized schema-three fit-cache layout; cached provenance cannot be verified."
+            "Unrecognized schema-three fit-cache layout; cached provenance ",
+            "cannot be verified."
         )
     }
     cache <- methods::new(
@@ -227,7 +275,8 @@ normalize_saved_fit_cache <- function(object) {
             )
     ) {
         stop(
-            "Saved response fits do not match the actual data and design inputs."
+            "Saved response fits do not match the actual data and design ",
+            "inputs."
         )
     }
     object@fits <- cache
@@ -270,6 +319,38 @@ normalize_saved_run_plans <- function(object) {
     object
 }
 
+reconstruct_legacy_pair_blocks <- function(expanded, canonical, metadata) {
+    starts <- integer()
+    position <- 1L
+    while (position <= nrow(expanded)) {
+        groups <- as.character(metadata$grna_group[
+            metadata$grna_target == expanded$grna_target[position]
+        ])
+        width <- length(groups)
+        block <- seq.int(position, length.out = width)
+        if (
+            !width ||
+                max(block) > nrow(expanded) ||
+                !identical(as.character(expanded$grna_group[block]), groups) ||
+                !all(vapply(
+                    block,
+                    function(row) {
+                        identical(
+                            as.list(canonical[row, , drop = FALSE]),
+                            as.list(canonical[position, , drop = FALSE])
+                        )
+                    },
+                    logical(1)
+                ))
+        ) {
+            return(list(pairs = canonical, certainty = "unknown"))
+        }
+        starts <- c(starts, position)
+        position <- position + width
+    }
+    list(pairs = canonical[starts, , drop = FALSE], certainty = "reconstructed")
+}
+
 # Recover multiplicity from the historical left-join traversal, rather than
 # uniquing rows. Unrecognized layouts remain readable but require fresh setup.
 #' @noRd
@@ -306,35 +387,7 @@ recover_legacy_requested_pairs <- function(
     ) {
         return(list(pairs = canonical, certainty = "unknown"))
     }
-    starts <- integer()
-    position <- 1L
-    while (position <= nrow(expanded)) {
-        groups <- as.character(metadata$grna_group[
-            metadata$grna_target == expanded$grna_target[position]
-        ])
-        width <- length(groups)
-        block <- seq.int(position, length.out = width)
-        if (
-            !width ||
-                max(block) > nrow(expanded) ||
-                !identical(as.character(expanded$grna_group[block]), groups) ||
-                !all(vapply(
-                    block,
-                    function(row) {
-                        identical(
-                            as.list(canonical[row, , drop = FALSE]),
-                            as.list(canonical[position, , drop = FALSE])
-                        )
-                    },
-                    logical(1)
-                ))
-        ) {
-            return(list(pairs = canonical, certainty = "unknown"))
-        }
-        starts <- c(starts, position)
-        position <- position + width
-    }
-    list(pairs = canonical[starts, , drop = FALSE], certainty = "reconstructed")
+    reconstruct_legacy_pair_blocks(expanded, canonical, metadata)
 }
 
 #' @noRd
@@ -365,44 +418,69 @@ migrate_historical_record <- function(table, old, version, effective = list()) {
     )
 }
 
+migrate_preparation_stage <- function(object, stage) {
+    store <- object@data@response_matrix
+    if (
+        !is.null(store) &&
+            (!methods::is(store, "BackedCountStore") ||
+                !is.null(store@handle))
+    ) {
+        object <- commit_preparation_stage(object, stage)
+    } else {
+        # Closed legacy stores cannot yet supply a live matrix to the
+        # coordinator validator; payload checks below use saved cell axes.
+        object@preparation@stages[[stage]] <- list(
+            identity = stage_input_identity(object, stage)
+        )
+    }
+    object
+}
+
+legacy_pair_payload_valid <- function(pairs, requested) {
+    is.data.frame(pairs) &&
+        nrow(pairs) == nrow(requested) &&
+        (!nrow(pairs) ||
+            (all(
+                c(
+                    "response_id",
+                    "grna_group",
+                    "n_nonzero_trt",
+                    "n_nonzero_cntrl",
+                    "pass_qc"
+                ) %in%
+                    names(pairs)
+            ) &&
+                is.logical(pairs$pass_qc) &&
+                !anyNA(pairs$pass_qc)))
+}
+
+legacy_source_cells_valid <- function(x, n) {
+    is.numeric(x) &&
+        !anyNA(x) &&
+        !any(x != as.integer(x)) &&
+        !any(x < 1L | x > n) &&
+        !anyDuplicated(x)
+}
+
+legacy_design_payload_valid <- function(object, prep, n) {
+    n > 0L &&
+        nrow(prep@design_matrix) == n &&
+        ncol(prep@design_matrix) > 0L &&
+        length(prep@guide_groups) == nrow(object@data@grna_target_data_frame) &&
+        !anyNA(prep@design_matrix)
+}
+
 # Flags are evidence only when their corresponding durable payload validates.
 #' @noRd
 migrate_preparation_stages <- function(object, flags) {
     prep <- object@preparation
     n <- nrow(object@data@covariate_data_frame)
-    source_valid <- function(x) {
-        is.numeric(x) &&
-            !anyNA(x) &&
-            !any(x != as.integer(x)) &&
-            !any(x < 1L | x > n) &&
-            !anyDuplicated(x)
-    }
     flag <- function(name) isTRUE(unname(flags[name]))
     object@preparation@stages <- list()
-    add_stage <- function(stage) {
-        store <- object@data@response_matrix
-        if (
-            !is.null(store) &&
-                (!methods::is(store, "BackedCountStore") ||
-                    !is.null(store@handle))
-        ) {
-            object <<- commit_preparation_stage(object, stage)
-        } else {
-            # Closed legacy stores cannot yet supply a live matrix to the
-            # coordinator validator; payload checks below use saved cell axes.
-            object@preparation@stages[[stage]] <<- list(
-                identity = stage_input_identity(object, stage)
-            )
-        }
-    }
     design_ok <- flag("set_analysis_parameters") &&
-        n > 0L &&
-        nrow(prep@design_matrix) == n &&
-        ncol(prep@design_matrix) > 0L &&
-        length(prep@guide_groups) == nrow(object@data@grna_target_data_frame) &&
-        !anyNA(prep@design_matrix)
+        legacy_design_payload_valid(object, prep, n)
     if (design_ok) {
-        add_stage("design")
+        object <- migrate_preparation_stage(object, "design")
     }
     assignment_ok <- design_ok &&
         flag("assign_grnas") &&
@@ -411,50 +489,42 @@ migrate_preparation_stages <- function(object, flags) {
             c("grna_group_idxs", "indiv_nt_grna_idxs") %in%
                 names(prep@source_groups)
         ) &&
-        all(vapply(prep@guide_assignments, source_valid, logical(1)))
+        all(vapply(
+            prep@guide_assignments,
+            legacy_source_cells_valid,
+            logical(1),
+            n = n
+        ))
     if (assignment_ok) {
-        add_stage("assignment")
+        object <- migrate_preparation_stage(object, "assignment")
     }
     cells_ok <- assignment_ok &&
         flag("run_qc") &&
         length(prep@analysis_cells) > 0L &&
-        source_valid(prep@analysis_cells) &&
+        legacy_source_cells_valid(prep@analysis_cells, n) &&
         is.list(prep@analysis_groups$grna_group_idxs)
     if (cells_ok) {
-        add_stage("cell_qc")
-    }
-    pair_ok <- function(pairs, requested) {
-        is.data.frame(pairs) &&
-            nrow(pairs) == nrow(requested) &&
-            (!nrow(pairs) ||
-                (all(
-                    c(
-                        "response_id",
-                        "grna_group",
-                        "n_nonzero_trt",
-                        "n_nonzero_cntrl",
-                        "pass_qc"
-                    ) %in%
-                        names(pairs)
-                ) &&
-                    is.logical(pairs$pass_qc) &&
-                    !anyNA(pairs$pass_qc)))
+        object <- migrate_preparation_stage(object, "cell_qc")
     }
     if (
         cells_ok &&
-            pair_ok(prep@discovery_pairs_with_info, prep@discovery_pairs) &&
-            pair_ok(
+            legacy_pair_payload_valid(
+                prep@discovery_pairs_with_info,
+                prep@discovery_pairs
+            ) &&
+            legacy_pair_payload_valid(
                 prep@positive_control_pairs_with_info,
                 prep@positive_control_pairs
             )
     ) {
-        add_stage("pair_qc")
+        object <- migrate_preparation_stage(object, "pair_qc")
     }
     object@preparation@stages
 }
 
 # Content identity is computed at import/migration, never once per response.
-# Live backing handles are deliberately excluded: their identity is process-local.
+# Live backing handles are deliberately excluded: their identity is
+# process-local.
 #' @noRd
 initialize_screen_identity <- function(object) {
     counts <- lapply(c("response_matrix", "grna_matrix"), function(field) {
@@ -503,7 +573,8 @@ backed_store_descriptor <- function(store) {
 validate_backed_descriptor <- function(store, descriptor) {
     if (is.null(descriptor)) {
         stop(
-            "Backing store has no anchored content descriptor; reimport the screen."
+            "Backing store has no anchored content descriptor; reimport the ",
+            "screen."
         )
     }
     actual <- backed_store_descriptor(store)
@@ -511,7 +582,8 @@ validate_backed_descriptor <- function(store, descriptor) {
     keys <- c("content_md5", "dimensions", "dimnames", "integer_id")
     if (!identical(actual[keys], descriptor[keys])) {
         stop(
-            "Backing store content does not match the saved descriptor; cached analyses cannot be reused."
+            "Backing store content does not match the saved descriptor; ",
+            "cached analyses cannot be reused."
         )
     }
     invisible(NULL)

@@ -169,7 +169,8 @@ set_response_matrix <- function(sceptre_object, response_matrix) {
             !identical(dimnames(previous), dimnames(response_matrix))
     ) {
         stop(
-            "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen."
+            "Replacement counts must preserve aligned cells and feature ",
+            "identities; use import_data() for a new screen."
         )
     }
     sceptre_object@data@response_matrix <- as_count_store(response_matrix)
@@ -207,7 +208,8 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
             !identical(dimnames(previous), dimnames(grna_matrix))
     ) {
         stop(
-            "Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen."
+            "Replacement counts must preserve aligned cells and feature ",
+            "identities; use import_data() for a new screen."
         )
     }
     sceptre_object@data@grna_matrix <- as_count_store(grna_matrix)
@@ -228,7 +230,8 @@ refresh_imported_summaries <- function(object, modality) {
     store <- methods::slot(object@data, paste0(modality, "_matrix"))
     if (methods::is(store, "BackedCountStore") || is.null(dim(store))) {
         stop(
-            "Use import_data() to replace backed screen content and its import summaries."
+            "Use import_data() to replace backed screen content and its ",
+            "import summaries."
         )
     }
     labels <- object@data@response_names
@@ -238,7 +241,8 @@ refresh_imported_summaries <- function(object, modality) {
             "response_p_mito" %in% names(object@data@covariate_data_frame)
     ) {
         stop(
-            "Original mitochondrial feature labels are unknown; use import_data() to replace response counts."
+            "Original mitochondrial feature labels are unknown; use ",
+            "import_data() to replace response counts."
         )
     }
     summaries <- compute_cell_covariates(
@@ -252,7 +256,8 @@ refresh_imported_summaries <- function(object, modality) {
             max_grna = summaries$feature_w_max_expression,
             max_grna_frac_umis = summaries$frac_umis_max_feature
         )
-        summaries$feature_w_max_expression <- summaries$frac_umis_max_feature <- NULL
+        summaries$feature_w_max_expression <-
+            summaries$frac_umis_max_feature <- NULL
     }
     for (field in names(summaries)) {
         object@data@covariate_data_frame[[paste0(

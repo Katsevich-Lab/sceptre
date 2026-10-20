@@ -1,5 +1,6 @@
 # Canonical guide metadata has one owner. Preparation stores only a row-aligned
-# derived group label, preserving repeated metadata rows and their original order.
+# derived group label, preserving repeated metadata rows and their original
+# order.
 guide_group_metadata <- function(object) {
     metadata <- object@data@grna_target_data_frame
     groups <- object@preparation@guide_groups
@@ -14,7 +15,8 @@ guide_group_metadata <- function(object) {
 }
 
 # Totals count requested target-response rows, not compiled guide rows. Passing
-# Bonferroni hypotheses count target-response families with at least one eligible
+# Bonferroni hypotheses count target-response families with at least one
+# eligible
 # guide; singleton/union retain the existing passing-row definition.
 pair_count <- function(object, type = "discovery", passing = FALSE) {
     stopifnot(type %in% c("discovery", "positive_control"))

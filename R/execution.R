@@ -2,9 +2,11 @@
 # Both permutation and CRT use these mechanics, while their gene/guide loops
 # and statistical calculations remain in the separate analysis functions.
 #' Choose a worker's progress-log path and optionally create the file
-#' @param analysis_type,proc_id Analysis name and worker number for the filename.
+#' @param analysis_type,proc_id Analysis name and worker number for the
+#' filename.
 #' @param parallel,print_progress Return NULL unless both are TRUE.
-#' @param log_dir Directory passed to `get_log_dir()`, which creates it if needed.
+#' @param log_dir Directory passed to `get_log_dir()`, which creates it if
+#' needed.
 #' @param initialize TRUE creates or empties the file. FALSE lets the CRT guide
 #'   phase append to the file already used during response fitting.
 #' @return Log-file path, or NULL when file-based reporting is disabled.
@@ -28,18 +30,20 @@ analysis_log_file <- function(
 }
 
 #' Print the parallel-analysis message and where to find progress logs
-#' @param analysis_type,print_progress,log_dir Analysis name and reporting settings.
+#' @param analysis_type,print_progress,log_dir Analysis name and reporting
+#' settings.
 #' @return The invisible result of the message call. Looking up the log location
 #'   can create its directory when progress reporting is enabled.
 #' @noRd
 announce_parallel_analysis <- function(analysis_type, print_progress, log_dir) {
     message("Running ", analysis_type, " in parallel.")
     if (print_progress) {
+        log_pattern <- paste0(analysis_type, "_*.out")
         message(
             "Change directories to ",
             crayon::blue(get_log_dir(log_dir)),
             " and view the files ",
-            crayon::blue(paste0(analysis_type, "_*.out")),
+            crayon::blue(log_pattern),
             " for progress updates."
         )
     }
@@ -81,54 +85,32 @@ analysis_worker_error <- function(
     )
 }
 
-#' Run each work block serially or in a separate forked worker
-#' @param blocks Input blocks, already divided and ordered by the caller.
-#' @param worker Function accepting a block and a worker number; serial work
-#'   receives NULL instead of a number.
-#' @param parallel Whether to use `mclapply()`, with one worker per block.
-#' @param analysis,phase Optional scientific analysis and execution phase labels.
-#' @return Worker results in input-block order, including legitimate NULL results.
-#'   Stop if a worker fails
-#'   or exits without returning a result. Include its block number and original
-#'   error message, before callers combine results or report success. Blocks and
-#'   random seeds are not rearranged; `mclapply()` keeps its default behavior.
-#' @noRd
-execute_analysis_blocks <- function(
+invoke_analysis_worker <- function(
     blocks,
     worker,
+    i,
+    proc_id,
     parallel,
-    analysis = NULL,
-    phase = NULL
+    analysis,
+    phase
 ) {
-    # A successful worker can return NULL for an empty block. Put its result
-    # inside a list so that this differs from a child exiting without replying.
-    invoke_worker <- function(i, proc_id) {
-        # Errors acquire execution context. A child interrupt is transported to
-        # the parent and re-signalled unchanged; a parent interrupt escapes.
-        tryCatch(
-            list(value = worker(blocks[[i]], proc_id)),
-            error = function(cause) {
-                stop(analysis_worker_error(i, cause, analysis, phase))
-            },
-            interrupt = function(cause) {
-                if (!parallel) {
-                    stop(cause)
-                }
-                list(interrupt = cause)
+    # Errors acquire execution context. A child interrupt is transported to
+    # the parent and re-signalled unchanged; a parent interrupt escapes.
+    tryCatch(
+        list(value = worker(blocks[[i]], proc_id)),
+        error = function(cause) {
+            stop(analysis_worker_error(i, cause, analysis, phase))
+        },
+        interrupt = function(cause) {
+            if (!parallel) {
+                stop(cause)
             }
-        )
-    }
-    replies <- if (!parallel) {
-        lapply(seq_along(blocks), function(i) invoke_worker(i, NULL))
-    } else {
-        parallel::mclapply(
-            seq_along(blocks),
-            function(proc_id) {
-                invoke_worker(proc_id, proc_id)
-            },
-            mc.cores = length(blocks)
-        )
-    }
+            list(interrupt = cause)
+        }
+    )
+}
+
+validate_analysis_replies <- function(replies, analysis, phase) {
     for (i in seq_along(replies)) {
         result <- replies[[i]]
         if (inherits(result, "try-error")) {
@@ -159,6 +141,55 @@ execute_analysis_blocks <- function(
         }
         if (inherits(result$interrupt, "interrupt")) stop(result$interrupt)
     }
+    invisible(NULL)
+}
+
+#' Run each work block serially or in a separate forked worker
+#' @param blocks Input blocks, already divided and ordered by the caller.
+#' @param worker Function accepting a block and a worker number; serial work
+#'   receives NULL instead of a number.
+#' @param parallel Whether to use `mclapply()`, with one worker per block.
+#' @param analysis,phase Optional scientific analysis and execution phase
+#' labels.
+#' @return Worker results in input-block order, including legitimate NULL
+#' results.
+#'   Stop if a worker fails
+#'   or exits without returning a result. Include its block number and original
+#'   error message, before callers combine results or report success. Blocks and
+#'   random seeds are not rearranged; `mclapply()` keeps its default behavior.
+#' @noRd
+execute_analysis_blocks <- function(
+    blocks,
+    worker,
+    parallel,
+    analysis = NULL,
+    phase = NULL
+) {
+    # A successful worker can return NULL for an empty block. Put its result
+    # inside a list so that this differs from a child exiting without replying.
+    invoke_worker <- function(i, proc_id) {
+        invoke_analysis_worker(
+            blocks,
+            worker,
+            i,
+            proc_id,
+            parallel,
+            analysis,
+            phase
+        )
+    }
+    replies <- if (!parallel) {
+        lapply(seq_along(blocks), function(i) invoke_worker(i, NULL))
+    } else {
+        parallel::mclapply(
+            seq_along(blocks),
+            function(proc_id) {
+                invoke_worker(proc_id, proc_id)
+            },
+            mc.cores = length(blocks)
+        )
+    }
+    validate_analysis_replies(replies, analysis, phase)
     lapply(replies, function(reply) reply$value)
 }
 
@@ -176,7 +207,8 @@ bind_analysis_results <- function(blocks) {
 #' @param position Item number within this block and phase, starting at 1.
 #' @param id Gene or guide-group name to display.
 #' @param total Number of items assigned to this block.
-#' @param print_progress,parallel Whether to report progress and use a worker log.
+#' @param print_progress,parallel Whether to report progress and use a worker
+#' log.
 #' @param log_file Worker log path for parallel runs.
 #' @param feature,prefix Text supplied by the calling analysis for its message.
 #' @return Invisible NULL. Report the first item and every fifth item. Parallel

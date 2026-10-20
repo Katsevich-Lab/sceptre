@@ -98,7 +98,8 @@ setClass(
         n_trt = "integer"
     )
 )
-# The coordinator owns workflow transitions and references, never duplicate data.
+# The coordinator owns workflow transitions and references, never duplicate
+# data.
 setClass(
     "sceptre_object",
     slots = c(

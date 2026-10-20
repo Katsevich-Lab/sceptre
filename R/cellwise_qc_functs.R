@@ -55,7 +55,8 @@ determine_cells_to_retain <- function(
 
     # 4. compute cells to retain based on cells containing multiple grnas (if in
     # low MOI)
-    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@preparation@assignment_exclusions
+    cells_to_exclude_zero_twoplus_grnas <-
+        sceptre_object@preparation@assignment_exclusions
     n_cells_rm_zero_twoplus_grnas <- length(
         sceptre_object@preparation@assignment_exclusions
     )
@@ -91,11 +92,13 @@ determine_cells_to_retain <- function(
 }
 
 
-#' Remove failed-QC cells from guide assignments and renumber the remaining cells
+#' Remove failed-QC cells from guide assignments and renumber the remaining
+#' cells
 #' @param sceptre_object Object with raw assignments as original matrix columns
 #'   and `cells_in_use` listing the columns kept after QC.
 #' @return Object with updated `grna_assignments`. Group members become unique
-#'   positions within `cells_in_use`, in that list's order. Remove NT guides with
+#'   positions within `cells_in_use`, in that list's order. Remove NT guides
+#'   with
 #'   no remaining cells. With NT controls, also store each NT group's positions
 #'   within the combined NT-cell list, as required by the saved-object format.
 #'   The caller must keep the returned object.

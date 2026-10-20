@@ -8,13 +8,7 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
     n_cells <- ncol(get_response_matrix(object))
     n_responses <- nrow(get_response_matrix(object))
     grna_target_data_frame <- guide_group_metadata(object)
-    n_nt_grnas <- grna_target_data_frame |>
-        dplyr::filter(grna_target == "non-targeting") |>
-        nrow()
-    targeting_grnas_df <- grna_target_data_frame |>
-        dplyr::filter(grna_target != "non-targeting")
-    n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
-    n_targeting_grnas <- nrow(targeting_grnas_df)
+    guide_counts <- screen_guide_counts(grna_target_data_frame)
     n_covariates <- length(names(object@data@covariate_data_frame))
     covariates <- paste0(
         sort(names(object@data@covariate_data_frame)),
@@ -41,11 +35,11 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         " responses\n\t\U2022 ",
         crayon::blue(moi),
         " multiplicity-of-infection \n\t\U2022 ",
-        crayon::blue(n_targeting_grnas),
+        crayon::blue(guide_counts$n_targeting_grnas),
         " targeting gRNAs (distributed across ",
-        crayon::blue(n_targeting_grna_targets),
+        crayon::blue(guide_counts$n_targeting_grna_targets),
         " targets) \n\t\U2022 ",
-        crayon::blue(n_nt_grnas),
+        crayon::blue(guide_counts$n_nt_grnas),
         " non-targeting gRNAs \n\t\U2022 ",
         crayon::blue(n_covariates),
         " covariates (",
@@ -400,7 +394,8 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
     available <- candidates[status[candidates]]
     if (!length(available)) {
         stop(
-            "There is no generic plot configured for the current prepared state."
+            "There is no generic plot configured for the current prepared ",
+            "state."
         )
     }
     funct_to_call <- paste0("plot_", available[[1L]])
@@ -410,7 +405,8 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 
 
 #' Read all cells for one named gene or guide
-#' @param mat Row-accessible sparse matrix (dgRMatrix) or open ondisc matrix (odm)
+#' @param mat Row-accessible sparse matrix (dgRMatrix) or open ondisc matrix
+#'   (odm)
 #'   with unique row names.
 #' @param id Gene/guide name present in rownames(mat).
 #' @return Dense numeric vector in original cell-column order. Other matrix
@@ -421,4 +417,19 @@ load_row <- function(mat, id) {
     if (methods::is(mat, "odm") || methods::is(mat, "dgRMatrix")) {
         storage_read_response(mat, storage_response_index(mat, id))
     }
+}
+
+screen_guide_counts <- function(grna_target_data_frame) {
+    n_nt_grnas <- grna_target_data_frame |>
+        dplyr::filter(grna_target == "non-targeting") |>
+        nrow()
+    targeting_grnas_df <- grna_target_data_frame |>
+        dplyr::filter(grna_target != "non-targeting")
+    n_targeting_grna_targets <- length(unique(targeting_grnas_df$grna_target))
+    n_targeting_grnas <- nrow(targeting_grnas_df)
+    list(
+        n_nt_grnas = n_nt_grnas,
+        n_targeting_grna_targets = n_targeting_grna_targets,
+        n_targeting_grnas = n_targeting_grnas
+    )
 }

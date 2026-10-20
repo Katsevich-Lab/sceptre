@@ -12,7 +12,8 @@ collect_execution(sceptre_object, execution, proposals)
 \item{execution}{Manifest returned by \code{prepare_execution()}.}
 
 \item{proposals}{List containing exactly one proposal per expected unit, in
-any arrival order. Missing, duplicated or incompatible proposals are errors.}
+any arrival order. Missing, duplicated or incompatible proposals are
+errors.}
 }
 \value{
 Updated screen with one completed result and compatible compact fits.
@@ -21,4 +22,31 @@ after restoring canonical traversal and adding failed-QC rows.
 }
 \description{
 Collect every work proposal and commit one complete-family result
+}
+\examples{
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+pairs <- construct_cis_pairs(object)
+object <- object |>
+  set_analysis_parameters(
+    side = "left", resampling_mechanism = "permutations",
+    discovery_pairs = pairs
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc()
+execution <- prepare_execution(object, "run_discovery_analysis", 2L)
+# Each worker uses the same full prepared screen and one stable unit ID.
+proposals <- lapply(execution$units, function(unit) {
+  execute_work_unit(object, execution, unit$id)
+})
+completed <- collect_execution(object, execution, rev(proposals))
+head(get_result(completed, "run_discovery_analysis"))
 }

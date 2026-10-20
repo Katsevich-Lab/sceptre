@@ -1,6 +1,7 @@
 # Correction policy is shared by public admission and component validity.
 # Alpha=1 retains its existing valid interpretation and finite empirical budget;
-# zero is unsupported because the empirical resampling-budget rule divides by it.
+# zero is unsupported because the empirical resampling-budget rule divides by
+# it.
 correction_settings_errors <- function(alpha, method) {
     problems <- character()
     if (
@@ -14,7 +15,10 @@ correction_settings_errors <- function(alpha, method) {
             alpha > 1
     ) {
         problems["multiple_testing_alpha"] <-
-            "`multiple_testing_alpha` must be one finite numeric value in (0, 1]."
+            paste0(
+                "`multiple_testing_alpha` must be one finite numeric value in ",
+                "(0, 1]."
+            )
     }
     supported <- is.character(method) &&
         is.null(dim(method)) &&
@@ -31,7 +35,8 @@ correction_settings_errors <- function(alpha, method) {
     }
     if (!supported) {
         problems["multiple_testing_method"] <- paste0(
-            "`multiple_testing_method` must be one supported stats::p.adjust method: ",
+            "`multiple_testing_method` must be one supported stats::p.adjust ",
+            "method: ",
             paste(stats::p.adjust.methods, collapse = ", "),
             "."
         )

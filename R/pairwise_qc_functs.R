@@ -1,9 +1,11 @@
 #' Add treatment and control counts to discovery and positive-control pairs
 #'
-#' Prepare cell/group lookups, count requested pairs through the storage helpers,
+#' Prepare cell/group lookups, count requested pairs through the storage
+#' helpers,
 #' and save the counts in the object's discovery and positive-control tables.
 #' Also save the NT-group-by-gene summary matrix and per-gene totals needed for
-#' calibration. Keep each table's requested pairs aligned with its returned counts.
+#' calibration. Keep each table's requested pairs aligned with its returned
+#' counts.
 #' @noRd
 compute_pairwise_qc_information <- function(sceptre_object) {
     # extract basic information from sceptre_object
@@ -78,9 +80,12 @@ compute_pairwise_qc_information <- function(sceptre_object) {
 #' Mark QC-passing pairs and count how many hypotheses remain
 #' @param sceptre_object Object with treatment/control counts, QC thresholds and
 #'   guide integration strategy already set.
-#' @return Object with pass_qc in each nonempty pair table and updated passing-pair
-#'   counts. For Bonferroni, count distinct gene-target pairs with any passing guide.
-#'   Otherwise count passing rows, including repeated requests. Leave empty tables
+#' @return Object with pass_qc in each nonempty pair table and updated
+#'   passing-pair
+#'   counts. For Bonferroni, count distinct gene-target pairs with any passing
+#'   guide.
+#'   Otherwise count passing rows, including repeated requests. Leave empty
+#'   tables
 #'   and their existing count fields unchanged.
 #' @noRd
 compute_qc_metrics <- function(sceptre_object) {

@@ -4,10 +4,13 @@
 # covariates. There are as many rows as design coefficients.
 # Keep the calculation and eigenvector order to preserve numerical results.
 #' Build the matrix used to adjust the score variance for fitted covariates
-#' @param Zt_wZ Symmetric p-by-p matrix `t(Z) %*% (w * Z)`, where Z is the design.
-#' @param wZ n-by-p design matrix with each cell's row multiplied by its weight w
+#' @param Zt_wZ Symmetric p-by-p matrix `t(Z) %*% (w * Z)`, where Z is the
+#'   design.
+#' @param wZ n-by-p design matrix with each cell's row multiplied by its weight
+#'   w
 #'   (not by sqrt(w)).
-#' @return A p-by-n matrix, `(Lambda^(-1/2) * t(U)) %*% t(wZ)`, where U and Lambda
+#' @return A p-by-n matrix, `(Lambda^(-1/2) * t(U)) %*% t(wZ)`, where U and
+#'   Lambda
 #'   come from `eigen(Zt_wZ)`. Columns follow the cells in `wZ`; rows follow the
 #'   eigenvectors in eigen() order, rather than individual covariates.
 #' @details Use the eigenvalues directly, without adding a ridge term, clipping

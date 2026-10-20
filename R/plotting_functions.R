@@ -112,7 +112,8 @@ plot_grna_count_distributions <- function(
     # Choose histogram bin bounds and labels for one guide's counts
     # grna_expressions: Finite per-cell counts, already restricted below 10000
     #   by the outer plotting function.
-    # Returns: Table of bin_upper_bounds and bin_labels in display order. Use the
+    # Returns: Table of bin_upper_bounds and bin_labels in display order. Use
+    # the
     #   outer function's rounded threshold: individual-count bins extend through
     #   max(10, threshold - 1), then bin widths grow exponentially as needed.
     #   Keep the existing bin labels, including at the threshold.
@@ -648,13 +649,18 @@ plot_run_calibration_check <- function(
 # 4. PLOT DISCOVERY ANALYSIS
 ############################
 #' Plot calibration and discovery p-values against a reference distribution
-#' @param calibration_result,discovery_result Tables containing p_value in row order.
+#' @param calibration_result,discovery_result Tables containing p_value in row
+#'   order.
 #'   Overlaid groups need equal sizes within a panel to share its QQ band.
-#' @param p_thresh Discovery display threshold, or NA to omit its reference line.
-#' @param transform_scale,include_legend,include_y_axis_text Plot display options.
+#' @param p_thresh Discovery display threshold, or NA to omit its reference
+#'   line.
+#' @param transform_scale,include_legend,include_y_axis_text Plot display
+#'   options.
 #' @param point_size,transparency Point appearance settings.
-#' @return QQ plot with points/bands sampled on a display grid using a fixed seed.
-#'   Restore the previous random state and use already processed results, without
+#' @return QQ plot with points/bands sampled on a display grid using a fixed
+#'   seed.
+#'   Restore the previous random state and use already processed results,
+#'   without
 #'   recalculating significance.
 #' @noRd
 compare_calibration_and_discovery_results <- function(
@@ -736,9 +742,11 @@ compare_calibration_and_discovery_results <- function(
 
 
 #' Plot effects and p-values, coloring points by their saved significance flag
-#' @param discovery_result Table with p_value, log_2_fold_change and significant.
+#' @param discovery_result Table with p_value, log_2_fold_change and
+#'   significant.
 #' @param p_thresh P-value used only for the horizontal reference line.
-#' @param x_limits Display bounds for log2 effects; p-values below 1e-12 display at 1e-12.
+#' @param x_limits Display bounds for log2 effects; p-values below 1e-12 display
+#'   at 1e-12.
 #' @param transparency,point_size Point appearance settings.
 #' @return ggplot using the result's significant column exactly, including ties.
 #'   Clipping changes only displayed values; it does not recompute significance.
@@ -1032,9 +1040,12 @@ plot_covariates <- function(
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     if (stage_complete(sceptre_object, "cell_qc")) {
-        response_n_umis_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_umis_range
-        response_n_nonzero_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_nonzero_range
-        p_mito_threshold <- sceptre_object@spec@cellwise_qc_thresholds$p_mito_threshold
+        response_n_umis_range <-
+            sceptre_object@spec@cellwise_qc_thresholds$response_n_umis_range
+        response_n_nonzero_range <-
+            sceptre_object@spec@cellwise_qc_thresholds$response_n_nonzero_range
+        p_mito_threshold <-
+            sceptre_object@spec@cellwise_qc_thresholds$p_mito_threshold
     }
     covariate_data_frame <- sceptre_object@data@covariate_data_frame
     # Plot one covariate across original cells with candidate QC cutoff lines
@@ -1042,7 +1053,8 @@ plot_covariates <- function(
     #   direct value cutoffs.
     # plot_tit: Plot title; use_quantile selects whether to convert curr_range
     #   from quantiles to observed values.
-    # Returns: Histogram with cutoff lines. Showing candidate cutoffs does not apply
+    # Returns: Histogram with cutoff lines. Showing candidate cutoffs does not
+    # apply
     #   QC or remove cells from the data.
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
@@ -1206,8 +1218,10 @@ plot_run_qc <- function(
 }
 
 #' Plot the stored percentage of cells removed for each QC reason
-#' @param sceptre_object Post-QC object with six removal counts in their saved order.
-#' @return Bar plot using the original cell count as denominator. Removal reasons
+#' @param sceptre_object Post-QC object with six removal counts in their saved
+#'   order.
+#' @return Bar plot using the original cell count as denominator. Removal
+#'   reasons
 #'   can overlap, so bars need not sum to the total. High MOI omits the zero/
 #'   multiple-guide bar. Read the saved counts rather than rerunning QC.
 #' @noRd
@@ -1254,7 +1268,8 @@ plot_cellwise_qc <- function(sceptre_object) {
 }
 
 #' Plot saved treatment/control counts and which discovery pairs pass QC
-#' @param sceptre_object Post-QC object with discovery_pairs_with_info and thresholds.
+#' @param sceptre_object Post-QC object with discovery_pairs_with_info and
+#'   thresholds.
 #' @param downsample_pairs Maximum number of table rows to sample for display.
 #' @param point_size,transparency Point appearance settings from plot_run_qc().
 #' @return Scatterplot of stored counts and QC flags. Row sampling uses seed 4
@@ -1451,10 +1466,13 @@ plot_run_power_check <- function(
 
 
 #' Sample result rows separately within p-value ranges for plotting
-#' @param result_df Table containing p_value; keep repeated rows as separate observations.
-#' @param downsample_pairs Maximum rows per power-of-ten p-value bin, rather than
+#' @param result_df Table containing p_value; keep repeated rows as separate
+#'   observations.
+#' @param downsample_pairs Maximum rows per power-of-ten p-value bin, rather
+#'   than
 #'   a maximum across the entire table.
-#' @return Tibble still grouped by bin, in group/sample order. Sampling uses seed 4
+#' @return Tibble still grouped by bin, in group/sample order. Sampling uses
+#'   seed 4
 #'   and restores the previous random state. This reduces display data only.
 #' @noRd
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
@@ -1525,8 +1543,8 @@ plot_response_grna_target_pair <- function(
     functs_called <- workflow_status(sceptre_object)
     # Preserve singleton-ID versus target-ID annotation lookup. A Bonferroni
     # guide-to-target plotting interpretation is separately deferred.
-    singleton_integration_strategy <- sceptre_object@spec@grna_integration_strategy ==
-        "singleton"
+    singleton_integration_strategy <-
+        sceptre_object@spec@grna_integration_strategy == "singleton"
     if (!functs_called[["assign_grnas"]]) {
         stop("`assign_grnas()` must be called on the `sceptre_object`.")
     }
@@ -1539,7 +1557,8 @@ plot_response_grna_target_pair <- function(
     cells_in_use <- sceptre_object@preparation@analysis_cells
 
     # check that grna_target is present in grna_assignments
-    grna_group_idxs <- sceptre_object@preparation@analysis_groups$grna_group_idxs
+    grna_group_idxs <-
+        sceptre_object@preparation@analysis_groups$grna_group_idxs
     grna_group_names <- names(grna_group_idxs)
     if (!grna_target %in% grna_group_names) {
         stop(

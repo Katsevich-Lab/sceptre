@@ -13,7 +13,8 @@ get_result(sceptre_object, analysis, historical = FALSE)
 are querying, one of \code{"run_calibration_check"}, \code{"run_power_check"}, or
 \code{"run_discovery_analysis"}.}
 
-\item{historical}{Return the saved table even when its provenance is historical.
+\item{historical}{Return the saved table even when its provenance is
+historical.
 The returned table carries its saved record as an attribute.}
 }
 \value{

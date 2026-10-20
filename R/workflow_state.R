@@ -17,7 +17,7 @@ preparation_stage_names <- function() {
     c("design", "assignment", "cell_qc", "pair_qc")
 }
 
-stage_input_identity <- function(object, stage) {
+preparation_stage_inputs <- function(object, stage) {
     p <- object@preparation
     s <- object@spec
     inputs <- switch(
@@ -51,22 +51,17 @@ stage_input_identity <- function(object, stage) {
             p@cell_removal_metrics,
             p@analysis_groups
         ),
-        pair_qc = list(
-            object@data@identity,
-            p@stages$cell_qc$identity,
-            s@grna_integration_strategy,
-            s@n_nonzero_trt_thresh,
-            s@n_nonzero_cntrl_thresh,
-            p@discovery_pairs,
-            p@positive_control_pairs,
-            p@discovery_pairs_with_info,
-            p@positive_control_pairs_with_info,
-            p@nt_nonzero_matrix,
-            p@control_nonzero_totals
-        ),
+        pair_qc = prepared_pair_qc_inputs(object),
         stop("Unknown preparation stage: ", stage)
     )
-    digest::digest(identity_value(inputs), algo = "sha256")
+    inputs
+}
+
+stage_input_identity <- function(object, stage) {
+    digest::digest(
+        identity_value(preparation_stage_inputs(object, stage)),
+        algo = "sha256"
+    )
 }
 
 stage_complete <- function(object, stage) {
@@ -171,7 +166,8 @@ commit_preparation_stage <- function(object, stage) {
             )
         ) {
             stop(
-                "Source guide groups must be prepared before assignment is committed."
+                "Source guide groups must be prepared before assignment is ",
+                "committed."
             )
         }
     } else if (stage == "cell_qc") {
@@ -184,28 +180,7 @@ commit_preparation_stage <- function(object, stage) {
             )
         }
     } else if (stage == "pair_qc") {
-        for (type in c("discovery", "positive_control")) {
-            pairs <- methods::slot(p, paste0(type, "_pairs_with_info"))
-            if (
-                nrow(pairs) != nrow(methods::slot(p, paste0(type, "_pairs"))) ||
-                    (nrow(pairs) &&
-                        (!all(
-                            c(
-                                "response_id",
-                                "grna_group",
-                                "n_nonzero_trt",
-                                "n_nonzero_cntrl",
-                                "pass_qc"
-                            ) %in%
-                                names(pairs)
-                        ) ||
-                            anyNA(pairs$pass_qc)))
-            ) {
-                stop(
-                    "Pair QC must cover the complete prepared hypothesis family."
-                )
-            }
-        }
+        validate_pair_qc_stage(p)
     } else {
         stop("Unknown preparation stage: ", stage)
     }
@@ -233,5 +208,50 @@ workflow_status <- function(object) {
             ),
             analyses
         )
+    )
+}
+
+# Validate pair coverage before committing the stage identity.
+validate_pair_qc_stage <- function(p) {
+    for (type in c("discovery", "positive_control")) {
+        pairs <- methods::slot(p, paste0(type, "_pairs_with_info"))
+        if (
+            nrow(pairs) != nrow(methods::slot(p, paste0(type, "_pairs"))) ||
+                (nrow(pairs) &&
+                    (!all(
+                        c(
+                            "response_id",
+                            "grna_group",
+                            "n_nonzero_trt",
+                            "n_nonzero_cntrl",
+                            "pass_qc"
+                        ) %in%
+                            names(pairs)
+                    ) ||
+                        anyNA(pairs$pass_qc)))
+        ) {
+            stop(
+                "Pair QC must cover the complete prepared hypothesis family."
+            )
+        }
+    }
+    invisible(NULL)
+}
+
+prepared_pair_qc_inputs <- function(object) {
+    p <- object@preparation
+    s <- object@spec
+    list(
+        object@data@identity,
+        p@stages$cell_qc$identity,
+        s@grna_integration_strategy,
+        s@n_nonzero_trt_thresh,
+        s@n_nonzero_cntrl_thresh,
+        p@discovery_pairs,
+        p@positive_control_pairs,
+        p@discovery_pairs_with_info,
+        p@positive_control_pairs_with_info,
+        p@nt_nonzero_matrix,
+        p@control_nonzero_totals
     )
 }

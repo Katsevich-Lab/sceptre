@@ -76,11 +76,15 @@ pair_results_from_native <- function(
 #' For singleton or Bonferroni, join guide names to their targets, keeping all
 #' metadata matches, then sort by p-value and response gene.
 #'
-#' For Bonferroni outside calibration, retain the smallest-p guide per gene-target
-#' pair and multiply its p-value by the number of guides that passed QC, capped at
-#' 1. If all guides failed QC, keep the largest treatment/control counts and leave
+#' For Bonferroni outside calibration, retain the smallest-p guide per
+#' gene-target
+#' pair and multiply its p-value by the number of guides that passed QC, capped
+#' at
+#' 1. If all guides failed QC, keep the largest treatment/control counts and
+#' leave
 #' the effect and p-value missing. Calibration keeps its separate guide rows.
-#' This guide-level adjustment precedes the later adjustment across tested pairs.
+#' This guide-level adjustment precedes the later adjustment across tested
+#' pairs.
 #' @noRd
 integrate_guides <- function(
     result,
@@ -143,7 +147,8 @@ integrate_guides <- function(
 
 #' Put failed-QC pairs back into the result table
 #'
-#' Append the failed-QC requests to tested pairs, leaving unavailable test fields
+#' Append the failed-QC requests to tested pairs, leaving unavailable test
+#' fields
 #' missing. Sort by p-value and response gene, with missing p-values last, and
 #' return a data.table. Keep pair labels and repeated requests. This sorts the
 #' output; it does not restore original request order or adjust p-values.
@@ -161,7 +166,8 @@ assemble_pair_results <- function(raw_result, requested_pairs) {
 #'
 #' After guide integration, call `p.adjust()` with the chosen method and mark
 #' adjusted p-values strictly below `alpha` as significant. Apply this to all
-#' collected results, not independently to each Nextflow worker's partial output.
+#' collected results, not independently to each Nextflow worker's partial
+#' output.
 #' The scalar significance cutoff must come from the function argument: output
 #' levels 2 and 3 also have an unrelated tail-shape column named `alpha`.
 #' @noRd
@@ -191,9 +197,11 @@ finalize_association_result <- function(
 # p-values over the complete family.
 #' Finish collected calibration results using the object's settings
 #'
-#' Called both by the package and directly by Nextflow scripts. Combine guides and
+#' Called both by the package and directly by Nextflow scripts. Combine guides
+#' and
 #' adjust across the complete set of results, keeping calibration guide rows
-#' rather than using the Bonferroni row reduction for power/discovery. Return the
+#' rather than using the Bonferroni row reduction for power/discovery. Return
+#' the
 #' table; the caller saves it into the object if needed.
 #' @noRd
 process_calibration_result <- function(result, sceptre_object) {
@@ -209,7 +217,8 @@ process_calibration_result <- function(result, sceptre_object) {
 
 #' Finish collected discovery results using the object's settings
 #'
-#' Called both by the package and directly by Nextflow scripts. Combine guides and
+#' Called both by the package and directly by Nextflow scripts. Combine guides
+#' and
 #' adjust p-values across the complete set of results. Return the table without
 #' rerunning tests or saving it into the object.
 #' @noRd
@@ -225,8 +234,10 @@ process_discovery_result <- function(result, sceptre_object) {
 
 #' Combine guide rows without marking significance across all tests
 #'
-#' Read guide metadata and the integration strategy from the object. The explicit
-#' calibration flag determines whether calibration-specific grouping rules apply.
+#' Read guide metadata and the integration strategy from the object. The
+#' explicit
+#' calibration flag determines whether calibration-specific grouping rules
+#' apply.
 #' Return the grouped table. Power uses this step without the across-pair
 #' significance calculation.
 #' @noRd

@@ -1,9 +1,13 @@
 #' Choose the default model formula from the available cell covariates
 #'
-#' Keep covariates in column order, excluding response mitochondrial fraction and,
-#' when requested, guide count summaries. Use log(x) for names matching n_umis or
-#' n_nonzero, adding one if any value is zero. Other covariates are included only
-#' if they have fewer than 15 distinct values. Return a formula for model.matrix();
+#' Keep covariates in column order, excluding response mitochondrial fraction
+#' and,
+#' when requested, guide count summaries. Use log(x) for names matching n_umis
+#' or
+#' n_nonzero, adding one if any value is zero. Other covariates are included
+#' only
+#' if they have fewer than 15 distinct values. Return a formula for
+#' model.matrix();
 #' validation of the supplied covariates happens elsewhere.
 #' @noRd
 auto_construct_formula_object <- function(
@@ -22,30 +26,11 @@ auto_construct_formula_object <- function(
         ]
     }
     terms <- lapply(cell_covariate_names, function(curr_name) {
-        # Dot and dots-position names have special evaluation semantics even
-        # when represented as symbols. A literal lookup preserves their column.
-        variable <- if (
-            curr_name %in% c(".", "...") || grepl("^\\.\\.[0-9]+$", curr_name)
-        ) {
-            call("get", curr_name)
-        } else {
-            as.name(curr_name)
-        }
-        count_based_covariate <- grepl("n_umis|n_nonzero", curr_name)
-        if (count_based_covariate) {
-            argument <- if (any(cell_covariates[[curr_name]] == 0)) {
-                call("+", variable, 1)
-            } else {
-                variable
-            }
-            call("log", argument)
-        } else if (
-            length(unique(cell_covariates[[curr_name]])) < MAX_N_LEVELS_ALLOWED
-        ) {
-            variable
-        } else {
-            NULL
-        }
+        default_covariate_term(
+            curr_name,
+            cell_covariates[[curr_name]],
+            MAX_N_LEVELS_ALLOWED
+        )
     })
     terms <- Filter(Negate(is.null), terms)
     rhs <- if (length(terms)) {
@@ -62,8 +47,10 @@ auto_construct_formula_object <- function(
 
 #' Combine response summaries, guide summaries and extra cell covariates
 #'
-#' Response and guide matrices must have cells in the same order. Calculate their
-#' summaries, prefix the column names with response_ or grna_, and append any extra
+#' Response and guide matrices must have cells in the same order. Calculate
+#' their
+#' summaries, prefix the column names with response_ or grna_, and append any
+#' extra
 #' covariates. Use response-matrix cell IDs as row names when supplied. Matrix
 #' storage may be converted for column access; cell order is kept.
 #' @noRd
@@ -109,7 +96,8 @@ auto_compute_cell_covariates <- function(
 #' When parallel work has at least twice as many items as workers, shuffle using
 #' seed 4 and split into blocks. Otherwise return one block in input order.
 #' For n_processors = "auto", use the preferred fraction of available physical
-#' cores once. Restore the caller's random state and temporary options afterward.
+#' cores once. Restore the caller's random state and temporary options
+#' afterward.
 #' This prepares the blocks; it does not start workers.
 #' @noRd
 partition_response_ids <- function(response_ids, parallel, n_processors) {
@@ -164,4 +152,30 @@ get_log_dir <- function(log_dir) {
         dir.create(log_dir, recursive = TRUE)
     }
     return(log_dir)
+}
+
+# Construct one language term without evaluating special column names.
+default_covariate_term <- function(curr_name, values, max_levels) {
+    # Dot and dots-position names have special evaluation semantics even
+    # when represented as symbols. A literal lookup preserves their column.
+    variable <- if (
+        curr_name %in% c(".", "...") || grepl("^\\.\\.[0-9]+$", curr_name)
+    ) {
+        call("get", curr_name)
+    } else {
+        as.name(curr_name)
+    }
+    count_based_covariate <- grepl("n_umis|n_nonzero", curr_name)
+    if (count_based_covariate) {
+        argument <- if (any(values == 0)) {
+            call("+", variable, 1)
+        } else {
+            variable
+        }
+        call("log", argument)
+    } else if (length(unique(values)) < max_levels) {
+        variable
+    } else {
+        NULL
+    }
 }

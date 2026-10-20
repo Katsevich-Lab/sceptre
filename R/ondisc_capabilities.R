@@ -4,6 +4,21 @@
 ondisc_capability_cache <- new.env(parent = emptyenv())
 
 ondisc_required_api <- function() {
+    prefix <- c(
+        "file_name_in",
+        "f_row_ptr",
+        "n_genes",
+        "n_cells_orig",
+        "n_cells_sub",
+        "grna_group_idxs"
+    )
+    suffix <- c(
+        "all_nt_idxs",
+        "to_analyze_response_idxs",
+        "to_analyze_grna_idxs",
+        "control_group_complement",
+        "cells_in_use"
+    )
     list(
         create_odm_from_r_matrix_internal = c(
             "mat",
@@ -19,33 +34,11 @@ ondisc_required_api <- function() {
             "row_idx",
             "threshold"
         ),
-        compute_n_ok_pairs_ondisc = c(
-            "file_name_in",
-            "f_row_ptr",
-            "n_genes",
-            "n_cells_orig",
-            "n_cells_sub",
-            "grna_group_idxs",
-            "all_nt_idxs",
-            "to_analyze_response_idxs",
-            "to_analyze_grna_idxs",
-            "control_group_complement",
-            "cells_in_use",
-            "unique_response_idxs"
-        ),
+        compute_n_ok_pairs_ondisc = c(prefix, suffix, "unique_response_idxs"),
         compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc = c(
-            "file_name_in",
-            "f_row_ptr",
-            "n_genes",
-            "n_cells_orig",
-            "n_cells_sub",
-            "grna_group_idxs",
+            prefix,
             "indiv_nt_grna_idxs",
-            "all_nt_idxs",
-            "to_analyze_response_idxs",
-            "to_analyze_grna_idxs",
-            "control_group_complement",
-            "cells_in_use"
+            suffix
         ),
         compute_n_trt_cells_matrix_ondisc = c(
             "file_name_in",
@@ -125,18 +118,7 @@ ondisc_capability_snapshot <- function(namespace) {
 # Pure validation makes incompatible-install tests independent of the user's
 # installed library; it does not call suspect native code to discover an ABI.
 ondisc_capability_issues <- function(snapshot) {
-    issues <- character()
-    for (name in names(ondisc_required_api())) {
-        actual <- snapshot$formals[[name]]
-        if (is.null(actual)) {
-            issues <- c(issues, paste0("missing function `", name, "()`"))
-        } else if (!identical(actual, ondisc_required_api()[[name]])) {
-            issues <- c(
-                issues,
-                paste0("incompatible arguments for `", name, "()`")
-            )
-        }
-    }
+    issues <- ondisc_api_argument_issues(snapshot)
     if (!"initialize_odm_from_backing_file" %in% snapshot$exports) {
         issues <- c(
             issues,
@@ -153,7 +135,10 @@ ondisc_capability_issues <- function(snapshot) {
     if (!identical(snapshot$slots[names(expected_slots)], expected_slots)) {
         issues <- c(
             issues,
-            "incompatible `odm` slots (path, dimensions, feature IDs, handle or shared import ID)"
+            paste0(
+                "incompatible `odm` slots (path, dimensions, feature IDs, ",
+                "handle or shared import ID)"
+            )
         )
     }
     for (method in c("row_read", "dim", "dimnames")) {
@@ -188,8 +173,10 @@ ondisc_capability_error <- function(issues, version = "unavailable") {
         version,
         ") cannot support SCEPTRE backed counts: ",
         paste(issues, collapse = "; "),
-        ". Install the qualified source `timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c`",
-        " and restart R. See the optional disk-backed setup in SCEPTRE's README.",
+        ". Install the qualified source ",
+        "`timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c`",
+        " and restart R. See the optional disk-backed setup in SCEPTRE's ",
+        "README.",
         " In-memory analyses do not require ondisc.",
         call. = FALSE
     )
@@ -228,4 +215,20 @@ require_ondisc_capabilities <- function() {
     }
     ondisc_capability_cache$namespace <- namespace
     invisible(NULL)
+}
+
+ondisc_api_argument_issues <- function(snapshot) {
+    issues <- character()
+    for (name in names(ondisc_required_api())) {
+        actual <- snapshot$formals[[name]]
+        if (is.null(actual)) {
+            issues <- c(issues, paste0("missing function `", name, "()`"))
+        } else if (!identical(actual, ondisc_required_api()[[name]])) {
+            issues <- c(
+                issues,
+                paste0("incompatible arguments for `", name, "()`")
+            )
+        }
+    }
+    issues
 }

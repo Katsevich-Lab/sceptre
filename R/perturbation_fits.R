@@ -3,9 +3,11 @@
 # never fitted probabilities, QR arrays, cell vectors or resampling draws.
 
 #' Reconstruct a compact logistic perturbation fit's probabilities
-#' @param fit Compact fitted_coefs and diagnostics from fit_perturbation_model().
+#' @param fit Compact fitted_coefs and diagnostics from
+#' fit_perturbation_model().
 #' @param design Actual fitting design in its original row and column order.
-#' @return Transient probability vector, using the original binomial inverse link.
+#' @return Transient probability vector, using the original binomial inverse
+#' link.
 #' @noRd
 reconstruct_perturbation_probabilities <- function(fit, design) {
     coefficients <- fit$fitted_coefs
@@ -17,7 +19,8 @@ reconstruct_perturbation_probabilities <- function(fit, design) {
             any(!is.finite(coefficients))
     ) {
         stop(
-            "A compact perturbation fit requires finite coefficients aligned to its design."
+            "A compact perturbation fit requires finite coefficients aligned ",
+            "to its design."
         )
     }
     if (
@@ -25,7 +28,8 @@ reconstruct_perturbation_probabilities <- function(fit, design) {
             !identical(names(coefficients), colnames(design))
     ) {
         stop(
-            "Perturbation fit coefficients do not match the ordered design columns."
+            "Perturbation fit coefficients do not match the ordered design ",
+            "columns."
         )
     }
     # Match glm.fit's arithmetic and C inverse-link, including its clipping.
@@ -44,11 +48,15 @@ reconstruct_perturbation_probabilities <- function(fit, design) {
 #'   of exact reconstruction decline caching without a second fit.
 #' @noRd
 fit_perturbation_model <- function(trt_idxs, design) {
-    warnings <- character()
+    diagnostics <- new.env(parent = emptyenv())
+    diagnostics$warnings <- character()
     logistic_fit <- withCallingHandlers(
         fit_perturbation_glm(trt_idxs, design),
         warning = function(condition) {
-            warnings <<- c(warnings, conditionMessage(condition))
+            diagnostics$warnings <- c(
+                diagnostics$warnings,
+                conditionMessage(condition)
+            )
         }
     )
     probabilities <- logistic_fit$fitted.values
@@ -63,7 +71,7 @@ fit_perturbation_model <- function(trt_idxs, design) {
             converged = logistic_fit$converged,
             boundary = logistic_fit$boundary,
             iterations = logistic_fit$iter,
-            warnings = warnings
+            warnings = diagnostics$warnings
         )
     )
     reconstructed <- tryCatch(

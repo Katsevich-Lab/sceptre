@@ -24,13 +24,15 @@ At most one unit per eligible response (permutation) or guide group (CRT).}
 
 \item{output_amount}{Output level 1, 2 or 3, as in the public analyses.}
 
-\item{n_calibration_pairs, calibration_group_size}{Optional calibration choices.
+\item{n_calibration_pairs, calibration_group_size}{Optional calibration
+choices.
 Calibration groups are sampled only during preparation.}
 }
 \value{
 An owned serializable manifest containing a frozen RunPlan, ordered
 work units and protocol/runtime certificates. Prepared metadata must not
-reuse generated numerical output column names. It contains no counts or live
+reuse generated numerical output column names. It contains no counts or
+live
 handles. This is a value artifact, not a saved completed analysis.
 }
 \description{
@@ -38,4 +40,31 @@ Prepare once, transport the manifest with a separately saved/reopened screen,
 execute every unit, and collect the proposals once. Hypothesis adjustment is
 performed across the complete family at collection. The runtime and package
 artifact must match in all processes; backing files remain immutable.
+}
+\examples{
+data(highmoi_example_data)
+data(grna_target_data_frame_highmoi)
+object <- import_data(
+  response_matrix = highmoi_example_data$response_matrix,
+  grna_matrix = highmoi_example_data$grna_matrix,
+  grna_target_data_frame = grna_target_data_frame_highmoi,
+  moi = "high",
+  extra_covariates = highmoi_example_data$extra_covariates,
+  response_names = highmoi_example_data$gene_names
+)
+pairs <- construct_cis_pairs(object)
+object <- object |>
+  set_analysis_parameters(
+    side = "left", resampling_mechanism = "permutations",
+    discovery_pairs = pairs
+  ) |>
+  assign_grnas(method = "thresholding") |>
+  run_qc()
+execution <- prepare_execution(object, "run_discovery_analysis", 2L)
+# Each worker uses the same full prepared screen and one stable unit ID.
+proposals <- lapply(execution$units, function(unit) {
+  execute_work_unit(object, execution, unit$id)
+})
+completed <- collect_execution(object, execution, rev(proposals))
+head(get_result(completed, "run_discovery_analysis"))
 }

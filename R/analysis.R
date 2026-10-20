@@ -1,17 +1,23 @@
 #' Run the requested gene-guide tests that passed QC
-#' @param sceptre_object Sceptre object supplying data and settings. This function
+#' @param sceptre_object Sceptre object supplying data and settings. This
+#'   function
 #'   returns results separately; the public workflow saves them into the object.
-#' @param response_grna_group_pairs All requested pairs, including failed-QC rows.
+#' @param response_grna_group_pairs All requested pairs, including failed-QC
+#'   rows.
 #' @param analysis_type Calibration, power or discovery analysis name.
 #' @param output_amount,print_progress,parallel,n_processors,log_dir Validated
-#'   output, progress, worker-count and logging settings from the public function.
+#'   output, progress, worker-count and logging settings from the public
+#'   function.
 #' @param plan Optional validated transient run plan.
 #' @return A list with the result table and reusable response fits in
 #'   `response_precomputations`. Failed-QC requests are included in the table.
-#' @details Prepare the cell selections and settings, then choose the permutation
-#'   or CRT loop. Permutations share one full set of random draws across the run;
+#' @details Prepare the cell selections and settings, then choose the
+#'   permutation
+#'   or CRT loop. Permutations share one full set of random draws across the
+#'   run;
 #'   CRT generates a full set per guide group. Keep that sharing and draw order:
-#'   regenerating draws for each pair could change results. Guide integration and
+#'   regenerating draws for each pair could change results. Guide integration
+#'   and
 #'   multiple-testing correction happen later, in the caller.
 #' @noRd
 analyze_association_pairs <- function(

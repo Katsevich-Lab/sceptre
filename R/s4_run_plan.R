@@ -51,7 +51,8 @@ run_plan_payload <- function(plan, include_identity = FALSE) {
 
 # Ordinary data frames already have R copy-on-modify behavior. Snapshot only
 # data.tables, whose by-reference writes would otherwise change a chosen family.
-# Preserve attribute order because schema-three hashes include its representation.
+# Preserve attribute order because schema-three hashes include its
+# representation.
 copy_run_plan_pairs <- function(pairs) {
     if (!data.table::is.data.table(pairs)) {
         return(pairs)
@@ -62,7 +63,8 @@ copy_run_plan_pairs <- function(pairs) {
 }
 
 # Lossless boundary conversion, not a constructor that re-signs old provenance.
-# Old list plans must carry their original identity and exactly the known fields.
+# Old list plans must carry their original identity and exactly the known
+# fields.
 as_run_plan <- function(plan) {
     if (methods::is(plan, "RunPlan")) {
         validObject(plan)
@@ -111,14 +113,20 @@ setValidity("RunPlan", function(object) {
             anyNA(pairs$pass_qc)
     ) {
         return(
-            "RunPlan requires prepared hypothesis columns and complete logical QC status"
+            paste0(
+                "RunPlan requires prepared hypothesis columns and complete ",
+                "logical QC status"
+            )
         )
     }
     for (name in c("response_id", "grna_group")) {
         ids <- pairs[[name]]
         if (!is.character(ids) || anyNA(ids) || any(!nzchar(ids))) {
             return(
-                "RunPlan hypothesis identifiers must be nonmissing character values"
+                paste0(
+                    "RunPlan hypothesis identifiers must be nonmissing ",
+                    "character values"
+                )
             )
         }
     }
@@ -132,6 +140,14 @@ setValidity("RunPlan", function(object) {
     if (!is.null(budget_error)) {
         return(budget_error)
     }
+    scope <- validate_calibration_plan_scope(object, pairs)
+    if (!isTRUE(scope)) {
+        return(scope)
+    }
+    validate_run_plan_identity(object@identity)
+})
+
+validate_calibration_plan_scope <- function(object, pairs) {
     calibration <- identical(object@analysis, "run_calibration_check")
     sizes <- list(object@n_calibration_pairs, object@calibration_group_size)
     if (calibration) {
@@ -153,7 +169,10 @@ setValidity("RunPlan", function(object) {
                 )
         ) {
             return(
-                "Selected calibration pairs do not match the requested run scope"
+                paste0(
+                    "Selected calibration pairs do not match the requested ",
+                    "run scope"
+                )
             )
         }
     } else if (any(lengths(sizes))) {
@@ -161,7 +180,10 @@ setValidity("RunPlan", function(object) {
             "Calibration-only RunPlan sizes must be empty for other analyses"
         )
     }
-    identity <- object@identity
+    TRUE
+}
+
+validate_run_plan_identity <- function(identity) {
     fields <- c(
         "data",
         "cells",
@@ -192,4 +214,4 @@ setValidity("RunPlan", function(object) {
         return("RunPlan requires its frozen input identity")
     }
     TRUE
-})
+}

@@ -2,13 +2,16 @@
 #' @param context Data and settings from `prepare_analysis_context()`: selected
 #'   cells, gene-guide pairs that passed QC, aligned design and reusable fits.
 #' @param execution Output level, progress, parallel-worker and log settings.
-#' @param synthetic_idxs Complete set of permutation draws, shared across this run.
+#' @param synthetic_idxs Complete set of permutation draws, shared across this
+#'   run.
 #' @return Result table and the old plus newly computed reusable response fits.
-#' @details Read each gene once per outer loop, even if its fit is saved. Reuse its
+#' @details Read each gene once per outer loop, even if its fit is saved. Reuse
+#'   its
 #'   fit and score arrays across guide groups when they use the same cells.
 #'   NT-control discovery needs a separate treatment-plus-NT fit for each group.
 #'   Visit genes in first-request order, or the existing seeded block order when
-#'   partitioned. Keep requests within each gene in order. Progress reporting and
+#'   partitioned. Keep requests within each gene in order. Progress reporting
+#'   and
 #'   periodic garbage collection happen before each gene is read.
 #' @noRd
 run_permutation_analysis <- function(context, execution, synthetic_idxs) {
@@ -134,11 +137,15 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
 #' @param context Data and settings from `prepare_analysis_context()`.
 #' @param execution Output level, progress, parallel-worker and log settings.
 #' @return Result table and the old plus newly computed reusable response fits.
-#' @details First prepare response fits that can be shared across groups, reading
+#' @details First prepare response fits that can be shared across groups,
+#'   reading
 #'   each gene before looking up its saved fit. Then, for each guide group, fit
-#'   its assignment probabilities and generate B1+B2+B3 draws once, reusing those
-#'   draws across the group's requested genes. With NT-control discovery, response
-#'   fits use group-specific treatment-plus-NT cells and are not saved for reuse.
+#'   its assignment probabilities and generate B1+B2+B3 draws once, reusing
+#'   those
+#'   draws across the group's requested genes. With NT-control discovery,
+#'   response
+#'   fits use group-specific treatment-plus-NT cells and are not saved for
+#'   reuse.
 #'   Preserve block/gene order, saved-fit order and progress timing. The guide
 #'   phase appends to the log started during response fitting.
 #' @noRd
@@ -150,8 +157,10 @@ run_crt_analysis <- function(context, execution) {
     # Prepare missing shared response fits for one worker's genes
     # block_rows: Original count-matrix gene rows, in processing order.
     # proc_id: Worker number used in the progress log, or NULL for serial work.
-    # Returns: Newly fitted genes only, named and ordered as processed. Each gene is
-    #   read before looking up its saved fit, including when that fit already exists.
+    # Returns: Newly fitted genes only, named and ordered as processed. Each
+    # gene is
+    #   read before looking up its saved fit, including when that fit already
+    #   exists.
     prepare_response_block <- function(block_rows, proc_id = NULL) {
         log_file <- analysis_log_file(
             context$analysis,
@@ -224,8 +233,10 @@ run_crt_analysis <- function(context, execution) {
     # Analyze a block of guide groups assigned to one worker
     # block_groups: Positions in the prepared guide-group list, starting at 1.
     # proc_id: Worker number used to append to its log, or NULL for serial work.
-    # Returns: Results in block, group and within-group request order. For NT controls,
-    #   construct only the current group's treatment-plus-NT selection as needed.
+    # Returns: Results in block, group and within-group request order. For NT
+    # controls,
+    #   construct only the current group's treatment-plus-NT selection as
+    #   needed.
     analyze_guide_block <- function(block_groups, proc_id = NULL) {
         log_file <- analysis_log_file(
             context$analysis,

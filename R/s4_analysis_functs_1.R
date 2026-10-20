@@ -32,8 +32,10 @@
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying
 #' the multiple testing correction method to use; see `p.adjust.methods` for
 #' options. Supported aliases and unambiguous abbreviations follow `p.adjust()`.
-#' @param multiple_testing_alpha (optional; default `0.1`) a single finite numeric
-#' value in `(0, 1]` specifying the nominal level of the multiple testing correction method
+#' @param multiple_testing_alpha (optional; default `0.1`) a single finite
+#'   numeric
+#' value in `(0, 1]` specifying the nominal level of the multiple testing
+#' correction method
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set
@@ -430,16 +432,26 @@ run_qc <- function(
 
 
 #' Prepare cellwise QC independently of pair eligibility
-#' @param sceptre_object Object with initial guide assignments and cell covariates.
-#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Pairwise QC cutoffs to save.
-#' @param response_n_umis_range,response_n_nonzero_range Quantile bounds for cell counts.
-#' @param p_mito_threshold Maximum mitochondrial fraction, when that summary exists.
-#' @param additional_cells_to_remove Original matrix column numbers to remove, starting at 1.
-#' @return Object with QC status, thresholds, removal counts, original columns of
-#'   retained cells and guide assignments renumbered for those cells. Clear saved
-#'   response fits if retained cells changed; keep the full original design matrix.
-#'   Warn about large low-MOI assignment exclusions and error if no cells remain.
-#' @details Nextflow calls this phase separately before distributing pairwise QC.
+#' @param sceptre_object Object with initial guide assignments and cell
+#'   covariates.
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Pairwise QC cutoffs to
+#'   save.
+#' @param response_n_umis_range,response_n_nonzero_range Quantile bounds for
+#'   cell counts.
+#' @param p_mito_threshold Maximum mitochondrial fraction, when that summary
+#'   exists.
+#' @param additional_cells_to_remove Original matrix column numbers to remove,
+#'   starting at 1.
+#' @return Object with QC status, thresholds, removal counts, original columns
+#'   of
+#'   retained cells and guide assignments renumbered for those cells. Clear
+#'   saved
+#'   response fits if retained cells changed; keep the full original design
+#'   matrix.
+#'   Warn about large low-MOI assignment exclusions and error if no cells
+#'   remain.
+#' @details Nextflow calls this phase separately before distributing pairwise
+#'   QC.
 #' @noRd
 run_qc_pt_1 <- function(
     sceptre_object,
@@ -494,9 +506,10 @@ run_qc_pt_1 <- function(
         additional_cells_to_remove
     )
     # informative error/warning messages
-    frac_cells_removed_2p_grna <- sceptre_object@preparation@cell_removal_metrics[[
-        "n_cells_rm_zero_twoplus_grnas"
-    ]] /
+    frac_cells_removed_2p_grna <-
+        sceptre_object@preparation@cell_removal_metrics[[
+            "n_cells_rm_zero_twoplus_grnas"
+        ]] /
         nrow(sceptre_object@data@covariate_data_frame)
     if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@data@low_moi) {
         warning(
@@ -534,7 +547,8 @@ run_qc_pt_1 <- function(
 
 
 #' Run pairwise QC and commit its durable preparation payload
-#' @param sceptre_object Object after cellwise QC, with updated guide assignments.
+#' @param sceptre_object Object after cellwise QC, with updated guide
+#'   assignments.
 #' @return Object with pair counts, pass_qc flags and NT summaries. Resampling
 #'   budgets and random draws are constructed later in a transient run plan.
 #' @noRd

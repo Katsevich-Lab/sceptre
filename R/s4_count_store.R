@@ -17,7 +17,8 @@ as_count_store <- function(x, descriptor = NULL) {
     if (methods::is(x, "BackedCountStore")) {
         if (!is.null(descriptor) && !identical(x@descriptor, descriptor)) {
             stop(
-                "Count store descriptor differs from its authoritative descriptor."
+                "Count store descriptor differs from its authoritative ",
+                "descriptor."
             )
         }
         return(x)
@@ -53,7 +54,8 @@ as_count_store <- function(x, descriptor = NULL) {
         ))
     }
     stop(
-        "Count stores must be normalized row-accessible Matrix or ondisc objects."
+        "Count stores must be normalized row-accessible Matrix or ondisc ",
+        "objects."
     )
 }
 
@@ -132,6 +134,18 @@ setValidity("BackedCountStore", function(object) {
     ) {
         return("Invalid backed count-store descriptor")
     }
+    labels <- validate_count_store_labels(d)
+    if (!isTRUE(labels)) {
+        return(labels)
+    }
+    if (!is.null(object@handle) && !methods::is(object@handle, "externalptr")) {
+        return("Backed count-store handle must be an external pointer or NULL")
+    }
+    TRUE
+})
+
+# Check optional axis labels only after the descriptor structure is valid.
+validate_count_store_labels <- function(d) {
     for (axis in seq_len(2L)) {
         labels <- d$dimnames[[axis]]
         if (
@@ -139,12 +153,12 @@ setValidity("BackedCountStore", function(object) {
                 (!is.character(labels) || length(labels) != d$dimensions[axis])
         ) {
             return(
-                "Backed count-store labels must align with descriptor dimensions"
+                paste0(
+                    "Backed count-store labels must align with descriptor ",
+                    "dimensions"
+                )
             )
         }
     }
-    if (!is.null(object@handle) && !methods::is(object@handle, "externalptr")) {
-        return("Backed count-store handle must be an external pointer or NULL")
-    }
     TRUE
-})
+}
