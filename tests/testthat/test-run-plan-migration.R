@@ -27,7 +27,12 @@ test_that("schema three list plans normalize without changing scientific identit
     expect_identical(migrated@fits@response_identity, attr(attr(old, "fits"), "identity"))
     expect_length(migrated@fits@perturbation_fits, 0L)
     expect_length(migrated@fits@perturbation_identity, 0L)
-    expect_identical(migrated@spec, old@spec)
+    expect_identical(migrated@spec@perturbation_fit_method, character())
+    expect_identical(get_perturbation_fit_method(migrated), "glm.fit")
+    physical_spec <- migrated@spec
+    attr(physical_spec, "perturbation_fit_method") <- NULL
+    expect_identical(physical_spec, old@spec)
+    expect_identical(record$provenance$spec, old_record$provenance$spec)
     expect_identical(migrated@preparation, old@preparation)
     expect_identical(serialize(old, NULL), before)
     expect_identical(sceptre:::migrate_sceptre_object(migrated), migrated)

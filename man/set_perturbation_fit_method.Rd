@@ -38,3 +38,15 @@ Package distributed execution rejects this experimental selector. Pipeline
 use additionally requires an adapter selector guard; use the reference method
 for pipeline workflows until that companion path is qualified.
 }
+\examples{
+response <- matrix(c(2, 3, 1, 4, 5, 2, 3, 4), 2,
+    dimnames = list(c("r1", "r2"), paste0("c", 1:4)))
+guides <- matrix(c(20, 0, 0, 0, 20, 0, 0, 0, 20, 20, 0, 0), 3,
+    dimnames = list(c("gA", "nt1", "nt2"), colnames(response)))
+metadata <- data.frame(grna_id = rownames(guides),
+    grna_target = c("A", "non-targeting", "non-targeting"))
+object <- import_data(response, guides, metadata, moi = "high")
+object <- set_perturbation_fit_method(object, "fast_logistic")
+get_perturbation_fit_method(object)
+object <- set_perturbation_fit_method(object, "glm.fit")
+}
