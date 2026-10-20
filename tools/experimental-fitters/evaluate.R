@@ -47,6 +47,35 @@ summary <- do.call(rbind,lapply(split(rows,rows$method),function(x){
 }))
 write.csv(summary,file.path(out,"science-summary.csv"),row.names=FALSE)
 
+# Actual public CRT calibration, selected candidate versus reference. Pairs
+# within one regenerated dataset are dependent; summarize by dataset, never
+# count all calibration pairs as independent binomial replicates.
+calibration <- list()
+case <- validation_cases()[validation_cases()$id == "confounded_crt",,drop=FALSE]
+for (r in seq_len(10L)) {
+    input <- validation_input(case, 7101900L + r, 600L)
+    options(sceptre.validation.configure=NULL)
+    base <- suppressMessages(validation_prepare(input,case))
+    for (method in c("glm.fit","fast_logistic")) {
+        object <- set_perturbation_fit_method(base,method)
+        before <- object@fits@perturbation_fits
+        completed <- withr::with_seed(7102900L+r,suppressMessages(run_calibration_check(object,
+            n_calibration_pairs=12L,calibration_group_size=2L,
+            print_progress=FALSE,parallel=FALSE)))
+        table <- get_result(completed,"run_calibration_check")
+        table$replicate <- r; table$method <- method
+        calibration[[length(calibration)+1L]]<-as.data.frame(table)
+        stopifnot(identical(before,completed@fits@perturbation_fits),
+            identical(completed@results@records$run_calibration_check$provenance$perturbation_fit_method,
+                f("perturbation_fit_method_id")(method)))
+    }
+}
+calibration <- do.call(rbind,calibration)
+write.csv(calibration,file.path(out,"public-calibration.csv"),row.names=FALSE)
+write.csv(aggregate(as.integer(calibration$p_value<.05),
+    by=calibration[c("method","replicate")],FUN=mean,na.rm=TRUE),
+    file.path(out,"public-calibration-by-dataset.csv"),row.names=FALSE)
+
 # Runtime includes preparation unless explicitly labelled prepared or warm.
 # Rprofmem measures allocation volume, not peak RSS or resident memory.
 measure <- function(fun,reps=20L) {

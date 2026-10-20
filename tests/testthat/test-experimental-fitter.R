@@ -232,6 +232,9 @@ test_that("CRT calibration uses the selected fitter transiently", {
         fit(...)
     })
     before <- o@fits@perturbation_fits
+    testthat::local_mocked_bindings(lookup_perturbation_fit = function(...) {
+        stop("Calibration must not look up logistic caches")
+    })
     completed <- withr::with_seed(
         817L,
         suppressMessages(run_calibration_check(
