@@ -49,7 +49,11 @@ Response features, guide features and cells need unique, nonempty IDs. Guide
 metadata must describe every guide in exactly its assay row order. Selected
 `colData` columns become additional covariates; unselected columns remain on
 the
-SCE. To compute mitochondrial fractions from symbols rather than feature IDs,
+SCE. Named physical assays and the unmodified guide alternative experiment must
+also agree with their container IDs; SCE's default name overlay cannot hide a
+stored permutation. Unnamed physical assays use their container's explicit IDs,
+whose original ordering remains the constructing caller's responsibility.
+To compute mitochondrial fractions from symbols rather than feature IDs,
 name a `rowData` column using `response_name_column`. Use the `counts` assay,
 never `logcounts`, size-factor-adjusted counts, or an embedding. Integer-valued
 normalized data cannot be identified automatically; raw-count provenance

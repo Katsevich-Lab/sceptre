@@ -46,7 +46,11 @@ import_from_sce <- function(
     if (!grna_alt_exp %in% SingleCellExperiment::altExpNames(sce)) {
         stop("Guide alternative experiment is missing: ", grna_alt_exp)
     }
-    guides <- SingleCellExperiment::altExp(sce, grna_alt_exp)
+    guides <- SingleCellExperiment::altExp(
+        sce,
+        grna_alt_exp,
+        withDimnames = FALSE
+    )
     grna <- sce_count_assay(guides, grna_assay, "guide")
     if (!identical(colnames(response), colnames(grna))) {
         stop("Response and guide cell IDs must be identical and in order.")
@@ -335,6 +339,7 @@ sce_count_assay <- function(sce, assay_name, label) {
     ) {
         stop(label, " raw count assay is missing.")
     }
+    sce_check_assay_dimnames(sce, assay_name)
     x <- SummarizedExperiment::assay(sce, assay_name)
     if (
         !(is.matrix(x) && is.numeric(x)) &&
@@ -349,8 +354,6 @@ sce_count_assay <- function(sce, assay_name, label) {
             " counts must be an in-memory numeric matrix or dgC/dgR/dgTMatrix."
         )
     }
-    check_interop_ids(rownames(x), nrow(x), paste(label, "feature"))
-    check_interop_ids(colnames(x), ncol(x), paste(label, "cell"))
     # Canonicalization sums duplicate sparse coordinates before validation.
     values <- if (is.matrix(x)) x else methods::as(x, "RsparseMatrix")@x
     if (any(!is.finite(values)) || any(values < 0 | values != floor(values))) {
@@ -360,6 +363,19 @@ sce_count_assay <- function(sce, assay_name, label) {
         )
     }
     x
+}
+
+sce_check_assay_dimnames <- function(sce, assay_name) {
+    raw <- SummarizedExperiment::assay(sce, assay_name, withDimnames = FALSE)
+    labels <- c("feature", "cell")
+    for (i in 1:2) {
+        check_interop_ids(dimnames(sce)[[i]], dim(sce)[i], labels[i])
+        stored <- dimnames(raw)[[i]]
+        if (!is.null(stored) && !identical(stored, dimnames(sce)[[i]])) {
+            stop("Stored assay ", labels[i], " IDs conflict with SCE IDs.")
+        }
+    }
+    invisible(NULL)
 }
 
 check_binary_assignments <- function(x, guides, cells) {

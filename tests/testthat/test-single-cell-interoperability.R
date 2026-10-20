@@ -139,6 +139,21 @@ test_that("SCE boundaries reject misalignment and normalized or missing counts",
     expect_error(import(covariates = "missing"), "colData")
     expect_error(import(response_assay = "logcounts"), "raw count assay")
     bad <- f$sce
+    child <- SingleCellExperiment::altExp(bad, "gRNA", withDimnames = FALSE)
+    child <- child[, rev(seq_len(ncol(child)))]
+    SingleCellExperiment::altExp(bad, "gRNA", withDimnames = FALSE) <- child
+    # Default SCE retrieval masks the child's stored ordering with parent IDs.
+    expect_identical(
+        colnames(SingleCellExperiment::altExp(bad, "gRNA")),
+        colnames(bad)
+    )
+    expect_error(import(bad), "cell IDs")
+    bad <- f$sce
+    physical <- SummarizedExperiment::assay(bad, "counts", withDimnames = FALSE)
+    physical <- physical[rev(seq_len(nrow(physical))), , drop = FALSE]
+    SummarizedExperiment::assay(bad, "counts", withDimnames = FALSE) <- physical
+    expect_error(import(bad), "Stored assay feature IDs")
+    bad <- f$sce
     SummarizedExperiment::assay(bad, "counts")[1, 1] <- 0.5
     expect_error(import(bad), "raw counts")
     SummarizedExperiment::assay(bad, "counts")[1, 1] <- Inf
