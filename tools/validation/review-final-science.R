@@ -128,7 +128,7 @@ review <- list(status = if (unique_inputs == 4000L) "independently_verified_term
         loaded_in_scientific_snapshot = "ondisc" %in% names(manifest_rows[[1L]]$session$loadedOnly),
         interpretation = "In-memory scientific runs, no backed/ondisc statistical validity claim"),
     rows_sha256 = hash(file.path(science, "combined", "replicates.csv")),
-    warnings_by_case = table(batch_rows$case[nzchar(batch_rows$warning)]),
+    warnings_by_case = as.list(table(batch_rows$case[nzchar(batch_rows$warning)])),
     legacy_empty_warning_NA_serialization_count = sum(legacy_empty_warning),
     original_summary_recomputed = TRUE, scientific_and_data_columns_exact = TRUE,
     combined_annotation_scope = "Only documented legacy empty-warning-to-NA serialization normalized; no p/data changes",
