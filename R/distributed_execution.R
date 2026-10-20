@@ -277,6 +277,7 @@ validate_execution_envelope <- function(object, execution) {
 }
 
 validate_execution_manifest <- function(object, execution) {
+    require_supported_distributed_inference(object)
     require_stage(object, "run_qc")
     require_execution_backend(object)
     validate_execution_envelope(object, execution)

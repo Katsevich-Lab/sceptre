@@ -374,8 +374,21 @@ label_alternative_plot <- function(plot, object, analysis) {
                 caption = paste(
                     "Experimental unadjusted Wilcoxon: log1p(CP10K).",
                     "Effect: descriptive mean CP10K ratio;",
-                    "no covariate adjustment."
+                    "no covariate adjustment. Plot p floor: 1e-300.",
+                    sep = "\n"
                 )
+            ) +
+            ggplot2::theme(
+                plot.caption = ggplot2::element_text(
+                    size = 8,
+                    hjust = 0,
+                    colour = "black"
+                ),
+                plot.background = ggplot2::element_rect(
+                    fill = "white",
+                    colour = NA
+                ),
+                plot.caption.position = "plot"
             )
     }
     if (inherits(plot, "ggplot")) {
@@ -393,4 +406,25 @@ require_supported_distributed_inference <- function(object) {
         )
     }
     invisible(NULL)
+}
+
+# Normal approximations can underflow to zero. Keep raw results intact and make
+# alternative-only log-scale plots finite, disclosing the display floor.
+alternative_plot_probabilities <- function(result) {
+    if (
+        !"inference_method" %in% names(result) ||
+            !identical(unique(result$inference_method), "wilcoxon_unadjusted")
+    ) {
+        return(result)
+    }
+    result <- owned_result_value(result)
+    result$p_value <- pmax(result$p_value, 1e-300)
+    result
+}
+
+alternative_volcano_threshold <- function(threshold, result) {
+    if (identical(unique(result$inference_method), "wilcoxon_unadjusted")) {
+        return(pmax(threshold, 1e-12))
+    }
+    threshold
 }

@@ -137,10 +137,11 @@ test_that("eligible all-tied families return one and failed-QC families remain m
 
 test_that("alternative plots label the actual method and descriptive effect", {
     inputs <- refactor_make_inputs()
-    inputs$response_matrix[1L, ] <- inputs$response_matrix[5L, ]
     object <- suppressMessages(refactor_prepare(inputs, refactor_case_definitions()$low_nt_perm))
     alternative <- run_wilcoxon(object)
-    p <- plot_run_discovery_analysis(alternative)
+    before <- serialize(alternative, NULL)
+    expect_no_warning(p <- plot_run_discovery_analysis(alternative))
+    expect_identical(serialize(alternative, NULL), before)
     expect_match(p$labels$caption, "Experimental unadjusted Wilcoxon")
     plots <- plot_run_discovery_analysis(alternative, return_indiv_plots = TRUE)
     expect_true(all(vapply(plots, function(p) grepl("mean CP10K ratio", p$labels$caption), logical(1))))
@@ -169,4 +170,23 @@ test_that("public method accessor reports current families and rejects malformed
     expect_identical(get_result_methods(old), c(run_discovery_analysis = "sceptre"))
     old@spec@side_code <- -1L
     expect_identical(get_result_methods(old), stats::setNames(character(), character()))
+})
+
+test_that("alternative display floor preserves scientific probabilities", {
+    raw <- data.frame(p_value = c(0, NA_real_, 0.04), inference_method = "wilcoxon_unadjusted")
+    display <- sceptre:::alternative_plot_probabilities(raw)
+    expect_identical(display$p_value, c(1e-300, NA_real_, 0.04))
+    expect_identical(raw$p_value, c(0, NA_real_, 0.04))
+    standard <- raw
+    standard$inference_method <- NULL
+    expect_identical(sceptre:::alternative_plot_probabilities(standard), standard)
+})
+
+test_that("a pre-existing SCEPTRE manifest cannot bypass the Wilcoxon guard", {
+    object <- suppressMessages(refactor_prepare(refactor_make_inputs(), refactor_case_definitions()$low_nt_perm))
+    manifest <- prepare_execution(object, "run_discovery_analysis")
+    alternative <- run_wilcoxon(object)
+    testthat::local_mocked_bindings(execute_unit_analysis = function(...) stop("worker must not run"), .package = "sceptre")
+    expect_error(execute_work_unit(alternative, manifest, manifest$units[[1L]]$id), "Wilcoxon is unsupported")
+    expect_error(collect_execution(alternative, manifest, list()), "Wilcoxon is unsupported")
 })
