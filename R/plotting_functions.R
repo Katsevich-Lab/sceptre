@@ -642,7 +642,7 @@ plot_run_calibration_check <- function(
             rel_heights = c(0.55, 0.45)
         )
     }
-    return(out)
+    return(label_alternative_plot(out, sceptre_object, "run_calibration_check"))
 }
 
 ############################
@@ -971,7 +971,11 @@ plot_run_discovery_analysis <- function(
             nrow = 2
         )
     }
-    return(p_out)
+    return(label_alternative_plot(
+        p_out,
+        sceptre_object,
+        "run_discovery_analysis"
+    ))
 }
 
 ############
@@ -1461,7 +1465,7 @@ plot_run_power_check <- function(
         ) +
         my_theme
 
-    return(p)
+    return(label_alternative_plot(p, sceptre_object, "run_power_check"))
 }
 
 

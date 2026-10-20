@@ -68,6 +68,7 @@ run_calibration_check <- function(
     output_amount = 1
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
+    sceptre_object <- invalidate_other_inference_results(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
     prepared <- run_calibration_check_pt_1(
         sceptre_object,
@@ -262,6 +263,7 @@ run_power_check <- function(
     log_dir = tempdir()
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
+    sceptre_object <- invalidate_other_inference_results(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
     sceptre_object <- skip_assign_grnas_and_run_qc(
         sceptre_object,
@@ -371,6 +373,7 @@ run_discovery_analysis <- function(
     log_dir = tempdir()
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
+    sceptre_object <- invalidate_other_inference_results(sceptre_object)
     check_parallel_supported(parallel) |> invisible()
     sceptre_object <- skip_assign_grnas_and_run_qc(
         sceptre_object,
