@@ -105,7 +105,7 @@ jobs:
       - name: Build and check package
         shell: bash
         run: |
-          git rev-parse HEAD > "$SCEPTRE_SUPPORT_EVIDENCE/source-commit.txt"
+          git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD > "$SCEPTRE_SUPPORT_EVIDENCE/source-commit.txt"
           R CMD build . --no-manual
           sha256sum sceptre_*.tar.gz > "$SCEPTRE_SUPPORT_EVIDENCE/archive-sha256.txt"
           R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
@@ -128,6 +128,6 @@ jobs:
           name: bioconductor-${{ matrix.bioc }}
           path: |
             sceptre_*.tar.gz
-            ${{ runner.temp }}/bioconductor-evidence
+            ${{ env.SCEPTRE_SUPPORT_EVIDENCE }}
             sceptre.Rcheck
             sceptre.BiocCheck
