@@ -44,7 +44,8 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
         crayon::blue(n_covariates),
         " covariates (",
         covariates,
-        ")"
+        ")",
+        alternative_inference_text(object)
     ))
 })
 
@@ -81,7 +82,6 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
 setMethod("print", signature = signature("sceptre_object"), function(x) {
     x <- migrate_sceptre_object(x)
     show(x)
-    print_alternative_inference(x)
 
     # 1. print analysis status
     funct_run_vect <- workflow_status(x)

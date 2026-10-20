@@ -2,6 +2,7 @@
 % Please edit documentation in R/wilcoxon.R
 \name{run_wilcoxon}
 \alias{run_wilcoxon}
+\alias{get_result_methods}
 \title{Run an experimental unadjusted Wilcoxon analysis}
 \usage{
 run_wilcoxon(
@@ -12,6 +13,8 @@ run_wilcoxon(
   n_calibration_pairs = NULL,
   calibration_group_size = NULL
 )
+
+get_result_methods(sceptre_object)
 }
 \arguments{
 \item{sceptre_object}{A prepared \code{sceptre_object} after \code{run_qc()}.}
@@ -34,6 +37,9 @@ An updated object with a complete-family result available through
 \code{get_result()}. This replaces the selected analysis record and invalidates
 current records from other inference methods. Keep a separate object for
 SCEPTRE comparisons. Fitted-model caches are not used or modified.
+\code{get_result_methods()} returns a named character vector of current
+completed families and method identifiers; absent or stale families
+are omitted.
 }
 \description{
 Explicit opt-in alternative to covariate-adjusted SCEPTRE inference. Requires
@@ -54,7 +60,8 @@ An all-tied eligible comparison returns p = 1. Empty groups are errors.
 
 \code{fold_change} and \code{log_2_fold_change} describe the ratio of arithmetic mean
 CP10K responses, not a Wilcoxon location estimate or adjusted effect.
-\code{se_fold_change} is unavailable. No covariates are fitted, regardless of the
+\code{se_fold_change} is unavailable. No covariates are fitted, regardless of
+the
 object's formula. Library-size scaling does not remove batch, cell-state,
 donor, clonality, or assignment confounding. Cells must be independent and
 exchangeable under the null; this is not donor-level inference. Asymptotic
@@ -82,9 +89,12 @@ pairs <- data.frame(
     grna_target = target, response_id = rownames(d$response_matrix)[1L]
 )
 object <- object |>
-    set_analysis_parameters(discovery_pairs = pairs, control_group = "nt_cells") |>
+    set_analysis_parameters(
+        discovery_pairs = pairs, control_group = "nt_cells"
+    ) |>
     assign_grnas(method = "thresholding") |>
     run_qc()
 alternative <- run_wilcoxon(object)
 get_result(alternative, "run_discovery_analysis")
+get_result_methods(alternative)
 }

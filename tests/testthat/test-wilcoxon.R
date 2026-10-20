@@ -152,3 +152,21 @@ test_that("Wilcoxon calibration never computes an unused resampling budget", {
     result <- suppressMessages(run_wilcoxon(object, "calibration_check", n_calibration_pairs = 4L, calibration_group_size = 1L))
     expect_equal(nrow(get_result(result, "run_calibration_check")), 4L)
 })
+
+test_that("public method accessor reports current families and rejects malformed methods", {
+    object <- suppressMessages(refactor_prepare(refactor_make_inputs(), refactor_case_definitions()$low_nt_perm))
+    expect_identical(get_result_methods(object), stats::setNames(character(), character()))
+    alternative <- run_wilcoxon(object)
+    expect_identical(get_result_methods(alternative), c(run_discovery_analysis = "wilcoxon_unadjusted"))
+    old <- alternative
+    old@results@records$run_discovery_analysis$invalidated_by <- "stale"
+    expect_identical(get_result_methods(old), stats::setNames(character(), character()))
+    bad <- alternative
+    bad@results@records$run_discovery_analysis$provenance$inference_method <- NA_character_
+    expect_error(get_result_methods(bad), "Invalid inference method")
+    old@results@records$run_discovery_analysis$invalidated_by <- NULL
+    old@results@records$run_discovery_analysis$provenance$inference_method <- NULL
+    expect_identical(get_result_methods(old), c(run_discovery_analysis = "sceptre"))
+    old@spec@side_code <- -1L
+    expect_identical(get_result_methods(old), stats::setNames(character(), character()))
+})

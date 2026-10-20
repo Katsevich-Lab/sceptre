@@ -403,13 +403,7 @@ prepare_execution <- function(
     calibration_group_size = NULL
 ) {
     object <- migrate_sceptre_object(sceptre_object)
-    if (has_current_wilcoxon_result(object)) {
-        stop(
-            "Experimental Wilcoxon is unsupported in distributed execution. ",
-            "Use run_wilcoxon() with direct execution or a separate ",
-            "prepared SCEPTRE object."
-        )
-    }
+    require_supported_distributed_inference(object)
     require_stage(object, "run_qc")
     require_execution_backend(object)
     analysis <- analysis_record_name(analysis)

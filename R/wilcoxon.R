@@ -19,6 +19,9 @@
 #'   `get_result()`. This replaces the selected analysis record and invalidates
 #'   current records from other inference methods. Keep a separate object for
 #'   SCEPTRE comparisons. Fitted-model caches are not used or modified.
+#'   `get_result_methods()` returns a named character vector of current
+#'   completed families and method identifiers; absent or stale families
+#'   are omitted.
 #' @details Uses the configured sidedness, QC, guide integration, and multiple
 #'   testing policy. Union pools assigned cells; singleton tests each guide;
 #'   Bonferroni uses the existing minimum-p guide reduction before correction
@@ -27,7 +30,8 @@
 #'
 #'   `fold_change` and `log_2_fold_change` describe the ratio of arithmetic mean
 #'   CP10K responses, not a Wilcoxon location estimate or adjusted effect.
-#'   `se_fold_change` is unavailable. No covariates are fitted, regardless of the
+#'   `se_fold_change` is unavailable. No covariates are fitted, regardless of
+#'   the
 #'   object's formula. Library-size scaling does not remove batch, cell-state,
 #'   donor, clonality, or assignment confounding. Cells must be independent and
 #'   exchangeable under the null; this is not donor-level inference. Asymptotic
@@ -55,11 +59,14 @@
 #'     grna_target = target, response_id = rownames(d$response_matrix)[1L]
 #' )
 #' object <- object |>
-#'     set_analysis_parameters(discovery_pairs = pairs, control_group = "nt_cells") |>
+#'     set_analysis_parameters(
+#'         discovery_pairs = pairs, control_group = "nt_cells"
+#'     ) |>
 #'     assign_grnas(method = "thresholding") |>
 #'     run_qc()
 #' alternative <- run_wilcoxon(object)
 #' get_result(alternative, "run_discovery_analysis")
+#' get_result_methods(alternative)
 
 run_wilcoxon <- function(
     sceptre_object,
@@ -69,6 +76,21 @@ run_wilcoxon <- function(
     n_calibration_pairs = NULL,
     calibration_group_size = NULL
 ) {
+    object <- validate_wilcoxon_support(sceptre_object, execution, parallel)
+    analysis <- analysis_record_name(analysis)
+    plan <- prepare_wilcoxon_plan(
+        object,
+        analysis,
+        n_calibration_pairs,
+        calibration_group_size
+    )
+    raw <- test_wilcoxon_family(object, plan)
+    result <- finalize_wilcoxon_family(object, plan, raw)
+    commit_wilcoxon_record(object, plan, result)
+}
+
+# Mode admission precedes storage access, pair sampling and execution.
+validate_wilcoxon_support <- function(sceptre_object, execution, parallel) {
     if (!identical(execution, "direct") || !identical(parallel, FALSE)) {
         stop("Experimental Wilcoxon supports direct serial execution only.")
     }
@@ -83,14 +105,6 @@ run_wilcoxon <- function(
     if (methods::is(object@data@response_matrix, "BackedCountStore")) {
         stop("Experimental Wilcoxon currently requires in-memory responses.")
     }
-    analysis <- analysis_record_name(analysis)
-    calibration <- identical(analysis, "run_calibration_check")
-    if (
-        !calibration &&
-            (!is.null(n_calibration_pairs) || !is.null(calibration_group_size))
-    ) {
-        stop("Calibration sizes apply only to calibration_check.")
-    }
     depth <- object@data@covariate_data_frame$response_n_umis
     cells <- object@preparation@analysis_cells
     if (
@@ -101,96 +115,122 @@ run_wilcoxon <- function(
             "Wilcoxon requires positive finite full-library UMIs for QC cells."
         )
     }
-    if (calibration) {
+    object
+}
+
+# Reuse pair construction and its QC checks, with no unused resampling budget.
+prepare_wilcoxon_plan <- function(object, analysis, n_pairs, group_size) {
+    budgets <- c(B1 = 0L, B2 = 0L, B3 = 0L)
+    if (identical(analysis, "run_calibration_check")) {
         prepared <- run_calibration_check_pt_1(
             object,
-            n_calibration_pairs = n_calibration_pairs,
-            calibration_group_size = calibration_group_size,
-            budgets = c(B1 = 0L, B2 = 0L, B3 = 0L)
+            n_calibration_pairs = n_pairs,
+            calibration_group_size = group_size,
+            budgets = budgets
         )
         pairs <- prepared$plan@pairs
-        n_calibration_pairs <- prepared$plan@n_calibration_pairs
-        calibration_group_size <- prepared$plan@calibration_group_size
+        n_pairs <- prepared$plan@n_calibration_pairs
+        group_size <- prepared$plan@calibration_group_size
     } else {
+        if (!is.null(n_pairs) || !is.null(group_size)) {
+            stop("Calibration sizes apply only to calibration_check.")
+        }
         pairs <- analysis_pairs(object, analysis)
     }
     if (!nrow(pairs)) {
         stop("Wilcoxon requires a nonempty prepared family.")
     }
-    plan <- make_run_plan(
+    make_run_plan(
         object,
         analysis,
         pairs,
-        n_calibration_pairs = n_calibration_pairs,
-        calibration_group_size = calibration_group_size,
-        budgets = c(B1 = 0L, B2 = 0L, B3 = 0L)
+        n_calibration_pairs = n_pairs,
+        calibration_group_size = group_size,
+        budgets = budgets
     )
-    eligible <- pairs[pairs$pass_qc, , drop = FALSE]
+}
+
+prepare_wilcoxon_context <- function(object, plan) {
+    eligible <- plan@pairs[plan@pairs$pass_qc, , drop = FALSE]
+    raw <- eligible
+    raw$p_value <- raw$fold_change <- raw$se_fold_change <-
+        raw$log_2_fold_change <- rep(NA_real_, nrow(raw))
     index <- prepare_index_context(
-        cells,
+        object@preparation@analysis_cells,
         ncol(get_response_matrix(object)),
         object@preparation@analysis_groups,
         eligible,
         rownames(get_response_matrix(object)),
-        calibration,
+        identical(plan@analysis, "run_calibration_check"),
         FALSE,
         TRUE
     )
-    raw <- eligible
-    raw$p_value <- raw$fold_change <- raw$se_fold_change <-
-        raw$log_2_fold_change <- rep(NA_real_, nrow(raw))
-    alternative <- c("less", "two.sided", "greater")[
-        object@spec@side_code + 2L
-    ]
-    analyze_block <- function(rows, proc_id = NULL) {
-        for (response_idx in unique(index$pair_rows$response_idx[rows])) {
-            y <- storage_read_response(
-                get_response_matrix(object),
-                response_idx,
-                cells
-            )
-            normalized <- 10000 * y / depth[cells]
-            request_rows <- rows[
-                index$pair_rows$response_idx[rows] == response_idx
-            ]
-            for (i in request_rows) {
-                view <- make_fit_view(index, raw$grna_group[i])
-                response <- normalized[view@fit_to_analysis]
-                trt <- view@trt_fit_pos
-                control <- setdiff(seq_along(response), trt)
-                if (!length(trt) || !length(control)) {
-                    stop(
-                        "Wilcoxon requires nonempty treatment and control groups."
-                    )
-                }
-                raw$p_value[i] <- wilcoxon_probability(
-                    log1p(response[trt]),
-                    log1p(response[control]),
-                    alternative
-                )
-                raw$fold_change[i] <- mean(response[trt]) /
-                    mean(response[control])
-                raw$log_2_fold_change[i] <- log2(raw$fold_change[i])
-            }
-        }
-        raw
+    list(
+        index = index,
+        raw = raw,
+        cells = object@preparation@analysis_cells,
+        depth = object@data@covariate_data_frame$response_n_umis,
+        alternative = c("less", "two.sided", "greater")[
+            object@spec@side_code + 2L
+        ]
+    )
+}
+
+# Reuse worker error context while admitting only a single serial block.
+test_wilcoxon_family <- function(object, plan) {
+    context <- prepare_wilcoxon_context(object, plan)
+    worker <- function(rows, proc_id = NULL) {
+        test_wilcoxon_response_rows(object, context, rows)
     }
-    raw <- execute_analysis_blocks(
-        list(seq_len(nrow(raw))),
-        analyze_block,
+    execute_analysis_blocks(
+        list(seq_len(nrow(context$raw))),
+        worker,
         parallel = FALSE,
-        analysis = analysis,
+        analysis = plan@analysis,
         phase = "wilcoxon_tests"
     )[[1L]]
+}
 
-    result <- assemble_pair_results(raw, pairs)
-    result <- if (identical(analysis, "run_power_check")) {
-        apply_grouping_to_result(result, object)
-    } else if (calibration) {
-        process_calibration_result(result, object)
-    } else {
-        process_discovery_result(result, object)
+# Read each response once; guide views select from normalized QC-cell counts.
+test_wilcoxon_response_rows <- function(object, context, rows) {
+    raw <- context$raw
+    index <- context$index
+    for (response_idx in unique(index$pair_rows$response_idx[rows])) {
+        y <- storage_read_response(
+            get_response_matrix(object),
+            response_idx,
+            context$cells
+        )
+        normalized <- 10000 * y / context$depth[context$cells]
+        request_rows <- rows[index$pair_rows$response_idx[rows] == response_idx]
+        for (i in request_rows) {
+            view <- make_fit_view(index, raw$grna_group[i])
+            response <- normalized[view@fit_to_analysis]
+            trt <- view@trt_fit_pos
+            control <- setdiff(seq_along(response), trt)
+            if (!length(trt) || !length(control)) {
+                stop("Wilcoxon requires nonempty treatment and control groups.")
+            }
+            raw$p_value[i] <- wilcoxon_probability(
+                log1p(response[trt]),
+                log1p(response[control]),
+                context$alternative
+            )
+            raw$fold_change[i] <- mean(response[trt]) / mean(response[control])
+            raw$log_2_fold_change[i] <- log2(raw$fold_change[i])
+        }
     }
+    raw
+}
+
+finalize_wilcoxon_family <- function(object, plan, raw) {
+    result <- assemble_pair_results(raw, plan@pairs)
+    result <- switch(
+        plan@analysis,
+        run_power_check = apply_grouping_to_result(result, object),
+        run_calibration_check = process_calibration_result(result, object),
+        run_discovery_analysis = process_discovery_result(result, object)
+    )
     if (!"fold_change" %in% names(result)) {
         result$fold_change <- 2^result$log_2_fold_change
     }
@@ -201,8 +241,20 @@ run_wilcoxon <- function(
     result$response_scale <- rep("log1p_CP10K_full_library", nrow(result))
     result$effect_estimator <- rep("mean_CP10K_ratio", nrow(result))
     result$test_status <- ifelse(result$pass_qc, "tested", "failed_qc")
+    result
+}
+
+commit_wilcoxon_record <- function(object, plan, result) {
+    analysis <- plan@analysis
     object <- invalidate_other_inference_results(object, "wilcoxon_unadjusted")
-    object <- commit_result_record(object, analysis, result, pairs, 1L, plan)
+    object <- commit_result_record(
+        object,
+        analysis,
+        result,
+        plan@pairs,
+        1L,
+        plan
+    )
     provenance <- object@results@records[[analysis]]$provenance
     provenance$inference_method <- "wilcoxon_unadjusted"
     provenance$response_fit_method <- provenance$perturbation_fit_method <-
@@ -230,7 +282,7 @@ wilcoxon_probability <- function(treatment, control, alternative) {
 }
 
 # Absence means the established SCEPTRE method for older records. Invalidation
-# preserves historical results and their provenance rather than relabelling them.
+# preserves historical results and provenance without relabelling them.
 invalidate_other_inference_results <- function(object, method = "sceptre") {
     for (analysis in analysis_names()) {
         record <- object@results@records[[analysis]]
@@ -249,40 +301,66 @@ invalidate_other_inference_results <- function(object, method = "sceptre") {
     object
 }
 
-print_alternative_inference <- function(object) {
-    for (analysis in analysis_names()) {
+alternative_inference_text <- function(object) {
+    lines <- lapply(analysis_names(), function(analysis) {
         if (!result_record_is_current(object, analysis)) {
-            next
+            return("")
         }
         method <- object@results@records[[analysis]]$provenance$inference_method
-        if (identical(method, "wilcoxon_unadjusted")) {
-            cat(
-                "\n",
-                analysis,
-                ": experimental unadjusted Wilcoxon; ",
-                "log1p(CP10K), full-library depth; no covariate adjustment.\n",
-                "Effect: descriptive mean CP10K ratio; no effect SE.\n",
-                "Configured formula/resampling settings are ignored.\n",
-                sep = ""
-            )
+        if (!identical(method, "wilcoxon_unadjusted")) {
+            return("")
         }
-    }
+        paste0(
+            "\n",
+            analysis,
+            ": experimental unadjusted Wilcoxon; ",
+            "log1p(CP10K), full-library depth; no covariate adjustment.\n",
+            "Effect: descriptive mean CP10K ratio; no effect SE.\n",
+            "Configured formula/resampling settings are ignored.\n"
+        )
+    })
+    paste0(unlist(lines, use.names = FALSE), collapse = "")
+}
+
+#' @rdname run_wilcoxon
+#' @export
+get_result_methods <- function(sceptre_object) {
+    object <- migrate_sceptre_object(sceptre_object)
+    current <- analysis_names()[vapply(
+        analysis_names(),
+        function(analysis) {
+            result_record_is_current(object, analysis)
+        },
+        logical(1)
+    )]
+    stats::setNames(
+        vapply(
+            current,
+            function(analysis) {
+                method <- object@results@records[[
+                    analysis
+                ]]$provenance$inference_method
+                if (is.null(method)) {
+                    return("sceptre")
+                }
+                if (
+                    !is.character(method) ||
+                        length(method) != 1L ||
+                        is.na(method) ||
+                        !method %in% c("sceptre", "wilcoxon_unadjusted")
+                ) {
+                    stop("Invalid inference method in a current result record.")
+                }
+                method
+            },
+            character(1)
+        ),
+        current
+    )
 }
 
 has_current_wilcoxon_result <- function(object) {
-    any(vapply(
-        analysis_names(),
-        function(analysis) {
-            result_record_is_current(object, analysis) &&
-                identical(
-                    object@results@records[[
-                        analysis
-                    ]]$provenance$inference_method,
-                    "wilcoxon_unadjusted"
-                )
-        },
-        logical(1)
-    ))
+    any(get_result_methods(object) == "wilcoxon_unadjusted")
 }
 
 label_alternative_plot <- function(plot, object, analysis) {
@@ -295,7 +373,8 @@ label_alternative_plot <- function(plot, object, analysis) {
             ggplot2::labs(
                 caption = paste(
                     "Experimental unadjusted Wilcoxon: log1p(CP10K).",
-                    "Effect: descriptive mean CP10K ratio; no covariate adjustment."
+                    "Effect: descriptive mean CP10K ratio;",
+                    "no covariate adjustment."
                 )
             )
     }
@@ -303,4 +382,15 @@ label_alternative_plot <- function(plot, object, analysis) {
         return(label(plot))
     }
     lapply(plot, label)
+}
+
+require_supported_distributed_inference <- function(object) {
+    if (has_current_wilcoxon_result(object)) {
+        stop(
+            "Experimental Wilcoxon is unsupported in distributed execution. ",
+            "Use run_wilcoxon() with direct execution or a separate ",
+            "prepared SCEPTRE object."
+        )
+    }
+    invisible(NULL)
 }
