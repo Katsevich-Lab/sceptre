@@ -146,3 +146,18 @@ mutated summaries are synthetic policy fixtures and must not be used for admissi
 Optional SeuratObject from W05's subsequent adapter scope is deliberately absent
 in the historical CRAN floor lane; current present/absent adapter qualification is
 separate. The installed-suite receipt records its availability on future runs.
+
+Validate workflow expressions and context availability with `actionlint` before
+publishing CI edits, not just a generic YAML parser. The existing isolated local
+binary is `/private/tmp/sceptre-ci-actionlint-1.7.12/actionlint`; invoke it against
+all `.github/workflows/*.yaml`, including coverage. Job-level env cannot use the
+runner context. Resolve dynamic runner paths in a step and persist them with
+GITHUB_ENV. The PR240 zero-job support failure and repaired exact-head staged
+validation are retained separately from package/runtime qualifications.
+
+The floor CI artifact uses an explicit whitelist of terminal JSON, complete
+build/install/test/check logs and environment/version tables. The prior entire
+output-directory upload included private installations, duplicated build sources
+and opaque RDS and produced a110MB artifact. Archive identity remains in the
+receipt; full local output is unchanged. Artifact minimization does not remove a
+test, diagnostic or qualification step.

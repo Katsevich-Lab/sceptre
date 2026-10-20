@@ -55,10 +55,20 @@ jobs:
         with:
           name: advertised-r-4.1-testthat-3.1.8
           path: |
-            ${{ runner.temp }}/r-floor-qualification
+            ${{ runner.temp }}/r-floor-qualification/receipt.json
+            ${{ runner.temp }}/r-floor-qualification/environment.json
+            ${{ runner.temp }}/r-floor-qualification/tests.json
+            ${{ runner.temp }}/r-floor-qualification/session.txt
+            ${{ runner.temp }}/r-floor-qualification/installed.tsv
+            ${{ runner.temp }}/r-floor-qualification/git-archive.log
+            ${{ runner.temp }}/r-floor-qualification/build.log
+            ${{ runner.temp }}/r-floor-qualification/install.log
+            ${{ runner.temp }}/r-floor-qualification/tests.log
+            ${{ runner.temp }}/r-floor-qualification/check.log
+            ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/00check.log
+            ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/tests/testthat.Rout
             r-floor-dependencies.txt
             r-floor-installed.tsv
-            sceptre.Rcheck
 
   bioconductor:
     timeout-minutes: 60
