@@ -27,3 +27,5 @@
 ^tools/components$
 ^tools/hardening$
 ^sceptre\.BiocCheck$
+
+^data-raw$

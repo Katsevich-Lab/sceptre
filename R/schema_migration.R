@@ -67,6 +67,19 @@ normalize_legacy_component_fields <- function(components) {
     components
 }
 
+# A saved data-frame subclass can retain an S4 old-class bit without its
+# hierarchy registered in this process. Canonicalize only the container;
+# coercion methods could change columns, names, row order or source attributes.
+legacy_slot_data_frame <- function(value) {
+    if (typeof(value) == "list" && "data.frame" %in% class(value)) {
+        if (isS4(value)) {
+            value <- asS3(value, complete = FALSE)
+        }
+        attr(value, "class") <- "data.frame"
+    }
+    value
+}
+
 copy_legacy_components <- function(components, version) {
     out <- methods::new("sceptre_object")
     # Only current component payloads cross the boundary; removed counters,
@@ -80,10 +93,15 @@ copy_legacy_components <- function(components, version) {
             ),
             "stages"
         )
+        table_fields <- names(methods::getSlots(class(component)))[
+            methods::getSlots(class(component)) == "data.frame"
+        ]
         for (field in fields) {
-            methods::slot(component, field, check = FALSE) <- components[[
-                owner
-            ]][[field]]
+            value <- components[[owner]][[field]]
+            if (field %in% table_fields) {
+                value <- legacy_slot_data_frame(value)
+            }
+            methods::slot(component, field, check = FALSE) <- value
         }
         methods::slot(out, owner) <- component
     }
@@ -103,8 +121,9 @@ migrate_legacy_requests <- function(out, components) {
         if (is.null(expanded)) {
             expanded <- data.frame()
         }
+        expanded <- legacy_slot_data_frame(expanded)
         methods::slot(out@preparation, field) <- expanded
-        original <- components$spec$requested[[field]]
+        original <- legacy_slot_data_frame(components$spec$requested[[field]])
         recovered <- recover_legacy_requested_pairs(
             expanded,
             original,

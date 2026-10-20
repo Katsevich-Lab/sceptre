@@ -1,5 +1,10 @@
 # sceptre (development version)
 
+- Legacy saved-table migration normalizes table containers while preserving
+  columns and metadata. Backed imports choose smaller HDF5 chunks for stores
+  with 2–1000 stored entries; stores with fewer than two entries fail before
+  either backing file is created. The optional rhdf5 test dependency is declared.
+
 - The distributed execution API now has runnable end-to-end examples. Internal
   validation and migration helpers are shorter, and warning capture uses local
   state without superassignment. These changes preserve numerical execution,

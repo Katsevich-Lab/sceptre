@@ -8,7 +8,7 @@ description <- read.dcf("DESCRIPTION")
 fields <- intersect(c("Imports", "LinkingTo", "Suggests"), colnames(description))
 deps <- unique(unlist(lapply(description[1L, fields], function(x)
     names(tools:::.split_dependencies(x)))))
-deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
+deps <- setdiff(deps, c("ondisc", "rhdf5", rownames(installed.packages(priority = "base"))))
 install.packages(deps, dependencies = NA)
 # Install the exact advertised test floor after dependencies, without allowing
 # any later dependency installation to replace it.

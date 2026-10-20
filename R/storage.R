@@ -218,18 +218,48 @@ storage_create_backed_pair <- function(
     integer_id
 ) {
     require_ondisc_capabilities()
+    constructor <- get(
+        "create_odm_from_r_matrix_internal",
+        asNamespace("ondisc")
+    )
+    # ondisc rejects its default 1000-entry HDF5 chunk for otherwise valid
+    # small matrices. Admit both stores before creating either file, retain the
+    # default for large stores, and explicitly lower only storage chunk size.
+    # This does not subset counts, change values or recompute covariates.
+    small_chunk <- function(matrix) {
+        entries <- length(matrix@j)
+        if (entries > 1000L) {
+            return(NULL)
+        }
+        if (entries < 2L) {
+            stop(
+                "This ondisc constructor cannot create a store with fewer than two stored entries; use in-memory import for this screen."
+            )
+        }
+        if (!"chunk_size" %in% names(formals(constructor))) {
+            stop(
+                "This ondisc constructor lacks the chunk_size argument required for a small count store."
+            )
+        }
+        as.integer(entries - 1L)
+    }
+    response_chunk <- small_chunk(response_matrix)
+    guide_chunk <- small_chunk(grna_matrix)
+    create <- function(matrix, name, chunk) {
+        args <- list(
+            mat = matrix,
+            file_to_write = file.path(directory_to_write, name),
+            integer_id = integer_id
+        )
+        if (!is.null(chunk)) {
+            args$chunk_size <- chunk
+        }
+        do.call(constructor, args)
+    }
     # Both files must retain the caller's shared import ID so reopening can
     # check that they belong to this object. The public constructor uses zero.
-    response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = response_matrix,
-        file_to_write = file.path(directory_to_write, "response.odm"),
-        integer_id = integer_id
-    )
-    grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = grna_matrix,
-        file_to_write = file.path(directory_to_write, "grna.odm"),
-        integer_id = integer_id
-    )
+    response_matrix <- create(response_matrix, "response.odm", response_chunk)
+    grna_matrix <- create(grna_matrix, "grna.odm", guide_chunk)
     list(response_matrix = response_matrix, grna_matrix = grna_matrix)
 }
 
