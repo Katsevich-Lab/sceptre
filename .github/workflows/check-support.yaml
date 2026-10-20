@@ -66,7 +66,7 @@ jobs:
             ${{ runner.temp }}/r-floor-qualification/tests.log
             ${{ runner.temp }}/r-floor-qualification/check.log
             ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/00check.log
-            ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/tests/testthat.Rout
+            ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/tests/testthat.Rout*
             r-floor-dependencies.txt
             r-floor-installed.tsv
 
