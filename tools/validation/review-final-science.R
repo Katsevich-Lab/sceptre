@@ -2,13 +2,15 @@
 # Independent OFFLINE readback of terminal final-source science. No package
 # inference or simulated-data generation; do not duplicate a live study.
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 6L) stop("Usage: review-final-science.R SCIENCE_ROOT FINAL_SOURCE_ROOT ARCHIVE PACKAGE_LIB BACKEND_LIB NEW_OUTPUT")
+if (!length(args) %in% c(8L, 9L)) stop("Usage: review-final-science.R SCIENCE_ROOT FINAL_SOURCE_ROOT ARCHIVE PACKAGE_LIB BACKEND_LIB NEW_OUTPUT EXPECTED_COMMIT EXPECTED_ARCHIVE_SHA [allow-shared-inputs]")
 science <- normalizePath(args[1L]); source_root <- normalizePath(args[2L])
 archive <- normalizePath(args[3L]); lib <- normalizePath(args[4L]); backend <- normalizePath(args[5L])
 out <- normalizePath(args[6L], mustWork = FALSE)
 if (dir.exists(out)) stop("Review output already exists")
-revision <- "a9727948fc7b8f74c3b4f461bd9a08ff2fe4fb18"
-expected_archive <- "32c760773f2c46673686e09b44506f09cd15c529fcde786801ca9e582cb692d5"
+revision <- args[7L]
+expected_archive <- args[8L]
+allow_shared <- length(args) == 9L && identical(args[9L], "allow-shared-inputs")
+stopifnot(grepl("^[a-f0-9]{40}$", revision), grepl("^[a-f0-9]{64}$", expected_archive))
 hash <- function(path) digest::digest(path, file = TRUE, algo = "sha256")
 stopifnot(file.exists(file.path(science, "COMPLETE")), identical(hash(archive), expected_archive))
 head <- system2("git", c("-C", shQuote(source_root), "rev-parse", "HEAD"), stdout = TRUE)
@@ -54,8 +56,11 @@ stopifnot(identical(rows, batch_rows), nrow(rows) == 12000L, !anyDuplicated(rows
           setequal(rows$case, case_ids), all(rows$error == ""), all(rows$pass_qc),
           all(is.finite(rows$p_value)), all(rows$p_value >= 0 & rows$p_value <= 1), all(rows$n_cells == 600L))
 truth <- c(null = 0, down = log(.5), up = log(2))
+seed_versions <- vapply(manifest_rows, function(m) if (is.null(m$seed_version)) "v1-legacy" else m$seed_version, character(1))
+stopifnot(length(unique(seed_versions)) == 1L, seed_versions[1L] %in% c("v1-legacy", "v2-disjoint-case-ranges"))
+stride <- if (seed_versions[1L] == "v2-disjoint-case-ranges") 1000000L else 1000L
 stopifnot(all(abs(rows$true_log_effect - truth[rows$response_id]) < 1e-14),
-          all(rows$seed == 20261000L + 1000L * case_indices[rows$case] + 2L * rows$replicate))
+          all(rows$seed == 20261000L + stride * case_indices[rows$case] + 2L * rows$replicate))
 for (id in case_ids) for (endpoint in names(truth)) {
     x <- rows[rows$case == id & rows$response_id == endpoint, ]
     stopifnot(nrow(x) == 1000L, identical(sort(x$replicate), 1:1000))
@@ -63,6 +68,12 @@ for (id in case_ids) for (endpoint in names(truth)) {
 # Each dataset has one input hash across its three tested outcomes; no pooling.
 stopifnot(all(vapply(split(rows$input_sha256, paste(rows$case, rows$replicate)),
                      function(x) length(unique(x)) == 1L, logical(1))))
+input_ids <- unique(rows[c("case", "replicate", "input_sha256")])
+stopifnot(nrow(input_ids) == 4000L, !anyDuplicated(input_ids[c("case", "replicate")]))
+unique_inputs <- length(unique(input_ids$input_sha256))
+if (unique_inputs != 4000L && !allow_shared)
+    stop("Study has ", unique_inputs, " unique inputs across4000case evaluations; final independent target unmet")
+if (!is.null(combined$unique_input_datasets)) stopifnot(combined$unique_input_datasets == unique_inputs)
 summary <- do.call(rbind, lapply(case_ids, function(id) do.call(rbind, lapply(names(truth), function(endpoint) {
     x <- rows[rows$case == id & rows$response_id == endpoint, ]
     do.call(rbind, lapply(c(.01, .05, .1), function(alpha) {
@@ -95,9 +106,11 @@ backend_desc <- read.dcf(file.path(backend, "ondisc", "DESCRIPTION"))
 stopifnot(identical(unname(backend_desc[1L, "RemoteSha"]), "589803edea2a66ad15e7f07186bee16c7739ab8c"))
 dir.create(out, recursive = TRUE)
 utils::write.csv(summary, file.path(out, "independent-summary.csv"), row.names = FALSE)
-review <- list(status = "independently_verified_terminal", reviewed_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
+review <- list(status = if (unique_inputs == 4000L) "independently_verified_terminal_unique4000" else "verified_case_specific_historical_SHARED_INPUTS_TARGET_UNMET", reviewed_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
     source_revision = revision, archive_sha256 = expected_archive, loaded_sceptre_DLL_sha256 = loaded_dll_hash,
-    scientific_case_datasets = 4000L, per_case = 1000L, endpoint_rows = 12000L,
+    case_evaluations = 4000L, unique_input_datasets = unique_inputs, per_case = 1000L, endpoint_rows = 12000L,
+    final_unique_input_target_met = unique_inputs == 4000L, seed_version = seed_versions[1L],
+    across_case_shared_input_excess = 4000L - unique_inputs,
     interval = "Pointwise exact Clopper-Pearson95%; datasets per endpoint/case; no pooled pilot duplicates",
     batch_indices = "1:1000 exactly once; pilotfirst40 deliberately not added", no_setup = TRUE,
     tied = c(datasets = 40L, rows = nrow(tied), errors = sum(tied$error != ""), p1 = sum(tied$p_value == 1)),
@@ -115,4 +128,4 @@ review <- list(status = "independently_verified_terminal", reviewed_utc = format
 saveRDS(review, file.path(out, "independent-review.rds"))
 jsonlite::write_json(review, file.path(out, "independent-review.json"), auto_unbox = TRUE, pretty = TRUE)
 print(summary[summary$alpha == .05, ])
-cat("Independent offline finalscience readback VERIFIED; no inference rerun.\n")
+cat("Independent offline readback complete; uniqueinputs:", unique_inputs, "/4000; no inference rerun.\n")
