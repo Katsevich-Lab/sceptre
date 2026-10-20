@@ -16,7 +16,12 @@ write.table(installed.packages()[, c("Package", "Version", "LibPath", "Built")],
     file.path(out, "installed.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
 jsonlite::write_json(list(R = R.version.string, platform = R.version$platform,
     library = find.package("sceptre"), ondisc = has_backend,
-    ondisc_policy = backend, testthat = as.character(packageVersion("testthat"))),
+    ondisc_policy = backend,
+    optional_interoperability = setNames(lapply(c("SingleCellExperiment",
+        "SummarizedExperiment", "S4Vectors"), function(x)
+        requireNamespace(x, quietly = TRUE)), c("SingleCellExperiment",
+        "SummarizedExperiment", "S4Vectors")),
+    testthat = as.character(packageVersion("testthat"))),
     file.path(out, "environment.json"), pretty = TRUE, auto_unbox = TRUE)
 result <- testthat::test_dir(system.file("tests", "testthat", package = "sceptre"),
     package = "sceptre", load_package = "installed", reporter = "summary",

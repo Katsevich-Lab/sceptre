@@ -8,7 +8,12 @@ description <- read.dcf("DESCRIPTION")
 fields <- intersect(c("Imports", "LinkingTo", "Suggests"), colnames(description))
 deps <- unique(unlist(lapply(description[1L, fields], function(x)
     names(tools:::.split_dependencies(x)))))
-deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
+# Optional Bioconductor interoperability has its own current-ecosystem lane.
+# The advertised R-floor lane deliberately tests installation without it.
+optional_bioc <- c("ondisc", "SingleCellExperiment", "SummarizedExperiment",
+    "S4Vectors")
+deps <- setdiff(deps, c(optional_bioc,
+    rownames(installed.packages(priority = "base"))))
 install.packages(deps, dependencies = NA)
 # Install the exact advertised test floor after dependencies, without allowing
 # any later dependency installation to replace it.

@@ -93,6 +93,10 @@ notes. A matched-wrapper pass must never be labelled an all-default clean check.
 `check-standard.yaml` remains the PR OS/release/oldrel/devel, native-boundary,
 and backend-absent tier. `check-support.yaml` remains the PR R4.1/exact-testthat3.1.8
 and Bioconductor release/devel tier, with manual dispatch and weekly refresh.
+The CRAN-snapshot R-floor lane intentionally omits optional SingleCellExperiment,
+SummarizedExperiment and S4Vectors, as well as ondisc. It makes no historical
+Bioconductor interoperability claim. Current Bioconductor lanes resolve those
+suggestions from their matching ecosystem; W05 owns present/absent roundtrips.
 No existing PR check was removed. All jobs use read-only contents permissions,
 disable persisted checkout credentials, have timeouts and cancel superseded
 runs. These workflows use pull_request (never pull_request_target), no write
