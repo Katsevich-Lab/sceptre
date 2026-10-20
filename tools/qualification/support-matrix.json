@@ -236,11 +236,15 @@
   "hosted_baseline": {
     "PR": "https://github.com/Katsevich-Lab/sceptre/pull/239",
     "source": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
-    "snapshot_utc": "2026-10-20T01:55Z",
+    "snapshot_utc": "2026-10-20T01:57Z",
     "passed": [
       "R-format",
       "in-memory-without-ondisc"
     ],
-    "others": "in progress at snapshot; not foundation0b qualification"
+    "others": "Remaining jobs in progress at snapshot; not foundation0b qualification",
+    "failed": [
+      "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611606/job/118409564546"
+    ],
+    "failure_classification": "Default support-site HTTP connectivity failure; package check has0E0W1N. ExactR4.6.1/Bioc3.23/checker1.48.1; no source repair or check suppression."
   }
 }
