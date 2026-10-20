@@ -6,9 +6,19 @@ on:
     branches: [main, dev]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '23 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   advertised-r-floor:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
       # testthat 3.1.8 scopes LC_MESSAGES; a forced LC_ALL would prevent that.
@@ -19,6 +29,8 @@ jobs:
       MKL_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: '4.1'
@@ -26,30 +38,33 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
       - name: Install coherent R-floor dependencies and exact testthat floor
         run: Rscript --vanilla tools/hardening/dependencies/install-r-floor-dependencies.R
-      - name: Build and check installed package without optional ondisc
+      - name: Qualify frozen archive in a fresh library without optional ondisc
+        run: >-
+          python3 tools/qualification/qualify.py --source .
+          --output "${{ runner.temp }}/r-floor-qualification" --ondisc absent --check
+      - name: Probe exact installed testthat floor and declared namespaces
         shell: bash
         run: |
-          R CMD build . --no-manual
-          R CMD INSTALL sceptre_*.tar.gz
+          export R_LIBS="${{ runner.temp }}/r-floor-qualification/library:${R_LIBS_USER}"
           Rscript --vanilla tools/hardening/dependencies/inventory-testthat.R
           Rscript --vanilla tools/hardening/dependencies/probe-testthat-floor.R
-          R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
-      - name: Require clean package check status
-        shell: Rscript {0}
-        run: |
-          status <- readLines("sceptre.Rcheck/00check.log")
-          stopifnot(!any(grepl("Status:.*(ERROR|WARNING)", status)))
+          R_DEFAULT_PACKAGES=NULL Rscript --vanilla tools/hardening/dependencies/probe-declared-namespaces.R
       - name: Retain exact support environment and check output
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: advertised-r-4.1-testthat-3.1.8
           path: |
+            ${{ runner.temp }}/r-floor-qualification
             r-floor-dependencies.txt
             r-floor-installed.tsv
             sceptre.Rcheck
 
   bioconductor:
+    # Current/devel ecosystems are a costly compatibility tier. PRs keep the
+    # explicit R-floor and standard platform gates; run these weekly/on demand.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
       image: bioconductor/bioconductor_docker:${{ matrix.bioc }}
@@ -66,6 +81,8 @@ jobs:
       MKL_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install dependencies from the matching Bioconductor ecosystem
         shell: Rscript {0}
         run: |
