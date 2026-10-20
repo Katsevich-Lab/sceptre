@@ -68,7 +68,7 @@ bool evaluate_impl(const Rcpp::NumericMatrix& X,
   for (int i = 0; i < n; ++i) {
     double eta = 0.0;
     for (int j = 0; j < p; ++j) {
-      row[j] = x[i + n * j];
+      row[j] = x[static_cast<R_xlen_t>(i) + static_cast<R_xlen_t>(n) * j];
       eta += beta[j] * row[j];
     }
     if (!std::isfinite(eta)) return false;
@@ -177,7 +177,7 @@ VectorXd sparse_Xty(const Rcpp::NumericMatrix& X,
     const int i = value - 1;
     if (treated[i]) Rcpp::stop("treated_indices cannot contain duplicates");
     treated[i] = 1;
-    for (int j = 0; j < p; ++j) result[j] += x[i + n * j];
+    for (int j = 0; j < p; ++j) result[j] += x[static_cast<R_xlen_t>(i) + static_cast<R_xlen_t>(n) * j];
   }
   return result;
 }
@@ -338,7 +338,7 @@ Rcpp::List prepare_grna_logistic_design_cpp(
     const VectorXd sums = X_map.colwise().sum();
     const MatrixXd gram = X_map.transpose() * X_map;
     std::copy(sums.data(), sums.data() + p, column_sums.begin());
-    std::copy(gram.data(), gram.data() + p * p, crossprod.begin());
+    std::copy(gram.data(), gram.data() + static_cast<Eigen::Index>(p) * p, crossprod.begin());
     Eigen::SelfAdjointEigenSolver<MatrixXd> decomposition(gram);
     if (decomposition.info() != Eigen::Success ||
         !decomposition.eigenvalues().allFinite()) {

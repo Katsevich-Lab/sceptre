@@ -18,6 +18,11 @@
   doubling the smaller inclusive add-one tail. Previously all ties could return
   two. Only values above one change; one-sided tails, draws, stage selection
   and rejection decisions at significance levels below one are unchanged.
+- Experimental `set_perturbation_fit_method()` enables Ziang Niu's accelerated
+  unpenalized logistic fitter for direct CRT analysis, with reference fallback
+  and distinct cache/provenance identity. `glm.fit` remains the default.
+  Package distributed execution rejects the experimental selector; pipeline
+  adapter qualification is separate. RcppEigen headers are now required.
 
 - The distributed execution API now has runnable end-to-end examples. Internal
   validation and migration helpers are shorter, and warning capture uses local

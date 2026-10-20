@@ -138,7 +138,7 @@ if(all(file.exists(real_paths))) {
                     max(abs(a$fit$fitted_coefs-b$fit$fitted_coefs)),
                 method_used=if(is.null(b$fit))"uncacheable_reference_fallback" else b$fit$diagnostics$method_used,
                 reference_p=values[[1]]$p,candidate_p=values[[2]]$p,
-                reference_lfc=values[[1]]$lfc,candidate_lfc=values[[2]]$lfc)
+                reference_fc=values[[1]]$fc,candidate_fc=values[[2]]$fc)
         }
     }
     write.csv(do.call(rbind,comparisons),file.path(out,"real-dctap-comparison.csv"),row.names=FALSE)

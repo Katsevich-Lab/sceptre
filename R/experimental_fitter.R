@@ -32,8 +32,9 @@ validate_perturbation_fit_method <- function(method) {
 #' reference pathway; this selector affects fitted CRT treatment probabilities
 #' for power and discovery. Validate calibration and power on each screen before
 #' interpreting discoveries. No SPA method is enabled by this selector.
-#' Distributed execution and pipeline input creation reject this experimental
-#' selector before execution; use the reference method for those workflows.
+#' Package distributed execution rejects this experimental selector. Pipeline
+#' use additionally requires an adapter selector guard; use the reference method
+#' for pipeline workflows until that companion path is qualified.
 #' @export
 set_perturbation_fit_method <- function(sceptre_object, method = "glm.fit") {
     validate_perturbation_fit_method(method)
