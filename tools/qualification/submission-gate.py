@@ -3,7 +3,7 @@
 Run from repo root with original BiocCheck1.49.30 first in R_LIBS.
 Args: candidate archive, its matched diagnostics-summary.json, NEW output dir.
 """
-import collections, hashlib, json, pathlib, re, subprocess, sys, tarfile
+import collections, csv, hashlib, json, pathlib, re, subprocess, sys, tarfile
 archive, summary, out = map(pathlib.Path, sys.argv[1:])
 archive, summary, out = archive.resolve(), summary.resolve(), out.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -78,11 +78,38 @@ def display(doc, source):
         m = re.fullmatch(r"(cat|print)\(\) in (R/.*?) \(line (\d+), column (\d+)\)", value)
         if m:
             call, file, line, col = m.groups()
-            rows.append((file, call, (source / file).read_text().splitlines()[int(line)-1].strip()))
-    return collections.Counter(rows)
-prior = display(old, out / "accepted/sceptre")
-current = display(new, candidate)
+            rows.append(dict(file=file, call=call, line=int(line), column=int(col),
+                text=(source / file).read_text().splitlines()[int(line)-1].strip()))
+    return rows
+old_display = display(old, out / "accepted/sceptre")
+new_display = display(new, candidate)
+key = lambda row: (row["file"], row["call"], row["text"])
+prior = collections.Counter(map(key, old_display))
+current = collections.Counter(map(key, new_display))
 extra = current - prior
+available = collections.defaultdict(collections.deque)
+for row in old_display:
+    available[key(row)].append(row)
+with (accepted.parent / "instance-gate/display-call-lineage.csv").open() as f:
+    reviewed = {(row["candidate_file"], int(row["candidate_line"])): row
+                for row in csv.DictReader(f)}
+lineage = []
+for row in new_display:
+    inherited = available[key(row)].popleft() if available[key(row)] else None
+    original = reviewed[(inherited["file"], inherited["line"])] if inherited else {}
+    lineage.append(dict(candidate_file=row["file"], candidate_line=row["line"],
+        candidate_column=row["column"], call=row["call"], exact_source_line=row["text"],
+        accepted_file=inherited["file"] if inherited else "",
+        accepted_line=inherited["line"] if inherited else "",
+        submitted_file=original.get("submitted_file", ""),
+        submitted_line=original.get("submitted_line", ""),
+        reviewed_lineage=original.get("lineage", ""),
+        status="inherited_exact_line_with_reviewed_submission_lineage" if inherited else "NEW_DISPLAY_INSTANCE"))
+if lineage:
+    with (out / "display-call-lineage.csv").open("w") as f:
+        writer = csv.DictWriter(f, fieldnames=list(lineage[0]))
+        writer.writeheader()
+        writer.writerows(lineage)
 result = dict(passed=not extra,
     candidate_archive_sha256=archive_hash,
     diagnostics_summary_sha256=hashlib.sha256(summary.read_bytes()).hexdigest(),
