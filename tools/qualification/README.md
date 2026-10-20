@@ -113,3 +113,12 @@ branch for an explicit repeat. Retain job URLs, terminal conclusions, artifact
 hashes and actual R/platform/dependency versions. Configured jobs are unqualified
 until those exact-revision jobs finish. Windows, hosted current R, native AMD64,
 and Bioconductor ecosystems cannot be inferred from local Mac/arm64 receipts.
+
+`check-scientific.yaml` is the separate dispatch-only heavy evidence tier. Choose
+one fixed W03 scenario and40/200 independent datasets; it installs a hashed source
+archive into a fresh library, uses600cells and serial inference, and uploads the
+DGP manifest, raw outcomes, failures and Monte Carlo intervals. It does not run
+on PRs or award a statistical-validity badge. Execution success means the harness
+finished; a40-replicate pilot cannot certify nominal calibration. Deliberate
+misspecification and tied/sparse stress cases retain their separate interpretation.
+Its archive is built without vignette execution and is not a release gate.
