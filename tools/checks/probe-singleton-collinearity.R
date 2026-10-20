@@ -7,8 +7,8 @@ library(sceptre)
 eval(parse(file.path(args[[1L]], "tests/testthat/test-observed-score-validity.R"))[[1L]])
 records <- list()
 for (seed in c(23703L, 23705L, 23711L)) for (mechanism in c("permutations", "crt")) {
-    for (control in c("complement", "nt_cells")) for (gene in paste0("r", 1:4)) {
-        object <- observed_score_public_object(mechanism = mechanism, control = control,
+    for (control in c("complement", "nt_cells")) for (side in c("left", "right", "both")) for (gene in paste0("r", 1:4)) {
+        object <- observed_score_public_object(side = side, mechanism = mechanism, control = control,
             genes = gene, seed = seed)
         warnings <- character()
         result <- tryCatch(withCallingHandlers({
@@ -23,11 +23,11 @@ for (seed in c(23703L, 23705L, 23711L)) for (mechanism in c("permutations", "crt
         }), error = function(cause) list(status = "error", message = conditionMessage(cause),
             classes = class(cause)))
         records[[length(records) + 1L]] <- c(list(seed = seed, mechanism = mechanism,
-            control = control, gene = gene, warnings = warnings), result)
+            control = control, side = side, gene = gene, warnings = warnings), result)
     }
 }
 summary <- do.call(rbind, lapply(records, function(x) data.frame(seed = x$seed,
-    mechanism = x$mechanism, control = x$control, gene = x$gene, status = x$status,
+    mechanism = x$mechanism, control = x$control, side = x$side, gene = x$gene, status = x$status,
     z = if (is.null(x$table)) NA_real_ else x$table$z_orig,
     p = if (is.null(x$table)) NA_real_ else x$table$p_value,
     significant = if (is.null(x$table)) NA else x$table$significant)))

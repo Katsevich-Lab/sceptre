@@ -37,8 +37,8 @@ observed_score_capture <- function(code) {
         warnings <<- c(warnings, conditionMessage(cause))
         invokeRestart("muffleWarning")
     }), error = identity)
-    # Exact treatment prediction can cause a documented glm convergence warning.
-    expect_true(all(grepl("^glm.fit: algorithm did not converge$|^glm.fit: fitted probabilities numerically 0 or 1 occurred$",
+    # Exact prediction can warn in glm; fork error transport can warn in mclapply.
+    expect_true(all(grepl("^glm.fit: algorithm did not converge$|^glm.fit: fitted probabilities numerically 0 or 1 occurred$|^all scheduled cores encountered errors in user code$|^scheduled cores? [0-9, ]+ encountered errors in user code$",
                           warnings)))
     result
 }
