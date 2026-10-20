@@ -103,7 +103,8 @@ run_calibration_check_pt_1 <- function(
     n_calibration_pairs = NULL,
     calibration_group_size = NULL,
     parallel = FALSE,
-    n_processors = "auto"
+    n_processors = "auto",
+    budgets = NULL
 ) {
     sceptre_object <- migrate_sceptre_object(sceptre_object)
     sceptre_object <- skip_assign_grnas_and_run_qc(
@@ -145,11 +146,13 @@ run_calibration_check_pt_1 <- function(
         calibration_group_size
     ) |>
         invisible()
-    budgets <- run_resampling_budget(
-        sceptre_object,
-        "run_calibration_check",
-        n_calibration_pairs
-    )
+    if (is.null(budgets)) {
+        budgets <- run_resampling_budget(
+            sceptre_object,
+            "run_calibration_check",
+            n_calibration_pairs
+        )
+    }
     pairs <- construct_negative_control_pairs(
         sceptre_object,
         n_calibration_pairs = n_calibration_pairs,

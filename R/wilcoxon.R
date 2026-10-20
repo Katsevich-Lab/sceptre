@@ -105,7 +105,8 @@ run_wilcoxon <- function(
         prepared <- run_calibration_check_pt_1(
             object,
             n_calibration_pairs = n_calibration_pairs,
-            calibration_group_size = calibration_group_size
+            calibration_group_size = calibration_group_size,
+            budgets = c(B1 = 0L, B2 = 0L, B3 = 0L)
         )
         pairs <- prepared$plan@pairs
         n_calibration_pairs <- prepared$plan@n_calibration_pairs

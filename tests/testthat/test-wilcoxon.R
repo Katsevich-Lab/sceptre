@@ -145,3 +145,10 @@ test_that("alternative plots label the actual method and descriptive effect", {
     plots <- plot_run_discovery_analysis(alternative, return_indiv_plots = TRUE)
     expect_true(all(vapply(plots, function(p) grepl("mean CP10K ratio", p$labels$caption), logical(1))))
 })
+
+test_that("Wilcoxon calibration never computes an unused resampling budget", {
+    object <- suppressMessages(refactor_prepare(refactor_make_inputs(), refactor_case_definitions()$low_nt_perm))
+    testthat::local_mocked_bindings(run_resampling_budget = function(...) stop("unused budget"), .package = "sceptre")
+    result <- suppressMessages(run_wilcoxon(object, "calibration_check", n_calibration_pairs = 4L, calibration_group_size = 1L))
+    expect_equal(nrow(get_result(result, "run_calibration_check")), 4L)
+})
