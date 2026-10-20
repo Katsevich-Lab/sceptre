@@ -368,7 +368,7 @@ sce_count_assay <- function(sce, assay_name, label) {
 sce_check_assay_dimnames <- function(sce, assay_name) {
     raw <- SummarizedExperiment::assay(sce, assay_name, withDimnames = FALSE)
     labels <- c("feature", "cell")
-    for (i in 1:2) {
+    for (i in seq_len(2L)) {
         check_interop_ids(dimnames(sce)[[i]], dim(sce)[i], labels[i])
         stored <- dimnames(raw)[[i]]
         if (!is.null(stored) && !identical(stored, dimnames(sce)[[i]])) {
