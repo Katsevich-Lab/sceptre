@@ -111,3 +111,49 @@ warnings/errors and elapsed time. CSV checkpoints survive interruptions; only
 `finished_utc` in manifest confirms terminal completion. Retain exact installed
 source/archive identity alongside receipts; the checkout revision alone cannot
 certify the binary used. No external data is needed or changed.
+
+---
+
+# Experimental Wilcoxon scientific pilot
+
+From the current repository root with the exact candidate package loaded:
+
+```sh
+Rscript tools/examples/wilcoxon.R
+Rscript tools/validation/wilcoxon-pilot.R 200 /tmp/wilcoxon-pilot
+```
+
+This produces actual rank-test p-values for independent 400-cell multinomial
+screens, each with 1000 UMIs per cell, two targeting guides and two NT guides.
+The first response has probability .01 in both arms under the exchangeable null;
+the second has .02 in both arms, or .04 in treatment under the effect scenario.
+Changes are balanced by a reservoir response, preserving total library size.
+Replicates use seed `100000 + replicate`, paired across scenarios.
+
+The confounded scenario changes the first response's probability to .04 in
+batch 1 while treatment has 90% batch-1 cells and controls 10%. It has no causal
+treatment effect on that response conditional on batch, but violates the marginal
+rank-test null. Its rejections illustrate the lack of covariate adjustment;
+they are not type-I error measurements under the rank-test null. The formula
+includes batch to demonstrate that this alternative ignores it.
+
+`summary.csv` reports raw p < .05 rates with 95% Wilson intervals over independent
+screens. With 200 screens, uncertainty at .05 is substantial (standard error
+about .015). `pvalues.csv` also retains two-pair BH .1 calls; raw rejection rates
+are not family FDR estimates. `settings.rds` stores code hashes and session
+information. Keep these identities with results. Do not present this pilot as
+real-screen, donor-level, small-sample, high-MOI, backed-storage or broad FDR
+validation. It does not establish equivalence to covariate-adjusted SCEPTRE.
+
+`tests/testthat/test-wilcoxon.R` separately checks numerical parity with base R,
+QC/index alignment, union/singleton/Bonferroni integration, complete-family
+correction, all ties, missing-QC results, provenance, method transitions,
+unsupported-mode guards, ownership, RNG preservation and save/reopen.
+Reference agreement is an implementation check, not a calibration study.
+
+See [the public API help](../../man/run_wilcoxon.Rd) and
+[R's Wilcoxon documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/wilcox.test.html).
+Distributed/Nextflow, backed responses and parallel execution are deliberately
+unsupported. Follow-up requires method-aware execution manifests, matching
+worker/collector provenance, direct/distributed tests and the same scientific
+qualification before expanding those modes.

@@ -32,3 +32,4 @@
 ^tools/qualification$
 ^tools/coverage$
 ^data-raw$
+^tools/examples$
