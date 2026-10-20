@@ -72,6 +72,21 @@ fit_perturbation_model <- function(
             )
         }
     )
+    compact_perturbation_proposal(
+        logistic_fit,
+        diagnostics$warnings,
+        method,
+        design
+    )
+}
+
+# Keep conversion separate from actual fitting and warning propagation.
+compact_perturbation_proposal <- function(
+    logistic_fit,
+    warnings,
+    method,
+    design
+) {
     probabilities <- logistic_fit$fitted.values
     coefficients <- logistic_fit$coefficients
     if (!is.numeric(coefficients) || any(!is.finite(coefficients))) {
@@ -84,7 +99,7 @@ fit_perturbation_model <- function(
             converged = logistic_fit$converged,
             boundary = logistic_fit$boundary,
             iterations = logistic_fit$iter,
-            warnings = diagnostics$warnings
+            warnings = warnings
         )
     )
     if (!identical(method, "glm.fit")) {

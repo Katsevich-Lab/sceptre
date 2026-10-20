@@ -39,7 +39,8 @@ validate_grna_logistic_prepared_design <- function(
 ) {
     if (!inherits(prepared_design, "sceptre_grna_logistic_design")) {
         stop(
-            "`prepared_design` must come from `prepare_grna_logistic_design()`.",
+            "`prepared_design` must come from ",
+            "`prepare_grna_logistic_design()`.",
             call. = FALSE
         )
     }
@@ -50,7 +51,8 @@ validate_grna_logistic_prepared_design <- function(
             !identical(as.integer(prepared_design$p), ncol(covariate_matrix))
     ) {
         stop(
-            "`prepared_design` is incompatible with `covariate_matrix` dimensions.",
+            "`prepared_design` is incompatible with ",
+            "`covariate_matrix` dimensions.",
             call. = FALSE
         )
     }

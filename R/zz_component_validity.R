@@ -315,25 +315,9 @@ validate_perturbation_fit_record <- function(fit, identity) {
 }
 
 validate_perturbation_diagnostics <- function(diagnostics) {
-    fields <- c("method_requested", "method_used", "fallback_reason")
-    if (any(fields %in% names(diagnostics))) {
-        if (
-            !all(fields %in% names(diagnostics)) ||
-                !identical(diagnostics$method_requested, "fast_logistic") ||
-                !is.character(diagnostics$method_used) ||
-                length(diagnostics$method_used) != 1L ||
-                anyNA(diagnostics$method_used) ||
-                !diagnostics$method_used %in% c("glm.fit", "fast_logistic") ||
-                !is.character(diagnostics$fallback_reason) ||
-                length(diagnostics$fallback_reason) != 1L ||
-                (diagnostics$method_used == "glm.fit" &&
-                    (is.na(diagnostics$fallback_reason) ||
-                        !nzchar(diagnostics$fallback_reason))) ||
-                (diagnostics$method_used == "fast_logistic" &&
-                    !is.na(diagnostics$fallback_reason))
-        ) {
-            return("Experimental perturbation fitter diagnostics are invalid")
-        }
+    valid <- validate_experimental_perturbation_diagnostics(diagnostics)
+    if (!isTRUE(valid)) {
+        return(valid)
     }
     if (
         !is.list(diagnostics) ||
@@ -369,6 +353,31 @@ validate_perturbation_diagnostics <- function(diagnostics) {
             ))
     ) {
         return("Perturbation fit diagnostics are invalid")
+    }
+    TRUE
+}
+
+
+validate_experimental_perturbation_diagnostics <- function(diagnostics) {
+    fields <- c("method_requested", "method_used", "fallback_reason")
+    if (any(fields %in% names(diagnostics))) {
+        if (
+            !all(fields %in% names(diagnostics)) ||
+                !identical(diagnostics$method_requested, "fast_logistic") ||
+                !is.character(diagnostics$method_used) ||
+                length(diagnostics$method_used) != 1L ||
+                anyNA(diagnostics$method_used) ||
+                !diagnostics$method_used %in% c("glm.fit", "fast_logistic") ||
+                !is.character(diagnostics$fallback_reason) ||
+                length(diagnostics$fallback_reason) != 1L ||
+                (diagnostics$method_used == "glm.fit" &&
+                    (is.na(diagnostics$fallback_reason) ||
+                        !nzchar(diagnostics$fallback_reason))) ||
+                (diagnostics$method_used == "fast_logistic" &&
+                    !is.na(diagnostics$fallback_reason))
+        ) {
+            return("Experimental perturbation fitter diagnostics are invalid")
+        }
     }
     TRUE
 }

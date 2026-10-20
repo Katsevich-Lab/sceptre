@@ -210,7 +210,9 @@ migrate_sceptre_object <- function(object) {
         # historical preparation/results to satisfy current object validity.
         # The optional experimental selector is empty for historical schema-3
         # objects. Preserve their default snapshots and frozen identities.
-        if (is.null(attr(object@spec, "perturbation_fit_method", exact = TRUE))) {
+        if (is.null(attr(
+            object@spec, "perturbation_fit_method", exact = TRUE
+        ))) {
             object@spec@perturbation_fit_method <- character()
         }
         validate_analysis_spec(object@spec)

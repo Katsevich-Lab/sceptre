@@ -184,10 +184,22 @@ threshold_count_matrix <- function(j, p, x, row_idx, threshold) {
 }
 
 
-prepare_grna_logistic_design_cpp <- function(Z, condition = TRUE, rank_tolerance = 1e-12) {
-    .Call(`_sceptre_prepare_grna_logistic_design_cpp`, Z, condition, rank_tolerance)
+prepare_grna_logistic_design_cpp <- function(
+    Z, condition = TRUE, rank_tolerance = 1e-12
+) {
+    .Call(
+        `_sceptre_prepare_grna_logistic_design_cpp`,
+        Z, condition, rank_tolerance
+    )
 }
 
-fit_grna_logistic_prepared_cpp <- function(prepared, treated_indices, tolerance = 1e-8, max_iterations = 25L, max_step_halvings = 20L, separation_eta_limit = 30.0, rank_tolerance = 1e-12) {
-    .Call(`_sceptre_fit_grna_logistic_prepared_cpp`, prepared, treated_indices, tolerance, max_iterations, max_step_halvings, separation_eta_limit, rank_tolerance)
+fit_grna_logistic_prepared_cpp <- function(
+    prepared, treated_indices, tolerance = 1e-8, max_iterations = 25L,
+    max_step_halvings = 20L, separation_eta_limit = 30, rank_tolerance = 1e-12
+) {
+    .Call(
+        `_sceptre_fit_grna_logistic_prepared_cpp`, prepared, treated_indices,
+        tolerance, max_iterations, max_step_halvings, separation_eta_limit,
+        rank_tolerance
+    )
 }

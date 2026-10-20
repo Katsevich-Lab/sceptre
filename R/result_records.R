@@ -456,8 +456,8 @@ completed_result_provenance <- function(object, plan, output_amount) {
         plan = plan,
         output_amount = output_amount,
         response_fit_method = response_fit_method_id(),
-        perturbation_fit_method = perturbation_fit_method_id(get_perturbation_fit_method(
-            object
-        ))
+        perturbation_fit_method = perturbation_fit_method_id(
+            get_perturbation_fit_method(object)
+        )
     )
 }

@@ -19,7 +19,7 @@ validate_perturbation_fit_method <- function(method) {
 #' reference fallback. It targets the same likelihood but is not bit identical.
 #' This selector concerns treatment membership, not guide assignment or SPA.
 #'
-#' @param sceptre_object An imported sceptre object, including a prepared object.
+#' @param sceptre_object An imported or prepared sceptre object.
 #' @param method Exactly `"glm.fit"` or `"fast_logistic"`.
 #' @return An updated object. Changing the method invalidates current results
 #' and logistic caches; response fits and prepared QC remain reusable.
@@ -27,7 +27,7 @@ validate_perturbation_fit_method <- function(method) {
 #' full-rank design. Unsupported designs, nonconvergence, numerical rank loss,
 #' degenerate treatment and suspected separation fall back to the original
 #' `glm.fit` once, retaining its warnings. Compact fit diagnostics record the
-#' requested/used method and fallback reason. Warm reuse retains these diagnostics
+#' requested/used method and fallback reason. Warm reuse retains diagnostics
 #' without replaying warnings. Calibration uses the existing permutation-based
 #' reference pathway; this selector affects fitted CRT treatment probabilities
 #' for power and discovery. Validate calibration and power on each screen before
@@ -90,29 +90,9 @@ fit_fast_perturbation_glm <- function(
         reason <- candidate$reason
     }
     if (!is.null(candidate) && isTRUE(candidate$converged)) {
-        coefs <- as.numeric(candidate$coefficients)
-        names(coefs) <- colnames(design)
-        compact <- list(fitted_coefs = coefs)
-        # Canonical link arithmetic makes cold and warm candidates bit identical
-        # to each other, not to the reference IRLS fit.
-        probability <- reconstruct_perturbation_probabilities(compact, design)
-        if (
-            all(is.finite(probability)) &&
-                all(probability > 0 & probability < 1)
-        ) {
-            return(list(
-                coefficients = coefs,
-                fitted.values = probability,
-                rank = candidate$rank,
-                converged = TRUE,
-                boundary = FALSE,
-                iter = candidate$iterations,
-                candidate_details = list(
-                    method_requested = "fast_logistic",
-                    method_used = "fast_logistic",
-                    fallback_reason = NA_character_
-                )
-            ))
+        result <- fast_logistic_result(candidate, design)
+        if (!is.null(result)) {
+            return(result)
         }
         reason <- "invalid_reconstructed_probabilities"
     }
@@ -123,4 +103,34 @@ fit_fast_perturbation_glm <- function(
         fallback_reason = reason
     )
     fit
+}
+
+
+# Use the canonical inverse link for compact warm/cold reconstruction.
+fast_logistic_result <- function(candidate, design) {
+    coefs <- as.numeric(candidate$coefficients)
+    names(coefs) <- colnames(design)
+    compact <- list(fitted_coefs = coefs)
+    # Canonical link arithmetic makes cold and warm candidates bit identical
+    # to each other, not to the reference IRLS fit.
+    probability <- reconstruct_perturbation_probabilities(compact, design)
+    if (
+        all(is.finite(probability)) &&
+            all(probability > 0 & probability < 1)
+    ) {
+        return(list(
+            coefficients = coefs,
+            fitted.values = probability,
+            rank = candidate$rank,
+            converged = TRUE,
+            boundary = FALSE,
+            iter = candidate$iterations,
+            candidate_details = list(
+                method_requested = "fast_logistic",
+                method_used = "fast_logistic",
+                fallback_reason = NA_character_
+            )
+        ))
+    }
+    NULL
 }

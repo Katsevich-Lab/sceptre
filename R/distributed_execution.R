@@ -163,7 +163,8 @@ execution_row_column <- function() ".sceptre_global_pair_row"
 require_execution_backend <- function(object) {
     if (!identical(get_perturbation_fit_method(object), "glm.fit")) {
         stop(
-            "Experimental fast_logistic is currently supported only by direct R execution; ",
+            "Experimental fast_logistic is supported only by ",
+            "direct R execution; ",
             "switch to glm.fit before preparing distributed or pipeline input."
         )
     }
