@@ -69,16 +69,20 @@ test_that("test all plots", {
             control_group = "nt_cells"
         ) |>
         assign_grnas(method = "thresholding", threshold = 40) |>
-        # don't want to remove any cells or pairs for this one
+        # Keep all cells; the intentionally absent t3 treatment must fail pair QC.
         run_qc(
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, 1),
-            n_nonzero_trt_thresh = 0,
+            n_nonzero_trt_thresh = 1,
             n_nonzero_cntrl_thresh = 0
         ) |>
         run_calibration_check(calibration_group_size = 1) |>
         run_power_check() |>
         run_discovery_analysis()
+
+    power <- get_result(scep, "run_power_check")
+    expect_identical(power$pass_qc[power$grna_target == "t3"], FALSE)
+    expect_true(is.na(power$p_value[power$grna_target == "t3"]))
 
     expect_rng_preserved <- function(expr) {
         set.seed(123)
