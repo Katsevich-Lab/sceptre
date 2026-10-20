@@ -1,6 +1,6 @@
 experimental_logistic_fixture <- function(n = 500L, p = 6L, seed = 1006L) {
     withr::with_seed(seed, {
-        D <- cbind(1, matrix(stats::rnorm(n * (p - 1L)), n))
+        D <- cbind(1, matrix(stats::rnorm(n * (p - 1L)), n, p - 1L))
         colnames(D) <- c(
             "(Intercept)",
             if (p > 1L) paste0("z", seq_len(p - 1L))
