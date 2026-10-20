@@ -423,7 +423,11 @@ alternative_plot_probabilities <- function(result) {
 }
 
 alternative_volcano_threshold <- function(threshold, result) {
-    if (identical(unique(result$inference_method), "wilcoxon_unadjusted")) {
+    if (
+        "inference_method" %in%
+            names(result) &&
+            identical(unique(result$inference_method), "wilcoxon_unadjusted")
+    ) {
         return(pmax(threshold, 1e-12))
     }
     threshold

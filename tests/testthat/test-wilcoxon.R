@@ -190,3 +190,9 @@ test_that("a pre-existing SCEPTRE manifest cannot bypass the Wilcoxon guard", {
     expect_error(execute_work_unit(alternative, manifest, manifest$units[[1L]]$id), "Wilcoxon is unsupported")
     expect_error(collect_execution(alternative, manifest, list()), "Wilcoxon is unsupported")
 })
+
+test_that("standard tibble plots do not inspect an absent alternative column", {
+    standard <- dplyr::tibble(p_value = 0.04)
+    expect_no_warning(value <- sceptre:::alternative_volcano_threshold(0.04, standard))
+    expect_identical(value, 0.04)
+})
