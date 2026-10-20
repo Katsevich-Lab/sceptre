@@ -28,9 +28,9 @@ validate_perturbation_fit_method <- function(method) {
 #' degenerate treatment and suspected separation fall back to the original
 #' `glm.fit` once, retaining its warnings. Compact fit diagnostics record the
 #' requested/used method and fallback reason. Warm reuse retains diagnostics
-#' without replaying warnings. Calibration uses the existing permutation-based
-#' reference pathway; this selector affects fitted CRT treatment probabilities
-#' for power and discovery. Validate calibration and power on each screen before
+#' without replaying warnings. CRT calibration uses the selected fitter
+#' transiently while retaining the existing cache bypass. Permutation resampling
+#' is unchanged. Validate calibration and power on each screen before
 #' interpreting discoveries. No SPA method is enabled by this selector.
 #' Package distributed execution rejects this experimental selector. Pipeline
 #' use additionally requires an adapter selector guard; use the reference method

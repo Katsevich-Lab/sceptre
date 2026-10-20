@@ -237,8 +237,7 @@ run_crt_analysis <- function(context, execution) {
         "prepared_logistic_design",
         if (
             identical(context$perturbation_fit_method, "fast_logistic") &&
-                context$shared_response_fit &&
-                !index$calibration_check
+                context$shared_response_fit
         ) {
             prepare_grna_logistic_design(context$design)
         } else {
@@ -291,6 +290,19 @@ run_crt_analysis <- function(context, execution) {
                 NULL
             }
             probabilities <- NULL
+            if (
+                index$calibration_check &&
+                    identical(context$perturbation_fit_method, "fast_logistic")
+            ) {
+                # Calibration retains its cache bypass, but uses the selected
+                # fitter transiently so its method provenance is accurate.
+                probabilities <- fit_perturbation_model(
+                    treatment$trt_idxs,
+                    context$design,
+                    method = "fast_logistic",
+                    prepared_design = prepared_logistic_design
+                )$probabilities
+            }
             if (!index$calibration_check) {
                 fit_design <- if (context$shared_response_fit) {
                     context$design

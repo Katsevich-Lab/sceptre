@@ -217,3 +217,32 @@ test_that("the selector is valid before analysis parameters are set", {
     expect_true(validObject(candidate))
     expect_identical(get_perturbation_fit_method(candidate), "fast_logistic")
 })
+
+
+test_that("CRT calibration uses the selected fitter transiently", {
+    o <- suppressMessages(refactor_prepare(
+        refactor_make_inputs(),
+        refactor_case_definitions()$high_complement_crt
+    ))
+    o <- set_perturbation_fit_method(o, "fast_logistic")
+    fit <- fit_fast_perturbation_glm
+    calls <- 0L
+    testthat::local_mocked_bindings(fit_fast_perturbation_glm = function(...) {
+        calls <<- calls + 1L
+        fit(...)
+    })
+    before <- o@fits@perturbation_fits
+    completed <- withr::with_seed(
+        817L,
+        suppressMessages(run_calibration_check(
+            o,
+            n_calibration_pairs = 3L,
+            calibration_group_size = 2L,
+            print_progress = FALSE,
+            parallel = FALSE
+        ))
+    )
+    expect_gt(calls, 0L)
+    expect_identical(completed@fits@perturbation_fits, before)
+    expect_true(result_record_is_current(completed, "run_calibration_check"))
+})
