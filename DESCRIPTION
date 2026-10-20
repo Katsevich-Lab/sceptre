@@ -46,6 +46,7 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
+    SeuratObject (>= 5.0.0),
     SingleCellExperiment,
     SummarizedExperiment,
     S4Vectors,

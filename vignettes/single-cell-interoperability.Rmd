@@ -139,5 +139,6 @@ pipeline stage CLI in separate R processes, compares pipeline/direct results at
 tolerance zero, and writes `results-sce.rds` plus logs and dependency
 identities.
 This qualifies the pipeline's R-stage serialization/execution boundary; it is
-not a scheduler or container qualification. AnnData, Seurat, delayed-assay and
+not a scheduler or container qualification. See the separate Seurat
+interoperability vignette for its optional adapter. AnnData, delayed-assay and
 Python interfaces remain outside this supported slice.

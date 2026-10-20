@@ -1,0 +1,115 @@
+---
+title: "Seurat raw counts and returned SCEPTRE results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Seurat interoperability}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+has_seurat <- requireNamespace("SeuratObject", quietly = TRUE)
+knitr::opts_chunk$set(eval = has_seurat)
+```
+
+`import_from_seurat()` uses the optional `SeuratObject >= 5.0.0` package.
+Full Seurat and SingleCellExperiment are unnecessary for this path. It supports
+ordinary in-memory `Assay5` and legacy `Assay` containers through SeuratObject
+5.
+This is data interoperability with Seurat; it does not run Seurat integration,
+batch correction, normalization, or marker testing.
+
+Supply the original full raw count library, with responses in one assay and
+guides in another. Each assay must have exactly one unsplit `counts` layer
+covering all its features and every cell in the whole Seurat object, in order.
+Seurat v5 permits assay-specific cell universes and split count layers; this
+adapter rejects these cases instead of silently selecting the first matching
+layer, intersecting cells, or joining batches. If needed, explicitly join
+layers
+upstream and verify the resulting full feature/cell library first. Missing
+counts,
+data-only assays, noninteger/negative/nonfinite counts, backed matrices, and
+partial count layers are rejected. Integer-valued normalization cannot be
+identified automatically; the caller must establish raw-count provenance.
+
+```{r}
+library(sceptre)
+library(SeuratObject)
+data("lowmoi_example_data")
+x <- lowmoi_example_data
+metadata <- x$grna_target_data_frame
+# Seurat replaces underscores in feature IDs. Make a transparent source mapping
+# before construction, then keep and supply the actual stored identifiers.
+metadata$original_grna_id <- metadata$grna_id
+ids <- paste0("guide", seq_len(nrow(x$grna_matrix)))
+rownames(x$grna_matrix) <- metadata$grna_id <- ids
+s <- CreateSeuratObject(
+    counts = Matrix::Matrix(x$response_matrix, sparse = TRUE),
+    meta.data = x$extra_covariates, min.cells = 0, min.features = 0)
+s[["gRNA"]] <- CreateAssay5Object(
+    counts = Matrix::Matrix(x$grna_matrix, sparse = TRUE),
+    min.cells = 0, min.features = 0)
+object <- import_from_seurat(s, metadata, "low", covariates = "batch")
+```
+
+The selected response assay defaults to `RNA` and guides to `gRNA`. The active
+Seurat assay and variable-feature selection do not determine imported counts.
+Guide metadata must cover the complete stored guide order. Selected cell
+metadata must follow the count cell order. Named physical layers must agree
+with Seurat's feature/cell maps; unnamed layers necessarily use those maps as
+their identity authority. The adapter cannot reconstruct names already changed
+or features already filtered upstream. To identify mitochondrial genes from a
+feature metadata symbol column, supply `response_name_column`. Otherwise
+feature
+IDs with the usual `MT-` prefix determine mitochondrial fractions.
+
+Full-library depth and detected-feature summaries are computed before choosing
+pairs or running QC. Counts remain raw and unchanged. Covariate names that
+collide
+with computed summaries reject. The shared external-assignment API accepts
+binary guide-by-original-cell calls, with the same canonical vector-ID and
+low/high-MOI rules described in the SingleCellExperiment vignette.
+
+```{r}
+pairs <- data.frame(response_id = rownames(x$response_matrix)[1L],
+                    grna_target = metadata$grna_target[1L])
+object <- set_analysis_parameters(object, discovery_pairs = pairs,
+    formula_object = ~ log(response_n_umis), control_group = "complement",
+    side = "left", resampling_approximation = "no_approximation")
+object <- set_grna_assignments(object, x$grna_matrix >= 5,
+                               "demonstration raw UMI >=5 caller")
+object <- run_qc(object, response_n_umis_range = c(0, 1),
+    response_n_nonzero_range = c(0, 1), p_mito_threshold = 1,
+    n_nonzero_trt_thresh = 3L, n_nonzero_cntrl_thresh = 3L)
+object <- run_discovery_analysis(object, print_progress = FALSE)
+returned <- export_results_to_seurat(object, s)
+Misc(returned, slot = "sceptre")$results$run_discovery_analysis
+```
+
+The broad QC ranges and threshold caller are demonstration settings, not
+general
+recommendations. Validate the upstream calling method and run calibration for
+your intended analysis. Successful import is not scientific validation.
+
+Results live in `Misc(returned, slot = "sceptre")`, with original and retained
+cell IDs, full-library covariates, current pair tables and provenance. Each
+response can have several target associations, so results are not flattened to
+one cell or feature metadata value. Export checks exact imported response
+counts
+and identities, requires current completed results, rejects existing `sceptre`
+miscellaneous information, and preserves the input object. Save/reopen using
+RDS.
+
+For an actual fresh-process pipeline roundtrip from the full bundled example:
+
+```{bash, eval=FALSE}
+R_LIBS=/absolute/isolated/library \
+  Rscript tools/interoperability/seurat-roundtrip.R \
+  /absolute/schema3-pipeline-checkout /tmp/new-seurat-roundtrip
+```
+
+The source helper uses the same pipeline external-assignment companion as SCE.
+Both analysis and assignment configuration sections remain absent to preserve
+the prepared calls. It compares direct/pipeline results at tolerance zero,
+checks original-object ownership and saves a returned Seurat object locally.
+This exercises R-stage serialization/execution, not a scheduler or container.

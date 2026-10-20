@@ -78,6 +78,10 @@ import_from_sce <- function(
 
 sce_extra_covariates <- function(sce, covariates) {
     cd <- SummarizedExperiment::colData(sce)
+    interop_extra_covariates(cd, covariates, colnames(sce))
+}
+
+interop_extra_covariates <- function(cd, covariates, cells) {
     reserved <- c(
         "response_n_umis",
         "response_n_nonzero",
@@ -93,16 +97,16 @@ sce_extra_covariates <- function(sce, covariates) {
             anyDuplicated(covariates) ||
             !all(covariates %in% colnames(cd))
     ) {
-        stop("covariates must name distinct existing colData columns.")
+        stop("covariates must name distinct existing cell metadata columns.")
     }
     if (any(covariates %in% reserved)) {
         stop(
-            "Selected colData covariates conflict with computed count ",
+            "Selected cell metadata covariates conflict with computed count ",
             "summaries."
         )
     }
     extra <- as.data.frame(cd[, covariates, drop = FALSE])
-    rownames(extra) <- colnames(sce)
+    rownames(extra) <- cells
     extra
 }
 
@@ -272,7 +276,7 @@ export_results_to_sce <- function(
     if ("sceptre" %in% names(md)) {
         stop("SCE already contains sceptre metadata.")
     }
-    md$sceptre <- owned_result_value(sce_result_metadata(
+    md$sceptre <- owned_result_value(interop_result_metadata(
         object,
         counts,
         records
@@ -281,7 +285,7 @@ export_results_to_sce <- function(
     sce
 }
 
-sce_result_metadata <- function(object, counts, records) {
+interop_result_metadata <- function(object, counts, records) {
     list(
         package_version = as.character(utils::packageVersion("sceptre")),
         schema_version = object@schema_version,
@@ -341,6 +345,11 @@ sce_count_assay <- function(sce, assay_name, label) {
     }
     sce_check_assay_dimnames(sce, assay_name)
     x <- SummarizedExperiment::assay(sce, assay_name)
+    check_interop_counts(x, label)
+    x
+}
+
+check_interop_counts <- function(x, label) {
     if (
         !(is.matrix(x) && is.numeric(x)) &&
             !any(vapply(
@@ -362,7 +371,7 @@ sce_count_assay <- function(sce, assay_name, label) {
             " counts must be finite nonnegative integers; supply raw counts."
         )
     }
-    x
+    invisible(NULL)
 }
 
 sce_check_assay_dimnames <- function(sce, assay_name) {

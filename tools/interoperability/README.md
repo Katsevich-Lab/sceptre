@@ -36,8 +36,8 @@ and owned results after serialization. It skips SCE cases when the optional
 dependency is absent. Ordinary matrix import and external assignments retain
 their existing required dependencies.
 
-Implementation support is limited to in-memory raw-count SCE assays. AnnData,
-Seurat, delayed/backed SCE import, upstream-normalization detection, and recovery
+Implementation support is limited to in-memory raw-count assays. AnnData,
+delayed/backed SCE import, upstream-normalization detection, and recovery
 of upstream-filtered feature libraries are outside this slice.
 
 ## W05 terminal evidence
@@ -62,3 +62,13 @@ The final integrated archive/vignette build, matched BiocCheck category/instance
 gate, scheduler/container qualification and independent scientific validation
 remain program gates. These local API/serialization receipts do not supersede
 them or qualify the foundation positivity issue reported by W02.
+
+## Seurat companion
+
+The separate `seurat-interoperability` vignette and `seurat-roundtrip.R` exercise
+the optional SeuratObject 5 path. A single complete `counts` layer is required
+per assay; split counts, partial layers and differing cell universes reject.
+The adapter uses the existing external-call and pipeline contracts. Full Seurat
+and SingleCellExperiment are unnecessary. Returned pair tables and provenance
+live in `Misc(returned, slot = "sceptre")`. Initial SCE receipts above do not
+qualify this newer companion; its versioned evidence is separate.

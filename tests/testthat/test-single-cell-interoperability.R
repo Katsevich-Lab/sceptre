@@ -136,7 +136,7 @@ test_that("SCE boundaries reject misalignment and normalized or missing counts",
         import(m = f$x$grna_target_data_frame[8:1, ]),
         "match all guide rows"
     )
-    expect_error(import(covariates = "missing"), "colData")
+    expect_error(import(covariates = "missing"), "metadata")
     expect_error(import(response_assay = "logcounts"), "raw count assay")
     bad <- f$sce
     child <- SingleCellExperiment::altExp(bad, "gRNA", withDimnames = FALSE)
