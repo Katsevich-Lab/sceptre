@@ -1,0 +1,8 @@
+
+══ Testing test-scientific-sentinels.R ═════════════════════════════════════════
+
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ] Done!

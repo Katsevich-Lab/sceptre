@@ -30,7 +30,7 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 \
 Arguments are new output directory, positive replicate count, cell count (default
 600), comma-separated case IDs (default all), optional candidate setup R file.
 Existing output directories are rejected. A setup file can set the option
-`sceptre.validation.configure` to a function of `(object, case)` returning an
+`sceptre.validation.configure` to a function of `(object, case)` receiving the fully prepared object after QC and returning an
 object with an explicitly selected experimental method. The script records the
 setup hash; candidate APIs/unsupported cases must be documented with that setup.
 For a separate experimental entry point, set

@@ -69,14 +69,15 @@ validation_prepare <- function(input, case) {
         side = "both", control_group = case$control,
         resampling_mechanism = case$mechanism,
         resampling_approximation = case$approximation)
-    # An optional candidate setup is deliberately outside default-method code.
-    configure <- getOption("sceptre.validation.configure")
-    if (!is.null(configure)) object <- configure(object, case)
     object <- sceptre::assign_grnas(object, method = "thresholding", threshold = 5L,
                                     print_progress = FALSE)
-    sceptre::run_qc(object, response_n_umis_range = c(0, 1),
+    object <- sceptre::run_qc(object, response_n_umis_range = c(0, 1),
         response_n_nonzero_range = c(0, 1), n_nonzero_trt_thresh = 7L,
         n_nonzero_cntrl_thresh = 7L)
+    # Configure only the fully prepared object, as candidate fit APIs require.
+    configure <- getOption("sceptre.validation.configure")
+    if (!is.null(configure)) object <- configure(object, case)
+    object
 }
 
 validation_replicate <- function(case, replicate, seed, n = 600L) {

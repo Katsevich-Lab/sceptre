@@ -8,9 +8,9 @@ test_that("independent count effects retain power and direction with default inf
         guides <- matrix(0, 4L, n, dimnames = list(c("a", "nt1", "nt2", "b"), ids))
         guides[cbind(groups, seq_len(n))] <- 50
         treated <- groups == 1L
-        response <- rbind(up = rpois(n, ifelse(treated, 12, 3)),
-                          down = rpois(n, ifelse(treated, 1, 8)),
-                          background = rpois(n, 10))
+        response <- rbind(up = stats::rpois(n, ifelse(treated, 12, 3)),
+                          down = stats::rpois(n, ifelse(treated, 1, 8)),
+                          background = stats::rpois(n, 10))
         colnames(response) <- ids
         object <- suppressMessages(import_data(response, guides,
             data.frame(grna_id = rownames(guides),
