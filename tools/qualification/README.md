@@ -12,14 +12,16 @@ overnight program:
 
 ```sh
 python3 tools/qualification/qualify.py --source . --revision HEAD \
-  --output /private/tmp/sceptre-EXACT-mac --ondisc present --check
+  --output /private/tmp/sceptre-EXACT-mac --ondisc present --check --as-cran
 ```
 
 Output must not exist. The runner resolves the commit/tree, exports the committed
 source (ignoring unstaged edits), builds the vignette-containing source archive,
 records its SHA256, installs with packaged tests into `output/library`, and runs
 the full installed suite. `--check` additionally requires a terminal R CMD check
-status without errors/warnings. Notes and test skips remain in the evidence.
+status without errors/warnings. `--as-cran` matches the standard hosted checks,
+including vignette rebuilds; omit it only for the documented ordinary check lane
+(`--no-build-vignettes`). Notes and test skips remain in the evidence.
 Build/install/test/check logs and terminal receipt JSON survive a failed run.
 Python3.9+ and R/Rscript are required. For another R runtime supply both `--r`
 and `--rscript` from that runtime. Initial `.libPaths()` are captured as read-only
@@ -96,7 +98,7 @@ notes. A matched-wrapper pass must never be labelled an all-default clean check.
 and backend-absent tier. `check-support.yaml` remains the PR R4.1/exact-testthat3.1.8
 and Bioconductor release/devel tier, with manual dispatch and weekly refresh.
 The CRAN-snapshot R-floor lane intentionally omits optional SingleCellExperiment,
-SummarizedExperiment and S4Vectors, as well as ondisc. It makes no historical
+SummarizedExperiment and S4Vectors, as well as ondisc and rhdf5. It makes no historical
 Bioconductor interoperability claim. Current Bioconductor lanes resolve those
 suggestions from their matching ecosystem; W05 owns present/absent roundtrips.
 No existing PR check was removed. All jobs use read-only contents permissions,
@@ -124,3 +126,14 @@ on PRs or award a statistical-validity badge. Execution success means the harnes
 finished; a40-replicate pilot cannot certify nominal calibration. Deliberate
 misspecification and tied/sparse stress cases retain their separate interpretation.
 Its archive is built without vignette execution and is not a release gate.
+
+Hosted baseline release/oldrel --as-cran checks exposed a genuine undeclared test
+import: the backing corruption regression calls rhdf5::h5read/h5write. rhdf5 is now
+a meaningful Suggests dependency; future backed test environments should install
+it. This can legitimately remove the old no-Bioconductor-dependency warning.
+The submission gate permits diagnostic removal using a message multiset subset,
+while retaining strict bounds on all remaining flagged source instances. The
+CRAN-snapshot floor intentionally omits this optional Bioconductor test backend.
+The data-raw generator remains in Git but is excluded from the package archive;
+packaged data files and runtime code are unchanged. Actual hosted repair requires
+an exact new-revision --as-cran run; the old failing jobs remain historical facts.

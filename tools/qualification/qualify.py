@@ -13,9 +13,13 @@ def main():
     p.add_argument("--output", type=pathlib.Path, required=True)
     p.add_argument("--ondisc", choices=["present", "absent", "either"], default="either")
     p.add_argument("--check", action="store_true")
+    p.add_argument("--as-cran", action="store_true",
+                   help="Use hosted --as-cran checks including vignette rebuilds")
     p.add_argument("--r", default="R")
     p.add_argument("--rscript", default="Rscript")
     a = p.parse_args()
+    if a.as_cran and not a.check:
+        p.error("--as-cran requires --check")
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     env = dict(os.environ)
@@ -72,7 +76,9 @@ def main():
         run([a.rscript, "--vanilla", pathlib.Path(__file__).with_name("installed-suite.R"),
             out / "library", out, a.ondisc], "tests.log")
         if a.check:
-            run([a.r, "CMD", "check", archive, "--no-manual", "--no-build-vignettes"], "check.log")
+            check_args = ["--no-manual", "--as-cran"] if a.as_cran else [
+                "--no-manual", "--no-build-vignettes"]
+            run([a.r, "CMD", "check", archive] + check_args, "check.log")
             check = (out / "sceptre.Rcheck/00check.log").read_text()
             receipt["R_CMD_check_status"] = [x for x in check.splitlines() if x.startswith("Status:")]
             if not receipt["R_CMD_check_status"]:

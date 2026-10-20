@@ -39,8 +39,19 @@ def messages(obj, key):
     if isinstance(obj, list):
         return sum((messages(v, key) for v in obj), [])
     return []
+def section(doc, severity):
+    value = doc[severity]
+    if isinstance(value, dict):
+        return value
+    assert value == [], "Unexpected diagnostic section representation"
+    return {}
+
 for severity, key in [("note", "checkCodingPractice"), ("warning", "checkBiocDepsDESC")]:
-    assert messages(new[severity].get(key, []), key) == messages(old[severity].get(key, []), key), \
+    current_messages = collections.Counter(json.dumps(x, sort_keys=True)
+        for x in messages(section(new, severity).get(key, []), key))
+    inherited_messages = collections.Counter(json.dumps(x, sort_keys=True)
+        for x in messages(section(old, severity).get(key, []), key))
+    assert not current_messages - inherited_messages, \
         "New diagnostic within inherited category"
 for role, package in [("candidate", archive), ("submitted", base / "official/sceptre_0.99.0.tar.gz"),
                       ("accepted", accepted / "sceptre_0.99.0.tar.gz")]:
@@ -74,7 +85,7 @@ def strings(obj):
     return []
 def display(doc, source):
     rows = []
-    for value in strings(doc["note"].get("checkCodingPractice", [])):
+    for value in strings(section(doc, "note").get("checkCodingPractice", [])):
         m = re.fullmatch(r"(cat|print)\(\) in (R/.*?) \(line (\d+), column (\d+)\)", value)
         if m:
             call, file, line, col = m.groups()
