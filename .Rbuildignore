@@ -27,3 +27,4 @@
 ^tools/components$
 ^tools/hardening$
 ^sceptre\.BiocCheck$
+^tools/validation$
