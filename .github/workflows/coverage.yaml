@@ -15,6 +15,7 @@ jobs:
       OPENBLAS_NUM_THREADS: 1
       MKL_NUM_THREADS: 1
       MAKEFLAGS: -j2
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       NOT_CRAN: 'true'
       SCEPTRE_REQUIRE_NATIVE_COVERAGE: 'true'
       SCEPTRE_REQUIRE_ONDISC: 'true'
