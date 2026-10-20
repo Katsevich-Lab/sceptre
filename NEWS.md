@@ -1,5 +1,10 @@
 # sceptre (development version)
 
+- Fixed issue #237: two-sided empirical p-values are capped at one after
+  doubling the smaller inclusive add-one tail. Previously all ties could return
+  two. Only values above one change; one-sided tails, draws, stage selection
+  and rejection decisions at significance levels below one are unchanged.
+
 - The distributed execution API now has runnable end-to-end examples. Internal
   validation and migration helpers are shorter, and warning capture uses local
   state without superassignment. These changes preserve numerical execution,
