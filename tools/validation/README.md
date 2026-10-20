@@ -114,7 +114,7 @@ certify the binary used. No external data is needed or changed.
 
 ---
 
-# Experimental Wilcoxon scientific pilot
+## Experimental Wilcoxon scientific pilot
 
 From the current repository root with the exact candidate package loaded:
 
