@@ -71,7 +71,7 @@ std::vector<double> null_score_segment(const Rcpp::NumericVector& a,
                                        const DrawBank& synthetic_idxs);
 
 // Count ties in empirical tails and add one to tail counts and total draw count.
-// For a two-sided test, double the smaller tail; keep values above 1 as calculated.
+// For a two-sided test, double the smaller tail and cap at 1.
 double compute_empirical_p_value(const std::vector<double>& null_statistics,
                                  double z_orig, int side);
 

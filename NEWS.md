@@ -1,3 +1,9 @@
+## Refactor review: empirical two-sided p-values
+
+- Two-sided empirical p-values now cap twice the smaller inclusive add-one tail
+  at 1. All-tied finite scores therefore return 1 instead of 2. One-sided
+  p-values, values already at or below 1, and null-score ordering are unchanged.
+
 ## Refactor review: invalid observed scores
 
 - Association comparisons with a nonfinite observed score (NaN or either

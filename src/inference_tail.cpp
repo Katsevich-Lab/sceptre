@@ -12,8 +12,8 @@ namespace inference {
 
 // Compute empirical p-values with one added to both tail counts and draw count.
 // side -1 selects the left tail, +1 the right, and other values twice the smaller
-// tail. Ties count in both tails. Keep the existing two-sided formula even when
-// it exceeds 1; empty draws use the same formula. Leave scores unchanged.
+// tail, capped at 1. Ties count in both tails; empty draws use the same
+// formula. Leave scores unchanged.
 double compute_empirical_p_value(const std::vector<double>& null_statistics, double z_orig, int side) {
   double p;
   if (side == -1 || side == 1) { // left or right
@@ -26,8 +26,8 @@ double compute_empirical_p_value(const std::vector<double>& null_statistics, dou
     }
     p = (1.0 + counter)/(1.0 + B);
   } else { // two-sided
-    p = 2 * std::min(compute_empirical_p_value(null_statistics, z_orig, -1),
-                     compute_empirical_p_value(null_statistics, z_orig, 1));
+    p = std::min(1.0, 2 * std::min(compute_empirical_p_value(null_statistics, z_orig, -1),
+                                  compute_empirical_p_value(null_statistics, z_orig, 1)));
   }
   return p;
 }
