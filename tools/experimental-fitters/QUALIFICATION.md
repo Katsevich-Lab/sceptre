@@ -134,9 +134,11 @@ Use the shared heavy lease for execution. The evaluator deliberately refuses an
 existing evidence directory. Preserve source/installed/harness hashes and
 source provenance. See `SOURCE.md` for pinned upstream source.
 
-Independent W03 method-admission review, larger statistical studies, broad
-estimability, Eigen allocation/OOM/interrupt stress, floor/cross-platform and
-container qualification, and exact final integrated-runtime checks remain
-separate gates. Current observed-score safety is a precise guard, not broad
+W03 independently approved restricted opt-in experimental method/sampler
+admission after source mathematics, actual bank/output reconciliation and
+terminal receipt readback. This closes that bounded review gate; W03 did not
+rerun the full suite or checker. Larger statistical studies, broad estimability,
+Eigen allocation/OOM/interrupt stress, floor/cross-platform and container
+qualification, and exact final integrated-runtime checks remain separate gates. Current observed-score safety is a precise guard, not broad
 estimability proof. Keep this candidate opt-in and direct-R only; do not use
 historical SPA benchmark summaries as qualification for it.

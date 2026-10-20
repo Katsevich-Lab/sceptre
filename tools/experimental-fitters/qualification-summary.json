@@ -81,6 +81,7 @@
     "per-group transient calibration fallback diagnostics not persisted",
     "Rprofmem excludes native allocations",
     "Eigen OOM/interrupt and cross-platform/container lanes unqualified",
-    "W03 independent admission and final integrated artifact checks separate"
-  ]
+    "larger default-science precision and final integrated artifact checks separate"
+  ],
+  "independent_W03_review": "APPROVE_RESTRICTED_OPTIN_EXPERIMENTAL_ADMISSION; source mathematics plus actual bank/output reconciliation and terminal receipt readback, not rerun"
 }
