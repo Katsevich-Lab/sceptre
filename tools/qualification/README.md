@@ -161,3 +161,11 @@ output-directory upload included private installations, duplicated build sources
 and opaque RDS and produced a110MB artifact. Archive identity remains in the
 receipt; full local output is unchanged. Artifact minimization does not remove a
 test, diagnostic or qualification step.
+
+DelayedArray is likewise a genuine optional test dependency: the SCE rejection
+fixture constructs a delayed assay to verify that backed input is refused. Its
+new direct Suggests declaration belongs to the final package owner. The CRAN-only
+historical R-floor lane omits it with the other optional Bioconductor backends;
+current Bioconductor/present-adapter checks must retain and exercise it. This
+avoids requesting a Bioconductor package from the CRAN snapshot and makes no
+claim that the DelayedArray fixture ran in the absence lane.

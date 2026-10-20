@@ -10,8 +10,8 @@ deps <- unique(unlist(lapply(description[1L, fields], function(x)
     names(tools:::.split_dependencies(x)))))
 # Optional storage/interoperability has its own current-ecosystem lanes.
 # The advertised R-floor lane deliberately tests installation without it.
-optional_backends <- c("ondisc", "rhdf5", "SingleCellExperiment",
-    "SummarizedExperiment", "S4Vectors", "SeuratObject")
+optional_backends <- c("ondisc", "rhdf5", "DelayedArray",
+    "SingleCellExperiment", "SummarizedExperiment", "S4Vectors", "SeuratObject")
 deps <- setdiff(deps, c(optional_backends,
     rownames(installed.packages(priority = "base"))))
 install.packages(deps, dependencies = NA)
