@@ -1,3 +1,14 @@
+## Refactor review: invalid observed scores
+
+- Association comparisons with a nonfinite observed score (NaN or either
+  infinity, including scores from zero or negative adjusted variance) now remain
+  in the tested family with p-value 1. No null tail is evaluated for that pair.
+  At output levels 2 and 3, stage 0 identifies this fallback and `z_orig` retains
+  the original score. Tail parameters and level-3 null-score columns are missing
+  for these pairs; an entirely stage-0 result has one missing `z_null_1` column.
+  Finite scores and null-score semantics are unchanged. Input and runtime errors
+  still raise errors rather than being converted to p-values.
+
 # sceptre (development version)
 
 - Legacy saved-table migration normalizes table containers while preserving

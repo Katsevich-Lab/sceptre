@@ -18,7 +18,9 @@ run_discovery_analysis(
 
 \item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2,
 or 3 specifying the amount of information to return. \code{1} returns the least
-amount of information and \code{3} the most.}
+amount of information and \code{3} the most. Nonfinite observed scores return
+p-value 1; at levels 2 and 3, stage 0 identifies this fallback and \code{z_orig}
+retains the observed score. No null scores are evaluated for these pairs.}
 
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether
 to print progress updates}

@@ -12,7 +12,9 @@
 #' @param sceptre_object a `sceptre_object`
 #' @param output_amount (optional; default `1`) an integer taking values 1, 2,
 #' or 3 specifying the amount of information to return. `1` returns the least
-#' amount of information and `3` the most.
+#' amount of information and `3` the most. Nonfinite observed scores return
+#' p-value 1; at levels 2 and 3, stage 0 identifies this fallback and `z_orig`
+#' retains the observed score. No null scores are evaluated for these pairs.
 #' @param n_calibration_pairs (optional) the number of negative control pairs to
 #' construct and test for association
 #' @param calibration_group_size (optional) the number of negative control gRNAs

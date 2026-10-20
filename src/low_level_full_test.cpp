@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <cmath>
 #include "inference.h"
 #include "sampling_safety.h"
 #include "result_lifetime.h"
@@ -10,8 +11,8 @@ using namespace Rcpp;
 // y, mu, a and w contain the selected cells in the same order; D has one column
 // per cell and eigenvectors in rows. Observed trt_idxs start at 1, and n_trt is
 // their count. Check lengths, positions and resampling sizes before converting
-// observed positions once to C++ numbering. Keep existing NaN/Inf arithmetic
-// for empty or degenerate fits.
+// observed positions once to C++ numbering. Nonfinite observed scores return
+// p = 1 with stage = 0, without ranking against null scores.
 // synthetic_idxs points to this worker's full set of draws, with positions
 // already starting at 0. Check the pointer, then read without changing it.
 // Permutations use the first n_trt entries of each draw; CRT uses the full draw,
@@ -63,9 +64,17 @@ SEXP run_association_test(NumericVector y,
       bank = draws.get();
     }
     std::unique_ptr<sceptre::inference::TailResult> tail(new sceptre::inference::TailResult);
-    *tail = sceptre::inference::evaluate_staged_tail(
-      z_orig, a, w, D, n_trt, use_all_cells, *bank, B1, B2, B3,
-      fit_parametric_curve, side_code);
+    if (!std::isfinite(z_orig)) {
+      // Keep the requested hypothesis in the family, conservatively. Stage 0
+      // identifies this policy fallback; no null statistics were evaluated.
+      tail->p = 1.0;
+      tail->stage = 0;
+      tail->sn_params = {{NA_REAL, NA_REAL, NA_REAL}};
+    } else {
+      *tail = sceptre::inference::evaluate_staged_tail(
+        z_orig, a, w, D, n_trt, use_all_cells, *bank, B1, B2, B3,
+        fit_parametric_curve, side_code);
+    }
     owned_tail = tail.release();
     continuation = token.release();
   }

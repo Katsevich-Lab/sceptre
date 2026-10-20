@@ -60,7 +60,12 @@ pair_results_from_native <- function(
     }
     if (output_amount >= 3L) {
         to_append <- lapply(curr_response_result, FUN = function(l) {
-            m <- data.table::as.data.table(matrix(l$resampling_dist, nrow = 1))
+            # Stage 0 evaluated no null scores. Keep a row of missing values
+            # so this requested pair survives output-level-3 assembly, even
+            # when every pair in this worker returned stage 0.
+            scores <- l$resampling_dist
+            if (!length(scores)) scores <- NA_real_
+            m <- data.table::as.data.table(matrix(scores, nrow = 1))
             colnames(m) <- paste0("z_null_", seq(1L, ncol(m)))
             m
         }) |>
