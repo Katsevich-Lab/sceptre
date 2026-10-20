@@ -1,6 +1,6 @@
 # Support checks complement the existing OS matrix and ondisc-absent job.
 # These definitions are qualification gates; adding them is not a hosted pass.
-name: R-floor-and-Bioconductor
+name: R-floor
 on:
   push:
     branches: [main, dev]
@@ -69,75 +69,3 @@ jobs:
             ${{ runner.temp }}/r-floor-qualification/sceptre.Rcheck/tests/testthat.Rout*
             r-floor-dependencies.txt
             r-floor-installed.tsv
-
-  bioconductor:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    container:
-      image: bioconductor/bioconductor_docker:${{ matrix.bioc }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # The upstream latest tag tracks the current release; devel tracks its
-        # matching R development ecosystem. Record actual versions per run.
-        bioc: [latest, devel]
-    env:
-      _R_CHECK_FORCE_SUGGESTS_: false
-      OMP_NUM_THREADS: 1
-      OPENBLAS_NUM_THREADS: 1
-      MKL_NUM_THREADS: 1
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Prepare support evidence directory
-        shell: bash
-        run: |
-          support_evidence_root="$RUNNER_TEMP/bioconductor-evidence"
-          mkdir -p "$support_evidence_root"
-          echo "SCEPTRE_SUPPORT_EVIDENCE=$support_evidence_root" >> "$GITHUB_ENV"
-      - name: Install dependencies from the matching Bioconductor ecosystem
-        shell: Rscript {0}
-        run: |
-          options(repos = BiocManager::repositories())
-          description <- read.dcf("DESCRIPTION")
-          fields <- intersect(c("Imports", "LinkingTo", "Suggests"), colnames(description))
-          deps <- unique(unlist(lapply(description[1L, fields], function(x)
-            names(tools:::.split_dependencies(x)))))
-          deps <- setdiff(deps, c("ondisc", rownames(installed.packages(priority = "base"))))
-          BiocManager::install(c(deps, "BiocCheck"), ask = FALSE, update = FALSE)
-          out <- Sys.getenv("SCEPTRE_SUPPORT_EVIDENCE")
-          dir.create(out, recursive = TRUE, showWarnings = FALSE)
-          writeLines(c(paste("Bioconductor", BiocManager::version()),
-            capture.output(sessionInfo())), file.path(out, "environment.txt"))
-          write.table(installed.packages()[, c("Package", "Version", "Built")],
-            file.path(out, "installed.tsv"), sep = "\t", quote = FALSE, row.names = FALSE)
-      - name: Build and check package
-        shell: bash
-        run: |
-          git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD > "$SCEPTRE_SUPPORT_EVIDENCE/source-commit.txt"
-          R CMD build . --no-manual
-          sha256sum sceptre_*.tar.gz > "$SCEPTRE_SUPPORT_EVIDENCE/archive-sha256.txt"
-          R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
-      - name: Require clean package check status
-        shell: Rscript {0}
-        run: |
-          status <- readLines("sceptre.Rcheck/00check.log")
-          terminal <- grep("^Status:", status, value = TRUE)
-          stopifnot(length(terminal) == 1L,
-            !any(grepl("ERROR|WARNING", terminal)))
-      - name: Run Bioconductor package diagnostics
-        shell: Rscript {0}
-        run: |
-          BiocCheck::BiocCheck(dir(pattern = "^sceptre_.*\\.tar\\.gz$")[1L],
-            `quit-with-status` = TRUE)
-      - name: Retain Bioconductor environment and diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bioconductor-${{ matrix.bioc }}
-          path: |
-            sceptre_*.tar.gz
-            ${{ env.SCEPTRE_SUPPORT_EVIDENCE }}
-            sceptre.Rcheck
-            sceptre.BiocCheck

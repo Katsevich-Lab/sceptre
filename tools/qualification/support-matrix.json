@@ -168,8 +168,8 @@
     {
       "platform": "Bioconductor release/devel official images",
       "R": "image supplied; actual version recorded at execution",
-      "status": "configured_unexecuted",
-      "authority": ".github/workflows/check-support.yaml"
+      "status": "not_scheduled_in_CI",
+      "authority": "Removed at Eugene's request; manual submission qualification remains separate"
     },
     {
       "platform": "Linuxamd64 native host",
@@ -227,7 +227,7 @@
       "long_lines": 108,
       "archive_summary_options_bound": true
     },
-    "current_all_default": "Not rerun locally for0b; configured hosted Bioconductor default lane remains distinct from matched checker."
+    "current_all_default": "Not rerun locally for0b; historical hosted default diagnostics remain distinct from the matched checker. Bioconductor CI is no longer scheduled."
   },
   "scientific_qualification": "Independent W03 work; not inferred from builds/installed-test or reference equality",
   "source_archive_sha256": "f9172ba52aeab123d5473a0b189d877527704d86cc6019ff7b37fb69c2d45a6f",
