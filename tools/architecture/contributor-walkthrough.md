@@ -1,0 +1,55 @@
+# Follow one discovery analysis
+
+The public workflow returns an updated `sceptre_object`. Internally, persistent owners hold scientific state while ordinary functions perform fitting, scoring, resampling, and result processing.
+
+This is a conceptual reading walkthrough, not an executed example. Open the [interactive map](../../ARCHITECTURE.md#object-and-workflow-map) alongside it.
+
+## 1 Import a screen
+
+`import_data()` normalizes response counts, guide counts, aligned cell covariates, and guide metadata into `ScreenData`. It establishes imported content identity. The constructor allocates the other four owners as empty placeholders; import does not create scientific settings, prepared assignments, fitted models, or completed results.
+
+Read [the importer](../../R/import_functs.R#L885) and [the owner declarations](../../R/s4_class.R).
+
+## 2 Record choices and prepare the design
+
+`set_analysis_parameters()` records canonical requested hypotheses and scientific choices in `AnalysisSpec`. The compiled design and guide-group expansions belong to `PreparationRecord`. Requested target–response pairs and expanded guide-group rows have different owners and meanings.
+
+See [owners and data flow](../../ARCHITECTURE.md#owners-and-data-flow) and [the schema architecture](../components/schema3/ARCHITECTURE.md#authority-and-representations).
+
+## 3 Assign guides and run QC
+
+`assign_grnas()` produces source-coordinate assignments. `run_qc()` records retained analysis cells, remapped memberships, pair eligibility, and successful stage identities in preparation. Ordered source cells, analysis positions, and fitting positions must remain aligned.
+
+Changing preparation invalidates dependent results. Whether a fit remains reusable depends on its actual fitting inputs; response and CRT perturbation fits have independent identities.
+
+Read [coordinates and ownership](../../ARCHITECTURE.md#coordinates-count-semantics-and-resources), [lifecycle and fit reuse](../components/schema3/ARCHITECTURE.md#preparation-lifecycle-and-fitting), and [the indexing implementation](../../R/analysis_context.R).
+
+## 4 Choose an analysis
+
+Calibration, power, and discovery are **sibling analyses** after preparation. Calibration diagnoses behavior with non-targeting pairs; power uses positive-control pairs; discovery tests the requested discovery family. Calibration and power are not required serial steps before discovery.
+
+For discovery, a temporary `RunPlan` binds the complete family, resampling budgets, and input identity. Temporary `CellView` values map each fitting scope to the exact ordered cells. A completed result retains a frozen plan snapshot; the plan is not a second working settings authority.
+
+Read [public analysis entry points](../../R/s4_analysis_functs_2.R) and [run-plan contracts](../components/schema3/ARCHITECTURE.md#transient-run-plans-and-committed-results).
+
+## 5 Execute the tests
+
+Execution asks storage for count vectors, reuses compatible compact fits or calls the fitter, prepares score arrays, and runs the numerical test using the appropriate resampling draws. Workers return results and fit proposals. The complete family is collected before final adjustment and commit.
+
+The module map answers a different question from the object map: **which functions request work from which other functions?** It is a dependency map, not the sequence of public calls.
+
+![Module requests and returned values](../architecture/module-map.svg)
+
+Read [analysis execution](../../R/association_execution.R), [workers](../../R/association_workers.R), [score preparation](../../R/score_preparation.R), and [the checked native entry](../../src/low_level_full_test.cpp).
+
+## 6 Commit and inspect results
+
+Successful finalization restores failed-QC requests, integrates guides, adjusts the complete family, and commits the result and eligible fit proposals. Each `ResultRecord` entry owns its table, input identity, frozen choices and plan, scope, and history. Getters, plotting, and export check currentness.
+
+A failed worker does not produce a partially committed analysis. The approved numerical fallback is different: a nonfinite observed score remains a result row with p-value 1 and diagnostic stage 0. Two-sided empirical p-values are capped at one. These are the two explicit statistical changes in this candidate.
+
+Read [result processing](../../R/result_processing.R), [result records](../../R/result_records.R), and [the candidate review status](contributor-site-notes.md).
+
+## Before changing this workflow
+
+Identify the authoritative owner, preserve cell and row order, define invalidation and provenance, and choose regression tests at the affected boundary. Use [the change map](contributor-change-map.md) to start with a bounded edit.

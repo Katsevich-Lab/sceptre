@@ -107,6 +107,53 @@ navbar:
   - icon: fa-history
     text: Changelog
     href: news/index.html
+  - icon: fa-code-branch
+    text: Contributing
+    href: CONTRIBUTING.html
   - icon: fa-users
     text: Community
     href: https://github.com/Katsevich-Lab/sceptre/discussions
+
+articles:
+- title: Get started
+  contents:
+  - sceptre
+- title: Contributor guide
+  contents:
+  - articles/contributor-walkthrough
+  - articles/contributor-change-map
+  - articles/contributor-site-notes
+- title: Internals reference
+  contents:
+  - articles/contributor-schema-architecture
+  - articles/contributor-object-fields
+  - articles/contributor-legacy-fields
+- title: Maintainer reference and historical records
+  desc: Supporting records retain their named source revisions and validation limits.
+  contents:
+  - articles/contributor-tests-testthat-fixtures-readme
+  - articles/contributor-tools-architecture-readme
+  - articles/contributor-tools-checks-readme
+  - articles/contributor-tools-components-fits-independent-review
+  - articles/contributor-tools-components-fits-pr233
+  - articles/contributor-tools-components-fits-qualification
+  - articles/contributor-tools-components-fits-validation-readme
+  - articles/contributor-tools-components-runplan-decision
+  - articles/contributor-tools-components-runplan-validation-readme
+  - articles/contributor-tools-components-schema3-validation
+  - articles/contributor-tools-hardening-benchmark-readme
+  - articles/contributor-tools-hardening-dependencies-readme
+  - articles/contributor-tools-hardening-disposition
+  - articles/contributor-tools-hardening-ondisc-contract
+  - articles/contributor-tools-hardening-qualification
+  - articles/contributor-tools-hardening-review-installed-8cbecfb-recheck
+  - articles/contributor-tools-hardening-review-narrow-169c16e-recheck
+  - articles/contributor-tools-hardening-submission-baseline-readme
+  - articles/contributor-tools-hardening-submission-cleanup-formatting-readme
+  - articles/contributor-tools-hardening-submission-cleanup-independent-review-final-submission-delta-review
+  - articles/contributor-tools-hardening-submission-cleanup-qualification
+  - articles/contributor-tools-refactor-bug-fixes
+  - articles/contributor-tools-refactor-consistency-readme
+  - articles/contributor-tools-refactor-readme
+  - articles/contributor-tools-refactor-validation-readme
+  - articles/contributor-tools-refactor-walkthrough

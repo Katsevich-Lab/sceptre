@@ -1,0 +1,198 @@
+{
+  "source_base": "abdb5c713b089c3b10dea93bd94955f0f20c0988",
+  "pages": [
+    {
+      "source": "tools/architecture/contributor-walkthrough.md",
+      "source_sha256": "a48e619d612f3da23bcff95e0426b022b1dfdc4bd5c9645a7f9dad09f9edc2e3",
+      "article": "vignettes/articles/contributor-walkthrough.Rmd",
+      "url": "articles/contributor-walkthrough.html"
+    },
+    {
+      "source": "tools/architecture/contributor-change-map.md",
+      "source_sha256": "8947f320e1eba0dc17480195e33b416761817319c3abd16eeefd6467366d161b",
+      "article": "vignettes/articles/contributor-change-map.Rmd",
+      "url": "articles/contributor-change-map.html"
+    },
+    {
+      "source": "tools/architecture/contributor-site-notes.md",
+      "source_sha256": "99d6ecfd57b542bca8f9eda5836e5c35ac1bf402517bd9cdacd65181d3b4a3c3",
+      "article": "vignettes/articles/contributor-site-notes.Rmd",
+      "url": "articles/contributor-site-notes.html"
+    },
+    {
+      "source": "tools/components/schema3/ARCHITECTURE.md",
+      "source_sha256": "9cad96ea9fa268968b21c2e0b246f5613ad066d2df39d044e48c2a59ba8a9c36",
+      "article": "vignettes/articles/contributor-schema-architecture.Rmd",
+      "url": "articles/contributor-schema-architecture.html"
+    },
+    {
+      "source": "tools/components/schema3/OBJECT_FIELDS.md",
+      "source_sha256": "20fa1920e3dacdfae07cf19c28c60b49211b851c15465d0452f1ad72574de929",
+      "article": "vignettes/articles/contributor-object-fields.Rmd",
+      "url": "articles/contributor-object-fields.html"
+    },
+    {
+      "source": "tools/components/schema3/FIELD_DECISIONS.md",
+      "source_sha256": "9f06314ee5a24dfe8e61f0b2a84af46aa7fa645adc00d51e6fcee4a215a7c258",
+      "article": "vignettes/articles/contributor-legacy-fields.Rmd",
+      "url": "articles/contributor-legacy-fields.html"
+    },
+    {
+      "source": "tools/components/runplan/DECISION.md",
+      "source_sha256": "28649ee2159a45b24c2fbc9ba9b1d3ac992802bd3d5babe35d9087157856cfbd",
+      "article": "vignettes/articles/contributor-tools-components-runplan-decision.Rmd",
+      "url": "articles/contributor-tools-components-runplan-decision.html"
+    },
+    {
+      "source": "tools/components/fits/PR233.md",
+      "source_sha256": "900eccf184f1f730346fe1a33f308cd045aaeb5b4dfb27259b299c634a23762b",
+      "article": "vignettes/articles/contributor-tools-components-fits-pr233.Rmd",
+      "url": "articles/contributor-tools-components-fits-pr233.html"
+    },
+    {
+      "source": "tools/hardening/QUALIFICATION.md",
+      "source_sha256": "758973ade8e8a969007fd1265fc0e35b734e785b949d248e90d18150d4c868a2",
+      "article": "vignettes/articles/contributor-tools-hardening-qualification.Rmd",
+      "url": "articles/contributor-tools-hardening-qualification.html"
+    },
+    {
+      "source": "tools/checks/README.md",
+      "source_sha256": "daf49693d062c1a1467623036c4c271f437c1c470580f41323f8f09ccb1b0755",
+      "article": "vignettes/articles/contributor-tools-checks-readme.Rmd",
+      "url": "articles/contributor-tools-checks-readme.html"
+    },
+    {
+      "source": "tools/components/schema3/VALIDATION.md",
+      "source_sha256": "a9cf6dc1b249f7870a55533fa185e13547d2353aa4bd2c33cff4bd5b39f661fc",
+      "article": "vignettes/articles/contributor-tools-components-schema3-validation.Rmd",
+      "url": "articles/contributor-tools-components-schema3-validation.html"
+    },
+    {
+      "source": "tools/components/runplan/validation/README.md",
+      "source_sha256": "a84e875676b43873f82ab952a9360caea506f62c38129ee7c1a5bd2e59f40dcb",
+      "article": "vignettes/articles/contributor-tools-components-runplan-validation-readme.Rmd",
+      "url": "articles/contributor-tools-components-runplan-validation-readme.html"
+    },
+    {
+      "source": "tools/components/fits/QUALIFICATION.md",
+      "source_sha256": "27a1a7842ce58cc079bf9edb7084d319127abe02cb9574f40f4eb817dfc494e8",
+      "article": "vignettes/articles/contributor-tools-components-fits-qualification.Rmd",
+      "url": "articles/contributor-tools-components-fits-qualification.html"
+    },
+    {
+      "source": "tools/refactor/README.md",
+      "source_sha256": "d5fdf33b5b4855ba76f525b7e1294cd29bcf3542c6b7724e82cbd9c6613c0002",
+      "article": "vignettes/articles/contributor-tools-refactor-readme.Rmd",
+      "url": "articles/contributor-tools-refactor-readme.html"
+    },
+    {
+      "source": "tools/hardening/ONDISC_CONTRACT.md",
+      "source_sha256": "372a2795f854489b87234452af98020e542219bd9b3e093719c401f2ca9f22f5",
+      "article": "vignettes/articles/contributor-tools-hardening-ondisc-contract.Rmd",
+      "url": "articles/contributor-tools-hardening-ondisc-contract.html"
+    },
+    {
+      "source": "tools/hardening/submission-cleanup/QUALIFICATION.md",
+      "source_sha256": "7d4db0c02ed79b6ae2f5ce4dc6d9505a2f97ac286d52c4acdc76dd55dd9225bc",
+      "article": "vignettes/articles/contributor-tools-hardening-submission-cleanup-qualification.Rmd",
+      "url": "articles/contributor-tools-hardening-submission-cleanup-qualification.html"
+    },
+    {
+      "source": "tools/hardening/DISPOSITION.md",
+      "source_sha256": "9ebf6f9ed200e7a3d13261768c0c07a262faecd40e455dc431255d5487939186",
+      "article": "vignettes/articles/contributor-tools-hardening-disposition.Rmd",
+      "url": "articles/contributor-tools-hardening-disposition.html"
+    },
+    {
+      "source": "tools/hardening/dependencies/README.md",
+      "source_sha256": "8637d7adef43ecc5664ea6450827c1e36da214a561880f6299d8e44a0ab1ea19",
+      "article": "vignettes/articles/contributor-tools-hardening-dependencies-readme.Rmd",
+      "url": "articles/contributor-tools-hardening-dependencies-readme.html"
+    },
+    {
+      "source": "tools/hardening/benchmark/README.md",
+      "source_sha256": "a266e87227b22b4d5ff3a4f590e30f04d0e42649e7d6359c2b541282abd9945f",
+      "article": "vignettes/articles/contributor-tools-hardening-benchmark-readme.Rmd",
+      "url": "articles/contributor-tools-hardening-benchmark-readme.html"
+    },
+    {
+      "source": "tools/hardening/review/installed-8cbecfb/RECHECK.md",
+      "source_sha256": "6bec96dd111362953218582472c29160e8374f408b623ba1b7c85db94c940248",
+      "article": "vignettes/articles/contributor-tools-hardening-review-installed-8cbecfb-recheck.Rmd",
+      "url": "articles/contributor-tools-hardening-review-installed-8cbecfb-recheck.html"
+    },
+    {
+      "source": "tools/hardening/review/narrow-169c16e/RECHECK.md",
+      "source_sha256": "6c8e5a6d2082e7cb5ea43aa62f470a4fa17e08ccfaad0c06a7802717dce4d799",
+      "article": "vignettes/articles/contributor-tools-hardening-review-narrow-169c16e-recheck.Rmd",
+      "url": "articles/contributor-tools-hardening-review-narrow-169c16e-recheck.html"
+    },
+    {
+      "source": "tools/components/fits/INDEPENDENT_REVIEW.md",
+      "source_sha256": "200fce86b449ca9bb510021ba82dde3a66b66e8e65f4430c84a5f9f08c89d558",
+      "article": "vignettes/articles/contributor-tools-components-fits-independent-review.Rmd",
+      "url": "articles/contributor-tools-components-fits-independent-review.html"
+    },
+    {
+      "source": "tools/components/fits/validation/README.md",
+      "source_sha256": "04d68ba1a89a0a45364a9d0f3e3fcdfbc1525b54cb5ebc31142d453ce2539129",
+      "article": "vignettes/articles/contributor-tools-components-fits-validation-readme.Rmd",
+      "url": "articles/contributor-tools-components-fits-validation-readme.html"
+    },
+    {
+      "source": "tools/refactor/walkthrough.qmd",
+      "source_sha256": "204fadfbe738c55188c311c72a9beb03daa0f62d943cb844f12d0c207f7d5532",
+      "article": "vignettes/articles/contributor-tools-refactor-walkthrough.Rmd",
+      "url": "articles/contributor-tools-refactor-walkthrough.html"
+    },
+    {
+      "source": "tools/refactor/bug-fixes.qmd",
+      "source_sha256": "74c72c3e5f70081dbb31936d508f90067302451d9e277e786552917e6078e1a8",
+      "article": "vignettes/articles/contributor-tools-refactor-bug-fixes.Rmd",
+      "url": "articles/contributor-tools-refactor-bug-fixes.html"
+    },
+    {
+      "source": "tools/refactor/validation/README.md",
+      "source_sha256": "d8cc6f9c73eda52d3502812ed94e4fe107454191ca4c28d167e0a0551c6fa83e",
+      "article": "vignettes/articles/contributor-tools-refactor-validation-readme.Rmd",
+      "url": "articles/contributor-tools-refactor-validation-readme.html"
+    },
+    {
+      "source": "tests/testthat/fixtures/README.md",
+      "source_sha256": "dcb5dbd11cd660a77164b0e9f20639b246a6734f443e587f5c06d7dd3c98ba75",
+      "article": "vignettes/articles/contributor-tests-testthat-fixtures-readme.Rmd",
+      "url": "articles/contributor-tests-testthat-fixtures-readme.html"
+    },
+    {
+      "source": "tools/architecture/README.md",
+      "source_sha256": "2692c4693841aa2dc26cf2dc7c3f3386799d3258c170b840dfce78cf6b52849b",
+      "article": "vignettes/articles/contributor-tools-architecture-readme.Rmd",
+      "url": "articles/contributor-tools-architecture-readme.html"
+    },
+    {
+      "source": "tools/hardening/submission-baseline/README.md",
+      "source_sha256": "77eb177df6200b0163bcc04c4759be269abd01e41d8484ad370f2c4cc2315484",
+      "article": "vignettes/articles/contributor-tools-hardening-submission-baseline-readme.Rmd",
+      "url": "articles/contributor-tools-hardening-submission-baseline-readme.html"
+    },
+    {
+      "source": "tools/hardening/submission-cleanup/independent-review/FINAL_SUBMISSION_DELTA_REVIEW.md",
+      "source_sha256": "4bdf5005059f3df4b05a43c1e18d2831400f344565c657340e59f751c9191521",
+      "article": "vignettes/articles/contributor-tools-hardening-submission-cleanup-independent-review-final-submission-delta-review.Rmd",
+      "url": "articles/contributor-tools-hardening-submission-cleanup-independent-review-final-submission-delta-review.html"
+    },
+    {
+      "source": "tools/hardening/submission-cleanup/formatting/README.md",
+      "source_sha256": "4863efab289c95c0d915d1d0a809bfb8ba478739b2ef4fad9515cd0fe43fcdc5",
+      "article": "vignettes/articles/contributor-tools-hardening-submission-cleanup-formatting-readme.Rmd",
+      "url": "articles/contributor-tools-hardening-submission-cleanup-formatting-readme.html"
+    },
+    {
+      "source": "tools/refactor/consistency/README.md",
+      "source_sha256": "e60e9059335c947909246026887b68920eba996114eef349c567963e2629bacc",
+      "article": "vignettes/articles/contributor-tools-refactor-consistency-readme.Rmd",
+      "url": "articles/contributor-tools-refactor-consistency-readme.html"
+    }
+  ],
+  "missing_original_targets": []
+}

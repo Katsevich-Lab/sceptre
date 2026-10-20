@@ -2,12 +2,34 @@
 
 Contributions to `sceptre` are welcome, including code, tests, and documentation.
 
-Participation in the project is subject to the [Code of Conduct](CODE_OF_CONDUCT.md).
+Participation in the project is subject to the [Code of Conduct](CODE_OF_CONDUCT.html).
 Please do not include private data, credentials, protected health information,
 or other sensitive information in pull requests, examples, or test fixtures.
 
 For bug reports, feature requests, and questions about using `sceptre`, see
-[Getting help with sceptre](SUPPORT.md).
+[Getting help with sceptre](SUPPORT.html).
+
+## Understand the internals
+
+Start with the objects and how they interact, then trace one analysis before
+reading the detailed contracts:
+
+1. [Explore the object and workflow map](ARCHITECTURE.html#object-and-workflow-map).
+2. [Follow one discovery analysis](articles/contributor-walkthrough.html).
+3. [Find the right place for a change](articles/contributor-change-map.html).
+4. Look up [exact object fields](articles/contributor-object-fields.html),
+   [schema contracts](articles/contributor-schema-architecture.html), and
+   [legacy field decisions](articles/contributor-legacy-fields.html) as needed.
+
+Import populates `ScreenData`. Scientific choices belong to `AnalysisSpec`;
+compiled design, assignments, and QC to `PreparationRecord`; compact reusable
+fits to `FitCache`; completed output and provenance to `ResultRecord`.
+`RunPlan` and `CellView` are temporary execution values. Calibration, power, and
+discovery are sibling analyses after preparation.
+
+The policies and submission checklist below apply to these contributions.
+[Site sources and review status](articles/contributor-site-notes.html) explain
+how the supporting pages are maintained and what remains to verify.
 
 ## Contributing code and documentation
 
@@ -23,17 +45,17 @@ promote a sufficiently scoped proposal to an issue for implementation tracking.
 ### Code, tests, and documentation
 
 For the code's main parts, cell numbering, numerical calculations and pipeline
-compatibility, see [Internal architecture](ARCHITECTURE.md).
+compatibility, see [Internal architecture](ARCHITECTURE.html).
 
 | Material | Where it belongs | How long it stays |
 |---|---|---|
 | Package implementation, help, examples and datasets | `R/`, `src/`, `man/`, `vignettes/`, `data/`, `inst/` | Permanent; maintain with the package |
 | Tests of current behavior and bug fixes | `tests/testthat/` | Permanent, including regression tests first added during the refactor |
-| CI and current-source C++ checks | `.github/workflows/`, [tools/checks/](tools/checks/README.md), `air.toml` | Permanent maintainer tooling |
+| CI and current-source C++ checks | `.github/workflows/`, [tools/checks/](articles/contributor-tools-checks-readme.html), `air.toml` | Permanent maintainer tooling |
 | Test-input recipes and provenance | `tools/fixtures/`, `tests/testthat/fixtures/README.md` | Permanent; never regenerate expected scientific outputs in CI |
 | Module-map drawing and editable source | `tools/architecture/` | Permanent; maintain with `ARCHITECTURE.md` |
 | Current architecture and contributor/project guidance | Root `ARCHITECTURE.md`, this guide, `README`, `ROADMAP.md`, `GOVERNANCE.md` and other project policies | Permanent; keep current |
-| Refactor tour, manual comparison and validation receipt | [tools/refactor/](tools/refactor/README.md); its published archive retains the specification, plans and bulk evidence | Temporary; retain for maintainer review, then archive before retiring |
+| Refactor tour, manual comparison and validation receipt | [tools/refactor/](articles/contributor-tools-refactor-readme.html); its published archive retains the specification, plans and bulk evidence | Temporary; retain for maintainer review, then archive before retiring |
 
 **Build exclusion does not mean temporary.** `.Rbuildignore` keeps maintainer
 material out of the distributed R source package. Permanent `tools/checks/`,
@@ -100,4 +122,4 @@ that fall outside the project's scope or current roadmap.
 ## License
 
 Contributions accepted into the repository are distributed under the project's
-[GPL-3 license](LICENSE.md).
+[GPL-3 license](LICENSE.html).

@@ -6,12 +6,26 @@ coordinates five durable S4 owners under `schema_version = 3L`; `RunPlan` and
 resampling, pair processing and storage operations remain ordinary functions.
 There is no class per algorithm, saved execution mode or universal plugin API.
 
-The [reflected field inventory](tools/components/schema3/OBJECT_FIELDS.md) gives
-exact current slots/types. The [schema guide](tools/components/schema3/ARCHITECTURE.md),
-[legacy field decisions](tools/components/schema3/FIELD_DECISIONS.md),
-[RunPlan decision](tools/components/runplan/DECISION.md) and
-[FitCache precedent/contract](tools/components/fits/PR233.md) supply deeper detail.
-For development and checking, see [CONTRIBUTING.md](CONTRIBUTING.md).
+The [reflected field inventory](articles/contributor-object-fields.html) gives
+exact current slots/types. The [schema guide](articles/contributor-schema-architecture.html),
+[legacy field decisions](articles/contributor-legacy-fields.html),
+[RunPlan decision](articles/contributor-tools-components-runplan-decision.html) and
+[FitCache precedent/contract](articles/contributor-tools-components-fits-pr233.html) supply deeper detail.
+For development and checking, see [CONTRIBUTING.md](CONTRIBUTING.html).
+
+## Object and workflow map
+
+Start with the persistent objects and their interactions. Select an operation
+in the map to highlight reads, updates, and historical results. Import populates
+`ScreenData` only; the other owners start as empty placeholders. Calibration,
+power, and discovery are sibling analyses after preparation.
+
+<iframe src="contributor/object-workflow.html" title="SCEPTRE object ownership and workflow map" style="width:100%;height:1250px;border:0" loading="lazy"></iframe>
+
+[Open the map at full width](contributor/object-workflow.html), or
+[follow one discovery analysis](articles/contributor-walkthrough.html).
+The figure is a conceptual illustration of the current component model,
+not an instrumented runtime trace. [Figure sources and scope](articles/contributor-site-notes.html#figure-provenance-and-scope).
 
 ## Owners and data flow
 
@@ -33,7 +47,12 @@ row-aligned derived grouping, and `guide_group_metadata()` constructs a view.
 Bonferroni counts response-target families with at least one eligible guide;
 other strategies retain their established passing compiled-row definition.
 
-![Main modules and their requests/returned values](tools/architecture/module-map.svg)
+### Function request map
+
+This complementary map shows dependencies between functions. The object map
+above is the primary guide to state ownership and workflow.
+
+![Main modules and their requests/returned values](contributor/module-map.svg)
 
 Arrows run from requester to provider. These are responsibilities inside one
 package, not separately installed modules. Permutation and CRT share worker
@@ -187,7 +206,7 @@ operation-level dispatch. No universal model/backend registry, class per test,
 heterogeneous cache framework or scheduler is required now.
 
 An experimental value protocol is implemented in
-[`R/distributed_execution.R`](R/distributed_execution.R). `prepare_execution()`
+[`R/distributed_execution.R`](https://github.com/Katsevich-Lab/sceptre/blob/abdb5c713b089c3b10dea93bd94955f0f20c0988/R/distributed_execution.R). `prepare_execution()`
 freezes one full-family RunPlan and canonical contiguous work units, each spanning
 whole response keys for permutations or whole guide-group keys for CRT. Its
 owned manifest contains protocol/runtime/method/context certificates and global
@@ -212,12 +231,12 @@ duplicate, corrupt or conflicting units fail atomically. Transport, scheduling,
 resource reopening and deployment remain external responsibilities; live native
 pointers cannot be serialized into worker payloads.
 
-[`test-distributed-execution.R`](tests/testthat/test-distributed-execution.R)
+[`test-distributed-execution.R`](https://github.com/Katsevich-Lab/sceptre/blob/abdb5c713b089c3b10dea93bd94955f0f20c0988/tests/testthat/test-distributed-execution.R)
 covers direct/protocol numerical and RNG comparisons, calibration/power,
 serialization/ownership, collection rejection and failure atomicity. Local
 qualification passes 17 cases / 105 assertions, including fresh R workers with
 in-memory and reopened backed counts, and implementation certificate checks.
-[Package qualification](tools/hardening/QUALIFICATION.md) records the exact
+[Package qualification](articles/contributor-tools-hardening-qualification.html) records the exact
 archive, full suite, dependency floors, parity and remaining diagnostics. The
 separately adapting Nextflow pipeline requires its own source/container/scheduler
 qualification; R-package checks do not establish that compatibility.
@@ -238,7 +257,7 @@ metadata outside the documented retention guarantee.
 
 Pipeline adaptation and its qualification are maintained in a separate worktree.
 Its evidence must bind the exact archive identified in
-[package qualification](tools/hardening/QUALIFICATION.md). The package has no
+[package qualification](articles/contributor-tools-hardening-qualification.html). The package has no
 flat-slot compatibility facade, `nf_pipeline`/`nuclear` mode or saved shard scope.
 Private phase signatures/intermediate formats are implementation details for
 that adaptation. Earlier flat-layout pipeline/parity documents and companion
@@ -247,11 +266,11 @@ compatibility claims. A collector must assemble raw shards and perform global
 family integration/adjustment once; adapting it must not constrain R ownership.
 
 Use targeted regressions for changed boundaries, followed by integrated package
-checks. [tools/checks/README.md](tools/checks/README.md) documents current-source
+checks. [tools/checks/README.md](articles/contributor-tools-checks-readme.html) documents current-source
 native/safety checks; `SCEPTRE_REQUIRE_ONDISC=true` makes backed coverage required.
-Existing [schema qualification](tools/components/schema3/VALIDATION.md),
-[RunPlan evidence](tools/components/runplan/validation/README.md) and
-[FitCache qualification](tools/components/fits/QUALIFICATION.md) are receipts for
+Existing [schema qualification](articles/contributor-tools-components-schema3-validation.html),
+[RunPlan evidence](articles/contributor-tools-components-runplan-validation-readme.html) and
+[FitCache qualification](articles/contributor-tools-components-fits-qualification.html) are receipts for
 their recorded revisions/environments, not blanket evidence for later edits,
 other operating systems, the R floor or realistic large-screen performance.
 Use separate source trees for concurrent compile/install/check jobs. Numerical
