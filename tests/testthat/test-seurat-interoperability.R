@@ -97,11 +97,14 @@ test_that("Seurat rejects split counts and cell-specific or feature-specific sub
     expect_error(import(bad), "all assay features and object cells")
     bad <- f$seurat
     # Deliberate counts-free fixture; bypass the setter's count-summary warning.
-    bad@assays$RNA <- SeuratObject::CreateAssay5Object(
+    data_only <- SeuratObject::CreateAssay5Object(
         data = count,
         min.cells = 0,
         min.features = 0
     )
+    SeuratObject::Key(data_only) <- SeuratObject::Key(bad[["RNA"]])
+    bad@assays$RNA <- data_only
+    expect_true(methods::validObject(bad))
     expect_error(import(bad), "unsplit counts")
 })
 
