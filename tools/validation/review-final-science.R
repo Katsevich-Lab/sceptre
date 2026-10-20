@@ -52,7 +52,13 @@ rows <- read_rows(file.path(science, "combined", "replicates.csv"))
 combined <- readRDS(file.path(science, "combined", "combined-manifest.rds"))
 stopifnot(!is.null(combined$finished_utc), identical(hash(file.path(science, "combined", "replicates.csv")), combined$combined_csv_sha256))
 batch_rows <- do.call(rbind, lapply(batch_dirs, function(p) read_rows(file.path(p, "replicates.csv"))))
-stopifnot(identical(rows, batch_rows), nrow(rows) == 12000L, !anyDuplicated(rows[c("case", "replicate", "response_id")]),
+# Legacy aggregation converted empty warning strings to NA; scientific columns
+# must still be EXACT. Permit only this explicit annotation serialization loss.
+legacy_empty_warning <- is.na(rows$warning) & !is.na(batch_rows$warning) & batch_rows$warning == ""
+compare_rows <- rows
+compare_rows$warning[legacy_empty_warning] <- ""
+stopifnot(all(vapply(names(rows), function(field) identical(compare_rows[[field]], batch_rows[[field]]), logical(1))))
+stopifnot(nrow(rows) == 12000L, !anyDuplicated(rows[c("case", "replicate", "response_id")]),
           setequal(rows$case, case_ids), all(rows$error == ""), all(rows$pass_qc),
           all(is.finite(rows$p_value)), all(rows$p_value >= 0 & rows$p_value <= 1), all(rows$n_cells == 600L))
 truth <- c(null = 0, down = log(.5), up = log(2))
@@ -122,8 +128,10 @@ review <- list(status = if (unique_inputs == 4000L) "independently_verified_term
         loaded_in_scientific_snapshot = "ondisc" %in% names(manifest_rows[[1L]]$session$loadedOnly),
         interpretation = "In-memory scientific runs, no backed/ondisc statistical validity claim"),
     rows_sha256 = hash(file.path(science, "combined", "replicates.csv")),
-    warnings_by_case = table(rows$case[nzchar(rows$warning)]),
-    original_summary_recomputed = TRUE, actual_batch_rows_equal_combined = TRUE,
+    warnings_by_case = table(batch_rows$case[nzchar(batch_rows$warning)]),
+    legacy_empty_warning_NA_serialization_count = sum(legacy_empty_warning),
+    original_summary_recomputed = TRUE, scientific_and_data_columns_exact = TRUE,
+    combined_annotation_scope = "Only documented legacy empty-warning-to-NA serialization normalized; no p/data changes",
     manifest_hashes = vapply(c(file.path(batch_dirs, "manifest.rds"),file.path(science,"combined","combined-manifest.rds")), hash, character(1)))
 saveRDS(review, file.path(out, "independent-review.rds"))
 jsonlite::write_json(review, file.path(out, "independent-review.json"), auto_unbox = TRUE, pretty = TRUE)

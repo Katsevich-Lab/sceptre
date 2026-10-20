@@ -8,7 +8,7 @@ make_fixture <- function(name, replicate, binary = "same", input = paste0("input
     rows <- data.frame(case = "toy", replicate = replicate,
         response_id = c("null", "down", "up"), true_log_effect = c(0, -1, 1),
         input_sha256 = input,
-        error = "", pass_qc = TRUE, p_value = c(.5, .01, .01))
+        error = "", warning = "", pass_qc = TRUE, p_value = c(.5, .01, .01))
     utils::write.csv(rows, file.path(path, "replicates.csv"), row.names = FALSE)
     saveRDS(list(finished_utc = "fixture", replicates = 1L,
         cases = data.frame(id = "toy"), installed_sha256 = binary,

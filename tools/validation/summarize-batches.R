@@ -12,7 +12,7 @@ records <- lapply(batches, function(path) {
     hash <- digest::digest(file.path(path, "replicates.csv"), algo = "sha256", file = TRUE)
     if (!identical(hash, m$replicates_sha256)) stop("Changed batch CSV: ", path)
     rows <- utils::read.csv(file.path(path, "replicates.csv"), stringsAsFactors = FALSE,
-                            colClasses = c(error = "character"))
+                            colClasses = c(error = "character", warning = "character"))
     if (nrow(rows) != m$replicates * nrow(m$cases) * 3L) stop("Incomplete batch rows: ", path)
     list(manifest = m, rows = rows)
 })
