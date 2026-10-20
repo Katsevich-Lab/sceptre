@@ -55,7 +55,8 @@ for (stage in c("parameters", "assignment", "qc", "discovery")) {
     status <- system2(file.path(R.home("bin"), "Rscript"), shQuote(c(
         file.path(pipeline, "bin", "stage.R"), file.path(out, "config.rds"),
         previous, destination, stage, "20261019", file.path(out, "lock.rds"), "")),
-        stdout = file.path(out, paste0(stage, ".log")), stderr = TRUE)
+        stdout = file.path(out, paste0(stage, ".log")),
+        stderr = file.path(out, paste0(stage, ".stderr.log")))
     stopifnot(status == 0L)
     previous <- destination
 }
