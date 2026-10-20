@@ -1,0 +1,90 @@
+[
+  {
+    "lane": "ubuntu-release",
+    "source_commit": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+    "job": "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565466",
+    "R": "4.6.1",
+    "platform": "x86_64-pc-linux-gnu",
+    "status": "failure",
+    "R_CMD_check": {
+      "flags": [
+        "--no-manual",
+        "--as-cran"
+      ],
+      "errors": 0,
+      "warnings": 1,
+      "notes": 1,
+      "tests": "passed",
+      "warning": "Undeclared test import rhdf5",
+      "note": "Non-standard top-level data-raw directory"
+    },
+    "source_fix": "e922caa declares genuine rhdf5 test Suggests and Rbuildignores data-raw; old jobs remain failed, repaired revision unexecuted",
+    "log_sha256": "8b5e4ea62de99c0f54cf20ac67743fe94759e1c062335ece67e9478984b1474a"
+  },
+  {
+    "lane": "ubuntu-oldrel",
+    "source_commit": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+    "job": "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565384",
+    "R": "4.5.3",
+    "platform": "x86_64-pc-linux-gnu",
+    "status": "failure",
+    "R_CMD_check": {
+      "flags": [
+        "--no-manual",
+        "--as-cran"
+      ],
+      "errors": 0,
+      "warnings": 1,
+      "notes": 1,
+      "tests": "passed",
+      "warning": "Undeclared test import rhdf5",
+      "note": "Non-standard top-level data-raw directory"
+    },
+    "source_fix": "e922caa declares genuine rhdf5 test Suggests and Rbuildignores data-raw; old jobs remain failed, repaired revision unexecuted",
+    "log_sha256": "128885154e9204045d2d8d010620c1531d283479b6335e4e01c7110bd67d9894"
+  },
+  {
+    "lane": "macos-release",
+    "source_commit": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+    "job": "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565265",
+    "R": "4.6.1",
+    "platform": "aarch64-apple-darwin23",
+    "status": "failure",
+    "R_CMD_check": {
+      "flags": [
+        "--no-manual",
+        "--as-cran"
+      ],
+      "errors": 0,
+      "warnings": 1,
+      "notes": 1,
+      "tests": "passed",
+      "warning": "Undeclared test import rhdf5",
+      "note": "Non-standard top-level data-raw directory"
+    },
+    "source_fix": "e922caa declares genuine rhdf5 test Suggests and Rbuildignores data-raw; old jobs remain failed, repaired revision unexecuted",
+    "log_sha256": "82f98220ae9ecd8f359b8a86b9381d515d5001e4621d40a50cede174c9a75793"
+  },
+  {
+    "lane": "windows-release",
+    "source_commit": "840f33436a6811a45d712b78bc587d8a0bb8a25b",
+    "job": "https://github.com/Katsevich-Lab/sceptre/actions/runs/39355611769/job/118409565391",
+    "R": "4.6.1ucrt",
+    "platform": "x86_64-w64-mingw32",
+    "status": "failure",
+    "R_CMD_check": {
+      "flags": [
+        "--no-manual",
+        "--as-cran"
+      ],
+      "errors": 0,
+      "warnings": 1,
+      "notes": 1,
+      "tests": "passed",
+      "warning": "Undeclared test import rhdf5",
+      "note": "Non-standard top-level data-raw directory"
+    },
+    "source_fix": "e922caa declares genuine rhdf5 test Suggests and Rbuildignores data-raw; old jobs remain failed, repaired revision unexecuted",
+    "log_sha256": "c0ff08aeb5485d080cc3c16e80eba0a53db5f5fd408e5cbf504637eaf3295bee"
+  }
+]

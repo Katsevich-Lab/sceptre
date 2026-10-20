@@ -1,0 +1,58 @@
+[
+  {
+    "probe": "unchanged",
+    "exit_code": 0,
+    "expected_exit": 0,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "warning_removed",
+    "exit_code": 0,
+    "expected_exit": 0,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "new_message",
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "duplicate_message",
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "wrong_archive",
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "stale_summary",
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  },
+  {
+    "probe": "weakened_options",
+    "exit_code": 1,
+    "expected_exit": 1,
+    "passed": true,
+    "fixture_kind": "Synthetic policy fixture; not a package diagnostic result",
+    "note": ""
+  }
+]
