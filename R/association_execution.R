@@ -76,7 +76,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
                     groups,
                     synthetic_idxs,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    response_id = id
                 )
             } else {
                 native_results <- test_permutation_group_fit(
@@ -86,7 +87,8 @@ run_permutation_analysis <- function(context, execution, synthetic_idxs) {
                     groups,
                     synthetic_idxs,
                     context$test_options,
-                    execution$output_amount
+                    execution$output_amount,
+                    response_id = id
                 )
             }
             results[[position]] <- pair_results_from_native(
@@ -329,7 +331,8 @@ run_crt_analysis <- function(context, execution) {
                     response_fits,
                     context$test_options,
                     execution$output_amount,
-                    probabilities = probabilities
+                    probabilities = probabilities,
+                    grna_group = id
                 )
             } else {
                 native_results <- test_crt_group_fit(
@@ -340,7 +343,8 @@ run_crt_analysis <- function(context, execution) {
                     context$test_options,
                     execution$output_amount,
                     probabilities = probabilities,
-                    group_design = fit_design
+                    group_design = fit_design,
+                    grna_group = id
                 )
             }
             results[[position]] <- pair_results_from_native(

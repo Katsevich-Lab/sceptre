@@ -24,12 +24,13 @@ test_permutation_shared_fit <- function(
     groups,
     synthetic_idxs,
     test_options,
-    output_amount
+    output_amount,
+    response_id = NULL
 ) {
     results <- vector("list", length(groups))
     for (i in seq_along(groups)) {
         treatment <- treatment_lookup(groups[i])
-        results[[i]] <- run_association_test(
+        results[[i]] <- test_association_pair(
             y = expression,
             mu = score$mu,
             a = score$a,
@@ -44,7 +45,9 @@ test_permutation_shared_fit <- function(
             B3 = test_options$B3,
             fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = test_options$side_code
+            side_code = test_options$side_code,
+            response_id = response_id,
+            grna_group = groups[i]
         )
     }
     results
@@ -74,7 +77,8 @@ test_permutation_group_fit <- function(
     groups,
     synthetic_idxs,
     test_options,
-    output_amount
+    output_amount,
+    response_id = NULL
 ) {
     results <- vector("list", length(groups))
     for (i in seq_along(groups)) {
@@ -83,7 +87,7 @@ test_permutation_group_fit <- function(
         group_design <- design[view$fit_to_analysis, , drop = FALSE]
         fit <- fit_response(group_expression, group_design)
         score <- prepare_score_components(group_expression, group_design, fit)
-        results[[i]] <- run_association_test(
+        results[[i]] <- test_association_pair(
             y = group_expression,
             mu = score$mu,
             a = score$a,
@@ -98,7 +102,9 @@ test_permutation_group_fit <- function(
             B3 = test_options$B3,
             fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = test_options$side_code
+            side_code = test_options$side_code,
+            response_id = response_id,
+            grna_group = groups[i]
         )
     }
     results
@@ -134,7 +140,8 @@ test_crt_shared_fit <- function(
     response_fits,
     test_options,
     output_amount,
-    probabilities = NULL
+    probabilities = NULL,
+    grna_group = NULL
 ) {
     if (is.null(probabilities)) {
         probabilities <- fit_assignment_probabilities(
@@ -158,7 +165,7 @@ test_crt_shared_fit <- function(
             design,
             lookup_response_fit(response_fits, response_ids[i])
         )
-        results[[i]] <- run_association_test(
+        results[[i]] <- test_association_pair(
             y = expression,
             mu = score$mu,
             a = score$a,
@@ -173,7 +180,9 @@ test_crt_shared_fit <- function(
             B3 = test_options$B3,
             fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = test_options$side_code
+            side_code = test_options$side_code,
+            response_id = response_ids[i],
+            grna_group = grna_group
         )
     }
     results
@@ -208,7 +217,8 @@ test_crt_group_fit <- function(
     test_options,
     output_amount,
     probabilities = NULL,
-    group_design = NULL
+    group_design = NULL,
+    grna_group = NULL
 ) {
     if (is.null(group_design)) {
         group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
@@ -232,7 +242,7 @@ test_crt_group_fit <- function(
         )
         fit <- fit_response(expression, group_design)
         score <- prepare_score_components(expression, group_design, fit)
-        results[[i]] <- run_association_test(
+        results[[i]] <- test_association_pair(
             y = expression,
             mu = score$mu,
             a = score$a,
@@ -247,8 +257,25 @@ test_crt_group_fit <- function(
             B3 = test_options$B3,
             fit_parametric_curve = test_options$fit_parametric_curve,
             return_resampling_dist = (output_amount == 3L),
-            side_code = test_options$side_code
+            side_code = test_options$side_code,
+            response_id = rownames(response_store)[response_rows[i]],
+            grna_group = grna_group
         )
     }
     results
+}
+
+# Add pair identity after native cleanup, while retaining the original cause.
+# Errors abort the complete family; no pair is silently filtered or assigned p=1.
+test_association_pair <- function(..., response_id = NULL, grna_group = NULL) {
+    tryCatch(run_association_test(...), error = function(cause) {
+        response <- if (is.null(response_id)) "<unknown>" else response_id
+        group <- if (is.null(grna_group)) "<unknown>" else grna_group
+        stop(structure(list(
+            message = paste0("Association test for response '", response,
+                "' and guide group '", group, "' failed: ", conditionMessage(cause)),
+            call = NULL, response_id = response_id, grna_group = grna_group,
+            cause = cause, parent = cause),
+            class = c("sceptre_pair_error", "error", "condition")))
+    })
 }

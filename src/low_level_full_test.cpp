@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <cmath>
 #include "inference.h"
 #include "sampling_safety.h"
 #include "result_lifetime.h"
@@ -10,8 +11,8 @@ using namespace Rcpp;
 // y, mu, a and w contain the selected cells in the same order; D has one column
 // per cell and eigenvectors in rows. Observed trt_idxs start at 1, and n_trt is
 // their count. Check lengths, positions and resampling sizes before converting
-// observed positions once to C++ numbering. Keep existing NaN/Inf arithmetic
-// for empty or degenerate fits.
+// observed positions once to C++ numbering. Reject nonfinite observed scores
+// before tail counting; leave numerical helpers and null-score arithmetic intact.
 // synthetic_idxs points to this worker's full set of draws, with positions
 // already starting at 0. Check the pointer, then read without changing it.
 // Permutations use the first n_trt entries of each draw; CRT uses the full draw,
@@ -58,6 +59,14 @@ SEXP run_association_test(NumericVector y,
         sceptre::inference::observed_positions_zero_based(trt_idxs);
       effect = sceptre::inference::estimate_effect(y, mu, observed_positions, n_trt);
       z_orig = sceptre::inference::observed_score(a, w, D, observed_positions);
+      // Undefined observed statistics cannot be ranked against null draws.
+      // Keep all finite arithmetic and null-score/empty-CRT semantics intact.
+      if (!std::isfinite(z_orig))
+        stop("Observed association score is not finite (treated cells: %d; total cells: %lld). "
+             "Check conditional treatment variation and positive score variance. "
+             "Assess whether this comparison is identifiable with the required covariates; "
+             "do not remove necessary confounders merely to obtain a p-value.",
+             n_trt, static_cast<long long>(a.size()));
       XPtr<sceptre::inference::DrawBank> draws(synthetic_idxs);
       if (draws.get() == nullptr) stop("Synthetic draw bank pointer is null.");
       bank = draws.get();

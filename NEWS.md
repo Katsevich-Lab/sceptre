@@ -1,5 +1,12 @@
 # sceptre (development version)
 
+- Association tests now stop with response/guide context when the observed score
+  is nonfinite. Previously undefined scores could produce small empirical
+  p-values, including when treatment was exactly represented by covariates.
+  The error aborts the complete family; finite statistics, resampling draws and
+  null-score arithmetic are unchanged. Assess identifiability with required
+  covariates rather than removing necessary confounders to obtain a p-value.
+
 - Fixed issue #237: two-sided empirical p-values are capped at one after
   doubling the smaller inclusive add-one tail. Previously all ties could return
   two. Only values above one change; one-sided tails, draws, stage selection
