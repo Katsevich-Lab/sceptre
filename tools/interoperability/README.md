@@ -72,3 +72,19 @@ The adapter uses the existing external-call and pipeline contracts. Full Seurat
 and SingleCellExperiment are unnecessary. Returned pair tables and provenance
 live in `Misc(returned, slot = "sceptre")`. Initial SCE receipts above do not
 qualify this newer companion; its versioned evidence is separate.
+
+`seurat-validation.json` records the terminal new checks: 32 Seurat assertions
+and 56 SCE regressions passed with no test failures or warnings. The actual
+100-response/50-guide/1,000-cell example retained 986 cells and returned two
+finite pair results through fresh pipeline CLI processes, matching direct
+results at tolerance zero. A controlled fresh process with SeuratObject absent
+passed ordinary import/calls and both optional-adapter guards.
+
+The runtime was SeuratObject 5.4.0 on R 4.6.0/macOS ARM64, using rebuilt native
+source with the accepted empirical cap and observed-score guard. The ambient
+`sp` package emitted a built-under-R-4.6.1 warning; it is retained separately
+from test warnings. An initial test-only data-free assay lacked its key and
+was rejected by Seurat validity before the intended boundary. The corrected
+fixture asserts validity first; the complete replacement run exited zero.
+Original failed logs remain local. Final integrated archive/vignette, matched
+BiocCheck, platform and scientific gates retain their separate authority.

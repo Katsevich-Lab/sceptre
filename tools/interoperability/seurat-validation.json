@@ -1,0 +1,79 @@
+{
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "SeuratObject": "5.4.0",
+  "Matrix": "1.7.5",
+  "sp": "2.2.3",
+  "tests": {
+    "SCE_regression": {
+      "assertions": 56,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0
+    },
+    "Seurat": {
+      "assertions": 32,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0,
+      "skipped": 0
+    }
+  },
+  "response_dimensions": [
+    100,
+    1000
+  ],
+  "guide_dimensions": [
+    50,
+    1000
+  ],
+  "retained_cells": 986,
+  "result_rows": 2,
+  "finite_pvalues": 2,
+  "result_metadata_present": true,
+  "scope": "User-requested Seurat extension; original SCE validation.json receipt is separate",
+  "feature_base": "11db293d8d5807c84467945c0a5086eb4fbeec08",
+  "measured_package_source": "a174f186aeb679d29e2463e00a0abf66ed148459",
+  "measured_test_source": "fa5a75fe0cfba32076ccbabf5b3324d6952f7415",
+  "post_install_source_delta": "Test-only data-only fixture copied the RNA assay key and asserted Seurat validity; production R/native bytes unchanged",
+  "pipeline_commit": "f10823411d808dbea99ffc79523d9aa1d4482b34",
+  "declared_optional_dependency": "SeuratObject >=5.0.0",
+  "minimum_version_evidence": "Official v5.0.0 source APIs checked by W04; actual runtime qualification here is5.4.0 only",
+  "accepted_foundation_sources": [
+    "e33ee20",
+    "a5af87e",
+    "a5e5877",
+    "a41e985",
+    "b4ba2d8",
+    "28b31ef"
+  ],
+  "actually_recompiled_cpp": [
+    "src/inference_tail.cpp",
+    "src/low_level_full_test.cpp"
+  ],
+  "fresh_process_pipeline_stages": [
+    "parameters",
+    "assignment",
+    "qc",
+    "discovery"
+  ],
+  "direct_pipeline_equality_tolerance": 0,
+  "controlled_optional_SeuratObject_absence": "PASS: ordinary import/calls and both adapter guards in a fresh R process using a scratch library excluding Seurat/SeuratObject",
+  "source_input_ownership": "PASS: assay matrices, cell metadata, reductions and unrelated Misc preserved; returned pair tables owned",
+  "initial_failure": "First negative data-only fixture lacked assay key. Seurat validity rejected before intended counts check. Corrected test asserted validity; second full run terminal0. No production adapter changes were needed.",
+  "environmental_warning": "sp2.2.3 was built underR4.6.1 while runtime isR4.6.0; load warning retained outside test capture, not silently suppressed",
+  "archive_vignette_BiocCheck": "Pending exact integrated archive/vignette, --as-cran and matched source-instance gates; source function/line inventory alone is not a full checker pass",
+  "scientific_limits": "Bundled example and deterministic fixtures establish interoperability/implementation equality, not caller calibration or large-screen validity. No Seurat normalization/integration algorithm is performed.",
+  "artifact_policy": "Source/docs/tests/compact metrics only committed. All generated objects/counts/calls/fits/results RDS stay local.",
+  "live_jobs": [],
+  "local_artifact_sha256": {
+    "/private/tmp/w05-seurat-install.log": "22a6d6fa3297f10311f3c121507ba0adeca456163ea44673be8483eb91e203f4",
+    "/private/tmp/w05-seurat-tests.log": "cb85d21d00538b6f6eb507e728b80e21000734c36bdea2e3682495f8374c764b",
+    "/private/tmp/w05-seurat-tests-fixed.log": "7418081017b4e07f89495469b9773829415fed4f152a87a3c7c79344efa6cb1d",
+    "/private/tmp/w05-seurat-roundtrip.log": "ba9aedd421d95c8a17c00f4ce43df13103f0f5772c8666b68cdf6f343ca60d94",
+    "/private/tmp/w05-seurat-absence.log": "ca80269966e062170566168209a47cf7366eaa1a910175fa39ab04031c0cb47c",
+    "/private/tmp/sceptre-w05-seurat-roundtrip/results-seurat.rds": "1d9d2d39a69790ec94b3dbcc3f52ffb802a08894db9880e4ad7689c60fdaff7d",
+    "/private/tmp/sceptre-w05-seurat-package-library/sceptre/libs/sceptre.so": "e32a77117766d4dc630d17ef0a28da5b065a8f3c1ed188ef02f13a598b608d6f"
+  }
+}
