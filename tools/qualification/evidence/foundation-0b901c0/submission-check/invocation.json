@@ -1,0 +1,11 @@
+{
+  "source_archive": "/private/tmp/sceptre-w04-foundation-0b901c0/mac/sceptre_0.99.0.tar.gz",
+  "archive": "/private/tmp/sceptre-w04-foundation-0b901c0/submission-check/sceptre_0.99.0.tar.gz",
+  "archive_sha256": "f9172ba52aeab123d5473a0b189d877527704d86cc6019ff7b37fb69c2d45a6f",
+  "checker": "1.49.30",
+  "cache": "/private/tmp/sceptre-w04-foundation-0b901c0/submission-check/cache",
+  "Bioconductor": "3.24",
+  "flags": ["no-check-R-ver", "no-check-bioc-help"],
+  "platform": "aarch64-apple-darwin23",
+  "diagnostics_summary_sha256": "ccbad8a59f7ba139006d5c2ff1d841ddb0d01c954b5144f277ebb9ac8c4841d8"
+}
