@@ -17,7 +17,7 @@ loaded_dll_hash <- hash(file.path(lib, "sceptre", "libs", "sceptre.so"))
 case_ids <- c("low_nt_empirical", "high_crt_empirical", "high_crt_skew", "confounded_crt")
 case_indices <- c(low_nt_empirical = 1L, high_crt_empirical = 3L, high_crt_skew = 4L, confounded_crt = 6L)
 batch_dirs <- file.path(science, paste0("batch-", seq.int(1L, 901L, 100L)))
-read_rows <- function(path) utils::read.csv(path, stringsAsFactors = FALSE, colClasses = c(error = "character"))
+read_rows <- function(path) utils::read.csv(path, stringsAsFactors = FALSE, colClasses = c(error = "character", warning = "character"))
 check_manifest <- function(path) {
     m <- readRDS(file.path(path, "manifest.rds"))
     stopifnot(!is.null(m$finished_utc), identical(m$source_revision, revision), !length(m$source_status))
