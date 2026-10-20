@@ -1,0 +1,46 @@
+migration serialized payload sceptre-0.99.0-21f9ea0.rds
+stage identity sceptre-0.99.0-21f9ea0.rds design
+stage identity sceptre-0.99.0-21f9ea0.rds assignment
+stage identity sceptre-0.99.0-21f9ea0.rds cell_qc
+stage identity sceptre-0.99.0-21f9ea0.rds pair_qc
+migration serialized payload sceptre-schema2-4aad80b.rds
+stage identity sceptre-schema2-4aad80b.rds design
+stage identity sceptre-schema2-4aad80b.rds assignment
+stage identity sceptre-schema2-4aad80b.rds cell_qc
+stage identity sceptre-schema2-4aad80b.rds pair_qc
+migration serialized payload sceptre-schema3-list-plans-2a0938e.rds
+stage identity sceptre-schema3-list-plans-2a0938e.rds design
+stage identity sceptre-schema3-list-plans-2a0938e.rds assignment
+stage identity sceptre-schema3-list-plans-2a0938e.rds cell_qc
+stage identity sceptre-schema3-list-plans-2a0938e.rds pair_qc
+discovery RunPlan exact value/certificate
+calibration RunPlan inferred sizes/certificate
+noncalibration rejects calibration sizes
+commit result/provenance/history/ownership representation
+complete-family validation
+incomplete-family rejection
+historical getter public value
+current getter public value
+runtime certificate helper extraction
+prepare manifest units/context/certificates
+validate manifest full context
+sparse pair extraction FALSE FALSE
+sparse pair extraction FALSE TRUE
+sparse pair extraction TRUE FALSE
+sparse pair extraction TRUE TRUE
+ondisc capability required API exact arguments
+ondisc capability ordered diagnostics
+warning accumulator values/order/classes/RNG
+worker NULL/order FALSE
+worker error condition FALSE
+worker interrupt FALSE
+worker NULL/order TRUE
+worker error condition TRUE
+worker interrupt TRUE
+parallel message bytes/classes
+validity valid payload RunPlan
+validity valid payload ScreenData
+validity valid payload sceptre_object
+validity valid payload FitCache
+validity valid payload AnalysisSpec
+show public output

@@ -1,0 +1,139 @@
+{
+  "pipeline_commit": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+  "nextflow": {
+    "distributed": {
+      "log": "/private/tmp/pipeline-bioc01bb-nf-distributed.log",
+      "same_image_direct_equality_pass": true,
+      "resume_tasks": 18,
+      "resume_cached": 17,
+      "resume_completed_validation": 1,
+      "terminal_line": "PASS actual failed worker prevents collection and completed family publication",
+      "worker_fault_applicable": true,
+      "worker_failure_marker": true,
+      "collector_submitted": false,
+      "completed_failed_discovery": false,
+      "guard_receipts": {
+        "nested_child_rejected": true,
+        "dynamic_include_rejected": true,
+        "missing_cyclic_rejected": true,
+        "legacy_flag_rejected": true,
+        "fresh_collision_changed_seed_rejected": true,
+        "altered_source_rejected": true
+      }
+    },
+    "reference": {
+      "log": "/private/tmp/pipeline-bioc01bb-nf-reference.log",
+      "same_image_direct_equality_pass": true,
+      "resume_tasks": 8,
+      "resume_cached": 7,
+      "resume_completed_validation": 1,
+      "terminal_line": "PASS altered .nf source resume rejected; original source identical resume passed",
+      "worker_fault_applicable": false,
+      "guard_receipts": {
+        "nested_child_rejected": true,
+        "dynamic_include_rejected": true,
+        "missing_cyclic_rejected": true,
+        "legacy_flag_rejected": true,
+        "fresh_collision_changed_seed_rejected": true,
+        "altered_source_rejected": true
+      }
+    }
+  },
+  "files": [
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-distributed.log",
+      "bytes": 4572,
+      "sha256": "0fef7dc5c7cbb22a5f25623479ff8dea72b508c561dfa64eff8be127805e11ff"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-distributed/resume-trace.tsv",
+      "bytes": 2904,
+      "sha256": "336061c4b02bca8849a3db34034ed5875fd0afaff9c182e01088a77493029bd2"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-distributed/results/run_signature.rds",
+      "bytes": 1338,
+      "sha256": "565679eb303ad653067c2340a94ac0dc76eb0d387a29329b49c3627d18617675"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-distributed/results/discovery/state/manifest.rds",
+      "bytes": 4463,
+      "sha256": "55eb479c5a3afccd9349088f60225cad45587795e1b21924514efad7ff2dfea6"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-distributed/worker-failure.log",
+      "bytes": 1707,
+      "sha256": "685134aab8d442bc847a18da941ce679fae22d5adadca69823be011a38c3ec90"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-reference.log",
+      "bytes": 2695,
+      "sha256": "099a1951b17eb4063a54130d8f99325c2c32bf361f0f4848c6b23125ce69e50e"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-reference/resume-trace.tsv",
+      "bytes": 1240,
+      "sha256": "fa1500a016211753d3f91bb749e9a194e09322e38cc2cc49be272eef457d1d60"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-reference/results/run_signature.rds",
+      "bytes": 1339,
+      "sha256": "c117c486d8312c65dd564274aedcc3244a22d9542f72a4d0983ef6249b5e02dd"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-nf-reference/results/discovery/state/manifest.rds",
+      "bytes": 4277,
+      "sha256": "2a55461cdd5795f8a9c94c055bcefcbf1e07bf45e244bac39360a18ce83aec49"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-direct.log",
+      "bytes": 26615,
+      "sha256": "a36d4aa1e1d6a16a682b50353c2d0c8f0077d198fe66b0ca76e4a212181e13f7"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-distributed.log",
+      "bytes": 8274,
+      "sha256": "c16accf4897b4555d0424fad725e13542c2d91a879f5b4bf20c815912013ff34"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-example.log",
+      "bytes": 2442,
+      "sha256": "d36b4418eee9d44dff4b5d3d10b836f8482dea08a395741fd65b9d7e84b3eb78"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-source-equivalence.json",
+      "bytes": 25849,
+      "sha256": "4ac8402e46e4c75e52c6bbf5487c4dd6659cae787d0a0eac09fed286ab0f77eb"
+    },
+    {
+      "path": "/private/tmp/extract-pipeline-compatibility.R",
+      "bytes": 1448,
+      "sha256": "8598f0bd48e23daf796c97ee95482c4c1462f8b6a2ab8e1430782b1f54c66593"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-prior-comparison/prior.rds",
+      "bytes": 15372,
+      "sha256": "0afcf5375f10aef174dbd6b786cc4a64d8e3424c645157f0d2289f539db9a368"
+    },
+    {
+      "path": "/private/tmp/pipeline-bioc01bb-prior-comparison/current.rds",
+      "bytes": 15372,
+      "sha256": "0afcf5375f10aef174dbd6b786cc4a64d8e3424c645157f0d2289f539db9a368"
+    },
+    {
+      "path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/01bb39ccf8373ae8965a2679ee4813a63ea2d85d/source.json",
+      "bytes": 837,
+      "sha256": "bc8439b1632b4c7820e24b941fa19208558cf7b007a073a9f58668dd47f992d5"
+    },
+    {
+      "path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/bioc01bb-direct/direct-comparison.rds",
+      "bytes": 3355,
+      "sha256": "caecf8d734074bc225111f771ebe071da69d5016a41cc620f6a2e99b50eb732e"
+    },
+    {
+      "path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/bioc01bb-distributed/distributed-comparison.rds",
+      "bytes": 1113,
+      "sha256": "6ffaa3ad0626c55af4ac06c49ffb703215cfc23addc265e4aea5da2a4f597cee"
+    }
+  ]
+}

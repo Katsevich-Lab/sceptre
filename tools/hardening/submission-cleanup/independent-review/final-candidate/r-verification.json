@@ -1,0 +1,76 @@
+{
+  "source_commit": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "installed_package": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/lib/sceptre",
+  "R": "R version 4.6.0 (2026-04-24)",
+  "package_version": "0.99.0",
+  "runtime": {
+    "R": "4.6.0",
+    "platform": "aarch64-apple-darwin23",
+    "package": "0.99.0",
+    "build": {
+      "R": "ddc59c5c79e69048e7ac6f57f386cef42865618df30ec3a5451dca7afdd2a6ef",
+      "native": "7c14330007713a307eca0ed0957e67b520324da7c255ce8ee295f797d3d039c7"
+    },
+    "stats": "4.6.0",
+    "Matrix": "1.7.5",
+    "Rcpp": "1.1.1.1.1",
+    "ondisc": null,
+    "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib",
+    "matprod": "default",
+    "RNGkind": ["Mersenne-Twister", "Inversion", "Rejection"]
+  },
+  "native_library_sha256": "7c14330007713a307eca0ed0957e67b520324da7c255ce8ee295f797d3d039c7",
+  "both_original_collector_findings_fixed": true,
+  "checks": {
+    "original_conflict_rejected": true,
+    "original_scope_vectors_absent": true,
+    "diagnostics_conflict_rejected": true,
+    "diagnostics_input_unchanged": true,
+    "remove_conflict_rejected": true,
+    "remove_input_unchanged": true,
+    "matching_warm_fit_preserved": true,
+    "full_context_identities_restored": true,
+    "stale_entry_replaced": true,
+    "stale_replacement_current": true,
+    "perturbation_proposal_attribute_isolated": true,
+    "response_proposal_attribute_isolated": true
+  },
+  "check_count": 12,
+  "all_extended_checks_passed": true,
+  "examples": {
+    "installed_package": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/lib/sceptre",
+    "R": "R version 4.6.0 (2026-04-24)",
+    "examples": {
+      "prepare_execution": {
+        "passed": true,
+        "units": 2,
+        "rows": 418,
+        "elapsed_seconds": 1.302,
+        "original_screen_uncommitted": true,
+        "completed_result_current": true,
+        "example_body_sha256": "e9c81eccd24a5edd427e7b73b1370d12d1257e53d8a6b80c6bed63e5332ed299"
+      },
+      "execute_work_unit": {
+        "passed": true,
+        "units": 2,
+        "rows": 418,
+        "elapsed_seconds": 0.692,
+        "original_screen_uncommitted": true,
+        "completed_result_current": true,
+        "example_body_sha256": "e9c81eccd24a5edd427e7b73b1370d12d1257e53d8a6b80c6bed63e5332ed299"
+      },
+      "collect_execution": {
+        "passed": true,
+        "units": 2,
+        "rows": 418,
+        "elapsed_seconds": 0.686,
+        "original_screen_uncommitted": true,
+        "completed_result_current": true,
+        "example_body_sha256": "e9c81eccd24a5edd427e7b73b1370d12d1257e53d8a6b80c6bed63e5332ed299"
+      }
+    },
+    "all_passed": true
+  },
+  "scope": "Fresh exact-archive installation; existing12 collector checks and all3 installed lifecycle examples independently executed. Other broad terminal receipts reviewed separately."
+}

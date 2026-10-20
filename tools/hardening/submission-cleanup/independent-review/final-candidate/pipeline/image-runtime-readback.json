@@ -1,0 +1,45 @@
+{
+  "source": {
+    "schema": 1,
+    "archive_kind": "R_CMD_build",
+    "sceptre_commit": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+    "sceptre_archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+    "ondisc_commit": "58e851a95cfd381b316ac40ed4490e569bd40e2f",
+    "ondisc_version": "1.3.1",
+    "Rhdf5lib_version": "1.30.0",
+    "zlib_version": "1.3.2",
+    "optional_source_sha256": {
+      "ondisc.tar.gz": "4a6ff86c762742c427e01a14c3cf0595dc61741b4101b8ecfb9666065536687b",
+      "Rhdf5lib.tar.gz": "170606eaa916cc0489bdc0a6dcf25fa13ee2c9275c95573b6145345d857c8746",
+      "zlib.tar.gz": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
+    },
+    "cran_snapshot": "https://packagemanager.posit.co/cran/2025-07-01",
+    "base": "rocker/r-ver:4.5.1@sha256:03b023fbf7b1b24ac1bb8b2ac5fd7e15a767e67b40ff50c155e328110981c2aa"
+  },
+  "R": "R version 4.5.1 (2025-06-13)",
+  "platform": "aarch64-unknown-linux-gnu",
+  "sceptre": "0.99.0",
+  "ondisc": "1.3.1",
+  "Rhdf5lib": "1.30.0",
+  "BLAS": "/usr/lib/aarch64-linux-gnu/openblas-pthread/libblas.so.3",
+  "installed": [
+    {
+      "package": "sceptre",
+      "sha256": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b"
+    },
+    {
+      "package": "ondisc",
+      "sha256": "b5a4a7c23c8b6469b14c787b4a46e482646cb756d012f67bb1def568d8eae552"
+    }
+  ],
+  "native": [
+    {
+      "package": "sceptre",
+      "sha256": "b7ea2540d26514efdb0442ac2d418554d3f139ae0f7f550bb107c22f8fb5b6cf"
+    },
+    {
+      "package": "ondisc",
+      "sha256": "e3a65d52160de9d271853780fac71b80478c4d1e55864a3d49da4a28a6c2f53a"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "submitted_source_commit": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "submitted_source_archive_sha256": "5300b3e3adfbb73a9a2173384ea3ec7e57b8cad8612f3fdc8116d5db5156eaf4",
+  "issue_url": "https://github.com/Bioconductor/BiocContributions/issues/176",
+  "run_url": "https://github.com/r-universe/biocstaging/actions/runs/33438717492",
+  "run_head_sha": "77f084cc9ed489918bad9d413821dac11a037a37",
+  "bioc_job_id": 99642866650,
+  "source_job_id": 99641478053,
+  "official_checker": {
+    "BiocCheck": "1.49.30",
+    "Bioconductor": "3.24",
+    "R": "4.6.1",
+    "platform": "Linux x86_64",
+    "package": "0.99.0",
+    "container_resolved_digest": "sha256:9e2813ce8cf2db1e107b2b195481f14b5c08d828c5d3692707e280aaef22cd14",
+    "checker_binary_reported_sha256": "39a5a193122a347219c58628d187c6436eb02ea9dc99d843e8a0a61acd689f95"
+  },
+  "original_historical_wrapper": {
+    "repository": "r-universe-org/actions",
+    "commit": "e859fe2adc2553a5c8b0b2ec6044215d60d3d9c7",
+    "path": "bioc-check/bioccheck.R",
+    "reported_options": {
+      "no-check-R-ver": true,
+      "no-check-bioc-help": true
+    }
+  },
+  "official_result": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 3,
+    "cat_print_instances": 9,
+    "long_functions": 49,
+    "long_lines": 145,
+    "missing_runnable_exported_examples": 0
+  },
+  "official_source_note_categories": [
+    "cat_print_outside_show",
+    "function_length",
+    "line_length"
+  ],
+  "original_artifacts": {
+    "bioc-checks": {
+      "id": 9775660207,
+      "zip_sha256": "96d7662cd2e75abb4f316f503a8de2c59fc3f02a4d4409ca19e48bb11bf79d05"
+    },
+    "package-source": {
+      "id": 9775542189,
+      "zip_sha256": "59fd0f2758857f648f9eb74140188b6e8fc77b75fa75bdf2279bf54f19a267b8"
+    }
+  },
+  "same_current_checker_run": {
+    "BiocCheck": "1.47.26",
+    "R": "4.6.0",
+    "flags_disabled": [],
+    "counts": {
+      "errors": 1,
+      "warnings": 1,
+      "notes": 5
+    },
+    "support_site_error": "HTTP timeout; not a source diagnostic",
+    "additional_unchanged_source_environment_notes": [
+      "R>=4.1 recommendation to4.6.0",
+      "mailing-list subscription requires administrator credentials"
+    ],
+    "long_functions": 48,
+    "long_lines": 145,
+    "terminal_receipt": "baseline/same-checker-baseline.log",
+    "full_diagnostics": "baseline/same-checker-1.47.26/diagnostics.json"
+  },
+  "pre_fix_candidate": {
+    "source": "169c16e4ba00c687c1f03fe37e9d79a11d01cd8f",
+    "followup_head": "a3433c71fd339932e4c2d366e5413e13ad8299c9",
+    "reported_checker": "1.47.26",
+    "reported_qualified_flags": [
+      "no-check-R-ver",
+      "no-check-bioc-help"
+    ],
+    "reported_errors": 0,
+    "reported_warnings": 1,
+    "reported_notes": 7,
+    "long_functions": 69,
+    "long_lines": 473,
+    "new_source_categories": [
+      "literal_colon_sequence",
+      "paste_in_condition",
+      "superassignment",
+      "missing_runnable_examples"
+    ]
+  },
+  "final_candidate_review_status": "pending exact committed implementation/archive and new diagnostic receipts",
+  "scope_caveat": "Official1.49.30 count49 is preserved; current1.47.26 count48 is a version-sensitive difference, not silently normalized. Current calls/functions/lines require instance lineage; category totals alone do not qualify a final candidate."
+}

@@ -1,0 +1,20 @@
+diff --git a/docs/bioc-cleanup-refresh.md b/docs/bioc-cleanup-refresh.md
+index bb566e6..8758c9c 100644
+--- a/docs/bioc-cleanup-refresh.md
++++ b/docs/bioc-cleanup-refresh.md
+@@ -86,9 +86,13 @@ Their previous receipts retain their original artifact identity.
+ The package owner reports the exact new archive passed `R CMD check` with
+ `Status: OK`, 5,641 installed assertions, seven historical workflows / 231 exact
+ comparisons including warnings and RNG, and all three installed API examples.
+-BiocCheck 1.49.30 (the original submission checker) and 1.47.26 both report
+-0 errors, 1 warning and 3 notes, with zero new diagnostic instances relative to
++With the original official wrapper options (`no-check-R-ver` and
++`no-check-bioc-help`), BiocCheck 1.49.30 (the original submission checker) and
++1.47.26 both report 0 errors, 1 warning and 3 notes, with zero new diagnostic
++instances relative to
+ submitted source `21f9ea098b69c444a884a49bc254de711968e3b5`.
++Unsuppressed local runs retain the support-site timeout and version/subscription
++diagnostics; these are not claimed as clean default runs.
+ This pipeline task did not rerun those package checkers. The owner's original
+ [qualification report](evidence/bioc-refresh-20261019/package-owner-qualification.md)
+ is preserved separately from these pipeline/container execution receipts.

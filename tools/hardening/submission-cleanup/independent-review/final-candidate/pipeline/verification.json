@@ -1,0 +1,86 @@
+{
+  "status": "pass_within_bounded_pipeline_compatibility_scope",
+  "open_material_pipeline_findings": [],
+  "reviewed_pipeline_commit": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+  "pipeline_checkout": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline",
+  "latest_head": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+  "latest_status": "",
+  "excluded_checkout": "/Users/ekatsevi/.codex/worktrees/72cc/sceptre-pipeline",
+  "package_source": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "local_image": "sha256:1510c16a1d5f0da6a266f8685c4b06fa1865e0116b159956af9625dd1cc249b2",
+  "independent_checks": {
+    "exact_archive_hash": true,
+    "actual_no_network_no_host_mount_image_readback": true,
+    "new_image_archive_and_source_match": true,
+    "new_image_installed_identity_matches_scientific_and_NF_reports": true,
+    "unchanged_23_file_pipeline_production_manifest": true,
+    "72_historical_saved_payloads_identical_to_new_saved_payloads": true,
+    "prior_169_source_rerun": false
+  },
+  "owner_receipts_reviewed": {
+    "direct_memory_cases": 9,
+    "direct_backed_required_cases": 2,
+    "direct_backed_skipped": false,
+    "distributed_memory_cases": 9,
+    "distributed_backed_required_cases": 2,
+    "distributed_backed_skipped": false,
+    "nextflow": {
+      "distributed": {
+        "log": "/private/tmp/pipeline-bioc01bb-nf-distributed.log",
+        "same_image_direct_equality_pass": true,
+        "resume_tasks": 18,
+        "resume_cached": 17,
+        "resume_completed_validation": 1,
+        "terminal_line": "PASS actual failed worker prevents collection and completed family publication",
+        "worker_fault_applicable": true,
+        "worker_failure_marker": true,
+        "collector_submitted": false,
+        "completed_failed_discovery": false,
+        "guard_receipts": {
+          "nested_child_rejected": true,
+          "dynamic_include_rejected": true,
+          "missing_cyclic_rejected": true,
+          "legacy_flag_rejected": true,
+          "fresh_collision_changed_seed_rejected": true,
+          "altered_source_rejected": true
+        }
+      },
+      "reference": {
+        "log": "/private/tmp/pipeline-bioc01bb-nf-reference.log",
+        "same_image_direct_equality_pass": true,
+        "resume_tasks": 8,
+        "resume_cached": 7,
+        "resume_completed_validation": 1,
+        "terminal_line": "PASS altered .nf source resume rejected; original source identical resume passed",
+        "worker_fault_applicable": false,
+        "guard_receipts": {
+          "nested_child_rejected": true,
+          "dynamic_include_rejected": true,
+          "missing_cyclic_rejected": true,
+          "legacy_flag_rejected": true,
+          "fresh_collision_changed_seed_rejected": true,
+          "altered_source_rejected": true
+        }
+      }
+    },
+    "installed_executable_example_passed": true,
+    "source_equivalence_176_files_reported_equal": true
+  },
+  "not_claimed": [
+    "R package full check or Bioconductor submission approval",
+    "new nf-test run",
+    "hosted CI execution",
+    "large-scale or cluster/cloud/Apptainer qualification",
+    "Linux AMD64 or cross-platform equality",
+    "qualification of dirty72cc arrays/HPC changes",
+    "new execution of historical169 source"
+  ],
+  "pipeline_evidence_commit": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+  "earlier_evidence_commit": "6d35036ffab74f9e1201199f11824e90beb06044",
+  "package_evidence_head": "9a4694450b5d456beedc11f3876ecb1cd84cb05c",
+  "durable_evidence_hash_entries_verified": 19,
+  "durable_original_receipts_byte_identical": 13,
+  "production_config_test_recipe_changes_since_818": [],
+  "metadata_cleanliness_issue_resolved": true
+}

@@ -1,0 +1,7 @@
+{
+  "version": "1.47.26",
+  "library": "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/BiocCheck",
+  "description_sha256": "f404c5eaabd4624538361841f556b4a3534d7fb64e96601e1b20f42314c777ea",
+  "function_length_source_sha256": "a679b07e58d0414b2d4724ca68abfd6bfbcc7b8d63797c0e429df8aa9e07f044",
+  "modified_checker": false
+}

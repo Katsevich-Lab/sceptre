@@ -1,0 +1,126 @@
+{
+  "evidence_commit": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+  "earlier_evidence_commit": "6d35036ffab74f9e1201199f11824e90beb06044",
+  "pipeline_production_baseline": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+  "clean": true,
+  "production_config_test_recipe_changes": [],
+  "hash_manifest_entries": 19,
+  "committed_entries_hash_verified": [
+    "README.md",
+    "build.log",
+    "direct.log",
+    "distributed.log",
+    "example.log",
+    "execution-record.json",
+    "extract-saved-stages.R",
+    "installed-packages.tsv",
+    "nextflow-distributed.log",
+    "nextflow-reference.log",
+    "package-owner-qualification.md",
+    "resume-distributed.tsv",
+    "resume-reference.tsv",
+    "runtime-readback.txt",
+    "scientific-reports.json",
+    "session-info.txt",
+    "source-equivalence.json",
+    "source.json",
+    "worker-failure.log"
+  ],
+  "hash_mismatches": [],
+  "referenced_but_not_committed": [],
+  "original_receipt_comparisons": [
+    {
+      "file": "build.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-build.log",
+      "original_sha256": "cf916a22569423ed1dc57ae72528a4328732c8f661621ff97298c10ce553fd3c",
+      "committed_sha256": "cf916a22569423ed1dc57ae72528a4328732c8f661621ff97298c10ce553fd3c",
+      "identical": true
+    },
+    {
+      "file": "direct.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-direct.log",
+      "original_sha256": "a36d4aa1e1d6a16a682b50353c2d0c8f0077d198fe66b0ca76e4a212181e13f7",
+      "committed_sha256": "a36d4aa1e1d6a16a682b50353c2d0c8f0077d198fe66b0ca76e4a212181e13f7",
+      "identical": true
+    },
+    {
+      "file": "distributed.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-distributed.log",
+      "original_sha256": "c16accf4897b4555d0424fad725e13542c2d91a879f5b4bf20c815912013ff34",
+      "committed_sha256": "c16accf4897b4555d0424fad725e13542c2d91a879f5b4bf20c815912013ff34",
+      "identical": true
+    },
+    {
+      "file": "example.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-example.log",
+      "original_sha256": "d36b4418eee9d44dff4b5d3d10b836f8482dea08a395741fd65b9d7e84b3eb78",
+      "committed_sha256": "d36b4418eee9d44dff4b5d3d10b836f8482dea08a395741fd65b9d7e84b3eb78",
+      "identical": true
+    },
+    {
+      "file": "extract-saved-stages.R",
+      "original_path": "/private/tmp/extract-pipeline-compatibility.R",
+      "original_sha256": "8598f0bd48e23daf796c97ee95482c4c1462f8b6a2ab8e1430782b1f54c66593",
+      "committed_sha256": "8598f0bd48e23daf796c97ee95482c4c1462f8b6a2ab8e1430782b1f54c66593",
+      "identical": true
+    },
+    {
+      "file": "nextflow-distributed.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-nf-distributed.log",
+      "original_sha256": "0fef7dc5c7cbb22a5f25623479ff8dea72b508c561dfa64eff8be127805e11ff",
+      "committed_sha256": "0fef7dc5c7cbb22a5f25623479ff8dea72b508c561dfa64eff8be127805e11ff",
+      "identical": true
+    },
+    {
+      "file": "nextflow-reference.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-nf-reference.log",
+      "original_sha256": "099a1951b17eb4063a54130d8f99325c2c32bf361f0f4848c6b23125ce69e50e",
+      "committed_sha256": "099a1951b17eb4063a54130d8f99325c2c32bf361f0f4848c6b23125ce69e50e",
+      "identical": true
+    },
+    {
+      "file": "resume-distributed.tsv",
+      "original_path": "/private/tmp/pipeline-bioc01bb-nf-distributed/resume-trace.tsv",
+      "original_sha256": "336061c4b02bca8849a3db34034ed5875fd0afaff9c182e01088a77493029bd2",
+      "committed_sha256": "336061c4b02bca8849a3db34034ed5875fd0afaff9c182e01088a77493029bd2",
+      "identical": true
+    },
+    {
+      "file": "resume-reference.tsv",
+      "original_path": "/private/tmp/pipeline-bioc01bb-nf-reference/resume-trace.tsv",
+      "original_sha256": "fa1500a016211753d3f91bb749e9a194e09322e38cc2cc49be272eef457d1d60",
+      "committed_sha256": "fa1500a016211753d3f91bb749e9a194e09322e38cc2cc49be272eef457d1d60",
+      "identical": true
+    },
+    {
+      "file": "runtime-readback.txt",
+      "original_path": "/private/tmp/pipeline-bioc01bb-runtime.txt",
+      "original_sha256": "b974503df773354f31d001a13999871bfd1ad8502583b80c886f848dc70d265a",
+      "committed_sha256": "b974503df773354f31d001a13999871bfd1ad8502583b80c886f848dc70d265a",
+      "identical": true
+    },
+    {
+      "file": "source-equivalence.json",
+      "original_path": "/private/tmp/pipeline-bioc01bb-source-equivalence.json",
+      "original_sha256": "4ac8402e46e4c75e52c6bbf5487c4dd6659cae787d0a0eac09fed286ab0f77eb",
+      "committed_sha256": "4ac8402e46e4c75e52c6bbf5487c4dd6659cae787d0a0eac09fed286ab0f77eb",
+      "identical": true
+    },
+    {
+      "file": "source.json",
+      "original_path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/01bb39ccf8373ae8965a2679ee4813a63ea2d85d/source.json",
+      "original_sha256": "bc8439b1632b4c7820e24b941fa19208558cf7b007a073a9f58668dd47f992d5",
+      "committed_sha256": "bc8439b1632b4c7820e24b941fa19208558cf7b007a073a9f58668dd47f992d5",
+      "identical": true
+    },
+    {
+      "file": "worker-failure.log",
+      "original_path": "/private/tmp/pipeline-bioc01bb-nf-distributed/worker-failure.log",
+      "original_sha256": "685134aab8d442bc847a18da941ce679fae22d5adadca69823be011a38c3ec90",
+      "committed_sha256": "685134aab8d442bc847a18da941ce679fae22d5adadca69823be011a38c3ec90",
+      "identical": true
+    }
+  ],
+  "package_evidence_head": "9a4694450b5d456beedc11f3876ecb1cd84cb05c",
+  "runtime_originals_committed_and_match_recorded_versions": true
+}

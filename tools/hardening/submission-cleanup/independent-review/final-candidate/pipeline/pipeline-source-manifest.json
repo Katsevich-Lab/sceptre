@@ -1,0 +1,106 @@
+{
+  "pipeline_repository": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline",
+  "branch": "codex/bioc-compatibility-refresh",
+  "pipeline_commit": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+  "clean_at_readback": true,
+  "implementation_guard_commit": "cb6349a2c97210c0adb7a6fb3c30f5374ae54184",
+  "production_code_changes_since_guard_review": [],
+  "excluded_other_checkout": "/Users/ekatsevi/.codex/worktrees/72cc/sceptre-pipeline",
+  "files": [
+    {
+      "path": "bin/.Rhistory",
+      "sha256": "7f6278017bd06552815f3549b9b948042e3d8a252da0a6f267f13e4fd8b7f667"
+    },
+    {
+      "path": "bin/distributed.R",
+      "sha256": "051190c2c5b68f7c5c610b7192ca01aa1048bff6d948cea439ac8022704b804c"
+    },
+    {
+      "path": "bin/distributed_stage.R",
+      "sha256": "2fbe5620e5ae788209b29146df8836d3031a4db13729091357f59ac98caf69e0"
+    },
+    {
+      "path": "bin/export_state.R",
+      "sha256": "53ee356bd721fc89b8d065f6b9ebae33b2edd78e8092a05eed2c8ac68d90fc83"
+    },
+    {
+      "path": "bin/lock_environment.R",
+      "sha256": "c2c1206ddd12afe022c3ef7b489b2b80c842144216f6bb3eb1318a68aa71abc5"
+    },
+    {
+      "path": "bin/pipeline.R",
+      "sha256": "d08f0e79d97b62ff9b5a4afbccda62e6bd6856bc6f19acd4d78d3ed2e3e86b53"
+    },
+    {
+      "path": "bin/prepare_input.R",
+      "sha256": "150dee16f7fdfda396a9b14b7a1cc268fa9070f00a871ce1d964498fbab44aac"
+    },
+    {
+      "path": "bin/stage.R",
+      "sha256": "9be18577f407717aa93d35546909db527524d3faeffc8f44c2183d59e66398c1"
+    },
+    {
+      "path": "bin/validate_state.R",
+      "sha256": "757de871a4251c7c98d384bb3a26de2aa63f5b2a2d3ea2c41771cdfc0b10e0d1"
+    },
+    {
+      "path": "bin/versions.R",
+      "sha256": "6c6b04911d0a5f45c1866273f707c5086a17790547a843d24af22720ed570a9d"
+    },
+    {
+      "path": "conf/base.config",
+      "sha256": "01a6e08b5a978037c0981a070ddb40685bd4d9da9884dd30e9ec00a76d8c7013"
+    },
+    {
+      "path": "conf/test.config",
+      "sha256": "d5dee69e2671c529401af413d502555af21e5a79a1cf8519d61d3e2b648865da"
+    },
+    {
+      "path": "main.nf",
+      "sha256": "29e5d09f36a49cde70c7256a6f6c87ac3798426502e65c57d0e0501dac268ba1"
+    },
+    {
+      "path": "modules/local/sceptre_collect/main.nf",
+      "sha256": "1227e23a6b675b38edf2bf77c07ebd206409f10787e33b4ee101378fefb9b50f"
+    },
+    {
+      "path": "modules/local/sceptre_export/main.nf",
+      "sha256": "6f07a737fe24b0903b75a81a11e06b133ff646e1666b45cf102ca7af559c40ca"
+    },
+    {
+      "path": "modules/local/sceptre_prepare/main.nf",
+      "sha256": "a3c9cbf4ca0b9059b7e018d16b6b45e8850a5b894e55cede86823323f539724f"
+    },
+    {
+      "path": "modules/local/sceptre_stage/main.nf",
+      "sha256": "9507013bc1db82e206379f3f871400aa0b7407bc3ef54cb34654dbba391976f2"
+    },
+    {
+      "path": "modules/local/sceptre_validate/main.nf",
+      "sha256": "6f51a7b4901e011e763eff9bcbdd3af317eaf030d13583b4215b2e36793e40d9"
+    },
+    {
+      "path": "modules/local/sceptre_worker/main.nf",
+      "sha256": "eab79a7d978be65e7f378ab71f6554f82a737fe939121c55d452c8b839d32da8"
+    },
+    {
+      "path": "nextflow.config",
+      "sha256": "ba628af1b331278a9e5804f1d522c850aef7f498dcb316c02494ccea5331e9e2"
+    },
+    {
+      "path": "nextflow_schema.json",
+      "sha256": "6c5ca69642431a1f9aa85041d54598a9d43b516bd52ca5017ae0685f8b3f2b6e"
+    },
+    {
+      "path": "subworkflows/local/sceptre/main.nf",
+      "sha256": "b555cbdf661b4d69ba68e21ec10d6537bc2c61038373b546854a72fec3d3568a"
+    },
+    {
+      "path": "subworkflows/local/sceptre_analysis/main.nf",
+      "sha256": "c3c01697dc71c38f64373280063559c103720638b9e8a6372d33398573b5845f"
+    }
+  ],
+  "final_evidence_commit": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+  "final_evidence_checkout_clean": true,
+  "production_paths_unchanged_through_evidence_commit": true
+}

@@ -71,6 +71,7 @@ pinned pipeline artifact even though the package version remains 0.99.0.
 | Exact installed archive, historical matched-budget parity | **Seven workflows, 231 tolerance-zero comparisons pass**, including warnings, post-run RNG, all public results, preparation and reusable response fits. The saved historical reference is compared with matched budgets; it is not a new fit of that reference. |
 | Three actual installed API examples | **All three pass** in a fresh process using the installed archive's Rd database and namespace. |
 | Independent helper comparison using extracted exact archive | **40 checks pass** across low-MOI complement permutation, NT permutation and high-MOI complement CRT: identity payloads, plans, contexts, manifests, unit/collected payloads, RNG, caller immutability and errors. This uses isolated source-function environments over the same prior installed classes; installed qualification is reported separately. |
+| Final external independent review | **No material findings**: 69 differential semantic checks, 12 installed collector checks and three installed examples pass. The reviewer independently confirms zero new diagnostic categories/instances and verifies the owner terminal receipts. Its separate pipeline scope is the unchanged 818a156 baseline; it expressly excludes the later arrays/HPC feature worktree. See the preserved [final review](independent-review/FINAL_SUBMISSION_DELTA_REVIEW.md). |
 | Formatting and generated R wrapper equivalence | **35-file proof passes**: 19 raw AST matches and 16 matches after documented constant-string/local-alias normalization; 38 emitted literal/signal texts and parsed roxygen descriptions match. The post-generator formatter reproduces all 11 changed Rcpp wrapper lines byte for byte. All 98 monitored source/help/vignette/metadata files remain unchanged. The later substantive count-store helper extraction is explicitly outside this mechanical proof. See [formatting](formatting/README.md). |
 | Local older-checker comparison, 1.47.26 | **0 errors, 1 warning, 3 notes**, matching its submitted-source baseline; 44 inherited long functions and 108 inherited long lines. |
 
@@ -78,6 +79,11 @@ Full source results and before/after hashes are in [qualification/source](qualif
 The initial older-checker attempt failed before reaching a diagnostic result
 because the sandbox blocked the metadata-cache lock and network lookup; its
 receipt is retained separately from the isolated-cache rerun.
+The external reviewer additionally ran both submitted and cleaned archives with
+all default checks enabled: both returned **1 error, 1 warning and 5 notes**,
+with the same support-site timeout, unchanged R-version recommendation and
+subscription-status note. That matched environmental result is retained and is
+not substituted for the original-wrapper comparison or described as clean.
 
 Earlier package floor/platform receipts and the pipeline's 38-case/container
 receipts bind their stated older artifacts. They are not relabelled as checks of
