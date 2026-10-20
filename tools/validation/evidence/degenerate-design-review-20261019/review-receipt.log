@@ -1,0 +1,31 @@
+Input SHA256: ccb3f6b07681c0e54601af4d529b8dd3dde692163e4ffcd78fe0e790519a8d57 
+DGP: Independent Poisson(5), all genes null 
+Design: intercept and exact target membership 
+Rank Z: 2 Rank [Z,X]: 2 Max absolute X projection residual: 1.086516e-14 
+
+Mechanism: permutations Status: completed 
+  response_id     numerator      variance observed_score
+1          r1 -1.363426e-08 -8.242296e-13            NaN
+2          r2 -1.396180e-07 -2.273737e-13            NaN
+3          r3 -4.241836e-09  9.379164e-13   -0.004379977
+4          r4 -4.264473e-08 -1.307399e-12            NaN
+[1] "NaNs produced" "NaNs produced" "NaNs produced"
+  response_id pass_qc     p_value stage       z_orig significant
+1          r1    TRUE 0.004987531     3          NaN        TRUE
+2          r2    TRUE 0.004987531     3          NaN        TRUE
+3          r4    TRUE 0.004987531     3          NaN        TRUE
+4          r3    TRUE 1.000000000     1 -0.004379977       FALSE
+
+Mechanism: crt Status: completed 
+  response_id     numerator      variance observed_score
+1          r1 -1.363426e-08 -8.242296e-13            NaN
+2          r2 -1.396180e-07 -2.273737e-13            NaN
+3          r3 -4.241836e-09  9.379164e-13   -0.004379977
+4          r4 -4.264473e-08 -1.307399e-12            NaN
+[1] "NaNs produced"                       "NaNs produced"                      
+[3] "NaNs produced"                       "glm.fit: algorithm did not converge"
+  response_id pass_qc     p_value stage       z_orig significant
+1          r1    TRUE 0.004987531     3          NaN        TRUE
+2          r2    TRUE 0.004987531     3          NaN        TRUE
+3          r4    TRUE 0.004987531     3          NaN        TRUE
+4          r3    TRUE 1.000000000     1 -0.004379977       FALSE
