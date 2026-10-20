@@ -16,8 +16,18 @@ knitr::opts_chunk$set(
 # sceptre <img src="man/figures/logo.png" align="right" width="150" alt="sceptre hex sticker" />
 
 <!-- badges: start -->
-[![R-CMD-check](https://img.shields.io/github/actions/workflow/status/Katsevich-Lab/sceptre/check-standard.yaml?branch=main&cacheSeconds=30)](https://github.com/Katsevich-Lab/sceptre/actions?query=workflow%3AR-CMD-check+branch%3Amain)
+[![R-CMD-check (main)](https://img.shields.io/github/actions/workflow/status/Katsevich-Lab/sceptre/check-standard.yaml?branch=main&cacheSeconds=30)](https://github.com/Katsevich-Lab/sceptre/actions/workflows/check-standard.yaml?query=branch%3Amain)
+[![Installed coverage workflow (main)](https://img.shields.io/github/actions/workflow/status/Katsevich-Lab/sceptre/coverage.yaml?branch=main&label=coverage%20workflow)](https://github.com/Katsevich-Lab/sceptre/actions/workflows/coverage.yaml?query=branch%3Amain)
+[![Development version 0.99.0](https://img.shields.io/badge/development-0.99.0-blue)](DESCRIPTION)
+[![License GPL-3](https://img.shields.io/badge/license-GPL--3-blue)](LICENSE.md)
+[![Documentation](https://img.shields.io/badge/docs-analysis%20book-blue)](https://timothy-barry.github.io/sceptre-book/)
+[![Citations](https://img.shields.io/badge/cite-method%20references-blue)](inst/CITATION)
 <!-- badges: end -->
+
+Workflow badges track **main**, not an unmerged PR. Each coverage run retains
+separate measured R and native coverage badges and browsable reports in its
+[Actions artifact](https://github.com/Katsevich-Lab/sceptre/actions/workflows/coverage.yaml).
+See [coverage scope and local reproduction](tools/coverage/README.md).
 
 `sceptre` implements an analysis pipeline for single-cell CRISPR screen (i.e., Perturb-seq) data, including data import, gRNA-to-cell assignment, quality control, and testing association between CRISPR perturbations and changes in gene expression. It is built on three principles:
 
