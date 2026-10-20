@@ -21,10 +21,10 @@ o <- run_qc(o,response_n_umis_range=c(0,1),response_n_nonzero_range=c(0,1),
     n_nonzero_trt_thresh=7L,n_nonzero_cntrl_thresh=7L)
 o <- set_perturbation_fit_method(o,"fast_logistic")
 fit <- withr::with_seed(71020,run_discovery_analysis(o,parallel=FALSE,print_progress=FALSE))
-print(get_result(fit))
+print(get_result(fit, "run_discovery_analysis"))
 print(lapply(fit@fits@perturbation_fits,function(x)x$diagnostics))
 # A cache hit retains method/fallback diagnostics and reconstructs exactly.
 warm <- withr::with_seed(71020,run_discovery_analysis(fit,parallel=FALSE,print_progress=FALSE))
-stopifnot(identical(get_result(fit),get_result(warm)))
+stopifnot(identical(get_result(fit, "run_discovery_analysis"),get_result(warm, "run_discovery_analysis")))
 # Restore the reference selector explicitly for distributed/pipeline execution.
 reference <- set_perturbation_fit_method(fit,"glm.fit")

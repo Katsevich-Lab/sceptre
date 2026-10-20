@@ -148,7 +148,7 @@ test_that("candidate cold and warm CRT preserve results draws and method certifi
             cold@fits@perturbation_identity$runtime$candidate_native,
             execution_native_certificate()
         )
-        expect_identical(get_result(cold), get_result(warm))
+        expect_identical(get_result(cold, "run_discovery_analysis"), get_result(warm, "run_discovery_analysis"))
         expect_identical(
             cold@fits@perturbation_fits,
             warm@fits@perturbation_fits
