@@ -37,6 +37,7 @@ render_coverage <- function(coverage, root, out) {
         test_scope = "Installed package testthat suite; tests only, not examples/vignettes or standalone native bridges",
         metric = "Unique executable physical lines hit at least once; not branch coverage or statistical validity",
         exclusions = generated, totals = totals, unmeasured_source_files = missing,
+        test_environment = as.list(Sys.getenv(c("NOT_CRAN", "SCEPTRE_REQUIRE_NATIVE_COVERAGE", "SCEPTRE_REQUIRE_ONDISC"))),
         R = R.version.string, platform = R.version$platform, covr = as.character(utils::packageVersion("covr")),
         compiler_flags = as.list(getOption("covr.flags")), gcov = getOption("covr.gcov"), gcov_args = getOption("covr.gcov_args"),
         ondisc = if (requireNamespace("ondisc", quietly = TRUE)) as.character(utils::packageVersion("ondisc")) else NULL,

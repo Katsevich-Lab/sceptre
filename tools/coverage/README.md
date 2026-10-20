@@ -46,7 +46,8 @@ GCC/gcov is used on Linux; Apple clang uses the matching `llvm-cov gcov` interfa
 on macOS. Compiler flags and tool paths are retained. This macOS baseline used
 Apple clang21, R4.6.0 arm64, covr3.6.5, and locally installed ondisc1.2.0; it is not
 proof of the pinned ondisc commit. CI explicitly installs/verifies the existing
-qualified ondisc source pin. Unexecuted overflow/capacity guards remain visible;
+qualified ondisc source pin and requires backed capabilities rather than permitting
+backed-test skips in that lane. Relevant test environment switches are retained. Unexecuted overflow/capacity guards remain visible;
 forcing impossible allocations merely to raise this percentage is inappropriate.
 
 ## Review and badges

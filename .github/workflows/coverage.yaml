@@ -17,6 +17,7 @@ jobs:
       MAKEFLAGS: -j2
       NOT_CRAN: 'true'
       SCEPTRE_REQUIRE_NATIVE_COVERAGE: 'true'
+      SCEPTRE_REQUIRE_ONDISC: 'true'
     steps:
       - uses: actions/checkout@v4
         with:
