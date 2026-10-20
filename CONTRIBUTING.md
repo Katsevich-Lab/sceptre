@@ -90,7 +90,7 @@ versions, skipped lanes, and terminal results; a submitted job is not a pass.
 | Fast | `testthat::test_local(".", filter = "wilcoxon")` (replace the filter for your change) | Focused behavior and regression checks using current source |
 | Full package | `testthat::test_local(".")`, then `devtools::check()` | Package-wide tests, examples, documentation and installation checks; inspect skips |
 | Native | `Rscript --vanilla tools/checks/test-native-components.R .` and the ownership/exception probes listed in `tools/checks/README.md` | Mathematical components and declared error/lifetime boundaries; these compile temporary instrumentation |
-| Scientific | `Rscript tools/validation/wilcoxon-pilot.R 200 output-dir` plus the applicable method-specific harness | Actual simulated null/effect p-values with Monte Carlo uncertainty; reference parity alone is not calibration |
+| Scientific | `Rscript tools/validation/wilcoxon-pilot.R 200 /tmp/wilcoxon-pilot` plus the applicable method-specific harness | Actual simulated null/effect p-values with Monte Carlo uncertainty; reference parity alone is not calibration |
 | Cross-surface | Same exact archive/runtime and complete family in direct and distributed workflows | Supported-mode equality and companion pipeline compatibility; an unsupported method must reject before execution |
 
 Statistical changes need an independent oracle or known-data-generating process,

@@ -157,3 +157,20 @@ Distributed/Nextflow, backed responses and parallel execution are deliberately
 unsupported. Follow-up requires method-aware execution manifests, matching
 worker/collector provenance, direct/distributed tests and the same scientific
 qualification before expanding those modes.
+
+## Receipt boundary
+
+Use a new output directory outside the clean checkout; existing paths are refused
+before writes. `status.rds` starts as running, checkpoints progress, and becomes
+complete only after all600screens (for200replicates) and artifact hashes exist.
+Errors/interrupts produce failed/interrupted status when R can handle them; a
+hard kill leaves a running/stale checkpoint, never a success receipt. Do not
+interpret an output directory or partial CSV as a completed run.
+
+`settings.rds` binds clean Git HEAD and source-file hashes to the installed
+package directory plus its actual loaded R/native build fingerprint. During
+archive qualification set `SCEPTRE_PILOT_ARCHIVE` to that exact source archive;
+its SHA256 is recorded too. The runtime and source identities are both retained,
+not inferred from package version alone. Every screen must have both expected
+responses, pass QC, and produce finite nonmissing probabilities in[0,1]; an
+unexpected eligibility or probability result stops the run with failed status.
