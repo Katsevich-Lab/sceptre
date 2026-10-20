@@ -31,7 +31,8 @@ reductions and existing unrelated miscellaneous information are unchanged.
 Existing sceptre miscellaneous data is rejected to avoid overwriting results.
 }
 \examples{
-if (requireNamespace("SeuratObject", quietly = TRUE)) {
+if (requireNamespace("SeuratObject", quietly = TRUE) &&
+    utils::packageVersion("SeuratObject") >= "5.0.0") {
     data("lowmoi_example_data")
     x <- lowmoi_example_data
     ids <- paste0("guide", seq_len(nrow(x$grna_matrix)))

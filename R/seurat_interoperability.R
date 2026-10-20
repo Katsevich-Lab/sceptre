@@ -19,7 +19,8 @@
 #'   covariates.
 #' @export
 #' @examples
-#' if (requireNamespace("SeuratObject", quietly = TRUE)) {
+#' if (requireNamespace("SeuratObject", quietly = TRUE) &&
+#'     utils::packageVersion("SeuratObject") >= "5.0.0") {
 #'     data("lowmoi_example_data")
 #'     x <- lowmoi_example_data
 #'     ids <- paste0("guide", seq_len(nrow(x$grna_matrix)))
@@ -115,7 +116,8 @@ seurat_response_names <- function(object, assay_name, column) {
 #' @return A copied Seurat object with owned pair results and provenance.
 #' @export
 #' @examples
-#' if (requireNamespace("SeuratObject", quietly = TRUE)) {
+#' if (requireNamespace("SeuratObject", quietly = TRUE) &&
+#'     utils::packageVersion("SeuratObject") >= "5.0.0") {
 #'     data("lowmoi_example_data")
 #'     x <- lowmoi_example_data
 #'     ids <- paste0("guide", seq_len(nrow(x$grna_matrix)))
