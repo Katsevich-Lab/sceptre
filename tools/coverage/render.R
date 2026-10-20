@@ -31,6 +31,8 @@ render_coverage <- function(coverage, root, out) {
         sha <- state$commit
         status <- state$dirty
     }
+    input_file <- file.path(out, "input-hashes.rds")
+    measurement_hashes <- if (file.exists(input_file)) readRDS(input_file) else hashes
     metadata <- list(commit = sha, dirty = status, measured_utc = format(Sys.time(), tz = "UTC", usetz = TRUE),
         test_scope = "Installed package testthat suite; tests only, not examples/vignettes or standalone native bridges",
         metric = "Unique executable physical lines hit at least once; not branch coverage or statistical validity",
@@ -40,7 +42,7 @@ render_coverage <- function(coverage, root, out) {
         ondisc = if (requireNamespace("ondisc", quietly = TRUE)) as.character(utils::packageVersion("ondisc")) else NULL,
         ondisc_remote_sha = if (requireNamespace("ondisc", quietly = TRUE)) utils::packageDescription("ondisc")$RemoteSha else NULL,
         ondisc_description_md5 = if (requireNamespace("ondisc", quietly = TRUE)) unname(tools::md5sum(system.file("DESCRIPTION", package = "ondisc"))) else NULL,
-        source_test_md5 = hashes)
+        source_test_md5 = hashes, measurement_input_md5 = measurement_hashes)
     jsonlite::write_json(metadata, file.path(out, "summary.json"), pretty = TRUE, auto_unbox = TRUE, na = "null")
     capture.output(sessionInfo(), file = file.path(out, "session-info.txt"))
     covr::to_cobertura(coverage, filename = file.path(out, "cobertura.xml"))

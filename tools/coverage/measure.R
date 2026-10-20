@@ -15,9 +15,16 @@ if (Sys.info()[["sysname"]] == "Darwin") {
 Sys.setenv(OMP_NUM_THREADS = 1, OPENBLAS_NUM_THREADS = 1, MKL_NUM_THREADS = 1,
     VECLIB_MAXIMUM_THREADS = 1, MAKEFLAGS = "-j2", NOT_CRAN = "true")
 input_files <- function() {
-    paths <- c(list.files(file.path(root, "R"), full.names = TRUE, recursive = TRUE),
-        list.files(file.path(root, "src"), pattern = "\\.(cpp|h|hpp)$", full.names = TRUE, recursive = TRUE),
-        list.files(file.path(root, "tests"), full.names = TRUE, recursive = TRUE))
+    # Bind runtime/test data, installation controls, native make/configure inputs,
+    # and the measurement code itself, not merely handwritten scientific code.
+    paths <- unlist(lapply(c("R", "tests", "data", "inst"), function(folder)
+        list.files(file.path(root, folder), full.names = TRUE, recursive = TRUE)), use.names = FALSE)
+    native <- list.files(file.path(root, "src"), full.names = TRUE, recursive = TRUE)
+    native <- native[!grepl("[.](o|so|dll|a|gcda|gcno|gcov)$", native)]
+    controls <- file.path(root, c("DESCRIPTION", "NAMESPACE", ".Rbuildignore", ".Rprofile",
+        "configure", "configure.win", "cleanup", "cleanup.win",
+        "tools/coverage/measure.R", "tools/coverage/render.R"))
+    paths <- sort(unique(c(paths, native, controls[file.exists(controls)])))
     stats::setNames(as.list(unname(tools::md5sum(paths))), substring(paths, nchar(root) + 2L))
 }
 input_hashes <- input_files()

@@ -12,7 +12,10 @@ then runs its **installed** test suite. It never installs into ordinary user
 libraries. Builds use at most two compiler jobs; BLAS threads are limited to one.
 Local overnight runs must first acquire the program's shared resource lease.
 Do not edit source/tests or the runner while it executes. The runner binds input
-hashes before compilation and rejects a changed source/test tree.
+hashes before compilation and rejects changes to code/tests/data, installation
+controls (DESCRIPTION/NAMESPACE/Rbuildignore/configure/Makevars), and the runner
+and renderer themselves. The complete measurement input hashes are retained
+separately from the scientific source/test hashes.
 
 Open `index.html` in a browser. Each file expands to annotated source: red lines
 were not reached, blue lines were reached. The artifact also contains per-line
