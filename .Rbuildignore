@@ -30,3 +30,4 @@
 ^tools/validation$
 ^tools/qualification$
 ^tools/coverage$
+^data-raw$

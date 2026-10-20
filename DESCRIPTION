@@ -48,6 +48,7 @@ Depends:
 Suggests:
     BH,
     ondisc,
+    rhdf5,
     R.utils,
     sessioninfo,
     rmarkdown,

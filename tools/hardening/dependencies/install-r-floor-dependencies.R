@@ -10,7 +10,7 @@ deps <- unique(unlist(lapply(description[1L, fields], function(x)
     names(tools:::.split_dependencies(x)))))
 # Optional Bioconductor interoperability has its own current-ecosystem lane.
 # The advertised R-floor lane deliberately tests installation without it.
-optional_bioc <- c("ondisc", "SingleCellExperiment", "SummarizedExperiment",
+optional_bioc <- c("ondisc", "rhdf5", "SingleCellExperiment", "SummarizedExperiment",
     "S4Vectors")
 deps <- setdiff(deps, c(optional_bioc,
     rownames(installed.packages(priority = "base"))))
