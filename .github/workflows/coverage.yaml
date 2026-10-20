@@ -18,6 +18,7 @@ jobs:
       NOT_CRAN: 'true'
       SCEPTRE_REQUIRE_NATIVE_COVERAGE: 'true'
       SCEPTRE_REQUIRE_ONDISC: 'true'
+      SCEPTRE_EXPECT_ONDISC_SHA: '589803edea2a66ad15e7f07186bee16c7739ab8c'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +62,7 @@ jobs:
               sprintf("- %s executable lines: %.2f%% (%s/%s)", k, z$percent, z$covered, z$executable)
             }, character(1)), "Line coverage is not branch coverage or scientific validation.")
           cat(paste(text, collapse = "\n"), "\n", file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+      # JSON glob retains child-runtime.json even when its pin assertion fails.
       - name: Retain browsable reports and failure logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,3 +79,5 @@ jobs:
             ${{ runner.temp }}/coverage/*.rds
             ${{ runner.temp }}/coverage/session-info.txt
             ${{ runner.temp }}/coverage/library/sceptre/tests/*.Rout*
+            ${{ runner.temp }}/coverage/library/sceptre/sceptre-tests/*.Rout*
+            ${{ runner.temp }}/coverage/library/sceptre-commands.Rout*

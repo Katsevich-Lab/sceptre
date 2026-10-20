@@ -23,7 +23,7 @@ input_files <- function() {
     native <- native[!grepl("[.](o|so|dll|a|gcda|gcno|gcov)$", native)]
     controls <- file.path(root, c("DESCRIPTION", "NAMESPACE", ".Rbuildignore", ".Rprofile",
         "configure", "configure.win", "cleanup", "cleanup.win",
-        "tools/coverage/measure.R", "tools/coverage/render.R"))
+        "tools/coverage/measure.R", "tools/coverage/render.R", "tools/coverage/child-runtime.R"))
     paths <- sort(unique(c(paths, native, controls[file.exists(controls)])))
     stats::setNames(as.list(unname(tools::md5sum(paths))), substring(paths, nchar(root) + 2L))
 }
@@ -33,10 +33,15 @@ saveRDS(list(commit = system2("git", c("-C", shQuote(root), "rev-parse", "HEAD")
     dirty = system2("git", c("-C", shQuote(root), "status", "--porcelain"), stdout = TRUE)),
     file.path(out, "source-state.rds"))
 lib <- file.path(out, "library")
+child_receipt <- file.path(out, "child-runtime.json")
+child_code <- paste(deparse(substitute({
+    source(runtime_script)
+    write_coverage_child_runtime(expected_path, receipt_path)
+}, list(runtime_script = file.path(root, "tools/coverage/child-runtime.R"),
+    expected_path = file.path(lib, "sceptre"), receipt_path = child_receipt))), collapse = "\n")
 coverage <- covr::package_coverage(root, type = "tests", quiet = FALSE,
-    clean = FALSE, install_path = lib,
-    code = paste0("stopifnot(identical(normalizePath(find.package('sceptre')), normalizePath(",
-        deparse(file.path(lib, "sceptre")), ")))"))
+    clean = FALSE, install_path = lib, code = child_code)
+if (!file.exists(child_receipt)) stop("Coverage child did not write its runtime identity receipt")
 saveRDS(coverage, file.path(out, "coverage.rds"))
 source(file.path(root, "tools/coverage/render.R"))
 if (!identical(input_hashes, input_files())) stop("Source/tests changed during measurement; rerun on a frozen checkout")

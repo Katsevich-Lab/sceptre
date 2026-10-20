@@ -99,3 +99,20 @@ wrong/constant/correlated/repeated native draws; it is retained unchanged.
 
 These are deterministic regression/algebra checks, not operating-characteristic
 calibration. W03 owns independent simulation validation; W02 owns native safety.
+
+
+## Direct child runtime identity
+
+New runs write `child-runtime.json` from covr's actual command child after the
+separate installed test run. It records the loaded sceptre namespace path,
+`.libPaths()`, R version, loaded ondisc namespace path/version/RemoteSha and DLL
+MD5. Its scope is explicit: the command child uses the same isolated-library
+configuration; it is not a historical capture of the separate test process.
+The receipt is written before rejecting a wrong installation or backend SHA,
+so failure artifacts retain the observed identity.
+
+Set `SCEPTRE_EXPECT_ONDISC_SHA=589803edea2a66ad15e7f07186bee16c7739ab8c` to require
+the actual child ondisc RemoteSha. The CI lane sets it. `summary.json` embeds
+`child_runtime`; renderer-only fields have an `ambient_ondisc_` prefix and cannot
+stand in for the child receipt. Old worker69e280b evidence is unchanged and has
+no direct child-runtime receipt; do not retroactively infer a pin attestation.
