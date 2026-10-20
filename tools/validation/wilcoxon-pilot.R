@@ -105,7 +105,7 @@ pilot_main <- function(args = commandArgs(trailingOnly = TRUE)) {
         names(state$artifact_sha256) <- c("pvalues.csv", "summary.csv", "settings.rds")
         checkpoint("complete")
         print(summary)
-        message("TERMINAL_SUCCESS: ", state$completed_screens, " independent screens; ", out)
+        message("TERMINAL_SUCCESS: ", state$completed_screens, " scenario-runs; ", replicates, " independent screens per scenario (seeds paired across scenarios); ", out)
         message("Confounded conditional null violates the marginal rank null; it is not a type-I error measurement.")
         message("Intervals use independent screens per endpoint. Raw alpha .05 rates are not family FDR.")
         message("This pilot does not establish real-data, donor-level, small-sample or general FDR validity.")

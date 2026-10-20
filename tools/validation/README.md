@@ -162,7 +162,7 @@ qualification before expanding those modes.
 
 Use a new output directory outside the clean checkout; existing paths are refused
 before writes. `status.rds` starts as running, checkpoints progress, and becomes
-complete only after all600screens (for200replicates) and artifact hashes exist.
+complete only after all600scenario-runs (200independent screens per scenario, with paired seeds) and artifact hashes exist.
 Errors/interrupts produce failed/interrupted status when R can handle them; a
 hard kill leaves a running/stale checkpoint, never a success receipt. Do not
 interpret an output directory or partial CSV as a completed run.
