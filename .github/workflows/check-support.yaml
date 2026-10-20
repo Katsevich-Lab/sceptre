@@ -97,13 +97,17 @@ jobs:
       - name: Build and check package
         shell: bash
         run: |
+          git rev-parse HEAD > bioconductor-source-commit.txt
           R CMD build . --no-manual
+          sha256sum sceptre_*.tar.gz > bioconductor-archive-sha256.txt
           R CMD check sceptre_*.tar.gz --no-manual --no-build-vignettes
       - name: Require clean package check status
         shell: Rscript {0}
         run: |
           status <- readLines("sceptre.Rcheck/00check.log")
-          stopifnot(!any(grepl("Status:.*(ERROR|WARNING)", status)))
+          terminal <- grep("^Status:", status, value = TRUE)
+          stopifnot(length(terminal) == 1L,
+            !any(grepl("ERROR|WARNING", terminal)))
       - name: Run Bioconductor package diagnostics
         shell: Rscript {0}
         run: |
@@ -115,6 +119,9 @@ jobs:
         with:
           name: bioconductor-${{ matrix.bioc }}
           path: |
+            sceptre_*.tar.gz
+            bioconductor-source-commit.txt
+            bioconductor-archive-sha256.txt
             bioconductor-environment.txt
             bioconductor-installed.tsv
             sceptre.Rcheck
