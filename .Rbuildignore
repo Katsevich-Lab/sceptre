@@ -33,3 +33,5 @@
 ^tools/coverage$
 ^data-raw$
 ^tools/examples$
+
+^tools/experimental-fitters$

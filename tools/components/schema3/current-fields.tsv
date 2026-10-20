@@ -29,6 +29,7 @@ AnalysisSpec	multiple_testing_alpha	numeric	Requested reporting significance thr
 AnalysisSpec	multiple_testing_method	character	Requested complete-family multiple-testing correction method.
 AnalysisSpec	cellwise_qc_thresholds	list	Requested UMI/nonzero quantile ranges and mitochondrial-fraction cutoff.
 AnalysisSpec	additional_cells_to_remove	integer	Additional source-cell positions explicitly excluded by the requested QC configuration.
+AnalysisSpec	perturbation_fit_method	character	Optional experimental CRT logistic fitter; empty means the reference glm.fit and preserves historical default certificates.
 PreparationRecord	design_matrix	matrix	Actual compiled model matrix, one row per source cell, with design columns, contrasts and ordering retained.
 PreparationRecord	nt_nonzero_matrix	matrix	Cached NT-guide-by-response stored-entry counts used by calibration.
 PreparationRecord	control_nonzero_totals	integer	Cached per-response stored-entry totals: all selected cells for complement controls, or summed NT-group counts for NT controls (overlaps count again).

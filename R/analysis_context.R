@@ -310,6 +310,7 @@ prepare_analysis_context <- function(object, analysis, pairs, plan = NULL) {
         list()
     }
     list(
+        perturbation_fit_method = get_perturbation_fit_method(object),
         fit_identity = identity,
         response_store = store,
         index = index,

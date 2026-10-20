@@ -62,7 +62,10 @@ validate_correction_settings <- function(alpha, method) {
 
 analysis_spec_is_empty <- function(object) {
     # An untouched constructor prototype has neither a formula nor any payload.
-    fields <- setdiff(methods::slotNames(object), "formula_object")
+    fields <- setdiff(
+        methods::slotNames(object),
+        c("formula_object", "perturbation_fit_method")
+    )
     !is.call(object@formula_object) &&
         all(vapply(
             fields,
@@ -72,6 +75,7 @@ analysis_spec_is_empty <- function(object) {
 }
 
 validate_analysis_spec <- function(object) {
+    validate_perturbation_fit_method(object@perturbation_fit_method)
     if (!analysis_spec_is_empty(object)) {
         validate_correction_settings(
             object@multiple_testing_alpha,
@@ -82,6 +86,16 @@ validate_analysis_spec <- function(object) {
 }
 
 setValidity("AnalysisSpec", function(object) {
+    method_error <- tryCatch(
+        {
+            validate_perturbation_fit_method(object@perturbation_fit_method)
+            NULL
+        },
+        error = function(e) conditionMessage(e)
+    )
+    if (!is.null(method_error)) {
+        return(method_error)
+    }
     if (analysis_spec_is_empty(object)) {
         return(TRUE)
     }

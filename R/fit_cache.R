@@ -179,7 +179,9 @@ perturbation_cache_identity <- function(object) {
             object@preparation@design_matrix[cells, , drop = FALSE],
             algo = "sha256"
         ),
-        method = perturbation_fit_method_id(),
+        method = perturbation_fit_method_id(get_perturbation_fit_method(
+            object
+        )),
         runtime = list(
             R = as.character(getRversion()),
             stats = as.character(utils::packageVersion("stats")),

@@ -35,6 +35,9 @@ analysis_pairs <- function(object, analysis) {
 
 analysis_spec_snapshot <- function(object) {
     names <- methods::slotNames(object@spec)
+    if (!length(object@spec@perturbation_fit_method)) {
+        names <- setdiff(names, "perturbation_fit_method")
+    }
     identity_value(stats::setNames(
         lapply(names, function(name) methods::slot(object@spec, name)),
         names
@@ -51,6 +54,9 @@ run_plan_identity <- function(object, plan) {
         "multiple_testing_alpha",
         "multiple_testing_method"
     )
+    if (length(object@spec@perturbation_fit_method)) {
+        options <- c(options, "perturbation_fit_method")
+    }
     list(
         data = object@data@identity,
         cells = object@preparation@analysis_cells,
@@ -450,6 +456,8 @@ completed_result_provenance <- function(object, plan, output_amount) {
         plan = plan,
         output_amount = output_amount,
         response_fit_method = response_fit_method_id(),
-        perturbation_fit_method = perturbation_fit_method_id()
+        perturbation_fit_method = perturbation_fit_method_id(get_perturbation_fit_method(
+            object
+        ))
     )
 }

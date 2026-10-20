@@ -40,7 +40,8 @@ setClass(
         multiple_testing_alpha = "numeric",
         multiple_testing_method = "character",
         cellwise_qc_thresholds = "list",
-        additional_cells_to_remove = "integer"
+        additional_cells_to_remove = "integer",
+        perturbation_fit_method = "character"
     )
 )
 setClass(

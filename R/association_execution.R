@@ -232,6 +232,20 @@ run_crt_analysis <- function(context, execution) {
         )
     }
 
+    # Force design conditioning only on an actual candidate cache miss.
+    delayedAssign(
+        "prepared_logistic_design",
+        if (
+            identical(context$perturbation_fit_method, "fast_logistic") &&
+                context$shared_response_fit &&
+                !index$calibration_check
+        ) {
+            prepare_grna_logistic_design(context$design)
+        } else {
+            NULL
+        }
+    )
+
     # Analyze a block of guide groups assigned to one worker
     # block_groups: Positions in the prepared guide-group list, starting at 1.
     # proc_id: Worker number used to append to its log, or NULL for serial work.
@@ -304,7 +318,16 @@ run_crt_analysis <- function(context, execution) {
                     fit_identity
                 )
                 if (is.null(saved)) {
-                    proposed <- fit_perturbation_model(trt, fit_design)
+                    proposed <- fit_perturbation_model(
+                        trt,
+                        fit_design,
+                        method = context$perturbation_fit_method,
+                        prepared_design = if (context$shared_response_fit) {
+                            prepared_logistic_design
+                        } else {
+                            NULL
+                        }
+                    )
                     probabilities <- proposed$probabilities
                     perturbation_updates[id] <- list(
                         if (is.null(proposed$fit)) {

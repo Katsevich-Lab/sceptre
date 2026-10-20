@@ -143,10 +143,16 @@ execution_runtime_certificate <- function(object) {
     )
 }
 
-execution_method_certificate <- function() {
+execution_method_certificate <- function(object = NULL) {
     list(
         response = response_fit_method_id(),
-        perturbation = perturbation_fit_method_id(),
+        perturbation = perturbation_fit_method_id(
+            if (is.null(object)) {
+                "glm.fit"
+            } else {
+                get_perturbation_fit_method(object)
+            }
+        ),
         resampling = "global-native-draw-sharing-v1"
     )
 }
@@ -155,6 +161,12 @@ execution_digest <- function(value) digest::digest(value, algo = "sha256")
 execution_row_column <- function() ".sceptre_global_pair_row"
 
 require_execution_backend <- function(object) {
+    if (!identical(get_perturbation_fit_method(object), "glm.fit")) {
+        stop(
+            "Experimental fast_logistic is currently supported only by direct R execution; ",
+            "switch to glm.fit before preparing distributed or pipeline input."
+        )
+    }
     if (
         !isTRUE(object@spec@run_permutations) &&
             any(vapply(
@@ -266,7 +278,7 @@ validate_execution_envelope <- function(object, execution) {
                 execution$runtime,
                 execution_runtime_certificate(object)
             ) ||
-            !identical(execution$methods, execution_method_certificate())
+            !identical(execution$methods, execution_method_certificate(object))
     ) {
         stop(
             "Execution manifest protocol, runtime or method certificate is ",
@@ -427,7 +439,7 @@ prepare_execution <- function(
     manifest <- list(
         protocol = 1L,
         runtime = execution_runtime_certificate(object),
-        methods = execution_method_certificate(),
+        methods = execution_method_certificate(object),
         context = execution_context_certificate(object),
         plan = plan,
         output_amount = as.integer(output_amount),

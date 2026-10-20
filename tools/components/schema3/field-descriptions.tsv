@@ -65,3 +65,4 @@ RunPlan	B3	Realized scalar nonnegative integer stage-three resampling budget, fr
 RunPlan	n_calibration_pairs	Requested positive scalar count for calibration, which may exceed the selected qualifying family; integer(0) for other analyses.
 RunPlan	calibration_group_size	Positive scalar number of NT guides per calibration group; integer(0) for other analyses.
 RunPlan	identity	Frozen data, ordered cells, actual design, assignments, choices and canonical execution-payload identity; object-context matching is validated separately.
+AnalysisSpec	perturbation_fit_method	Optional experimental CRT logistic fitter; empty means the reference glm.fit and preserves historical default certificates.

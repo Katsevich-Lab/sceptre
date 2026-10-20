@@ -51,6 +51,7 @@ an optional dependency class; loading the package does not load ondisc.
 | `multiple_testing_method` | `character` | Requested complete-family multiple-testing correction method. |
 | `cellwise_qc_thresholds` | `list` | Requested UMI/nonzero quantile ranges and mitochondrial-fraction cutoff. |
 | `additional_cells_to_remove` | `integer` | Additional source-cell positions explicitly excluded by the requested QC configuration. |
+| `perturbation_fit_method` | `character` | Optional experimental CRT logistic fitter; empty means the reference glm.fit and preserves historical default certificates. |
 
 ## PreparationRecord
 

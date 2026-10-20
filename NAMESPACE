@@ -46,3 +46,6 @@ importFrom(methods,new)
 importFrom(methods,slot)
 importFrom(methods,validObject)
 useDynLib(sceptre, .registration = TRUE)
+
+export(get_perturbation_fit_method)
+export(set_perturbation_fit_method)

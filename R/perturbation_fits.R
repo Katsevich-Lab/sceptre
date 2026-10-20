@@ -47,11 +47,24 @@ reconstruct_perturbation_probabilities <- function(fit, design) {
 #'   historical fitting warnings. Aliased/nonfinite coefficients and any failure
 #'   of exact reconstruction decline caching without a second fit.
 #' @noRd
-fit_perturbation_model <- function(trt_idxs, design) {
+fit_perturbation_model <- function(
+    trt_idxs,
+    design,
+    method = "glm.fit",
+    prepared_design = NULL
+) {
+    validate_perturbation_fit_method(method)
+    if (!length(method)) {
+        stop("A fitter method is required.")
+    }
     diagnostics <- new.env(parent = emptyenv())
     diagnostics$warnings <- character()
     logistic_fit <- withCallingHandlers(
-        fit_perturbation_glm(trt_idxs, design),
+        if (identical(method, "glm.fit")) {
+            fit_perturbation_glm(trt_idxs, design)
+        } else {
+            fit_fast_perturbation_glm(trt_idxs, design, prepared_design)
+        },
         warning = function(condition) {
             diagnostics$warnings <- c(
                 diagnostics$warnings,
@@ -74,6 +87,12 @@ fit_perturbation_model <- function(trt_idxs, design) {
             warnings = diagnostics$warnings
         )
     )
+    if (!identical(method, "glm.fit")) {
+        compact$diagnostics <- c(
+            compact$diagnostics,
+            logistic_fit$candidate_details
+        )
+    }
     reconstructed <- tryCatch(
         reconstruct_perturbation_probabilities(compact, design),
         error = function(condition) NULL
