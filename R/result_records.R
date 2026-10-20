@@ -449,7 +449,7 @@ validate_completed_probabilities <- function(object, analysis, result) {
 }
 
 completed_result_provenance <- function(object, plan, output_amount) {
-    list(
+    provenance <- list(
         schema_version = object@schema_version,
         package_version = as.character(utils::packageVersion("sceptre")),
         spec = analysis_spec_snapshot(object),
@@ -460,4 +460,8 @@ completed_result_provenance <- function(object, plan, output_amount) {
             get_perturbation_fit_method(object)
         )
     )
+    if (identical(get_perturbation_fit_method(object), "fast_logistic")) {
+        provenance$perturbation_fit_native <- execution_native_certificate()
+    }
+    provenance
 }

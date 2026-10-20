@@ -172,7 +172,7 @@ invalidate_screen_dependents <- function(object) {
 
 perturbation_cache_identity <- function(object) {
     cells <- object@preparation@analysis_cells
-    list(
+    identity <- list(
         cells = cells,
         columns = colnames(object@preparation@design_matrix),
         design = digest::digest(
@@ -189,6 +189,10 @@ perturbation_cache_identity <- function(object) {
             matprod = getOption("matprod")
         )
     )
+    if (identical(get_perturbation_fit_method(object), "fast_logistic")) {
+        identity$runtime$candidate_native <- execution_native_certificate()
+    }
+    identity
 }
 
 perturbation_fit_identity <- function(source_cells, design, trt_idxs) {

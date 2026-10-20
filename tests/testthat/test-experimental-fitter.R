@@ -129,18 +129,25 @@ test_that("candidate cold and warm CRT preserve results draws and method certifi
         o <- suppressMessages(refactor_prepare(refactor_make_inputs(), case))
         o <- set_perturbation_fit_method(o, "fast_logistic")
         run <- function(x) {
-            withr::with_seed(
-                817L,
-                suppressMessages(run_discovery_analysis(
+            withr::with_seed(817L, {
+                completed <- suppressMessages(run_discovery_analysis(
                     x,
                     print_progress = FALSE,
                     parallel = FALSE,
                     output_amount = 3L
                 ))
-            )
+                list(object = completed, rng = .Random.seed)
+            })
         }
-        cold <- run(o)
-        warm <- run(cold)
+        cold_run <- run(o)
+        cold <- cold_run$object
+        warm_run <- run(cold)
+        warm <- warm_run$object
+        expect_identical(cold_run$rng, warm_run$rng)
+        expect_identical(
+            cold@fits@perturbation_identity$runtime$candidate_native,
+            execution_native_certificate()
+        )
         expect_identical(get_result(cold), get_result(warm))
         expect_identical(
             cold@fits@perturbation_fits,
