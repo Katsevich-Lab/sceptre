@@ -265,6 +265,8 @@ commit_wilcoxon_record <- function(object, plan, result) {
     provenance$inference_method <- "wilcoxon_unadjusted"
     provenance$response_fit_method <- provenance$perturbation_fit_method <-
         "not_used"
+    # A configured fitter was not executed by this unadjusted test.
+    provenance$perturbation_fit_native <- NULL
     provenance$normalization <- "log1p(10000 * count / full-library UMIs)"
     provenance$test <- "stats::wilcox.test; exact=FALSE; correct=TRUE"
     provenance$covariate_adjustment <- FALSE

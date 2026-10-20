@@ -196,3 +196,44 @@ test_that("standard tibble plots do not inspect an absent alternative column", {
     expect_no_warning(value <- sceptre:::alternative_volcano_threshold(0.04, standard))
     expect_identical(value, 0.04)
 })
+
+test_that("Wilcoxon drops inherited fitter-native usage provenance", {
+    object <- suppressMessages(refactor_prepare(refactor_make_inputs(), refactor_case_definitions()$low_nt_perm))
+    inherited <- sceptre:::completed_result_provenance
+    testthat::local_mocked_bindings(completed_result_provenance = function(...) {
+        provenance <- inherited(...)
+        provenance$perturbation_fit_native <- "unused-selected-fitter-native"
+        provenance
+    }, .package = "sceptre")
+    alternative <- run_wilcoxon(object)
+    provenance <- alternative@results@records$run_discovery_analysis$provenance
+    expect_false("perturbation_fit_native" %in% names(provenance))
+    expect_identical(provenance$response_fit_method, "not_used")
+    expect_identical(provenance$perturbation_fit_method, "not_used")
+    expect_identical(get_result_methods(alternative), c(run_discovery_analysis = "wilcoxon_unadjusted"))
+    expect_match(plot_run_discovery_analysis(alternative)$labels$caption,
+        "Experimental unadjusted Wilcoxon")
+})
+
+test_that("selected fast fitter remains unused by combined-API Wilcoxon", {
+    skip_if_not("set_perturbation_fit_method" %in% getNamespaceExports("sceptre"),
+        "W07 public fitter selector is not present in this standalone branch")
+    object <- suppressMessages(refactor_prepare(refactor_make_inputs(), refactor_case_definitions()$low_nt_perm))
+    select_fitter <- getExportedValue("sceptre", "set_perturbation_fit_method")
+    get_fitter <- getExportedValue("sceptre", "get_perturbation_fit_method")
+    selected <- select_fitter(object, "fast_logistic")
+    testthat::local_mocked_bindings(
+        fit_perturbation_model = function(...) stop("unused fitter must not execute"),
+        fit_response = function(...) stop("unused response fit must not execute"),
+        .package = "sceptre")
+    expected <- get_result(run_wilcoxon(object), "run_discovery_analysis")
+    alternative <- run_wilcoxon(selected)
+    provenance <- alternative@results@records$run_discovery_analysis$provenance
+    expect_false("perturbation_fit_native" %in% names(provenance))
+    expect_identical(provenance$response_fit_method, "not_used")
+    expect_identical(provenance$perturbation_fit_method, "not_used")
+    expect_identical(get_result_methods(alternative), c(run_discovery_analysis = "wilcoxon_unadjusted"))
+    expect_identical(get_fitter(selected), "fast_logistic")
+    expect_equal(get_result(alternative, "run_discovery_analysis")$p_value,
+        expected$p_value)
+})
