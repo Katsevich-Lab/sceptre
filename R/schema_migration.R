@@ -93,9 +93,8 @@ copy_legacy_components <- function(components, version) {
             ),
             "stages"
         )
-        table_fields <- names(methods::getSlots(class(component)))[
-            methods::getSlots(class(component)) == "data.frame"
-        ]
+        slot_types <- methods::getSlots(class(component))
+        table_fields <- names(slot_types)[slot_types == "data.frame"]
         for (field in fields) {
             value <- components[[owner]][[field]]
             if (field %in% table_fields) {
