@@ -1,0 +1,4 @@
+R R version 4.6.0 (2026-04-24)
+BiocCheck 1.47.26
+R_BIOC_VERSION 
+Invocation: BiocCheck::BiocCheck(official_archive, checkDir=out); no disabled checks or other flags

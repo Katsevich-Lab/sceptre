@@ -35,8 +35,21 @@ test_that("legacy matrix conversion agrees with the selected ondisc copy", {
     for (input in list(mat, methods::as(mat, "CsparseMatrix"),
                        methods::as(mat, "TsparseMatrix"), as.matrix(mat))) {
         for (row_access in c(TRUE, FALSE)) {
-            expect_identical(set_matrix_accessibility(input, row_access),
-                             ondisc:::set_matrix_accessibility(input, row_access))
+            # Older ondisc binaries read one pointer entry past the end in
+            # their conversion helper. This comparison deliberately calls that
+            # independent upstream oracle; fixed binaries emit no warning.
+            known <- c("subscript out of bounds (index 8 >= vector size 8)",
+                       "subscript out of bounds (index 6 >= vector size 6)")
+            warnings <- character()
+            reference <- withCallingHandlers(
+                ondisc:::set_matrix_accessibility(input, row_access),
+                warning = function(w) {
+                    detail <- conditionMessage(w)
+                    warnings <<- c(warnings, detail)
+                    if (detail %in% known) invokeRestart("muffleWarning")
+                })
+            expect_true(all(warnings %in% known), info = paste(warnings, collapse = "; "))
+            expect_identical(set_matrix_accessibility(input, row_access), reference)
         }
     }
 })
@@ -88,27 +101,40 @@ storage_test_contract <- function(mat) {
                         group_idx = c(2L, 1L, 1L, 1L))
     original <- serialize(list(cells, groups, nt_groups, controls, pairs), NULL)
     for (control in list("complement", controls)) {
-        for (nuclear in c(FALSE, TRUE)) {
-            out <- storage_pair_counts(mat, pairs, groups, cells, control,
-                                        nt_groups, nuclear)
+        for (summarize in c(TRUE, FALSE)) {
+            out <- expect_no_warning(storage_pair_counts(mat, pairs, groups, cells,
+                control, if (summarize) nt_groups else NULL))
             expect_identical(out$n_nonzero_trt, c(2L, 1L, 1L, 1L))
             expect_identical(out$n_nonzero_cntrl,
                              if (identical(control, "complement")) c(1L, 2L, 2L, 2L)
                              else rep(2L, 4L))
-            if (!(nuclear && methods::is(mat, "odm"))) {
+            if (summarize) {
                 expect_identical(out$n_nonzero_mat, matrix(rep(1L, 4L), 2L))
                 expect_identical(out$n_nonzero_tot,
                                  if (identical(control, "complement")) c(3L, 3L) else c(2L, 2L))
+            } else {
+                expect_identical(out$n_nonzero_mat, matrix())
+                expect_identical(out$n_nonzero_tot, integer())
             }
         }
         # Pair-only API must agree without constructing unused NT summaries.
-        pair_only <- storage_pair_counts(mat, pairs, groups, cells, control)
+        pair_only <- expect_no_warning(storage_pair_counts(mat, pairs, groups,
+            cells, control))
         expect_identical(pair_only$n_nonzero_trt, out$n_nonzero_trt)
         expect_identical(pair_only$n_nonzero_cntrl, out$n_nonzero_cntrl)
         expect_identical(pair_only$n_nonzero_tot, integer())
-        empty <- storage_pair_counts(mat, pairs[integer(), ], groups, cells, control)
+        empty <- expect_no_warning(storage_pair_counts(mat, pairs[integer(), ],
+            groups, cells, control))
         expect_identical(empty$n_nonzero_trt, integer())
         expect_identical(empty$n_nonzero_cntrl, integer())
+        empty_summary <- expect_no_warning(storage_pair_counts(mat,
+            pairs[integer(), ], groups, cells, control, nt_groups))
+        expect_identical(empty_summary$n_nonzero_trt, integer())
+        expect_identical(empty_summary$n_nonzero_cntrl, integer())
+        expect_identical(empty_summary$n_nonzero_mat,
+            matrix(rep(1L, 4L), 2L))
+        expect_identical(empty_summary$n_nonzero_tot,
+            if (identical(control, "complement")) c(3L, 3L) else c(2L, 2L))
     }
     expected <- matrix(c(1L, 2L, 1L, 2L), 2L)
     for (repeat_call in seq_len(2L)) {

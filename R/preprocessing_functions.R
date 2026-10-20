@@ -1,7 +1,9 @@
 #' Apply the model formula while keeping one design row per original cell
 #' @param covariate_data_frame Covariates with one row per original cell.
-#' @param formula_object Formula for model.matrix(), including intercept/contrasts.
-#' @return Numeric design matrix in input-cell order. Error if transformation drops
+#' @param formula_object Formula for model.matrix(), including
+#'   intercept/contrasts.
+#' @return Numeric design matrix in input-cell order. Error if transformation
+#'   drops
 #'   cells, creates missing/infinite values or gives redundant design columns.
 #' @noRd
 convert_covariate_df_to_design_matrix <- function(
@@ -40,7 +42,8 @@ convert_covariate_df_to_design_matrix <- function(
 
 
 #' Calculate cell summaries from an in-memory feature-by-cell count matrix
-#' @param matrix_in Count matrix, converted to column access for the calculation.
+#' @param matrix_in Count matrix, converted to column access for the
+#'   calculation.
 #' @param feature_names Labels matching feature rows. An empty vector disables
 #'   mitochondrial summaries even when requested.
 #' @param compute_p_mito,compute_max_feature Whether to include mitochondrial
@@ -100,12 +103,14 @@ compute_cell_covariates <- function(
 #' @param B Total number of draws, normally B1 + B2 + B3.
 #' @param calibration_check,control_group_complement Whether this is calibration
 #'   and whether controls are all other kept cells.
-#' @param calibration_group_size Number of NT guides combined per calibration group.
+#' @param calibration_group_size Number of NT guides combined per calibration
+#'   group.
 #' @param n_cells Number of cells kept after QC, used with complement controls.
 #' @return An R external pointer to C++ memory containing the complete draws.
 #'   Draws contain positions starting at 0 within the data used by a fit, not
 #'   original matrix column numbers. The pointer is temporary and must not be
-#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing R's
+#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing
+#'   R's
 #'   random-number stream.
 #' @details Complement discovery samples among all kept cells, drawing enough
 #'   positions for the largest treatment group. Calibration needs enough for a
@@ -141,7 +146,8 @@ get_synthetic_permutation_idxs <- function(
         )
         if (calibration_group_size > active_nt_count) {
             stop(
-                "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+                "`calibration_group_size` exceeds the active non-targeting ",
+                "gRNA count after QC (",
                 active_nt_count,
                 ")."
             )
@@ -205,7 +211,8 @@ get_synthetic_permutation_idxs <- function(
 
 
 #' Add the guide-group names used by the chosen integration strategy
-#' @param sceptre_object Object with guide/target metadata and requested pair tables.
+#' @param sceptre_object Object with guide/target metadata and requested pair
+#'   tables.
 #' @return Updated object. Union uses target names without expanding pairs.
 #'   Singleton and Bonferroni join each requested target to all matching guides,
 #'   so multiple guides or repeated metadata matches can create multiple rows.
@@ -213,50 +220,40 @@ get_synthetic_permutation_idxs <- function(
 #'   reserved group label non-targeting.
 #' @noRd
 update_dfs_based_on_grouping_strategy <- function(sceptre_object) {
-    grouping_strategy <- sceptre_object@grna_integration_strategy
-    if (grouping_strategy == "union") {
-        sceptre_object@grna_target_data_frame$grna_group <- sceptre_object@grna_target_data_frame$grna_target
-        sceptre_object@discovery_pairs$grna_group <- sceptre_object@discovery_pairs$grna_target
-        sceptre_object@positive_control_pairs$grna_group <- sceptre_object@positive_control_pairs$grna_target
+    metadata <- sceptre_object@data@grna_target_data_frame
+    strategy <- sceptre_object@spec@grna_integration_strategy
+    groups <- if (strategy == "union") {
+        metadata$grna_target
+    } else {
+        ifelse(
+            metadata$grna_target == "non-targeting",
+            "non-targeting",
+            metadata$grna_id
+        )
     }
-    if (grouping_strategy %in% c("singleton", "bonferroni")) {
-        grna_target_data_frame <- sceptre_object@grna_target_data_frame
-        discovery_pairs <- sceptre_object@discovery_pairs
-        positive_control_pairs <- sceptre_object@positive_control_pairs
-
-        # function to update targeting pairs
-        update_targeting_pairs <- function(
-            targeting_pairs,
-            updated_grna_target_data_frame
-        ) {
-            targeting_pairs$grna_group <- NULL
-            dplyr::left_join(
-                targeting_pairs,
-                updated_grna_target_data_frame |>
-                    dplyr::select(grna_target, grna_group),
-                by = "grna_target",
-                relationship = "many-to-many"
-            )
+    sceptre_object@preparation@guide_groups <- groups
+    compile <- function(requested) {
+        requested$grna_group <- NULL
+        if (strategy == "union") {
+            requested$grna_group <- requested$grna_target
+            return(requested)
         }
-
-        # update each data frame, appending a grna group column
-        updated_grna_target_data_frame <- grna_target_data_frame |>
-            dplyr::mutate(
-                grna_group = ifelse(
-                    grna_target == "non-targeting",
-                    "non-targeting",
-                    grna_id
-                )
-            )
-        sceptre_object@grna_target_data_frame <- updated_grna_target_data_frame
-        sceptre_object@discovery_pairs <- update_targeting_pairs(
-            discovery_pairs,
-            updated_grna_target_data_frame
+        mapping <- data.frame(
+            grna_target = metadata$grna_target,
+            grna_group = groups
         )
-        sceptre_object@positive_control_pairs <- update_targeting_pairs(
-            positive_control_pairs,
-            updated_grna_target_data_frame
+        dplyr::left_join(
+            requested,
+            mapping,
+            by = "grna_target",
+            relationship = "many-to-many"
         )
     }
-    return(sceptre_object)
+    sceptre_object@preparation@discovery_pairs <- compile(
+        sceptre_object@spec@discovery_pairs
+    )
+    sceptre_object@preparation@positive_control_pairs <- compile(
+        sceptre_object@spec@positive_control_pairs
+    )
+    sceptre_object
 }

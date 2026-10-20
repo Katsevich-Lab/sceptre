@@ -1,0 +1,13 @@
+{
+  "cases": 253,
+  "passed": 5641,
+  "failed": 0,
+  "errors": 0,
+  "warnings": 0,
+  "skips": 0,
+  "R": "R version 4.6.0 (2026-04-24)",
+  "platform": "aarch64-apple-darwin23",
+  "testthat": "3.3.2",
+  "package_path": "/Users/ekatsevi/.codex/worktrees/ab6a/sceptre",
+  "mode": "none"
+}

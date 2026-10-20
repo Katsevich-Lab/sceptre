@@ -1,0 +1,41 @@
+{
+  "source_commit": "8cbecfb88afdfbb3b45a991f63def7bcef8c8848",
+  "source_archive_sha256": "2c84adca90818abb8cc55ef049a4059d2a4214e564a6d0d4e0bd2089aa50210a",
+  "installed_package": "/private/tmp/sceptre-hardening-review-20261019/installed-8cbecfb/lib/sceptre",
+  "R": "R version 4.6.0 (2026-04-24)",
+  "package_version": "0.99.0",
+  "runtime": {
+    "R": "4.6.0",
+    "platform": "aarch64-apple-darwin23",
+    "package": "0.99.0",
+    "build": {
+      "R": "206dccfa54d6224512e1c0bcd3c643ca9c7e55168ca1311149c8c2fab794b132",
+      "native": "a56a9cb23f44c6a793d35b030d08d7e7817f31d41b6e12056c997e81f8e8423a"
+    },
+    "stats": "4.6.0",
+    "Matrix": "1.7.5",
+    "Rcpp": "1.1.1.1.1",
+    "ondisc": null,
+    "BLAS": "/Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib",
+    "matprod": "default",
+    "RNGkind": ["Mersenne-Twister", "Inversion", "Rejection"]
+  },
+  "both_original_findings_fixed": true,
+  "checks": {
+    "original_conflict_rejected": true,
+    "original_scope_vectors_absent": true,
+    "diagnostics_conflict_rejected": true,
+    "diagnostics_input_unchanged": true,
+    "remove_conflict_rejected": true,
+    "remove_input_unchanged": true,
+    "matching_warm_fit_preserved": true,
+    "full_context_identities_restored": true,
+    "stale_entry_replaced": true,
+    "stale_replacement_current": true,
+    "perturbation_proposal_attribute_isolated": true,
+    "response_proposal_attribute_isolated": true
+  },
+  "all_extended_checks_passed": true,
+  "check_count": 12,
+  "scope": "Clean git archive and fresh local install; two original repros plus focused extensions. Not full suite/check, R4.4, container or Nextflow qualification."
+}

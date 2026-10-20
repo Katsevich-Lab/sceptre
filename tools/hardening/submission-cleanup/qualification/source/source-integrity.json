@@ -1,0 +1,16 @@
+{
+  "scope": "All regular files under R/src/man/tests",
+  "source_commit": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "command": [
+    "Rscript",
+    "--vanilla",
+    "tools/hardening/validation/run-full-tests.R"
+  ],
+  "started_utc": "2026-10-20T00:32:06.650940+00:00",
+  "finished_utc": "2026-10-20T00:33:11.611974+00:00",
+  "exit_code": 0,
+  "file_count_before": 190,
+  "file_count_after": 190,
+  "source_unchanged": true,
+  "changes": {}
+}

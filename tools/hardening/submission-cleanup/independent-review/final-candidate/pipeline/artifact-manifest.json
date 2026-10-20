@@ -1,0 +1,57 @@
+{
+  "pipeline_production_baseline": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+  "pipeline_evidence_commit": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+  "package_source": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "package_evidence_head": "9a4694450b5d456beedc11f3876ecb1cd84cb05c",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "artifacts": [
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/RECHECK.md",
+      "relative_path": "RECHECK.md",
+      "bytes": 6389,
+      "sha256": "63118fd6f7820e5ac993762ef68a2f169346fdcc02e77959d43222b109dde2b8"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/verification.json",
+      "relative_path": "verification.json",
+      "bytes": 3783,
+      "sha256": "56b60b263de55fc1a9ba963c8761a264af26dd9aa0369c19704409f883317171"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/identities.json",
+      "relative_path": "identities.json",
+      "bytes": 824,
+      "sha256": "83d2b78349b4996772a4e27015d984ab6ff5873ac30536fd27afd9f12156512e"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/pipeline-source-manifest.json",
+      "relative_path": "pipeline-source-manifest.json",
+      "bytes": 3820,
+      "sha256": "83e7dcf58ff10fd2ed37f8807229ec008e4ecea6f0837383f63176efa1992399"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/image-runtime-readback.json",
+      "relative_path": "image-runtime-readback.json",
+      "bytes": 1638,
+      "sha256": "17ba309d8de5d4409795a65fb281e14e3ba8ff9ed76fe504722ac4ed50bc28bd"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/scientific-receipt-summary.json",
+      "relative_path": "scientific-receipt-summary.json",
+      "bytes": 3354,
+      "sha256": "6299fe3d3956d118b385e295e759df43e1408aa46ddd581d446072e180447ac8"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/receipt-index.json",
+      "relative_path": "receipt-index.json",
+      "bytes": 5466,
+      "sha256": "de21beba2e19a2e33915b7b5cd9aa6bf7fceda4ab70f33865c5ac6f5ad6941ff"
+    },
+    {
+      "path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/final-candidate/pipeline/evidence-commit-readback.json",
+      "relative_path": "evidence-commit-readback.json",
+      "bytes": 5560,
+      "sha256": "6178f4e71534f807e4f2270a3903301457b80853ec601b024d56a287569e15c3"
+    }
+  ]
+}

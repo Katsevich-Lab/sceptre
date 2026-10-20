@@ -1,14 +1,19 @@
 #' Test several guide groups using the same response fit and permutation draws
 #' @param expression Gene's counts in the selected model-fitting cell order.
 #' @param score Fitted means and score arrays in that same cell order.
-#' @param treatment_lookup Function returning each group's treated-cell positions
+#' @param treatment_lookup Function returning each group's treated-cell
+#'   positions
 #'   in those arrays, starting at 1, and their count.
 #' @param groups Guide-group names in request order, including repeats.
-#' @param synthetic_idxs Complete shared set of permutation draws. Draw positions
-#'   start at 0 for C++; observed treatment positions start at 1 and are converted
+#' @param synthetic_idxs Complete shared set of permutation draws. Draw
+#'   positions
+#'   start at 0 for C++; observed treatment positions start at 1 and are
+#'   converted
 #'   by `run_association_test()`.
-#' @param test_options Stage sizes B1/B2/B3, test direction and approximation setting.
-#' @param output_amount Public output level; level 3 includes resampled statistics.
+#' @param test_options Stage sizes B1/B2/B3, test direction and approximation
+#'   setting.
+#' @param output_amount Public output level; level 3 includes resampled
+#'   statistics.
 #' @return C++ result lists in guide-group order. The response fit, score arrays
 #'   and random draws are already prepared; this worker applies the tests.
 #' @noRd
@@ -51,11 +56,14 @@ test_permutation_shared_fit <- function(
 #'   intercept-only formula.
 #' @param index Cell lookups prepared for discovery with NT controls.
 #' @param groups Guide-group names in request order.
-#' @param synthetic_idxs Complete shared hybrid-permutation draws. Each test uses
+#' @param synthetic_idxs Complete shared hybrid-permutation draws. Each test
+#'   uses
 #'   the first n_trt entries of each draw for its own treatment-cell count.
 #' @param test_options,output_amount Validated test settings and output level.
-#' @return C++ results in guide-group order. Each group gets its own response fit,
-#'   with treatment cells first, then NT cells, keeping membership order and repeats.
+#' @return C++ results in guide-group order. Each group gets its own response
+#'   fit,
+#'   with treatment cells first, then NT cells, keeping membership order and
+#'   repeats.
 #'   These group-specific fits are not saved in the shared response-fit list.
 #'   The supplied draws are reused, rather than generated again here.
 #' @noRd
@@ -98,17 +106,22 @@ test_permutation_group_fit <- function(
 
 #' Test one guide group's requested genes using shared response fits
 #' @param response_store Response count matrix, readable one gene at a time.
-#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.
+#' @param response_rows Original matrix gene-row numbers, starting at 1, in
+#'   request order.
 #' @param response_ids Corresponding gene names used to find their saved fits.
 #' @param design Design matrix whose rows follow `source_cells`.
 #' @param source_cells Original matrix column numbers for this fit, in order;
 #'   repeats are allowed.
 #' @param treatment Treated cells' positions within this fit, starting at 1, and
 #'   their count.
-#' @param response_fits Previously prepared response fits for these same cells/design.
+#' @param response_fits Previously prepared response fits for these same
+#'   cells/design.
 #' @param test_options,output_amount Validated test settings and output level.
+#' @param probabilities Optional probabilities reconstructed from a compatible
+#'   compact perturbation fit. NULL follows the original one-fit cold path.
 #' @return C++ results in requested gene order. Fit assignment probabilities and
-#'   generate B1+B2+B3 CRT draws once for this guide, then read each gene and use
+#'   generate B1+B2+B3 CRT draws once for this guide, then read each gene and
+#'   use
 #'   its saved response fit. This worker does not add new response fits.
 #' @noRd
 test_crt_shared_fit <- function(
@@ -120,9 +133,15 @@ test_crt_shared_fit <- function(
     treatment,
     response_fits,
     test_options,
-    output_amount
+    output_amount,
+    probabilities = NULL
 ) {
-    probabilities <- fit_assignment_probabilities(treatment$trt_idxs, design)
+    if (is.null(probabilities)) {
+        probabilities <- fit_assignment_probabilities(
+            treatment$trt_idxs,
+            design
+        )
+    }
     synthetic_idxs <- sample_crt_indices(
         probabilities,
         B = test_options$total_resamples
@@ -162,14 +181,22 @@ test_crt_shared_fit <- function(
 
 #' Fit and test one guide group's genes using its treatment-plus-NT cells
 #' @param response_store Response count matrix, readable one gene at a time.
-#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.
+#' @param response_rows Original matrix gene-row numbers, starting at 1, in
+#'   request order.
 #' @param design Design matrix for all cells kept after QC, in that order.
-#' @param fit_view Cell selection from `make_fit_view()`: `fit_to_analysis` selects
+#' @param fit_view Cell selection from `make_fit_view()`: `fit_to_analysis`
+#'   selects
 #'   design rows; `source_cells` selects original count-matrix columns;
-#'   `trt_fit_pos` locates treatment cells within the selected data, starting at 1.
+#'   `trt_fit_pos` locates treatment cells within the selected data, starting at
+#'   1.
 #' @param test_options,output_amount Validated test settings and output level.
+#' @param probabilities Optional probabilities reconstructed from a compatible
+#'   compact perturbation fit. NULL follows the original one-fit cold path.
+#' @param group_design Optional existing slice of design in fit_view order.
+#'   NULL constructs the same slice locally.
 #' @return C++ results in requested gene order. Fit assignment probabilities and
-#'   generate a full set of CRT draws once for this guide. Then read, fit and test
+#'   generate a full set of CRT draws once for this guide. Then read, fit and
+#'   test
 #'   each gene using the selected cells. These response fits belong only to this
 #'   group's cells and are not saved for other groups to reuse.
 #' @noRd
@@ -179,13 +206,19 @@ test_crt_group_fit <- function(
     design,
     fit_view,
     test_options,
-    output_amount
+    output_amount,
+    probabilities = NULL,
+    group_design = NULL
 ) {
-    group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
-    probabilities <- fit_assignment_probabilities(
-        fit_view$trt_fit_pos,
-        group_design
-    )
+    if (is.null(group_design)) {
+        group_design <- design[fit_view$fit_to_analysis, , drop = FALSE]
+    }
+    if (is.null(probabilities)) {
+        probabilities <- fit_assignment_probabilities(
+            fit_view$trt_fit_pos,
+            group_design
+        )
+    }
     synthetic_idxs <- sample_crt_indices(
         probabilities,
         B = test_options$total_resamples

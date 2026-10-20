@@ -1,0 +1,8 @@
+.libPaths(c('/private/tmp/sceptre-architecture-audit-xqkki89z/library', .libPaths()))
+library(sceptre)
+source('/private/tmp/sceptre-base-helper.R')
+inputs <- readRDS('tests/testthat/fixtures/refactor/inputs.rds')
+cases <- readRDS('tests/testthat/fixtures/refactor/cases.rds')
+outputs <- lapply(cases, function(case) refactor_run_case(inputs, case))
+saveRDS(outputs, '/private/tmp/sceptre-components-parity-base.rds')
+cat('completed',length(outputs),'baseline workflows\n')

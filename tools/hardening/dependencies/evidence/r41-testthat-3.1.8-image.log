@@ -1,0 +1,62 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.upgrade
+#1 transferring dockerfile: 286B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/sceptre-r41-dependency-floor:local
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM docker.io/library/sceptre-r41-dependency-floor:local@sha256:6eade6c3720edb0b76ecc1173cafd94e617335d03bcb2a59f1314d35e104daa0
+#4 resolve docker.io/library/sceptre-r41-dependency-floor:local@sha256:6eade6c3720edb0b76ecc1173cafd94e617335d03bcb2a59f1314d35e104daa0 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 731.34kB 0.0s done
+#5 DONE 0.0s
+
+#6 [2/3] COPY testthat_3.1.8.tar.gz /tmp/testthat_3.1.8.tar.gz
+#6 DONE 0.0s
+
+#7 [3/3] RUN R CMD INSTALL --library=/opt/sceptre-floor-library /tmp/testthat_3.1.8.tar.gz && Rscript -e 'stopifnot(packageVersion("testthat")=="3.1.8")'
+#7 0.418 * installing *source* package ‘testthat’ ...
+#7 0.429 ** package ‘testthat’ successfully unpacked and MD5 sums checked
+#7 0.451 ** using staged installation
+#7 0.463 ** libs
+#7 0.466 gcc -I"/usr/share/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT     -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
+#7 0.494 gcc -I"/usr/share/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT     -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c reassign.c -o reassign.o
+#7 0.524 g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT     -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-catch.cpp -o test-catch.o
+#7 1.005 g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT     -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-example.cpp -o test-example.o
+#7 1.612 g++ -std=gnu++14 -I"/usr/share/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT     -fpic  -g -O2 -ffile-prefix-map=/build/r-base-9G2I6Z/r-base-4.1.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-runner.cpp -o test-runner.o
+#7 12.13 g++ -std=gnu++14 -shared -L/usr/lib/R/lib -Wl,-z,relro -o testthat.so init.o reassign.o test-catch.o test-example.o test-runner.o -L/usr/lib/R/lib -lR
+#7 12.24 installing to /opt/sceptre-floor-library/00LOCK-testthat/00new/testthat/libs
+#7 12.24 ** R
+#7 12.27 ** inst
+#7 12.27 ** byte-compile and prepare package for lazy loading
+#7 18.04 ** help
+#7 18.17 *** installing help indices
+#7 18.26 *** copying figures
+#7 18.26 ** building package indices
+#7 18.48 ** installing vignettes
+#7 18.49 ** testing if installed package can be loaded from temporary location
+#7 18.70 ** checking absolute paths in shared objects and dynamic libraries
+#7 18.72 ** testing if installed package can be loaded from final location
+#7 19.13 ** testing if installed package keeps a record of temporary installation path
+#7 19.13 * DONE (testthat)
+#7 DONE 19.4s
+
+#8 exporting to image
+#8 exporting layers
+#8 exporting layers 0.3s done
+#8 exporting manifest sha256:c275c0da914d9db5319c0e5405c1adf891f739e9309a41efc82027c3350a9a95
+#8 exporting manifest sha256:c275c0da914d9db5319c0e5405c1adf891f739e9309a41efc82027c3350a9a95 0.0s done
+#8 exporting config sha256:9076bb5f1d7561e50c5ba93d613bf54fdb4c46033e01222e00bd17750672b143 done
+#8 exporting attestation manifest sha256:615ad742c49651c670f17f1958f3b4f04052f9e0b0225d70506e663cdfd7c5b0 0.0s done
+#8 exporting manifest list sha256:707a616855761f837bb07992e48e31d5a2c7824bed00290f8eba0d869c502acf done
+#8 naming to docker.io/library/sceptre-r41-dependency-floor:testthat-3.1.8 done
+#8 unpacking to docker.io/library/sceptre-r41-dependency-floor:testthat-3.1.8 0.1s done
+#8 DONE 0.5s

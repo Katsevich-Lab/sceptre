@@ -1,0 +1,62 @@
+ℹ Loading sceptre
+component-results: ...............................Constructing negative control pairs.
+ ✓
+..........................
+refactor-calibration-safety: ................................................................................................
+refactor-context-execution: .....................................................................................................................
+run-plan-migration: ...........................................
+run-plans: ............................................................................
+s4_analysis_functs_2: Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_1 (1 of 9)
+Running precomputation on response response_37 (5 of 9)
+Analyzing pairs containing gRNA group nt1 (1 of 6)
+Analyzing pairs containing gRNA group nt5 (5 of 6)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_3 (1 of 9)
+Running precomputation on response response_28 (5 of 9)
+Analyzing pairs containing gRNA group nt1&nt5&nt10 (1 of 9)
+Analyzing pairs containing gRNA group nt6&nt7&nt8 (5 of 9)
+......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t3 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_10 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 2)
+.......Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the power check.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+....Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 2)
+...
+
+══ DONE ════════════════════════════════════════════════════════════════════════

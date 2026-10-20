@@ -100,7 +100,7 @@ test_that("run_qc remove cells with multiple grnas in low moi", {
     # the only cells in use are those with a single grna UMI count exceeding
     # the threshold
     expect_equal(
-        scep_low@cells_in_use,
+        scep_low@preparation@analysis_cells,
         (1:num_grnas)[-locs_of_extra_expression]
     )
 })
@@ -149,7 +149,7 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
         ) |>
         assign_grnas(method = "thresholding", threshold = 5)
 
-    expect_equal(run_qc(scep_high_pre_qc)@cells_in_use, 1:num_cells) # all here
+    expect_equal(run_qc(scep_high_pre_qc)@preparation@analysis_cells, 1:num_cells) # all here
 
     cells_to_remove <- c(1, 3, 5)
 
@@ -157,7 +157,7 @@ test_that("run_qc remove cells via `additional_cells_to_remove` high moi", {
         scep_high_pre_qc,
         additional_cells_to_remove = cells_to_remove
     )
-    expect_equal(scep_qc@cells_in_use, (1:num_cells)[-cells_to_remove])
+    expect_equal(scep_qc@preparation@analysis_cells, (1:num_cells)[-cells_to_remove])
 })
 
 
@@ -204,35 +204,35 @@ test_that("run_qc remove cells with `response_n_umis_range` and `response_n_nonz
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_all@cells_in_use, 1:100) # all remain currently
+    expect_identical(scep_all@preparation@analysis_cells, 1:100) # all remain currently
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0.02, 1),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_qc@cells_in_use, (1:100)[-zero_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-zero_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, .97),
             response_n_nonzero_range = c(0, 1)
         )
-    expect_identical(scep_qc@cells_in_use, (1:100)[-high_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-high_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0.03, 1)
         )
-    expect_identical(scep_qc@cells_in_use, (1:100)[-zero_umi_count_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-zero_umi_count_idx])
 
     scep_qc <- scep_high_pre_qc |>
         run_qc(
             response_n_umis_range = c(0, 1),
             response_n_nonzero_range = c(0, .02)
         )
-    expect_equal(scep_qc@cells_in_use, zero_umi_count_idx)
+    expect_equal(scep_qc@preparation@analysis_cells, zero_umi_count_idx)
 })
 
 test_that("run_qc remove cells with `p_mito_threshold` high moi", {
@@ -282,7 +282,7 @@ test_that("run_qc remove cells with `p_mito_threshold` high moi", {
             p_mito_threshold = .93
         )
 
-    expect_identical(scep_qc@cells_in_use, (1:100)[-high_p_mito_idx])
+    expect_identical(scep_qc@preparation@analysis_cells, (1:100)[-high_p_mito_idx])
 })
 
 test_that("run_qc test positive control pairs", {
@@ -377,17 +377,17 @@ test_that("run_qc test positive control pairs", {
 
     # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
     expect_equal(
-        scep_low_control_nt_all_pass@positive_control_pairs_with_info$n_nonzero_trt,
+        scep_low_control_nt_all_pass@preparation@positive_control_pairs_with_info$n_nonzero_trt,
         c(10, 10, 0)
     )
     expect_equal(
-        scep_low_control_nt_all_pass@positive_control_pairs_with_info$n_nonzero_cntrl,
+        scep_low_control_nt_all_pass@preparation@positive_control_pairs_with_info$n_nonzero_cntrl,
         c(10, 0, 10)
     )
 
     # confirming all pass QC with these thresholds
     expect_true(all(
-        scep_low_control_nt_all_pass@positive_control_pairs_with_info$pass_qc
+        scep_low_control_nt_all_pass@preparation@positive_control_pairs_with_info$pass_qc
     ))
 
     # for this one only t3 fails because it has no cells expressing the response, since no gRNAs express t3
@@ -399,7 +399,7 @@ test_that("run_qc test positive control pairs", {
             n_nonzero_cntrl_thresh = 0
         )
     expect_equal(
-        scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc,
+        scep_low_control_nt_fail@preparation@positive_control_pairs_with_info$pass_qc,
         c(TRUE, TRUE, FALSE)
     )
 
@@ -412,7 +412,7 @@ test_that("run_qc test positive control pairs", {
             n_nonzero_cntrl_thresh = 1
         )
     expect_equal(
-        scep_low_control_nt_fail@positive_control_pairs_with_info$pass_qc,
+        scep_low_control_nt_fail@preparation@positive_control_pairs_with_info$pass_qc,
         c(TRUE, FALSE, TRUE)
     )
 
@@ -439,17 +439,17 @@ test_that("run_qc test positive control pairs", {
 
     # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
     expect_equal(
-        scep_high_control_complement_all_pass@positive_control_pairs_with_info$n_nonzero_trt,
+        scep_high_control_complement_all_pass@preparation@positive_control_pairs_with_info$n_nonzero_trt,
         c(10, 10, 0)
     )
     expect_equal(
-        scep_high_control_complement_all_pass@positive_control_pairs_with_info$n_nonzero_cntrl,
+        scep_high_control_complement_all_pass@preparation@positive_control_pairs_with_info$n_nonzero_cntrl,
         c(20, 0, 40)
     )
 
     # confirming all pass QC with these thresholds
     expect_true(all(
-        scep_high_control_complement_all_pass@positive_control_pairs_with_info$pass_qc
+        scep_high_control_complement_all_pass@preparation@positive_control_pairs_with_info$pass_qc
     ))
 
     scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
@@ -460,7 +460,7 @@ test_that("run_qc test positive control pairs", {
             n_nonzero_cntrl_thresh = 0
         )
     expect_equal(
-        scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc,
+        scep_high_control_complement_fail@preparation@positive_control_pairs_with_info$pass_qc,
         c(TRUE, TRUE, FALSE)
     )
 
@@ -472,7 +472,7 @@ test_that("run_qc test positive control pairs", {
             n_nonzero_cntrl_thresh = 21
         )
     expect_equal(
-        scep_high_control_complement_fail@positive_control_pairs_with_info$pass_qc,
+        scep_high_control_complement_fail@preparation@positive_control_pairs_with_info$pass_qc,
         c(FALSE, FALSE, TRUE)
     )
 })
@@ -557,17 +557,17 @@ test_that("run_qc test discovery pairs", {
 
     # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
     expect_equal(
-        scep_low_control_nt_all_pass@discovery_pairs_with_info$n_nonzero_trt,
+        scep_low_control_nt_all_pass@preparation@discovery_pairs_with_info$n_nonzero_trt,
         c(10, 0, 0)
     )
     expect_equal(
-        scep_low_control_nt_all_pass@discovery_pairs_with_info$n_nonzero_cntrl,
+        scep_low_control_nt_all_pass@preparation@discovery_pairs_with_info$n_nonzero_cntrl,
         c(0, 10, 10)
     )
 
     # confirming all pass QC with these thresholds
     expect_true(all(
-        scep_low_control_nt_all_pass@discovery_pairs_with_info$pass_qc
+        scep_low_control_nt_all_pass@preparation@discovery_pairs_with_info$pass_qc
     ))
 
     scep_low_control_nt_fail <- scep_low_control_nt_pre_qc |>
@@ -578,7 +578,7 @@ test_that("run_qc test discovery pairs", {
             n_nonzero_cntrl_thresh = 0
         ) # don't want to remove the cells I'm messing with
     expect_equal(
-        scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc,
+        scep_low_control_nt_fail@preparation@discovery_pairs_with_info$pass_qc,
         c(TRUE, FALSE, FALSE)
     )
 
@@ -590,7 +590,7 @@ test_that("run_qc test discovery pairs", {
             n_nonzero_cntrl_thresh = 1
         ) # don't want to remove the cells I'm messing with
     expect_equal(
-        scep_low_control_nt_fail@discovery_pairs_with_info$pass_qc,
+        scep_low_control_nt_fail@preparation@discovery_pairs_with_info$pass_qc,
         c(FALSE, TRUE, TRUE)
     )
 
@@ -616,17 +616,17 @@ test_that("run_qc test discovery pairs", {
 
     # confirming the values of `n_nonzero_trt` and `n_nonzero_cntrl`
     expect_equal(
-        scep_high_control_complement_all_pass@discovery_pairs_with_info$n_nonzero_trt,
+        scep_high_control_complement_all_pass@preparation@discovery_pairs_with_info$n_nonzero_trt,
         c(10, 0, 0)
     )
     expect_equal(
-        scep_high_control_complement_all_pass@discovery_pairs_with_info$n_nonzero_cntrl,
+        scep_high_control_complement_all_pass@preparation@discovery_pairs_with_info$n_nonzero_cntrl,
         c(10, 30, 40)
     )
 
     # confirming all pass QC with these thresholds
     expect_true(all(
-        scep_high_control_complement_all_pass@discovery_pairs_with_info$pass_qc
+        scep_high_control_complement_all_pass@preparation@discovery_pairs_with_info$pass_qc
     ))
 
     scep_high_control_complement_fail <- scep_high_control_complement_pre_qc |>
@@ -637,7 +637,7 @@ test_that("run_qc test discovery pairs", {
             n_nonzero_cntrl_thresh = 0
         ) # don't want to remove the cells I'm messing with
     expect_equal(
-        scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc,
+        scep_high_control_complement_fail@preparation@discovery_pairs_with_info$pass_qc,
         c(TRUE, FALSE, FALSE)
     )
 
@@ -649,7 +649,7 @@ test_that("run_qc test discovery pairs", {
             n_nonzero_cntrl_thresh = 21
         ) # don't want to remove the cells I'm messing with
     expect_equal(
-        scep_high_control_complement_fail@discovery_pairs_with_info$pass_qc,
+        scep_high_control_complement_fail@preparation@discovery_pairs_with_info$pass_qc,
         c(FALSE, TRUE, TRUE)
     )
 })
@@ -750,7 +750,7 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
 
     # making sure that the only cells removed are the ones intended to be removed
     expect_setequal(
-        scep_low@cells_in_use,
+        scep_low@preparation@analysis_cells,
         all_cells[
             -c(
                 cells_to_remove_low_umi,
@@ -762,17 +762,17 @@ test_that("run_qc PC pairs interaction between cellwise QC with `response_n_umis
 
     # 6 cells were removed from on-target 1, 3 cells from on-target 2
     expect_equal(
-        scep_low@positive_control_pairs_with_info$n_nonzero_trt,
+        scep_low@preparation@positive_control_pairs_with_info$n_nonzero_trt,
         c(4, 7, 0)
     )
     # 4 NT cells were removed
     expect_equal(
-        scep_low@positive_control_pairs_with_info$n_nonzero_cntrl,
+        scep_low@preparation@positive_control_pairs_with_info$n_nonzero_cntrl,
         c(6, 0, 6)
     )
 
     expect_equal(
-        scep_low@positive_control_pairs_with_info$pass_qc,
+        scep_low@preparation@positive_control_pairs_with_info$pass_qc,
         c(FALSE, TRUE, FALSE)
     )
 })
@@ -858,24 +858,24 @@ test_that("run_qc discovery pairs interaction between cellwise QC with `response
         )
 
     expect_setequal(
-        scep_high@cells_in_use,
+        scep_high@preparation@analysis_cells,
         all_cells[-c(cells_to_remove_low_umi, cells_to_remove_high_umi)]
     )
 
     # 4 cells remain in t1
     expect_equal(
-        scep_high@discovery_pairs_with_info$n_nonzero_trt,
+        scep_high@preparation@discovery_pairs_with_info$n_nonzero_trt,
         c(4, 0, 0)
     )
     # 13 cells were removed from the control group for t3
     expect_equal(
-        scep_high@discovery_pairs_with_info$n_nonzero_cntrl,
+        scep_high@preparation@discovery_pairs_with_info$n_nonzero_cntrl,
         c(10, 20, 27)
     )
 
     # pair1 only has 10 nonzero control cells
     expect_equal(
-        scep_high@discovery_pairs_with_info$pass_qc,
+        scep_high@preparation@discovery_pairs_with_info$pass_qc,
         c(FALSE, TRUE, TRUE)
     )
 })

@@ -1,0 +1,24 @@
+{
+  "checker": "1.47.26",
+  "R": "4.6.0",
+  "disabled_flags": [],
+  "baseline_counts": {
+    "error": 1,
+    "warning": 1,
+    "note": 5
+  },
+  "candidate_counts": {
+    "error": 1,
+    "warning": 1,
+    "note": 5
+  },
+  "same_diagnostic_category_keys": true,
+  "same_inherited_dependency_warning": true,
+  "same_unchanged_R_version_and_admin_subscription_notes": true,
+  "same_support_site_timeout_error_ignoring_elapsed_milliseconds": true,
+  "baseline_long_functions": 48,
+  "candidate_long_functions": 44,
+  "baseline_long_lines": 145,
+  "candidate_long_lines": 108,
+  "interpretation": "Both full-default runs retain the support-site timeout and unchanged R-version/subscription notes. Neither is a clean all-default check. Source-instance mapping is separately verified using both checker versions."
+}

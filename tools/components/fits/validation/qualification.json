@@ -1,0 +1,57 @@
+{
+  "implementation_commit": "e545b0891292ba82399271ec35c2e1f6818d0cbe",
+  "RunPlan_checkpoint_commit": "e86eb48",
+  "saved_schema": 3,
+  "platform": "macOS arm64",
+  "R": "4.6.0",
+  "ondisc": "1.2.0",
+  "BiocCheck": "1.47.26",
+  "source_tarball_sha256": "57fbb7038b4180d5710891928a7da7c1bb5a81bc36f2d01a37ed0cc254ee6df1",
+  "R_CMD_build": "passed including vignette generation",
+  "R_CMD_check": "OK",
+  "installed_tests": {
+    "pass": 5069,
+    "fail": 0,
+    "warn": 0,
+    "skip": 0
+  },
+  "source_tests": {
+    "cases": 205,
+    "expectations": 5069,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skipped": 0,
+    "passed": 5069,
+    "elapsed_seconds": 48.951,
+    "failures": []
+  },
+  "source_checkpoint_followup": "One nonnumerical methods:: qualification for slot replacement; installed suite covers exact final source. Original source/parity hashes retained.",
+  "BiocCheck_results": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 6
+  },
+  "BiocCheck_disabled": [
+    "R-version recommendation",
+    "interactive bioc-help check"
+  ],
+  "parity": {
+    "cases": 7,
+    "comparisons": 231,
+    "tolerance": 0,
+    "all_equal": true,
+    "scope": "computed tables, available preparation payloads, compact response fits, warnings, R RNG; equal realized budgets"
+  },
+  "native_source_changes": 0,
+  "independent_integration_review": "no actionable findings; separately exercised actual cold/warm complement and low-MOI NT, stale context, invalidation, failed-run preservation and saved migration/serialization",
+  "reference_PR": {
+    "number": 233,
+    "title": "Cache the gRNA precomputation on the sceptre_object",
+    "author": "Eugenio Mattei",
+    "head": "3f1ff0650078b382662ee70b72ea5c72fa15b031",
+    "url": "https://github.com/Katsevich-Lab/sceptre/pull/233"
+  },
+  "optional_dependency_probe": "passed: package load, actual schema-one memory migration/access, closed typed-store inspection without ondisc",
+  "additional_RunPlan_probe": "data.table pair payload survives serialization with identical execution certificate and successful contextual validation"
+}

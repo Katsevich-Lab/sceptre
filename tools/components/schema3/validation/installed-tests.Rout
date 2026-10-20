@@ -1,0 +1,112 @@
+
+R version 4.6.0 (2026-04-24) -- "Because it was There"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(testthat)
+> library(sceptre)
+> 
+> test_check("sceptre")
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Performing gRNA-to-cell assignments for gRNA grna_1 (1 of 4)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Constructing negative control pairs.
+ ✓
+Note: Unable to generate the number of negative control pairs (1406) requested. Generating as many negative control pairs (1000) as possible.
+Running calibration_check in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//Rtmp7nUnLT/sceptre_logs/ and view the files calibration_check_*.out for progress updates.
+ ✓
+Running power_check in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//Rtmp7nUnLT/sceptre_logs/ and view the files power_check_*.out for progress updates.
+ ✓
+Running discovery_analysis in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//Rtmp7nUnLT/sceptre_logs/ and view the files discovery_analysis_*.out for progress updates.
+ ✓
+Running gRNA assignments in parallel.
+Change directories to /var/folders/1w/h831hyps5qs5lzkh5xjj0_wh0000gq/T//Rtmp7nUnLT/sceptre_logs/ and view the files assign_grnas_*.out for progress updates.
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 4)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_1 (1 of 9)
+Running precomputation on response response_37 (5 of 9)
+Analyzing pairs containing gRNA group nt1 (1 of 6)
+Analyzing pairs containing gRNA group nt5 (5 of 6)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Running precomputation on response response_3 (1 of 9)
+Running precomputation on response response_28 (5 of 9)
+Analyzing pairs containing gRNA group nt1&nt5&nt10 (1 of 9)
+Analyzing pairs containing gRNA group nt6&nt7&nt8 (5 of 9)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t3 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_10 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+The calibration check (`run_calibration_check()`) should be run before the power check.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Constructing negative control pairs.
+ ✓
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_9 (1 of 3)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response t1 (1 of 2)
+Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.
+Generating permutation resamples.
+ ✓
+Analyzing pairs containing response response_4 (1 of 2)
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 4848 ]
+> 
+> proc.time()
+   user  system elapsed 
+ 37.487   4.443  42.798 

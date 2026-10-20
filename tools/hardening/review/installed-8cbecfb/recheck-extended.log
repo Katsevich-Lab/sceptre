@@ -1,0 +1,98 @@
+$mode
+[1] "installed"
+
+$package
+[1] "/private/tmp/sceptre-hardening-review-20261019/installed-8cbecfb/lib/sceptre"
+
+$package_version
+[1] "0.99.0"
+
+$R
+[1] "R version 4.6.0 (2026-04-24)"
+
+$overlay_source
+NULL
+
+$manifest_cell_paths
+[1] "manifest$plan@identity$cells"
+
+$proposal_cell_paths
+$proposal_cell_paths[[1]]
+character(0)
+
+$proposal_cell_paths[[2]]
+character(0)
+
+
+$matching_control_collected_current
+[1] TRUE
+
+$conflict_rejected
+[1] TRUE
+
+$conflict_error
+[1] "Conflicting perturbation fit for an existing valid warm cache entry."
+
+$original_coefficient
+[1] -1.237565
+
+$injected_coefficient
+[1] -0.2375649
+
+$collected_coefficient
+NULL
+
+$accepted_result_current
+NULL
+
+$caller_unchanged
+[1] TRUE
+
+$compact_proposal_certificates
+[1] TRUE
+
+$group
+[1] "A"
+
+$unit_id
+[1] "unit-000001"
+
+$all_fixed
+[1] TRUE
+
+$original_conflict_rejected
+[1] TRUE
+
+$original_scope_vectors_absent
+[1] TRUE
+
+$diagnostics_conflict_rejected
+[1] TRUE
+
+$diagnostics_input_unchanged
+[1] TRUE
+
+$remove_conflict_rejected
+[1] TRUE
+
+$remove_input_unchanged
+[1] TRUE
+
+$matching_warm_fit_preserved
+[1] TRUE
+
+$full_context_identities_restored
+[1] TRUE
+
+$stale_entry_replaced
+[1] TRUE
+
+$stale_replacement_current
+[1] TRUE
+
+$perturbation_proposal_attribute_isolated
+[1] TRUE
+
+$response_proposal_attribute_isolated
+[1] TRUE
+

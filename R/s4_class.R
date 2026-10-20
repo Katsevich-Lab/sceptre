@@ -1,20 +1,30 @@
+# Domain state only. RunPlan and CellView are temporary typed values.
 #' @import Matrix
-# Users and Nextflow save objects with these 56 fields (S4 slots). Matrix fields
-# use one-element lists. Keep this saved format compatible; temporary analysis
-# lists are built during a run and are not added to the saved object.
+#' @importFrom methods new slot validObject
+setClassUnion("CountHandle", c("externalptr", "NULL"))
 setClass(
-    "sceptre_object",
-    slots = list(
-        # raw data
-        response_matrix = "list",
-        grna_matrix = "list",
+    "BackedCountStore",
+    slots = c(descriptor = "list", handle = "CountHandle"),
+    prototype = list(handle = NULL)
+)
+setClassUnion("CountStore", c("dgRMatrix", "BackedCountStore", "NULL"))
+
+setClass(
+    "ScreenData",
+    slots = c(
+        response_names = "character",
+        response_matrix = "CountStore",
+        grna_matrix = "CountStore",
         covariate_data_frame = "data.frame",
-        covariate_matrix = "matrix",
         grna_target_data_frame = "data.frame",
         low_moi = "logical",
-        covariate_names = "character",
-
-        # analysis parameters
+        import_grna_assignment_info = "list",
+        identity = "character"
+    )
+)
+setClass(
+    "AnalysisSpec",
+    slots = c(
         discovery_pairs = "data.frame",
         positive_control_pairs = "data.frame",
         formula_object = "formula",
@@ -24,55 +34,88 @@ setClass(
         run_permutations = "logical",
         n_nonzero_trt_thresh = "integer",
         n_nonzero_cntrl_thresh = "integer",
-        B1 = "integer",
-        B2 = "integer",
-        B3 = "integer",
         grna_integration_strategy = "character",
         grna_assignment_method = "character",
         grna_assignment_hyperparameters = "list",
         multiple_testing_alpha = "numeric",
         multiple_testing_method = "character",
-        cell_removal_metrics = "integer",
         cellwise_qc_thresholds = "list",
-
-        # computed objects
-        mitochondrial_gene = "logical",
-        M_matrix = "matrix",
-        n_nonzero_tot_vector = "integer",
+        additional_cells_to_remove = "integer"
+    )
+)
+setClass(
+    "PreparationRecord",
+    slots = c(
+        design_matrix = "matrix",
+        nt_nonzero_matrix = "matrix",
+        control_nonzero_totals = "integer",
         discovery_pairs_with_info = "data.frame",
         positive_control_pairs_with_info = "data.frame",
-        negative_control_pairs = "data.frame",
-        initial_grna_assignment_list = "list",
-        grna_assignments_raw = "list",
-        grna_assignments = "list",
-        grnas_per_cell = "integer",
-        cells_w_zero_or_twoplus_grnas = "integer",
-        cells_in_use = "integer",
-        n_discovery_pairs = "integer",
-        n_ok_discovery_pairs = "integer",
-        n_positive_control_pairs = "integer",
-        n_ok_positive_control_pairs = "integer",
-        calibration_group_size = "integer",
+        guide_assignments = "list",
+        source_groups = "list",
+        analysis_groups = "list",
+        guide_counts_per_cell = "integer",
+        assignment_exclusions = "integer",
+        analysis_cells = "integer",
+        cell_removal_metrics = "integer",
+        stages = "list",
+        guide_groups = "character",
+        discovery_pairs = "data.frame",
+        positive_control_pairs = "data.frame"
+    )
+)
+setClass(
+    "FitCache",
+    slots = c(
+        response_fits = "list",
+        response_identity = "list",
+        perturbation_fits = "list",
+        perturbation_identity = "list"
+    )
+)
+setClass("ResultRecord", slots = c(records = "list", import_metadata = "list"))
+
+setClass(
+    "RunPlan",
+    slots = c(
+        analysis = "character",
+        pairs = "data.frame",
+        B1 = "integer",
+        B2 = "integer",
+        B3 = "integer",
         n_calibration_pairs = "integer",
-        import_grna_assignment_info = "list",
-        mean_cells_per_grna = "numeric",
+        calibration_group_size = "integer",
+        identity = "list"
+    )
+)
 
-        # cached objects
-        response_precomputations = "list",
-
-        # flags
-        last_function_called = "character",
-        functs_called = "logical",
-
-        # results
-        calibration_result = "data.frame",
-        power_result = "data.frame",
-        discovery_result = "data.frame",
-
-        # odm-related entries
-        nuclear = "logical",
-        nf_pipeline = "logical",
-        integer_id = "integer",
-        elements_to_analyze = "character"
+setClass(
+    "CellView",
+    slots = c(
+        fit_to_analysis = "integer",
+        source_cells = "integer",
+        trt_fit_pos = "integer",
+        n_trt = "integer"
+    )
+)
+# The coordinator owns workflow transitions and references, never duplicate
+# data.
+setClass(
+    "sceptre_object",
+    slots = c(
+        data = "ScreenData",
+        spec = "AnalysisSpec",
+        preparation = "PreparationRecord",
+        fits = "FitCache",
+        results = "ResultRecord",
+        schema_version = "integer"
+    ),
+    prototype = list(
+        data = new("ScreenData"),
+        spec = new("AnalysisSpec"),
+        preparation = new("PreparationRecord"),
+        fits = new("FitCache"),
+        results = new("ResultRecord"),
+        schema_version = 3L
     )
 )

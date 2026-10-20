@@ -1,0 +1,182 @@
+component-results: 12.................3..Constructing negative control pairs.
+ ✓
+....................4....
+refactor-storage: ..........SS..........................................................S
+result-ownership: 5W6W78.
+worker-errors: ................
+
+══ Skipped ═════════════════════════════════════════════════════════════════════
+1. legacy matrix conversion agrees with the selected ondisc copy ('test-refactor-storage.R:33:5') - Reason: ondisc cannot be loaded
+
+2. legacy backed storage coerces fractions and retains stored positions ('test-refactor-storage.R:58:5') - Reason: ondisc cannot be loaded
+
+3. backed storage has the same ordered count and ownership contracts ('test-refactor-storage.R:166:5') - Reason: ondisc cannot be loaded
+
+══ Warnings ════════════════════════════════════════════════════════════════════
+1. admission owns caller tables, RunPlan pairs and nested attributes ('test-result-ownership.R:31:5') - Returning historical results; they do not represent the current analysis settings.
+
+2. historical extraction owns every exposed record and preserves certificates ('test-result-ownership.R:54:5') - Returning historical results; they do not represent the current analysis settings.
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test-component-results.R:21:5'): completed results freeze effect
+result_record_is_current(object, "run_discovery_analysis") is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+── 2. Error ('test-component-results.R:22:5'): completed results freeze effectiv
+Error in `current_result(sceptre_object, analysis)`: No completed current result for `run_discovery_analysis`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.
+Backtrace:
+ 1. testthat::expect_identical(...)
+      at test-component-results.R:22:5
+ 4. sceptre::get_result(object, "run_discovery_analysis")
+ 9. sceptre:::current_result(sceptre_object, analysis)
+
+── 3. Failure ('test-component-results.R:58:5'): prepared analysis and raw shard
+workflow_status(object)[["run_discovery_analysis"]] is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+── 4. Error ('test-component-results.R:148:5'): result records preserve the publ
+Error in `current_result(sceptre_object, analysis)`: No completed current result for `run_discovery_analysis`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.
+Backtrace:
+ 1. testthat::expect_s3_class(...)
+      at test-component-results.R:148:5
+ 4. sceptre::get_result(object, "run_discovery_analysis")
+ 9. sceptre:::current_result(sceptre_object, analysis)
+
+── 5. Error ('test-result-ownership.R:12:5'): public current results cannot muta
+Error in `current_result(sceptre_object, analysis)`: No completed current result for `run_discovery_analysis`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.
+Backtrace:
+ 1. sceptre::get_result(first, "run_discovery_analysis")
+      at test-result-ownership.R:12:5
+ 6. sceptre:::current_result(sceptre_object, analysis)
+
+── 6. Error ('test-result-ownership.R:34:5'): admission owns caller tables, RunP
+Error in `require_stage(object, "run_qc")`: The function `run_qc()` must be called successfully before this stage.
+Backtrace:
+ 1. refactor_private("commit_result_record")(...)
+      at test-result-ownership.R:34:5
+ 2. sceptre:::require_stage(object, "run_qc")
+
+── 7. Error ('test-result-ownership.R:56:5'): historical extraction owns every e
+Error in `run_plan_payload(plan, include_identity = TRUE)`: Unrecognized run-plan payload fields.
+Backtrace:
+ 1. testthat::expect_identical(...)
+      at test-result-ownership.R:56:5
+ 4. refactor_private("as_run_plan")(graph$provenance$plan)
+ 5. sceptre:::run_plan_payload(plan, include_identity = TRUE)
+
+── 8. Failure ('test-result-ownership.R:75:5'): owned snapshots retain plain-fra
+serialize(source, NULL) (`actual`) not identical to serialize(copied, NULL) (`expected`).
+
+     actual | expected                 
+[32] "00"   | "00"     [32]            
+[33] "00"   | "00"     [33]            
+[34] "00"   | "00"     [34]            
+[35] "ee"   - "0d"     [35]            
+[36] "00"   -                          
+[37] "00"   -                          
+[38] "00"   -                          
+[39] "02"   -                          
+[40] "00"   -                          
+[41] "00"   -                          
+ ... ...      ...      and 370 more ...
+
+      actual | expected                
+[395] "00"   | "00"     [349]          
+[396] "00"   | "00"     [350]          
+[397] "00"   | "00"     [351]          
+[398] "0a"   - "11"     [352]          
+[399] "64"   - "2e"     [353]          
+[400] "61"   - "69"     [354]          
+[401] "74"   - "6e"     [355]          
+[402] "61"   - "74"     [356]          
+[403] "2e"   - "65"     [357]          
+[404] "74"   - "72"     [358]          
+  ... ...      ...      and 99 more ...
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+I believe in you!
+No deferred expressions to run
+                       file
+1  test-component-results.R
+2  test-component-results.R
+3  test-component-results.R
+4  test-component-results.R
+5  test-component-results.R
+6  test-component-results.R
+7  test-component-results.R
+8  test-component-results.R
+9  test-component-results.R
+10  test-refactor-storage.R
+11  test-refactor-storage.R
+12  test-refactor-storage.R
+13  test-refactor-storage.R
+14  test-refactor-storage.R
+15  test-refactor-storage.R
+16  test-refactor-storage.R
+17  test-result-ownership.R
+18  test-result-ownership.R
+19  test-result-ownership.R
+20  test-result-ownership.R
+21     test-worker-errors.R
+22     test-worker-errors.R
+23     test-worker-errors.R
+24     test-worker-errors.R
+25     test-worker-errors.R
+                                                                                   test
+1             completed results freeze effective budgets and preserve historical tables
+2                    result guards detect data, ordered cell, design and family changes
+3     prepared analysis and raw shards cannot masquerade as completed reporting results
+4       zero discovery eligibility does not prevent qualifying NT calibration proposals
+5  public calibration preparation stays incomplete and failed execution commits nothing
+6                      calibration working budget does not leak into power or discovery
+7                              invalid result proposals cannot create completed records
+8                    result records preserve the public result table's data.table class
+9     run provenance freezes assignment and QC settings separately from working choices
+10                          legacy storage retains stored-zero and fractional semantics
+11                         owned sparse group coordinates remain unchanged across calls
+12                        legacy matrix conversion agrees with the selected ondisc copy
+13                 legacy backed storage coerces fractions and retains stored positions
+14                     storage reads preserve requested source order and repeated cells
+15                     sparse storage counts preserve requests and caller-owned indices
+16                    backed storage has the same ordered count and ownership contracts
+17             public current results cannot mutate current or later historical records
+18                    admission owns caller tables, RunPlan pairs and nested attributes
+19           historical extraction owns every exposed record and preserves certificates
+20                owned snapshots retain plain-frame attributes and automatic row names
+21                            worker errors retain their cause before result collection
+22                                         successful empty worker results remain valid
+23                        a child exiting without replying cannot silently drop a block
+24                                 CRT dispatch preserves empty internal request blocks
+25                  parallel mixture assignment surfaces worker cause before flattening
+   nb failed error warning skipped
+1   1      1  TRUE       0   FALSE
+2  15      0 FALSE       0   FALSE
+3   4      1 FALSE       0   FALSE
+4   5      0 FALSE       0   FALSE
+5   7      0 FALSE       0   FALSE
+6   4      0 FALSE       0   FALSE
+7   5      0 FALSE       0   FALSE
+8   0      0  TRUE       0   FALSE
+9   4      0 FALSE       0   FALSE
+10  7      0 FALSE       0   FALSE
+11  3      0 FALSE       0   FALSE
+12  1      0 FALSE       0    TRUE
+13  1      0 FALSE       0    TRUE
+14  6      0 FALSE       0   FALSE
+15 52      0 FALSE       0   FALSE
+16  1      0 FALSE       0    TRUE
+17  0      0  TRUE       0   FALSE
+18  1      0  TRUE       1   FALSE
+19  1      0  TRUE       1   FALSE
+20  2      1 FALSE       0   FALSE
+21  5      0 FALSE       0   FALSE
+22  2      0 FALSE       0   FALSE
+23  2      0 FALSE       0   FALSE
+24  5      0 FALSE       0   FALSE
+25  2      0 FALSE       0   FALSE
+Error: !any(d$failed > 0L | d$error | d$warning > 0L) is not TRUE
+Execution halted

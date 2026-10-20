@@ -1,0 +1,67 @@
+class	field	description
+sceptre_object	data	Imported screen data and backing-store identity.
+sceptre_object	spec	Resolved requested scientific and configuration choices.
+sceptre_object	preparation	Durable design, source assignments, QC payloads and completed preparation records.
+sceptre_object	fits	Compact response and CRT perturbation fits with independently validated actual fitting identities.
+sceptre_object	results	Completed tables with their own provenance, validity identity and history.
+sceptre_object	schema_version	Saved schema version; scalar integer 3.
+ScreenData	response_names	Original response labels aligned with response rows, used for mitochondrial summaries; empty when legacy labels are unknown.
+ScreenData	response_matrix	Typed CountStore: row-accessible dgRMatrix, or BackedCountStore owning a descriptor and optional live handle; NULL only before import or for legacy unavailable counts.
+ScreenData	grna_matrix	Typed CountStore with the same ordered source cells as responses; backed stores retain dimensions and labels when closed.
+ScreenData	covariate_data_frame	One row per source cell: imported count summaries and supplied extra covariates.
+ScreenData	grna_target_data_frame	Canonical imported guide-to-target metadata, preserving supplied row order and multiplicity.
+ScreenData	low_moi	Whether the screen is analyzed as low MOI.
+ScreenData	import_grna_assignment_info	Source-cell-aligned maximum-guide labels and maximum-guide UMI fractions computed at import or supported replacement.
+ScreenData	identity	Content/metadata fingerprint assigned at import or supported replacement; active backing files are immutable by contract.
+AnalysisSpec	discovery_pairs	Canonical requested discovery target-response rows, without derived guide expansion.
+AnalysisSpec	positive_control_pairs	Canonical requested positive-control target-response rows, without derived guide expansion.
+AnalysisSpec	formula_object	Resolved requested model formula; the actual compiled design belongs to preparation.
+AnalysisSpec	side_code	Requested test direction: -1 left, 0 both, 1 right.
+AnalysisSpec	resampling_approximation	Requested tail policy: skew_normal or no_approximation.
+AnalysisSpec	control_group_complement	TRUE selects complement controls; FALSE selects nontargeting controls.
+AnalysisSpec	run_permutations	TRUE selects permutation resampling; FALSE selects CRT.
+AnalysisSpec	n_nonzero_trt_thresh	Minimum treatment observations for pair eligibility.
+AnalysisSpec	n_nonzero_cntrl_thresh	Minimum control observations for pair eligibility.
+AnalysisSpec	grna_integration_strategy	Requested guide integration: union, singleton or bonferroni.
+AnalysisSpec	grna_assignment_method	Resolved guide-assignment choice: maximum, thresholding or mixture.
+AnalysisSpec	grna_assignment_hyperparameters	Method-specific requested assignment settings, including any assignment-model formula.
+AnalysisSpec	multiple_testing_alpha	Requested reporting significance threshold; also determines empirical resampling precision.
+AnalysisSpec	multiple_testing_method	Requested complete-family multiple-testing correction method.
+AnalysisSpec	cellwise_qc_thresholds	Requested UMI/nonzero quantile ranges and mitochondrial-fraction cutoff.
+AnalysisSpec	additional_cells_to_remove	Additional source-cell positions explicitly excluded by the requested QC configuration.
+PreparationRecord	design_matrix	Actual compiled model matrix, one row per source cell, with design columns, contrasts and ordering retained.
+PreparationRecord	nt_nonzero_matrix	Cached NT-guide-by-response stored-entry counts used by calibration.
+PreparationRecord	control_nonzero_totals	Cached per-response stored-entry totals: all selected cells for complement controls, or summed NT-group counts for NT controls (overlaps count again).
+PreparationRecord	discovery_pairs_with_info	Compiled discovery rows with treatment/control counts and eligibility decisions, including failed-QC rows.
+PreparationRecord	positive_control_pairs_with_info	Compiled positive-control rows with treatment/control counts and eligibility decisions.
+PreparationRecord	guide_assignments	Named individual-guide memberships in canonical source-cell coordinates, durable before QC.
+PreparationRecord	source_groups	Target/guide groups and individual NT memberships in source-cell coordinates.
+PreparationRecord	analysis_groups	Groups remapped to analysis/NT-fit coordinates after cell QC, including the ordered NT-to-analysis mapping.
+PreparationRecord	guide_counts_per_cell	Cached per-cell assignment counts used for low-MOI exclusions and assignment diagnostics.
+PreparationRecord	assignment_exclusions	Source cells excluded because assignments are absent or ambiguous under the chosen assignment method.
+PreparationRecord	analysis_cells	Ordered source-cell positions retained by cell QC.
+PreparationRecord	cell_removal_metrics	Named counts of QC exclusion reasons; reasons may overlap.
+PreparationRecord	stages	Completed design/assignment/cell_qc/pair_qc records. An entry exists only after validation; its identity and prerequisites determine readiness.
+PreparationRecord	guide_groups	Derived group labels aligned one-for-one with canonical guide metadata rows; no duplicated metadata table.
+PreparationRecord	discovery_pairs	Compiled discovery target-to-guide-group expansion, preserving requested row multiplicity.
+PreparationRecord	positive_control_pairs	Compiled positive-control target-to-guide-group expansion.
+FitCache	response_fits	Named response fits: each contains fitted_coefs and scalar theta. Identifiers, coefficient/design compatibility and dispersion are validated.
+FitCache	response_identity	Actual data identity, ordered fitting cells, ordered design columns, design-value fingerprint and fitter version for response fits.
+FitCache	perturbation_fits	Named CRT logistic fits: compact fitted_coefs, five fit diagnostics and three hashes of actual ordered fit cells, group design and binary treatment. No cell-length vectors or sampled draws.
+FitCache	perturbation_identity	Shared ordered analysis source cells, design columns/value hash, logistic fitter method and arithmetic runtime. NT group-specific fitting inputs are certified by each entry without repeated cell vectors.
+ResultRecord	records	Completed run entries keyed by analysis name. Each owns its table, frozen spec/run plan, scope, identity and previous run history; invalidated_by explains historical status.
+ResultRecord	import_metadata	Boundary-only migration diagnostics, such as old schema version, discarded fit count or a temporary legacy reopen hint; not workflow state.
+CellView	fit_to_analysis	Ordered positions in the selected analysis cells used for this fit.
+CellView	source_cells	The corresponding ordered original count-matrix columns.
+CellView	trt_fit_pos	Treatment positions within this fit.
+CellView	n_trt	Validated treatment-position count; transient numerical convenience.
+BackedCountStore	descriptor	Authoritative backing path, anchored content_md5, integer dimensions, dimnames and native integer_id; validated on creation and reopening.
+BackedCountStore	handle	Process-local external pointer when open, NULL when closed; never used as content identity.
+RunPlan	analysis	Canonical scalar analysis mode: run_calibration_check, run_power_check or run_discovery_analysis.
+RunPlan	pairs	Owned prepared hypothesis rows and complete logical QC status, preserving order, failed-QC rows, repeated requests and table representation. Public result commits require the complete prepared family.
+RunPlan	B1	Realized scalar nonnegative integer stage-one resampling budget.
+RunPlan	B2	Realized scalar nonnegative integer stage-two resampling budget; the total budget is checked before native execution.
+RunPlan	B3	Realized scalar nonnegative integer stage-three resampling budget, frozen for this run independently of later calibration or reporting choices.
+RunPlan	n_calibration_pairs	Requested positive scalar count for calibration, which may exceed the selected qualifying family; integer(0) for other analyses.
+RunPlan	calibration_group_size	Positive scalar number of NT guides per calibration group; integer(0) for other analyses.
+RunPlan	identity	Frozen data, ordered cells, actual design, assignments, choices and canonical execution-payload identity; object-context matching is validated separately.

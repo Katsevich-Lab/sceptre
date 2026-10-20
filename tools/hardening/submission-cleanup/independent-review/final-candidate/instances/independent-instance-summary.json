@@ -1,0 +1,15 @@
+{
+  "revision": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "baseline": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "original_checker": "1.49.30",
+  "baseline_long_function_sites": 49,
+  "candidate_long_function_sites": 45,
+  "new_long_function_sites": 0,
+  "baseline_long_line_instances": 145,
+  "candidate_long_line_instances": 108,
+  "new_or_modified_long_line_instances": 0,
+  "inherited_display_operations": 9,
+  "new_display_operations": 0,
+  "exact_archive_git_files": 180,
+  "limitations": "Independent scanner and site/functional lineage review, not numerical parity or a new full BiocCheck run. Full-check environment/runtime/options handled separately."
+}

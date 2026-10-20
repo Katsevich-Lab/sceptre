@@ -1,0 +1,70 @@
+{
+  "submitted_source": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate_source": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "candidate_archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "checker": "1.49.30",
+  "Bioconductor": "3.24",
+  "local_R": "4.6.0",
+  "local_platform": "aarch64-apple-darwin23",
+  "original_official_result": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 3
+  },
+  "matched_baseline_result": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 3
+  },
+  "candidate_result": {
+    "errors": 0,
+    "warnings": 1,
+    "notes": 3
+  },
+  "remaining_diagnostics": [
+    {
+      "type": "warning",
+      "check": "checkBiocDepsDESC",
+      "meaning": "No direct Bioconductor dependency",
+      "baseline": "official/00BiocCheck.log:25-29; unchanged specialized package architecture, explained in original September1 author comment",
+      "candidate": "bioccheck-1.49.30/sceptre.BiocCheck/00BiocCheck.log:25-29",
+      "new_instances": 0
+    },
+    {
+      "type": "note",
+      "check": "checkCodingPractice",
+      "meaning": "cat/print outside show",
+      "baseline_instances": 9,
+      "candidate_instances": 9,
+      "full_instance_lineage": "instance-gate/display-call-lineage.csv",
+      "new_instances": 0
+    },
+    {
+      "type": "note",
+      "check": "checkFunctionLengths",
+      "meaning": "Functions over50lines",
+      "baseline_instances": 49,
+      "candidate_instances": 45,
+      "full_instance_lineage": "instance-gate/function-lineage.csv",
+      "new_instances": 0
+    },
+    {
+      "type": "note",
+      "check": "checkFormatting",
+      "meaning": "Lines over80characters",
+      "baseline_instances": 145,
+      "candidate_instances": 108,
+      "full_instance_lineage": "instance-gate/long-line-lineage.csv",
+      "new_instances": 0
+    }
+  ],
+  "resolved_source_diagnostics": [
+    "literal1:3 membership in distributed APIs",
+    "paste in progress message signal",
+    "three superassignments",
+    "missing runnable examples on three distributed API pages",
+    "25new or newly long function sites",
+    "363new or modified long lines"
+  ],
+  "scope": "Matches the original official wrapper options no-check-R-ver and no-check-bioc-help. Independent unsuppressed baseline1E1W5N is retained separately, including support-site timeout; no claim of all-default-checks clean. Scientific parity and R CMD check are separately qualified by the integration owner."
+}

@@ -1,0 +1,162 @@
+{
+  "date": "2026-10-19",
+  "status": "pass_within_stated_submission_delta_and_local_compatibility_scope",
+  "open_material_findings": [],
+  "report": "FINAL_SUBMISSION_DELTA_REVIEW.md",
+  "actual_submitted_source": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "candidate": {
+    "source_commit": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+    "evidence_head": "9a4694450b5d456beedc11f3876ecb1cd84cb05c",
+    "R_evidence_checkout_clean": true,
+    "archive_original_path": "/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre_0.99.0.tar.gz",
+    "archive_review_copy": "final-candidate/sceptre_0.99.0.tar.gz",
+    "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+    "production_source_documentation_test_delta_from_source_to_evidence_head": []
+  },
+  "original_official_comparison": {
+    "checker": "1.49.30",
+    "original_official_R": "4.6.1",
+    "original_official_platform": "Linux x86_64",
+    "historical_wrapper_options": {
+      "no-check-R-ver": true,
+      "no-check-bioc-help": true
+    },
+    "newly_disabled_checks": [],
+    "baseline_counts": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3
+    },
+    "candidate_counts": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3
+    },
+    "new_diagnostic_categories": [],
+    "long_functions": {
+      "baseline": 49,
+      "candidate": 45,
+      "new_instances": 0
+    },
+    "long_lines": {
+      "baseline": 145,
+      "candidate": 108,
+      "new_or_modified_instances": 0
+    },
+    "display_calls": {
+      "baseline": 9,
+      "candidate": 9,
+      "new_instances": 0
+    },
+    "independent_instance_report": "final-candidate/instances/CANDIDATE_INSTANCE_REVIEW.md",
+    "independent_instance_metadata": "final-candidate/instances/independent-instance-summary.json",
+    "older_checker_48_vs_49_explanation": "final-candidate/instances/checker-version-instance-difference.json"
+  },
+  "all_default_independent_comparison": {
+    "checker": "1.47.26",
+    "R": "4.6.0",
+    "disabled_flags": [],
+    "baseline_counts": {
+      "error": 1,
+      "warning": 1,
+      "note": 5
+    },
+    "candidate_counts": {
+      "error": 1,
+      "warning": 1,
+      "note": 5
+    },
+    "same_diagnostic_category_keys": true,
+    "clean_all_default_run": false,
+    "shared_extra_results": [
+      "support-site HTTP timeout error",
+      "unchanged R-version recommendation",
+      "administrative mailing-list subscription note"
+    ],
+    "proof": "final-candidate/default-checker-comparison.json"
+  },
+  "independent_execution_and_review": {
+    "fresh_exact_archive_installation": true,
+    "runtime": "macOS ARM64 / R 4.6.0",
+    "source_manifest_entries": 176,
+    "separate_instance_manifest_entries": 180,
+    "R_source_files": 46,
+    "focused_semantic_differential_checks_passed": 69,
+    "installed_collector_checks_passed": 12,
+    "actual_installed_API_examples_passed": 3,
+    "each_example_units": 2,
+    "each_example_result_rows": 418,
+    "semantic_report": "final-candidate/semantics/SEMANTIC_REVIEW.md",
+    "installed_verification": "final-candidate/r-verification.json",
+    "broad_owner_suite_independently_rerun": false
+  },
+  "owner_terminal_receipts_verified": {
+    "index": "final-candidate/owner-receipts/receipt-index.json",
+    "byte_identical_committed_originals": 13,
+    "source_cases": 253,
+    "source_assertions_passed": 5641,
+    "exact_installed_R_CMD_check_status": "OK",
+    "check_flags": [
+      "--no-manual",
+      "--no-build-vignettes"
+    ],
+    "installed_assertions_passed": 5641,
+    "test_failures_errors_warnings_skips": 0,
+    "default_build_and_vignette_passed": true,
+    "historical_workflows": 7,
+    "tolerance_zero_comparisons_passed": 231,
+    "historical_reference_reused": true,
+    "earlier_semantic_subreport_pending_qualification_resolved_by_these_terminal_receipts": true
+  },
+  "pipeline": {
+    "production_commit": "818a156a8a53cf3e34e58b05bd37d115eb4ced49",
+    "evidence_commit": "bfce9a812c45a7a9e389f1650ff2b42745c7ea89",
+    "image_id": "sha256:1510c16a1d5f0da6a266f8685c4b06fa1865e0116b159956af9625dd1cc249b2",
+    "new_image_independent_no_network_no_mount_readback": true,
+    "unchanged_production_manifest_entries": 23,
+    "installed_sceptre_hash": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b",
+    "runtime": "Linux ARM64 / R 4.5.1 / ondisc 1.3.1 / Rhdf5lib 1.30.0 / OpenBLAS",
+    "direct_cases": {
+      "memory": 9,
+      "required_backed": 2,
+      "skipped": 0
+    },
+    "distributed_cases": {
+      "memory": 9,
+      "required_backed": 2,
+      "skipped": 0
+    },
+    "representative_Docker_workflows": 2,
+    "actual_distributed_worker_failure_guard_passed": true,
+    "historical_saved_payloads_equal": 72,
+    "historical_source_rerun": false,
+    "review": "final-candidate/pipeline/RECHECK.md",
+    "metadata": "final-candidate/pipeline/verification.json",
+    "final_worktree_snapshot": "pipeline-final-worktree-readback.json",
+    "pending_documentation_clarification_is_not_production_change": true,
+    "excluded_worktree": "/Users/ekatsevi/.codex/worktrees/72cc/sceptre-pipeline"
+  },
+  "not_claimed": [
+    "Clean all-default BiocCheck",
+    "Bioconductor acceptance",
+    "Release or merge",
+    "Image publication",
+    "New hosted CI or nf-test run",
+    "New external-body marker probe",
+    "Large-screen, cluster/cloud, Apptainer, AMD64, Windows or minimum-R-floor qualification",
+    "Cross-platform numerical equality",
+    "Arbitrary stack-trace frame identity",
+    "Qualification of unrelated arrays/HPC feature work",
+    "Rerun of historical reference science"
+  ],
+  "phase_specific_earlier_evidence_preserved": [
+    "baseline-identities.json",
+    "BASELINE_AND_FIX_SCOPE.md",
+    "baseline-review-artifact-manifest.json"
+  ],
+  "private_context_excluded": [
+    "raw Compass project read",
+    "copied local submission-plan files"
+  ],
+  "memory_role": "Only used to distinguish later refactor qualification from actual submission authority; substantive facts verified from current source and receipts"
+}

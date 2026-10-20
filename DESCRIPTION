@@ -29,6 +29,7 @@ RoxygenNote: 7.3.3
 LinkingTo: Rcpp, BH
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
+    digest,
     cowplot,
     crayon,
     data.table,
@@ -45,14 +46,13 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
-    digest,
     BH,
     ondisc,
     R.utils,
     sessioninfo,
     rmarkdown,
     knitr,
-    testthat (>= 3.0.0),
+    testthat (>= 3.1.8),
     MASS
 VignetteBuilder: knitr
 Config/testthat/edition: 3

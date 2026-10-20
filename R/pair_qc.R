@@ -6,7 +6,8 @@
 #' @inheritParams storage_pair_counts
 #' @return The count list from `storage_pair_counts()`, in requested pair order,
 #'   with optional NT summaries. See that function for which cell numbers to
-#'   supply and how stored sparse entries are counted. No QC threshold is applied
+#'   supply and how stored sparse entries are counted. No QC threshold is
+#'   applied
 #'   here; this step only obtains the measurements.
 #' @noRd
 collect_pair_qc_metrics <- function(
@@ -15,8 +16,7 @@ collect_pair_qc_metrics <- function(
     groups,
     source_cells,
     controls,
-    nt_groups = NULL,
-    nuclear = FALSE
+    nt_groups = NULL
 ) {
     storage_pair_counts(
         store,
@@ -24,8 +24,7 @@ collect_pair_qc_metrics <- function(
         groups,
         source_cells,
         controls,
-        nt_groups,
-        nuclear
+        nt_groups
     )
 }
 

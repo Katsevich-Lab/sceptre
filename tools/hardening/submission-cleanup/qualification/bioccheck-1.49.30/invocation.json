@@ -1,0 +1,9 @@
+{
+  "source_archive": "/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre_0.99.0.tar.gz",
+  "archive": "/Users/ekatsevi/.codex/worktrees/ab6a/sceptre/tools/hardening/submission-cleanup/qualification/bioccheck-1.49.30/sceptre_0.99.0.tar.gz",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "checker": "1.49.30",
+  "Bioconductor": "3.24",
+  "flags": ["no-check-R-ver", "no-check-bioc-help"],
+  "platform": "aarch64-apple-darwin23"
+}

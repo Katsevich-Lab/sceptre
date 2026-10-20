@@ -1,0 +1,7 @@
+{
+  "version": "1.49.30",
+  "library": "/private/tmp/sceptre-submission-checker-1.49.30/library/BiocCheck",
+  "description_sha256": "0b065f14c312e8fd917566806e65e0bfa65c95136dbd0f9a20f544fde9cf1008",
+  "function_length_source_sha256": "faf5ca389b8c2ca942d7a6cadd3fc02e66877cec66481f597e3a3d5846a53c36",
+  "modified_checker": false
+}

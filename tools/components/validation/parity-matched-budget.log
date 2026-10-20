@@ -1,0 +1,7 @@
+low_nt_perm : TRUE 
+low_complement_perm : TRUE 
+high_complement_crt : TRUE 
+low_complement_crt : TRUE 
+high_perm : TRUE 
+low_bonferroni : TRUE 
+low_singleton : TRUE 

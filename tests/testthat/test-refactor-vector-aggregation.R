@@ -130,7 +130,7 @@ test_that("public in-memory vector imports retain cell order and metadata multip
             expect_identical(as.matrix(sceptre::get_grna_matrix(object)), fixture$expected)
             expect_s4_class(sceptre::get_grna_matrix(object), "dgRMatrix")
             expect_identical(rownames(sceptre::get_cell_covariates(object)), colnames(counts))
-            expect_identical(object@grna_target_data_frame,
+            expect_identical(object@data@grna_target_data_frame,
                 data.frame(grna_target = c("targetZ", "targetA"), grna_id = c("vZ", "vA")))
             expect_identical(serialize(list(counts, response, fixture$metadata), NULL), before)
         }

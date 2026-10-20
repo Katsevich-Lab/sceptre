@@ -1,0 +1,367 @@
+{
+  "date": "2026-10-19",
+  "phase": "baseline and pre-fix delta; final candidate pending",
+  "original_root": "/private/tmp/sceptre-bioconductor-delta-review-20261019",
+  "private_context_excluded": [
+    "compass-project-live.json",
+    "copied local submission-plan files"
+  ],
+  "files": [
+    {
+      "relative_path": "BASELINE_AND_FIX_SCOPE.md",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/BASELINE_AND_FIX_SCOPE.md",
+      "size": 8242,
+      "sha256": "5423cc2ea687ed5f2e6d1c019869e2e1f208c47e978daf67de097927ff990d57"
+    },
+    {
+      "relative_path": "baseline-identities.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline-identities.json",
+      "size": 3285,
+      "sha256": "cfe2eb8428103c2d093d54d04dcaf3b987ea21a6e26bf0b1e128a10ec03fcb66"
+    },
+    {
+      "relative_path": "run-same-checker-baseline.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/run-same-checker-baseline.R",
+      "size": 890,
+      "sha256": "734ad253888993a3c19ee7a3a79933052f43fff14d0954dda4e5c1ab63fe859c"
+    },
+    {
+      "relative_path": "current-checker-entrypoint.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-checker-entrypoint.txt",
+      "size": 690,
+      "sha256": "9c15587a80a7df234fcebcc0c0773a47b8d1711c279f3258ef3fc7e89a94fd0c"
+    },
+    {
+      "relative_path": "baseline/issue176-issue.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/issue176-issue.json",
+      "size": 6009,
+      "sha256": "fca5370fb58541e66596429d1ddbc6efd90feaa1eedfaa750a36d714ade89da8"
+    },
+    {
+      "relative_path": "baseline/issue176-comments.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/issue176-comments.json",
+      "size": 38478,
+      "sha256": "0d8282f29a09a4773f581c2c14d5cb2d40529c7ff51cf10abe30a912b1fdfc3b"
+    },
+    {
+      "relative_path": "baseline/official-run.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-run.json",
+      "size": 12750,
+      "sha256": "f7af422f802c26888dd99408247caf66b6eb80918ee6647cbfeeab7f90191745"
+    },
+    {
+      "relative_path": "baseline/official-bioc-job.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-bioc-job.json",
+      "size": 2413,
+      "sha256": "17eb871a975a25307ee5d3c1cda0bc4fbd0dc1b61b1e7f6cbb11ea7d6b9df1ac"
+    },
+    {
+      "relative_path": "baseline/official-bioc-job.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-bioc-job.log",
+      "size": 81542,
+      "sha256": "4e26e0752a16da7b3bab045f87f1dbc231fdb1b23b97dd90128554c5cdd2c7ef"
+    },
+    {
+      "relative_path": "baseline/official-bioc-job.log.plain.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-bioc-job.log.plain.txt",
+      "size": 81084,
+      "sha256": "4823ddca0bcec22e41c425c42f8c46e75d5f5703081d33535dc8c00ec668dd2a"
+    },
+    {
+      "relative_path": "baseline/official-source-job.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-source-job.log",
+      "size": 84799,
+      "sha256": "88e8428a463f202f40e4b484db44bc3c62c85316938cf40a55bf7b7729a5f7ad"
+    },
+    {
+      "relative_path": "baseline/official-source-job.log.plain.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-source-job.log.plain.txt",
+      "size": 84247,
+      "sha256": "fb61dd6a8870fd5faab58f9c8adfc238672c3a9d6770b7edb2667273414b5b2e"
+    },
+    {
+      "relative_path": "baseline/official-run-tree.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-run-tree.json",
+      "size": 12099,
+      "sha256": "0d0b6a0883750c4b4355561e89e6bf8f6e0dd78a938455e377bcf4e78059fda7"
+    },
+    {
+      "relative_path": "baseline/staging-repo.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/staging-repo.json",
+      "size": 6339,
+      "sha256": "4a10c21421562d7275b891596ecf8e4e91d87ba10199f3e43223f781eb47724c"
+    },
+    {
+      "relative_path": "baseline/staging-commits.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/staging-commits.json",
+      "size": 350767,
+      "sha256": "9068fd865361722dea8474ce0225cbbd384457df964cb4d8cdfb7f8502380e0b"
+    },
+    {
+      "relative_path": "baseline/official-action-bioccheck.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-action-bioccheck.R",
+      "size": 1075,
+      "sha256": "2e910e2595206abd6ca96e307c14e12335da4a9362afbe96cd3b50bb70ca291f"
+    },
+    {
+      "relative_path": "baseline/official-action-bioccheck.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-action-bioccheck.R.json",
+      "size": 2540,
+      "sha256": "b65bddbb312ac855a7b7939996de74d4f21ff5aeb8919cb0e24089086eb390a8"
+    },
+    {
+      "relative_path": "baseline/official-action-prep.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-action-prep.R",
+      "size": 125,
+      "sha256": "d5c603a49e3472b7f9b638f291827927a12b870d78cf1e00fd26321e90e7081e"
+    },
+    {
+      "relative_path": "baseline/official-action-prep.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/official-action-prep.R.json",
+      "size": 1194,
+      "sha256": "75187991992e99db7b52d4c935be4e6b5b00ec543b4270fc1faa17c3d6c47f32"
+    },
+    {
+      "relative_path": "baseline/bioc-checks.zip",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/bioc-checks.zip",
+      "size": 5251,
+      "sha256": "96d7662cd2e75abb4f316f503a8de2c59fc3f02a4d4409ca19e48bb11bf79d05"
+    },
+    {
+      "relative_path": "baseline/bioc-checks-artifact/00BiocCheck.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/bioc-checks-artifact/00BiocCheck.log",
+      "size": 13458,
+      "sha256": "7c31473d800182235276f075c7dc5bd560fed1d57100ba034c3137a9c597657f"
+    },
+    {
+      "relative_path": "baseline/bioc-checks-artifact/output.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/bioc-checks-artifact/output.log",
+      "size": 4599,
+      "sha256": "39120e281f364905182cb205bca765c53a1c31249987422f3b07f7bddb0e5d52"
+    },
+    {
+      "relative_path": "baseline/package-source.zip",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/package-source.zip",
+      "size": 3487990,
+      "sha256": "59fd0f2758857f648f9eb74140188b6e8fc77b75fa75bdf2279bf54f19a267b8"
+    },
+    {
+      "relative_path": "baseline/package-source-artifact/sceptre_0.99.0.tar.gz",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/package-source-artifact/sceptre_0.99.0.tar.gz",
+      "size": 3486982,
+      "sha256": "5300b3e3adfbb73a9a2173384ea3ec7e57b8cad8612f3fdc8116d5db5156eaf4"
+    },
+    {
+      "relative_path": "baseline/package-source-artifact/pkgdata.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/package-source-artifact/pkgdata.txt",
+      "size": 118,
+      "sha256": "51a482cffd26feee305900e2494fc0fa366bf4fde524299356a96bdb924fe66f"
+    },
+    {
+      "relative_path": "baseline/submitted-source-equivalence.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/submitted-source-equivalence.json",
+      "size": 14091,
+      "sha256": "91da43f3b8d40f8e8b313005d90f3da85461640fa41ec6d2cf366b45c803a553"
+    },
+    {
+      "relative_path": "baseline/same-checker-baseline.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-baseline.log",
+      "size": 5052,
+      "sha256": "acd494f14750ae8610c19173adb04754a493b2a34cd1badf6b6435a832471003"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/checker-installed-files.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/checker-installed-files.json",
+      "size": 6695,
+      "sha256": "33e094a48bc390572d460bdeb269c264178498d575975855ebb3d40a4b8d9926"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/diagnostics.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/diagnostics.json",
+      "size": 13349,
+      "sha256": "5fd388e501cbff41cfec754959cb01e5e527a8b1172670616f2b9b98d77c4fd3"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/invocation.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/invocation.txt",
+      "size": 165,
+      "sha256": "47c496823680444300544d2325348553c1ff2a66892221bb8f164db3ac4565b7"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/result-structure.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/result-structure.txt",
+      "size": 10631,
+      "sha256": "7715bb4492fc8bab3f3bba0c652673a6a94bee7a97dea9ddc248bfd0737e7bd2"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/sceptre.BiocCheck/00BiocCheck.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/sceptre.BiocCheck/00BiocCheck.log",
+      "size": 13908,
+      "sha256": "db09050d3d299a52bf2b9ead5a72cb052ae2d3f26ce68d050c8d69db81c19c46"
+    },
+    {
+      "relative_path": "baseline/same-checker-1.47.26/session-info.txt",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/baseline/same-checker-1.47.26/session-info.txt",
+      "size": 1905,
+      "sha256": "f02d7b5ac4a0b474cca383dcd0523396bd50d8334fc414358e70f4d47b73d684"
+    },
+    {
+      "relative_path": "current-instance-audit/CURRENT_INSTANCE_FIX_SCOPE.md",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/CURRENT_INSTANCE_FIX_SCOPE.md",
+      "size": 8458,
+      "sha256": "3a255b635e1e2184a37a4fcced181a0610f1ca391af5bb5e0d33f183d86aa566"
+    },
+    {
+      "relative_path": "current-instance-audit/audit-file-sha256.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/audit-file-sha256.json",
+      "size": 13840,
+      "sha256": "b51ccae2014c2011e3d0b08339261c893933b5a29299c53bcb8abcfa4fcf6315"
+    },
+    {
+      "relative_path": "current-instance-audit/baseline-all-functions.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/baseline-all-functions.tsv",
+      "size": 20751,
+      "sha256": "60fc26bb5c8ba9049953f4389e2905ed8bbd8e6d8cbf1f40d380c9b2cf9f3ebb"
+    },
+    {
+      "relative_path": "current-instance-audit/baseline-long-functions.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/baseline-long-functions.tsv",
+      "size": 5882,
+      "sha256": "f2c4e503fef400e52f178745ee08d2f3a5e70d50548db45fd124a91c51353250"
+    },
+    {
+      "relative_path": "current-instance-audit/baseline-long-lines.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/baseline-long-lines.tsv",
+      "size": 40943,
+      "sha256": "c0863f4d3766564f4ce6862e306cdd675dcc915ac4a0d452fe9be9e0a58d9b56"
+    },
+    {
+      "relative_path": "current-instance-audit/current-00BiocCheck.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/current-00BiocCheck.log",
+      "size": 36818,
+      "sha256": "818ae147e1c3e798bbd525bc219495886f1bd883b422029bf2127ac18d22d568"
+    },
+    {
+      "relative_path": "current-instance-audit/current-all-functions.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/current-all-functions.tsv",
+      "size": 38335,
+      "sha256": "e17e3fa93cd3c09734749aa2d37329beb4292c47c156069284a30ed341af8742"
+    },
+    {
+      "relative_path": "current-instance-audit/current-console-bioccheck.log",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/current-console-bioccheck.log",
+      "size": 5073,
+      "sha256": "72345c7c39e37e07dddb7663e5d77a75105baf2be81ecf928076ead24a025a8b"
+    },
+    {
+      "relative_path": "current-instance-audit/current-long-functions.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/current-long-functions.tsv",
+      "size": 7892,
+      "sha256": "e02fe6938fe8b726991ab8ef57114754659cc30931404c4782c80c7f1389fbba"
+    },
+    {
+      "relative_path": "current-instance-audit/current-long-lines.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/current-long-lines.tsv",
+      "size": 106140,
+      "sha256": "fa8a9db19aa5c65b76ce398c785b3052a56e94709888ddd305d27a6d783c4b16"
+    },
+    {
+      "relative_path": "current-instance-audit/flagged-call-instances.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/flagged-call-instances.tsv",
+      "size": 2744,
+      "sha256": "146784074ef0bb5c10276d05e7bf3c1c3d82a6438aee9c45dd96f252cf2ef466"
+    },
+    {
+      "relative_path": "current-instance-audit/function-lineage-assessment.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/function-lineage-assessment.tsv",
+      "size": 18134,
+      "sha256": "2480faeb87085629d608bd7abe3024fbc14f268f9f1bce13305f9a22103d177e"
+    },
+    {
+      "relative_path": "current-instance-audit/inventory.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/inventory.R",
+      "size": 4634,
+      "sha256": "551736983fe04f97bd5ec7be59d9937661802c2fe39c7141db2410a1bd02e3d9"
+    },
+    {
+      "relative_path": "current-instance-audit/lineage-summary.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/lineage-summary.json",
+      "size": 299,
+      "sha256": "f6685570489702213552d094e03389abf1e5dfcc66bb43a3f2e8565c8603322c"
+    },
+    {
+      "relative_path": "current-instance-audit/long-line-instance-delta.tsv",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/long-line-instance-delta.tsv",
+      "size": 133391,
+      "sha256": "d50f3643a2f4601050b26b8d672b97649d396126b442d30c577b90f60ae2fd5c"
+    },
+    {
+      "relative_path": "current-instance-audit/long-line-summary.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/long-line-summary.json",
+      "size": 122,
+      "sha256": "4b16d978caba693409552127d5bd2d9efe6a514a67ccf1b603c85201871c2390"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-DESCRIPTION.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-DESCRIPTION.json",
+      "size": 2875,
+      "sha256": "09ff2d568d7b9a2c5903faf37c3e39c8ecde266f9c594cd473567ab34e81007a"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-checkRcoding.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-checkRcoding.R",
+      "size": 17143,
+      "sha256": "14a74bb32de0d8860b5360176d644f9656e3fc67a6033e017bb96fcfafa45f09"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-checkRcoding.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-checkRcoding.R.json",
+      "size": 24471,
+      "sha256": "d34087241feaafdc3fdbb75aba3c524a1eba134708576e33ab7b5517e4dd0914"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-checks.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-checks.R",
+      "size": 29718,
+      "sha256": "7bf52acd3ba863c2c29fb04b2fa1b1a3f4f157cf9f4ed1818694108a81c3028b"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-checks.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-checks.R.json",
+      "size": 41753,
+      "sha256": "7323e81bd47022134af47413af6b9fdea3f0dec0d94335d10c282da57ddec817"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-parseFiles.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-parseFiles.R",
+      "size": 1386,
+      "sha256": "d0dc4d2dae3f39b63946257a66afd39e2a45099b22900bbd132f9bac399ded2a"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-parseFiles.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-parseFiles.R.json",
+      "size": 2744,
+      "sha256": "9f5c69bb231aa7875a7a3353126c4b9a065f7e1ec19c28185a0fa32a4d82cad1"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-util.R",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-util.R",
+      "size": 13836,
+      "sha256": "1e1bedce329b8e8d996660a7f2ee38a31a73a81e9b44202809c68715346b88e3"
+    },
+    {
+      "relative_path": "current-instance-audit/upstream-BiocCheck-R-util.R.json",
+      "original_path": "/private/tmp/sceptre-bioconductor-delta-review-20261019/current-instance-audit/upstream-BiocCheck-R-util.R.json",
+      "size": 19857,
+      "sha256": "9eefcf8e8b05f6a417a29f3e2c4709edef5dfdfe3cea695925f21fcbe62c8112"
+    }
+  ],
+  "superseded_provisional_tables_excluded": [
+    "current-instance-audit/function-instance-delta.tsv"
+  ],
+  "authoritative_instance_tables": [
+    "current-instance-audit/flagged-call-instances.tsv",
+    "current-instance-audit/function-lineage-assessment.tsv",
+    "current-instance-audit/long-line-instance-delta.tsv"
+  ]
+}

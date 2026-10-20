@@ -1,0 +1,16 @@
+{
+  "access_date": "2026-10-19",
+  "first_supported_candidate": "3.1.8",
+  "reason": "local_mocked_bindings must handle the imported S4 print binding used by the unchanged public sink error/interrupt regression",
+  "sources": {
+    "v3.1.7": "https://raw.githubusercontent.com/r-lib/testthat/v3.1.7/R/mock2.R",
+    "v3.1.8": "https://raw.githubusercontent.com/r-lib/testthat/v3.1.8/R/mock2.R"
+  },
+  "v3.1.7_behavior": "namespace-only binding lookup; actual installed probe fails: no binding for print",
+  "v3.1.8_behavior": "namespace, imports and global rebinding; genuine archive direct imported-print probe passes",
+  "archive3.1.8": {
+    "url": "https://cran.r-project.org/src/contrib/Archive/testthat/testthat_3.1.8.tar.gz",
+    "sha256": "3493f8afdd0f6b6ad62acc47550e10a0764ead7922c02b24aa812cad7f7bc827"
+  },
+  "v3.1.8_mock_source_sha256": "782dc0135baeeaec635aae1916f510cb87f8493e2ba6167ced675b61a43cbbf3"
+}

@@ -42,7 +42,7 @@ test_that("CRT dispatch preserves empty internal request blocks", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$high_complement_crt
     object <- refactor_capture(refactor_prepare(inputs, case))$value
-    pairs <- object@discovery_pairs_with_info[FALSE, , drop = FALSE]
+    pairs <- object@preparation@discovery_pairs_with_info[FALSE, , drop = FALSE]
     context <- refactor_private("prepare_analysis_context")(object, "discovery_analysis", pairs)
     execution <- list(output_amount = 1L, print_progress = FALSE, parallel = FALSE,
                       n_processors = 2L, log_dir = tempdir())
@@ -56,4 +56,22 @@ test_that("CRT dispatch preserves empty internal request blocks", {
     parallel <- refactor_capture(run(context, execution))
     expect_identical(parallel$warnings, character())
     expect_equal(parallel$value, serial$value)
+})
+
+test_that("parallel mixture assignment surfaces worker cause before flattening", {
+    skip_on_os("windows")
+    ids <- paste0("guide-", seq_len(4L))
+    counts <- matrix(0, 4L, 5L, dimnames = list(ids, NULL))
+    hyperparameters <- list(n_em_rep = 2L, pi_guess_range = c(1e-5, 0.1),
+        g_pert_guess_range = c(10, 50), formula_object = ~ 1,
+        n_nonzero_cells_cutoff = 6L, backup_threshold = 20,
+        probability_threshold = 0.8)
+    testthat::local_mocked_bindings(load_row = function(...) {
+        stop("guide backing store is unreadable")
+    }, .package = "sceptre")
+    run <- refactor_private("assign_grnas_to_cells_mixture")
+    expect_warning(expect_error(suppressMessages(run(counts,
+        data.frame(z = seq_len(5L)), hyperparameters, FALSE, TRUE, 2L,
+        tempdir(), ids)), "Analysis worker 1 failed: guide backing store is unreadable"),
+        "encountered errors")
 })

@@ -1,0 +1,96 @@
+{
+  "source_revision": "01bb39ccf8373ae8965a2679ee4813a63ea2d85d",
+  "archive_sha256": "606363fce32238354fc0d126d79f515973da7c8287ca43b14ce53ce2d00df4b7",
+  "archive": "/private/tmp/sceptre-bioc-cleaned-01bb39c/sceptre_0.99.0.tar.gz",
+  "retained_archive": "qualification/bioccheck-1.49.30/sceptre_0.99.0.tar.gz",
+  "submitted_revision": "21f9ea098b69c444a884a49bc254de711968e3b5",
+  "submitted_archive_sha256": "5300b3e3adfbb73a9a2173384ea3ec7e57b8cad8612f3fdc8116d5db5156eaf4",
+  "R_CMD_build": {
+    "default_build": true,
+    "vignette_rebuilt": true,
+    "exit_code": 0
+  },
+  "R_CMD_check": {
+    "flags": [
+      "--no-manual",
+      "--no-build-vignettes"
+    ],
+    "status": "OK",
+    "exit_code": 0,
+    "installed_test_assertions": 5641,
+    "failures": 0,
+    "warnings": 0,
+    "skips": 0
+  },
+  "source_tests": {
+    "cases": 253,
+    "assertions_passed": 5641,
+    "failures": 0,
+    "errors": 0,
+    "warnings": 0,
+    "skips": 0,
+    "file_hashes_unchanged": 190
+  },
+  "installed_parity": {
+    "cases": 7,
+    "comparisons": 231,
+    "tolerance": 0,
+    "all_equal": true,
+    "includes_warnings_and_RNG": true
+  },
+  "installed_distributed_examples": {
+    "cases": 3,
+    "all_executed": true,
+    "exit_code": 0
+  },
+  "BiocCheck": {
+    "1.49.30": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3,
+      "long_functions": 45,
+      "long_lines": 108
+    },
+    "1.47.26": {
+      "errors": 0,
+      "warnings": 1,
+      "notes": 3,
+      "long_functions": 44,
+      "long_lines": 108
+    },
+    "flags": [
+      "no-check-R-ver",
+      "no-check-bioc-help"
+    ],
+    "flags_match_original_hosted_wrapper": true,
+    "local_platform": "macOS ARM64 / R4.6.0",
+    "original_hosted_platform": "Linux x86_64 / R4.6.1",
+    "all_default_checks_claim": false
+  },
+  "instance_delta": {
+    "new_note_categories": 0,
+    "new_long_functions": 0,
+    "new_or_modified_long_lines": 0,
+    "display_calls": 9,
+    "all_display_calls_have_submitted_lineage": true
+  },
+  "artifact_source_files_matched": 176,
+  "native_tests_DESCRIPTION_NAMESPACE_unchanged_from_previous_qualified_source": true,
+  "independent_source_helper_comparisons": {
+    "checks": 40,
+    "passed": true,
+    "scope": "Exact extracted source in isolated environments over same prior installed classes; installed archive tests and parity separate."
+  },
+  "formatting": {
+    "files": 35,
+    "raw_AST_identical": 19,
+    "normalized_AST_identical": 16,
+    "literal_texts_exact": 38,
+    "source_hashes_unchanged": 98
+  },
+  "hosted_CI_run": false,
+  "push": false,
+  "merge": false,
+  "release": false,
+  "time_utc": "2026-10-20T00:37:09.381455+00:00"
+}

@@ -1,5 +1,5 @@
 # `auto_compute_cell_covariates` is used by `import_data` to
-# create `sceptre_object@covariate_data_frame`
+# create `sceptre_object@data@covariate_data_frame`
 test_that("auto_compute_cell_covariates", {
     set.seed(11123)
     num_cells <- 43
@@ -167,24 +167,25 @@ test_that("seeded internal helpers preserve the caller's RNG state", {
         grna_target = c(paste0("target_", seq_len(35)), "non-targeting")
     )
     sceptre_object <- methods::new("sceptre_object")
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame
-    sceptre_object@nuclear <- TRUE
+    sceptre_object@data@grna_target_data_frame <- grna_target_data_frame
+    sceptre_object@preparation@guide_groups <- grna_target_data_frame$grna_target
 
+    sceptre_object@spec@discovery_pairs <- data.frame(
+        grna_target = paste0("target_", seq_len(30L)), response_id = "r")
     set.seed(103)
     seed_before <- .Random.seed
     grnas_in_use <- determine_grnas_in_use(
-        sceptre_object = sceptre_object,
-        restricted_grnas = TRUE
+        sceptre_object = sceptre_object
     )
     expect_equal(.Random.seed, seed_before)
-    expect_length(grnas_in_use, 31)
+    expect_identical(grnas_in_use, grna_target_data_frame$grna_id)
     expect_true("nt_1" %in% grnas_in_use)
 })
 
 # `auto_construct_formula_object` is used by `set_analysis_parameters` when
 # `formula_object = "default"` is used. This then becomes
-# `sceptre_object@formula_object` and is used to make
-# `sceptre_object@covariate_matrix` via `convert_covariate_df_to_design_matrix`.
+# `sceptre_object@spec@formula_object` and is used to make
+# `sceptre_object@preparation@design_matrix` via `convert_covariate_df_to_design_matrix`.
 # Note that this function is never called directly; rather, it is only used on
 # a `sceptre_object` that was returned by `import_data`. This limits the possible
 # `covariate_data_frame` inputs as they are guaranteed to have been produced by

@@ -7,22 +7,22 @@ digraph modules {
   qc [label=< <B>Pair QC &amp; calibration pairs</B><BR/>Counts and the shared eligibility rule<BR/><FONT POINT-SIZE="12">pair_qc.R<BR/>neg_control_functions.R</FONT> >];
   preparation [label=< <B>Analysis preparation<BR/>&amp; coordination</B><BR/>Align pairs, cells and settings<BR/><FONT POINT-SIZE="12">analysis.R · analysis_context.R</FONT> >];
   results [label=< <B>Result tables</B><BR/>Sort pairs, integrate guides<BR/>and finish output tables<BR/><FONT POINT-SIZE="12">result_processing.R</FONT> >];
-  cache [label=< <B>Response-fit reuse</B><BR/>Look up and merge compact fits;<BR/>clear or save them via workflow<BR/><FONT POINT-SIZE="12">fit_cache.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
+  cache [label=< <B>Response + CRT fit reuse</B><BR/>Look up and merge compact fits;<BR/>clear or save them via workflow<BR/><FONT POINT-SIZE="12">fit_cache.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
   execution [label=< <B>Analysis execution</B><BR/>Permutation / CRT loops;<BR/>workers, progress and logs<BR/><FONT POINT-SIZE="12">association_execution.R<BR/>association_workers.R · execution.R</FONT> >, fillcolor="#DAE8FA", color="#4E75A5"];
   storage [label=< <B>Count access</B><BR/>Read responses; count selected cells<BR/><FONT POINT-SIZE="12">storage.R · sparse count kernels in src/</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
-  models [label=< <B>Fitting &amp; score preparation</B><BR/>Fit models; prepare test arrays<BR/><FONT POINT-SIZE="12">fitting.R<BR/>score_preparation.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
+  models [label=< <B>Fitting &amp; score preparation</B><BR/>Fit models; prepare test arrays<BR/><FONT POINT-SIZE="12">fitting.R · perturbation_fits.R<BR/>score_preparation.R</FONT> >, fillcolor="#FAF4E5", color="#B6A06A"];
   inference [label=< <B>Numerical association test</B><BR/>Effects, p-values and diagnostics<BR/><FONT POINT-SIZE="12">src/low_level_full_test.cpp</FONT><BR/><FONT POINT-SIZE="12">src/inference_*.cpp</FONT> >, fillcolor="#E4F1E8", color="#659576"];
 
   {rank=same; qc; preparation; results;}
   {rank=same; cache; execution;}
   {rank=same; storage; models; inference;}
 
-  workflow -> qc [label="settings → QC flags /\ncalibration pairs"];
+  workflow -> qc [label="settings → validated QC /\ncalibration family"];
   workflow -> preparation [label="object + requested pairs\n→ raw results + fit updates"];
   workflow -> results [label="raw results + settings\n→ final output table"];
   preparation -> execution [label="ordered inputs + settings\n→ pair results + fit updates", penwidth=2];
   cache -> execution [style=invis];
-  execution -> cache [constraint=false, label="response ID\n→ saved fit", color="#AA9058", fontcolor="#6E5929"];
+  execution -> cache [constraint=false, label="response / guide + inputs\n→ compatible compact fit", color="#AA9058", fontcolor="#6E5929"];
   execution -> storage [label="gene + cells → count vector"];
   execution -> models [label="counts + design\n→ fit / scores"];
   execution -> inference [label="test arrays + draws\n→ effects + p-values"];

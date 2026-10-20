@@ -1,0 +1,6 @@
+Error in FUN(X[[i]], ...) : no binding for "print"
+[1] "Error in FUN(X[[i]], ...) : no binding for \"print\"\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in FUN(X[[i]], ...): no binding for "print">

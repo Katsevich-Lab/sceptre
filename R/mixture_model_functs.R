@@ -1,12 +1,16 @@
 #' Assign guides with a count mixture adjusted for cell covariates
 #' @param grna_matrix Guide-by-cell counts prepared for row access.
 #' @param cell_covariate_data_frame Covariates in matching original-cell order.
-#' @param grna_assignment_hyperparameters EM, formula and assignment-threshold settings.
-#' @param print_progress,parallel,n_processors,log_dir Worker and reporting settings.
+#' @param grna_assignment_hyperparameters EM, formula and assignment-threshold
+#'   settings.
+#' @param print_progress,parallel,n_processors,log_dir Worker and reporting
+#'   settings.
 #' @param grna_ids Guide names to process, in order.
-#' @return Named lists of original cell-column numbers, starting at 1. Serial work
+#' @return Named lists of original cell-column numbers, starting at 1. Serial
+#'   work
 #'   follows input order; parallel work follows the seeded block order. Read one
-#'   guide at a time, report progress and collect garbage every 200 items. Starting
+#'   guide at a time, report progress and collect garbage every 200 items.
+#'   Starting
 #'   guesses use a fixed seed and restore R's random state. Low counts or failed
 #'   mixture fits use the existing raw-count fallback.
 #' @noRd
@@ -63,7 +67,8 @@ assign_grnas_to_cells_mixture <- function(
     )
 
     # Assign cells for one worker's block of guides
-    # curr_grna_ids: Guide names in processing order; proc_id names the worker log.
+    # curr_grna_ids: Guide names in processing order; proc_id names the worker
+    # log.
     # Returns: Named assignment list. Report progress and collect garbage before
     #   reading each guide, using the shared design and fixed starting guesses.
     assign_guide_block <- function(curr_grna_ids, proc_id = NULL) {
@@ -124,12 +129,12 @@ assign_grnas_to_cells_mixture <- function(
             parallel,
             n_processors
         )
-        res <- parallel::mclapply(
-            seq_along(grna_ids_partitioned),
-            function(proc_id) {
-                assign_guide_block(grna_ids_partitioned[[proc_id]], proc_id)
-            },
-            mc.cores = length(grna_ids_partitioned)
+        res <- execute_analysis_blocks(
+            grna_ids_partitioned,
+            assign_guide_block,
+            parallel = TRUE,
+            analysis = "assign_grnas",
+            phase = "guide_assignment"
         )
         initial_assignment_list <- res |> purrr::flatten()
     }
@@ -143,11 +148,15 @@ assign_grnas_to_cells_mixture <- function(
 #' @param pi_guesses,g_pert_guesses Paired starting values for EM fits.
 #' @param g Guide counts in original-cell order.
 #' @param covariate_matrix Design matrix with rows in that same order.
-#' @param n_nonzero_cells_cutoff Minimum number of cells with g >= 1 to attempt EM.
+#' @param n_nonzero_cells_cutoff Minimum number of cells with g >= 1 to attempt
+#'   EM.
 #' @param backup_threshold Raw-count threshold used when EM is unsuitable.
-#' @param probability_threshold Posterior-probability cutoff after a successful EM fit.
-#' @return Original cell positions, starting at 1, in increasing order. Initialize
-#'   with a Poisson fit, silencing its expected warnings, then run C++ EM. If too
+#' @param probability_threshold Posterior-probability cutoff after a successful
+#'   EM fit.
+#' @return Original cell positions, starting at 1, in increasing order.
+#'   Initialize
+#'   with a Poisson fit, silencing its expected warnings, then run C++ EM. If
+#'   too
 #'   few cells have counts or EM fails, use raw-count thresholding instead.
 #' @noRd
 obtain_em_assignments <- function(
@@ -204,7 +213,8 @@ obtain_em_assignments <- function(
 #' Generate repeatable starting values for the mixture fits
 #' @param n_em_rep Number of paired starting guesses.
 #' @param pi_guess_range,g_pert_guess_range Uniform sampling bounds.
-#' @return Lists pi_guesses and g_pert_guesses, sampled in that order with seed 4.
+#' @return Lists pi_guesses and g_pert_guesses, sampled in that order with seed
+#'   4.
 #'   Restore the caller's previous random state afterward, including when no
 #'   random seed existed before the call.
 #' @noRd

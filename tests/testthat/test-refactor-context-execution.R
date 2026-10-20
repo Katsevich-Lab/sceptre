@@ -4,19 +4,19 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
     object <- methods::new("sceptre_object")
     store <- methods::as(Matrix::Matrix(counts, sparse = TRUE), "RsparseMatrix")
     object <- refactor_private("set_response_matrix")(object, store)
-    object@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
-    object@covariate_matrix <- matrix(1, 12L, 1L,
+    object@preparation@analysis_cells <- c(2L, 4L, 5L, 8L, 11L)
+    object@preparation@design_matrix <- matrix(1, 12L, 1L,
                                       dimnames = list(NULL, "(Intercept)"))
-    object@low_moi <- TRUE
-    object@control_group_complement <- FALSE
-    object@grna_assignments <- list(grna_group_idxs = list(A = c(2L, 3L)),
+    object@data@low_moi <- TRUE
+    object@spec@control_group_complement <- FALSE
+    object@preparation@analysis_groups <- list(grna_group_idxs = list(A = c(2L, 3L)),
         indiv_nt_grna_idxs = list(ntA = 1L, ntB = c(2L, 3L)),
         all_nt_idxs = c(4L, 1L, 5L))
-    object@B1 <- 9L
-    object@B2 <- object@B3 <- 0L
-    object@side_code <- 1L
-    object@calibration_group_size <- 1L
-    object@resampling_approximation <- "no_approximation"
+    object@spec@side_code <- 1L
+    object@spec@resampling_approximation <- "no_approximation"
+    object@spec@multiple_testing_alpha <- 0.1
+    object@spec@multiple_testing_method <- "BH"
+    object <- refactor_private("initialize_screen_identity")(object)
 
     # Write the original matrix columns explicitly, without using the selection
     # helpers to calculate expected values. Calibration uses NT cells (8,2,11);
@@ -39,19 +39,23 @@ test_that("NT intercept-only calibration and discovery preserve explicit matrix 
         expected_z <- sum((y[treatment] - mu) / denom) /
             sqrt(mu / denom * (k - k^2 / length(y)))
         for (permutations in c(TRUE, FALSE)) {
-            object@run_permutations <- permutations
+            object@spec@run_permutations <- permutations
             before <- serialize(object, NULL)
-            context <- refactor_private("prepare_analysis_context")(object, role, pairs)
+            plan <- refactor_private("make_run_plan")(object, role, pairs,
+                calibration_group_size = if (calibration) 1L else NULL,
+                budgets = c(B1 = 9L, B2 = 0L, B3 = 0L))
+            context <- refactor_private("prepare_analysis_context")(object, role, pairs,
+                plan = plan)
             expect_identical(dim(context$design), c(length(source), 1L))
             expect_identical(context$common_view$source_cells,
-                if (calibration) source else object@cells_in_use)
+                if (calibration) source else object@preparation@analysis_cells)
             actual <- suppressMessages(refactor_private("analyze_association_pairs")(
                 object, pairs, role, output_amount = 3L, print_progress = FALSE,
-                parallel = FALSE, n_processors = 1L, log_dir = tempdir()))
+                parallel = FALSE, n_processors = 1L, log_dir = tempdir(), plan = plan))
             expect_equal(actual$result$z_orig, expected_z, tolerance = 1e-8)
             expect_identical(actual$result$response_id, "r")
             expect_identical(actual$result$grna_group, pairs$grna_group)
-            expect_identical(dim(object@covariate_matrix), c(12L, 1L))
+            expect_identical(dim(object@preparation@design_matrix), c(12L, 1L))
             expect_identical(serialize(object, NULL), before)
             expect_length(actual$response_precomputations, if (calibration) 1L else 0L)
         }
@@ -119,7 +123,7 @@ test_that("progress bytes and periodic maintenance retain independent cadences",
 test_that("public workflows retain fit, bank and row-read sharing scopes", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     base_case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_nt_perm
-    originals <- lapply(c("fit_response", "fit_assignment_probabilities",
+    originals <- lapply(c("fit_response", "fit_perturbation_glm",
         "sample_crt_indices", "get_synthetic_permutation_idxs",
         "storage_read_response"), refactor_private)
     names(originals) <- c("fit", "assignment", "crt", "permutation", "read")
@@ -132,7 +136,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
         fit_response = function(...) {
             events$fit <- events$fit + 1L; originals$fit(...)
         },
-        fit_assignment_probabilities = function(...) {
+        fit_perturbation_glm = function(...) {
             events$assignment <- events$assignment + 1L; originals$assignment(...)
         },
         sample_crt_indices = function(fitted_probabilities, B) {
@@ -150,7 +154,7 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
             case$control <- control
             case$mechanism <- mechanism
             object <- suppressMessages(refactor_prepare(inputs, case))
-            pairs <- object@discovery_pairs_with_info
+            pairs <- object@preparation@discovery_pairs_with_info
             pairs <- pairs[pairs$pass_qc, , drop = FALSE]
             nr <- length(unique(pairs$response_id))
             ng <- length(unique(pairs$grna_group))
@@ -169,16 +173,16 @@ test_that("public workflows retain fit, bank and row-read sharing scopes", {
                 if (mechanism == "permutations") {
                     expect_identical(events$read, nr)
                     expect_identical(events$assignment, 0L)
-                    expect_equal(events$permutation, sum(as.double(c(object@B1, object@B2, object@B3))))
+                    expect_equal(events$permutation, sum(as.double(unlist(refactor_private("run_plan_payload")(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan)[c("B1", "B2", "B3")]))))
                     expect_length(events$crt, 0L)
                 } else {
                     expect_identical(events$read, np + if (control == "complement") nr else 0L)
-                    expect_identical(events$assignment, ng)
+                    expect_identical(events$assignment, if (warm) 0L else ng)
                     expect_length(events$permutation, 0L)
-                    expect_equal(events$crt, rep(sum(as.double(c(object@B1, object@B2, object@B3))), ng))
+                    expect_equal(events$crt, rep(sum(as.double(unlist(refactor_private("run_plan_payload")(before_seed@results@records[["run_discovery_analysis"]]$provenance$plan)[c("B1", "B2", "B3")]))), ng))
                 }
-                if (warm) expect_equal(before_seed@discovery_result,
-                                       object@discovery_result, tolerance = 1e-8)
+                if (warm) expect_equal(before_seed@results@records[["run_discovery_analysis"]]$table,
+                                       object@results@records[["run_discovery_analysis"]]$table, tolerance = 1e-8)
                 object <- before_seed
             }
         }

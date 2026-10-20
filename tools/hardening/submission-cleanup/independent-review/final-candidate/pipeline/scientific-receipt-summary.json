@@ -1,0 +1,79 @@
+{
+  "direct": {
+    "path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/bioc01bb-direct/direct-comparison.rds",
+    "cases": ["low_nt_permutation", "low_complement_permutation", "low_nt_crt", "low_complement_crt", "high_crt", "high_mixture_crt", "high_permutation", "low_nt_empirical_permutation", "high_empirical_crt"],
+    "case_count": 9,
+    "backend": {
+      "passed": true,
+      "skipped": false,
+      "version": "1.3.1",
+      "cases": ["low_nt_permutation", "high_permutation"]
+    },
+    "runtime": {
+      "package": "sceptre",
+      "version": "0.99.0",
+      "installed_sha256": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b",
+      "R": "4 5.1 aarch64-unknown-linux-gnu",
+      "optional_backend": {
+        "version": "1.3.1",
+        "installed_sha256": "b5a4a7c23c8b6469b14c787b4a46e482646cb756d012f67bb1def568d8eae552"
+      }
+    }
+  },
+  "distributed": {
+    "path": "/Users/ekatsevi/.codex/worktrees/bioc-compatibility-refresh/sceptre-pipeline/container/.build/bioc01bb-distributed/distributed-comparison.rds",
+    "cases": ["low_nt_permutation", "low_complement_permutation", "low_nt_crt", "low_complement_crt", "high_crt", "high_mixture_crt", "high_permutation", "low_nt_empirical_permutation", "high_empirical_crt", "low_nt_permutation_backed", "high_permutation_backed"],
+    "case_count": 11,
+    "backend": {
+      "skipped": false,
+      "passed": true,
+      "version": "1.3.1"
+    },
+    "runtime": {
+      "package": "sceptre",
+      "version": "0.99.0",
+      "installed_sha256": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b",
+      "R": "4 5.1 aarch64-unknown-linux-gnu",
+      "optional_backend": {
+        "version": "1.3.1",
+        "installed_sha256": "b5a4a7c23c8b6469b14c787b4a46e482646cb756d012f67bb1def568d8eae552"
+      }
+    }
+  },
+  "nextflow_distributed": {
+    "path": "/private/tmp/pipeline-bioc01bb-nf-distributed",
+    "image": "sha256:1510c16a1d5f0da6a266f8685c4b06fa1865e0116b159956af9625dd1cc249b2",
+    "mode": "distributed",
+    "R": "4 5.1 aarch64-unknown-linux-gnu",
+    "installed": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b",
+    "backend": {
+      "version": "1.3.1",
+      "installed_sha256": "b5a4a7c23c8b6469b14c787b4a46e482646cb756d012f67bb1def568d8eae552"
+    },
+    "execution": {
+      "mode": "distributed",
+      "protocol": 1,
+      "identity": "d72657f8ec751cb46fdcd18952606e3ff422941f20fd3eaff79da68143a31aab",
+      "units": ["unit-000001", "unit-000002"],
+      "plan_sha256": "8c01ea57a905e52c888c7d97c20ee9e834c93176dd91a8850b979070ac51a294"
+    }
+  },
+  "nextflow_reference": {
+    "path": "/private/tmp/pipeline-bioc01bb-nf-reference",
+    "image": "sha256:1510c16a1d5f0da6a266f8685c4b06fa1865e0116b159956af9625dd1cc249b2",
+    "mode": "reference",
+    "R": "4 5.1 aarch64-unknown-linux-gnu",
+    "installed": "8f59580aaf43aee9218bb379acda39d7ce1004e8fe65e4a2012a0a7ce98dec9b",
+    "backend": {
+      "version": "1.3.1",
+      "installed_sha256": "b5a4a7c23c8b6469b14c787b4a46e482646cb756d012f67bb1def568d8eae552"
+    },
+    "execution": {}
+  },
+  "historical_saved_payload_comparison": {
+    "count": 72,
+    "identical": true,
+    "new_prior_source_execution": false,
+    "fields": ["tables", "realized plans", "assignments", "RNG kind", "RNG state"]
+  }
+}

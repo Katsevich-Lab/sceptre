@@ -1,0 +1,27 @@
+* installing *source* package ‘testthat’ ...
+** package ‘testthat’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+using C compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using C++ compiler: ‘Apple clang version 21.0.0 (clang-2100.1.1.101)’
+using SDK: ‘MacOSX26.5.sdk’
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c init.c -o init.o
+clang -arch arm64 -I"/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c reassign.c -o reassign.o
+clang++ -arch arm64 -std=gnu++17 -I"/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2   -c test-catch.cpp -o test-catch.o
+clang++ -arch arm64 -std=gnu++17 -I"/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2   -c test-example.cpp -o test-example.o
+clang++ -arch arm64 -std=gnu++17 -I"/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/opt/R/arm64/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/include    -fPIC  -falign-functions=64 -Wall -g -O2   -c test-runner.cpp -o test-runner.o
+clang++ -arch arm64 -std=gnu++17 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -L/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib -L/opt/R/arm64/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/lib -o testthat.so init.o reassign.o test-catch.o test-example.o test-runner.o -F/Library/Frameworks/R.framework/Versions/4.4-arm64 -framework R -Wl,-framework -Wl,CoreFoundation
+installing to /private/tmp/sceptre-r44-floor-library/00LOCK-testthat/00new/testthat/libs
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (testthat)

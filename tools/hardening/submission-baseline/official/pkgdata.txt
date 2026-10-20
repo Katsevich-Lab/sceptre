@@ -1,0 +1,6 @@
+JOB_STATUS='success'
+DISTRO='resolute'
+FILE='sceptre_0.99.0.tar.gz'
+TARGET='source'
+CHECKSTATUS=''
+STOREDATE=20260831

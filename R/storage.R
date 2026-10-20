@@ -16,14 +16,18 @@ storage_response_index <- function(store, id) {
 #' @param store Row-accessible sparse matrix (`dgRMatrix`) or an `odm` opened
 #'   in the current R process.
 #' @param response_idx Gene's row number in `store`, starting at 1.
-#' @param source_cells Original count-matrix column numbers, in the desired order.
+#' @param source_cells Original count-matrix column numbers, in the desired
+#'   order.
 #'   NULL selects all cells; `integer()` selects none. Repeats are kept.
 #' @return Numeric count vector in the requested order, including for one cell.
-#' @details Read the complete gene row before selecting its cells. This loads one
-#'   row, rather than the whole matrix, and leaves the original counts unchanged.
+#' @details Read the complete gene row before selecting its cells. This loads
+#'   one
+#'   row, rather than the whole matrix, and leaves the original counts
+#'   unchanged.
 #' @noRd
 storage_read_response <- function(store, response_idx, source_cells = NULL) {
     y <- if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         as.numeric(store[response_idx, ])
     } else {
         load_csr_row(store@j, store@p, store@x, response_idx, ncol(store))
@@ -43,6 +47,7 @@ storage_read_response <- function(store, response_idx, source_cells = NULL) {
 #' @noRd
 storage_threshold_row <- function(store, feature_idx, threshold) {
     if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         ondisc:::threshold_count_matrix_cpp(
             file_name_in = store@h5_file,
             f_row_ptr = store@ptr,
@@ -64,7 +69,8 @@ storage_threshold_row <- function(store, feature_idx, threshold) {
 #' @param groups List of cell-position vectors, using the numbering the caller
 #'   needs. This helper copies the numbers without changing their meaning.
 #' @return Fresh integer vectors with names, order and repeats preserved.
-#'   Some private ondisc functions subtract one from their input vectors in place.
+#'   Some private ondisc functions subtract one from their input vectors in
+#'   place.
 #'   Give them copies so the original guide assignments remain unchanged.
 #'   `as.integer()` alone may reuse the original vector and is not a safe copy.
 #' @noRd
@@ -78,24 +84,28 @@ storage_owned_groups <- function(groups) {
 #' @param pair_index Table giving each request's gene row (`response_idx`) and
 #'   position in `groups` (`group_idx`), both starting at 1. Repeated requests
 #'   and any request order are allowed.
-#' @param groups Treatment-cell lists. Numbers are positions within `source_cells`,
-#'   not original matrix columns. For `source_cells = c(2, 4, 5)`, group `c(1, 3)`
+#' @param groups Treatment-cell lists. Numbers are positions within
+#'   `source_cells`,
+#'   not original matrix columns. For `source_cells = c(2, 4, 5)`, group `c(1,
+#'   3)`
 #'   means original cells 2 and 5.
 #' @param source_cells Original matrix columns kept after QC, in analysis order.
-#' @param controls `"complement"` for all other kept cells, or NT-control positions
+#' @param controls `"complement"` for all other kept cells, or NT-control
+#'   positions
 #'   within `source_cells`.
 #' @param nt_groups Optional NT-guide cell lists, also as positions within
 #'   `source_cells`. Low-MOI callers supply their NT groups for a summary across
 #'   all genes. These lists are counted as supplied, without removing overlaps.
 #'   NULL requests pair counts without retaining that summary.
-#' @param nuclear Whether this is a nuclear pipeline task. For ondisc, skip the
-#'   all-gene summary and read only requested gene rows. The in-memory summary
-#'   still shares a scan with the pair counts when requested.
-#' @return `n_nonzero_trt` and `n_nonzero_cntrl`, integer vectors in request order.
-#'   When retained, `n_nonzero_mat` has NT groups in rows and all genes in columns;
-#'   `n_nonzero_tot` has a total per gene. Otherwise these two fields contain the
+#' @return `n_nonzero_trt` and `n_nonzero_cntrl`, integer vectors in request
+#'   order.
+#'   When retained, `n_nonzero_mat` has NT groups in rows and all genes in
+#'   columns;
+#'   `n_nonzero_tot` has a total per gene. Otherwise these two fields contain
+#'   the
 #'   existing empty placeholders `matrix()` and `integer()`.
-#' @details These counts count stored entries, including explicitly stored zeros,
+#' @details These counts count stored entries, including explicitly stored
+#'   zeros,
 #'   rather than testing whether loaded values are positive. Complement totals
 #'   count kept cells; NT totals sum the supplied NT groups, so an overlap would
 #'   be counted again. Requests are sorted for reading, then restored to their
@@ -109,8 +119,7 @@ storage_pair_counts <- function(
     groups,
     source_cells,
     controls,
-    nt_groups = NULL,
-    nuclear = FALSE
+    nt_groups = NULL
 ) {
     complement <- is.character(controls) && identical(controls, "complement")
     all_nt_idxs <- if (complement) integer() else as.integer(controls)
@@ -122,60 +131,28 @@ storage_pair_counts <- function(
     response_idxs <- as.integer(pair_index$response_idx[scan_order])
     group_idxs <- as.integer(pair_index$group_idx[scan_order])
     if (methods::is(store, "odm")) {
-        if (!complement) {
-            nt_groups <- lapply(nt_groups, function(group) {
-                match(group, all_nt_idxs)
-            })
-        }
-        groups <- storage_owned_groups(groups)
-        nt_groups <- storage_owned_groups(nt_groups)
-        common <- list(
-            file_name_in = store@h5_file,
-            f_row_ptr = store@ptr,
-            n_genes = nrow(store),
-            n_cells_orig = ncol(store),
-            n_cells_sub = length(source_cells),
-            grna_group_idxs = groups,
-            all_nt_idxs = all_nt_idxs,
-            to_analyze_response_idxs = response_idxs,
-            to_analyze_grna_idxs = group_idxs,
-            control_group_complement = complement,
-            cells_in_use = source_cells
+        out <- storage_backed_pair_counts(
+            store,
+            response_idxs,
+            group_idxs,
+            groups,
+            source_cells,
+            all_nt_idxs,
+            nt_groups,
+            complement,
+            summarize
         )
-        if (nuclear || !summarize) {
-            out <- do.call(
-                ondisc:::compute_n_ok_pairs_ondisc,
-                c(
-                    common,
-                    list(
-                        unique_response_idxs = sort(unique(response_idxs))
-                    )
-                )
-            )
-            out$n_nonzero_mat <- matrix()
-            out$n_nonzero_tot <- integer()
-        } else {
-            out <- do.call(
-                ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc,
-                c(common, list(indiv_nt_grna_idxs = nt_groups))
-            )
-        }
     } else {
-        out <- sparse_pair_counts(
-            j = store@j,
-            p = store@p,
-            n_cells_orig = ncol(store),
-            grna_group_idxs = groups,
-            nt_groups_analysis = nt_groups,
-            to_analyze_response_idxs = response_idxs,
-            to_analyze_grna_idxs = group_idxs,
-            control_group_complement = complement,
-            cells_in_use = source_cells
+        out <- storage_sparse_pair_counts(
+            store,
+            groups,
+            source_cells,
+            nt_groups,
+            response_idxs,
+            group_idxs,
+            complement,
+            summarize
         )
-        if (!summarize) {
-            out$n_nonzero_mat <- matrix()
-            out$n_nonzero_tot <- integer()
-        }
     }
     restore_order <- order(scan_order)
     out$n_nonzero_trt <- out$n_nonzero_trt[restore_order]
@@ -185,7 +162,8 @@ storage_pair_counts <- function(
 
 #' Count stored entries for guide groups across a requested list of genes
 #' @inheritParams storage_pair_counts
-#' @param response_idxs Original gene-row numbers, starting at 1, in requested order.
+#' @param response_idxs Original gene-row numbers, starting at 1, in requested
+#'   order.
 #' @return Integer matrix with one row per group and one column per requested
 #'   gene. Keep request order, repeats and matrix dimensions, even for zero or
 #'   one row/column.
@@ -195,6 +173,7 @@ storage_pair_counts <- function(
 #' @noRd
 storage_group_counts <- function(store, response_idxs, groups, source_cells) {
     if (methods::is(store, "odm")) {
+        require_ondisc_capabilities()
         groups <- storage_owned_groups(groups)
         out <- ondisc:::compute_n_trt_cells_matrix_ondisc(
             file_name_in = store@h5_file,
@@ -218,14 +197,18 @@ storage_group_counts <- function(store, response_idxs, groups, source_cells) {
 }
 
 #' Write response and guide matrices to ondisc files with the same import ID
-#' @param response_matrix,grna_matrix Sparse count matrices prepared during import.
+#' @param response_matrix,grna_matrix Sparse count matrices prepared during
+#'   import.
 #' @param directory_to_write Output directory already created by the caller.
 #' @param integer_id Import ID already randomly chosen by the caller.
 #' @return Open ondisc matrices named `response_matrix` and `grna_matrix`.
-#' @details Write `response.odm`, then `grna.odm`. If the second write fails, the
-#'   first file may already exist. Use the private ondisc constructor to preserve
+#' @details Write `response.odm`, then `grna.odm`. If the second write fails,
+#'   the
+#'   first file may already exist. Use the private ondisc constructor to
+#'   preserve
 #'   the supplied shared ID; the public constructor fixes its ID at zero.
-#'   ondisc's integer count conversion, chunk-size limits and errors still apply.
+#'   ondisc's integer count conversion, chunk-size limits and errors still
+#'   apply.
 #'   Open file handles belong to the current R process.
 #' @noRd
 storage_create_backed_pair <- function(
@@ -234,6 +217,7 @@ storage_create_backed_pair <- function(
     directory_to_write,
     integer_id
 ) {
+    require_ondisc_capabilities()
     # Both files must retain the caller's shared import ID so reopening can
     # check that they belong to this object. The public constructor uses zero.
     response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
@@ -257,6 +241,7 @@ storage_create_backed_pair <- function(
 #'   saved ID. A mismatch raises the existing error. No files are rewritten.
 #' @noRd
 storage_reopen_backed_pair <- function(response_file, grna_file, integer_id) {
+    require_ondisc_capabilities()
     response <- ondisc::initialize_odm_from_backing_file(response_file)
     grna <- ondisc::initialize_odm_from_backing_file(grna_file)
     if (integer_id != response@integer_id) {
@@ -275,10 +260,12 @@ storage_reopen_backed_pair <- function(response_file, grna_file, integer_id) {
 #' Calculate count summaries for each cell
 #' @param store Column-accessible sparse matrix (`dgCMatrix`), with features in
 #'   rows and cells in columns.
-#' @param mt_gene_idxs Mitochondrial feature-row numbers, starting at 1; may be empty.
+#' @param mt_gene_idxs Mitochondrial feature-row numbers, starting at 1; may be
+#'   empty.
 #' @param compute_p_mito,compute_max_feature Whether to calculate mitochondrial
 #'   fractions and the largest feature's contribution.
-#' @return One value per cell for `n_nonzero` (counts greater than 0.5), `n_umi`,
+#' @return One value per cell for `n_nonzero` (counts greater than 0.5),
+#'   `n_umi`,
 #'   `p_mito`, `frac_umis_max_feature` and `max_feature`. Unlike R row numbers,
 #'   `max_feature` starts at 0; ties use the first maximum. Disabled optional
 #'   summaries remain zero. A computed ratio with zero total counts can be
@@ -305,13 +292,17 @@ storage_cell_covariates <- function(
 
 #' Convert a count matrix for efficient access by row or column
 #' @param matrix_in Numeric dense matrix, numeric or logical sparse matrix, or
-#'   open ondisc matrix (`odm`). Sparse input may use row, column or triplet storage.
+#'   open ondisc matrix (`odm`). Sparse input may use row, column or triplet
+#'   storage.
 #' @param make_row_accessible TRUE requests row storage (`dgRMatrix`); FALSE
 #'   requests column storage (`dgCMatrix`).
 #' @return Sparse matrix with the same dimensions and names, or the supplied
-#'   `odm`. A numeric sparse matrix already in the requested form is returned as is.
-#' @details Keep stored numeric values, including zeros and fractions. For logical
-#'   sparse input, every stored entry becomes one, even an explicitly stored FALSE;
+#'   `odm`. A numeric sparse matrix already in the requested form is returned as
+#'   is.
+#' @details Keep stored numeric values, including zeros and fractions. For
+#'   logical
+#'   sparse input, every stored entry becomes one, even an explicitly stored
+#'   FALSE;
 #'   this preserves the package's existing convention. Duplicate triplet entries
 #'   are not combined here. Sorting uses copies so callers' sparse vectors are
 #'   unchanged. Dense input is first treated as a general matrix to retain both
@@ -321,7 +312,8 @@ storage_cell_covariates <- function(
 #' @noRd
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
     owns_i <- owns_j <- owns_x <- FALSE
-    # For logical sparse input, count every stored entry as 1, even stored FALSE.
+    # For logical sparse input, count every stored entry as 1, even stored
+    # FALSE.
     if (methods::is(matrix_in, "lgRMatrix")) {
         attr(matrix_in, "class") <- "dgRMatrix"
         matrix_in@x <- rep(1.0, length(matrix_in@j))
@@ -412,11 +404,136 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
 #' @param p Compressed sparse pointer: cumulative entry counts starting at zero,
 #'   with length equal to the number of rows/columns plus one. Counts must not
 #'   decrease, and the vector must describe at least one row/column.
-#' @return Row/column numbers starting at zero, one per stored entry. For example,
-#'   `p = c(0, 2, 2, 3)` gives `c(0, 0, 2)`: two entries in the first row/column,
-#'   none in the second and one in the third. The input and entry order are kept.
+#' @return Row/column numbers starting at zero, one per stored entry. For
+#'   example,
+#'   `p = c(0, 2, 2, 3)` gives `c(0, 0, 2)`: two entries in the first
+#'   row/column,
+#'   none in the second and one in the third. The input and entry order are
+#'   kept.
 #' @noRd
 sparse_pointer_to_indices <- function(p) {
     l <- diff(p)
     rep(x = seq(0, length(l) - 1L), times = l)
+}
+
+# Retain the sentinel request required by the qualified ondisc ABI.
+storage_backed_pair_counts <- function(
+    store,
+    response_idxs,
+    group_idxs,
+    groups,
+    source_cells,
+    all_nt_idxs,
+    nt_groups,
+    complement,
+    summarize
+) {
+    require_ondisc_capabilities()
+    if (!complement) {
+        nt_groups <- lapply(nt_groups, function(group) {
+            match(group, all_nt_idxs)
+        })
+    }
+    groups <- storage_owned_groups(groups)
+    nt_groups <- storage_owned_groups(nt_groups)
+    # Some installed ondisc binaries inspect the next requested row before
+    # checking whether the final pair was consumed. Keep an inert request
+    # beyond the gene domain so that lookahead remains within the vector.
+    # Neither native loop visits this row; discard its unused output below.
+    # The original unique rows are still the only rows requested for reading.
+    n_requested <- length(response_idxs)
+    native_response_idxs <- c(response_idxs, as.integer(nrow(store) + 1L))
+    native_group_idxs <- c(group_idxs, 1L)
+    common <- storage_backed_pair_arguments(
+        store,
+        groups,
+        source_cells,
+        all_nt_idxs,
+        native_response_idxs,
+        native_group_idxs,
+        complement
+    )
+    out <- invoke_backed_pair_count(common, response_idxs, nt_groups, summarize)
+    out$n_nonzero_trt <- out$n_nonzero_trt[seq_len(n_requested)]
+    out$n_nonzero_cntrl <- out$n_nonzero_cntrl[seq_len(n_requested)]
+    out
+}
+
+storage_backed_pair_arguments <- function(
+    store,
+    groups,
+    source_cells,
+    all_nt_idxs,
+    native_response_idxs,
+    native_group_idxs,
+    complement
+) {
+    list(
+        file_name_in = store@h5_file,
+        f_row_ptr = store@ptr,
+        n_genes = nrow(store),
+        n_cells_orig = ncol(store),
+        n_cells_sub = length(source_cells),
+        grna_group_idxs = groups,
+        all_nt_idxs = all_nt_idxs,
+        to_analyze_response_idxs = native_response_idxs,
+        to_analyze_grna_idxs = native_group_idxs,
+        control_group_complement = complement,
+        cells_in_use = source_cells
+    )
+}
+
+storage_sparse_pair_counts <- function(
+    store,
+    groups,
+    source_cells,
+    nt_groups,
+    response_idxs,
+    group_idxs,
+    complement,
+    summarize
+) {
+    out <- sparse_pair_counts(
+        j = store@j,
+        p = store@p,
+        n_cells_orig = ncol(store),
+        grna_group_idxs = groups,
+        nt_groups_analysis = nt_groups,
+        to_analyze_response_idxs = response_idxs,
+        to_analyze_grna_idxs = group_idxs,
+        control_group_complement = complement,
+        cells_in_use = source_cells
+    )
+    if (!summarize) {
+        out$n_nonzero_mat <- matrix()
+        out$n_nonzero_tot <- integer()
+    }
+    out
+}
+
+invoke_backed_pair_count <- function(
+    common,
+    response_idxs,
+    nt_groups,
+    summarize
+) {
+    if (!summarize) {
+        out <- do.call(
+            ondisc:::compute_n_ok_pairs_ondisc,
+            c(
+                common,
+                list(
+                    unique_response_idxs = sort(unique(response_idxs))
+                )
+            )
+        )
+        out$n_nonzero_mat <- matrix()
+        out$n_nonzero_tot <- integer()
+    } else {
+        out <- do.call(
+            ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc,
+            c(common, list(indiv_nt_grna_idxs = nt_groups))
+        )
+    }
+    out
 }

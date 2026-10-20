@@ -1,0 +1,22 @@
+{
+  "candidate": {
+    "long_functions": 44,
+    "long_lines": 108,
+    "calls": {
+      "sequence": [],
+      "paste_signal": [],
+      "superassignment": [],
+      "print_cat": ["print() in R/output_resources.R (line 18, column 5)", "cat() in R/s4_helpers.R (line 90, column 5)", "cat() in R/s4_helpers.R (line 92, column 9)", "cat() in R/s4_helpers.R (line 112, column 5)", "cat() in R/s4_helpers.R (line 243, column 9)", "cat() in R/s4_helpers.R (line 294, column 9)", "cat() in R/s4_helpers.R (line 305, column 9)", "cat() in R/s4_helpers.R (line 321, column 9)", "cat() in R/s4_helpers.R (line 334, column 9)"]
+    }
+  },
+  "baseline": {
+    "long_functions": 48,
+    "long_lines": 145,
+    "calls": {
+      "sequence": [],
+      "paste_signal": [],
+      "superassignment": [],
+      "print_cat": ["print() in R/s4_analysis_functs_2.R (line 723, column 5)", "cat() in R/s4_helpers.R (line 91, column 5)", "cat() in R/s4_helpers.R (line 93, column 9)", "cat() in R/s4_helpers.R (line 107, column 5)", "cat() in R/s4_helpers.R (line 234, column 9)", "cat() in R/s4_helpers.R (line 266, column 9)", "cat() in R/s4_helpers.R (line 272, column 9)", "cat() in R/s4_helpers.R (line 285, column 9)", "cat() in R/s4_helpers.R (line 295, column 9)"]
+    }
+  }
+}

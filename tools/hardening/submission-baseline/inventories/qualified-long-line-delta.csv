@@ -1,0 +1,474 @@
+file,line,width,text,status
+R/RcppExports.R,20,167,"run_association_test <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {",new_or_modified_long_line
+R/RcppExports.R,21,175,"    .Call(`_sceptre_run_association_test`, y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code)",new_or_modified_long_line
+R/RcppExports.R,24,98,"run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial) {",unchanged_source_text_from_submission
+R/RcppExports.R,25,106,"    .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)",unchanged_source_text_from_submission
+R/RcppExports.R,28,160,"sample_calibration_groups <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {",new_or_modified_long_line
+R/RcppExports.R,29,168,"    .Call(`_sceptre_sample_calibration_groups`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)",new_or_modified_long_line
+R/RcppExports.R,32,93,"iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {",unchanged_source_text_from_submission
+R/RcppExports.R,33,101,"    .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)",unchanged_source_text_from_submission
+R/RcppExports.R,40,161,"sample_calibration_pairs <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {",new_or_modified_long_line
+R/RcppExports.R,41,169,"    .Call(`_sceptre_sample_calibration_pairs`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)",new_or_modified_long_line
+R/RcppExports.R,44,90,"compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {",unchanged_source_text_from_submission
+R/RcppExports.R,45,98,"    .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)",unchanged_source_text_from_submission
+R/RcppExports.R,48,103,"evaluate_pair_eligibility_cpp <- function(treatment, control, treatment_threshold, control_threshold) {",new_or_modified_long_line
+R/RcppExports.R,49,111,"    .Call(`_sceptre_evaluate_pair_eligibility_cpp`, treatment, control, treatment_threshold, control_threshold)",new_or_modified_long_line
+R/RcppExports.R,52,177,"sparse_pair_counts <- function(j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {",new_or_modified_long_line
+R/RcppExports.R,53,185,"    .Call(`_sceptre_sparse_pair_counts`, j, p, n_cells_orig, grna_group_idxs, nt_groups_analysis, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)",new_or_modified_long_line
+R/RcppExports.R,57,83,"    .Call(`_sceptre_sparse_group_counts`, j, p, n_cells_orig, groups, cells_in_use)",new_or_modified_long_line
+R/RcppExports.R,68,119,"compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {",unchanged_source_text_from_submission
+R/RcppExports.R,69,127,"    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)",unchanged_source_text_from_submission
+R/analysis.R,2,82,#' @param sceptre_object Sceptre object supplying data and settings. This function,new_or_modified_long_line
+R/analysis.R,4,82,"#' @param response_grna_group_pairs All requested pairs, including failed-QC rows.",new_or_modified_long_line
+R/analysis.R,7,82,"#'   output, progress, worker-count and logging settings from the public function.",new_or_modified_long_line
+R/analysis.R,11,81,"#' @details Prepare the cell selections and settings, then choose the permutation",new_or_modified_long_line
+R/analysis.R,12,81,#'   or CRT loop. Permutations share one full set of random draws across the run;,new_or_modified_long_line
+R/analysis.R,14,81,#'   regenerating draws for each pair could change results. Guide integration and,new_or_modified_long_line
+R/analysis_context.R,10,81,"#' @param source_cells Original count-matrix column numbers, in the order to use.",new_or_modified_long_line
+R/analysis_context.R,25,95,"            ""Analysis source cells must be unique integer positions within the response store.""",new_or_modified_long_line
+R/analysis_context.R,73,81,#'   come before any additional NT2 cells. The position numbers are not converted,new_or_modified_long_line
+R/analysis_context.R,88,82,#'   match against. The caller has already checked that the requested names exist.,new_or_modified_long_line
+R/analysis_context.R,91,82,#'   Request order and repeated requests are kept. This helper only matches names;,new_or_modified_long_line
+R/analysis_context.R,108,82,"#' @param pairs,response_ids Requested tests and the original matrix's gene names.",new_or_modified_long_line
+R/analysis_context.R,165,85,"#' @param group_id A targeting guide group, or joined NT guide names for calibration.",new_or_modified_long_line
+R/analysis_context.R,184,83,"#' @param group_id Guide-group name, or NULL to prepare cells shared across groups.",new_or_modified_long_line
+R/analysis_context.R,190,81,"#'   treatment cells followed by the NT cells. For NT discovery, NULL returns all",new_or_modified_long_line
+R/analysis_context.R,196,81,#'   treatment occupies positions `1:2` within this fit. Counts and design-matrix,new_or_modified_long_line
+R/analysis_context.R,200,81,#'   every guide at once. This helper only selects cells; it does not read counts,new_or_modified_long_line
+R/analysis_context.R,261,83,"#' @param analysis One of `calibration_check`, `power_check`, `discovery_analysis`.",new_or_modified_long_line
+R/analysis_context.R,265,82,"#'   and pair lookups (`index`), shared cell selection (`common_view`), and design",new_or_modified_long_line
+R/analysis_context.R,270,82,"#'   `test_options` includes B1, B2, B3, their checked sum, test direction and the",new_or_modified_long_line
+R/assign_grna_functions.R,5,83,#' @param sceptre_object Sceptre object with assignment method and settings chosen.,new_or_modified_long_line
+R/assign_grna_functions.R,8,81,"#' @return Object with initial assignments as original matrix column numbers and,",new_or_modified_long_line
+R/assign_grna_functions.R,24,90,    grna_assignment_hyperparameters <- sceptre_object@spec@grna_assignment_hyperparameters,new_or_modified_long_line
+R/assign_grna_functions.R,32,86,        sceptre_object@preparation@guide_assignments <- assign_grnas_to_cells_mixture(,new_or_modified_long_line
+R/assign_grna_functions.R,44,91,        sceptre_object@preparation@guide_assignments <- assign_grnas_to_cells_thresholding(,new_or_modified_long_line
+R/assign_grna_functions.R,53,100,"            max_grna_frac_umis = sceptre_object@data@import_grna_assignment_info$max_grna_frac_umis,",new_or_modified_long_line
+R/assign_grna_functions.R,54,92,"            umi_fraction_threshold = grna_assignment_hyperparameters$umi_fraction_threshold,",unchanged_source_text_from_submission
+R/assign_grna_functions.R,56,98,"            min_grna_n_umis_threshold = grna_assignment_hyperparameters$min_grna_n_umis_threshold,",unchanged_source_text_from_submission
+R/assign_grna_functions.R,59,90,        sceptre_object@preparation@guide_assignments <- max_result$initial_assignment_list,new_or_modified_long_line
+R/assign_grna_functions.R,61,100,        sceptre_object@preparation@assignment_exclusions <- max_result$cells_w_zero_or_twoplus_grnas,new_or_modified_long_line
+R/assign_grna_functions.R,75,136,"            ""No gRNA was assigned to any cell. Consider setting `method` to 'thresholding' and `threshold` to a small, positive number.""",unchanged_source_text_from_submission
+R/assign_grna_functions.R,122,83,#' @param max_grna_frac_umis Fraction of that cell's guide UMIs from its top guide.,new_or_modified_long_line
+R/assign_grna_functions.R,123,89,#' @param umi_fraction_threshold Flag cells whose top-guide fraction is at or below this.,new_or_modified_long_line
+R/assign_grna_functions.R,162,83,#' @param sceptre_object Object with gathered guide assignments and guide metadata.,new_or_modified_long_line
+R/assign_grna_functions.R,166,81,"#'   their cells are combined without duplicates, in first-seen order. Individual",new_or_modified_long_line
+R/assign_grna_functions.R,182,92,        sceptre_object@preparation@guide_counts_per_cell <- compute_n_grnas_per_cell_vector(,new_or_modified_long_line
+R/association_execution.R,5,83,"#' @param synthetic_idxs Complete set of permutation draws, shared across this run.",new_or_modified_long_line
+R/association_execution.R,7,83,"#' @details Read each gene once per outer loop, even if its fit is saved. Reuse its",new_or_modified_long_line
+R/association_execution.R,11,81,#'   partitioned. Keep requests within each gene in order. Progress reporting and,new_or_modified_long_line
+R/association_execution.R,137,81,"#' @details First prepare response fits that can be shared across groups, reading",new_or_modified_long_line
+R/association_execution.R,139,81,"#'   its assignment probabilities and generate B1+B2+B3 draws once, reusing those",new_or_modified_long_line
+R/association_execution.R,140,82,"#'   draws across the group's requested genes. With NT-control discovery, response",new_or_modified_long_line
+R/association_execution.R,141,81,#'   fits use group-specific treatment-plus-NT cells and are not saved for reuse.,new_or_modified_long_line
+R/association_execution.R,153,84,"    # Returns: Newly fitted genes only, named and ordered as processed. Each gene is",new_or_modified_long_line
+R/association_execution.R,154,85,"    #   read before looking up its saved fit, including when that fit already exists.",new_or_modified_long_line
+R/association_execution.R,227,87,"    # Returns: Results in block, group and within-group request order. For NT controls,",new_or_modified_long_line
+R/association_execution.R,228,81,    #   construct only the current group's treatment-plus-NT selection as needed.,new_or_modified_long_line
+R/association_workers.R,4,81,#' @param treatment_lookup Function returning each group's treated-cell positions,new_or_modified_long_line
+R/association_workers.R,7,81,#' @param synthetic_idxs Complete shared set of permutation draws. Draw positions,new_or_modified_long_line
+R/association_workers.R,8,82,#'   start at 0 for C++; observed treatment positions start at 1 and are converted,new_or_modified_long_line
+R/association_workers.R,10,86,"#' @param test_options Stage sizes B1/B2/B3, test direction and approximation setting.",new_or_modified_long_line
+R/association_workers.R,11,83,#' @param output_amount Public output level; level 3 includes resampled statistics.,new_or_modified_long_line
+R/association_workers.R,54,81,#' @param synthetic_idxs Complete shared hybrid-permutation draws. Each test uses,new_or_modified_long_line
+R/association_workers.R,57,82,"#' @return C++ results in guide-group order. Each group gets its own response fit,",new_or_modified_long_line
+R/association_workers.R,58,85,"#'   with treatment cells first, then NT cells, keeping membership order and repeats.",new_or_modified_long_line
+R/association_workers.R,101,90,"#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.",new_or_modified_long_line
+R/association_workers.R,108,86,#' @param response_fits Previously prepared response fits for these same cells/design.,new_or_modified_long_line
+R/association_workers.R,113,81,"#'   generate B1+B2+B3 CRT draws once for this guide, then read each gene and use",new_or_modified_long_line
+R/association_workers.R,173,90,"#' @param response_rows Original matrix gene-row numbers, starting at 1, in request order.",new_or_modified_long_line
+R/association_workers.R,175,83,#' @param fit_view Cell selection from `make_fit_view()`: `fit_to_analysis` selects,new_or_modified_long_line
+R/association_workers.R,177,83,"#'   `trt_fit_pos` locates treatment cells within the selected data, starting at 1.",new_or_modified_long_line
+R/association_workers.R,184,82,"#'   generate a full set of CRT draws once for this guide. Then read, fit and test",new_or_modified_long_line
+R/aux_functions.R,3,82,"#' Keep covariates in column order, excluding response mitochondrial fraction and,",new_or_modified_long_line
+R/aux_functions.R,4,81,"#' when requested, guide count summaries. Use log(x) for names matching n_umis or",new_or_modified_long_line
+R/aux_functions.R,5,81,"#' n_nonzero, adding one if any value is zero. Other covariates are included only",new_or_modified_long_line
+R/aux_functions.R,6,83,#' if they have fewer than 15 distinct values. Return a formula for model.matrix();,new_or_modified_long_line
+R/aux_functions.R,65,81,#' Response and guide matrices must have cells in the same order. Calculate their,new_or_modified_long_line
+R/aux_functions.R,66,83,"#' summaries, prefix the column names with response_ or grna_, and append any extra",new_or_modified_long_line
+R/aux_functions.R,112,81,#' cores once. Restore the caller's random state and temporary options afterward.,new_or_modified_long_line
+R/cellwise_qc_functs.R,58,91,    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@preparation@assignment_exclusions,new_or_modified_long_line
+R/cellwise_qc_functs.R,94,81,#' Remove failed-QC cells from guide assignments and renumber the remaining cells,new_or_modified_long_line
+R/cellwise_qc_functs.R,98,81,"#'   positions within `cells_in_use`, in that list's order. Remove NT guides with",new_or_modified_long_line
+R/check_functions.R,9,81,"#'   Check classes, dimensions, labels and metadata fields without scanning every",new_or_modified_long_line
+R/check_functions.R,25,183,"            ""The data frame `grna_target_data_frame` should have columns `grna_id` and `grna_target`. The `grna_target` column should specify the target of each individual `grna_id`.""",unchanged_source_text_from_submission
+R/check_functions.R,45,123,"            ""The ampersand character (&) cannot be present in the gRNA IDs. The following gRNA IDs contain an ampersand: "",",unchanged_source_text_from_submission
+R/check_functions.R,51,166,"            ""No individual gRNA can have the ID `non-targeting`. The string `non-targeting` is reserved for the `grna_target` column of the `grna_target_data_frame`.""",unchanged_source_text_from_submission
+R/check_functions.R,59,193,"            ""The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix. The row names of the grna expression matrix are as follows: "",",unchanged_source_text_from_submission
+R/check_functions.R,66,81,    # input_matrix: Matrix to check; `input_matrix_name` identifies it in errors.,new_or_modified_long_line
+R/check_functions.R,68,85,"    # Returns: Invisible NULL on success, otherwise an error naming the input matrix.",new_or_modified_long_line
+R/check_functions.R,118,126,"            ""The number of cells in the `response_matrix`, `grna_matrix`, and `extra_covariates` (if supplied) must coincide.""",unchanged_source_text_from_submission
+R/check_functions.R,162,104,"                        ""`. These cell barcodes must be identical and in the same order across objects.""",unchanged_source_text_from_submission
+R/check_functions.R,180,205,"            ""The covariate names `response_n_nonzero`, `response_n_umis`, `response_p_mito`, `grna_n_nonzero`, and `grna_n_umis` are reserved. Change the column names of the `extra_covariates` data frame.""",unchanged_source_text_from_submission
+R/check_functions.R,196,105,"                ""` of the `extra_covariates` data frame should be of type numeric, character, or factor.""",unchanged_source_text_from_submission
+R/check_functions.R,204,226,"                    ""` is incorrectly formatted. The number of unique elements in this column must equal the number of factors in this column. Consider relabeling the factors or converting this column into a character vector.""",unchanged_source_text_from_submission
+R/check_functions.R,234,99,"            ""The `grna_id` or `grna_target` column of `grna_target_data_frame` contains NA values.""",unchanged_source_text_from_submission
+R/check_functions.R,243,84,#' @param sceptre_object Imported sceptre object with count matrices and covariates.,new_or_modified_long_line
+R/check_functions.R,245,86,#' @param response_grna_target_pairs_list Named discovery and positive-control tables.,new_or_modified_long_line
+R/check_functions.R,248,85,"#' @param grna_integration_strategy,resampling_approximation Chosen guide-combination",new_or_modified_long_line
+R/check_functions.R,252,81,#'   The current checks access missing-value columns before checking their names.,new_or_modified_long_line
+R/check_functions.R,301,81,"                    ""` must contain the columns `grna_target` and `response_id`.""",unchanged_source_text_from_submission
+R/check_functions.R,316,103,"                    ""` data frame must be a subset of the row names of the response expression matrix.""",unchanged_source_text_from_submission
+R/check_functions.R,331,113,"                    ""` data frame must be a subset of the colummn `grna_target` of the `grna_target_data_frame`.""",unchanged_source_text_from_submission
+R/check_functions.R,343,155,"                    ""` data frame cannot contain the gRNA group `non-targeting`. To test non-targeting gRNAs against responses, run the calibration check.""",unchanged_source_text_from_submission
+R/check_functions.R,367,147,"            ""The variables in the `formula_object` must be a subset of the columns of the `covariate_data_frame`. Check the following variables: "",",unchanged_source_text_from_submission
+R/check_functions.R,375,83,"            ""`control_group` should set to `nt_cells`, `complement`, or `default`.""",unchanged_source_text_from_submission
+R/check_functions.R,383,87,"            ""`resampling_mechanism` should set to `permutations`, `crt`, or `default`.""",unchanged_source_text_from_submission
+R/check_functions.R,398,161,"                ""The string 'non-targeting' must be present in the `grna_target` column of the `grna_target_data_frame` is `control_group` is set to 'nt_cells'.""",unchanged_source_text_from_submission
+R/check_functions.R,413,95,"            ""`grna_integration_strategy` must be either 'union', 'singleton', or 'bonferroni'.""",unchanged_source_text_from_submission
+R/check_functions.R,424,110,"            ""`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object.""",unchanged_source_text_from_submission
+R/check_functions.R,431,92,"            ""`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'.""",unchanged_source_text_from_submission
+R/check_functions.R,451,121,"            ""`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. "",",unchanged_source_text_from_submission
+R/check_functions.R,462,84,"#' @return NULL on success, otherwise an error. The existing comparison also accepts",new_or_modified_long_line
+R/check_functions.R,463,82,#'   fractional values and Inf; this helper does not round them or choose workers.,new_or_modified_long_line
+R/check_functions.R,472,105,"            ""`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2.""",unchanged_source_text_from_submission
+R/check_functions.R,482,87,#' @param hyperparameters Named method settings after merging user values and defaults.,new_or_modified_long_line
+R/check_functions.R,484,83,"#' @return NULL on success, otherwise the first method, range or setting-name error",new_or_modified_long_line
+R/check_functions.R,485,81,"#'   below. The perturbation parameter uses its documented `[0, 20]` range. Other",new_or_modified_long_line
+R/check_functions.R,498,82,"            ""`assignment_method` must be `mixture`, `maximum`, or `thresholding`.""",unchanged_source_text_from_submission
+R/check_functions.R,518,123,"                ""The hyperparameter list must contain the fields `umi_fraction_threshold` and `min_grna_n_umis_threshold`.""",unchanged_source_text_from_submission
+R/check_functions.R,526,101,"                ""`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0.""",unchanged_source_text_from_submission
+R/check_functions.R,531,82,"                ""`min_grna_n_umis_threshold` should be an integer greater than 0.""",unchanged_source_text_from_submission
+R/check_functions.R,539,84,"                ""The hyperparameter list must contain the single entry `threshold`.""",unchanged_source_text_from_submission
+R/check_functions.R,563,185,"                ""The hyperparameter list must contain the fields `n_em_rep`, `pi_guess_range`, `g_pert_guess_range`, `n_nonzero_cells_cutoff`, `backup_threshold`, and `formula_object`.""",unchanged_source_text_from_submission
+R/check_functions.R,571,86,"                ""`n_em_rep` should be an integer greater than zero and less than 100.""",unchanged_source_text_from_submission
+R/check_functions.R,582,164,"                ""`pi_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,1].""",unchanged_source_text_from_submission
+R/check_functions.R,593,169,"                ""`g_pert_guess_range` should be a numeric vector of length 2, where the first entry is less than the second and both entries are in the interval [0,20].""",unchanged_source_text_from_submission
+R/check_functions.R,598,91,"                ""`n_nonzero_cells_cutoff` should be an integer greater than or equal to 1.""",unchanged_source_text_from_submission
+R/check_functions.R,603,85,"                ""`backup_threshold` should be an integer greater than or equal to 1.""",unchanged_source_text_from_submission
+R/check_functions.R,611,84,"                ""`probability_threshold` should be a numeric in the interval (0,1).""",unchanged_source_text_from_submission
+R/check_functions.R,624,82,"#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pair-QC cutoffs.",new_or_modified_long_line
+R/check_functions.R,627,81,"#' @return NULL on success, otherwise the first error below. These are the checks",new_or_modified_long_line
+R/check_functions.R,640,104,"            ""`n_nonzero_trt_thresh` and `n_nonzero_cntrl_thresh` must be greater than or equal to zero.""",unchanged_source_text_from_submission
+R/check_functions.R,670,89,"            ""At least one gRNA must be assigned to at least one cell to call `run_qc()`.""",unchanged_source_text_from_submission
+R/check_functions.R,710,81,#' then check that the total also fits a C++ integer before converting it. Report,new_or_modified_long_line
+R/check_functions.R,725,82,#' two-sided test or ceiling(5 * n_pairs / alpha) for a one-sided test. Check both,new_or_modified_long_line
+R/check_functions.R,739,81,"#' @param sceptre_object Post-QC object. Count active NT guides from assignments,",new_or_modified_long_line
+R/check_functions.R,743,82,"#' @param calibration_group_size Positive number of NT guides per group, no larger",new_or_modified_long_line
+R/check_functions.R,766,259,"                ""Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.""",unchanged_source_text_from_submission
+R/check_functions.R,772,214,"                ""At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`.""",unchanged_source_text_from_submission
+R/check_functions.R,788,94,"            ""`calibration_group_size` exceeds the active non-targeting gRNA count after QC ("",",new_or_modified_long_line
+R/check_functions.R,802,84,#' @param grna_target_data_frame Metadata used to check for NT guides when required.,new_or_modified_long_line
+R/check_functions.R,803,85,#' @param pc_analysis TRUE for the positive-control power check; FALSE for discovery.,new_or_modified_long_line
+R/check_functions.R,849,90,"            ""The calibration check (`run_calibration_check()`) should be run before the "",",unchanged_source_text_from_submission
+R/distributed_execution.R,3,81,# native bytes; deployments must also pin one exact package artifact per process.,new_or_modified_long_line
+R/distributed_execution.R,5,83,"# revision. Deparsing excludes source references, bytecode and closure environments",new_or_modified_long_line
+R/distributed_execution.R,6,82,# (which contain process paths); the function expressions themselves are retained.,new_or_modified_long_line
+R/distributed_execution.R,21,89,"            ""Cannot certify execution: the loaded sceptre native library is unavailable.""",new_or_modified_long_line
+R/distributed_execution.R,78,90,                    # Include the effective implementation for each package signature too:,new_or_modified_long_line
+R/distributed_execution.R,79,87,                    # a redefinition outside this namespace can change actual dispatch.,new_or_modified_long_line
+R/distributed_execution.R,157,93,"            ""Backed CRT remains unsupported; use permutation resampling or in-memory counts.""",new_or_modified_long_line
+R/distributed_execution.R,227,92,"            ""Prepared hypothesis metadata collides with generated numerical output columns.""",new_or_modified_long_line
+R/distributed_execution.R,230,81,"    # Append after the canonical plan/context comparison; never subset the index,",new_or_modified_long_line
+R/distributed_execution.R,261,89,"            ""Execution manifest protocol, runtime or method certificate is incompatible.""",new_or_modified_long_line
+R/distributed_execution.R,274,84,"            ""Execution manifest no longer matches the full prepared screen context.""",new_or_modified_long_line
+R/distributed_execution.R,319,82,"#' @param n_calibration_pairs,calibration_group_size Optional calibration choices.",new_or_modified_long_line
+R/distributed_execution.R,323,81,#'   reuse generated numerical output column names. It contains no counts or live,new_or_modified_long_line
+R/distributed_execution.R,382,83,"#' @param sceptre_object The full matching prepared screen, with live count stores.",new_or_modified_long_line
+R/distributed_execution.R,520,88,"            ""Work proposal has missing, duplicated or reordered global hypothesis rows.""",new_or_modified_long_line
+R/distributed_execution.R,573,81,"#'   any arrival order. Missing, duplicated or incompatible proposals are errors.",new_or_modified_long_line
+R/distributed_execution.R,661,94,"                        ""Conflicting perturbation fit for an existing valid warm cache entry.""",new_or_modified_long_line
+R/distributed_execution.R,672,98,"                        ""Work proposal perturbation fit does not match its actual ordered inputs.""",new_or_modified_long_line
+R/domain_summaries.R,2,82,"# derived group label, preserving repeated metadata rows and their original order.",new_or_modified_long_line
+R/domain_summaries.R,17,81,# Bonferroni hypotheses count target-response families with at least one eligible,new_or_modified_long_line
+R/execution.R,5,81,"#' @param analysis_type,proc_id Analysis name and worker number for the filename.",new_or_modified_long_line
+R/execution.R,7,82,"#' @param log_dir Directory passed to `get_log_dir()`, which creates it if needed.",new_or_modified_long_line
+R/execution.R,31,84,"#' @param analysis_type,print_progress,log_dir Analysis name and reporting settings.",new_or_modified_long_line
+R/execution.R,89,81,"#' @param analysis,phase Optional scientific analysis and execution phase labels.",new_or_modified_long_line
+R/execution.R,90,82,"#' @return Worker results in input-block order, including legitimate NULL results.",new_or_modified_long_line
+R/execution.R,179,82,"#' @param print_progress,parallel Whether to report progress and use a worker log.",new_or_modified_long_line
+R/fit_cache.R,13,81,#'   some of its cells are used in a fit. This function reports a change; it does,new_or_modified_long_line
+R/fit_cache.R,44,85,"#' @param event Reason for checking: `parameters`, `assignments` or `analysis_cells`.",new_or_modified_long_line
+R/fit_cache.R,48,81,#'   response fits retain their existing low-MOI/design/cell invalidation policy.,new_or_modified_long_line
+R/fit_cache.R,78,81,#'   This is simple concatenation: it does not replace or remove duplicate names.,new_or_modified_long_line
+R/fit_cache.R,79,81,"#'   Only coefficients and dispersion are stored, not cell-length fitted vectors.",new_or_modified_long_line
+R/fit_cache.R,98,81,#'   The public analysis functions call this after the tests finish successfully.,new_or_modified_long_line
+R/fit_cache.R,120,81,"# content identity is computed once, never once per response. Coefficients retain",new_or_modified_long_line
+R/fit_cache.R,153,82,"# Guide labels select candidates, not validity. Lookup must compare actual inputs.",new_or_modified_long_line
+R/fit_cache.R,154,82,# assign_grnas clears perturbation fits at either MOI; response invalidation keeps,new_or_modified_long_line
+R/fit_cache.R,155,81,# its existing low-MOI/design/cell policy. Calibration bypasses perturbation fits,new_or_modified_long_line
+R/fit_cache.R,156,81,# and preserves discovery entries. Commit only after all workers/results succeed.,new_or_modified_long_line
+R/fit_cache.R,228,82,"            ""Perturbation fits do not match the actual analysis design and cells.""",new_or_modified_long_line
+R/fit_cache.R,239,84,"            ""Perturbation fit identifiers must belong to the prepared guide groups.""",new_or_modified_long_line
+R/fitting.R,10,87,"#'   (`theta`), restricted to `[0.01, 1000]`. These are small enough to save for reuse.",new_or_modified_long_line
+R/fitting.R,11,82,"#' @details Fit Poisson `glm.fit()`, then estimate dispersion at its fitted means.",new_or_modified_long_line
+R/fitting.R,32,119,"            ""The coefficients corresponding to the following covariates cannot be estimated in the regression model: "",",unchanged_source_text_from_submission
+R/fitting.R,34,128,"            "". Consider removing these covariates from the model (by updating `formula_object` in `set_analysis_parameters()`).""",unchanged_source_text_from_submission
+R/fitting.R,43,83,"#' @param trt_idxs Treated cells' row numbers in `covariate_matrix`, starting at 1.",new_or_modified_long_line
+R/getters_and_setters.R,172,120,"            ""Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.""",new_or_modified_long_line
+R/getters_and_setters.R,210,120,"            ""Replacement counts must preserve aligned cells and feature identities; use import_data() for a new screen.""",new_or_modified_long_line
+R/getters_and_setters.R,231,90,"            ""Use import_data() to replace backed screen content and its import summaries.""",new_or_modified_long_line
+R/getters_and_setters.R,241,110,"            ""Original mitochondrial feature labels are unknown; use import_data() to replace response counts.""",new_or_modified_long_line
+R/getters_and_setters.R,255,85,        summaries$feature_w_max_expression <- summaries$frac_umis_max_feature <- NULL,new_or_modified_long_line
+R/import_functs.R,10,139,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual},unchanged_source_text_from_submission
+R/import_functs.R,108,82,"#' @param response_matrix,grna_matrix Feature-by-cell matrices with unique feature",new_or_modified_long_line
+R/import_functs.R,110,83,"#' @param grna_target_data_frame Guide-to-target metadata. If vector_id is present,",new_or_modified_long_line
+R/import_functs.R,113,85,"#' @param extra_covariates Covariates in the same cell order, or an empty data frame.",new_or_modified_long_line
+R/import_functs.R,114,82,#' @param response_names Feature labels matching response rows; NA_character_ uses,new_or_modified_long_line
+R/import_functs.R,117,85,"#'   covariates, retaining original cell order. Conversion may allocate new matrices.",new_or_modified_long_line
+R/import_functs.R,167,96,"#' @param response_matrix,grna_matrix,grna_target_data_frame,moi,extra_covariates,response_names",new_or_modified_long_line
+R/import_functs.R,171,82,"#' @return Initialized object and backing files response.odm and grna.odm, sharing",new_or_modified_long_line
+R/import_functs.R,250,120,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter},unchanged_source_text_from_submission
+R/import_functs.R,252,82,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1},unchanged_source_text_from_submission
+R/import_functs.R,339,82,#' @param directories Batch directories in desired cell order. Feature tables must,new_or_modified_long_line
+R/import_functs.R,340,82,"#'   match across batches. Matrix Market entries may arrive unsorted, and response",new_or_modified_long_line
+R/import_functs.R,343,85,"#' @param moi,grna_target_data_frame,extra_covariates Inputs to import_data_memory();",new_or_modified_long_line
+R/import_functs.R,345,81,#' @return Initialized object with cells in directory order and features in their,new_or_modified_long_line
+R/import_functs.R,346,83,#'   feature-file order. Supply barcode files for every batch or none. For multiple,new_or_modified_long_line
+R/import_functs.R,454,87,"            ""The features.tsv file should contain the modality `CRISPR Guide Capture`.""",unchanged_source_text_from_submission
+R/import_functs.R,630,83,"#' @param moi,grna_target_data_frame,extra_covariates Import settings and metadata;",new_or_modified_long_line
+R/import_functs.R,705,139,#' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-from-the-parse-program-experimental}{Chapter 1 of the manual},unchanged_source_text_from_submission
+R/import_functs.R,713,412,"#' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' ""Technical Performance of CRISPR Detect in Cell Lines"" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.",unchanged_source_text_from_submission
+R/import_functs.R,855,83,"#' @param response_matrix,grna_matrix Validated feature-by-cell matrices with cells",new_or_modified_long_line
+R/import_functs.R,860,81,#' @param grna_target_data_frame Guide metadata. Convert guide IDs and targets to,new_or_modified_long_line
+R/import_functs.R,882,113,    covariate_data_frame$grna_feature_w_max_expression <- covariate_data_frame$grna_frac_umis_max_feature <- NULL,unchanged_source_text_from_submission
+R/import_functs.R,902,82,"#' Each row of dt gives cell_idx, feature_idx and value x. Positions already start",new_or_modified_long_line
+R/import_functs.R,903,82,"#' at zero. Make new output vectors sorted by cell, then feature, without changing",new_or_modified_long_line
+R/import_functs.R,915,82,"            ""The imported cell count leaves no room for its final sparse pointer.""",new_or_modified_long_line
+R/import_functs.R,928,85,"            ""Imported cell or feature coordinates are outside the matrix dimensions.""",new_or_modified_long_line
+R/import_functs.R,936,106,"            ""Repeated (cell, feature) coordinates in imported count file; each coordinate must be unique.""",new_or_modified_long_line
+R/import_functs.R,977,83,"#' @param response_matrix,grna_matrix Feature-by-cell matrices with matching cells.",new_or_modified_long_line
+R/import_functs.R,1000,81,#' @param directory_to_write One nonmissing path. Expand a leading ~ for the home,new_or_modified_long_line
+R/import_functs.R,1033,81,#' @return Absolute path with forward slashes and the home-directory abbreviation,new_or_modified_long_line
+R/import_functs.R,1058,87,#' @param file_path Path whose leading home-directory abbreviation is already expanded.,new_or_modified_long_line
+R/import_functs.R,1069,86,"            ""inside a directory or file name. HDF5 misinterprets embedded tildes as "",",unchanged_source_text_from_submission
+R/import_functs.R,1070,87,"            ""user-home expansion and produces a corrupted path. Please choose a path "",",unchanged_source_text_from_submission
+R/import_functs.R,1071,86,"            ""where no directory or file name contains '~' (a leading '~/' is fine - "",",unchanged_source_text_from_submission
+R/import_functs.R,1082,86,"#' @param extra_covariates Extra covariates in the same cell order, or an empty table.",new_or_modified_long_line
+R/import_functs.R,1083,87,"#' @param response_names Response labels matching rows, or NA_character_ for row names.",new_or_modified_long_line
+R/import_functs.R,1084,82,"#' @return covariate_data_frame, response_matrix and grna_matrix. Keep dimensions,",new_or_modified_long_line
+R/import_functs.R,1126,82,"#' @param grna_target_data_frame Metadata with grna_id, vector_id and grna_target.",new_or_modified_long_line
+R/import_functs.R,1128,84,#' @return Metadata with vector_id renamed to grna_id and the old guide IDs removed.,new_or_modified_long_line
+R/import_functs.R,1156,82,#' @details Prepare sparse rows using Matrix's rules for duplicate numeric/logical,new_or_modified_long_line
+R/import_functs.R,1158,83,#'   preserve its platform-specific rounding. The vector-level output and transpose,new_or_modified_long_line
+R/import_functs.R,1194,81,#' @param counts Sparse matrix with selected guides in rows and original cells in,new_or_modified_long_line
+R/mixture_model_functs.R,4,88,"#' @param grna_assignment_hyperparameters EM, formula and assignment-threshold settings.",new_or_modified_long_line
+R/mixture_model_functs.R,5,85,"#' @param print_progress,parallel,n_processors,log_dir Worker and reporting settings.",new_or_modified_long_line
+R/mixture_model_functs.R,7,82,"#' @return Named lists of original cell-column numbers, starting at 1. Serial work",new_or_modified_long_line
+R/mixture_model_functs.R,9,83,"#'   guide at a time, report progress and collect garbage every 200 items. Starting",new_or_modified_long_line
+R/mixture_model_functs.R,25,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.""",unchanged_source_text_from_submission
+R/mixture_model_functs.R,66,83,    # curr_grna_ids: Guide names in processing order; proc_id names the worker log.,new_or_modified_long_line
+R/mixture_model_functs.R,98,100,"                    n_nonzero_cells_cutoff = grna_assignment_hyperparameters$n_nonzero_cells_cutoff,",unchanged_source_text_from_submission
+R/mixture_model_functs.R,99,88,"                    backup_threshold = grna_assignment_hyperparameters$backup_threshold,",unchanged_source_text_from_submission
+R/mixture_model_functs.R,100,97,                    probability_threshold = grna_assignment_hyperparameters$probability_threshold,unchanged_source_text_from_submission
+R/mixture_model_functs.R,146,83,#' @param n_nonzero_cells_cutoff Minimum number of cells with g >= 1 to attempt EM.,new_or_modified_long_line
+R/mixture_model_functs.R,148,87,#' @param probability_threshold Posterior-probability cutoff after a successful EM fit.,new_or_modified_long_line
+R/mixture_model_functs.R,149,82,"#' @return Original cell positions, starting at 1, in increasing order. Initialize",new_or_modified_long_line
+R/mixture_model_functs.R,150,81,"#'   with a Poisson fit, silencing its expected warnings, then run C++ EM. If too",new_or_modified_long_line
+R/mixture_model_functs.R,207,82,"#' @return Lists pi_guesses and g_pert_guesses, sampled in that order with seed 4.",new_or_modified_long_line
+R/neg_control_functions.R,2,81,"#' @param sceptre_object Post-QC object containing nontargeting (NT) guide cells,",new_or_modified_long_line
+R/neg_control_functions.R,3,86,#'   `M_matrix` (NT-group counts by gene) and `n_nonzero_tot_vector` (totals by gene).,new_or_modified_long_line
+R/neg_control_functions.R,7,81,"#' @return Table with gene names, joined NT guide names (`grna_group`), treatment",new_or_modified_long_line
+R/neg_control_functions.R,8,81,"#'   and control counts, and `pass_qc = TRUE`, in the C++ sampler's order. If too",new_or_modified_long_line
+R/neg_control_functions.R,10,81,#'   C++ sampling uses fixed seeds without advancing R's random-number generator.,new_or_modified_long_line
+R/neg_control_functions.R,25,85,    discovery_pairs_with_info <- sceptre_object@preparation@discovery_pairs_with_info,new_or_modified_long_line
+R/neg_control_functions.R,169,81,"#'   Entries are positions in `nt_grna_names`, starting at 1 after the C++ output",new_or_modified_long_line
+R/ondisc_capabilities.R,156,98,"            ""incompatible `odm` slots (path, dimensions, feature IDs, handle or shared import ID)""",new_or_modified_long_line
+R/ondisc_capabilities.R,191,105,"        "". Install the qualified source `timothy-barry/ondisc@589803edea2a66ad15e7f07186bee16c7739ab8c`"",",new_or_modified_long_line
+R/ondisc_capabilities.R,192,82,"        "" and restart R. See the optional disk-backed setup in SCEPTRE's README."",",new_or_modified_long_line
+R/ondisc_functs.R,16,81,"#' The saved RDS contains anchored backing descriptors and closed handles, rather",new_or_modified_long_line
+R/ondisc_functs.R,18,83,"#' inspection of saved metadata and historical results, but does not reopen counts.",new_or_modified_long_line
+R/ondisc_functs.R,19,81,#' Use `read_ondisc_backed_sceptre_object()` before continuing backed analyses or,new_or_modified_long_line
+R/ondisc_functs.R,20,82,#' exporting reports that need counts. The optional ondisc installation is checked,new_or_modified_long_line
+R/ondisc_functs.R,25,81,"#' checks their shared import ID, anchored file checksums, dimensions and feature",new_or_modified_long_line
+R/ondisc_functs.R,30,82,#' Active backing files are immutable: do not replace or edit them while an object,new_or_modified_long_line
+R/ondisc_functs.R,32,83,#' getters do not repeatedly hash files. If count content or its imported summaries,new_or_modified_long_line
+R/ondisc_functs.R,33,83,"#' must change, create a new screen with `import_data()` instead of overwriting the",new_or_modified_long_line
+R/ondisc_functs.R,34,81,#' backing files. Old saved objects whose original feature labels are unknown may,new_or_modified_long_line
+R/ondisc_functs.R,118,84,"            ""Backing store has no anchored content descriptor; reimport the screen.""",new_or_modified_long_line
+R/ondisc_functs.R,152,81,    # verified reattachment; never bless changed content by writing fresh hashes.,new_or_modified_long_line
+R/pair_constructor_functs.R,24,160,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_cis_pairs}{Section 2.2.2 of the manual},unchanged_source_text_from_submission
+R/pair_constructor_functs.R,80,103,"            ""`response_position_data_frame` must contain columns 'response_id', 'chr', and 'position'.""",unchanged_source_text_from_submission
+R/pair_constructor_functs.R,90,86,"            ""`grna_target_data_frame` must contain columns 'chr', 'start', and 'end'.""",unchanged_source_text_from_submission
+R/pair_constructor_functs.R,113,308,"            ""The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `data(gene_position_data_frame_grch38); head(gene_position_data_frame_grch38)`.""",unchanged_source_text_from_submission
+R/pair_constructor_functs.R,196,162,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#sec-set-analysis-parameters_construct_trans_pairs}{Section 2.2.2 of the manual},unchanged_source_text_from_submission
+R/pair_constructor_functs.R,254,101,"            ""`pairs_to_exclude` must be set to 'none', 'pc_pairs', or 'pairs_containing_pc_targets'.""",unchanged_source_text_from_submission
+R/pair_constructor_functs.R,303,133,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html#positive-control-pairs}{Section 2.2 in the manual},unchanged_source_text_from_submission
+R/pair_qc.R,9,81,#'   supply and how stored sparse entries are counted. No QC threshold is applied,new_or_modified_long_line
+R/pairwise_qc_functs.R,3,81,"#' Prepare cell/group lookups, count requested pairs through the storage helpers,",new_or_modified_long_line
+R/pairwise_qc_functs.R,6,83,#' calibration. Keep each table's requested pairs aligned with its returned counts.,new_or_modified_long_line
+R/pairwise_qc_functs.R,81,83,#' @return Object with pass_qc in each nonempty pair table and updated passing-pair,new_or_modified_long_line
+R/pairwise_qc_functs.R,82,85,"#'   counts. For Bonferroni, count distinct gene-target pairs with any passing guide.",new_or_modified_long_line
+R/pairwise_qc_functs.R,83,82,"#'   Otherwise count passing rows, including repeated requests. Leave empty tables",new_or_modified_long_line
+R/perturbation_fits.R,6,81,#' @param fit Compact fitted_coefs and diagnostics from fit_perturbation_model().,new_or_modified_long_line
+R/perturbation_fits.R,8,82,"#' @return Transient probability vector, using the original binomial inverse link.",new_or_modified_long_line
+R/perturbation_fits.R,20,92,"            ""A compact perturbation fit requires finite coefficients aligned to its design.""",new_or_modified_long_line
+R/perturbation_fits.R,28,84,"            ""Perturbation fit coefficients do not match the ordered design columns.""",new_or_modified_long_line
+R/plotting_functions.R,115,81,    # Returns: Table of bin_upper_bounds and bin_labels in display order. Use the,new_or_modified_long_line
+R/plotting_functions.R,121,87,"        max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default",unchanged_source_text_from_submission
+R/plotting_functions.R,325,136,"        assignment[init_assignments[[curr_grna_id]]] <- TRUE # for this grna, `assignment` indicates which cells got this grna initially",unchanged_source_text_from_submission
+R/plotting_functions.R,651,85,"#' @param calibration_result,discovery_result Tables containing p_value in row order.",new_or_modified_long_line
+R/plotting_functions.R,653,81,"#' @param p_thresh Discovery display threshold, or NA to omit its reference line.",new_or_modified_long_line
+R/plotting_functions.R,654,82,"#' @param transform_scale,include_legend,include_y_axis_text Plot display options.",new_or_modified_long_line
+R/plotting_functions.R,656,82,#' @return QQ plot with points/bands sampled on a display grid using a fixed seed.,new_or_modified_long_line
+R/plotting_functions.R,657,81,"#'   Restore the previous random state and use already processed results, without",new_or_modified_long_line
+R/plotting_functions.R,739,81,"#' @param discovery_result Table with p_value, log_2_fold_change and significant.",new_or_modified_long_line
+R/plotting_functions.R,741,90,#' @param x_limits Display bounds for log2 effects; p-values below 1e-12 display at 1e-12.,new_or_modified_long_line
+R/plotting_functions.R,1035,97,        response_n_umis_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_umis_range,new_or_modified_long_line
+R/plotting_functions.R,1036,103,        response_n_nonzero_range <- sceptre_object@spec@cellwise_qc_thresholds$response_n_nonzero_range,new_or_modified_long_line
+R/plotting_functions.R,1037,87,        p_mito_threshold <- sceptre_object@spec@cellwise_qc_thresholds$p_mito_threshold,new_or_modified_long_line
+R/plotting_functions.R,1045,84,    # Returns: Histogram with cutoff lines. Showing candidate cutoffs does not apply,new_or_modified_long_line
+R/plotting_functions.R,1209,85,#' @param sceptre_object Post-QC object with six removal counts in their saved order.,new_or_modified_long_line
+R/plotting_functions.R,1210,81,#' @return Bar plot using the original cell count as denominator. Removal reasons,new_or_modified_long_line
+R/plotting_functions.R,1257,86,#' @param sceptre_object Post-QC object with discovery_pairs_with_info and thresholds.,new_or_modified_long_line
+R/plotting_functions.R,1454,90,#' @param result_df Table containing p_value; keep repeated rows as separate observations.,new_or_modified_long_line
+R/plotting_functions.R,1455,81,"#' @param downsample_pairs Maximum rows per power-of-ten p-value bin, rather than",new_or_modified_long_line
+R/plotting_functions.R,1457,83,"#' @return Tibble still grouped by bin, in group/sample order. Sampling uses seed 4",new_or_modified_long_line
+R/plotting_functions.R,1528,86,    singleton_integration_strategy <- sceptre_object@spec@grna_integration_strategy ==,new_or_modified_long_line
+R/plotting_functions.R,1542,81,    grna_group_idxs <- sceptre_object@preparation@analysis_groups$grna_group_idxs,new_or_modified_long_line
+R/preprocessing_functions.R,3,83,"#' @param formula_object Formula for model.matrix(), including intercept/contrasts.",new_or_modified_long_line
+R/preprocessing_functions.R,4,83,#' @return Numeric design matrix in input-cell order. Error if transformation drops,new_or_modified_long_line
+R/preprocessing_functions.R,18,154,"            ""Some rows of `covariate_data_frame` were lost after applying the `formula object`. This is likely due to NAs, which should be removed first.""",unchanged_source_text_from_submission
+R/preprocessing_functions.R,27,159,"                ""` of the `covariate_data_frame` after the `formula object` has been applied contains entries that are -Inf, Inf, or NA. Remove these entries.""",unchanged_source_text_from_submission
+R/preprocessing_functions.R,35,528,"            ""The `formula_object` contains redundant information. This often occurs when one variable is `nested` inside another. For example, if the data frame contains a column `lane` with levels `lane_1`, `lane_2`, `lane_3`, and `lane_4` and a column `batch` with levels `batch_1` and `batch_2`, and if `lane_1` and `lane_2` are contained entirely within `batch_1` while `lane_3` and `lane_4` are contained entirely within `batch`2`, then `batch` is redundant. In this case `batch` should be removed from the formula object.""",unchanged_source_text_from_submission
+R/preprocessing_functions.R,43,81,"#' @param matrix_in Count matrix, converted to column access for the calculation.",new_or_modified_long_line
+R/preprocessing_functions.R,103,84,#' @param calibration_group_size Number of NT guides combined per calibration group.,new_or_modified_long_line
+R/preprocessing_functions.R,108,82,#'   saved in a sceptre object. C++ samplers use fixed seeds without advancing R's,new_or_modified_long_line
+R/preprocessing_functions.R,144,98,"                ""`calibration_group_size` exceeds the active non-targeting gRNA count after QC ("",",new_or_modified_long_line
+R/preprocessing_functions.R,208,85,#' @param sceptre_object Object with guide/target metadata and requested pair tables.,new_or_modified_long_line
+R/qq_plot_helpers.R,9,86,"    # Returns: Rows from the lowest-numbered group in each panel, keeping their order.",new_or_modified_long_line
+R/qq_plot_helpers.R,10,82,    #   Groups within a panel must have the same number of points to share a band;,new_or_modified_long_line
+R/qq_plot_helpers.R,11,85,"    #   otherwise error. Select separately per panel, since group numbers can differ.",new_or_modified_long_line
+R/qq_plot_helpers.R,28,93,"                    ""Within each panel, you must have the same number of points per QQ plot!""",unchanged_source_text_from_submission
+R/qq_plot_helpers.R,32,97,"                    dplyr::select(y, PANEL, group) |> # remove attributes like color, shape, etc.",unchanged_source_text_from_submission
+R/qq_plot_helpers.R,43,81,"    # distribution,max_pts_to_plot,ci_level: Reference distribution, display-grid",new_or_modified_long_line
+R/qq_plot_helpers.R,44,87,    #   resolution and pointwise confidence level. Break rank ties by first occurrence.,new_or_modified_long_line
+R/qq_plot_helpers.R,45,83,"    # Returns: x/y/ymin/ymax in plotted coordinates. To reduce overplotting, retain",new_or_modified_long_line
+R/qq_plot_helpers.R,46,82,"    #   one sampled row per occupied x/y grid cell, using seed 4 and restoring the",new_or_modified_long_line
+R/qq_plot_helpers.R,47,84,"    #   previous random state. max_pts_to_plot controls grid resolution, rather than",new_or_modified_long_line
+R/qq_plot_helpers.R,105,88,"#' @param distribution Reference distribution, such as ""unif"" or ""norm""; default ""unif"".",new_or_modified_long_line
+R/qq_plot_helpers.R,106,81,#' @param max_pts_to_plot Number of display-grid intervals per axis. Keep at most,new_or_modified_long_line
+R/qq_plot_helpers.R,151,87,"    # distribution,max_pts_to_plot: Reference distribution and display-grid resolution.",new_or_modified_long_line
+R/qq_plot_helpers.R,153,85,    # Returns: x/y rows in plotted coordinates. Sample one row per occupied grid cell,new_or_modified_long_line
+R/qq_plot_helpers.R,202,88,"#' @param distribution Reference distribution, such as ""unif"" or ""norm""; default ""unif"".",new_or_modified_long_line
+R/qq_plot_helpers.R,203,81,#' @param max_pts_to_plot Display-grid intervals per axis; keep at most one point,new_or_modified_long_line
+R/qq_plot_helpers.R,243,82,"#' @return Scale transformation -log(x, base), with inverse base^(-x), logarithmic",new_or_modified_long_line
+R/qq_plot_helpers.R,244,85,"#'   breaks and domain `[1e-100, Inf]`. The two local functions implement the forward",new_or_modified_long_line
+R/result_processing.R,79,82,"#' For Bonferroni outside calibration, retain the smallest-p guide per gene-target",new_or_modified_long_line
+R/result_processing.R,80,82,"#' pair and multiply its p-value by the number of guides that passed QC, capped at",new_or_modified_long_line
+R/result_processing.R,81,82,"#' 1. If all guides failed QC, keep the largest treatment/control counts and leave",new_or_modified_long_line
+R/result_processing.R,83,81,#' This guide-level adjustment precedes the later adjustment across tested pairs.,new_or_modified_long_line
+R/result_processing.R,146,81,"#' Append the failed-QC requests to tested pairs, leaving unavailable test fields",new_or_modified_long_line
+R/result_processing.R,164,81,"#' collected results, not independently to each Nextflow worker's partial output.",new_or_modified_long_line
+R/result_processing.R,194,82,#' Called both by the package and directly by Nextflow scripts. Combine guides and,new_or_modified_long_line
+R/result_processing.R,196,81,#' rather than using the Bonferroni row reduction for power/discovery. Return the,new_or_modified_long_line
+R/result_processing.R,212,82,#' Called both by the package and directly by Nextflow scripts. Combine guides and,new_or_modified_long_line
+R/result_processing.R,228,81,#' Read guide metadata and the integration strategy from the object. The explicit,new_or_modified_long_line
+R/result_processing.R,229,81,#' calibration flag determines whether calibration-specific grouping rules apply.,new_or_modified_long_line
+R/result_records.R,203,85,"                ""Calibration run-plan groups must use prepared non-targeting guides.""",new_or_modified_long_line
+R/result_records.R,216,103,"            ""The run plan no longer matches its data, design, assignments, choices or execution scope.""",new_or_modified_long_line
+R/result_records.R,262,81,"# legitimate repeated requests. This uses labels only, never statistical kernels.",new_or_modified_long_line
+R/result_records.R,331,82,"            ""A completed analysis requires a nonempty result table with p-values.""",new_or_modified_long_line
+R/result_records.R,356,81,"            ""Completed result p-values must be numeric probabilities or missing.""",new_or_modified_long_line
+R/result_records.R,373,107,"                ""Discovery and calibration results must be adjusted across the complete hypothesis family.""",new_or_modified_long_line
+R/result_records.R,409,103,"            ""`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.""",new_or_modified_long_line
+R/s4_analysis_functs_1.R,5,108,#' \href{https://timothy-barry.github.io/sceptre-book/set-analysis-parameters.html}{Chapter 2 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,35,82,#' @param multiple_testing_alpha (optional; default `0.1`) a single finite numeric,new_or_modified_long_line
+R/s4_analysis_functs_1.R,36,91,"#' value in `(0, 1]` specifying the nominal level of the multiple testing correction method",new_or_modified_long_line
+R/s4_analysis_functs_1.R,194,97,#' \href{https://timothy-barry.github.io/sceptre-book/assign-grnas.html}{Chapter 3 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,357,91,#' \href{https://timothy-barry.github.io/sceptre-book/run-qc.html}{Chapter 4 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,433,83,#' @param sceptre_object Object with initial guide assignments and cell covariates.,new_or_modified_long_line
+R/s4_analysis_functs_1.R,434,82,"#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Pairwise QC cutoffs to save.",new_or_modified_long_line
+R/s4_analysis_functs_1.R,435,89,"#' @param response_n_umis_range,response_n_nonzero_range Quantile bounds for cell counts.",new_or_modified_long_line
+R/s4_analysis_functs_1.R,436,84,"#' @param p_mito_threshold Maximum mitochondrial fraction, when that summary exists.",new_or_modified_long_line
+R/s4_analysis_functs_1.R,437,93,"#' @param additional_cells_to_remove Original matrix column numbers to remove, starting at 1.",new_or_modified_long_line
+R/s4_analysis_functs_1.R,438,81,"#' @return Object with QC status, thresholds, removal counts, original columns of",new_or_modified_long_line
+R/s4_analysis_functs_1.R,439,81,#'   retained cells and guide assignments renumbered for those cells. Clear saved,new_or_modified_long_line
+R/s4_analysis_functs_1.R,440,83,#'   response fits if retained cells changed; keep the full original design matrix.,new_or_modified_long_line
+R/s4_analysis_functs_1.R,441,81,#'   Warn about large low-MOI assignment exclusions and error if no cells remain.,new_or_modified_long_line
+R/s4_analysis_functs_1.R,442,81,#' @details Nextflow calls this phase separately before distributing pairwise QC.,new_or_modified_long_line
+R/s4_analysis_functs_1.R,497,83,    frac_cells_removed_2p_grna <- sceptre_object@preparation@cell_removal_metrics[[,new_or_modified_long_line
+R/s4_analysis_functs_1.R,505,101,"            ""%) contain two or more gRNAs. Consider switching from a low-MOI to a high-MOI analysis.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,510,181,"            ""All cells were removed as part of cellwise QC. Consider relaxing the cellwise QC thresholds (`response_n_umis_range`, `response_n_nonzero_range`, `p_mito_threshold`)."",",unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,512,88,"                "" Additionally, consider switching from a low-MOI to high-MOI analysis.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_1.R,537,82,"#' @param sceptre_object Object after cellwise QC, with updated guide assignments.",new_or_modified_long_line
+R/s4_analysis_functs_2.R,9,106,#' \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html}{Chapter 5 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,96,81,#' @return List with the object and a transient validated run plan. The plan owns,new_or_modified_long_line
+R/s4_analysis_functs_2.R,115,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,123,121,"            ""`calibration_group_size` and `n_calibration_pairs` must be supplied when discovery pairs are not specified.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,127,86,        calibration_group_size <- compute_calibration_group_size(guide_group_metadata(,new_or_modified_long_line
+R/s4_analysis_functs_2.R,169,81,#' Use the pairs chosen in phase one and the current cells and settings. Analysis,new_or_modified_long_line
+R/s4_analysis_functs_2.R,220,123,#' \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,271,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,274,92,    response_grna_group_pairs <- sceptre_object@preparation@positive_control_pairs_with_info,new_or_modified_long_line
+R/s4_analysis_functs_2.R,329,123,#' \href{https://timothy-barry.github.io/sceptre-book/run-power-check-and-discovery-analysis.html}{Chapter 6 of the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,379,147,"            ""Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,382,85,    response_grna_group_pairs <- sceptre_object@preparation@discovery_pairs_with_info,new_or_modified_long_line
+R/s4_analysis_functs_2.R,440,159,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,447,146,#' \href{https://timothy-barry.github.io/sceptre-book/run-calibration-check.html#sec-run_calibration_check_output_amount}{Chapter 6 in the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,454,83,#' @param historical Return the saved table even when its provenance is historical.,new_or_modified_long_line
+R/s4_analysis_functs_2.R,491,112,"            ""`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`.""",unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,505,97,"            ""Returning historical results; they do not represent the current analysis settings."",",new_or_modified_long_line
+R/s4_analysis_functs_2.R,523,159,#' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-sceptre_write_outputs_to_directory}{Section 8 of the introductory chapter in the manual},unchanged_source_text_from_submission
+R/s4_analysis_functs_2.R,665,82,"#' If data and parameters are ready, run assignment then QC when both are missing,",new_or_modified_long_line
+R/s4_analysis_functs_2.R,666,81,#' or just QC when assignment is complete. Otherwise return the object unchanged;,new_or_modified_long_line
+R/s4_analysis_functs_2.R,668,82,"#' n_processors to assignment. Its messages, randomness and logs, and QC's removal",new_or_modified_long_line
+R/s4_analysis_functs_2.R,682,101,"                ""Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments.""",unchanged_source_text_from_submission
+R/s4_class.R,101,81,"# The coordinator owns workflow transitions and references, never duplicate data.",new_or_modified_long_line
+R/s4_count_store.R,20,83,"                ""Count store descriptor differs from its authoritative descriptor.""",new_or_modified_long_line
+R/s4_count_store.R,56,82,"        ""Count stores must be normalized row-accessible Matrix or ondisc objects.""",new_or_modified_long_line
+R/s4_count_store.R,142,81,"                ""Backed count-store labels must align with descriptor dimensions""",new_or_modified_long_line
+R/s4_helpers.R,403,81,"            ""There is no generic plot configured for the current prepared state.""",new_or_modified_long_line
+R/s4_helpers.R,413,82,#' @param mat Row-accessible sparse matrix (dgRMatrix) or open ondisc matrix (odm),new_or_modified_long_line
+R/s4_run_plan.R,54,82,# Preserve attribute order because schema-three hashes include its representation.,new_or_modified_long_line
+R/s4_run_plan.R,65,81,# Old list plans must carry their original identity and exactly the known fields.,new_or_modified_long_line
+R/s4_run_plan.R,114,89,"            ""RunPlan requires prepared hypothesis columns and complete logical QC status""",new_or_modified_long_line
+R/s4_run_plan.R,121,84,"                ""RunPlan hypothesis identifiers must be nonmissing character values""",new_or_modified_long_line
+R/s4_run_plan.R,156,81,"                ""Selected calibration pairs do not match the requested run scope""",new_or_modified_long_line
+R/schema_migration.R,214,95,"            ""Unrecognized schema-three fit-cache layout; cached provenance cannot be verified.""",new_or_modified_long_line
+R/schema_migration.R,230,81,"            ""Saved response fits do not match the actual data and design inputs.""",new_or_modified_long_line
+R/schema_migration.R,457,82,# Live backing handles are deliberately excluded: their identity is process-local.,new_or_modified_long_line
+R/schema_migration.R,506,84,"            ""Backing store has no anchored content descriptor; reimport the screen.""",new_or_modified_long_line
+R/schema_migration.R,514,106,"            ""Backing store content does not match the saved descriptor; cached analyses cannot be reused.""",new_or_modified_long_line
+R/score_preparation.R,7,82,"#' @param Zt_wZ Symmetric p-by-p matrix `t(Z) %*% (w * Z)`, where Z is the design.",new_or_modified_long_line
+R/score_preparation.R,8,81,#' @param wZ n-by-p design matrix with each cell's row multiplied by its weight w,new_or_modified_long_line
+R/score_preparation.R,10,82,"#' @return A p-by-n matrix, `(Lambda^(-1/2) * t(U)) %*% t(wZ)`, where U and Lambda",new_or_modified_long_line
+R/storage.R,19,82,"#' @param source_cells Original count-matrix column numbers, in the desired order.",new_or_modified_long_line
+R/storage.R,22,81,#' @details Read the complete gene row before selecting its cells. This loads one,new_or_modified_long_line
+R/storage.R,23,81,"#'   row, rather than the whole matrix, and leaves the original counts unchanged.",new_or_modified_long_line
+R/storage.R,69,82,#'   Some private ondisc functions subtract one from their input vectors in place.,new_or_modified_long_line
+R/storage.R,83,83,"#' @param groups Treatment-cell lists. Numbers are positions within `source_cells`,",new_or_modified_long_line
+R/storage.R,84,82,"#'   not original matrix columns. For `source_cells = c(2, 4, 5)`, group `c(1, 3)`",new_or_modified_long_line
+R/storage.R,87,83,"#' @param controls `""complement""` for all other kept cells, or NT-control positions",new_or_modified_long_line
+R/storage.R,93,83,"#' @return `n_nonzero_trt` and `n_nonzero_cntrl`, integer vectors in request order.",new_or_modified_long_line
+R/storage.R,94,83,"#'   When retained, `n_nonzero_mat` has NT groups in rows and all genes in columns;",new_or_modified_long_line
+R/storage.R,95,81,#'   `n_nonzero_tot` has a total per gene. Otherwise these two fields contain the,new_or_modified_long_line
+R/storage.R,97,81,"#' @details These counts count stored entries, including explicitly stored zeros,",new_or_modified_long_line
+R/storage.R,135,81,        # The original unique rows are still the only rows requested for reading.,new_or_modified_long_line
+R/storage.R,197,85,"#' @param response_idxs Original gene-row numbers, starting at 1, in requested order.",new_or_modified_long_line
+R/storage.R,231,83,"#' @param response_matrix,grna_matrix Sparse count matrices prepared during import.",new_or_modified_long_line
+R/storage.R,235,81,"#' @details Write `response.odm`, then `grna.odm`. If the second write fails, the",new_or_modified_long_line
+R/storage.R,236,81,#'   first file may already exist. Use the private ondisc constructor to preserve,new_or_modified_long_line
+R/storage.R,238,81,"#'   ondisc's integer count conversion, chunk-size limits and errors still apply.",new_or_modified_long_line
+R/storage.R,276,150,"            ""The `sceptre_object` and `response_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file.""",unchanged_source_text_from_submission
+R/storage.R,281,146,"            ""The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file.""",unchanged_source_text_from_submission
+R/storage.R,290,86,"#' @param mt_gene_idxs Mitochondrial feature-row numbers, starting at 1; may be empty.",new_or_modified_long_line
+R/storage.R,293,81,"#' @return One value per cell for `n_nonzero` (counts greater than 0.5), `n_umi`,",new_or_modified_long_line
+R/storage.R,320,85,"#'   open ondisc matrix (`odm`). Sparse input may use row, column or triplet storage.",new_or_modified_long_line
+R/storage.R,324,84,#'   `odm`. A numeric sparse matrix already in the requested form is returned as is.,new_or_modified_long_line
+R/storage.R,325,82,"#' @details Keep stored numeric values, including zeros and fractions. For logical",new_or_modified_long_line
+R/storage.R,326,83,"#'   sparse input, every stored entry becomes one, even an explicitly stored FALSE;",new_or_modified_long_line
+R/storage.R,336,81,"    # For logical sparse input, count every stored entry as 1, even stored FALSE.",new_or_modified_long_line
+R/storage.R,427,82,"#' @return Row/column numbers starting at zero, one per stored entry. For example,",new_or_modified_long_line
+R/storage.R,428,81,"#'   `p = c(0, 2, 2, 3)` gives `c(0, 0, 2)`: two entries in the first row/column,",new_or_modified_long_line
+R/storage.R,429,81,#'   none in the second and one in the third. The input and entry order are kept.,new_or_modified_long_line
+R/workflow_state.R,174,86,"                ""Source guide groups must be prepared before assignment is committed.""",new_or_modified_long_line
+R/workflow_state.R,205,81,"                    ""Pair QC must cover the complete prepared hypothesis family.""",new_or_modified_long_line
+R/zz_component_validity.R,32,87,"            ""CellView has inconsistent ordered source, analysis or treatment positions""",new_or_modified_long_line
+R/zz_component_validity.R,46,94,"                ""Count stores must be normalized row-accessible Matrix or typed backed stores""",new_or_modified_long_line
+R/zz_component_validity.R,104,82,"                ""Response cache identity must match actual data and design inputs""",new_or_modified_long_line
+R/zz_component_validity.R,184,83,"                ""Response fit coefficients or dispersion do not match their design""",new_or_modified_long_line
+R/zz_component_validity.R,224,84,"                ""Perturbation fit records require compact model and identity fields""",new_or_modified_long_line
+R/zz_component_validity.R,281,85,"                ""Perturbation fit coefficients or compact input identity are invalid""",new_or_modified_long_line
+R/zz_spec_validity.R,3,81,# zero is unsupported because the empirical resampling-budget rule divides by it.,new_or_modified_long_line
+R/zz_spec_validity.R,17,82,"            ""`multiple_testing_alpha` must be one finite numeric value in (0, 1].""",new_or_modified_long_line
+R/zz_spec_validity.R,34,87,"            ""`multiple_testing_method` must be one supported stats::p.adjust method: "",",new_or_modified_long_line
+vignettes/sceptre.Rmd,20,88,[frequently asked questions page](https://timothy-barry.github.io/sceptre-book/faq.html),unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,31,113,"```{r schematic, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Standard `sceptre` pipeline"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,354,135,"```{r plot-grna-counts, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Histograms of the gRNA count distributions"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,388,81,Chapter 3 of the manual for details. The default method in low-MOI is the simpler,unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,412,117,"```{r plot-assignments, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""gRNA-to-cell assignments"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,485,121,"```{r plot-qc, out.width = ""450px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Cellwise and pairwise quality control"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,547,118,"```{r plot-calibration, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Calibration check results"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,610,106,"```{r plot-power, out.width = ""550px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Power check results"")}",unchanged_source_text_from_submission
+vignettes/sceptre.Rmd,650,117,"```{r plot-discovery, out.width = ""650px"", fig.align=""center"", echo = FALSE, fig.cap=c(""Discovery analysis results"")}",unchanged_source_text_from_submission

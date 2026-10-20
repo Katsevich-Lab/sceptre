@@ -5,10 +5,12 @@ indexing_screen <- function() {
     object <- methods::new("sceptre_object")
     store <- methods::as(Matrix::Matrix(counts, sparse = TRUE), "RsparseMatrix")
     object <- refactor_private("set_response_matrix")(object, store)
-    object@low_moi <- TRUE
-    object@control_group_complement <- FALSE
-    object@cells_in_use <- c(2L, 4L, 5L, 8L, 11L)
-    object@grna_assignments_raw <- list(
+    object@data@low_moi <- TRUE
+    object@spec@control_group_complement <- FALSE
+    object@spec@multiple_testing_alpha <- 0.1
+    object@spec@multiple_testing_method <- "BH"
+    object@preparation@analysis_cells <- c(2L, 4L, 5L, 8L, 11L)
+    object@preparation@source_groups <- list(
         grna_group_idxs = list(A = c(5L, 4L)),
         indiv_nt_grna_idxs = list(ntA = 8L, ntB = c(2L, 11L))
     )
@@ -20,18 +22,18 @@ test_that("noncontiguous cells preserve actual extraction and native QC coordina
     screen <- indexing_screen()
     before <- serialize(screen, NULL)
     object <- refactor_private("update_grna_assignments_given_qc")(screen$object)
-    groups <- object@grna_assignments
+    groups <- object@preparation@analysis_groups
     discovery <- c(groups$grna_group_idxs$A, groups$all_nt_idxs)
     calibration <- groups$indiv_nt_grna_idxs$ntB
     expect_identical(groups$grna_group_idxs$A, c(2L, 3L))
     expect_identical(groups$all_nt_idxs, c(4L, 1L, 5L))
     expect_identical(calibration, c(2L, 3L))
     y <- refactor_private("load_row")(screen$store, "r")
-    discovery_y <- y[object@cells_in_use][discovery]
-    calibration_y <- y[object@cells_in_use][groups$all_nt_idxs]
+    discovery_y <- y[object@preparation@analysis_cells][discovery]
+    calibration_y <- y[object@preparation@analysis_cells][groups$all_nt_idxs]
     expect_identical(discovery_y, c(1, 0, 1, 0, 1))
     expect_identical(calibration_y, c(1, 0, 1))
-    expect_identical(unname(screen$design[object@cells_in_use, , drop = FALSE][discovery, 2L]),
+    expect_identical(unname(screen$design[object@preparation@analysis_cells, , drop = FALSE][discovery, 2L]),
                      c(4, 5, 8, 2, 11))
     expect_identical(sum(discovery_y[1:2] != 0), 1L)
     expect_identical(sum(discovery_y[3:5] != 0), 2L)
@@ -43,13 +45,13 @@ test_that("noncontiguous cells preserve actual extraction and native QC coordina
         nt_groups_analysis = lapply(groups$indiv_nt_grna_idxs, function(local) groups$all_nt_idxs[local]),
         to_analyze_response_idxs = 1L,
         to_analyze_grna_idxs = 1L, control_group_complement = FALSE,
-        cells_in_use = object@cells_in_use
+        cells_in_use = object@preparation@analysis_cells
     )
     expect_identical(native$n_nonzero_trt, 1L)
     expect_identical(native$n_nonzero_cntrl, 2L)
     expect_identical(unname(native$n_nonzero_mat[, 1L]), c(1L, 1L))
     expect_identical(serialize(screen, NULL), before)
-    expect_identical(refactor_private("update_grna_assignments_given_qc")(screen$object)@grna_assignments,
+    expect_identical(refactor_private("update_grna_assignments_given_qc")(screen$object)@preparation@analysis_groups,
                      groups)
 })
 
@@ -105,13 +107,14 @@ test_that("canonical contexts compose source, analysis and fit coordinates once"
     before <- serialize(list(object, pairs), NULL)
     prepare <- refactor_private("prepare_index_context")
     view_for <- refactor_private("make_fit_view")
-    index <- prepare(object@cells_in_use, 12L, object@grna_assignments, pairs,
+    index <- prepare(object@preparation@analysis_cells, 12L, object@preparation@analysis_groups, pairs,
         rownames(screen$store), FALSE, FALSE, TRUE)
     expect_identical(index$analysis_to_source, c(2L, 4L, 5L, 8L, 11L))
     expect_identical(index$nt_to_analysis, c(4L, 1L, 5L))
     expect_identical(index$nt_groups_analysis, list(ntA = 4L, ntB = c(1L, 5L)))
     view <- view_for(index, "A")
-    expect_named(view, c("fit_to_analysis", "source_cells", "trt_fit_pos", "n_trt"))
+    expect_s4_class(view, "CellView")
+    expect_identical(slotNames(view), c("fit_to_analysis", "source_cells", "trt_fit_pos", "n_trt"))
     expect_identical(view$fit_to_analysis, c(2L, 3L, 4L, 1L, 5L))
     expect_identical(view$source_cells, c(4L, 5L, 8L, 2L, 11L))
     expect_identical(view$trt_fit_pos, 1:2)
@@ -134,7 +137,7 @@ test_that("canonical contexts compose source, analysis and fit coordinates once"
 
     calibration_pairs <- pairs
     calibration_pairs$grna_group <- "ntB"
-    calibration <- prepare(object@cells_in_use, 12L, object@grna_assignments,
+    calibration <- prepare(object@preparation@analysis_cells, 12L, object@preparation@analysis_groups,
         calibration_pairs, rownames(screen$store), TRUE, FALSE, TRUE)
     nt_view <- view_for(calibration, "ntB")
     expect_identical(nt_view$fit_to_analysis, c(4L, 1L, 5L))
@@ -145,7 +148,7 @@ test_that("canonical contexts compose source, analysis and fit coordinates once"
     expect_identical(nt_view$source_cells[nt_control_pos], 8L)
     expect_identical(refactor_private("make_treatment_index_lookup")(calibration)("ntB"),
                      list(trt_idxs = c(2L, 3L), n_trt = 2L))
-    complement <- prepare(object@cells_in_use, 12L, object@grna_assignments,
+    complement <- prepare(object@preparation@analysis_cells, 12L, object@preparation@analysis_groups,
         pairs, rownames(screen$store), FALSE, TRUE, TRUE)
     complement_view <- view_for(complement, "A")
     expect_identical(complement_view$fit_to_analysis, 1:5)

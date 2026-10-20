@@ -60,7 +60,7 @@ test_that("set_matrix_accessibility", {
 })
 
 # `convert_covariate_df_to_design_matrix` is used in `set_analysis_parameters`
-# to take `sceptre_object@covariate_data_frame` and `sceptre_object@formula_object`
+# to take `sceptre_object@data@covariate_data_frame` and `sceptre_object@spec@formula_object`
 # and make the corresponding model matrix.
 test_that("convert_covariate_df_to_design_matrix", {
     set.seed(187)

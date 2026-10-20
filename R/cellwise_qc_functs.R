@@ -28,20 +28,23 @@ determine_cells_to_retain <- function(
         which(v < cutoffs[1] | v > cutoffs[2])
     }
     cells_to_exclude_n_umis <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_umis,
+        sceptre_object@data@covariate_data_frame$response_n_umis,
         response_n_umis_range
     )
     n_cells_rm_n_umis <- length(cells_to_exclude_n_umis)
     cells_to_exclude_n_responses <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_nonzero,
+        sceptre_object@data@covariate_data_frame$response_n_nonzero,
         response_n_nonzero_range
     )
     n_cells_rm_n_responses <- length(cells_to_exclude_n_responses)
 
     # 3. compute cells to retain based on p_mito
-    if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
+    if (
+        "response_p_mito" %in%
+            colnames(sceptre_object@data@covariate_data_frame)
+    ) {
         cells_to_exclude_p_mito <- which(
-            sceptre_object@covariate_data_frame$response_p_mito >
+            sceptre_object@data@covariate_data_frame$response_p_mito >
                 p_mito_threshold
         )
         n_cells_rm_p_mito <- length(cells_to_exclude_p_mito)
@@ -52,9 +55,10 @@ determine_cells_to_retain <- function(
 
     # 4. compute cells to retain based on cells containing multiple grnas (if in
     # low MOI)
-    cells_to_exclude_zero_twoplus_grnas <- sceptre_object@cells_w_zero_or_twoplus_grnas
+    cells_to_exclude_zero_twoplus_grnas <-
+        sceptre_object@preparation@assignment_exclusions
     n_cells_rm_zero_twoplus_grnas <- length(
-        sceptre_object@cells_w_zero_or_twoplus_grnas
+        sceptre_object@preparation@assignment_exclusions
     )
 
     # 5. finally, determine the set of cells to retain, and update the
@@ -73,7 +77,7 @@ determine_cells_to_retain <- function(
     } else {
         seq(1L, n_cells)[-cells_to_exclude]
     }
-    sceptre_object@cells_in_use <- cells_to_retain
+    sceptre_object@preparation@analysis_cells <- cells_to_retain
     n_cells_rm_total <- n_cells - length(cells_to_retain)
     cell_removal_metrics <- c(
         n_cells_rm_n_umis = n_cells_rm_n_umis,
@@ -83,24 +87,26 @@ determine_cells_to_retain <- function(
         n_cells_rm_user_specified = n_cells_rm_user_specified,
         n_cells_rm_total = n_cells_rm_total
     )
-    sceptre_object@cell_removal_metrics <- cell_removal_metrics
+    sceptre_object@preparation@cell_removal_metrics <- cell_removal_metrics
     return(sceptre_object)
 }
 
 
-#' Remove failed-QC cells from guide assignments and renumber the remaining cells
+#' Remove failed-QC cells from guide assignments and renumber the remaining
+#' cells
 #' @param sceptre_object Object with raw assignments as original matrix columns
 #'   and `cells_in_use` listing the columns kept after QC.
 #' @return Object with updated `grna_assignments`. Group members become unique
-#'   positions within `cells_in_use`, in that list's order. Remove NT guides with
+#'   positions within `cells_in_use`, in that list's order. Remove NT guides
+#'   with
 #'   no remaining cells. With NT controls, also store each NT group's positions
 #'   within the combined NT-cell list, as required by the saved-object format.
 #'   The caller must keep the returned object.
 #' @noRd
 update_grna_assignments_given_qc <- function(sceptre_object) {
     # Read the saved original-cell assignments and the cells retained by QC.
-    cells_in_use <- sceptre_object@cells_in_use
-    grna_assignments_raw <- sceptre_object@grna_assignments_raw
+    cells_in_use <- sceptre_object@preparation@analysis_cells
+    grna_assignments_raw <- sceptre_object@preparation@source_groups
     n_cells <- ncol(get_response_matrix(sceptre_object))
 
     analysis_to_source <- prepare_cell_map(cells_in_use, n_cells)
@@ -129,7 +135,7 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
 
     # With NT controls, save each NT group's positions within the combined
     # NT-cell list, rather than within the list of all cells kept after QC.
-    if (!sceptre_object@control_group_complement) {
+    if (!sceptre_object@spec@control_group_complement) {
         l <- encode_nt_fit_assignments(
             grna_assignments$indiv_nt_grna_idxs
         )
@@ -138,6 +144,6 @@ update_grna_assignments_given_qc <- function(sceptre_object) {
     }
 
     # 4. update the sceptre_object and return
-    sceptre_object@grna_assignments <- grna_assignments
+    sceptre_object@preparation@analysis_groups <- grna_assignments
     return(sceptre_object)
 }

@@ -1,0 +1,8 @@
+{
+  "command": "R CMD build .",
+  "result": "passed including vignette generation",
+  "source_tarball": "/private/tmp/sceptre-fits-qualified-check/sceptre_0.99.0.tar.gz",
+  "source_tarball_sha256": "57fbb7038b4180d5710891928a7da7c1bb5a81bc36f2d01a37ed0cc254ee6df1",
+  "saved_schema": 3,
+  "post_source_checkpoint_change": "Qualified RunPlan slot replacement as methods::slot to resolve namespace checker note; final installed-package suite covers this exact archive."
+}

@@ -1,0 +1,41 @@
+PASS ondisc ABI argument names and order 
+PASS low_complement_perm design raw stage identity 
+PASS low_complement_perm assignment raw stage identity 
+PASS low_complement_perm cell_qc raw stage identity 
+PASS low_complement_perm pair_qc raw stage identity 
+PASS low_complement_perm realized run plan 
+PASS low_complement_perm ordered context and numerical settings 
+PASS low_complement_perm same-runtime manifest payload 
+PASS low_complement_perm unit raw tables fits and certificates 
+PASS low_complement_perm complete collected value and family correction 
+PASS low_complement_perm R RNG unchanged by execution 
+PASS low_complement_perm caller value unchanged 
+PASS low_complement_perm missing proposal error 
+PASS low_complement_perm unknown unit error 
+PASS low_nt_perm design raw stage identity 
+PASS low_nt_perm assignment raw stage identity 
+PASS low_nt_perm cell_qc raw stage identity 
+PASS low_nt_perm pair_qc raw stage identity 
+PASS low_nt_perm realized run plan 
+PASS low_nt_perm ordered context and numerical settings 
+PASS low_nt_perm same-runtime manifest payload 
+PASS low_nt_perm unit raw tables fits and certificates 
+PASS low_nt_perm complete collected value and family correction 
+PASS low_nt_perm R RNG unchanged by execution 
+PASS low_nt_perm caller value unchanged 
+PASS low_nt_perm missing proposal error 
+PASS low_nt_perm unknown unit error 
+PASS high_complement_crt design raw stage identity 
+PASS high_complement_crt assignment raw stage identity 
+PASS high_complement_crt cell_qc raw stage identity 
+PASS high_complement_crt pair_qc raw stage identity 
+PASS high_complement_crt realized run plan 
+PASS high_complement_crt ordered context and numerical settings 
+PASS high_complement_crt same-runtime manifest payload 
+PASS high_complement_crt unit raw tables fits and certificates 
+PASS high_complement_crt complete collected value and family correction 
+PASS high_complement_crt R RNG unchanged by execution 
+PASS high_complement_crt caller value unchanged 
+PASS high_complement_crt missing proposal error 
+PASS high_complement_crt unknown unit error 
+Review scope: isolated source-function environments over the same installed pre-cleanup class/runtime; this does not replace final installed candidate checks.

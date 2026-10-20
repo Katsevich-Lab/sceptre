@@ -6,7 +6,8 @@
 #' @param moi `"low"` or `"high"`.
 #' @param extra_covariates Optional covariates with rows in the same cell order.
 #' @return NULL on success, otherwise an error at the first failing check below.
-#'   Check classes, dimensions, labels and metadata fields without scanning every
+#'   Check classes, dimensions, labels and metadata fields without scanning
+#'   every
 #'   count value, converting storage or reordering cells.
 #' @noRd
 check_import_data_inputs <- function(
@@ -63,9 +64,11 @@ check_import_data_inputs <- function(
 
     # check type of input matrices
     # Check that one input matrix has a supported class
-    # input_matrix: Matrix to check; `input_matrix_name` identifies it in errors.
+    # input_matrix: Matrix to check; `input_matrix_name` identifies it in
+    # errors.
     # allowed_matrix_classes: Supported class names. Do not convert the input.
-    # Returns: Invisible NULL on success, otherwise an error naming the input matrix.
+    # Returns: Invisible NULL on success, otherwise an error naming the input
+    # matrix.
     check_matrix_class <- function(
         input_matrix,
         input_matrix_name,
@@ -240,16 +243,20 @@ check_import_data_inputs <- function(
 
 
 #' Check proposed analysis settings against the imported data
-#' @param sceptre_object Imported sceptre object with count matrices and covariates.
+#' @param sceptre_object Imported sceptre object with count matrices and
+#'   covariates.
 #' @param formula_object Model formula; offsets are not supported.
-#' @param response_grna_target_pairs_list Named discovery and positive-control tables.
+#' @param response_grna_target_pairs_list Named discovery and positive-control
+#'   tables.
 #' @param control_group,resampling_mechanism,side,low_moi Chosen control cells,
 #'   resampling method, test direction and MOI setting.
-#' @param grna_integration_strategy,resampling_approximation Chosen guide-combination
+#' @param grna_integration_strategy,resampling_approximation Chosen
+#'   guide-combination
 #'   method and resampling approximation.
 #' @return NULL on success, otherwise the first error in the order below.
 #'   Check pair names and duplicate complete rows without changing their order.
-#'   The current checks access missing-value columns before checking their names.
+#'   The current checks access missing-value columns before checking their
+#'   names.
 #'   ondisc-backed matrices currently support permutations only. This helper
 #'   checks settings; building the design matrix happens separately.
 #' @noRd
@@ -264,9 +271,10 @@ check_set_analysis_parameters <- function(
     grna_integration_strategy,
     resampling_approximation
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     response_matrix <- get_response_matrix(sceptre_object)
-    covariate_data_frame <- sceptre_object@covariate_data_frame
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
+    covariate_data_frame <- sceptre_object@data@covariate_data_frame
+    grna_target_data_frame <- guide_group_metadata(sceptre_object)
 
     # if response_grna_target_pairs has been supplied, check its
     # characteristics
@@ -353,7 +361,7 @@ check_set_analysis_parameters <- function(
     }
 
     # check that there are no offsets in the formula object
-    if (grepl("offset", as.character(formula_object)[2])) {
+    if (formula_contains_offset_call(formula_object)) {
         stop("Offsets are not currently supported in formula objects.")
     }
 
@@ -458,8 +466,10 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 
 #' Check the requested worker count using the current validation rule
 #' @param n_processors Exactly `"auto"` or a numeric value at least 2.
-#' @return NULL on success, otherwise an error. The existing comparison also accepts
-#'   fractional values and Inf; this helper does not round them or choose workers.
+#' @return NULL on success, otherwise an error. The existing comparison also
+#'   accepts
+#'   fractional values and Inf; this helper does not round them or choose
+#'   workers.
 #'   Call it after the other argument checks, as in the public workflows.
 #' @noRd
 check_processor_count <- function(n_processors) {
@@ -478,10 +488,13 @@ check_processor_count <- function(n_processors) {
 #' Check guide-assignment method and settings before assigning cells
 #' @param sceptre_object Object supplying the low/high-MOI setting.
 #' @param assignment_method Chosen maximum, thresholding or mixture method.
-#' @param hyperparameters Named method settings after merging user values and defaults.
+#' @param hyperparameters Named method settings after merging user values and
+#'   defaults.
 #' @param n_processors Requested worker count, checked after method settings.
-#' @return NULL on success, otherwise the first method, range or setting-name error
-#'   below. The perturbation parameter uses its documented `[0, 20]` range. Other
+#' @return NULL on success, otherwise the first method, range or setting-name
+#'   error
+#'   below. The perturbation parameter uses its documented `[0, 20]` range.
+#'   Other
 #'   type, missing-value and scalar checks retain their current rules. No models
 #'   are fitted and no assignments are changed here.
 #' @noRd
@@ -491,6 +504,7 @@ check_assign_grna_inputs <- function(
     hyperparameters,
     n_processors
 ) {
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
     if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
         stop(
             "`assignment_method` must be `mixture`, `maximum`, or `thresholding`."
@@ -498,7 +512,7 @@ check_assign_grna_inputs <- function(
     }
 
     # check that assignment method is OK for high MOI
-    if (!sceptre_object@low_moi && assignment_method == "maximum") {
+    if (!sceptre_object@data@low_moi && assignment_method == "maximum") {
         stop("`assignment_method` cannot be `maximum` in high-MOI.")
     }
 
@@ -619,10 +633,12 @@ check_assign_grna_inputs <- function(
 
 
 #' Check pair-count thresholds, QC quantiles and whether any guide was assigned
-#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pair-QC cutoffs.
+#' @param n_nonzero_trt_thresh,n_nonzero_cntrl_thresh Nonnegative pair-QC
+#'   cutoffs.
 #' @param response_n_umis_range,response_n_nonzero_range Ordered quantile pairs.
 #' @param initial_grna_assignment_list Named lists of original-cell assignments.
-#' @return NULL on success, otherwise the first error below. These are the checks
+#' @return NULL on success, otherwise the first error below. These are the
+#'   checks
 #'   performed here, rather than validation of every public QC argument. This
 #'   function does not remove cells or count gene-guide pairs.
 #' @noRd
@@ -705,7 +721,8 @@ check_native_scalar_count <- function(value, name, minimum = 0) {
 #' Check B1, B2 and B3 and return the total number of resamples
 #'
 #' Each stage size must be a nonnegative whole number. Add using doubles first,
-#' then check that the total also fits a C++ integer before converting it. Report
+#' then check that the total also fits a C++ integer before converting it.
+#' Report
 #' an error if it is too large; do not silently reduce the number of resamples.
 #' @noRd
 checked_resampling_total <- function(B1, B2, B3) {
@@ -720,7 +737,8 @@ checked_resampling_total <- function(B1, B2, B3) {
 #' Calculate B3 for empirical p-values and check the total resampling size
 #'
 #' For a nonnegative whole pair count, use ceiling(10 * n_pairs / alpha) for a
-#' two-sided test or ceiling(5 * n_pairs / alpha) for a one-sided test. Check both
+#' two-sided test or ceiling(5 * n_pairs / alpha) for a one-sided test. Check
+#' both
 #' B3 and B1+B2+B3 before converting B3 to an integer. Large requests error
 #' rather than being silently capped.
 #' @noRd
@@ -734,11 +752,13 @@ compute_empirical_budget <- function(n_pairs, alpha, side_code, B1, B2) {
 }
 
 #' Check calibration sizes against NT guides that still have cells after QC
-#' @param sceptre_object Post-QC object. Count active NT guides from assignments,
+#' @param sceptre_object Post-QC object. Count active NT guides from
+#'   assignments,
 #'   since metadata can still list guides whose last cell was removed by QC.
 #' @param n_calibration_pairs Positive whole number fitting a C++ integer.
 #' @param n_processors Requested worker count, checked last.
-#' @param calibration_group_size Positive number of NT guides per group, no larger
+#' @param calibration_group_size Positive number of NT guides per group, no
+#'   larger
 #'   than the active NT-guide count. NT controls require at least two active NT
 #'   guides; complement controls require at least one.
 #' @return NULL on success, otherwise the first error below. Sizes are checked
@@ -750,10 +770,12 @@ check_calibration_check_inputs <- function(
     n_processors,
     calibration_group_size
 ) {
-    control_group_complement <- sceptre_object@control_group_complement
+    sceptre_object <- migrate_sceptre_object(sceptre_object)
+    control_group_complement <- sceptre_object@spec@control_group_complement
     # QC can remove every cell assigned to a guide while its metadata remains.
     n_nt_grnas <- sum(
-        lengths(sceptre_object@grna_assignments$indiv_nt_grna_idxs) > 0L
+        lengths(sceptre_object@preparation@analysis_groups$indiv_nt_grna_idxs) >
+            0L
     )
     # check number of gRNAS
     if (!control_group_complement) {
@@ -781,7 +803,8 @@ check_calibration_check_inputs <- function(
     )
     if (calibration_group_size > n_nt_grnas) {
         stop(
-            "`calibration_group_size` exceeds the active non-targeting gRNA count after QC (",
+            "`calibration_group_size` exceeds the active non-targeting gRNA ",
+            "count after QC (",
             n_nt_grnas,
             ")."
         )
@@ -795,8 +818,10 @@ check_calibration_check_inputs <- function(
 #' Check that discovery or power analysis has pairs and usable control cells
 #' @param response_grna_group_pairs Requested pair table with QC information.
 #' @param control_group_complement Whether controls are all other kept cells.
-#' @param grna_target_data_frame Metadata used to check for NT guides when required.
-#' @param pc_analysis TRUE for the positive-control power check; FALSE for discovery.
+#' @param grna_target_data_frame Metadata used to check for NT guides when
+#'   required.
+#' @param pc_analysis TRUE for the positive-control power check; FALSE for
+#'   discovery.
 #' @param calibration_result Earlier calibration results; an empty table prompts
 #'   the advisory message to run calibration first.
 #' @param n_ok_pairs Number of pairs passing QC; zero stops the analysis.
@@ -858,4 +883,24 @@ check_discovery_analysis_inputs <- function(
     check_processor_count(n_processors)
 
     return(NULL)
+}
+
+# Detect actual offset calls rather than covariate labels containing the word.
+#' @noRd
+formula_contains_offset_call <- function(expression) {
+    if (!is.call(expression)) {
+        return(FALSE)
+    }
+    head <- expression[[1L]]
+    offset <- identical(head, as.name("offset")) ||
+        (is.call(head) &&
+            length(head) == 3L &&
+            as.character(head[[1L]]) %in% c("::", ":::") &&
+            identical(head[[3L]], as.name("offset")))
+    offset ||
+        any(vapply(
+            as.list(expression)[-1L],
+            formula_contains_offset_call,
+            logical(1)
+        ))
 }

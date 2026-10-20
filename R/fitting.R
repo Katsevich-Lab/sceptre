@@ -7,8 +7,10 @@
 #' @param covariate_matrix Numeric design matrix with one row per selected cell,
 #'   in exactly the same order as `expressions`.
 #' @return Coefficients (`fitted_coefs`) in design-column order and dispersion
-#'   (`theta`), restricted to `[0.01, 1000]`. These are small enough to save for reuse.
-#' @details Fit Poisson `glm.fit()`, then estimate dispersion at its fitted means.
+#'   (`theta`), restricted to `[0.01, 1000]`. These are small enough to save for
+#'   reuse.
+#' @details Fit Poisson `glm.fit()`, then estimate dispersion at its fitted
+#'   means.
 #'   Warnings from the fit are passed through. Missing coefficients trigger the
 #'   covariate error below. The caller handles saving or reusing this fit.
 #' @noRd
@@ -40,7 +42,8 @@ fit_response <- function(expressions, covariate_matrix) {
 }
 
 #' Fit each selected cell's probability of belonging to the treatment group
-#' @param trt_idxs Treated cells' row numbers in `covariate_matrix`, starting at 1.
+#' @param trt_idxs Treated cells' row numbers in `covariate_matrix`, starting at
+#'   1.
 #'   These are positions in this fit, not columns of the original count matrix.
 #'   Repeated positions mark the same cell as treated once.
 #' @param covariate_matrix Numeric design matrix for the cells in this fit.
@@ -49,12 +52,14 @@ fit_response <- function(expressions, covariate_matrix) {
 #'   helper adds no separate convergence check.
 #' @noRd
 fit_assignment_probabilities <- function(trt_idxs, covariate_matrix) {
-    indicator <- integer(length = nrow(covariate_matrix))
+    fit_perturbation_glm(trt_idxs, covariate_matrix)$fitted.values
+}
+
+# Fit exactly once with the established indicator encoding and glm defaults.
+# The caller may retain compact coefficients; the full glm object is transient.
+#' @noRd
+fit_perturbation_glm <- function(trt_idxs, design) {
+    indicator <- integer(length = nrow(design))
     indicator[trt_idxs] <- 1L
-    logistic_fit <- stats::glm.fit(
-        y = indicator,
-        x = covariate_matrix,
-        family = stats::binomial()
-    )
-    logistic_fit$fitted.values
+    stats::glm.fit(y = indicator, x = design, family = stats::binomial())
 }

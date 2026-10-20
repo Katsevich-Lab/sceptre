@@ -1,0 +1,111 @@
+component-results: 12.................3..Constructing negative control pairs.
+ ✓
+....................4....
+refactor-storage: ..........SS..........................................................S
+worker-errors: ................
+
+══ Skipped ═════════════════════════════════════════════════════════════════════
+1. legacy matrix conversion agrees with the selected ondisc copy ('test-refactor-storage.R:33:5') - Reason: ondisc cannot be loaded
+
+2. legacy backed storage coerces fractions and retains stored positions ('test-refactor-storage.R:58:5') - Reason: ondisc cannot be loaded
+
+3. backed storage has the same ordered count and ownership contracts ('test-refactor-storage.R:166:5') - Reason: ondisc cannot be loaded
+
+══ Failed ══════════════════════════════════════════════════════════════════════
+── 1. Failure ('test-component-results.R:21:5'): completed results freeze effect
+result_record_is_current(object, "run_discovery_analysis") is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+── 2. Error ('test-component-results.R:22:5'): completed results freeze effectiv
+Error in `current_result(sceptre_object, analysis)`: No completed current result for `run_discovery_analysis`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.
+Backtrace:
+ 1. testthat::expect_identical(...)
+      at test-component-results.R:22:5
+ 4. sceptre::get_result(object, "run_discovery_analysis")
+ 9. sceptre:::current_result(sceptre_object, analysis)
+
+── 3. Failure ('test-component-results.R:58:5'): prepared analysis and raw shard
+workflow_status(object)[["run_discovery_analysis"]] is not TRUE
+
+`actual`:   FALSE
+`expected`: TRUE 
+
+── 4. Error ('test-component-results.R:148:5'): result records preserve the publ
+Error in `current_result(sceptre_object, analysis)`: No completed current result for `run_discovery_analysis`. Rerun the analysis or use get_result(..., historical = TRUE) to inspect saved results.
+Backtrace:
+ 1. testthat::expect_s3_class(...)
+      at test-component-results.R:148:5
+ 4. sceptre::get_result(object, "run_discovery_analysis")
+ 9. sceptre:::current_result(sceptre_object, analysis)
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+Don't worry, you'll get it.
+No deferred expressions to run
+                       file
+1  test-component-results.R
+2  test-component-results.R
+3  test-component-results.R
+4  test-component-results.R
+5  test-component-results.R
+6  test-component-results.R
+7  test-component-results.R
+8  test-component-results.R
+9  test-component-results.R
+10  test-refactor-storage.R
+11  test-refactor-storage.R
+12  test-refactor-storage.R
+13  test-refactor-storage.R
+14  test-refactor-storage.R
+15  test-refactor-storage.R
+16  test-refactor-storage.R
+17     test-worker-errors.R
+18     test-worker-errors.R
+19     test-worker-errors.R
+20     test-worker-errors.R
+21     test-worker-errors.R
+                                                                                   test
+1             completed results freeze effective budgets and preserve historical tables
+2                    result guards detect data, ordered cell, design and family changes
+3     prepared analysis and raw shards cannot masquerade as completed reporting results
+4       zero discovery eligibility does not prevent qualifying NT calibration proposals
+5  public calibration preparation stays incomplete and failed execution commits nothing
+6                      calibration working budget does not leak into power or discovery
+7                              invalid result proposals cannot create completed records
+8                    result records preserve the public result table's data.table class
+9     run provenance freezes assignment and QC settings separately from working choices
+10                          legacy storage retains stored-zero and fractional semantics
+11                         owned sparse group coordinates remain unchanged across calls
+12                        legacy matrix conversion agrees with the selected ondisc copy
+13                 legacy backed storage coerces fractions and retains stored positions
+14                     storage reads preserve requested source order and repeated cells
+15                     sparse storage counts preserve requests and caller-owned indices
+16                    backed storage has the same ordered count and ownership contracts
+17                            worker errors retain their cause before result collection
+18                                         successful empty worker results remain valid
+19                        a child exiting without replying cannot silently drop a block
+20                                 CRT dispatch preserves empty internal request blocks
+21                  parallel mixture assignment surfaces worker cause before flattening
+   nb failed error warning skipped
+1   1      1  TRUE       0   FALSE
+2  15      0 FALSE       0   FALSE
+3   4      1 FALSE       0   FALSE
+4   5      0 FALSE       0   FALSE
+5   7      0 FALSE       0   FALSE
+6   4      0 FALSE       0   FALSE
+7   5      0 FALSE       0   FALSE
+8   0      0  TRUE       0   FALSE
+9   4      0 FALSE       0   FALSE
+10  7      0 FALSE       0   FALSE
+11  3      0 FALSE       0   FALSE
+12  1      0 FALSE       0    TRUE
+13  1      0 FALSE       0    TRUE
+14  6      0 FALSE       0   FALSE
+15 52      0 FALSE       0   FALSE
+16  1      0 FALSE       0    TRUE
+17  5      0 FALSE       0   FALSE
+18  2      0 FALSE       0   FALSE
+19  2      0 FALSE       0   FALSE
+20  5      0 FALSE       0   FALSE
+21  2      0 FALSE       0   FALSE

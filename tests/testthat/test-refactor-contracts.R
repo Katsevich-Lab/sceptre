@@ -10,7 +10,7 @@ test_that("supported workflows produce valid complete results reproducibly", {
         expect_identical(actual, repeat_run, info = name)
         expect_workflow_results(actual, inputs, cases[[name]])
         final <- actual$value$final
-        expect_equal(length(final$cells_in_use), ncol(inputs$response_matrix) - length(inputs$remove_cells))
+        expect_equal(length(final$analysis_cells), ncol(inputs$response_matrix) - length(inputs$remove_cells))
         expect_identical(serialize(inputs, NULL), before)
     }
 })
@@ -24,7 +24,7 @@ test_that("repeated analyses and cache invalidation preserve current fit views",
     expect_identical(actual$value$retained_side_cache, actual$value$cold$response_precomputations)
     expect_length(actual$value$formula_cache, 0L)
     expect_length(actual$value$changed_qc_cache, 0L)
-    expect_false(identical(actual$value$reassigned$grna_assignments, actual$value$cold$grna_assignments))
+    expect_false(identical(actual$value$reassigned$analysis_groups, actual$value$cold$analysis_groups))
     expect_equal(actual$value$reassigned$discovery_result, actual$value$reassigned_cold$discovery_result, tolerance = 1e-8)
 })
 
@@ -106,7 +106,8 @@ test_that("current saved objects resume without changing discovery results", {
 test_that("a versioned saved object remains a supported input", {
     inputs <- readRDS(file.path(refactor_fixture_dir(), "inputs.rds"))
     case <- readRDS(file.path(refactor_fixture_dir(), "cases.rds"))$low_complement_perm
-    restored <- readRDS(test_path("fixtures", "saved-objects", "sceptre-0.99.0-21f9ea0.rds"))
+    restored <- refactor_private("migrate_sceptre_object")(readRDS(
+        test_path("fixtures", "saved-objects", "sceptre-0.99.0-21f9ea0.rds")))
     before <- serialize(restored, NULL)
     current <- refactor_capture(refactor_prepare(inputs, case))
     old_run <- refactor_capture(sceptre::run_discovery_analysis(restored, print_progress = FALSE))

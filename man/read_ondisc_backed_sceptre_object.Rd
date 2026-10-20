@@ -42,30 +42,63 @@ specified directory. Next, \code{read_ondisc_backed_sceptre_object()} reads and
 initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file,
 \code{response.odm} file, and \code{grna.odm} file stored on disk.
 }
+\details{
+The saved RDS contains anchored backing descriptors and closed handles,
+rather
+than live process-local file handles. Reading it with \code{readRDS()} permits
+inspection of saved metadata and historical results, but does not reopen
+counts.
+Use \code{read_ondisc_backed_sceptre_object()} before continuing backed analyses
+or
+exporting reports that need counts. The optional ondisc installation is
+checked
+for the required API when backed counts are opened; in-memory analyses do not
+load ondisc.
+
+The response and guide files must be the original matching pair. Reopening
+checks their shared import ID, anchored file checksums, dimensions and
+feature
+order. Identical files may be moved or copied: pass their new paths to the
+reader. Verified relocation preserves compatible fits and saved result
+provenance. An import ID alone is not a content fingerprint.
+
+Active backing files are immutable: do not replace or edit them while an
+object
+is in use. Saving and reopening verify the existing content anchors; analysis
+getters do not repeatedly hash files. If count content or its imported
+summaries
+must change, create a new screen with \code{import_data()} instead of overwriting
+the
+backing files. Old saved objects whose original feature labels are unknown
+may
+likewise require reimport before count replacement.
+}
 \examples{
-data(lowmoi_example_data)
-# 1. create ondisc-backed sceptre_object
-sceptre_object <- import_data(
-  response_matrix = lowmoi_example_data$response_matrix,
-  grna_matrix = lowmoi_example_data$grna_matrix,
-  grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-  extra_covariates = lowmoi_example_data$extra_covariates,
-  moi = "low",
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
-)
+if (requireNamespace("ondisc", quietly = TRUE)) {
+  data(lowmoi_example_data)
+  # 1. create ondisc-backed sceptre_object
+  sceptre_object <- import_data(
+    response_matrix = lowmoi_example_data$response_matrix,
+    grna_matrix = lowmoi_example_data$grna_matrix,
+    grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+    extra_covariates = lowmoi_example_data$extra_covariates,
+    moi = "low",
+    use_ondisc = TRUE,
+    directory_to_write = tempdir()
+  )
 
-# 2. write
-write_ondisc_backed_sceptre_object(
-  sceptre_object = sceptre_object,
-  directory_to_write = tempdir()
-)
+  # 2. write
+  write_ondisc_backed_sceptre_object(
+    sceptre_object = sceptre_object,
+    directory_to_write = tempdir()
+  )
 
-# 3. read
-rm(sceptre_object)
-sceptre_object <- read_ondisc_backed_sceptre_object(
-  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
-  response_odm_file_fp = paste0(tempdir(), "/response.odm"),
-  grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
-)
+  # 3. read
+  rm(sceptre_object)
+  sceptre_object <- read_ondisc_backed_sceptre_object(
+    sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
+    response_odm_file_fp = paste0(tempdir(), "/response.odm"),
+    grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
+  )
+}
 }

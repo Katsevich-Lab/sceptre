@@ -80,7 +80,7 @@ test_that("public calibration uses actual NT groups surviving cellwise QC", {
     inputs <- readRDS(test_path("fixtures", "refactor", "inputs.rds"))
     case <- readRDS(test_path("fixtures", "refactor", "cases.rds"))$low_complement_perm
     object <- suppressMessages(refactor_prepare(inputs, case))
-    groups <- object@grna_assignments_raw$indiv_nt_grna_idxs
+    groups <- object@preparation@source_groups$indiv_nt_grna_idxs
     expect_true(length(groups) >= 2L)
     removed_group <- names(groups)[[1L]]
     # Run public QC to remove a guide's last cell. Keep its metadata row so the
@@ -89,9 +89,9 @@ test_that("public calibration uses actual NT groups surviving cellwise QC", {
         response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
         n_nonzero_trt_thresh = 0L, n_nonzero_cntrl_thresh = 0L,
         additional_cells_to_remove = unique(c(inputs$remove_cells, groups[[1L]]))))
-    expect_false(removed_group %in% names(object@grna_assignments$indiv_nt_grna_idxs))
-    expect_true(removed_group %in% object@grna_target_data_frame$grna_id)
-    active <- length(object@grna_assignments$indiv_nt_grna_idxs)
+    expect_false(removed_group %in% names(object@preparation@analysis_groups$indiv_nt_grna_idxs))
+    expect_true(removed_group %in% object@data@grna_target_data_frame$grna_id)
+    active <- length(object@preparation@analysis_groups$indiv_nt_grna_idxs)
     expect_error(suppressMessages(sceptre::run_calibration_check(object,
         calibration_group_size = active + 1L, n_calibration_pairs = 1L)),
         "active non-targeting gRNA count after QC")
@@ -100,9 +100,9 @@ test_that("public calibration uses actual NT groups surviving cellwise QC", {
         n_nonzero_trt_thresh = 0L, n_nonzero_cntrl_thresh = 0L,
         additional_cells_to_remove = unique(c(inputs$remove_cells,
             unlist(groups[-length(groups)], use.names = FALSE)))))
-    expect_length(one_active@grna_assignments$indiv_nt_grna_idxs, 1L)
+    expect_length(one_active@preparation@analysis_groups$indiv_nt_grna_idxs, 1L)
     expect_gt(refactor_private("compute_calibration_group_size")(
-        one_active@grna_target_data_frame), 1L)
+        refactor_private("guide_group_metadata")(one_active)), 1L)
     # Omit group size deliberately: the metadata-derived default is checked
     # against active assignments, rather than silently reduced after QC.
     expect_error(suppressMessages(sceptre::run_calibration_check(one_active,
@@ -139,17 +139,17 @@ test_that("public high-MOI calibration accepts overlapping NT unions", {
         response_n_umis_range = c(0, 1), response_n_nonzero_range = c(0, 1),
         n_nonzero_trt_thresh = 0L, n_nonzero_cntrl_thresh = 0L,
         additional_cells_to_remove = inputs$remove_cells))
-    assignments <- object@grna_assignments$indiv_nt_grna_idxs
+    assignments <- object@preparation@analysis_groups$indiv_nt_grna_idxs
     expect_true(sum(sort(lengths(assignments), decreasing = TRUE)[1:2]) >
-                    length(object@cells_in_use))
+                    length(object@preparation@analysis_cells))
     result <- suppressMessages(sceptre::run_calibration_check(object,
         calibration_group_size = 2L, n_calibration_pairs = 1L, print_progress = FALSE))
-    expect_equal(nrow(result@calibration_result), 1L)
-    pairs <- result@negative_control_pairs
+    expect_equal(nrow(result@results@records[["run_calibration_check"]]$table), 1L)
+    pairs <- result@results@records[["run_calibration_check"]]$provenance$plan@pairs
     guides <- strsplit(pairs$grna_group[[1L]], "&", fixed = TRUE)[[1L]]
     selected <- unique(unlist(assignments[guides], use.names = FALSE))
-    source <- object@cells_in_use[selected]
-    complement <- setdiff(object@cells_in_use, source)
+    source <- object@preparation@analysis_cells[selected]
+    complement <- setdiff(object@preparation@analysis_cells, source)
     response <- inputs$response_matrix[pairs$response_id[[1L]], ]
     expect_equal(pairs$n_nonzero_trt, sum(response[source] > 0))
     expect_equal(pairs$n_nonzero_cntrl, sum(response[complement] > 0))

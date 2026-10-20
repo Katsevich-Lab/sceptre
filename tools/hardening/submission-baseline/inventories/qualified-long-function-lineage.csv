@@ -1,0 +1,70 @@
+file,name,length,startLine,endLine,codingLines,baseline_file,baseline_name,baseline_length,baseline_start_line,baseline_end_line,status,basis
+R/analysis_context.R,prepare_analysis_context,71,275,345,71,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/analysis.R,analyze_association_pairs,75,17,91,73,R/s4_analysis_functs_2.R,run_sceptre_analysis_high_level,74,430,503,inherited_function_site,"0b6ae38 and f4aaab4: same public analysis dispatcher, permutation draw bank and eligible/failed-pair assembly"
+R/assign_grna_functions.R,assign_grnas_to_cells,70,13,82,60,R/assign_grna_functions.R,assign_grnas_to_cells,75,4,78,inherited_function_site,Same named function in same source file
+R/assign_grna_functions.R,process_initial_assignment_list,61,171,231,54,R/assign_grna_functions.R,process_initial_assignment_list,65,160,224,inherited_function_site,Same named function in same source file
+R/association_execution.R,run_permutation_analysis,118,14,131,111,R/medium_level_functs_v2.R,run_perm_test_in_memory,212,43,254,inherited_function_site,0b6ae38: explicit old/new function replacement; context replaces argument expansion
+R/association_execution.R,analyze_response_block,69,28,96,69,R/medium_level_functs_v2.R,analyze_given_response_ids,109,96,204,inherited_function_site,0b6ae38: nested per-response block replacement; same response fitting and group testing loop
+R/association_execution.R,run_crt_analysis,237,145,381,223,R/medium_level_functs_v2.R,run_crt_in_memory_v2,252,258,509,inherited_function_site,0b6ae38 and ec1980c: explicit old/new CRT coordinator replacement; later compact perturbation fits added
+R/association_execution.R,analyze_guide_block,118,229,346,118,R/medium_level_functs_v2.R,perform_association_analysis,71,409,479,inherited_function_site,0b6ae38: explicit nested group-analysis replacement; guide groups retain request order
+R/association_workers.R,test_crt_shared_fit,54,116,169,54,R/association_testing_functions_v2.R,crt_glm_factored_out,77,160,236,inherited_function_site,0b6ae38: explicit replacement of shared response-fit CRT test; same per-guide sampling then per-response native tests
+R/association_workers.R,test_crt_group_fit,52,188,239,52,R/association_testing_functions_v2.R,discovery_ntcells_crt,80,239,318,inherited_function_site,0b6ae38: explicit replacement of treatment-plus-NT CRT test
+R/aux_functions.R,auto_construct_formula_object,52,9,60,47,R/aux_functions.R,auto_construct_formula_object,47,63,109,new_threshold_crossing,Same named function in same source file
+R/cellwise_qc_functs.R,determine_cells_to_retain,78,14,91,67,R/cellwise_qc_functs.R,determine_cells_to_retain,75,1,75,inherited_function_site,Same named function in same source file
+R/check_functions.R,check_import_data_inputs,228,12,239,185,R/check_functions.R,check_import_data_inputs,224,1,224,inherited_function_site,Same named function in same source file
+R/check_functions.R,check_set_analysis_parameters,181,256,436,142,R/check_functions.R,check_set_analysis_parameters,181,227,407,inherited_function_site,Same named function in same source file
+R/check_functions.R,check_assign_grna_inputs,132,489,620,122,R/check_functions.R,check_assign_grna_inputs,138,425,562,inherited_function_site,Same named function in same source file
+R/check_functions.R,check_discovery_analysis_inputs,54,812,865,43,R/check_functions.R,check_discovery_analysis_inputs,62,652,713,inherited_function_site,Same named function in same source file
+R/distributed_execution.R,execution_build_certificate,78,27,104,76,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/distributed_execution.R,validate_execution_manifest,70,236,305,70,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/distributed_execution.R,prepare_execution,54,326,379,54,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/distributed_execution.R,execute_work_unit,87,391,477,87,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/distributed_execution.R,validate_execution_proposal,71,479,549,71,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/distributed_execution.R,collect_execution,157,578,734,154,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/execution.R,execute_analysis_blocks,68,96,163,64,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/import_functs.R,import_data_use_ondisc,54,175,228,44,R/import_functs.R,import_data_use_ondisc,54,152,205,inherited_function_site,Same named function in same source file
+R/import_functs.R,import_data_from_cellranger_memory,276,350,625,260,R/import_functs.R,import_data_from_cellranger_memory,283,307,589,inherited_function_site,Same named function in same source file
+R/import_functs.R,import_data_from_cellranger_use_ondisc,57,639,695,51,R/import_functs.R,import_data_from_cellranger_use_ondisc,65,593,657,inherited_function_site,Same named function in same source file
+R/import_functs.R,import_data_from_parse,87,762,848,76,R/import_functs.R,import_data_from_parse,88,720,807,inherited_function_site,Same named function in same source file
+R/mixture_model_functs.R,assign_grnas_to_cells_mixture,127,13,139,113,R/mixture_model_functs.R,assign_grnas_to_cells_mixture,126,1,126,inherited_function_site,Same named function in same source file
+R/neg_control_functions.R,construct_negative_control_pairs,131,12,142,121,R/neg_control_functions.R,construct_negative_control_pairs_v2,143,1,143,inherited_function_site,"Retained negative-control pair construction, suffix removal and storage/count adapters"
+R/ondisc_capabilities.R,ondisc_required_api,55,6,60,55,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/ondisc_capabilities.R,ondisc_capability_issues,57,127,183,57,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/ondisc_functs.R,read_ondisc_backed_sceptre_object,63,78,140,61,R/ondisc_functs.R,read_ondisc_backed_sceptre_object,39,54,92,new_threshold_crossing,Same named function in same source file
+R/pair_constructor_functs.R,construct_cis_pairs,109,58,166,96,R/pair_constructor_functs.R,construct_cis_pairs,104,58,161,inherited_function_site,Same named function in same source file
+R/pairwise_qc_functs.R,compute_pairwise_qc_information,68,8,75,61,R/pairwise_qc_functs.R,compute_pairwise_qc_information,113,1,113,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_grna_count_distributions,166,69,234,139,R/plotting_functions.R,plot_grna_count_distributions,167,65,231,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,_anonymous_.157,52,157,208,51,R/plotting_functions.R,_anonymous_.154,52,154,205,inherited_function_site,"Same anonymous lapply(grnas_to_plot, function(curr_grna_id)) graph-construction site"
+R/plotting_functions.R,plot_assign_grnas,190,283,472,180,R/plotting_functions.R,plot_assign_grnas,189,280,468,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_run_calibration_check,111,535,645,104,R/plotting_functions.R,plot_run_calibration_check,110,531,640,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,compare_calibration_and_discovery_results,76,660,735,72,R/plotting_functions.R,compare_calibration_and_discovery_results,76,645,720,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_run_discovery_analysis,109,859,967,99,R/plotting_functions.R,plot_run_discovery_analysis,98,836,933,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_covariates,92,1026,1117,85,R/plotting_functions.R,plot_covariates,84,992,1075,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_pairwise_qc,63,1264,1326,62,R/plotting_functions.R,plot_pairwise_qc,61,1207,1267,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_run_power_check,70,1381,1450,67,R/plotting_functions.R,plot_run_power_check,64,1322,1385,inherited_function_site,Same named function in same source file
+R/plotting_functions.R,plot_response_grna_target_pair,172,1518,1689,145,R/plotting_functions.R,plot_response_grna_target_pair,167,1446,1612,inherited_function_site,Same named function in same source file
+R/preprocessing_functions.R,get_synthetic_permutation_idxs,82,123,204,79,R/preprocessing_functions.R,get_synthetic_permutation_idxs,62,166,227,inherited_function_site,Same named function in same source file
+R/result_processing.R,pair_results_from_native,60,12,71,60,R/aux_functions.R,construct_data_frame_v2,60,1,60,inherited_function_site,f4aaab4: raw result field extraction moved verbatim then alias removed
+R/result_processing.R,integrate_guides,58,85,142,58,R/s4_analysis_functs_2.R,apply_grouping_to_result,58,506,563,inherited_function_site,"f4aaab4: guide integration, metadata join and Bonferroni body extracted; adapter alias later removed"
+R/result_records.R,make_run_plan,68,113,180,68,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/result_records.R,validate_result_family,53,263,315,53,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/result_records.R,commit_result_record,83,317,399,83,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/s4_analysis_functs_1.R,set_analysis_parameters,114,67,180,101,R/s4_analysis_functs_1.R,set_analysis_parameters,119,67,185,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_1.R,assign_grnas,93,248,340,81,R/s4_analysis_functs_1.R,assign_grnas,88,253,340,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_1.R,run_qc_pt_1,90,444,533,72,R/s4_analysis_functs_1.R,run_qc_pt_1,77,431,507,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_2.R,run_calibration_check_pt_1,66,99,164,66,R/s4_analysis_functs_2.R,run_calibration_check_pt_1,74,89,162,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_2.R,run_power_check,67,253,319,67,R/s4_analysis_functs_2.R,run_power_check,62,250,311,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_2.R,run_discovery_analysis,63,361,423,63,R/s4_analysis_functs_2.R,run_discovery_analysis,62,353,414,inherited_function_site,Same named function in same source file
+R/s4_analysis_functs_2.R,write_outputs_to_directory,96,564,659,87,R/s4_analysis_functs_2.R,write_outputs_to_directory,92,696,787,inherited_function_site,Same named function in same source file
+R/s4_helpers.R,_anonymous_.2,54,2,55,51,R/s4_helpers.R,_anonymous_.2,50,2,51,new_threshold_crossing,"Same setMethod(show, sceptre_object, function(object)); previously exactly 50 lines"
+R/s4_helpers.R,_anonymous_.87,261,87,347,253,R/s4_helpers.R,_anonymous_.83,220,83,302,inherited_function_site,"Same setMethod(print, sceptre_object, function(x)); component slot and results access adapted"
+R/s4_run_plan.R,_anonymous_.97,99,97,195,99,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/schema_migration.R,migrate_sceptre_object,193,4,196,179,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/schema_migration.R,recover_legacy_requested_pairs,63,276,338,63,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/schema_migration.R,migrate_preparation_stages,85,370,454,83,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/storage.R,storage_pair_counts,89,105,193,84,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/storage.R,set_matrix_accessibility,87,334,420,76,R/preprocessing_functions.R,set_matrix_accessibility,76,1,76,inherited_function_site,0acfe2a: explicit same-name relocation into storage module
+R/workflow_state.R,stage_input_identity,51,20,70,51,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/workflow_state.R,commit_preparation_stage,62,155,216,62,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/zz_component_validity.R,_anonymous_.77,70,77,146,70,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper
+R/zz_component_validity.R,validate_perturbation_fit_entries,96,191,286,96,,,,,,new_function_site,No one-to-one pre-existing long-function site; extracted or new contract/helper

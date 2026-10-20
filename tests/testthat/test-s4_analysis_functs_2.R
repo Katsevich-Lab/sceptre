@@ -41,23 +41,23 @@ test_that("run_calibration_check", {
     scep_calib_3 <- scep_pre_calib |>
         run_calibration_check(calibration_group_size = 3)
 
-    expect_equal(nrow(scep_calib_1@calibration_result), nrow(discovery_pairs))
-    expect_equal(nrow(scep_calib_3@calibration_result), nrow(discovery_pairs))
+    expect_equal(nrow(scep_calib_1@results@records[["run_calibration_check"]]$table), nrow(discovery_pairs))
+    expect_equal(nrow(scep_calib_3@results@records[["run_calibration_check"]]$table), nrow(discovery_pairs))
 
     expect_false(any(grepl(
         pattern = "&",
-        x = scep_calib_1@calibration_result$grna_target,
+        x = scep_calib_1@results@records[["run_calibration_check"]]$table$grna_target,
         fixed = TRUE
     )))
     expect_equal(
-        strsplit(scep_calib_3@calibration_result$grna_target, "&") |>
+        strsplit(scep_calib_3@results@records[["run_calibration_check"]]$table$grna_target, "&") |>
             sapply(length),
         rep(3, nrow(discovery_pairs))
     )
 
     # with this seed all nulls are false for both objects
-    expect_false(any(scep_calib_1@calibration_result$significant))
-    expect_false(any(scep_calib_3@calibration_result$significant))
+    expect_false(any(scep_calib_1@results@records[["run_calibration_check"]]$table$significant))
+    expect_false(any(scep_calib_3@results@records[["run_calibration_check"]]$table$significant))
 })
 
 
@@ -142,20 +142,20 @@ test_that("run_calibration_check negative control pairs complement set with cell
             cells_expressing_no_grna
         )
     ]
-    expect_setequal(scep_complement_size_1@cells_in_use, remaining_cells)
+    expect_setequal(scep_complement_size_1@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_complement_size_1@negative_control_pairs
+    neg_df <- scep_complement_size_1@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # a single neg ctrl pair with this seed fails QC so there are 2 left
     expect_equal(
         nrow(neg_df),
-        sum(scep_complement_size_1@discovery_pairs_with_info$pass_qc)
+        sum(scep_complement_size_1@preparation@discovery_pairs_with_info$pass_qc)
     )
 
     expect_true(all(neg_df$pass_qc))
 
     for (i in 1:nrow(neg_df)) {
-        trt_cells <- remaining_cells[scep_complement_size_1@grna_assignments$indiv_nt_grna_idxs[[neg_df$grna_group[
+        trt_cells <- remaining_cells[scep_complement_size_1@preparation@analysis_groups$indiv_nt_grna_idxs[[neg_df$grna_group[
             i
         ]]]]
         expect_equal(
@@ -164,7 +164,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
         )
 
         # complement control group
-        cntrl_cells <- setdiff(scep_complement_size_1@cells_in_use, trt_cells)
+        cntrl_cells <- setdiff(scep_complement_size_1@preparation@analysis_cells, trt_cells)
         expect_equal(
             neg_df$n_nonzero_cntrl[i],
             sum(response_matrix[neg_df$response_id[i], cntrl_cells] > 0)
@@ -191,21 +191,21 @@ test_that("run_calibration_check negative control pairs complement set with cell
             cells_expressing_no_grna
         )
     ]
-    expect_setequal(scep_complement_size_2@cells_in_use, remaining_cells)
+    expect_setequal(scep_complement_size_2@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_complement_size_2@negative_control_pairs
+    neg_df <- scep_complement_size_2@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # with this seed we lose one pair but its due to pairwise QC on the actual discovery pairs
     expect_equal(
         nrow(neg_df),
-        sum(scep_complement_size_2@discovery_pairs_with_info$pass_qc)
+        sum(scep_complement_size_2@preparation@discovery_pairs_with_info$pass_qc)
     )
     expect_true(all(neg_df$pass_qc))
 
     for (i in 1:nrow(neg_df)) {
         # all nt cells each time
         trt_cells <- remaining_cells[
-            scep_complement_size_2@grna_assignments$indiv_nt_grna_idxs |>
+            scep_complement_size_2@preparation@analysis_groups$indiv_nt_grna_idxs |>
                 unlist()
         ]
         expect_equal(
@@ -214,7 +214,7 @@ test_that("run_calibration_check negative control pairs complement set with cell
         )
 
         # complement control group
-        cntrl_cells <- setdiff(scep_complement_size_2@cells_in_use, trt_cells)
+        cntrl_cells <- setdiff(scep_complement_size_2@preparation@analysis_cells, trt_cells)
         expect_equal(
             neg_df$n_nonzero_cntrl[i],
             sum(response_matrix[neg_df$response_id[i], cntrl_cells] > 0)
@@ -302,19 +302,19 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
             cells_expressing_no_grna
         )
     ]
-    expect_setequal(scep_nt_size_1@cells_in_use, remaining_cells)
+    expect_setequal(scep_nt_size_1@preparation@analysis_cells, remaining_cells)
 
-    neg_df <- scep_nt_size_1@negative_control_pairs
+    neg_df <- scep_nt_size_1@results@records[["run_calibration_check"]]$provenance$plan@pairs
 
     # a single neg ctrl pair with this seed fails QC so there are 2 left
     expect_equal(
         nrow(neg_df),
-        sum(scep_nt_size_1@discovery_pairs_with_info$pass_qc)
+        sum(scep_nt_size_1@preparation@discovery_pairs_with_info$pass_qc)
     )
     expect_true(all(neg_df$pass_qc))
 
     for (i in 1:nrow(neg_df)) {
-        trt_cells <- remaining_cells[scep_nt_size_1@grna_assignments$all_nt_idxs[scep_nt_size_1@grna_assignments$indiv_nt_grna_idxs[[neg_df$grna_group[
+        trt_cells <- remaining_cells[scep_nt_size_1@preparation@analysis_groups$all_nt_idxs[scep_nt_size_1@preparation@analysis_groups$indiv_nt_grna_idxs[[neg_df$grna_group[
             i
         ]]]]]
         expect_equal(
@@ -324,7 +324,7 @@ test_that("run_calibration_check negative control pairs nt set with cellwise qc"
         # nt control group
         other_nt <- setdiff(c("nt1", "nt2"), neg_df$grna_group[i])
 
-        cntrl_cells <- remaining_cells[scep_nt_size_1@grna_assignments$all_nt_idxs[scep_nt_size_1@grna_assignments$indiv_nt_grna_idxs[[
+        cntrl_cells <- remaining_cells[scep_nt_size_1@preparation@analysis_groups$all_nt_idxs[scep_nt_size_1@preparation@analysis_groups$indiv_nt_grna_idxs[[
             other_nt
         ]]]]
         expect_equal(
@@ -407,22 +407,22 @@ test_that("run_power_check", {
         ) |>
         run_power_check()
 
-    expect_equal(nrow(scep_power@power_result), nrow(positive_control_pairs))
+    expect_equal(nrow(scep_power@results@records[["run_power_check"]]$table), nrow(positive_control_pairs))
     # this test is extremely significant
     expect_true(
-        dplyr::filter(scep_power@power_result, response_id == "t1") |>
+        dplyr::filter(scep_power@results@records[["run_power_check"]]$table, response_id == "t1") |>
             dplyr::pull(p_value) <
             1e-10
     )
     # this test is not significant at all
     expect_true(
-        dplyr::filter(scep_power@power_result, response_id == "t2") |>
+        dplyr::filter(scep_power@results@records[["run_power_check"]]$table, response_id == "t2") |>
             dplyr::pull(p_value) >
             0.5
     )
     # log fold change should be NA here because the response_matrix values are constant
     expect_true(
-        dplyr::filter(scep_power@power_result, response_id == "t3") |>
+        dplyr::filter(scep_power@results@records[["run_power_check"]]$table, response_id == "t3") |>
             dplyr::pull(log_2_fold_change) |>
             is.na()
     )

@@ -1,0 +1,57 @@
+Package: BiocCheck
+Title: Bioconductor-specific package checks
+Version: 1.49.30
+Date: 2026-07-27
+Authors@R: c(
+    person("Bioconductor", "Package Maintainer", ,
+        "maintainer@bioconductor.org", "aut"),
+    person("Lori", "Shepherd", role = "aut"),
+    person("Daniel", "von Twisk", role = "ctb"),
+    person("Kevin", "Rue", role = "ctb"),
+    person("Marcel", "Ramos", , "marcel.ramos@sph.cuny.edu",
+        c("aut", "cre"), c(ORCID = "0000-0002-3242-0582")),
+    person("Leonardo", "Collado-Torres", role = "ctb"),
+    person("Federico", "Marini", role = "ctb")
+  )
+Description: BiocCheck guides maintainers through Bioconductor best
+    practicies. It runs Bioconductor-specific package checks by searching
+    through package code, examples, and vignettes. Maintainers are
+    required to address all errors, warnings, and most notes produced.
+License: Artistic-2.0
+URL: https://github.com/Bioconductor/BiocCheck
+BugReports: https://github.com/Bioconductor/BiocCheck/issues
+Depends: 
+    R (>= 4.4.0)
+Imports:
+    BiocBaseUtils,
+    BiocFileCache,
+    BiocManager,
+    biocViews,
+    callr,
+    cli,
+    codetools,
+    commonmark,
+    graph,
+    httr2,
+    knitr,
+    methods,
+    rvest,
+    stringdist,
+    tools,
+    utils,
+    xml2
+Suggests: 
+    BiocStyle,
+    curl,
+    devtools,
+    gert,
+    jsonlite,
+    rmarkdown,
+    tinytest,
+    usethis
+VignetteBuilder: 
+    knitr
+biocViews: Infrastructure
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0

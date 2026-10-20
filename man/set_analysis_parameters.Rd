@@ -52,10 +52,12 @@ mechanism to use, either \code{"permutations"} or \code{"crt"}}
 
 \item{multiple_testing_method}{(optional; default \code{"BH"}) a string specifying
 the multiple testing correction method to use; see \code{p.adjust.methods} for
-options}
+options. Supported aliases and unambiguous abbreviations follow \code{p.adjust()}.}
 
-\item{multiple_testing_alpha}{(optional; default \code{0.1}) a numeric specifying
-the nominal level of the multiple testing correction method}
+\item{multiple_testing_alpha}{(optional; default \code{0.1}) a single finite
+numeric
+value in \verb{(0, 1]} specifying the nominal level of the multiple testing
+correction method}
 }
 \value{
 an updated \code{sceptre_object} in which the analysis parameters have

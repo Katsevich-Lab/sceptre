@@ -2,11 +2,29 @@ test_that("assignment getter owns zero-based slots and preserves saved membershi
     for (assignments in list(list(single = c(2L, 5L)),
                              list(first = c(2L, 5L), second = c(1L, 4L)),
                              list(first = integer(), second = c(1L, 4L)))) {
+        counts <- matrix(0, length(assignments), 5L,
+            dimnames = list(names(assignments), NULL))
+        for (i in seq_along(assignments)) counts[i, assignments[[i]]] <- 1
+        metadata <- data.frame(grna_id = names(assignments),
+            grna_target = names(assignments))
+        cells <- c(2L, 4L, 5L)
+        raw <- list(grna_group_idxs = assignments, indiv_nt_grna_idxs = list())
+        retained <- list(grna_group_idxs = lapply(assignments, function(x) {
+            match(intersect(x, cells), cells)
+        }), indiv_nt_grna_idxs = list())
         object <- methods::new("sceptre_object",
-            grna_matrix = list(matrix(0, length(assignments), 5L)),
-            initial_grna_assignment_list = assignments,
-            functs_called = c(assign_grnas = TRUE, run_qc = TRUE),
-            cells_in_use = c(2L, 4L, 5L))
+            data = methods::new("ScreenData", identity = "assignment-getter-fixture",
+                grna_target_data_frame = metadata,
+                response_matrix = set_matrix_accessibility(matrix(1, 1L, 5L)),
+                grna_matrix = set_matrix_accessibility(counts)),
+            preparation = methods::new("PreparationRecord",
+                guide_groups = names(assignments), design_matrix = matrix(1, 5L, 1L),
+                guide_assignments = assignments,
+                source_groups = raw, analysis_groups = retained,
+                analysis_cells = cells))
+        for (stage in c("design", "assignment", "cell_qc", "pair_qc")) {
+            object <- refactor_private("commit_preparation_stage")(object, stage)
+        }
         before <- serialize(object, NULL)
         expected <- matrix(FALSE, length(assignments), 5L,
                            dimnames = list(names(assignments), NULL))
