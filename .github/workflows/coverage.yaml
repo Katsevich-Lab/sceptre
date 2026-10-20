@@ -52,7 +52,9 @@ jobs:
         run: |
           x <- jsonlite::read_json(file.path(Sys.getenv("RUNNER_TEMP"), "coverage", "summary.json"))
           text <- c("### Installed-package coverage", paste("Source:", x$commit),
-            "Download the coverage artifact and open index.html for annotated source; summary.json records scope and input hashes.",
+            paste0("[Download this run's report and badges](", Sys.getenv("GITHUB_SERVER_URL"), "/",
+              Sys.getenv("GITHUB_REPOSITORY"), "/actions/runs/", Sys.getenv("GITHUB_RUN_ID"),
+              "#artifacts), extract, and open index.html. summary.json records scope and input hashes."),
             vapply(names(x$totals), function(k) {
               z <- x$totals[[k]][[1L]]
               sprintf("- %s executable lines: %.2f%% (%s/%s)", k, z$percent, z$covered, z$executable)

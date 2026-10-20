@@ -18,8 +18,8 @@ Open `index.html` in a browser. Each file expands to annotated source: red lines
 were not reached, blue lines were reached. The artifact also contains per-line
 and per-file CSVs, `summary.json`, Cobertura XML, raw covr RDS, session information,
 and separate measured R/native SVG badges. No coverage-service account is needed.
-The workflow's job summary links the artifact conceptually; GitHub requires
-opening the run's Artifacts panel, downloading it, and opening the HTML locally.
+The workflow's job summary links the exact run's Artifacts panel; GitHub requires
+downloading the artifact and opening the HTML locally.
 No PR comment or public hosting is required, including for fork PRs.
 
 ## What the metric means
@@ -36,8 +36,8 @@ Only covr's standard generated wrappers are excluded (`R/RcppExports.R`,
 `src/RcppExports.cpp`; no handwritten exclusions are added). Source inventory
 files without executable records are explicitly listed. Declaration/documentation
 files may legitimately have no executable records; an unavailable native toolchain
-must never silently become 100% native coverage. CI requires at least one measured
-native line and fails if instrumentation yields none.
+must never silently become 100% native coverage. CI requires measured records for every handwritten C++ translation unit and fails
+if native instrumentation is incomplete.
 
 GCC/gcov is used on Linux; Apple clang uses the matching `llvm-cov gcov` interface
 on macOS. Compiler flags and tool paths are retained. This macOS baseline used

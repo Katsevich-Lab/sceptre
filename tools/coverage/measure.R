@@ -27,7 +27,9 @@ saveRDS(list(commit = system2("git", c("-C", shQuote(root), "rev-parse", "HEAD")
     file.path(out, "source-state.rds"))
 lib <- file.path(out, "library")
 coverage <- covr::package_coverage(root, type = "tests", quiet = FALSE,
-    clean = FALSE, install_path = lib)
+    clean = FALSE, install_path = lib,
+    code = paste0("stopifnot(identical(normalizePath(find.package('sceptre')), normalizePath(",
+        deparse(file.path(lib, "sceptre")), ")))"))
 saveRDS(coverage, file.path(out, "coverage.rds"))
 source(file.path(root, "tools/coverage/render.R"))
 if (!identical(input_hashes, input_files())) stop("Source/tests changed during measurement; rerun on a frozen checkout")
