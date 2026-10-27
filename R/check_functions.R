@@ -611,30 +611,40 @@ check_run_qc_inputs <- function(
 check_calibration_check_inputs <- function(
     sceptre_object,
     n_calibration_pairs,
-    n_processors
+    n_processors,
+    calibration_group_size
 ) {
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
     control_group_complement <- sceptre_object@control_group_complement
-    n_nt_grnas <- grna_target_data_frame |>
-        dplyr::filter(grna_group == "non-targeting") |>
-        nrow()
+    # count the NT gRNAs that still have cells after QC, not the NT gRNAs in
+    # the grna_target_data_frame
+    n_nt_grnas <- length(sceptre_object@grna_assignments$indiv_nt_grna_idxs)
     # 1. check number of gRNAS
     if (!control_group_complement) {
         if (n_nt_grnas < 2) {
             stop(
-                "Two or more non-targeting gRNAs must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`."
+                "Two or more non-targeting gRNAs with cells remaining after QC must be present to run the calibration check when using the NT cells as the control group. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`; QC can remove all cells of a non-targeting gRNA."
             )
         }
     } else {
         if (n_nt_grnas < 1) {
             stop(
-                "At least one non-targeting gRNA must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`."
+                "At least one non-targeting gRNA with cells remaining after QC must be present to run the calibration check. gRNAs that are non-targeting should be assigned a gRNA group label of 'non-targeting' in the `grna_target_data_frame`; QC can remove all cells of a non-targeting gRNA."
             )
         }
     }
-    # 2. check number of calibration pairs
+    # 2. check number of calibration pairs and the calibration group size
     if (n_calibration_pairs == 0L) {
         stop("Cannot run a calibration check on zero negative control pairs.")
+    }
+    if (calibration_group_size > n_nt_grnas) {
+        stop(
+            "`calibration_group_size` (",
+            calibration_group_size,
+            ") exceeds the number of non-targeting gRNAs with cells remaining ",
+            "after QC (",
+            n_nt_grnas,
+            "). Set `calibration_group_size` to a smaller value."
+        )
     }
     # 3. check n_processors
     if (
