@@ -1145,9 +1145,9 @@ plot_run_qc <- function(
     if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
         p_b <- plot_pairwise_qc(
             sceptre_object,
-            downsample_pairs = 10000L,
-            point_size = 0.55,
-            transparency = 0.8,
+            downsample_pairs = downsample_pairs,
+            point_size = point_size,
+            transparency = transparency,
             return_indiv_plots = FALSE
         )
         # combine the plots
