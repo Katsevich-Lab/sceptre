@@ -2,7 +2,7 @@
 
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now import Matrix Market files whose entries are not sorted by cell. Previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
 
--   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error when a matrix file lists the same (cell, feature) entry more than once, or an entry outside the dimensions declared in the file's header. `import_data_from_cellranger()` also stops when an entry's feature index lies outside the rows of `features.tsv`; previously such entries were dropped silently.
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error when a matrix file lists the same (cell, feature) entry more than once, or an entry outside the dimensions declared in the file's header. `import_data_from_cellranger()` also stops when an entry's feature index lies outside the rows of `features.tsv`; previously such entries were dropped silently. Both functions also stop when a coordinate is not an integer, such as `2.0`; previously such an entry could be moved silently to another cell.
 
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) now assigns counts to the correct rows when gene and gRNA features are interleaved in `features.tsv`, rather than listed in two contiguous blocks.
 

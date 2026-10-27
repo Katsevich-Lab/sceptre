@@ -55,8 +55,9 @@ subject to change. We expect the API to solidify as we learn more about the
 Parse platform and the structure of the Parse count matrix generation program
 output.
 
-A matrix file that lists the same (cell, feature) entry more than once, or
-an entry outside the dimensions declared in its header, is an error.
+A matrix file that lists the same (cell, feature) entry more than once, an
+entry outside the dimensions declared in its header, or a coordinate that is
+not an integer, is an error.
 
 The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
 }

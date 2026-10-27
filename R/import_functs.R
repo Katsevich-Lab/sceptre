@@ -223,7 +223,8 @@ import_data_use_ondisc <- function(
 #' Supplying barcode files for only some directories is an error.
 #' For standard in-memory objects, a matrix file that lists the same
 #' (feature, cell) entry more than once, or an entry outside the dimensions
-#' declared in its header or the rows of `features.tsv`, is also an error.
+#' declared in its header or the rows of `features.tsv`, or a coordinate that
+#' is not an integer, is also an error.
 #' Users can create either a standard `sceptre` object or an `ondisc`-backed
 #' `sceptre` object; the latter is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
@@ -502,6 +503,7 @@ import_data_from_cellranger_memory <- function(
             showProgress = FALSE,
             nThread = 2L
         )
+        check_integer_coordinates(dt, matrix_fp)
         # entries whose feature idx lies outside features.tsv would otherwise
         # be dropped silently when the matrix is split by feature type
         if (!all_in_range(dt$feature_idx, 1L, nrow(feature_df))) {
@@ -690,8 +692,9 @@ import_data_from_cellranger_use_ondisc <- function(
 #' Parse platform and the structure of the Parse count matrix generation program
 #' output.
 #'
-#' A matrix file that lists the same (cell, feature) entry more than once, or
-#' an entry outside the dimensions declared in its header, is an error.
+#' A matrix file that lists the same (cell, feature) entry more than once, an
+#' entry outside the dimensions declared in its header, or a coordinate that is
+#' not an integer, is an error.
 #'
 #' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
 #'
@@ -781,6 +784,7 @@ import_data_from_parse <- function(
             showProgress = FALSE,
             nThread = 2L
         )
+        check_integer_coordinates(dt, mat_fp)
         # create a sparse matrix in csc format
         out <- create_csc_matrix(
             dt = dt,
@@ -870,6 +874,20 @@ init_sceptre_object <- function(
         run_discovery_analysis = FALSE
     )
     return(sceptre_object)
+}
+
+
+check_integer_coordinates <- function(dt, matrix_fp) {
+    # fread keeps a column it reads as double (from "2.0" or "2.5", say)
+    # despite colClasses; the coordinate checks and the shift to zero-based
+    # idxs would then act on truncated copies and misplace entries
+    if (!is.integer(dt$cell_idx) || !is.integer(dt$feature_idx)) {
+        stop(
+            "The matrix file ",
+            matrix_fp,
+            " contains cell or feature coordinates that are not integers."
+        )
+    }
 }
 
 

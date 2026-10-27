@@ -359,3 +359,71 @@ test_that("Cell Ranger import rejects missing file coordinates", {
         )
     }
 })
+
+test_that("Parse import rejects coordinates that are not integers", {
+    directory <- withr::local_tempdir()
+    gene <- file.path(directory, "gene.mtx")
+    guide <- file.path(directory, "guide.mtx")
+    gene_ids <- file.path(directory, "genes.csv")
+    guide_ids <- file.path(directory, "guides.csv")
+    header <- c(
+        "%%MatrixMarket matrix coordinate real general",
+        "% fixture",
+        "2 2 2"
+    )
+    writeLines(
+        c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
+        gene_ids
+    )
+    writeLines(
+        c(
+            "feature_id,feature_name,genome",
+            "a,guide-a,human",
+            "b,guide-b,human"
+        ),
+        guide_ids
+    )
+    writeLines(c(header, "1 1 4", "2 2 6"), guide)
+    metadata <- data.frame(
+        grna_id = c("guide-a", "guide-b"),
+        grna_target = c("target-a", "non-targeting")
+    )
+    # main read "2.0" and silently moved the entry to another cell
+    for (bad in c("2.0 2 7", "1 2.5 7")) {
+        writeLines(c(header, "1 1 5", bad), gene)
+        expect_error(
+            suppressWarnings(suppressMessages(import_data_from_parse(
+                gene,
+                guide,
+                gene_ids,
+                guide_ids,
+                "low",
+                metadata
+            ))),
+            "coordinates that are not integers",
+            fixed = TRUE
+        )
+    }
+})
+
+test_that("Cell Ranger import rejects coordinates that are not integers", {
+    metadata <- data.frame(
+        grna_id = c("guide-a", "guide-b"),
+        grna_target = c("target-a", "non-targeting")
+    )
+    for (bad in c("2.5 2 1", "2 2.0 1")) {
+        directory <- write_cellranger_coordinates(
+            file.path(withr::local_tempdir(), "fractional"),
+            c("1 1 5", bad)
+        )
+        expect_error(
+            suppressWarnings(suppressMessages(import_data_from_cellranger(
+                directory,
+                "low",
+                metadata
+            ))),
+            "coordinates that are not integers",
+            fixed = TRUE
+        )
+    }
+})
