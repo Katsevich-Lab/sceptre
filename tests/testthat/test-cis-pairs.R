@@ -107,3 +107,61 @@ test_that("construct_cis_pairs() finds all nearby genes in the GRCh37 table", {
     expect_identical(actual$response_id, expected)
     expect_true(all(actual$grna_target == "enhancer"))
 })
+
+test_that("cis gene selection does not overflow for large coordinates", {
+    # The first two positions differ by more than a C++ int can hold
+    positions <- c(
+        .Machine$integer.max,
+        -.Machine$integer.max,
+        0L,
+        1L,
+        1800000010L,
+        -1800000010L,
+        80L,
+        120L
+    )
+    for (midpoint in c(
+        0L,
+        100L,
+        1800000010L,
+        -1800000010L,
+        .Machine$integer.max
+    )) {
+        for (distance in c(-1L, 0L, 20L, 1800000000L, .Machine$integer.max)) {
+            expected <- which(
+                abs(as.double(positions) - as.double(midpoint)) <=
+                    as.double(distance)
+            )
+            expect_identical(
+                compute_genes_within_distance(midpoint, positions, distance),
+                expected
+            )
+        }
+    }
+})
+
+test_that("construct_cis_pairs() computes the midpoint of large coordinates", {
+    response_ids <- c("near", "far")
+    metadata <- data.frame(
+        grna_id = c("guide-1", "guide-2"),
+        grna_target = c("target-wide", "non-targeting"),
+        chr = "chr3",
+        start = 1800000000L,
+        end = 1800000020L
+    )
+    object <- cis_pair_object(response_ids, metadata)
+    positions <- data.frame(
+        response_id = response_ids,
+        chr = "chr3",
+        position = c(1800000010L, 1L)
+    )
+    actual <- construct_cis_pairs(
+        object,
+        distance_threshold = 20L,
+        response_position_data_frame = positions
+    )
+    expect_identical(
+        actual,
+        data.frame(grna_target = "target-wide", response_id = "near")
+    )
+})
