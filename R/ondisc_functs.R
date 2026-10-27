@@ -121,6 +121,6 @@ get_id_vect <- function(v, pod_size) {
 
 write_vector <- function(vector, file_name) {
     file_con <- file(file_name)
+    on.exit(close(file_con), add = TRUE)
     writeLines(as.character(vector), file_con)
-    close(file_con)
 }
