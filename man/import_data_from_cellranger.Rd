@@ -58,6 +58,9 @@ When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, \code{b1_} and \code{b2_}) to keep
 the cell IDs unique and stable across imports.
 Supplying barcode files for only some directories is an error.
+For standard in-memory objects, a matrix file that lists the same
+(feature, cell) entry more than once, or an entry outside the dimensions
+declared in its header or the rows of \code{features.tsv}, is also an error.
 Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed
 \code{sceptre} object; the latter is more appropriate for large-scale data. See
 \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}

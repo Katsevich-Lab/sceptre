@@ -221,6 +221,9 @@ import_data_use_ondisc <- function(
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
 #' the cell IDs unique and stable across imports.
 #' Supplying barcode files for only some directories is an error.
+#' For standard in-memory objects, a matrix file that lists the same
+#' (feature, cell) entry more than once, or an entry outside the dimensions
+#' declared in its header or the rows of `features.tsv`, is also an error.
 #' Users can create either a standard `sceptre` object or an `ondisc`-backed
 #' `sceptre` object; the latter is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
@@ -692,6 +695,9 @@ import_data_from_cellranger_use_ondisc <- function(
 #' subject to change. We expect the API to solidify as we learn more about the
 #' Parse platform and the structure of the Parse count matrix generation program
 #' output.
+#'
+#' A matrix file that lists the same (cell, feature) entry more than once, or
+#' an entry outside the dimensions declared in its header, is an error.
 #'
 #' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
 #'
