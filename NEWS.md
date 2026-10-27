@@ -1,3 +1,15 @@
+# sceptre 0.99.1
+
+-   `set_analysis_parameters()` now discards saved response-model fits when the control group or the design matrix changes. Previously, in low MOI, after running the calibration check with NT-cell controls and then switching to `control_group = "complement"` with the same formula, the discovery analysis reused fits estimated on the NT cells only (and vice versa), which changed its p-values. Changing factor contrasts with the same formula also left stale fits in place. Analyses that call `set_analysis_parameters()` once are unaffected by this change.
+
+-   `construct_cis_pairs()` now finds every gene within the distance threshold when the gene positions are not sorted within a chromosome. Previously it could omit nearby genes. This affects the bundled `gene_position_data_frame_grch37`, which is not sorted, and unsorted custom position tables; `gene_position_data_frame_grch38` is sorted and gives the same pairs as before.
+
+-   `construct_cis_pairs()` no longer overflows integer arithmetic for genomic coordinates above about one billion.
+
+-   A formula with only an intercept (`formula_object = ~ 1`) now works with NT-cell controls in the calibration check and discovery analysis; previously these failed with an error.
+
+-   `construct_trans_pairs()` with `pairs_to_exclude = "pc_pairs"` no longer converts the caller's `positive_control_pairs` data frame to a `data.table`.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.
