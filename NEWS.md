@@ -1,6 +1,6 @@
 # sceptre 0.99.1
 
--   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged.
+-   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged. With `grna_integration_strategy = "bonferroni"`, if two or more of a target's gRNAs have p-values capped at 1, the combined result now takes its fold change and nonzero-cell counts from the first of these gRNAs rather than from the one with the smallest uncapped p-value; its p-value (1) and significance call are unchanged.
 
 -   In high MOI with `resampling_mechanism = "permutations"`, the calibration check no longer requests more permuted cells than exist when non-targeting gRNA groups overlap. Previously the resampling step could read and write outside its memory in this case. The high-MOI default, the CRT, was not affected.
 
