@@ -164,3 +164,92 @@ test_that("Parse import rejects repeated file coordinates", {
         fixed = TRUE
     )
 })
+
+write_cellranger_coordinates <- function(directory, entries) {
+    dir.create(directory)
+    writeLines(
+        c(
+            "gene-z\tZ\tGene Expression",
+            "guide-a\tA\tCRISPR Guide Capture",
+            "gene-a\tA\tGene Expression",
+            "guide-b\tB\tCRISPR Guide Capture",
+            "gene-m\tM\tGene Expression"
+        ),
+        file.path(directory, "features.tsv")
+    )
+    writeLines(c("cell-z", "cell-a"), file.path(directory, "barcodes.tsv"))
+    writeLines(
+        c(
+            "%%MatrixMarket matrix coordinate real general",
+            "% fixture",
+            paste(5L, 2L, length(entries)),
+            entries
+        ),
+        file.path(directory, "matrix.mtx")
+    )
+    directory
+}
+
+test_that("Cell Ranger import maps interleaved feature types to the right rows", {
+    directory <- write_cellranger_coordinates(
+        file.path(withr::local_tempdir(), "interleaved"),
+        c(
+            "5 2 3",
+            "2 1 8",
+            "1 2 0",
+            "4 2 4",
+            "3 1 2",
+            "1 1 5",
+            "2 2 1.5",
+            "4 1 6",
+            "3 2 7"
+        )
+    )
+    metadata <- data.frame(
+        grna_id = c("guide-a", "guide-b"),
+        grna_target = c("target-a", "non-targeting")
+    )
+    object <- suppressMessages(import_data_from_cellranger(
+        directory,
+        "low",
+        metadata
+    ))
+    response <- get_response_matrix(object)
+    guides <- get_grna_matrix(object)
+    expect_true(methods::validObject(response))
+    expect_true(methods::validObject(guides))
+    expect_identical(rownames(response), c("gene-z", "gene-a", "gene-m"))
+    expect_identical(rownames(guides), c("guide-a", "guide-b"))
+    expect_identical(colnames(response), c("cell-z", "cell-a"))
+    expect_identical(colnames(guides), c("cell-z", "cell-a"))
+    expect_identical(response@p, c(0L, 2L, 4L, 5L))
+    expect_identical(response@j, c(0L, 1L, 0L, 1L, 1L))
+    expect_identical(response@x, c(5, 0, 2, 7, 3))
+    expect_identical(guides@p, c(0L, 2L, 4L))
+    expect_identical(guides@j, c(0L, 1L, 0L, 1L))
+    expect_identical(guides@x, c(8, 1.5, 6, 4))
+
+    # The same coordinate in a different directory is a different cell.
+    batches <- suppressMessages(import_data_from_cellranger(
+        rep(directory, 2L),
+        "low",
+        metadata
+    ))
+    expect_identical(
+        colnames(get_response_matrix(batches)),
+        c("b1_cell-z", "b1_cell-a", "b2_cell-z", "b2_cell-a")
+    )
+    duplicate <- write_cellranger_coordinates(
+        file.path(withr::local_tempdir(), "duplicate"),
+        c("1 1 2", "2 1 1", "1 1 0")
+    )
+    expect_error(
+        suppressMessages(import_data_from_cellranger(
+            duplicate,
+            "low",
+            metadata
+        )),
+        "Repeated (cell, feature) coordinates",
+        fixed = TRUE
+    )
+})

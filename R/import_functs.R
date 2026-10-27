@@ -503,9 +503,15 @@ import_data_from_cellranger_memory <- function(
             curr_feature_idxs <- modality_idxs[[modality]]
             # subset
             dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
-            # offset the feature idxs such that they start at 1
-            increment_feature_vector_value <- -min(curr_feature_idxs)
-            increment_vector(dt_sub$feature_idx, increment_feature_vector_value)
+            # map the feature idxs to zero-based rows of this modality; the
+            # features of a modality need not be contiguous in features.tsv
+            feature_rows <- integer(nrow(feature_df))
+            feature_rows[curr_feature_idxs] <- seq_along(curr_feature_idxs) - 1L
+            data.table::set(
+                dt_sub,
+                j = "feature_idx",
+                value = feature_rows[dt_sub$feature_idx]
+            )
             increment_vector(dt_sub$cell_idx, -1L)
             # create a sparse matrix in csc format
             out <- create_csc_matrix(
