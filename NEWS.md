@@ -1,3 +1,15 @@
+# sceptre 0.99.1
+
+-   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged.
+
+-   In high MOI with `resampling_mechanism = "permutations"`, the calibration check no longer requests more permuted cells than exist when non-targeting gRNA groups overlap. Previously the resampling step could read and write outside its memory in this case. The high-MOI default, the CRT, was not affected.
+
+-   The calibration check now compares `calibration_group_size` with the number of non-targeting gRNAs that still have cells after QC, and stops with a clear error if the size is too large. Previously it counted the non-targeting gRNAs in `grna_target_data_frame`; a group size larger than the number of non-targeting gRNAs with cells could make the calibration check write outside allocated memory and then fail with a misleading error, and with NT-cell controls and one remaining non-targeting gRNA, the calibration check ran without control cells.
+
+-   `assign_grnas(method = "mixture")` now checks that both entries of `g_pert_guess_range` lie in [0, 20], as documented; previously it checked `pi_guess_range` by mistake, so a larger `g_pert_guess_range` was accepted. Values such as `c(10, 5000)` now give an error (the default, `log(c(10, 5000))`, is within range).
+
+-   With `parallel = TRUE`, an error in a parallel worker is now reported with its original message, and a worker that exits without returning results (for example, because it ran out of memory) now causes an error. Previously the original error was replaced by an unrelated one, and a worker that exited left its results missing with only a warning.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.
