@@ -134,9 +134,21 @@ set_analysis_parameters <- function(
     ) |>
         invisible()
 
-    # 3. determine whether to reset response precomputations
-    reset_response_precomps <- !((length(sceptre_object@formula_object) >= 2) &&
-        identical(sceptre_object@formula_object[[2L]], formula_object[[2L]]))
+    # 3. determine whether to reset response precomputations; these depend on
+    # the design matrix (not only the formula, as factor contrasts can change
+    # it) and on the cells used to fit them (NT cells or the complement)
+    covariate_matrix <- convert_covariate_df_to_design_matrix(
+        covariate_data_frame = sceptre_object@covariate_data_frame,
+        formula_object = formula_object
+    )
+    reset_response_precomps <- !identical(
+        sceptre_object@covariate_matrix,
+        covariate_matrix
+    ) ||
+        !identical(
+            sceptre_object@control_group_complement,
+            control_group == "complement"
+        )
 
     # 4. update uncached fields of the sceptre object
     side_code <- which(side == c("left", "both", "right")) - 2L
@@ -167,10 +179,7 @@ set_analysis_parameters <- function(
     sceptre_object@multiple_testing_alpha <- multiple_testing_alpha
     sceptre_object@multiple_testing_method <- multiple_testing_method
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
-    sceptre_object@covariate_matrix <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = sceptre_object@covariate_data_frame,
-        formula_object = formula_object
-    )
+    sceptre_object@covariate_matrix <- covariate_matrix
 
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
