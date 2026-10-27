@@ -272,7 +272,11 @@ construct_trans_pairs <- function(
     )
     data.table::setDT(out_pairs)
     if (pairs_to_exclude == "pc_pairs") {
-        data.table::setDT(positive_control_pairs)
+        # copy rather than setDT(), which would convert the caller's data
+        # frame by reference
+        positive_control_pairs <- data.table::as.data.table(
+            positive_control_pairs
+        )
         if (nrow(positive_control_pairs) >= 1) {
             out_pairs <- data.table::fsetdiff(out_pairs, positive_control_pairs)
         }
