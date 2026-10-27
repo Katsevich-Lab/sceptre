@@ -879,6 +879,12 @@ create_csc_matrix <- function(dt, n_cells, n_features) {
     if (!coordinates_sorted(dt$cell_idx, dt$feature_idx)) {
         data.table::setorderv(dt, c("cell_idx", "feature_idx"))
     }
+    if (any_repeated_coordinates(dt$cell_idx, dt$feature_idx)) {
+        stop(
+            "Repeated (cell, feature) coordinates in imported count file; ",
+            "each coordinate must be unique."
+        )
+    }
     p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
     out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
     out@i <- dt$feature_idx

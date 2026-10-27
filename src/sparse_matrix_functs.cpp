@@ -50,6 +50,19 @@ bool coordinates_sorted(IntegerVector i, IntegerVector j) {
 
 
 // [[Rcpp::export]]
+bool any_repeated_coordinates(IntegerVector i, IntegerVector j) {
+  // i and j are sorted by i, then by j, so repeated (i, j) pairs are adjacent
+  const int n = i.size();
+  const int* a = i.begin();
+  const int* b = j.begin();
+  for (int k = 1; k < n; k ++) {
+    if (a[k] == a[k - 1] && b[k] == b[k - 1]) return true;
+  }
+  return false;
+}
+
+
+// [[Rcpp::export]]
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
                                  int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);

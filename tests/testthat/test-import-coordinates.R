@@ -105,3 +105,62 @@ test_that("the sortedness check orders by cell, then by feature", {
     expect_false(coordinates_sorted(c(0L, 1L, 0L), c(0L, 0L, 1L)))
     expect_false(coordinates_sorted(c(0L, 0L), c(2L, 1L)))
 })
+
+test_that("file CSC construction rejects repeated coordinates", {
+    dt <- data.table::data.table(
+        cell_idx = c(1L, 0L, 1L),
+        feature_idx = c(0L, 1L, 0L),
+        x = c(0, 7, 3)
+    )
+    expect_error(
+        create_csc_matrix(dt, 2L, 2L),
+        "Repeated (cell, feature) coordinates",
+        fixed = TRUE
+    )
+    expect_false(any_repeated_coordinates(integer(), integer()))
+    expect_false(any_repeated_coordinates(c(0L, 0L, 1L), c(0L, 1L, 1L)))
+    expect_true(any_repeated_coordinates(c(0L, 1L, 1L), c(2L, 1L, 1L)))
+})
+
+test_that("Parse import rejects repeated file coordinates", {
+    directory <- withr::local_tempdir()
+    gene <- file.path(directory, "gene.mtx")
+    guide <- file.path(directory, "guide.mtx")
+    gene_ids <- file.path(directory, "genes.csv")
+    guide_ids <- file.path(directory, "guides.csv")
+    header <- c(
+        "%%MatrixMarket matrix coordinate real general",
+        "% fixture",
+        "2 2 4"
+    )
+    writeLines(c(header, "1 1 5", "2 2 7", "1 1 0", "1 2 2"), gene)
+    writeLines(c(header, "2 1 1.5", "1 2 6", "2 2 4", "1 1 8"), guide)
+    writeLines(
+        c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
+        gene_ids
+    )
+    writeLines(
+        c(
+            "feature_id,feature_name,genome",
+            "a,guide-a,human",
+            "b,guide-b,human"
+        ),
+        guide_ids
+    )
+    metadata <- data.frame(
+        grna_id = c("guide-a", "guide-b"),
+        grna_target = c("target-a", "non-targeting")
+    )
+    expect_error(
+        suppressMessages(import_data_from_parse(
+            gene,
+            guide,
+            gene_ids,
+            guide_ids,
+            "low",
+            metadata
+        )),
+        "Repeated (cell, feature) coordinates",
+        fixed = TRUE
+    )
+})

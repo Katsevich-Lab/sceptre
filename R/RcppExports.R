@@ -82,6 +82,10 @@ coordinates_sorted <- function(i, j) {
     .Call(`_sceptre_coordinates_sorted`, i, j)
 }
 
+any_repeated_coordinates <- function(i, j) {
+    .Call(`_sceptre_any_repeated_coordinates`, i, j)
+}
+
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
     .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
 }
