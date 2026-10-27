@@ -731,7 +731,7 @@ make_volcano_plot <- function(
     out <- ggplot2::ggplot(
         data = discovery_result |>
             dplyr::mutate(
-                reject = p_value < p_thresh,
+                reject = significant,
                 p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
                 log_2_fold_change = ifelse(
                     log_2_fold_change > x_limits[2],
@@ -760,7 +760,9 @@ make_volcano_plot <- function(
             NULL
         }) +
         ggplot2::theme(legend.position = "none") +
-        ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
+        ggplot2::scale_color_manual(
+            values = c("FALSE" = "dodgerblue", "TRUE" = "blueviolet")
+        ) +
         ggplot2::ggtitle("Discovery volcano plot")
     return(out)
 }

@@ -93,3 +93,34 @@ test_that("high gRNA count thresholds do not request negative expansion bins", {
     expect_identical(.Random.seed, seed)
     expect_identical(serialize(object, NULL), before)
 })
+
+test_that("volcano colors follow the significance calls, including ties", {
+    result <- data.frame(
+        p_value = c(.01, .02, .02, .03),
+        log_2_fold_change = c(-2, 0, .5, 2),
+        significant = c(TRUE, TRUE, FALSE, FALSE)
+    )
+    before <- serialize(result, NULL)
+    plot <- make_volcano_plot(result, p_thresh = .02)
+    expect_identical(plot$data$reject, result$significant)
+    expect_identical(plot$data$p_value, result$p_value)
+    expect_identical(plot$data$log_2_fold_change, c(-1.5, 0, .5, 1.5))
+    expect_identical(plot$layers[[2L]]$data$yintercept, .02)
+    expect_identical(serialize(result, NULL), before)
+    colors <- function(plot) ggplot2::ggplot_build(plot)$data[[1L]]$colour
+    expect_identical(
+        colors(plot),
+        c("blueviolet", "blueviolet", "dodgerblue", "dodgerblue")
+    )
+    # the colors do not depend on which calls are present
+    result$significant <- TRUE
+    expect_identical(
+        colors(make_volcano_plot(result, p_thresh = .03)),
+        rep("blueviolet", 4L)
+    )
+    result$significant <- FALSE
+    expect_identical(
+        colors(make_volcano_plot(result, p_thresh = NA)),
+        rep("dodgerblue", 4L)
+    )
+})
