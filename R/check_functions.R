@@ -521,7 +521,7 @@ check_assign_grna_inputs <- function(
         if (
             length(g_pert_guess_range) != 2 ||
                 any(g_pert_guess_range < 0) ||
-                any(pi_guess_range > 20) ||
+                any(g_pert_guess_range > 20) ||
                 g_pert_guess_range[2] <= g_pert_guess_range[1]
         ) {
             stop(
