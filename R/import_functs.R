@@ -857,6 +857,28 @@ init_sceptre_object <- function(
 
 
 create_csc_matrix <- function(dt, n_cells, n_features) {
+    # dt holds zero-based cell and feature idxs; it is created by the calling
+    # import function and is not visible to the user. Matrix Market entries
+    # need not be sorted, so sort dt in place by cell, then by feature (unless
+    # already sorted, as is typical).
+    if (nrow(dt) >= 1L) {
+        if (
+            anyNA(dt$cell_idx) ||
+                anyNA(dt$feature_idx) ||
+                min(dt$cell_idx) < 0L ||
+                max(dt$cell_idx) >= n_cells ||
+                min(dt$feature_idx) < 0L ||
+                max(dt$feature_idx) >= n_features
+        ) {
+            stop(
+                "Imported cell or feature coordinates are outside the matrix ",
+                "dimensions."
+            )
+        }
+    }
+    if (!coordinates_sorted(dt$cell_idx, dt$feature_idx)) {
+        data.table::setorderv(dt, c("cell_idx", "feature_idx"))
+    }
     p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
     out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
     out@i <- dt$feature_idx

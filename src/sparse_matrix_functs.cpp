@@ -37,6 +37,19 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 
 
 // [[Rcpp::export]]
+bool coordinates_sorted(IntegerVector i, IntegerVector j) {
+  // whether (i, j) pairs are sorted by i, then by j
+  const int n = i.size();
+  const int* a = i.begin();
+  const int* b = j.begin();
+  for (int k = 1; k < n; k ++) {
+    if (a[k] < a[k - 1] || (a[k] == a[k - 1] && b[k] < b[k - 1])) return false;
+  }
+  return true;
+}
+
+
+// [[Rcpp::export]]
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
                                  int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);
