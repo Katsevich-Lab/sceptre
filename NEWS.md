@@ -1,3 +1,15 @@
+# sceptre 0.99.1
+
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now import Matrix Market files whose entries are not sorted by cell. Previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
+
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error when a matrix file lists the same (cell, feature) entry more than once, or an entry outside the dimensions declared in the file's header. `import_data_from_cellranger()` also stops when an entry's feature index lies outside the rows of `features.tsv`; previously such entries were dropped silently.
+
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) now assigns counts to the correct rows when gene and gRNA features are interleaved in `features.tsv`, rather than listed in two contiguous blocks.
+
+-   `import_data()` no longer loses entries of a dense (base R) square response or gRNA matrix that is symmetric or nearly symmetric.
+
+-   Reading a Matrix Market file that has no dimension line no longer leaves its file connection open.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.
