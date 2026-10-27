@@ -504,12 +504,7 @@ import_data_from_cellranger_memory <- function(
         )
         # entries whose feature idx lies outside features.tsv would otherwise
         # be dropped silently when the matrix is split by feature type
-        if (
-            nrow(dt) >= 1L &&
-                (anyNA(dt$feature_idx) ||
-                    min(dt$feature_idx) < 1L ||
-                    max(dt$feature_idx) > nrow(feature_df))
-        ) {
+        if (!all_in_range(dt$feature_idx, 1L, nrow(feature_df))) {
             stop(
                 "The matrix file in directory ",
                 directories[i],
@@ -521,16 +516,15 @@ import_data_from_cellranger_memory <- function(
             curr_feature_idxs <- modality_idxs[[modality]]
             # subset
             dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
-            # map the feature idxs to zero-based rows of this modality; the
+            # map the feature idxs to one-based rows of this modality; the
             # features of a modality need not be contiguous in features.tsv
             feature_rows <- integer(nrow(feature_df))
-            feature_rows[curr_feature_idxs] <- seq_along(curr_feature_idxs) - 1L
+            feature_rows[curr_feature_idxs] <- seq_along(curr_feature_idxs)
             data.table::set(
                 dt_sub,
                 j = "feature_idx",
                 value = feature_rows[dt_sub$feature_idx]
             )
-            increment_vector(dt_sub$cell_idx, -1L)
             # create a sparse matrix in csc format
             out <- create_csc_matrix(
                 dt = dt_sub,
@@ -787,10 +781,6 @@ import_data_from_parse <- function(
             showProgress = FALSE,
             nThread = 2L
         )
-        # make the cell and feature idxs zero-based
-        increment_vector(dt$cell_idx, value = -1L)
-        increment_vector(dt$feature_idx, value = -1L)
-
         # create a sparse matrix in csc format
         out <- create_csc_matrix(
             dt = dt,
@@ -884,34 +874,34 @@ init_sceptre_object <- function(
 
 
 create_csc_matrix <- function(dt, n_cells, n_features) {
-    # dt holds zero-based cell and feature idxs; it is created by the calling
-    # import function and is not visible to the user. Matrix Market entries
-    # need not be sorted, so sort dt in place by cell, then by feature (unless
-    # already sorted, as is typical).
-    if (nrow(dt) >= 1L) {
-        if (
-            anyNA(dt$cell_idx) ||
-                anyNA(dt$feature_idx) ||
-                min(dt$cell_idx) < 0L ||
-                max(dt$cell_idx) >= n_cells ||
-                min(dt$feature_idx) < 0L ||
-                max(dt$feature_idx) >= n_features
-        ) {
+    # dt holds one-based cell and feature idxs, as in a Matrix Market file.
+    # dt is modified in place: it is sorted by cell, then by feature, and its
+    # idxs are made zero-based. Callers pass a table they created and do not
+    # use afterwards. One scan checks the coordinates and whether they are
+    # already sorted and unique, as is typical; only otherwise is dt sorted.
+    status <- scan_coordinates(
+        dt$cell_idx,
+        dt$feature_idx,
+        n_cells,
+        n_features
+    )
+    if (status < 0L) {
+        stop(
+            "Imported cell or feature coordinates are outside the matrix ",
+            "dimensions."
+        )
+    }
+    if (status == 0L) {
+        data.table::setorderv(dt, c("cell_idx", "feature_idx"))
+        if (any_repeated_coordinates(dt$cell_idx, dt$feature_idx)) {
             stop(
-                "Imported cell or feature coordinates are outside the matrix ",
-                "dimensions."
+                "Repeated (cell, feature) coordinates in imported count file; ",
+                "each coordinate must be unique."
             )
         }
     }
-    if (!coordinates_sorted(dt$cell_idx, dt$feature_idx)) {
-        data.table::setorderv(dt, c("cell_idx", "feature_idx"))
-    }
-    if (any_repeated_coordinates(dt$cell_idx, dt$feature_idx)) {
-        stop(
-            "Repeated (cell, feature) coordinates in imported count file; ",
-            "each coordinate must be unique."
-        )
-    }
+    increment_vector(dt$cell_idx, -1L)
+    increment_vector(dt$feature_idx, -1L)
     p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
     out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
     out@i <- dt$feature_idx

@@ -78,8 +78,12 @@ obtain_pointer_vector <- function(i, dim) {
     .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
-coordinates_sorted <- function(i, j) {
-    .Call(`_sceptre_coordinates_sorted`, i, j)
+scan_coordinates <- function(i, j, n_i, n_j) {
+    .Call(`_sceptre_scan_coordinates`, i, j, n_i, n_j)
+}
+
+all_in_range <- function(x, lo, hi) {
+    .Call(`_sceptre_all_in_range`, x, lo, hi)
 }
 
 any_repeated_coordinates <- function(i, j) {

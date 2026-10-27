@@ -251,15 +251,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// coordinates_sorted
-bool coordinates_sorted(IntegerVector i, IntegerVector j);
-RcppExport SEXP _sceptre_coordinates_sorted(SEXP iSEXP, SEXP jSEXP) {
+// scan_coordinates
+int scan_coordinates(IntegerVector i, IntegerVector j, int n_i, int n_j);
+RcppExport SEXP _sceptre_scan_coordinates(SEXP iSEXP, SEXP jSEXP, SEXP n_iSEXP, SEXP n_jSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type j(jSEXP);
-    rcpp_result_gen = Rcpp::wrap(coordinates_sorted(i, j));
+    Rcpp::traits::input_parameter< int >::type n_i(n_iSEXP);
+    Rcpp::traits::input_parameter< int >::type n_j(n_jSEXP);
+    rcpp_result_gen = Rcpp::wrap(scan_coordinates(i, j, n_i, n_j));
+    return rcpp_result_gen;
+END_RCPP
+}
+// all_in_range
+bool all_in_range(IntegerVector x, int lo, int hi);
+RcppExport SEXP _sceptre_all_in_range(SEXP xSEXP, SEXP loSEXP, SEXP hiSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type lo(loSEXP);
+    Rcpp::traits::input_parameter< int >::type hi(hiSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_in_range(x, lo, hi));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -349,7 +364,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
-    {"_sceptre_coordinates_sorted", (DL_FUNC) &_sceptre_coordinates_sorted, 2},
+    {"_sceptre_scan_coordinates", (DL_FUNC) &_sceptre_scan_coordinates, 4},
+    {"_sceptre_all_in_range", (DL_FUNC) &_sceptre_all_in_range, 3},
     {"_sceptre_any_repeated_coordinates", (DL_FUNC) &_sceptre_any_repeated_coordinates, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
