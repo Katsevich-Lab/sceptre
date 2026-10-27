@@ -1,0 +1,6 @@
+response_id	grna_target	p_value	n_nonzero_trt	n_nonzero_cntrl	log_2_fold_change	pass_qc	significant
+r3	A	0.998	18	66	0.72911641954235717	TRUE	FALSE
+r1	A	1	18	64	1.6967830446094576	TRUE	FALSE
+r5	B	1	13	66	0.08439523461262706	TRUE	FALSE
+r2	B	NA	0	67	NA	FALSE	NA
+r4	A	NA	0	0	NA	FALSE	NA

@@ -1,0 +1,5 @@
+response_id	grna_group	n_nonzero_trt	n_nonzero_cntrl	pass_qc
+r1	a1	18	64	TRUE
+r1	a2	19	64	TRUE
+r2	b1	0	67	FALSE
+r2	b2	0	67	FALSE
