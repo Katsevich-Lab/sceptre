@@ -26,6 +26,7 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
         response_ids <- rownames(matrix_in)
         cell_ids <- colnames(matrix_in)
         n_cells <- ncol(matrix_in)
+        input_is_dense <- methods::is(matrix_in, "matrix")
         if (methods::is(matrix_in, "dgTMatrix")) {
             i <- matrix_in@i
             j <- matrix_in@j
@@ -44,9 +45,9 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
         }
         x <- matrix_in@x
 
-        # perform the sorting operation
-        sort_in_place <- methods::is(matrix_in, "matrix") ||
-            methods::is(matrix_in, "dgTMatrix")
+        # perform the sorting operation; sort in place only the triplets created
+        # here from a dense input, never the slots of the caller's matrix
+        sort_in_place <- input_is_dense
         if (sort_in_place) {
             l <- list(i = i, j = j, x = x)
             dt <- data.table::setDT(l) # assign by reference
