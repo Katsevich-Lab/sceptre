@@ -253,3 +253,25 @@ test_that("Cell Ranger import maps interleaved feature types to the right rows",
         fixed = TRUE
     )
 })
+
+test_that("Cell Ranger import rejects feature indices outside features.tsv", {
+    metadata <- data.frame(
+        grna_id = c("guide-a", "guide-b"),
+        grna_target = c("target-a", "non-targeting")
+    )
+    for (bad in c("6 1 3", "0 1 3")) {
+        directory <- write_cellranger_coordinates(
+            file.path(withr::local_tempdir(), "outside"),
+            c("1 1 5", bad, "2 2 1")
+        )
+        expect_error(
+            suppressMessages(import_data_from_cellranger(
+                directory,
+                "low",
+                metadata
+            )),
+            "feature indices outside the rows of its features.tsv",
+            fixed = TRUE
+        )
+    }
+})

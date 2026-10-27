@@ -499,6 +499,21 @@ import_data_from_cellranger_memory <- function(
             showProgress = FALSE,
             nThread = 2L
         )
+        # entries whose feature idx lies outside features.tsv would otherwise
+        # be dropped silently when the matrix is split by feature type
+        if (
+            nrow(dt) >= 1L &&
+                (anyNA(dt$feature_idx) ||
+                    min(dt$feature_idx) < 1L ||
+                    max(dt$feature_idx) > nrow(feature_df))
+        ) {
+            stop(
+                "The matrix file in directory ",
+                directories[i],
+                " contains feature indices outside the rows of its ",
+                "features.tsv file."
+            )
+        }
         subsetted_mats <- lapply(modalities, function(modality) {
             curr_feature_idxs <- modality_idxs[[modality]]
             # subset
