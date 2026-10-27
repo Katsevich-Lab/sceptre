@@ -847,8 +847,15 @@ plot_run_discovery_analysis <- function(
             "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
         )
     }
-    # first, compute the rejection set
-    discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
+    # first, compute the rejection set; drop only the rows missing a field used
+    # in the plots (with output_amount 2 or 3, valid rows can have missing
+    # diagnostic columns)
+    discovery_result <- sceptre_object@discovery_result |>
+        dplyr::filter(
+            !is.na(p_value),
+            !is.na(log_2_fold_change),
+            !is.na(significant)
+        )
     calibration_result <- sceptre_object@calibration_result
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
