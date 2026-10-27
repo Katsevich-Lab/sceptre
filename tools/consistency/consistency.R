@@ -198,7 +198,7 @@ rscript <- function(args, env = character()) {
 
 literal <- function(x) paste(deparse(x), collapse = "")
 
-suite_files <- c("harness.R", "fixture-io.R")
+suite_files <- c("harness.R", "fixture-io.R", "export.R")
 
 # --------------------------------------------------------------------------
 
@@ -249,6 +249,7 @@ command_record <- function(opts) {
     }
     file.copy(saved, file.path(out, "saved-objects"))
 
+    consistency_write_inputs(file.path(out, "inputs"))
     cases <- consistency_cases()
     entries <- list()
     for (name in names(cases)) {
@@ -258,13 +259,15 @@ command_record <- function(opts) {
         rds <- file.path("cases", paste0(name, ".rds"))
         dir.create(file.path(out, "cases"), showWarnings = FALSE)
         saveRDS(observation, file.path(out, rds), version = 3L, compress = "xz")
+        written <- consistency_export_case(name, observation, out)
         entries[[name]] <- list(
             group = cases[[name]]$group,
             description = cases[[name]]$description,
             known_bug = consistency_known_bugs[[name]],
             error = observation$error,
             warnings = observation$warnings,
-            rds = rds
+            rds = rds,
+            tables = written
         )
         message(sprintf("%-38s %6.2fs", name, seconds))
     }

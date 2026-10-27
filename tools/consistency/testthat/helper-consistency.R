@@ -4,7 +4,7 @@ suite_dir <- normalizePath(
     winslash = "/",
     mustWork = TRUE
 )
-suite_files <- c("harness.R", "fixture-io.R")
+suite_files <- c("harness.R", "fixture-io.R", "export.R")
 for (file in suite_files) {
     source(file.path(suite_dir, file), local = TRUE)
 }

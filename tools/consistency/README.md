@@ -3,7 +3,8 @@
 These tests record what a reference commit of sceptre outputs on small inputs,
 and check that a candidate reproduces it. They are meant for changes that should
 not alter results, such as the restructuring of the R internals and the move to
-`SingleCellExperiment`.
+`SingleCellExperiment`. The fixtures are also the R reference that pysceptre is
+meant to match ([fixture format](#fixture-format)).
 
 The current fixtures record `main` at
 `21f9ea098b69c444a884a49bc254de711968e3b5` (sceptre 0.99.0), on macOS arm64
@@ -58,10 +59,13 @@ Rscript tools/consistency/consistency.R compare --reference main --ref my-branch
 |---|---|
 | `harness.R` | Inputs, cases and how each case is observed. Used both to record and to test. |
 | `fixture-io.R` | Digests of files and inputs. |
+| `export.R` | The language-neutral copy: TSV tables and Matrix Market inputs. |
 | `consistency.R` | The command: `run`, `regenerate`, `compare` and `record`. |
-| `testthat/` | Public outputs and internal state of each case (separate tests), a two-worker run, fixture integrity, and checks that the comparison detects small changes. |
+| `testthat/` | Public outputs and internal state of each case (separate tests), a two-worker run, fixture integrity, the TSV copy, and checks that the comparison detects small changes. |
 | `fixtures/manifest.json` | Provenance, comparison rules, input digests, known-bug flags, and a description of every case and table. |
 | `fixtures/cases/<case>.rds` | The full observation of each case. |
+| `fixtures/tables/<case>/<table>.tsv` | The case's tables, in a language-neutral form. |
+| `fixtures/inputs/` | Language-neutral copies of the inputs. |
 | `fixtures/saved-objects/` | A saved object written by sceptre 0.99.0. It is an input and is never regenerated. |
 
 ## Cases
@@ -155,7 +159,7 @@ To land a fix that changes one of these cases:
 3. Regenerate from the fixed commit:
    `Rscript tools/consistency/consistency.R regenerate --ref HEAD`.
 4. Check that the fixture diff touches only those cases' files
-   (`fixtures/cases/<case>.rds`) and the manifest.
+   (`fixtures/cases/<case>.rds`, `fixtures/tables/<case>/`) and the manifest.
    For #12, the public outputs of `cache_control_switch` should then equal
    those of `cache_control_switch_cleared`.
 
@@ -178,7 +182,8 @@ The other planned fixes have no case here:
 - **Everything else must be identical:** integers, logicals, strings, factors
   with their levels, names, dimensions, classes, row names, row order, error
   messages, warnings, and the R random number generator state after each case.
-  Tables are stored in full (all columns, classes and row names).
+  Tables are stored in full (all columns, classes and row names). They are
+  flattened only for the TSV copy.
 - A failure lists the differing paths, for example
   `observation$value$tables$discovery_result$columns$p_value`.
 
@@ -211,13 +216,13 @@ Rscript tools/consistency/consistency.R regenerate --ref main
 
 This installs the reference commit into a temporary library and records every
 case in a fresh R process, using the harness of the working tree. It then
-replaces `manifest.json` and `cases/` under `fixtures/`.
+replaces `manifest.json`, `cases/`, `tables/` and `inputs/` under `fixtures/`.
 `--out DIR` writes to another directory instead.
 
 Regenerate in three situations only:
 
-- **The harness changed.** The manifest records the SHA256 of `harness.R` and
-  `fixture-io.R`, and the fixture tests fail until the fixtures
+- **The harness changed.** The manifest records the SHA256 of `harness.R`,
+  `fixture-io.R` and `export.R`, and the fixture tests fail until the fixtures
   are regenerated. Regenerate from the reference commit. If the change only
   reorganizes the harness, the diff should touch only the manifest.
 - **A change is meant to alter results**, such as a bug fix
@@ -230,3 +235,73 @@ recording platform: with the same R version, platform and packages,
 regenerating twice from one commit gives byte-identical files except for
 `generated_at` in the manifest. A different R version or platform changes the
 serialized `.rds` bytes, and can change the last digits of doubles.
+
+## Fixture format
+
+This section describes what a test in another language, such as pysceptre's,
+needs to read the fixtures.
+
+**Manifest.** `fixtures/manifest.json` contains:
+
+- `reference`: the commit and package version that produced the fixtures.
+- `environment`: the R version, platform, random number generator and package
+  versions.
+- `comparison`: the rules and tiers above.
+- `seeds`, `inputs` (digests) and `known_bug_cases`.
+- `cases`: one entry per case, with its `group`, `description`, `known_bug`
+  (or null), `error` (the error message, or null), `warnings`, and `tables`.
+  Each table entry gives its `file`, its `columns` with their types, `n_rows`,
+  and any `omitted_columns`.
+- `files`: the SHA256 of every fixture file.
+
+**Tables.** Files are UTF-8, tab-separated, with one header row and LF line
+endings.
+
+- Each column has one of four types, given in the manifest: `integer`,
+  `double`, `logical` (`TRUE`/`FALSE`) or `character`. Factors are written as
+  their labels.
+- Missing values are `NA`.
+- Doubles are written with 17 significant digits (`%.17g`), so a correctly
+  rounded parser, such as Python's `float`, recovers each value exactly.
+  `Inf`, `-Inf` and `NaN` are written as such.
+- Row names that are not automatic become a first column, `row_name`.
+- Table names follow the observation path, joined with `__`, for example
+  `warm__discovery_result.tsv`. Tables from internal state start with
+  `internal__`, for example `internal__discovery_pairs_with_info.tsv`.
+
+**Indices.** Cell and feature indices are 1-based, in the order of the input
+matrices.
+
+- `grna_assignments` lists one row per (`grna_id`, `cell`) assignment.
+- `cell_covariates` has one row per cell, in input order.
+- Imported matrices are `row`, `col`, `value` triplets of the nonzero entries,
+  ordered by column, then row.
+
+**Result tables.** `calibration_result`, `power_result` and `discovery_result`
+are the tables returned by `get_result()`. `internal__discovery_pairs_with_info`
+and `internal__positive_control_pairs_with_info` are the requested pairs with
+their pairwise QC. With `output_amount = 3`, the resampled null statistics
+(`z_null_*` columns) are kept in the `.rds` only. The manifest records how many
+columns were omitted.
+
+**What exists only in the `.rds`.**
+
+- Non-tabular internal state: cached response fits, resampling budgets, the
+  QC'd index lists.
+- Printed summaries.
+- The count matrices of the file imports. Read the original files under
+  `inst/extdata/` instead.
+- Trans pairs without exclusions or with targets excluded, which are full cross
+  products.
+- The per-cell tables of nested observations.
+
+**Inputs.** `fixtures/inputs/synthetic/` holds the synthetic data as dense
+TSV matrices (first column: the row identifier), its covariates, pairs and
+removed cells. `workflow_settings.json` gives the seven workflow settings and
+the arguments common to all of them. `fixtures/inputs/example/` holds the
+package example data as gzipped Matrix Market files, with row and column
+identifiers in separate TSV files.
+
+**Random numbers.** Calibration pair selection and the resampling draws depend
+on R's Mersenne-Twister generator, seeded with `seeds$cases` before each case.
+Matching those outputs exactly requires reproducing R's random number streams.
