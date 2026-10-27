@@ -115,7 +115,7 @@ plot_grna_count_distributions <- function(
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
         bin_upper_bounds <- 0:max_single_bin
         bin_labels <- as.character(bin_upper_bounds)
-        if (max_expression_count > 10) {
+        if (max_expression_count > max_single_bin) {
             # now we need to add exp growing bins, w/ more complex labels
             # this next section relies on the fact that the upper bounds are
             # going to be at locations

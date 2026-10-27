@@ -59,3 +59,37 @@ test_that("plot_run_qc() forwards its pairwise plot options", {
     )@discovery_pairs_with_info
     expect_identical(serialize(object, NULL), before)
 })
+
+test_that("high gRNA count thresholds do not request negative expansion bins", {
+    object <- plot_fix_object()
+    before <- serialize(object, NULL)
+    set.seed(184L)
+    seed <- .Random.seed
+    for (threshold in c(16, 40)) {
+        panels <- plot_grna_count_distributions(
+            object,
+            grnas_to_plot = "g",
+            threshold = threshold,
+            return_indiv_plots = TRUE
+        )
+        expect_length(panels, 1L)
+        expect_identical(
+            as.character(panels[[1L]]$data$grna_expressions_bin),
+            c("0", "1", "11", "15")
+        )
+        expect_identical(panels[[1L]]$data$bin_counts, rep(1L, 4L))
+    }
+    # the exponential bins of the default are unchanged
+    default <- plot_grna_count_distributions(
+        object,
+        grnas_to_plot = "g",
+        return_indiv_plots = TRUE
+    )
+    expect_identical(
+        as.character(default[[1L]]$data$grna_expressions_bin),
+        c("0", "1", "10", "11")
+    )
+    expect_identical(default[[1L]]$data$bin_counts, rep(1L, 4L))
+    expect_identical(.Random.seed, seed)
+    expect_identical(serialize(object, NULL), before)
+})
