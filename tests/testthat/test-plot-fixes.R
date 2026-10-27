@@ -124,3 +124,42 @@ test_that("volcano colors follow the significance calls, including ties", {
         rep("dodgerblue", 4L)
     )
 })
+
+test_that("QQ bands keep one group separately in every panel", {
+    values <- c(.05, .2, .4, .6, .9)
+    data <- data.frame(
+        panel = rep(c("A", "B"), each = 10L),
+        group = rep(c("g1", "g2", "g3", "g4"), each = 5L),
+        p = rep(values, 4L)
+    )
+    set.seed(114L)
+    seed <- .Random.seed
+    for (panels in list(data, data[data$panel == "A", ])) {
+        plot <- ggplot2::ggplot(panels, ggplot2::aes(y = p, group = group)) +
+            stat_qq_band() +
+            ggplot2::facet_wrap(~panel)
+        built <- ggplot2::ggplot_build(plot)
+        band <- built$data[[1L]]
+        expect_setequal(
+            as.character(unique(band$PANEL)),
+            as.character(built$layout$layout$PANEL)
+        )
+        # uniform order-statistic bands, computed independently
+        for (panel in unique(band$PANEL)) {
+            actual <- band[band$PANEL == panel, ]
+            actual <- actual[order(actual$x), ]
+            expect_equal(actual$x, stats::ppoints(5L), tolerance = 1e-12)
+            expect_equal(
+                actual$ymin,
+                stats::qbeta(.025, 1:5, 5:1),
+                tolerance = 1e-12
+            )
+            expect_equal(
+                actual$ymax,
+                stats::qbeta(.975, 1:5, 5:1),
+                tolerance = 1e-12
+            )
+        }
+    }
+    expect_identical(.Random.seed, seed)
+})
