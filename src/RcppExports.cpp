@@ -146,16 +146,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// increment_matrix
-void increment_matrix(IntegerMatrix m);
-RcppExport SEXP _sceptre_increment_matrix(SEXP mSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type m(mSEXP);
-    increment_matrix(m);
-    return R_NilValue;
-END_RCPP
-}
 // sample_undercover_pairs_v2
 List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh);
 RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP) {
@@ -187,19 +177,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type nt_grna_group_idxs(nt_grna_group_idxsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type cells_in_use(cells_in_useSEXP);
     rcpp_result_gen = Rcpp::wrap(compute_n_trt_cells_matrix(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use));
-    return rcpp_result_gen;
-END_RCPP
-}
-// compute_genes_within_distance
-std::vector<int> compute_genes_within_distance(int midpoint, IntegerVector gene_tss_posits, int distance_threshold);
-RcppExport SEXP _sceptre_compute_genes_within_distance(SEXP midpointSEXP, SEXP gene_tss_positsSEXP, SEXP distance_thresholdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type midpoint(midpointSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type gene_tss_posits(gene_tss_positsSEXP);
-    Rcpp::traits::input_parameter< int >::type distance_threshold(distance_thresholdSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_genes_within_distance(midpoint, gene_tss_posits, distance_threshold));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -269,18 +246,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_n_grnas_per_cell_vector
-IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells);
-RcppExport SEXP _sceptre_compute_n_grnas_per_cell_vector(SEXP grna_assignmentsSEXP, SEXP n_cellsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type grna_assignments(grna_assignmentsSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_n_grnas_per_cell_vector(grna_assignments, n_cells));
-    return rcpp_result_gen;
-END_RCPP
-}
 // threshold_count_matrix
 IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, double threshold);
 RcppExport SEXP _sceptre_threshold_count_matrix(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP thresholdSEXP) {
@@ -307,15 +272,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_run_reduced_em_algo_cpp", (DL_FUNC) &_sceptre_run_reduced_em_algo_cpp, 5},
     {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
-    {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
     {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 7},
     {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
-    {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
-    {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
     {NULL, NULL, 0}
 };

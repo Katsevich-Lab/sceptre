@@ -244,8 +244,8 @@ run_perm_test_in_memory <- function(
         data.table::rbindlist(fill = TRUE)
     precomp_out_list <- lapply(res, function(chunk) {
         chunk[["precomp_out_list"]]
-    }) |>
-        purrr::flatten()
+    })
+    precomp_out_list <- do.call(c, unname(precomp_out_list))
     response_precomputations <- c(response_precomputations, precomp_out_list)
 
     return(list(
@@ -400,7 +400,7 @@ run_crt_in_memory_v2 <- function(
             )
             check_worker_results(res)
         }
-        precomp_out_list <- purrr::flatten(res)
+        precomp_out_list <- do.call(c, unname(res))
         response_precomputations <- c(
             response_precomputations,
             precomp_out_list

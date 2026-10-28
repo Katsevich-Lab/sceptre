@@ -167,9 +167,9 @@ process_initial_assignment_list <- function(sceptre_object) {
     # 1. if not using maximum assignment, compute n grnas per cell and cells
     # with multiple grnas
     if (!maximum_assignment) {
-        sceptre_object@grnas_per_cell <- compute_n_grnas_per_cell_vector(
-            initial_assignment_list,
-            n_cells
+        sceptre_object@grnas_per_cell <- tabulate(
+            as.integer(unlist(initial_assignment_list)),
+            nbins = n_cells
         )
         if (low_moi) {
             cells_w_multiple_grnas <- which(sceptre_object@grnas_per_cell >= 2L)

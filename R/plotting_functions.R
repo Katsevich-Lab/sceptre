@@ -1535,7 +1535,7 @@ plot_response_grna_target_pair <- function(
             NULL
         }
     ) |>
-        purrr::compact()
+        Filter(f = length)
     for (curr_df in df_list) {
         if (singleton_integration_strategy) {
             subset_result <- curr_df |>

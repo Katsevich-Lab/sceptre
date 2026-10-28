@@ -83,19 +83,6 @@ IntegerMatrix iterate_over_combinations(int n_nt_grnas, int undercover_group_siz
 
 
 // [[Rcpp::export]]
-void increment_matrix(IntegerMatrix m) {
-  int n_row = m.nrow();
-  int n_col = m.ncol();
-  for (int i = 0; i < n_row; i ++) {
-    for (int j = 0; j < n_col; j ++) {
-      m(i, j) ++;
-    }
-  }
-  return;
-}
-
-
-// [[Rcpp::export]]
 List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
                                 int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
   // 0.1 define a few variables

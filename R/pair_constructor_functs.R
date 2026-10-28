@@ -140,10 +140,9 @@ construct_cis_pairs <- function(
             midpoint <- as.integer(floor(
                 (as.double(min_posit) + as.double(max_posit)) / 2
             ))
-            paired_responses <- response_ids[compute_genes_within_distance(
-                midpoint,
-                response_posits,
-                distance_threshold
+            # subtract as doubles; the difference of two integers can overflow
+            paired_responses <- response_ids[which(
+                abs(as.double(response_posits) - midpoint) <= distance_threshold
             )]
             if (length(paired_responses) >= 1L) {
                 data.table::data.table(
