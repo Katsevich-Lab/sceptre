@@ -281,7 +281,7 @@ test_that("Cell Ranger barcode counts must match matrix cell counts", {
     )
 })
 
-test_that("Cell Ranger import checks gRNA rows before forming vectors", {
+test_that("Cell Ranger import gives each vector one row spanning its gRNAs", {
     inputs <- get_cellranger_test_inputs()
     targets <- inputs$grna_target_data_frame
     # one vector per target, holding its gRNAs, whose positions differ
@@ -308,11 +308,63 @@ test_that("Cell Ranger import checks gRNA rows before forming vectors", {
                 }
             ))
         }
-        expect_no_error(import(targets))
+        object <- import(targets)
+        vectors <- object@grna_target_data_frame
+        expect_identical(vectors$grna_id, unique(targets$vector_id))
+        expect_identical(
+            vectors$start,
+            as.vector(tapply(targets$start, targets$vector_id, min)[
+                vectors$grna_id
+            ])
+        )
+        expect_identical(
+            vectors$end,
+            as.vector(tapply(targets$end, targets$vector_id, max)[
+                vectors$grna_id
+            ])
+        )
+        # with one row per vector, singleton integration tests each pair once
+        object <- set_analysis_parameters(
+            object,
+            discovery_pairs = data.frame(
+                grna_target = vectors$grna_target[1:2],
+                response_id = rownames(get_response_matrix(object))[1:2]
+            ),
+            grna_integration_strategy = "singleton",
+            resampling_mechanism = "permutations"
+        )
+        expect_identical(anyDuplicated(object@discovery_pairs_with_info), 0L)
         expect_error(
             import(repeated),
             paste("These appear more than once:", targets$grna_id[1L]),
             fixed = TRUE
         )
     }
+})
+
+test_that("a vector's gRNAs must agree in every column but start and end", {
+    targets <- data.frame(
+        grna_id = c("g1", "g2", "g3"),
+        grna_target = c("A", "A", "B"),
+        chr = c("chr1", "chr2", "chr1"),
+        start = c(10, 50, 90),
+        end = c(30, 70, 110),
+        vector_id = c("v1", "v1", "v2")
+    )
+    expect_error(
+        collapse_grna_target_data_frame(targets),
+        "The gRNAs of vector `v1` must agree in `chr`",
+        fixed = TRUE
+    )
+    targets$chr <- "chr1"
+    expect_identical(
+        collapse_grna_target_data_frame(targets),
+        data.frame(
+            grna_target = c("A", "B"),
+            chr = "chr1",
+            start = c(10, 90),
+            end = c(70, 110),
+            grna_id = c("v1", "v2")
+        )
+    )
 })

@@ -959,10 +959,41 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
         stop("`vector_id` must be nested within `grna_target`.")
     }
 
-    grna_target_data_frame |>
+    # one row per vector, in order of appearance. A vector targets the span of
+    # its gRNAs, so its position runs from their smallest start to their
+    # largest end; every other column must agree across its gRNAs.
+    vectors <- grna_target_data_frame |>
         dplyr::select(-grna_id) |>
-        dplyr::rename(grna_id = vector_id) |>
-        dplyr::distinct()
+        dplyr::rename(grna_id = vector_id)
+    vector_ids <- unique(vectors$grna_id)
+    rows <- lapply(
+        split(vectors, factor(vectors$grna_id, levels = vector_ids)),
+        function(v) {
+            if ("start" %in% names(v)) {
+                v$start <- min(v$start)
+            }
+            if ("end" %in% names(v)) {
+                v$end <- max(v$end)
+            }
+            v <- dplyr::distinct(v)
+            if (nrow(v) > 1L) {
+                differ <- names(v)[vapply(
+                    v,
+                    function(x) length(unique(x)) > 1L,
+                    logical(1)
+                )]
+                stop(
+                    "The gRNAs of vector `",
+                    v$grna_id[1L],
+                    "` must agree in ",
+                    paste0("`", differ, "`", collapse = ", "),
+                    "; only `start` and `end` may differ."
+                )
+            }
+            v
+        }
+    )
+    dplyr::bind_rows(rows)
 }
 
 
