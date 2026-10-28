@@ -1,3 +1,19 @@
+# Each gRNA has one row of the grna target data frame, giving its one target
+# (and vector). Called on the data frame as the user supplied it, before
+# anything sums gRNAs into vectors.
+check_grna_ids_unique <- function(grna_target_data_frame) {
+    repeated_grna_ids <- unique(grna_target_data_frame$grna_id[duplicated(
+        grna_target_data_frame$grna_id
+    )])
+    if (length(repeated_grna_ids) >= 1L) {
+        stop(
+            "Each `grna_id` must appear in only one row of the `grna_target_data_frame`. These appear more than once: ",
+            paste0(repeated_grna_ids, collapse = ", ")
+        )
+    }
+}
+
+
 check_import_data_inputs <- function(
     response_matrix,
     grna_matrix,
@@ -47,16 +63,6 @@ check_import_data_inputs <- function(
         stop(
             "The column `grna_id` of the `grna_target_data_frame` must be a subset of the row names of the grna expression matrix. The row names of the grna expression matrix are as follows: ",
             paste0(rownames(grna_matrix), collapse = ", ")
-        )
-    }
-    # each gRNA has one row, giving its one target (and vector)
-    repeated_grna_ids <- unique(grna_target_data_frame$grna_id[duplicated(
-        grna_target_data_frame$grna_id
-    )])
-    if (length(repeated_grna_ids) >= 1L) {
-        stop(
-            "Each `grna_id` must appear in only one row of the `grna_target_data_frame`. These appear more than once: ",
-            paste0(repeated_grna_ids, collapse = ", ")
         )
     }
 

@@ -280,3 +280,39 @@ test_that("Cell Ranger barcode counts must match matrix cell counts", {
         fixed = TRUE
     )
 })
+
+test_that("Cell Ranger import checks gRNA rows before forming vectors", {
+    inputs <- get_cellranger_test_inputs()
+    targets <- inputs$grna_target_data_frame
+    # one vector per target, holding its gRNAs, whose positions differ
+    targets$vector_id <- ifelse(
+        targets$grna_target == "non-targeting",
+        targets$grna_id,
+        paste0(targets$grna_target, "_v1")
+    )
+    repeated <- rbind(targets, targets[1L, ])
+    modes <- if (requireNamespace("ondisc", quietly = TRUE)) {
+        c(FALSE, TRUE)
+    } else {
+        FALSE
+    }
+    for (use_ondisc in modes) {
+        import <- function(grna_target_data_frame) {
+            suppressMessages(import_data_from_cellranger(
+                directories = inputs$directories,
+                moi = "high",
+                grna_target_data_frame = grna_target_data_frame,
+                use_ondisc = use_ondisc,
+                directory_to_write = if (use_ondisc) {
+                    withr::local_tempdir(.local_envir = parent.frame(2L))
+                }
+            ))
+        }
+        expect_no_error(import(targets))
+        expect_error(
+            import(repeated),
+            paste("These appear more than once:", targets$grna_id[1L]),
+            fixed = TRUE
+        )
+    }
+})

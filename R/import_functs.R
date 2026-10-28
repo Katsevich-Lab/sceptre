@@ -112,6 +112,7 @@ import_data_memory <- function(
     response_names
 ) {
     #  perform initial check
+    check_grna_ids_unique(grna_target_data_frame)
     check_import_data_inputs(
         response_matrix,
         grna_matrix,
@@ -160,6 +161,7 @@ import_data_use_ondisc <- function(
     directory_to_write
 ) {
     #  perform initial check
+    check_grna_ids_unique(grna_target_data_frame)
     check_import_data_inputs(
         response_matrix,
         grna_matrix,
@@ -592,6 +594,7 @@ import_data_from_cellranger_use_ondisc <- function(
     directory_to_write <- prepare_directory_to_write(directory_to_write)
 
     # 1. call the corresponding ondisc function
+    check_grna_ids_unique(grna_target_data_frame)
     vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
     out <- ondisc::create_odm_from_cellranger(
         directories_to_load = directories,
