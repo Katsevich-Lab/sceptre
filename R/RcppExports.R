@@ -70,24 +70,16 @@ compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_ce
     .Call(`_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3`, j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use)
 }
 
+read_mtx <- function(path, transpose) {
+    .Call(`_sceptre_read_mtx`, path, transpose)
+}
+
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
     .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }
 
 obtain_pointer_vector <- function(i, dim) {
     .Call(`_sceptre_obtain_pointer_vector`, i, dim)
-}
-
-scan_coordinates <- function(i, j, n_i, n_j) {
-    .Call(`_sceptre_scan_coordinates`, i, j, n_i, n_j)
-}
-
-all_in_range <- function(x, lo, hi) {
-    .Call(`_sceptre_all_in_range`, x, lo, hi)
-}
-
-any_repeated_coordinates <- function(i, j) {
-    .Call(`_sceptre_any_repeated_coordinates`, i, j)
 }
 
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {

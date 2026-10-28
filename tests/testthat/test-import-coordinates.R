@@ -1,60 +1,86 @@
-test_that("file CSC construction sorts entries without dropping zeros", {
-    dt <- data.table::data.table(
-        cell_idx = c(2L, 1L, 2L, 1L),
-        feature_idx = c(2L, 2L, 1L, 1L),
-        x = c(11, 1, 10, 0)
-    )
-    out <- create_csc_matrix(dt, 3L, 2L)
-    expect_s4_class(out, "dgCMatrix")
-    expect_true(methods::validObject(out))
-    expect_identical(out@Dim, c(2L, 3L))
-    expect_identical(out@p, c(0L, 2L, 4L, 4L))
-    expect_identical(out@i, c(0L, 1L, 0L, 1L))
-    expect_identical(out@x, c(0, 1, 10, 11))
+# eminem checks the Matrix Market format itself; these tests cover how sceptre
+# builds its matrices from the parsed entries.
 
-    # Previously this ordering left only one of the three entries visible,
-    # although the matrix passed Matrix's validity check.
-    missing <- data.table::data.table(
-        cell_idx = c(2L, 1L, 2L),
-        feature_idx = c(1L, 2L, 3L),
-        x = c(2, 3, 4)
+write_cellranger_coordinates <- function(directory, entries, n_rows = 5L) {
+    dir.create(directory)
+    writeLines(
+        c(
+            "gene-z\tZ\tGene Expression",
+            "guide-a\tA\tCRISPR Guide Capture",
+            "gene-a\tA\tGene Expression",
+            "guide-b\tB\tCRISPR Guide Capture",
+            "gene-m\tM\tGene Expression"
+        ),
+        file.path(directory, "features.tsv")
     )
-    out <- create_csc_matrix(missing, 2L, 3L)
-    expect_identical(out@p, c(0L, 1L, 3L))
-    expect_identical(out@i, c(1L, 0L, 2L))
-    expect_identical(out@x, c(3, 2, 4))
-    expect_identical(as.matrix(out), matrix(c(0, 3, 0, 2, 0, 4), 3L, 2L))
+    writeLines(c("cell-z", "cell-a"), file.path(directory, "barcodes.tsv"))
+    # Cell Ranger writes gzipped matrices
+    connection <- gzfile(file.path(directory, "matrix.mtx.gz"), "w")
+    writeLines(
+        c(
+            "%%MatrixMarket matrix coordinate real general",
+            "% fixture",
+            paste(n_rows, 2L, length(entries)),
+            entries
+        ),
+        connection
+    )
+    close(connection)
+    directory
+}
+
+cellranger_metadata <- data.frame(
+    grna_id = c("guide-a", "guide-b"),
+    grna_target = c("target-a", "non-targeting")
+)
+
+test_that("Cell Ranger import sorts entries and maps interleaved feature types", {
+    directory <- write_cellranger_coordinates(
+        file.path(withr::local_tempdir(), "interleaved"),
+        c(
+            "5 2 3",
+            "2 1 8",
+            "1 2 0",
+            "4 2 4",
+            "3 1 2",
+            "1 1 5",
+            "2 2 1.5",
+            "4 1 6",
+            "3 2 7"
+        )
+    )
+    object <- suppressMessages(import_data_from_cellranger(
+        directory,
+        "low",
+        cellranger_metadata
+    ))
+    response <- get_response_matrix(object)
+    guides <- get_grna_matrix(object)
+    expect_true(methods::validObject(response))
+    expect_true(methods::validObject(guides))
+    expect_identical(rownames(response), c("gene-z", "gene-a", "gene-m"))
+    expect_identical(rownames(guides), c("guide-a", "guide-b"))
+    expect_identical(colnames(response), c("cell-z", "cell-a"))
+    expect_identical(response@p, c(0L, 2L, 4L, 5L))
+    expect_identical(response@j, c(0L, 1L, 0L, 1L, 1L))
+    expect_identical(response@x, c(5, 0, 2, 7, 3))
+    expect_identical(guides@p, c(0L, 2L, 4L))
+    expect_identical(guides@j, c(0L, 1L, 0L, 1L))
+    expect_identical(guides@x, c(8, 1.5, 6, 4))
+
+    # The same coordinate in a different directory is a different cell.
+    batches <- suppressMessages(import_data_from_cellranger(
+        rep(directory, 2L),
+        "low",
+        cellranger_metadata
+    ))
+    expect_identical(
+        colnames(get_response_matrix(batches)),
+        c("b1_cell-z", "b1_cell-a", "b2_cell-z", "b2_cell-a")
+    )
 })
 
-test_that("file CSC construction checks coordinates and keeps empty files", {
-    for (field in c("cell_idx", "feature_idx")) {
-        for (bad in c(0L, 3L, NA_integer_)) {
-            invalid <- data.table::data.table(
-                cell_idx = 1L,
-                feature_idx = 1L,
-                x = 1
-            )
-            invalid[[field]] <- bad
-            expect_error(
-                create_csc_matrix(invalid, 2L, 2L),
-                "outside the matrix dimensions",
-                fixed = TRUE
-            )
-        }
-    }
-    empty <- data.table::data.table(
-        cell_idx = integer(),
-        feature_idx = integer(),
-        x = numeric()
-    )
-    out <- create_csc_matrix(empty, 3L, 2L)
-    expect_identical(out@p, rep(0L, 4L))
-    expect_identical(out@i, integer())
-    expect_identical(out@x, numeric())
-    expect_identical(out@Dim, c(2L, 3L))
-})
-
-test_that("Parse import sorts unsorted file coordinates", {
+test_that("Parse import sorts entries and reads cells from rows", {
     directory <- withr::local_tempdir()
     gene <- file.path(directory, "gene.mtx")
     guide <- file.path(directory, "guide.mtx")
@@ -79,17 +105,13 @@ test_that("Parse import sorts unsorted file coordinates", {
         ),
         guide_ids
     )
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
     object <- suppressMessages(import_data_from_parse(
         gene,
         guide,
         gene_ids,
         guide_ids,
         "low",
-        metadata
+        cellranger_metadata
     ))
     response <- get_response_matrix(object)
     expect_identical(response@p, c(0L, 2L, 4L))
@@ -99,331 +121,29 @@ test_that("Parse import sorts unsorted file coordinates", {
     expect_identical(get_grna_matrix(object)@x, c(8, 1.5, 6, 4))
 })
 
-test_that("the coordinate scan checks ranges and strict ordering", {
-    expect_identical(scan_coordinates(integer(), integer(), 2L, 2L), 1L)
-    expect_identical(scan_coordinates(c(1L, 1L, 2L), c(1L, 3L, 2L), 2L, 3L), 1L)
-    expect_identical(scan_coordinates(c(1L, 2L, 1L), c(1L, 1L, 2L), 2L, 2L), 0L)
-    expect_identical(scan_coordinates(c(1L, 1L), c(2L, 1L), 1L, 2L), 0L)
-    # a repeated pair is not strictly increasing
-    expect_identical(scan_coordinates(c(1L, 1L), c(1L, 1L), 1L, 1L), 0L)
-    expect_identical(scan_coordinates(c(1L, NA), c(1L, 1L), 2L, 2L), -1L)
-    expect_identical(scan_coordinates(c(2L, 1L), c(1L, 3L), 2L, 2L), -1L)
-    expect_identical(scan_coordinates(0L, 1L, 2L, 2L), -1L)
-    expect_true(all_in_range(integer(), 1L, 2L))
-    expect_true(all_in_range(c(2L, 1L), 1L, 2L))
-    expect_false(all_in_range(c(1L, NA), 1L, 2L))
-    expect_false(all_in_range(0L, 1L, 2L))
-    expect_false(all_in_range(3L, 1L, 2L))
-})
-
-test_that("file CSC construction rejects repeated coordinates", {
-    dt <- data.table::data.table(
-        cell_idx = c(2L, 1L, 2L),
-        feature_idx = c(1L, 2L, 1L),
-        x = c(0, 7, 3)
-    )
-    expect_error(
-        create_csc_matrix(dt, 2L, 2L),
-        "Repeated (cell, feature) coordinates",
-        fixed = TRUE
-    )
-    expect_false(any_repeated_coordinates(integer(), integer()))
-    expect_false(any_repeated_coordinates(c(0L, 0L, 1L), c(0L, 1L, 1L)))
-    expect_true(any_repeated_coordinates(c(0L, 1L, 1L), c(2L, 1L, 1L)))
-})
-
-test_that("Parse import rejects repeated file coordinates", {
-    directory <- withr::local_tempdir()
-    gene <- file.path(directory, "gene.mtx")
-    guide <- file.path(directory, "guide.mtx")
-    gene_ids <- file.path(directory, "genes.csv")
-    guide_ids <- file.path(directory, "guides.csv")
-    header <- c(
-        "%%MatrixMarket matrix coordinate real general",
-        "% fixture",
-        "2 2 4"
-    )
-    writeLines(c(header, "1 1 5", "2 2 7", "1 1 0", "1 2 2"), gene)
-    writeLines(c(header, "2 1 1.5", "1 2 6", "2 2 4", "1 1 8"), guide)
-    writeLines(
-        c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
-        gene_ids
-    )
-    writeLines(
-        c(
-            "feature_id,feature_name,genome",
-            "a,guide-a,human",
-            "b,guide-b,human"
-        ),
-        guide_ids
-    )
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    expect_error(
-        suppressMessages(import_data_from_parse(
-            gene,
-            guide,
-            gene_ids,
-            guide_ids,
-            "low",
-            metadata
-        )),
-        "Repeated (cell, feature) coordinates",
-        fixed = TRUE
-    )
-})
-
-write_cellranger_coordinates <- function(directory, entries) {
-    dir.create(directory)
-    writeLines(
-        c(
-            "gene-z\tZ\tGene Expression",
-            "guide-a\tA\tCRISPR Guide Capture",
-            "gene-a\tA\tGene Expression",
-            "guide-b\tB\tCRISPR Guide Capture",
-            "gene-m\tM\tGene Expression"
-        ),
-        file.path(directory, "features.tsv")
-    )
-    writeLines(c("cell-z", "cell-a"), file.path(directory, "barcodes.tsv"))
-    writeLines(
-        c(
-            "%%MatrixMarket matrix coordinate real general",
-            "% fixture",
-            paste(5L, 2L, length(entries)),
-            entries
-        ),
-        file.path(directory, "matrix.mtx")
-    )
-    directory
-}
-
-test_that("Cell Ranger import maps interleaved feature types to the right rows", {
-    directory <- write_cellranger_coordinates(
-        file.path(withr::local_tempdir(), "interleaved"),
-        c(
-            "5 2 3",
-            "2 1 8",
-            "1 2 0",
-            "4 2 4",
-            "3 1 2",
-            "1 1 5",
-            "2 2 1.5",
-            "4 1 6",
-            "3 2 7"
+test_that("import rejects repeated entries and malformed matrix files", {
+    import <- function(entries, n_rows = 5L) {
+        directory <- write_cellranger_coordinates(
+            file.path(withr::local_tempdir(), "bad"),
+            entries,
+            n_rows
         )
-    )
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    object <- suppressMessages(import_data_from_cellranger(
-        directory,
-        "low",
-        metadata
-    ))
-    response <- get_response_matrix(object)
-    guides <- get_grna_matrix(object)
-    expect_true(methods::validObject(response))
-    expect_true(methods::validObject(guides))
-    expect_identical(rownames(response), c("gene-z", "gene-a", "gene-m"))
-    expect_identical(rownames(guides), c("guide-a", "guide-b"))
-    expect_identical(colnames(response), c("cell-z", "cell-a"))
-    expect_identical(colnames(guides), c("cell-z", "cell-a"))
-    expect_identical(response@p, c(0L, 2L, 4L, 5L))
-    expect_identical(response@j, c(0L, 1L, 0L, 1L, 1L))
-    expect_identical(response@x, c(5, 0, 2, 7, 3))
-    expect_identical(guides@p, c(0L, 2L, 4L))
-    expect_identical(guides@j, c(0L, 1L, 0L, 1L))
-    expect_identical(guides@x, c(8, 1.5, 6, 4))
-
-    # The same coordinate in a different directory is a different cell.
-    batches <- suppressMessages(import_data_from_cellranger(
-        rep(directory, 2L),
-        "low",
-        metadata
-    ))
-    expect_identical(
-        colnames(get_response_matrix(batches)),
-        c("b1_cell-z", "b1_cell-a", "b2_cell-z", "b2_cell-a")
-    )
-    duplicate <- write_cellranger_coordinates(
-        file.path(withr::local_tempdir(), "duplicate"),
-        c("1 1 2", "2 1 1", "1 1 0")
-    )
-    expect_error(
         suppressMessages(import_data_from_cellranger(
-            duplicate,
+            directory,
             "low",
-            metadata
-        )),
-        "Repeated (cell, feature) coordinates",
+            cellranger_metadata
+        ))
+    }
+    expect_error(
+        import(c("1 1 2", "2 1 1", "1 1 0")),
+        "the same (row, column) entry appears more than once",
         fixed = TRUE
     )
-})
-
-test_that("Cell Ranger import rejects feature indices outside features.tsv", {
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
+    # the parser's own errors reach the user with the file name
+    expect_error(import(c("1 1 2", "2.0 1 1")), "matrix.mtx.gz: .*line 5")
+    expect_error(
+        import(c("1 1 2", "3 2 1"), n_rows = 4L),
+        "has 4 rows, but its features.tsv file has 5",
+        fixed = TRUE
     )
-    for (bad in c("6 1 3", "0 1 3")) {
-        directory <- write_cellranger_coordinates(
-            file.path(withr::local_tempdir(), "outside"),
-            c("1 1 5", bad, "2 2 1")
-        )
-        expect_error(
-            suppressMessages(import_data_from_cellranger(
-                directory,
-                "low",
-                metadata
-            )),
-            "feature indices outside the rows of its features.tsv",
-            fixed = TRUE
-        )
-    }
-})
-
-test_that("Parse import rejects missing file coordinates", {
-    directory <- withr::local_tempdir()
-    gene <- file.path(directory, "gene.mtx")
-    guide <- file.path(directory, "guide.mtx")
-    gene_ids <- file.path(directory, "genes.csv")
-    guide_ids <- file.path(directory, "guides.csv")
-    header <- c(
-        "%%MatrixMarket matrix coordinate real general",
-        "% fixture",
-        "2 2 3"
-    )
-    writeLines(
-        c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
-        gene_ids
-    )
-    writeLines(
-        c(
-            "feature_id,feature_name,genome",
-            "a,guide-a,human",
-            "b,guide-b,human"
-        ),
-        guide_ids
-    )
-    writeLines(c(header, "2 1 1.5", "1 2 6", "1 1 8"), guide)
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    for (bad in c("NA 1 5", "1 NA 5")) {
-        writeLines(c(header, "1 2 2", bad, "2 2 7"), gene)
-        expect_error(
-            suppressMessages(import_data_from_parse(
-                gene,
-                guide,
-                gene_ids,
-                guide_ids,
-                "low",
-                metadata
-            )),
-            "outside the matrix dimensions",
-            fixed = TRUE
-        )
-    }
-})
-
-test_that("Cell Ranger import rejects missing file coordinates", {
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    cases <- list(
-        list(entry = "1 NA 3", message = "outside the matrix dimensions"),
-        list(
-            entry = "NA 1 3",
-            message = "feature indices outside the rows of its features.tsv"
-        )
-    )
-    for (case in cases) {
-        directory <- write_cellranger_coordinates(
-            file.path(withr::local_tempdir(), "missing"),
-            c("1 1 5", case$entry, "2 2 1")
-        )
-        expect_error(
-            suppressMessages(import_data_from_cellranger(
-                directory,
-                "low",
-                metadata
-            )),
-            case$message,
-            fixed = TRUE
-        )
-    }
-})
-
-test_that("Parse import rejects coordinates that are not integers", {
-    directory <- withr::local_tempdir()
-    gene <- file.path(directory, "gene.mtx")
-    guide <- file.path(directory, "guide.mtx")
-    gene_ids <- file.path(directory, "genes.csv")
-    guide_ids <- file.path(directory, "guides.csv")
-    header <- c(
-        "%%MatrixMarket matrix coordinate real general",
-        "% fixture",
-        "2 2 2"
-    )
-    writeLines(
-        c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
-        gene_ids
-    )
-    writeLines(
-        c(
-            "feature_id,feature_name,genome",
-            "a,guide-a,human",
-            "b,guide-b,human"
-        ),
-        guide_ids
-    )
-    writeLines(c(header, "1 1 4", "2 2 6"), guide)
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    # main read "2.0" and silently moved the entry to another cell
-    for (bad in c("2.0 2 7", "1 2.5 7")) {
-        writeLines(c(header, "1 1 5", bad), gene)
-        expect_error(
-            suppressWarnings(suppressMessages(import_data_from_parse(
-                gene,
-                guide,
-                gene_ids,
-                guide_ids,
-                "low",
-                metadata
-            ))),
-            "coordinates that are not integers",
-            fixed = TRUE
-        )
-    }
-})
-
-test_that("Cell Ranger import rejects coordinates that are not integers", {
-    metadata <- data.frame(
-        grna_id = c("guide-a", "guide-b"),
-        grna_target = c("target-a", "non-targeting")
-    )
-    for (bad in c("2.5 2 1", "2 2.0 1")) {
-        directory <- write_cellranger_coordinates(
-            file.path(withr::local_tempdir(), "fractional"),
-            c("1 1 5", bad)
-        )
-        expect_error(
-            suppressWarnings(suppressMessages(import_data_from_cellranger(
-                directory,
-                "low",
-                metadata
-            ))),
-            "coordinates that are not integers",
-            fixed = TRUE
-        )
-    }
 })

@@ -1,14 +1,12 @@
 # sceptre 0.99.1
 
--   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now import Matrix Market files whose entries are not sorted by cell. Previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now read Matrix Market files with eminem, a C++ parser provided by the Bioconductor package assorthead. They now import files whose entries are not sorted by cell; previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
 
--   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error when a matrix file lists the same (cell, feature) entry more than once, or an entry outside the dimensions declared in the file's header. `import_data_from_cellranger()` also stops when an entry's feature index lies outside the rows of `features.tsv`; previously such entries were dropped silently. Both functions also stop when a coordinate is not an integer, such as `2.0`; previously such an entry could be moved silently to another cell.
+-   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error, naming the file and line, when a matrix file is malformed: for example, when an entry lies outside the dimensions declared in the file's header or a coordinate is not an integer (such as `2.0`). Previously such entries could be dropped or moved silently to another cell. Both functions also stop when a matrix file lists the same (cell, feature) entry more than once, and `import_data_from_cellranger()` stops when a matrix file and its `features.tsv` file have different numbers of rows.
 
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) now assigns counts to the correct rows when gene and gRNA features are interleaved in `features.tsv`, rather than listed in two contiguous blocks.
 
 -   `import_data()` no longer loses entries of a dense (base R) square response or gRNA matrix that is symmetric or nearly symmetric.
-
--   Reading a Matrix Market file that has no dimension line no longer leaves its file connection open.
 
 # sceptre 0.99.0 (2026-06-24)
 
