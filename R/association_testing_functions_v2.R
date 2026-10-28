@@ -117,7 +117,7 @@ discovery_ntcells_perm_test <- function(
 
         # 1. get the expression vector and covariate matrix
         curr_expression_vector <- expression_vector[combined_idxs]
-        curr_covariate_matrix <- covariate_matrix[combined_idxs, ]
+        curr_covariate_matrix <- covariate_matrix[combined_idxs, , drop = FALSE]
 
         # 2. perform the response precomputation
         response_precomp <- perform_response_precomputation(
@@ -258,7 +258,7 @@ discovery_ntcells_crt <- function(
     combined_idxs <- c(idxs$trt_idxs, all_nt_idxs)
     trt_idxs <- seq(1L, n_trt)
     # subset the covariate matrix for this gRNA
-    curr_covariate_matrix <- covariate_matrix[combined_idxs, ]
+    curr_covariate_matrix <- covariate_matrix[combined_idxs, , drop = FALSE]
     # perform the grna precomputation
     fitted_probabilities <- perform_grna_precomputation(
         trt_idxs = trt_idxs,
