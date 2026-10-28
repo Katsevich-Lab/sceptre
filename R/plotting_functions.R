@@ -115,7 +115,7 @@ plot_grna_count_distributions <- function(
         max_single_bin <- max(10, threshold - 1) # 10 is just a nice convenient default
         bin_upper_bounds <- 0:max_single_bin
         bin_labels <- as.character(bin_upper_bounds)
-        if (max_expression_count > 10) {
+        if (max_expression_count > max_single_bin) {
             # now we need to add exp growing bins, w/ more complex labels
             # this next section relies on the fact that the upper bounds are
             # going to be at locations
@@ -731,7 +731,7 @@ make_volcano_plot <- function(
     out <- ggplot2::ggplot(
         data = discovery_result |>
             dplyr::mutate(
-                reject = p_value < p_thresh,
+                reject = significant,
                 p_value = ifelse(p_value < p_lower_lim, p_lower_lim, p_value),
                 log_2_fold_change = ifelse(
                     log_2_fold_change > x_limits[2],
@@ -760,7 +760,9 @@ make_volcano_plot <- function(
             NULL
         }) +
         ggplot2::theme(legend.position = "none") +
-        ggplot2::scale_color_manual(values = c("dodgerblue", "blueviolet")) +
+        ggplot2::scale_color_manual(
+            values = c("FALSE" = "dodgerblue", "TRUE" = "blueviolet")
+        ) +
         ggplot2::ggtitle("Discovery volcano plot")
     return(out)
 }
@@ -845,8 +847,15 @@ plot_run_discovery_analysis <- function(
             "This `sceptre_object` has not yet had `run_discovery_analysis` called on it."
         )
     }
-    # first, compute the rejection set
-    discovery_result <- sceptre_object@discovery_result |> stats::na.omit()
+    # first, compute the rejection set; drop only the rows missing a field used
+    # in the plots (with output_amount 2 or 3, valid rows can have missing
+    # diagnostic columns)
+    discovery_result <- sceptre_object@discovery_result |>
+        dplyr::filter(
+            !is.na(p_value),
+            !is.na(log_2_fold_change),
+            !is.na(significant)
+        )
     calibration_result <- sceptre_object@calibration_result
     discovery_set <- discovery_result |> dplyr::filter(significant)
     p_thresh <- if (nrow(discovery_set) >= 1L) {
@@ -1145,9 +1154,9 @@ plot_run_qc <- function(
     if (nrow(sceptre_object@discovery_pairs_with_info) >= 1L) {
         p_b <- plot_pairwise_qc(
             sceptre_object,
-            downsample_pairs = 10000L,
-            point_size = 0.55,
-            transparency = 0.8,
+            downsample_pairs = downsample_pairs,
+            point_size = point_size,
+            transparency = transparency,
             return_indiv_plots = FALSE
         )
         # combine the plots

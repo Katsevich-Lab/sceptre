@@ -10,6 +10,16 @@
 
 -   With `parallel = TRUE`, an error in a parallel worker is now reported with its original message, and a worker that exits without returning results (for example, because it ran out of memory) now causes an error. Previously the original error was replaced by an unrelated one, and a worker that exited left its results missing with only a warning.
 
+-   `plot_run_qc()` now applies its `downsample_pairs`, `point_size` and `transparency` arguments to the pairwise QC plot; previously they were ignored.
+
+-   `plot_grna_count_distributions()` no longer fails when `threshold` is above 11 and the largest plotted count lies between 11 and `threshold - 2`.
+
+-   In `plot_run_discovery_analysis()`, the volcano plot now colors points by the `significant` column of the discovery result. Previously the significant pair with the largest p-value was colored as not significant, and with no discoveries all points had a missing color (grey); they now have the color of non-significant points.
+
+-   `plot_run_discovery_analysis()` no longer drops valid pairs from its plots when the discovery analysis was run with `output_amount = 2` or `3`. Previously rows with missing optional diagnostic columns were removed, so the plots could show far fewer pairs than the result table, and in some settings none.
+
+-   `import_data()` no longer reorders the slots of a `dgTMatrix` or `lgTMatrix` supplied as the response or gRNA matrix; the caller's matrix is left unchanged.
+
 -   `set_analysis_parameters()` now discards saved response-model fits when the control group or the design matrix changes. Previously, in low MOI, after running the calibration check with NT-cell controls and then switching to `control_group = "complement"` with the same formula, the discovery analysis reused fits estimated on the NT cells only (and vice versa), which changed its p-values. Changing factor contrasts with the same formula also left stale fits in place. Analyses that call `set_analysis_parameters()` once are unaffected by this change.
 
 -   `construct_cis_pairs()` now finds every gene within the distance threshold when the gene positions are not sorted within a chromosome. Previously it could omit nearby genes. This affects the bundled `gene_position_data_frame_grch37`, which is not sorted, and unsorted custom position tables; `gene_position_data_frame_grch38` is sorted and gives the same pairs as before.
