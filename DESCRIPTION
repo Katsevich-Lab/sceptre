@@ -42,10 +42,19 @@ Imports:
     stats,
     purrr,
     parallelly (>= 1.23.0),
+    rlang,
+    S4Vectors,
+    SingleCellExperiment,
+    SummarizedExperiment,
     withr
 Depends: 
     R (>= 4.1)
 Suggests:
+    anndataR,
+    arrow,
+    jsonlite,
+    MuData,
+    MultiAssayExperiment,
     ondisc,
     R.utils,
     sessioninfo,
