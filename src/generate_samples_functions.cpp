@@ -133,30 +133,6 @@ SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B) {
 
 
 // [[Rcpp::export]]
-SEXP crt_index_sampler(NumericVector fitted_probabilities, int B) {
-  // initialize output list of vectors
-  std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
-
-  // initialize the random number generator
-  boost::random::mt19937 generator(4);
-  boost::random::uniform_real_distribution<double> distribution(0, 1);
-  double u;
-
-  // generate B resampled treatment vectors
-  for (int i = 0; i < B; i ++) {
-    std::vector<int> v;
-    for (int j = 0; j < fitted_probabilities.size(); j ++) {
-      u = distribution(generator);
-      if (fitted_probabilities[j] > u) v.push_back(j);
-    }
-    (*synth_idx_list)[i] = v;
-  }
-  Rcpp::XPtr<std::vector<std::vector<int>>> ptr(synth_idx_list);
-  return ptr;
-}
-
-
-// [[Rcpp::export]]
 SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B) {
   // initialize output vector
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
