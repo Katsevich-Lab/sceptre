@@ -82,8 +82,8 @@ obtain_pointer_vector <- function(i, dim) {
     .Call(`_sceptre_obtain_pointer_vector`, i, dim)
 }
 
-compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
-    .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
+compute_n_nonzero_and_max_feature <- function(i, p, x) {
+    .Call(`_sceptre_compute_n_nonzero_and_max_feature`, i, p, x)
 }
 
 compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {

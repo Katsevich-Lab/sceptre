@@ -37,55 +37,24 @@ IntegerVector obtain_pointer_vector(IntegerVector i, int dim) {
 
 
 // [[Rcpp::export]]
-List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
-                                 int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
+List compute_n_nonzero_and_max_feature(IntegerVector i, IntegerVector p, NumericVector x) {
+  // for each column of a CSC matrix: the number of entries above 0.5, and the
+  // largest positive entry with its row (the first such row; row 0 if no entry
+  // is positive)
+  int n_cells = p.size() - 1;
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);
-  NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes), frac_umis_max_feature(n_cells);
-  List out;
-
-  int n_nonzero_count, curr_max_feature;
-  double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature;
-  for (int k = 0; k < mt_gene_idxs.size(); k ++) mt_gene_idxs[k] --;
-
+  NumericVector max_value(n_cells);
   for (int k = 0; k < n_cells; k ++) {
-    curr_max_feature = 0;
-    umi_count_curr_max_feature = 0;
-    n_umi_count = 0;
-    n_nonzero_count = 0;
-    load_sparse_vector(i, p, x, k, n_genes, y);
-    for (int r = 0; r < n_genes; r ++) {
-      n_umi_count += y[r];
-      if (y[r] > 0.5) n_nonzero_count ++;
-    }
-
-    // compute p mito
-    if (compute_p_mito) {
-      n_umi_count_mito = 0;
-      for (int r = 0; r < mt_gene_idxs.size(); r ++) n_umi_count_mito += y[mt_gene_idxs[r]];
-      p_mito[k] = n_umi_count_mito/n_umi_count;
-    }
-
-    // compute max feature, fraction expressed
-    if (compute_max_feature) {
-      curr_max_feature = 0;
-      umi_count_curr_max_feature = 0;
-      for (int r = 0; r < n_genes; r ++) {
-        if (y[r] > umi_count_curr_max_feature) {
-          curr_max_feature = r;
-          umi_count_curr_max_feature = y[r];
-        }
+    for (int l = p[k]; l < p[k + 1]; l ++) {
+      if (x[l] > 0.5) n_nonzero[k] ++;
+      if (x[l] > max_value[k]) {
+        max_value[k] = x[l];
+        max_feature[k] = i[l];
       }
-      max_feature[k] = curr_max_feature;
-      frac_umis_max_feature[k] = umi_count_curr_max_feature/n_umi_count;
     }
-
-    n_nonzero[k] = n_nonzero_count;
-    n_umi[k] = n_umi_count;
   }
-
-  out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito,
-                     Named("max_feature") = max_feature, Named("frac_umis_max_feature") = frac_umis_max_feature);
-  return out;
+  return List::create(Named("n_nonzero") = n_nonzero, Named("max_feature") = max_feature,
+                      Named("max_value") = max_value);
 }
 
 

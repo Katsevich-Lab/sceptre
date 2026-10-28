@@ -263,21 +263,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compute_cell_covariates_cpp
-List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes, int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature);
-RcppExport SEXP _sceptre_compute_cell_covariates_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP n_genesSEXP, SEXP n_cellsSEXP, SEXP mt_gene_idxsSEXP, SEXP compute_p_mitoSEXP, SEXP compute_max_featureSEXP) {
+// compute_n_nonzero_and_max_feature
+List compute_n_nonzero_and_max_feature(IntegerVector i, IntegerVector p, NumericVector x);
+RcppExport SEXP _sceptre_compute_n_nonzero_and_max_feature(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type n_genes(n_genesSEXP);
-    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type mt_gene_idxs(mt_gene_idxsSEXP);
-    Rcpp::traits::input_parameter< bool >::type compute_p_mito(compute_p_mitoSEXP);
-    Rcpp::traits::input_parameter< bool >::type compute_max_feature(compute_max_featureSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_cpp(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature));
+    rcpp_result_gen = Rcpp::wrap(compute_n_nonzero_and_max_feature(i, p, x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -338,7 +333,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
-    {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
+    {"_sceptre_compute_n_nonzero_and_max_feature", (DL_FUNC) &_sceptre_compute_n_nonzero_and_max_feature, 3},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_increment_vector", (DL_FUNC) &_sceptre_increment_vector, 2},
     {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},

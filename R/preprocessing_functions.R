@@ -144,23 +144,19 @@ compute_cell_covariates <- function(
     } else {
         mt_gene_idxs <- integer()
     }
-    # call the low-level function
-    out <- compute_cell_covariates_cpp(
+    n_umis <- unname(Matrix::colSums(matrix_in))
+    out <- compute_n_nonzero_and_max_feature(
         i = matrix_in@i,
         p = matrix_in@p,
-        x = matrix_in@x,
-        n_genes = nrow(matrix_in),
-        n_cells = ncol(matrix_in),
-        mt_gene_idxs = mt_gene_idxs,
-        compute_p_mito = compute_p_mito,
-        compute_max_feature = compute_max_feature
+        x = matrix_in@x
     )
-    ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
+    ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = n_umis)
     if (compute_p_mito) {
-        ret$p_mito <- out$p_mito
+        mito_umis <- Matrix::colSums(matrix_in[mt_gene_idxs, , drop = FALSE])
+        ret$p_mito <- unname(mito_umis) / n_umis
     }
     if (compute_max_feature) {
-        ret$frac_umis_max_feature <- out$frac_umis_max_feature
+        ret$frac_umis_max_feature <- out$max_value / n_umis
         ret$feature_w_max_expression <- rownames(matrix_in)[
             out$max_feature + 1L
         ]
