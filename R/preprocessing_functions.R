@@ -31,6 +31,11 @@ set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
             i <- matrix_in@i
             j <- matrix_in@j
         } else if (methods::is(matrix_in, "matrix")) {
+            # Matrix stores a square (nearly) symmetric matrix as one triangle
+            # only, so first coerce a square matrix to a general matrix
+            if (n_responses == n_cells) {
+                matrix_in <- methods::as(matrix_in, "generalMatrix")
+            }
             matrix_in <- methods::as(matrix_in, "TsparseMatrix")
             i <- matrix_in@i
             j <- matrix_in@j

@@ -221,6 +221,11 @@ import_data_use_ondisc <- function(
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
 #' the cell IDs unique and stable across imports.
 #' Supplying barcode files for only some directories is an error.
+#' For standard in-memory objects, a malformed matrix file (for example, one
+#' with an entry outside the dimensions declared in its header), a matrix file
+#' that lists the same (feature, cell) entry more than once, or a matrix file
+#' whose number of rows differs from the number of rows of `features.tsv`, is an
+#' error.
 #' Users can create either a standard `sceptre` object or an `ondisc`-backed
 #' `sceptre` object; the latter is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
@@ -434,21 +439,24 @@ import_data_from_cellranger_memory <- function(
             col.names = c("feature_id", "feature_name", "modality"),
             header = FALSE
         )
-        for (col in colnames(feature_df)) {
-            if (
-                any(
-                    dplyr::pull(feature_df, dplyr::all_of(col)) !=
-                        dplyr::pull(curr_feature_df, dplyr::all_of(col))
-                )
-            ) {
-                stop("The features.tsv files must match across directories.")
-            }
+        if (!isTRUE(all.equal(feature_df, curr_feature_df))) {
+            stop("The features.tsv files must match across directories.")
         }
 
         # process the matrix
-        matrix_fp <- matrix_fps[i]
-        matrix_metadata <- get_mtx_metadata(matrix_fp)
-        n_cells_per_matrix[i] <- matrix_metadata$n_cells
+        mat <- read_mtx(path.expand(matrix_fps[i]), transpose = FALSE)
+        if (nrow(mat) != nrow(feature_df)) {
+            stop(
+                "The matrix file in directory ",
+                directories[i],
+                " has ",
+                nrow(mat),
+                " rows, but its features.tsv file has ",
+                nrow(feature_df),
+                "."
+            )
+        }
+        n_cells_per_matrix[i] <- ncol(mat)
         if (retain_cell_barcodes) {
             curr_barcodes <- data.table::fread(
                 file = barcode_fps[i],
@@ -464,7 +472,7 @@ import_data_from_cellranger_memory <- function(
                 )
             }
             curr_barcodes <- curr_barcodes[[1L]]
-            if (length(curr_barcodes) != matrix_metadata$n_cells) {
+            if (length(curr_barcodes) != ncol(mat)) {
                 barcode_label <- if (length(curr_barcodes) == 1L) {
                     "barcode"
                 } else {
@@ -478,7 +486,7 @@ import_data_from_cellranger_memory <- function(
                     " ",
                     barcode_label,
                     ", but its matrix contains ",
-                    matrix_metadata$n_cells,
+                    ncol(mat),
                     " cells."
                 )
             }
@@ -491,31 +499,12 @@ import_data_from_cellranger_memory <- function(
             }
             cell_barcodes[[i]] <- curr_barcodes
         }
-        dt <- data.table::fread(
-            file = matrix_fp,
-            skip = matrix_metadata$n_to_skip,
-            col.names = c("feature_idx", "cell_idx", "x"),
-            colClasses = c("integer", "integer", "double"),
-            showProgress = FALSE,
-            nThread = 2L
-        )
-        subsetted_mats <- lapply(modalities, function(modality) {
-            curr_feature_idxs <- modality_idxs[[modality]]
-            # subset
-            dt_sub <- dt[dt$feature_idx %in% curr_feature_idxs, ]
-            # offset the feature idxs such that they start at 1
-            increment_feature_vector_value <- -min(curr_feature_idxs)
-            increment_vector(dt_sub$feature_idx, increment_feature_vector_value)
-            increment_vector(dt_sub$cell_idx, -1L)
-            # create a sparse matrix in csc format
-            out <- create_csc_matrix(
-                dt = dt_sub,
-                n_cells = matrix_metadata$n_cells,
-                n_features = length(curr_feature_idxs)
-            )
-            return(out)
+        # split the rows by feature type; the features of a type need not be
+        # contiguous in features.tsv
+        subsetted_mats <- lapply(modality_idxs, function(idxs) {
+            mat[idxs, , drop = FALSE]
         })
-        rm(dt)
+        rm(mat)
         gc() |> invisible()
         out_list[[i]] <- subsetted_mats
         message(crayon::green(" \u2713"))
@@ -672,6 +661,10 @@ import_data_from_cellranger_use_ondisc <- function(
 #' Parse platform and the structure of the Parse count matrix generation program
 #' output.
 #'
+#' A malformed matrix file (for example, one with an entry outside the
+#' dimensions declared in its header), or one that lists the same
+#' (cell, feature) entry more than once, is an error.
+#'
 #' The example data shipped with the package (used in the examples below) are a small subset of Parse Biosciences' "Technical Performance of CRISPR Detect in Cell Lines" demo dataset, used under the Creative Commons Attribution 4.0 International (CC BY 4.0) license, with attribution to Parse Biosciences. See \url{https://www.parsebiosciences.com/datasets/technical-performance-of-crispr-detect-in-cell-lines/}.
 #'
 #' @param gene_mat_fp file path to the gene `count_matrix.mtx` file.
@@ -746,34 +739,9 @@ import_data_from_parse <- function(
         }
     }
 
-    # 2. load the gene.mtx and grna.mtx data
-    load_matrix <- function(mat_fp) {
-        matrix_metadata <- get_mtx_metadata(
-            mat_fp,
-            c("n_cells", "n_features", "n_nonzero")
-        )
-        dt <- data.table::fread(
-            file = mat_fp,
-            skip = matrix_metadata$n_to_skip,
-            col.names = c("cell_idx", "feature_idx", "x"),
-            colClasses = c("integer", "integer", "double"),
-            showProgress = FALSE,
-            nThread = 2L
-        )
-        # make the cell and feature idxs zero-based
-        increment_vector(dt$cell_idx, value = -1L)
-        increment_vector(dt$feature_idx, value = -1L)
-
-        # create a sparse matrix in csc format
-        out <- create_csc_matrix(
-            dt = dt,
-            n_cells = matrix_metadata$n_cells,
-            n_features = matrix_metadata$n_features
-        )
-        return(out)
-    }
-    gene_mat <- load_matrix(gene_mat_fp)
-    grna_mat <- load_matrix(grna_mat_fp)
+    # 2. load the gene.mtx and grna.mtx data; Parse writes cells in rows
+    gene_mat <- read_mtx(path.expand(gene_mat_fp), transpose = TRUE)
+    grna_mat <- read_mtx(path.expand(grna_mat_fp), transpose = TRUE)
 
     # 3. load the gene ids; update rownames of gene mat
     gene_feature_df <- data.table::fread(
@@ -853,36 +821,6 @@ init_sceptre_object <- function(
         run_discovery_analysis = FALSE
     )
     return(sceptre_object)
-}
-
-
-create_csc_matrix <- function(dt, n_cells, n_features) {
-    p <- obtain_pointer_vector(i = dt$cell_idx, dim = n_cells)
-    out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-    out@i <- dt$feature_idx
-    out@p <- p
-    out@x <- dt$x
-    out@Dim <- c(n_features, n_cells)
-    return(out)
-}
-
-
-get_mtx_metadata <- function(
-    mtx_file,
-    col_id = c("n_features", "n_cells", "n_nonzero")
-) {
-    con <- file(mtx_file, "r")
-    n_to_skip <- 0L
-    while (TRUE) {
-        n_to_skip <- n_to_skip + 1L
-        line <- readLines(con, n = 1)
-        if (substr(line, 0, 1) != "%") break()
-    }
-    close(con)
-    metrics <- strsplit(line, split = " ", fixed = TRUE)[[1]] |> as.integer()
-    out <- list(metrics[1], metrics[2], metrics[3], n_to_skip)
-    names(out) <- c(col_id, "n_to_skip")
-    return(out)
 }
 
 
