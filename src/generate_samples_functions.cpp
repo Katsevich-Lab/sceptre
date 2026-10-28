@@ -28,6 +28,7 @@ void draw_wor_sample(boost::random::mt19937& generator, boost::random::uniform_r
 //' @noRd
 // [[Rcpp::export]]
 SEXP fisher_yates_sampler(int n_tot, int M, int B) {
+  if (M > n_tot) stop("M must not exceed n_tot.");
   // initialize output vector, x vector shared across samples
   std::vector<std::vector<int>>* synth_idx_list = new std::vector<std::vector<int>>(B);
   std::vector<int> x(n_tot);

@@ -1,5 +1,25 @@
 # sceptre 0.99.1
 
+-   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged. With `grna_integration_strategy = "bonferroni"`, if two or more of a target's gRNAs have p-values capped at 1, the combined result now takes its fold change and nonzero-cell counts from the first of these gRNAs rather than from the one with the smallest uncapped p-value; its p-value (1) and significance call are unchanged.
+
+-   In high MOI with `resampling_mechanism = "permutations"`, the calibration check no longer requests more permuted cells than exist when non-targeting gRNA groups overlap. Previously the resampling step could read and write outside its memory in this case. The high-MOI default, the CRT, was not affected.
+
+-   The calibration check now compares `calibration_group_size` with the number of non-targeting gRNAs that still have cells after QC, and stops with a clear error if the size is too large. Previously it counted the non-targeting gRNAs in `grna_target_data_frame`; a group size larger than the number of non-targeting gRNAs with cells could make the calibration check write outside allocated memory and then fail with a misleading error, and with NT-cell controls and one remaining non-targeting gRNA, the calibration check ran without control cells.
+
+-   `assign_grnas(method = "mixture")` now checks that both entries of `g_pert_guess_range` lie in [0, 20], as documented; previously it checked `pi_guess_range` by mistake, so a larger `g_pert_guess_range` was accepted. Values such as `c(10, 5000)` now give an error (the default, `log(c(10, 5000))`, is within range).
+
+-   With `parallel = TRUE`, an error in a parallel worker is now reported with its original message, and a worker that exits without returning results (for example, because it ran out of memory) now causes an error. Previously the original error was replaced by an unrelated one, and a worker that exited left its results missing with only a warning.
+
+-   `plot_run_qc()` now applies its `downsample_pairs`, `point_size` and `transparency` arguments to the pairwise QC plot; previously they were ignored.
+
+-   `plot_grna_count_distributions()` no longer fails when `threshold` is above 11 and the largest plotted count lies between 11 and `threshold - 2`.
+
+-   In `plot_run_discovery_analysis()`, the volcano plot now colors points by the `significant` column of the discovery result. Previously the significant pair with the largest p-value was colored as not significant, and with no discoveries all points had a missing color (grey); they now have the color of non-significant points.
+
+-   `plot_run_discovery_analysis()` no longer drops valid pairs from its plots when the discovery analysis was run with `output_amount = 2` or `3`. Previously rows with missing optional diagnostic columns were removed, so the plots could show far fewer pairs than the result table, and in some settings none.
+
+-   `import_data()` no longer reorders the slots of a `dgTMatrix` or `lgTMatrix` supplied as the response or gRNA matrix; the caller's matrix is left unchanged.
+
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now read Matrix Market files with eminem, a C++ parser provided by the Bioconductor package assorthead, and accept general coordinate matrices with integer or real values, as Cell Ranger and Parse write them; other Matrix Market variants, such as symmetric or pattern matrices, are now an error. They now import files whose entries are not sorted by cell; previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
 
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error, naming the file and line, when a matrix file is malformed: for example, when an entry lies outside the dimensions declared in the file's header or a coordinate is not an integer (such as `2.0`). Previously such entries could be dropped or moved silently to another cell. Both functions also stop when a matrix file lists the same (cell, feature) entry more than once, and `import_data_from_cellranger()` stops when a matrix file and its `features.tsv` file have different numbers of rows.
