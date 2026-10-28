@@ -59,37 +59,80 @@ test_that("converting to an Analysis and back loses nothing at any stage", {
     expect_identical(SingleCellExperiment::altExpNames(screen), "gRNA")
 })
 
-test_that("an analysis saved to files and read back finishes with the same results", {
-    skip_if_not_installed("anndataR")
-    skip_if_not_installed("arrow")
-    skip_if_not_installed("MuData")
+skip_without_file_packages <- function() {
+    for (package in c("anndataR", "arrow", "jsonlite", "MuData")) {
+        skip_if_not_installed(package)
+    }
+}
+
+# Values that files cannot hold: a formula's environment, data.table's internal
+# pointer, and whether a table was a tibble.
+without_r_internals <- function(x) {
+    if (inherits(x, "tbl_df")) {
+        x <- as.data.frame(x)
+    }
+    if (is.data.frame(x)) {
+        attr(x, ".internal.selfref") <- NULL
+    }
+    if (inherits(x, "formula")) {
+        environment(x) <- globalenv()
+    }
+    if (is.list(x) && !is.data.frame(x)) {
+        x[] <- lapply(x, without_r_internals)
+    }
+    x
+}
+
+expect_same_object <- function(actual, expected) {
+    for (name in methods::slotNames(expected)) {
+        expect_identical(
+            without_r_internals(methods::slot(actual, name)),
+            without_r_internals(methods::slot(expected, name)),
+            label = name
+        )
+    }
+}
+
+test_that("an analysis read back from files is the same at every stage", {
+    skip_without_file_packages()
+    workflow <- analysis_workflow()
+    object <- workflow$start
+    directory <- withr::local_tempdir()
+    for (step in c(list(identity), workflow$steps)) {
+        object <- suppressMessages(step(object))
+        write_analysis(as_analysis(object), directory)
+        expect_same_object(as_sceptre_object(read_analysis(directory)), object)
+    }
+})
+
+test_that("an analysis saved before discovery finishes with the same results", {
+    skip_without_file_packages()
     workflow <- analysis_workflow()
     steps <- workflow$steps
     direct <- suppressMessages(run_steps(workflow$start, steps))
-    # save after QC, then run the discovery analysis on what was read back
     before <- suppressMessages(run_steps(workflow$start, steps[1:3]))
     directory <- withr::local_tempdir()
     write_analysis(as_analysis(before), directory)
-    expect_true(all(file.exists(file.path(
-        directory,
-        c("screen.h5mu", "state.h5ad")
-    ))))
-    read_back <- as_sceptre_object(read_analysis(directory))
-    resumed <- suppressMessages(steps$discovery(read_back))
-    expect_identical(resumed@discovery_result, direct@discovery_result)
-    # results and fits are read back from Parquet with their values intact
-    write_analysis(as_analysis(direct), directory)
-    final <- read_analysis(directory)
-    expect_equal(
-        as.data.frame(final@results$discovery),
-        as.data.frame(direct@discovery_result),
-        ignore_attr = TRUE
+    resumed <- suppressMessages(
+        steps$discovery(as_sceptre_object(read_analysis(directory)))
     )
-    expect_equal(final@fits, direct@response_precomputations)
+    expect_identical(resumed@discovery_result, direct@discovery_result)
+})
+
+test_that("formulas inside settings survive the state file", {
+    skip_without_file_packages()
+    object <- analysis_workflow()$start
+    object@grna_assignment_hyperparameters <- list(
+        n_em_rep = 5L,
+        formula_object = ~ log(grna_n_umis) + batch
+    )
+    directory <- withr::local_tempdir()
+    write_analysis(as_analysis(object), directory)
+    expect_same_object(as_sceptre_object(read_analysis(directory)), object)
 })
 
 test_that("missing gRNA locations survive the screen file", {
-    skip_if_not_installed("MuData")
+    skip_without_file_packages()
     data(highmoi_example_data, package = "sceptre", envir = environment())
     data(
         grna_target_data_frame_highmoi,

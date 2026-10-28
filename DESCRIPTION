@@ -52,6 +52,7 @@ Depends:
 Suggests:
     anndataR,
     arrow,
+    jsonlite,
     MuData,
     MultiAssayExperiment,
     ondisc,

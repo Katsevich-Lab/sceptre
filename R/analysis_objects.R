@@ -136,13 +136,17 @@ as_analysis <- function(sceptre_object) {
         ),
         altExps = list(
             gRNA = SingleCellExperiment::SingleCellExperiment(
-                assays = list(counts = screen_slots$grna_matrix[[1]])
+                assays = list(counts = screen_slots$grna_matrix[[1]]),
+                # each cell's top gRNA and its share of the cell's gRNA UMIs
+                colData = S4Vectors::DataFrame(
+                    screen_slots$import_grna_assignment_info,
+                    check.names = FALSE
+                )
             )
         ),
         metadata = list(
             low_moi = screen_slots$low_moi,
             grna_target_data_frame = screen_slots$grna_target_data_frame,
-            import_grna_assignment_info = screen_slots$import_grna_assignment_info,
             covariate_row_names = attr(
                 screen_slots$covariate_data_frame,
                 "row.names"
@@ -186,20 +190,20 @@ as_sceptre_object <- function(analysis) {
         optional = TRUE
     )
     attr(covariates, "row.names") <- meta$covariate_row_names
+    grna <- SingleCellExperiment::altExp(screen, "gRNA")
     values <- c(
         list(
             response_matrix = list(SummarizedExperiment::assay(
                 screen,
                 "counts"
             )),
-            grna_matrix = list(SummarizedExperiment::assay(
-                SingleCellExperiment::altExp(screen, "gRNA"),
-                "counts"
-            )),
+            grna_matrix = list(SummarizedExperiment::assay(grna, "counts")),
             covariate_data_frame = covariates,
             grna_target_data_frame = meta$grna_target_data_frame,
             low_moi = meta$low_moi,
-            import_grna_assignment_info = meta$import_grna_assignment_info
+            import_grna_assignment_info = as.list(
+                SummarizedExperiment::colData(grna)
+            )
         ),
         analysis@spec@settings,
         unlist(
