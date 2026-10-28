@@ -143,7 +143,8 @@ run_calibration_check_pt_1 <- function(
     check_calibration_check_inputs(
         sceptre_object,
         n_calibration_pairs,
-        n_processors
+        n_processors,
+        calibration_group_size
     ) |>
         invisible()
 

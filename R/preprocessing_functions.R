@@ -191,7 +191,9 @@ get_synthetic_permutation_idxs <- function(
             FUN.VALUE = integer(1)
         ) |>
             sort(decreasing = TRUE)
-        M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
+        # in high MOI, NT gRNA groups can overlap, so the sum of their sizes
+        # can exceed the number of cells; a union never does
+        M <- min(sum(indiv_nt_sizes[seq(1, calibration_group_size)]), n_cells)
         out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
     } else if (!calibration_check && !control_group_complement) {
         # 3. discovery, nt cells (low MOI only)
