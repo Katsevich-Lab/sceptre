@@ -119,7 +119,7 @@ assign_grnas_to_cells_mixture <- function(
             mc.cores = length(grna_ids_partitioned)
         )
         check_worker_results(res)
-        initial_assignment_list <- res |> purrr::flatten()
+        initial_assignment_list <- do.call(c, unname(res))
     }
 
     # return

@@ -960,22 +960,14 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
 
 
 collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
-    # temporary function; we may rewrite this function to improve its
-    # speed and memory efficiency if multiguide vector data become more
-    # prevalent.
-    vector_ids <- grna_target_data_frame$vector_id |> unique()
-    grna_matrix <- as.matrix(grna_matrix)
-    n_cells <- ncol(grna_matrix)
-    grna_matrix_collapsed <- vapply(
-        vector_ids,
-        function(curr_vector_id) {
-            curr_grna_ids <- grna_target_data_frame |>
-                dplyr::filter(vector_id == curr_vector_id) |>
-                dplyr::pull(grna_id)
-            Matrix::colSums(grna_matrix[curr_grna_ids, , drop = FALSE])
-        },
-        FUN.VALUE = numeric(n_cells)
-    ) |>
-        t()
-    return(grna_matrix_collapsed)
+    # for each vector, sum the rows of the gRNAs that the target data frame
+    # lists for it: multiply by the indicator matrix of vectors (rows) by
+    # entries of the data frame (columns)
+    vector_indicators <- Matrix::fac2sparse(factor(
+        grna_target_data_frame$vector_id,
+        levels = unique(grna_target_data_frame$vector_id)
+    ))
+    grna_matrix <- set_matrix_accessibility(grna_matrix, FALSE)
+    grna_matrix <- grna_matrix[grna_target_data_frame$grna_id, , drop = FALSE]
+    Matrix::drop0(vector_indicators %*% grna_matrix)
 }

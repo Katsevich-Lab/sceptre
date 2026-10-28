@@ -14,29 +14,6 @@ cis_pair_object <- function(response_ids, metadata) {
     )
 }
 
-test_that("cis gene selection checks every position in supplied order", {
-    expect_identical(
-        compute_genes_within_distance(100L, c(90L, 1000L, 110L), 20L),
-        c(1L, 3L)
-    )
-    expect_identical(
-        compute_genes_within_distance(
-            100L,
-            c(120L, 80L, 121L, 79L, 100L, 80L),
-            20L
-        ),
-        c(1L, 2L, 5L, 6L)
-    )
-    expect_identical(
-        compute_genes_within_distance(100L, integer(), 20L),
-        integer()
-    )
-    expect_identical(
-        compute_genes_within_distance(100L, c(100L, 99L), -1L),
-        integer()
-    )
-})
-
 test_that("construct_cis_pairs() finds genes listed after an out-of-range gene", {
     response_ids <- c(
         "left",
@@ -106,38 +83,6 @@ test_that("construct_cis_pairs() finds all nearby genes in the GRCh37 table", {
     expect_gt(length(expected), 1L)
     expect_identical(actual$response_id, expected)
     expect_true(all(actual$grna_target == "enhancer"))
-})
-
-test_that("cis gene selection does not overflow for large coordinates", {
-    # The first two positions differ by more than a C++ int can hold
-    positions <- c(
-        .Machine$integer.max,
-        -.Machine$integer.max,
-        0L,
-        1L,
-        1800000010L,
-        -1800000010L,
-        80L,
-        120L
-    )
-    for (midpoint in c(
-        0L,
-        100L,
-        1800000010L,
-        -1800000010L,
-        .Machine$integer.max
-    )) {
-        for (distance in c(-1L, 0L, 20L, 1800000000L, .Machine$integer.max)) {
-            expected <- which(
-                abs(as.double(positions) - as.double(midpoint)) <=
-                    as.double(distance)
-            )
-            expect_identical(
-                compute_genes_within_distance(midpoint, positions, distance),
-                expected
-            )
-        }
-    }
 })
 
 test_that("construct_cis_pairs() computes the midpoint of large coordinates", {

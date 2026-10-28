@@ -50,20 +50,12 @@ iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possi
     .Call(`_sceptre_iterate_over_combinations`, n_nt_grnas, undercover_group_size, n_possible_groups)
 }
 
-increment_matrix <- function(m) {
-    invisible(.Call(`_sceptre_increment_matrix`, m))
-}
-
 sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
     .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
 }
 
 compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
     .Call(`_sceptre_compute_n_trt_cells_matrix`, j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use)
-}
-
-compute_genes_within_distance <- function(midpoint, gene_tss_posits, distance_threshold) {
-    .Call(`_sceptre_compute_genes_within_distance`, midpoint, gene_tss_posits, distance_threshold)
 }
 
 compute_nt_nonzero_matrix_and_n_ok_pairs_v3 <- function(j, p, n_cells_orig, n_cells_sub, grna_group_idxs, indiv_nt_grna_idxs, all_nt_idxs, to_analyze_response_idxs, to_analyze_grna_idxs, control_group_complement, cells_in_use) {
@@ -80,10 +72,6 @@ load_csr_row <- function(j, p, x, row_idx, n_cells) {
 
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
     .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
-}
-
-compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
-    .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
 }
 
 threshold_count_matrix <- function(j, p, x, row_idx, threshold) {

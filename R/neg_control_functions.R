@@ -113,9 +113,8 @@ construct_negative_control_pairs_v2 <- function(
         stop("No negative control pair passes pairwise QC.")
     }
     response_ids <- rownames(response_matrix)
-    increment_matrix(possible_groups_m)
     undercover_groups <- get_undercover_group_names(
-        possible_groups_m,
+        possible_groups_m + 1L,
         nt_grna_names
     )
     df <- data.frame(
