@@ -52,18 +52,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// crt_index_sampler
-SEXP crt_index_sampler(NumericVector fitted_probabilities, int B);
-RcppExport SEXP _sceptre_crt_index_sampler(SEXP fitted_probabilitiesSEXP, SEXP BSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type fitted_probabilities(fitted_probabilitiesSEXP);
-    Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(crt_index_sampler(fitted_probabilities, B));
-    return rcpp_result_gen;
-END_RCPP
-}
 // crt_index_sampler_fast
 SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B);
 RcppExport SEXP _sceptre_crt_index_sampler_fast(SEXP fitted_probabilitiesSEXP, SEXP BSEXP) {
@@ -324,7 +312,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
     {"_sceptre_fisher_yates_sampler", (DL_FUNC) &_sceptre_fisher_yates_sampler, 3},
     {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
-    {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
     {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 15},
     {"_sceptre_run_reduced_em_algo_cpp", (DL_FUNC) &_sceptre_run_reduced_em_algo_cpp, 5},

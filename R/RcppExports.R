@@ -26,10 +26,6 @@ hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
 }
 
-crt_index_sampler <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B)
-}
-
 crt_index_sampler_fast <- function(fitted_probabilities, B) {
     .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
 }
