@@ -38,6 +38,8 @@
 
 -   `import_data()` no longer loses entries of a dense (base R) square response or gRNA matrix that is symmetric or nearly symmetric.
 
+-   Empirical p-values (from permutations or the CRT, without the skew-normal fit) now count a resampled test statistic as tying the observed one when the two agree to a relative tolerance of 1e-10. Previously ties were detected by exact comparison, but the observed and resampled statistics are computed separately, so statistics that should tie could differ in their last digits, and the same analysis could give different p-values on different computers (in one example, 0.996 on macOS and 0.94 on Linux). Ties are common when the treated group is small or the formula has no continuous covariates; in such cases p-values can now be slightly larger. Other p-values are unchanged.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.
