@@ -89,7 +89,7 @@ run_perm_test_in_memory <- function(
     # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+        covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
     # 2. define function to loop subset of response IDs
@@ -235,6 +235,7 @@ run_perm_test_in_memory <- function(
             },
             mc.cores = length(partitioned_response_ids)
         )
+        check_worker_results(res)
         message(crayon::green(" \u2713"))
     }
 
@@ -303,7 +304,7 @@ run_crt_in_memory_v2 <- function(
     # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+        covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
     # 2. define the run precomputation function
@@ -397,6 +398,7 @@ run_crt_in_memory_v2 <- function(
                 },
                 mc.cores = length(partitioned_response_ids)
             )
+            check_worker_results(res)
         }
         precomp_out_list <- purrr::flatten(res)
         response_precomputations <- c(
@@ -498,6 +500,7 @@ run_crt_in_memory_v2 <- function(
             },
             mc.cores = length(partitioned_grna_group_ids)
         )
+        check_worker_results(res)
         message(crayon::green(" \u2713"))
     }
     result <- res |> data.table::rbindlist(fill = TRUE)

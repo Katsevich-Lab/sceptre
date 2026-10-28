@@ -136,7 +136,10 @@ construct_cis_pairs <- function(
             ]
             min_posit <- min(x$start)
             max_posit <- max(x$end)
-            midpoint <- as.integer(floor((min_posit + max_posit) / 2))
+            # add as doubles; the sum of two integers can overflow
+            midpoint <- as.integer(floor(
+                (as.double(min_posit) + as.double(max_posit)) / 2
+            ))
             paired_responses <- response_ids[compute_genes_within_distance(
                 midpoint,
                 response_posits,
@@ -269,7 +272,11 @@ construct_trans_pairs <- function(
     )
     data.table::setDT(out_pairs)
     if (pairs_to_exclude == "pc_pairs") {
-        data.table::setDT(positive_control_pairs)
+        # copy rather than setDT(), which would convert the caller's data
+        # frame by reference
+        positive_control_pairs <- data.table::as.data.table(
+            positive_control_pairs
+        )
         if (nrow(positive_control_pairs) >= 1) {
             out_pairs <- data.table::fsetdiff(out_pairs, positive_control_pairs)
         }

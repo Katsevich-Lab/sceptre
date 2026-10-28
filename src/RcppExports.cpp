@@ -224,6 +224,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// read_mtx
+S4 read_mtx(const std::string& path, bool transpose);
+RcppExport SEXP _sceptre_read_mtx(SEXP pathSEXP, SEXP transposeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type transpose(transposeSEXP);
+    rcpp_result_gen = Rcpp::wrap(read_mtx(path, transpose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // load_csr_row
 NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells);
 RcppExport SEXP _sceptre_load_csr_row(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP) {
@@ -323,6 +335,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
+    {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
