@@ -109,6 +109,14 @@ test_that("an analysis read back from files is the same at every stage", {
         file.path(directory, "results", "discovery.parquet")
     )
     expect_error(read_analysis(directory), "results/discovery.parquet")
+    # so is a file added after writing, here fits for an analysis without fits
+    directory <- withr::local_tempfile()
+    write_analysis(as_analysis(workflow$start), directory)
+    arrow::write_parquet(
+        data.frame(added = 1L),
+        file.path(directory, "fits.parquet")
+    )
+    expect_error(read_analysis(directory), "fits.parquet")
     expect_error(
         write_analysis(as_analysis(object), directory),
         "must be empty"

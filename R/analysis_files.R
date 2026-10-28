@@ -170,7 +170,8 @@ state_slots <- function() {
     )
 }
 
-# An MD5 checksum of every file, so that reading stops at a changed file.
+# An MD5 checksum of every file, so that reading stops at a changed, missing
+# or added file.
 write_checksums <- function(directory) {
     files <- setdiff(
         list.files(directory, recursive = TRUE),
@@ -192,10 +193,16 @@ check_checksums <- function(directory) {
         colClasses = "character"
     )
     actual <- unname(tools::md5sum(file.path(directory, expected$file)))
-    changed <- expected$file[is.na(actual) | actual != expected$md5]
+    present <- setdiff(list.files(directory, recursive = TRUE), "checksums.tsv")
+    # a file added later under an expected name would otherwise be read
+    changed <- c(
+        expected$file[is.na(actual) | actual != expected$md5],
+        setdiff(present, expected$file)
+    )
     if (length(changed) > 0L) {
         stop(
-            "Analysis files are missing or changed since they were written: ",
+            "Analysis files are missing, changed or added since they were ",
+            "written: ",
             paste(changed, collapse = ", "),
             call. = FALSE
         )
