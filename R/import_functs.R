@@ -439,15 +439,8 @@ import_data_from_cellranger_memory <- function(
             col.names = c("feature_id", "feature_name", "modality"),
             header = FALSE
         )
-        for (col in colnames(feature_df)) {
-            if (
-                any(
-                    dplyr::pull(feature_df, dplyr::all_of(col)) !=
-                        dplyr::pull(curr_feature_df, dplyr::all_of(col))
-                )
-            ) {
-                stop("The features.tsv files must match across directories.")
-            }
+        if (!isTRUE(all.equal(feature_df, curr_feature_df))) {
+            stop("The features.tsv files must match across directories.")
         }
 
         # process the matrix

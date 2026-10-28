@@ -146,4 +146,25 @@ test_that("import rejects repeated entries and malformed matrix files", {
         "has 4 rows, but its features.tsv file has 5",
         fixed = TRUE
     )
+
+    # a later features.tsv that repeats the first one does not match it
+    first <- write_cellranger_coordinates(
+        file.path(withr::local_tempdir(), "first"),
+        "1 1 2"
+    )
+    second <- write_cellranger_coordinates(
+        file.path(withr::local_tempdir(), "second"),
+        "1 1 2"
+    )
+    features <- readLines(file.path(second, "features.tsv"))
+    writeLines(rep(features, 2L), file.path(second, "features.tsv"))
+    expect_error(
+        suppressMessages(import_data_from_cellranger(
+            c(first, second),
+            "low",
+            cellranger_metadata
+        )),
+        "The features.tsv files must match across directories.",
+        fixed = TRUE
+    )
 })
