@@ -333,7 +333,7 @@ test_that("Cell Ranger import gives each vector one row spanning its gRNAs", {
             grna_integration_strategy = "singleton",
             resampling_mechanism = "permutations"
         )
-        expect_identical(anyDuplicated(object@discovery_pairs_with_info), 0L)
+        expect_identical(nrow(object@discovery_pairs), 2L)
         expect_error(
             import(repeated),
             paste("These appear more than once:", targets$grna_id[1L]),

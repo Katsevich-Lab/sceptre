@@ -34,7 +34,9 @@ Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
 giving the chromosome, start coordinate, and end coordiante, respectively, of
 each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
-\code{vector_id} specifying the vector to which a given gRNA belongs.}
+\code{vector_id} specifying the vector to which a given gRNA belongs. A vector's
+gRNAs must agree in every column but \code{start} and \code{end}; the vector's
+position spans them, from their smallest \code{start} to their largest \code{end}.}
 
 \item{moi}{a string indicating the MOI of the dataset, either "low" or
 "high".}
