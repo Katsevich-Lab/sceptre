@@ -255,6 +255,18 @@ consistency_analyses <- c(
     discovery_result = "run_discovery_analysis"
 )
 
+# The value of `x`, or NULL when it calls a getter for a step that has not run
+# yet. Asking the exported getters, rather than reading which functions were
+# called from a slot, keeps the public outputs free of internal state.
+consistency_if_run <- function(x) {
+    tryCatch(x, error = function(e) {
+        if (grepl("has not yet been (called|run)", conditionMessage(e))) {
+            return(NULL)
+        }
+        stop(e)
+    })
+}
+
 # The internal part of an observation, or NULL when the internal snapshots are
 # waived. `x` is evaluated only when it is used, so a restructuring that removes
 # slots can still check the public outputs.
@@ -268,22 +280,19 @@ consistency_internal_part <- function(x) {
 # An analysis object: public tables (getters and get_result()) and internal
 # slots, including the requested pairs with their pairwise QC.
 consistency_observe <- function(object) {
-    called <- object@functs_called
     tables <- list(
         cell_covariates = consistency_plain(sceptre::get_cell_covariates(
             object
         ))
     )
-    if (isTRUE(called[["assign_grnas"]])) {
-        tables$grna_assignments <- consistency_assignment_table(object)
-    }
+    # assigning NULL drops the element, so steps that have not run are absent
+    tables$grna_assignments <- consistency_if_run(consistency_assignment_table(
+        object
+    ))
     for (name in names(consistency_analyses)) {
-        if (isTRUE(called[[consistency_analyses[[name]]]])) {
-            tables[[name]] <- consistency_plain(sceptre::get_result(
-                object,
-                consistency_analyses[[name]]
-            ))
-        }
+        tables[[name]] <- consistency_if_run(consistency_plain(
+            sceptre::get_result(object, consistency_analyses[[name]])
+        ))
     }
     internal <- consistency_internal_part({
         internal <- lapply(consistency_internal_slots, function(name) {
