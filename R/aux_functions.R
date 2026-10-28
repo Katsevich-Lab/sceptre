@@ -195,6 +195,35 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
 }
 
 
+# parallel::mclapply() returns a "try-error" object for a worker that failed
+# and NULL for a worker that exited without returning a result. Stop with the
+# worker's original error before its result is combined with the others. A
+# successful worker never returns NULL here: every caller's worker function
+# returns a list or a data.table, possibly empty.
+check_worker_results <- function(res) {
+    for (i in seq_along(res)) {
+        if (inherits(res[[i]], "try-error")) {
+            cause <- attr(res[[i]], "condition")
+            detail <- if (inherits(cause, "condition")) {
+                conditionMessage(cause)
+            } else {
+                as.character(res[[i]])
+            }
+            stop("Parallel worker ", i, " failed: ", detail, call. = FALSE)
+        }
+        if (is.null(res[[i]])) {
+            stop(
+                "Parallel worker ",
+                i,
+                " returned no result; it may have exited unexpectedly.",
+                call. = FALSE
+            )
+        }
+    }
+    invisible(res)
+}
+
+
 get_log_dir <- function(log_dir) {
     log_dir <- paste0(log_dir, "/sceptre_logs/")
     if (!dir.exists(log_dir)) {
