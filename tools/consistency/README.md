@@ -39,8 +39,8 @@ as text, and single threads keep results reproducible.
 - `tests/test-<group>.R`: one file per group of cases, snapshotted in
   `tests/_snaps/<group>/<case>.R` (public outputs) and
   `<case>-internal.R` (internal state).
-- `tests/test-inputs.R`: the inputs and the list of cases, and serial against
-  parallel.
+- `tests/test-inputs.R`: the inputs, the list of cases and their test files,
+  and serial against parallel.
 - `tests/inputs/saved-objects/`: a saved 0.99.0 object, a file-format input.
 
 ## Cases
@@ -111,7 +111,8 @@ the internal checks.
 ## Comparison
 
 Each snapshot is the observation written as R code with 17 significant digits,
-so it reads back exactly and shows in a diff which values changed. testthat
+so it reads back to within one unit in the last place and shows in a diff
+which values changed. testthat
 stores the snapshots, reports new and changed ones, and fails them in CI;
 `consistency_differences()` in `harness.R` decides whether an observation
 matches its snapshot:

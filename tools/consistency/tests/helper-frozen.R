@@ -6,10 +6,11 @@ input_dir <- test_path("inputs")
 waive_internal <- identical(Sys.getenv("SCEPTRE_FROZEN_WAIVE_INTERNAL"), "true")
 tolerance <- as.numeric(Sys.getenv("SCEPTRE_FROZEN_TOLERANCE", "1e-8"))
 
-# Snapshot `x` as R code, exact to the last bit and readable in a diff, and
-# compare it with the recorded snapshot by consistency_differences(): testthat
-# compares numbers relative to their average size, which would not notice a
-# p-value moving from 1e-25 to 1e-14.
+# Snapshot `x` as R code with 17 significant digits, readable in a diff (R's
+# parser can read a double back one unit in the last place off, far below any
+# tolerance). consistency_differences() compares it with the recorded
+# snapshot: testthat compares numbers relative to their average size, which
+# would not notice a p-value moving from 1e-25 to 1e-14.
 expect_frozen <- function(x, name) {
     path <- tempfile(fileext = ".R")
     writeLines(
@@ -49,6 +50,8 @@ snapshot_cases <- function(group) {
             # A restructuring that moves slots may waive these snapshots, and
             # must then say so in its pull request.
             test_that(paste("internal state:", case_name), {
+                # announced first, so a waived run does not delete it as unused
+                announce_snapshot_file(paste0(case_name, "-internal.R"))
                 skip_if(waive_internal, "internal snapshots waived")
                 expect_frozen(
                     consistency_internal(observation),

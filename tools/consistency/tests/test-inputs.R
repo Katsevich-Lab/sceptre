@@ -44,12 +44,18 @@ test_that("two workers give the serial results", {
         observation <- consistency_sort_precomputations(observation)
         if (waive_internal) consistency_public(observation) else observation
     }
-    expect_length(
-        consistency_differences(
-            run(parallel = TRUE),
-            run(parallel = FALSE),
-            tolerance
-        ),
-        0L
+    expect_equal(
+        consistency_differences(run(parallel = TRUE), run(parallel = FALSE), 0),
+        character()
+    )
+})
+
+# Each group of cases has its test file, so deleting one cannot silently drop
+# its cases.
+test_that("every group of cases has a test file", {
+    groups <- unique(vapply(consistency_cases(), `[[`, "", "group"))
+    expect_setequal(
+        paste0("test-", gsub("_", "-", groups), ".R"),
+        setdiff(list.files(test_path(), "^test-.*[.]R$"), "test-inputs.R")
     )
 })

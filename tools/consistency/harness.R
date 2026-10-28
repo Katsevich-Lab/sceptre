@@ -1352,6 +1352,13 @@ consistency_differences <- function(
         if (length(actual) != length(expected)) {
             return(paste0(path, ": length differs"))
         }
+        other_attributes <- function(x) {
+            a <- attributes(x)
+            a[setdiff(names(a), "names")]
+        }
+        if (!identical(other_attributes(actual), other_attributes(expected))) {
+            return(paste0(path, ": attributes differ"))
+        }
         keys <- if (is.null(names(expected))) {
             paste0("[[", seq_along(expected), "]]")
         } else {
