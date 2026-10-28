@@ -89,12 +89,13 @@ test_that("a discovery analysis with all-tied scores returns a p-value of one", 
 })
 
 test_that("a tie counts the same whichever way rounding moves it", {
-    # Resampled scores equal to the observed one up to rounding, one unit in
-    # the last place below or above it, as the observed and resampled
+    # Resampled scores equal to the observed one up to rounding, a unit or two
+    # in the last place below or above it, as the observed and resampled
     # statistics come out when computed by different code.
     p_values <- function(tie) {
         # every cell but the observed one is a tie, so every draw is one
         a <- c(0.75, rep(tie, 4L))
+        set.seed(1L) # without a seed, all draws could hit the observed cell
         draws <- fisher_yates_sampler(n_tot = 5L, M = 1L, B = 4L)
         vapply(
             -1:1,
@@ -124,4 +125,34 @@ test_that("a tie counts the same whichever way rounding moves it", {
     above <- p_values(0.75 * (1 + .Machine$double.eps))
     expect_identical(below, above)
     expect_identical(below, p_values(0.75))
+})
+
+test_that("an infinite observed statistic still counts its ties", {
+    # a zero denominator with a positive numerator makes every statistic +Inf
+    set.seed(1L)
+    draws <- fisher_yates_sampler(n_tot = 5L, M = 1L, B = 4L)
+    p <- vapply(
+        -1:1,
+        function(side) {
+            run_low_level_test_full_v4(
+                y = rep(2, 5),
+                mu = rep(2, 5),
+                a = rep(1, 5),
+                w = rep(0, 5),
+                D = matrix(0, 1L, 5L),
+                trt_idxs = 1L,
+                n_trt = 1L,
+                use_all_cells = FALSE,
+                synthetic_idxs = draws,
+                B1 = 4L,
+                B2 = 0L,
+                B3 = 0L,
+                fit_parametric_curve = FALSE,
+                return_resampling_dist = TRUE,
+                side_code = side
+            )$p
+        },
+        numeric(1)
+    )
+    expect_identical(p, c(1, 1, 1))
 })

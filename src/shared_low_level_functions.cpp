@@ -41,6 +41,7 @@ double compute_empirical_p_value(const std::vector<double>& null_statistics, dou
     double counter = 0;
     double B = (double) null_statistics.size();
     double tie = 1e-10 * std::max(std::abs(z_orig), 1.0);
+    if (!std::isfinite(tie)) tie = 0; // an infinite statistic ties exactly
     if (side == -1) { // left
       for (int i = 0; i < null_statistics.size(); i ++) if (null_statistics[i] <= z_orig + tie) counter ++;
     } else { // right
