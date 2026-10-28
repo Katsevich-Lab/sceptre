@@ -38,6 +38,15 @@ compare_frozen <- function(old, new) {
     length(differences) == 0L
 }
 
+# Public snapshots that differ by platform for a documented reason
+# (../README.md, "Platforms"), skipped on that platform: case = c(os, reason).
+platform_differences <- list(
+    edge_intercept_only_nt = c(
+        "linux",
+        "permutation statistics tie the observed one; tie counts differ by platform"
+    )
+)
+
 snapshot_cases <- function(group) {
     cases <- consistency_cases()
     for (name in names(cases)[vapply(cases, `[[`, "", "group") == group]) {
@@ -45,6 +54,14 @@ snapshot_cases <- function(group) {
             case_name <- name
             observation <- consistency_run_case(case_name, input_dir)
             test_that(paste("public outputs:", case_name), {
+                # announced first, so a skipped run does not delete it as unused
+                announce_snapshot_file(paste0(case_name, ".R"))
+                difference <- platform_differences[[case_name]]
+                skip_if(
+                    !is.null(difference) &&
+                        tolower(Sys.info()[["sysname"]]) == difference[[1L]],
+                    difference[[2L]]
+                )
                 expect_frozen(consistency_public(observation), case_name)
             })
             # A restructuring that moves slots may waive these snapshots, and

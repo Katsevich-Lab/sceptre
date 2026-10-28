@@ -146,7 +146,9 @@ statistics take few distinct values, and some equal the observed statistic.
 Whether a tie counts as "at least as extreme" then depends on the last bit of
 floating-point arithmetic, so the empirical p-values of `r3` and `r5` differ
 by platform (0.996 on macOS, 0.94 to 0.984 on Linux). This is sceptre's
-behavior, not the suite's.
+behavior, not the suite's, so that case's public snapshot is skipped on Linux
+(`platform_differences` in `tests/helper-frozen.R`); its internal snapshot is
+still checked.
 
 CI installs `R.utils`, which `data.table::fread()` needs to read the gzipped
 Cell Ranger example files.
