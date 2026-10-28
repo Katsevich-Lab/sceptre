@@ -30,8 +30,9 @@ gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the
 "high".}
 
 \item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and
-\code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs
-should be assigned a label of "non-targeting". Optionally,
+\code{grna_target} mapping each individual gRNA to its target, one row per gRNA.
+Non-targeting gRNAs should be assigned a label of "non-targeting".
+Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
 giving the chromosome, start coordinate, and end coordiante, respectively, of
 each gRNA. Additionally, \code{grna_target_data_frame} can contain the column

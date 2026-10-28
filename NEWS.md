@@ -38,6 +38,8 @@
 
 -   `import_data()` no longer loses entries of a dense (base R) square response or gRNA matrix that is symmetric or nearly symmetric.
 
+-   `import_data()`, `import_data_from_cellranger()` and `import_data_from_parse()` now stop with an error when a gRNA appears in more than one row of `grna_target_data_frame`. Previously such rows were accepted, and with a `vector_id` column the gRNA's counts were added to its vector once per row.
+
 # sceptre 0.99.0 (2026-06-24)
 
 This release prepares `sceptre` for submission to Bioconductor.

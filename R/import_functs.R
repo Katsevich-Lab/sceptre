@@ -20,8 +20,9 @@
 #' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the
 #' gRNA IDs. The column names, when supplied, should give the cell IDs.
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
@@ -240,8 +241,9 @@ import_data_use_ondisc <- function(
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
@@ -677,8 +679,9 @@ import_data_from_cellranger_use_ondisc <- function(
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column

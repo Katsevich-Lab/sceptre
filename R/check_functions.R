@@ -49,6 +49,16 @@ check_import_data_inputs <- function(
             paste0(rownames(grna_matrix), collapse = ", ")
         )
     }
+    # each gRNA has one row, giving its one target (and vector)
+    repeated_grna_ids <- unique(grna_target_data_frame$grna_id[duplicated(
+        grna_target_data_frame$grna_id
+    )])
+    if (length(repeated_grna_ids) >= 1L) {
+        stop(
+            "Each `grna_id` must appear in only one row of the `grna_target_data_frame`. These appear more than once: ",
+            paste0(repeated_grna_ids, collapse = ", ")
+        )
+    }
 
     # 7. check type of input matrices
     check_matrix_class <- function(

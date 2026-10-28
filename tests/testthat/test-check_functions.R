@@ -513,3 +513,44 @@ test_that("check_import_data_inputs", {
         regex = "`extra_covariates` has infinite values that need to be removed"
     )
 })
+
+test_that("each grna_id appears in only one row of grna_target_data_frame", {
+    targets <- make_mock_grna_target_data(
+        num_guides_per_target = c(2, 3),
+        chr_distances = 1,
+        chr_starts = 1,
+        num_nt_guides = 2
+    )
+    num_cells <- 23
+    check <- function(grna_target_data_frame) {
+        check_import_data_inputs(
+            response_matrix = make_mock_response_matrices(18, num_cells, "one"),
+            grna_matrix = make_mock_grna_matrices(
+                targets,
+                num_cells,
+                non_nt_patterns = "one",
+                nt_patterns = "one"
+            ),
+            grna_target_data_frame = grna_target_data_frame,
+            moi = "low",
+            extra_covariates = make_mock_extra_covariates_data_frames(
+                num_cells,
+                patterns = "many_levels"
+            )
+        )
+    }
+    expect_no_error(check(targets))
+    # a repeated row would count the gRNA twice when gRNAs are summed into
+    # vectors, and could give it two targets
+    repeated <- rbind(targets, targets[c(1L, 3L, 1L), ])
+    expect_error(
+        check(repeated),
+        paste0(
+            "These appear more than once: ",
+            targets$grna_id[1L],
+            ", ",
+            targets$grna_id[3L]
+        ),
+        fixed = TRUE
+    )
+})
