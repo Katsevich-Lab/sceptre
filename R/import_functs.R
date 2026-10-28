@@ -451,7 +451,7 @@ import_data_from_cellranger_memory <- function(
         }
 
         # process the matrix
-        mat <- read_mtx(matrix_fps[i], transpose = FALSE)
+        mat <- read_mtx(path.expand(matrix_fps[i]), transpose = FALSE)
         if (nrow(mat) != nrow(feature_df)) {
             stop(
                 "The matrix file in directory ",
@@ -747,8 +747,8 @@ import_data_from_parse <- function(
     }
 
     # 2. load the gene.mtx and grna.mtx data; Parse writes cells in rows
-    gene_mat <- read_mtx(gene_mat_fp, transpose = TRUE)
-    grna_mat <- read_mtx(grna_mat_fp, transpose = TRUE)
+    gene_mat <- read_mtx(path.expand(gene_mat_fp), transpose = TRUE)
+    grna_mat <- read_mtx(path.expand(grna_mat_fp), transpose = TRUE)
 
     # 3. load the gene ids; update rownames of gene mat
     gene_feature_df <- data.table::fread(

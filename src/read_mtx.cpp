@@ -28,8 +28,9 @@ S4 read_mtx(const std::string& path, bool transpose) {
           banner.field == eminem::Field::DOUBLE)) {
       throw std::runtime_error("expected a general coordinate matrix of integer or real counts");
     }
-    if (parser.get_nlines() > static_cast<unsigned long long>(INT_MAX)) {
-      throw std::runtime_error("too many entries for a sparse matrix in R");
+    if (parser.get_nlines() > static_cast<unsigned long long>(INT_MAX) ||
+        parser.get_nrows() == INT_MAX || parser.get_ncols() == INT_MAX) {
+      throw std::runtime_error("too many entries or dimensions for a sparse matrix in R");
     }
     n_rows = transpose ? parser.get_ncols() : parser.get_nrows();
     n_cols = transpose ? parser.get_nrows() : parser.get_ncols();
