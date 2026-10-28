@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "eminem/eminem.hpp"
+#include "tatami/sparse/compress_sparse_triplets.hpp"
 
 #include <algorithm>
 #include <climits>
@@ -11,9 +12,10 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 S4 read_mtx(const std::string& path, bool transpose) {
-  // Read a Matrix Market file into a dgCMatrix. eminem checks the banner, the
-  // dimensions and every entry. With transpose, the rows of the file become
-  // columns (Parse writes cells in rows; Cell Ranger writes features in rows).
+  // Read a Matrix Market file into a dgCMatrix. eminem parses the file and
+  // checks the banner, the dimensions and every entry; tatami sorts the
+  // entries. With transpose, the rows of the file become columns (Parse writes
+  // cells in rows; Cell Ranger writes features in rows).
   std::vector<int> rows, cols;
   std::vector<double> vals;
   int n_rows, n_cols;
@@ -47,40 +49,20 @@ S4 read_mtx(const std::string& path, bool transpose) {
     stop(path + ": " + e.what());
   }
 
-  // place the entries column by column, keeping file order within a column
-  IntegerVector p(n_cols + 1), i(rows.size());
-  NumericVector x(rows.size());
-  for (int c : cols) p[c + 1] ++;
-  for (int c = 0; c < n_cols; c ++) p[c + 1] += p[c];
-  std::vector<int> next(p.begin(), p.end() - 1);
-  for (size_t k = 0; k < rows.size(); k ++) {
-    int dest = next[cols[k]]++;
-    i[dest] = rows[k];
-    x[dest] = vals[k];
-  }
-
-  // sort rows within each column (files are usually sorted already)
-  std::vector<std::pair<int, double>> buffer;
+  // sort the entries by column, then by row, and get the column pointers
+  auto p = tatami::compress_sparse_triplets<std::vector<double>, int>(n_cols, vals, cols, rows);
+  // a dgCMatrix may not repeat a row within a column: Matrix functions would
+  // then disagree about the value, so reject repeated entries
   for (int c = 0; c < n_cols; c ++) {
-    int start = p[c], end = p[c + 1];
-    if (!std::is_sorted(i.begin() + start, i.begin() + end)) {
-      buffer.clear();
-      for (int k = start; k < end; k ++) buffer.emplace_back(i[k], x[k]);
-      std::sort(buffer.begin(), buffer.end());
-      for (int k = start; k < end; k ++) {
-        i[k] = buffer[k - start].first;
-        x[k] = buffer[k - start].second;
-      }
-    }
-    if (std::adjacent_find(i.begin() + start, i.begin() + end) != i.begin() + end) {
+    if (std::adjacent_find(rows.begin() + p[c], rows.begin() + p[c + 1]) != rows.begin() + p[c + 1]) {
       stop(path + ": the same (row, column) entry appears more than once");
     }
   }
 
   S4 out("dgCMatrix");
   out.slot("Dim") = IntegerVector::create(n_rows, n_cols);
-  out.slot("i") = i;
-  out.slot("p") = p;
-  out.slot("x") = x;
+  out.slot("i") = IntegerVector(rows.begin(), rows.end());
+  out.slot("p") = IntegerVector(p.begin(), p.end());
+  out.slot("x") = NumericVector(vals.begin(), vals.end());
   return out;
 }
