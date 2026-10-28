@@ -513,3 +513,16 @@ test_that("check_import_data_inputs", {
         regex = "`extra_covariates` has infinite values that need to be removed"
     )
 })
+
+test_that("each grna_id appears in only one row of grna_target_data_frame", {
+    targets <- data.frame(
+        grna_id = c("g1", "g2", "g3", "nt1"),
+        grna_target = c("A", "A", "B", "non-targeting")
+    )
+    expect_no_error(check_grna_ids_unique(targets))
+    expect_error(
+        check_grna_ids_unique(targets[c(1L, 2L, 3L, 1L, 4L, 3L), ]),
+        "These appear more than once: g1, g3",
+        fixed = TRUE
+    )
+})

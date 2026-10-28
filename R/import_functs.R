@@ -20,12 +20,15 @@
 #' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the
 #' gRNA IDs. The column names, when supplied, should give the cell IDs.
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. A vector's
+#' gRNAs must agree in every column but `start` and `end`; the vector's
+#' position spans them, from their smallest `start` to their largest `end`.
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param extra_covariates (optional) a data frame containing extra covariates
@@ -111,6 +114,7 @@ import_data_memory <- function(
     response_names
 ) {
     #  perform initial check
+    check_grna_ids_unique(grna_target_data_frame)
     check_import_data_inputs(
         response_matrix,
         grna_matrix,
@@ -159,6 +163,7 @@ import_data_use_ondisc <- function(
     directory_to_write
 ) {
     #  perform initial check
+    check_grna_ids_unique(grna_target_data_frame)
     check_import_data_inputs(
         response_matrix,
         grna_matrix,
@@ -240,12 +245,15 @@ import_data_use_ondisc <- function(
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. A vector's
+#' gRNAs must agree in every column but `start` and `end`; the vector's
+#' position spans them, from their smallest `start` to their largest `end`.
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #' If row names are supplied and cell barcodes are retained, the row names must
@@ -586,11 +594,17 @@ import_data_from_cellranger_use_ondisc <- function(
     extra_covariates,
     directory_to_write
 ) {
-    # 0. check that directory_to_write has been supplied
+    # 0. check that each gRNA has one row, before ondisc sums gRNAs into
+    # vectors, and that directory_to_write has been supplied
+    check_grna_ids_unique(grna_target_data_frame)
     directory_to_write <- prepare_directory_to_write(directory_to_write)
 
-    # 1. call the corresponding ondisc function
+    # 1. call the corresponding ondisc function, which takes the gRNA rows; the
+    # vectors are checked first, before ondisc writes anything
     vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
+    vector_data_frame <- if (vector_supplied) {
+        collapse_grna_target_data_frame(grna_target_data_frame)
+    }
     out <- ondisc::create_odm_from_cellranger(
         directories_to_load = directories,
         directory_to_write = directory_to_write,
@@ -604,9 +618,7 @@ import_data_from_cellranger_use_ondisc <- function(
 
     # 1.5. update grna_target_data_frame, if vector supplied
     if (vector_supplied) {
-        grna_target_data_frame <- collapse_grna_target_data_frame(
-            grna_target_data_frame
-        )
+        grna_target_data_frame <- vector_data_frame
     }
 
     # 2. check data imports
@@ -677,12 +689,15 @@ import_data_from_cellranger_use_ondisc <- function(
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
-#' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
-#' should be assigned a label of "non-targeting". Optionally,
+#' `grna_target` mapping each individual gRNA to its target, one row per gRNA.
+#' Non-targeting gRNAs should be assigned a label of "non-targeting".
+#' Optionally,
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. A vector's
+#' gRNAs must agree in every column but `start` and `end`; the vector's
+#' position spans them, from their smallest `start` to their largest `end`.
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #'
@@ -952,10 +967,44 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
         stop("`vector_id` must be nested within `grna_target`.")
     }
 
-    grna_target_data_frame |>
+    # one row per vector, in order of appearance. A vector targets the span of
+    # its gRNAs, so its position runs from their smallest start to their
+    # largest end; every other column must agree across its gRNAs.
+    vectors <- grna_target_data_frame |>
         dplyr::select(-grna_id) |>
-        dplyr::rename(grna_id = vector_id) |>
-        dplyr::distinct()
+        dplyr::rename(grna_id = vector_id)
+    vector_ids <- unique(vectors$grna_id)
+    rows <- lapply(
+        split(
+            vectors,
+            factor(vectors$grna_id, levels = vector_ids, exclude = NULL)
+        ),
+        function(v) {
+            if ("start" %in% names(v)) {
+                v$start <- min(v$start)
+            }
+            if ("end" %in% names(v)) {
+                v$end <- max(v$end)
+            }
+            v <- dplyr::distinct(v)
+            if (nrow(v) > 1L) {
+                differ <- names(v)[vapply(
+                    v,
+                    function(x) length(unique(x)) > 1L,
+                    logical(1)
+                )]
+                stop(
+                    "The gRNAs of vector `",
+                    v$grna_id[1L],
+                    "` must agree in ",
+                    paste0("`", differ, "`", collapse = ", "),
+                    "; only `start` and `end` may differ."
+                )
+            }
+            v
+        }
+    )
+    dplyr::bind_rows(rows)
 }
 
 
