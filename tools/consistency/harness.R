@@ -193,7 +193,7 @@ consistency_observe_import <- function(object) {
                 object
             ))
         ),
-        internal = list(
+        internal = consistency_internal_part(list(
             covariate_names = object@covariate_names,
             low_moi = object@low_moi,
             tables = list(
@@ -201,7 +201,7 @@ consistency_observe_import <- function(object) {
                     object@grna_target_data_frame
                 )
             )
-        )
+        ))
     )
 }
 
@@ -255,6 +255,16 @@ consistency_analyses <- c(
     discovery_result = "run_discovery_analysis"
 )
 
+# The internal part of an observation, or NULL when the internal snapshots are
+# waived. `x` is evaluated only when it is used, so a restructuring that removes
+# slots can still check the public outputs.
+consistency_internal_part <- function(x) {
+    if (identical(Sys.getenv("SCEPTRE_FROZEN_WAIVE_INTERNAL"), "true")) {
+        return(NULL)
+    }
+    x
+}
+
 # An analysis object: public tables (getters and get_result()) and internal
 # slots, including the requested pairs with their pairwise QC.
 consistency_observe <- function(object) {
@@ -275,18 +285,21 @@ consistency_observe <- function(object) {
             ))
         }
     }
-    internal <- lapply(consistency_internal_slots, function(name) {
-        consistency_plain(methods::slot(object, name))
-    })
-    names(internal) <- consistency_internal_slots
-    internal$tables <- list(
-        discovery_pairs_with_info = consistency_plain(
-            object@discovery_pairs_with_info
-        ),
-        positive_control_pairs_with_info = consistency_plain(
-            object@positive_control_pairs_with_info
+    internal <- consistency_internal_part({
+        internal <- lapply(consistency_internal_slots, function(name) {
+            consistency_plain(methods::slot(object, name))
+        })
+        names(internal) <- consistency_internal_slots
+        internal$tables <- list(
+            discovery_pairs_with_info = consistency_plain(
+                object@discovery_pairs_with_info
+            ),
+            positive_control_pairs_with_info = consistency_plain(
+                object@positive_control_pairs_with_info
+            )
         )
-    )
+        internal
+    })
     list(tables = tables, internal = internal)
 }
 
@@ -445,7 +458,7 @@ consistency_run_workflow <- function(setting, parallel = FALSE) {
     inputs <- consistency_synthetic_inputs()
     consistency_capture({
         object <- consistency_prepare_synthetic(inputs, setting)
-        prepared <- object@response_precomputations
+        prepared <- consistency_internal_part(object@response_precomputations)
         object <- sceptre::run_calibration_check(
             object,
             n_calibration_pairs = 4L,
@@ -470,7 +483,9 @@ consistency_run_workflow <- function(setting, parallel = FALSE) {
             output_amount = setting$output
         )
         out <- consistency_observe(object)
-        out$internal$prepared_precomputations <- prepared
+        if (!is.null(prepared)) {
+            out$internal$prepared_precomputations <- prepared
+        }
         out$summary <- consistency_summary_text(object)
         out
     })
@@ -611,7 +626,9 @@ consistency_case_import_cellranger_one_directory_covariates <- function() {
                     sceptre::get_cell_covariates(object)
                 )
             ),
-            internal = list(covariate_names = object@covariate_names)
+            internal = consistency_internal_part(list(
+                covariate_names = object@covariate_names
+            ))
         )
     })
 }
@@ -663,7 +680,7 @@ consistency_import_example <- function(moi) {
 consistency_observe_assignment <- function(object) {
     list(
         tables = list(grna_assignments = consistency_assignment_table(object)),
-        internal = list(
+        internal = consistency_internal_part(list(
             method = object@grna_assignment_method,
             hyperparameters = consistency_plain(
                 object@grna_assignment_hyperparameters
@@ -674,7 +691,7 @@ consistency_observe_assignment <- function(object) {
                 object@import_grna_assignment_info
             ),
             mean_cells_per_grna = object@mean_cells_per_grna
-        )
+        ))
     )
 }
 
@@ -909,7 +926,9 @@ consistency_case_cache_reuse <- function() {
             resampling_approximation = setting$approximation,
             side = "right"
         )
-        side_cache <- changed@response_precomputations
+        side_cache <- consistency_internal_part(
+            changed@response_precomputations
+        )
         changed <- discover(changed)
         formula_changed <- sceptre::set_analysis_parameters(
             cold,
@@ -924,7 +943,9 @@ consistency_case_cache_reuse <- function() {
             threshold = 45,
             print_progress = FALSE
         )
-        reassigned_cache <- reassigned@response_precomputations
+        reassigned_cache <- consistency_internal_part(
+            reassigned@response_precomputations
+        )
         reassigned <- discover(consistency_qc_synthetic(reassigned, inputs))
         reassigned_cold <- discover(consistency_prepare_synthetic(
             inputs,
@@ -939,12 +960,12 @@ consistency_case_cache_reuse <- function() {
             changed_side = consistency_observe(changed),
             reassigned = consistency_observe(reassigned),
             reassigned_cold = consistency_observe(reassigned_cold),
-            internal = list(
+            internal = consistency_internal_part(list(
                 retained_side_cache = side_cache,
                 formula_cache = formula_changed@response_precomputations,
                 reassigned_cache = reassigned_cache,
                 changed_qc_cache = qc_changed@response_precomputations
-            )
+            ))
         )
     })
 }
@@ -970,7 +991,9 @@ consistency_control_switch <- function(clear_fits) {
             control_group = "complement",
             resampling_mechanism = "permutations"
         )
-        n_retained_fits <- length(changed@response_precomputations)
+        n_retained_fits <- consistency_internal_part(
+            length(changed@response_precomputations)
+        )
         changed <- sceptre::assign_grnas(
             changed,
             method = "thresholding",
@@ -982,9 +1005,9 @@ consistency_control_switch <- function(clear_fits) {
             changed@response_precomputations <- list()
         }
         out <- consistency_observe(consistency_discover(changed))
-        # The number of fits kept by the switch is the bug itself (#12), so
-        # only the flagged case records it.
-        if (!clear_fits) {
+        # The number of fits kept by the switch is what #12 was about (the
+        # switch must discard them), so the uncleared run records it.
+        if (!clear_fits && !is.null(n_retained_fits)) {
             out$internal$n_retained_fits <- n_retained_fits
         }
         out
@@ -1333,7 +1356,8 @@ consistency_public <- function(x) {
 
 # Differences between two observations, as readable paths. Doubles agree when
 # |actual - expected| <= tolerance * |expected| elementwise (an expected exact
-# zero allows |actual| <= 1e-12), with the same NA/NaN/Inf positions. The
+# zero allows |actual| <= 1e-12, unless the tolerance is 0, which asks for
+# equality), with the same NA/NaN/Inf positions. The
 # comparison is relative at every magnitude, so a p-value of 1e-25 that moves
 # to 1e-14 is a difference. Every other value must be identical.
 consistency_differences <- function(
@@ -1400,7 +1424,7 @@ consistency_differences <- function(
     a <- actual[finite]
     e <- expected[finite]
     gap <- abs(a - e)
-    allowed <- ifelse(e == 0, 1e-12, tolerance * abs(e))
+    allowed <- ifelse(e == 0 & tolerance > 0, 1e-12, tolerance * abs(e))
     bad <- gap > allowed
     if (any(bad)) {
         worst <- which.max(gap / allowed)

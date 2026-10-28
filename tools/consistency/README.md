@@ -103,8 +103,12 @@ Each case has two snapshots:
 
 A change that should keep results must reproduce the public snapshots. A
 restructuring that moves or redefines slots, such as the move to
-`SingleCellExperiment`, may set `SCEPTRE_FROZEN_WAIVE_INTERNAL=true`, which
-skips the internal snapshots; the pull request must then say so. Adapting
+`SingleCellExperiment`, may set `SCEPTRE_FROZEN_WAIVE_INTERNAL=true`. The cases
+then read no internal slots at all, so removed or renamed slots do not break
+the public snapshots, and the internal snapshots are skipped; the pull request
+must say so. The cache cases are the exception: they clear the fit cache
+(`response_precomputations`) as part of what they test, so a change to the
+cache adapts them. Adapting
 `consistency_observe()` to the new object and updating the snapshots restores
 the internal checks.
 
@@ -120,7 +124,8 @@ matches its snapshot:
 - **Doubles** are compared elementwise and relatively:
   |actual − expected| ≤ tolerance · |expected|. This holds at every magnitude,
   so a p-value of 1e-25 that becomes 1e-14 is a difference. An expected value
-  of exactly 0 allows |actual| ≤ 1e-12. The positions of `NA`, `NaN` and `Inf`
+  of exactly 0 allows |actual| ≤ 1e-12 (nothing at a tolerance of 0, which the
+  serial-versus-parallel check uses). The positions of `NA`, `NaN` and `Inf`
   must match. (testthat's own `tolerance` is relative to the average size of
   the values, so it would miss the p-value above.)
 - **Everything else must be identical:** integers, logicals, strings, factors
