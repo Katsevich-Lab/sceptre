@@ -136,6 +136,16 @@ Ubuntu runs at 1e-6 as an informational job (`continue-on-error`) until it has
 passed in CI. Every decision (QC, significance, pair identity, assignments)
 must be identical under both.
 
+Known Linux difference: in `edge_intercept_only_nt`, the permutation null
+statistics take few distinct values, and some equal the observed statistic.
+Whether a tie counts as "at least as extreme" then depends on the last bit of
+floating-point arithmetic, so the empirical p-values of `r3` and `r5` differ
+by platform (0.996 on macOS, 0.94 to 0.984 on Linux). This is sceptre's
+behavior, not the suite's.
+
+CI installs `R.utils`, which `data.table::fread()` needs to read the gzipped
+Cell Ranger example files.
+
 ## Updating the snapshots
 
 When a change is meant to alter results, run the suite, then review and accept

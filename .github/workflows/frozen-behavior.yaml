@@ -56,6 +56,7 @@ jobs:
           extra-packages: |
             any::testthat
             any::withr
+            any::R.utils
 
       - name: Install sceptre
         run: R CMD INSTALL --no-docs .
