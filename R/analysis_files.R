@@ -140,9 +140,7 @@ read_analysis <- function(directory) {
     }
     path <- file.path(directory, "fits.parquet")
     if (file.exists(path)) {
-        object@response_precomputations <- fits_list(as.data.frame(arrow::read_parquet(
-            path
-        )))
+        object@response_precomputations <- fits_list(read_table(path))
     }
     as_analysis(object)
 }
@@ -252,7 +250,9 @@ read_table <- function(path, default = data.frame()) {
     if (!file.exists(path)) {
         return(default)
     }
-    table <- arrow::read_parquet(path)
+    # mmap = FALSE: memory-mapped tables keep the file open, and Windows then
+    # cannot overwrite or delete it while the analysis is in memory
+    table <- arrow::read_parquet(path, mmap = FALSE)
     if (!inherits(table, "data.table")) {
         table <- as.data.frame(table)
     }
