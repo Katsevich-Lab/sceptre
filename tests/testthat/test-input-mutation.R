@@ -40,14 +40,7 @@ test_that("triplet conversion leaves the caller's matrix unchanged", {
                 if (row_access) actual@j else actual@i,
                 if (row_access) coordinates$j[order] else coordinates$i[order]
             )
-            expect_identical(
-                actual@x,
-                if (methods::is(input, "lgTMatrix")) {
-                    rep(1, 5L)
-                } else {
-                    values[order]
-                }
-            )
+            expect_identical(actual@x, as.numeric(input@x[order]))
             expect_identical(
                 class(actual)[[1L]],
                 if (row_access) "dgRMatrix" else "dgCMatrix"

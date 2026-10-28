@@ -1,62 +1,24 @@
-# `set_matrix_accessibility` is used by `import_data` to prepare `response_matrix`
-# to be row-accessible, as well as in several other places.
-test_that("set_matrix_accessibility", {
-    set.seed(115)
-    n_row <- 23
-    n_col <- 38
-    m <- matrix(
-        data = rpois(n = n_row * n_col, lambda = 0.5),
-        nrow = n_row,
-        ncol = n_col
+test_that("conversion sums repeated triplets and reads stored FALSE as 0", {
+    repeated <- Matrix::sparseMatrix(
+        i = c(1, 1, 2),
+        j = c(1, 1, 2),
+        x = c(1, 2, 3),
+        dims = c(2, 2),
+        repr = "T"
     )
-    cell_ids <- paste0("cell_", seq_len(n_col))
-    colnames(m) <- cell_ids
-
-    ## testing row accessible when the input is a matrix
-    m_r <- set_matrix_accessibility(matrix_in = m, make_row_accessible = TRUE)
-    expect_true(is(m_r, "dgRMatrix"))
-    expect_true(all(m_r == m))
-    expect_identical(colnames(m_r), cell_ids)
-    expect_false("i" %in% names(attributes(m_r)))
-
-    ## testing row accessible when the input is a TsparseMatrix
-    m_r <- m |>
-        as("TsparseMatrix") |>
-        set_matrix_accessibility(make_row_accessible = TRUE)
-    expect_true(is(m_r, "dgRMatrix"))
-    expect_true(all(m_r == m))
-    expect_identical(colnames(m_r), cell_ids)
-    expect_false("i" %in% names(attributes(m_r)))
-
-    ## testing row accessible when the input is already a dgRMatrix
-    m_r <- m_r |> set_matrix_accessibility(make_row_accessible = TRUE)
-    expect_true(is(m_r, "dgRMatrix"))
-    expect_true(all(m_r == m))
-    expect_identical(colnames(m_r), cell_ids)
-    expect_false("i" %in% names(attributes(m_r)))
-
-    ## testing col accessible when the input is a matrix
-    m_c <- set_matrix_accessibility(matrix_in = m, make_row_accessible = FALSE)
-    expect_true(is(m_c, "dgCMatrix"))
-    expect_true(all(m_c == m))
-    expect_identical(colnames(m_c), cell_ids)
-    expect_false("j" %in% names(attributes(m_c)))
-
-    ## testing col accessible when the input is a TsparseMatrix
-    m_c <- m |>
-        as("TsparseMatrix") |>
-        set_matrix_accessibility(make_row_accessible = FALSE)
-    expect_true(is(m_c, "dgCMatrix"))
-    expect_true(all(m_c == m))
-    expect_identical(colnames(m_c), cell_ids)
-    expect_false("j" %in% names(attributes(m_c)))
-
-    ## testing col accessible when the input is already a dgCMatrix
-    m_c <- m_c |> set_matrix_accessibility(make_row_accessible = FALSE)
-    expect_true(is(m_c, "dgCMatrix"))
-    expect_true(all(m_c == m))
-    expect_identical(colnames(m_c), cell_ids)
-    expect_false("j" %in% names(attributes(m_c)))
+    stored_false <- Matrix::sparseMatrix(
+        i = c(1, 2),
+        j = c(1, 2),
+        x = c(TRUE, FALSE),
+        dims = c(2, 2)
+    )
+    for (row_access in c(TRUE, FALSE)) {
+        actual <- set_matrix_accessibility(repeated, row_access)
+        expect_true(methods::validObject(actual))
+        expect_identical(as.matrix(actual), matrix(c(3, 0, 0, 3), 2, 2))
+        actual <- set_matrix_accessibility(stored_false, row_access)
+        expect_identical(as.matrix(actual), matrix(c(1, 0, 0, 0), 2, 2))
+    }
 })
 
 # `convert_covariate_df_to_design_matrix` is used in `set_analysis_parameters`
