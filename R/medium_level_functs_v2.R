@@ -219,9 +219,9 @@ run_perm_test_in_memory <- function(
         if (print_progress) {
             message(
                 "Change directories to ",
-                crayon::blue(get_log_dir(log_dir)),
+                cli::col_blue(get_log_dir(log_dir)),
                 " and view the files ",
-                crayon::blue(log_file_pattern),
+                cli::col_blue(log_file_pattern),
                 " for progress updates."
             )
         }
@@ -236,7 +236,7 @@ run_perm_test_in_memory <- function(
             mc.cores = length(partitioned_response_ids)
         )
         check_worker_results(res)
-        message(crayon::green(" \u2713"))
+        message(cli::col_green(" \u2713"))
     }
 
     # 5. combine and sort result
@@ -382,9 +382,9 @@ run_crt_in_memory_v2 <- function(
             if (print_progress) {
                 message(
                     "Change directories to ",
-                    crayon::blue(get_log_dir(log_dir)),
+                    cli::col_blue(get_log_dir(log_dir)),
                     " and view the files ",
-                    crayon::blue(log_file_pattern),
+                    cli::col_blue(log_file_pattern),
                     " for progress updates."
                 )
             }
@@ -501,7 +501,7 @@ run_crt_in_memory_v2 <- function(
             mc.cores = length(partitioned_grna_group_ids)
         )
         check_worker_results(res)
-        message(crayon::green(" \u2713"))
+        message(cli::col_green(" \u2713"))
     }
     result <- res |> data.table::rbindlist(fill = TRUE)
 

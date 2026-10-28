@@ -125,7 +125,7 @@ construct_negative_control_pairs_v2 <- function(
         n_nonzero_cntrl = samp$n_nonzero_cntrl_v,
         pass_qc = TRUE
     )
-    message(crayon::green(" \u2713"))
+    message(cli::col_green(" \u2713"))
 
     # 5. check the number of rows of df, and issue a warning if less than the
     # required amount
@@ -137,7 +137,7 @@ construct_negative_control_pairs_v2 <- function(
             nrow(df),
             ") as possible."
         )
-        message(crayon::red(note_text))
+        message(cli::col_red(note_text))
     }
     return(df)
 }
