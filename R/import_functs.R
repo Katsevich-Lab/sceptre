@@ -590,11 +590,12 @@ import_data_from_cellranger_use_ondisc <- function(
     extra_covariates,
     directory_to_write
 ) {
-    # 0. check that directory_to_write has been supplied
+    # 0. check that each gRNA has one row, before ondisc sums gRNAs into
+    # vectors, and that directory_to_write has been supplied
+    check_grna_ids_unique(grna_target_data_frame)
     directory_to_write <- prepare_directory_to_write(directory_to_write)
 
     # 1. call the corresponding ondisc function
-    check_grna_ids_unique(grna_target_data_frame)
     vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
     out <- ondisc::create_odm_from_cellranger(
         directories_to_load = directories,

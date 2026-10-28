@@ -2,9 +2,9 @@
 # (and vector). Called on the data frame as the user supplied it, before
 # anything sums gRNAs into vectors.
 check_grna_ids_unique <- function(grna_target_data_frame) {
-    repeated_grna_ids <- unique(grna_target_data_frame$grna_id[duplicated(
-        grna_target_data_frame$grna_id
-    )])
+    # [[ ]] matches the column name exactly, unlike $
+    grna_ids <- grna_target_data_frame[["grna_id"]]
+    repeated_grna_ids <- unique(grna_ids[duplicated(grna_ids)])
     if (length(repeated_grna_ids) >= 1L) {
         stop(
             "Each `grna_id` must appear in only one row of the `grna_target_data_frame`. These appear more than once: ",
