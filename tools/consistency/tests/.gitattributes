@@ -1,0 +1,2 @@
+# Keep inputs and snapshots byte-identical on every platform.
+* -text

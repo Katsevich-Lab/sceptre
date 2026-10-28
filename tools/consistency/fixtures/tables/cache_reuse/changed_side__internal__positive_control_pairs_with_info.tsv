@@ -1,3 +1,0 @@
-response_id	grna_group	n_nonzero_trt	n_nonzero_cntrl	pass_qc
-r1	A	39	99	TRUE
-r2	B	0	102	FALSE

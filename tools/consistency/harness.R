@@ -1,81 +1,18 @@
 # Frozen behavior suite: shared harness.
 #
-# Defines the inputs, the cases and how each case is observed. The recorder
-# (`consistency.R record`) and the testthat suite both source this file, so a
-# reference commit and a candidate are always observed by the same code. The
-# cases call only exported functions. Observations have two parts:
+# Defines the inputs, the cases and how each case is observed. The cases call
+# only exported functions. Observations have two parts:
 #
 # - public: what a user can see (exported getters, get_result(), printed
 #   summaries, written outputs, errors, warnings and the RNG state);
 # - internal: `sceptre_object` slots, stored under elements named `internal`.
 #
-# The tests compare the two parts separately, so a restructuring that moves
-# slots can waive the internal comparison explicitly. Nothing here writes
-# outside `tempdir()`.
+# tests/test-frozen.R snapshots the two parts separately, so a restructuring
+# that moves slots can waive the internal snapshots explicitly. Nothing here
+# writes outside `tempdir()`.
 
-consistency_schema_version <- 2L
 consistency_input_seed <- 20261016L
 consistency_case_seed <- 271828L
-
-# Relative tolerance for doubles, by tier (see README.md, "Comparison rules").
-consistency_tolerances <- c(strict = 1e-8, portable = 1e-6)
-
-# Cases whose recorded output is the reference commit's known-buggy behavior.
-# Each case isolates its bug, so a fix changes only that case's fixtures. See
-# README.md ("Known-bug cases") for the procedure when fixing one.
-consistency_known_bugs <- list(
-    import_dense_symmetric = list(
-        fix_pr = "A1",
-        bugs = "#4 dense symmetric input",
-        summary = paste(
-            "A square symmetric dense response matrix loses its lower-triangle",
-            "entry on import."
-        )
-    ),
-    import_cellranger_one_directory_covariates = list(
-        fix_pr = "A2",
-        bugs = "a7b08441 single-directory batch column",
-        summary = paste(
-            "Single-directory Cell Ranger import drops a user-supplied `batch`",
-            "covariate."
-        )
-    ),
-    pairs_cis_unsorted_positions = list(
-        fix_pr = "A2",
-        bugs = "#9 unsorted gene positions",
-        summary = paste(
-            "construct_cis_pairs() misses in-range responses when the position",
-            "table is not sorted."
-        )
-    ),
-    pairs_trans_caller_mutation = list(
-        fix_pr = "A2",
-        bugs = "#8 caller data.frame converted",
-        summary = paste(
-            "construct_trans_pairs(pairs_to_exclude = 'pc_pairs') converts the",
-            "caller's positive-control data.frame to a data.table."
-        )
-    ),
-    edge_intercept_only_nt = list(
-        fix_pr = "A2",
-        bugs = "#11 `~ 1` with NT controls",
-        summary = paste(
-            "An intercept-only formula with non-targeting controls fails with",
-            "'non-conformable arguments'."
-        )
-    ),
-    cache_control_switch = list(
-        fix_pr = "A2",
-        bugs = "#12 stale fits after switching control group",
-        summary = paste(
-            "After calibration with NT controls, switching to complement",
-            "controls reuses the NT-cell response fits.",
-            "`cache_control_switch_cleared` records the run with fits cleared."
-        )
-    )
-)
-
-consistency_known_bug_cases <- function() names(consistency_known_bugs)
 
 # ---------------------------------------------------------------------------
 # Inputs
@@ -169,6 +106,15 @@ consistency_example_data <- function() {
         high = env$highmoi_example_data,
         high_targets = env$grna_target_data_frame_highmoi
     )
+}
+
+# MD5 of an object, from serialization format 2 without its 14-byte header
+# (which records the writing R version), so it depends on the object only.
+consistency_md5 <- function(x) {
+    file <- tempfile("sceptre-consistency-")
+    on.exit(unlink(file), add = TRUE)
+    writeBin(serialize(x, NULL, xdr = TRUE, version = 2L)[-seq_len(14L)], file)
+    unname(tools::md5sum(file))
 }
 
 consistency_extdata <- function(...) {
@@ -1107,12 +1053,10 @@ consistency_case_edge_intercept_only_nt <- function() {
 # it. Its counts are #234's Poisson inputs, so its fits are the least stable
 # across platforms (see README.md, "Cross-platform policy").
 consistency_saved_object_file <- "sceptre-0.99.0-21f9ea0.rds"
-consistency_saved_object_sha256 <-
-    "c6b6fc377e85a064a994ce20bead6d6f0931f0a4345abf6df79eb8b1eb1d70c5"
 
-consistency_case_saved_object_0_99_0 <- function(fixture_dir) {
+consistency_case_saved_object_0_99_0 <- function(input_dir) {
     path <- file.path(
-        fixture_dir,
+        input_dir,
         "saved-objects",
         consistency_saved_object_file
     )
@@ -1171,7 +1115,7 @@ consistency_cases <- function() {
     case <- function(group, description, run) {
         list(group = group, description = description, run = run)
     }
-    ignore <- function(f) function(fixture_dir) f()
+    ignore <- function(f) function(input_dir) f()
     settings <- consistency_workflow_settings()
     workflow <- lapply(names(settings), function(name) {
         s <- settings[[name]]
@@ -1193,7 +1137,7 @@ consistency_cases <- function() {
                 ", output_amount ",
                 s$output
             ),
-            function(fixture_dir) consistency_run_workflow(s)
+            function(input_dir) consistency_run_workflow(s)
         )
     })
     names(workflow) <- paste0("workflow_", names(settings))
@@ -1359,13 +1303,13 @@ consistency_seeded <- function(code_function) {
 }
 
 # Run one case. Observations carry value, warnings, error and rng_after.
-consistency_run_case <- function(name, fixture_dir) {
+consistency_run_case <- function(name, input_dir) {
     cases <- consistency_cases()
     if (!name %in% names(cases)) {
         stop("Unknown consistency case: ", name)
     }
     data.table::setDTthreads(1L)
-    consistency_seeded(function() cases[[name]]$run(fixture_dir))
+    consistency_seeded(function() cases[[name]]$run(input_dir))
 }
 
 # ---------------------------------------------------------------------------
@@ -1385,6 +1329,22 @@ consistency_public <- function(x) {
     out <- lapply(x[keep], consistency_public)
     attributes(out) <- attributes(x[keep])
     out
+}
+
+# Every double rounded to 8 significant digits. The snapshots then compare
+# each value to that relative precision at any magnitude; testthat's own
+# tolerance is relative to the average, so it would not notice a p-value
+# moving from 1e-25 to 1e-14.
+consistency_round <- function(x) {
+    if (is.list(x)) {
+        rounded <- lapply(x, consistency_round)
+        attributes(rounded) <- attributes(x)
+        return(rounded)
+    }
+    if (is.double(x)) {
+        return(signif(x, 8L))
+    }
+    x
 }
 
 # The `internal` elements of an observation, keyed by their path.
