@@ -20,6 +20,16 @@
 
 -   `import_data()` no longer reorders the slots of a `dgTMatrix` or `lgTMatrix` supplied as the response or gRNA matrix; the caller's matrix is left unchanged.
 
+-   `set_analysis_parameters()` now discards saved response-model fits when the control group or the design matrix changes. Previously, in low MOI, after running the calibration check with NT-cell controls and then switching to `control_group = "complement"` with the same formula, the discovery analysis reused fits estimated on the NT cells only (and vice versa), which changed its p-values. Changing factor contrasts with the same formula also left stale fits in place. Analyses that call `set_analysis_parameters()` once are unaffected by this change.
+
+-   `construct_cis_pairs()` now finds every gene within the distance threshold when the gene positions are not sorted within a chromosome. Previously it could omit nearby genes. This affects the bundled `gene_position_data_frame_grch37`, which is not sorted, and unsorted custom position tables; `gene_position_data_frame_grch38` is sorted and gives the same pairs as before.
+
+-   `construct_cis_pairs()` no longer overflows integer arithmetic for genomic coordinates above about one billion.
+
+-   A formula with only an intercept (`formula_object = ~ 1`) now works with NT-cell controls in the calibration check and discovery analysis; previously these failed with an error.
+
+-   `construct_trans_pairs()` with `pairs_to_exclude = "pc_pairs"` no longer converts the caller's `positive_control_pairs` data frame to a `data.table`.
+
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now read Matrix Market files with eminem, a C++ parser provided by the Bioconductor package assorthead, and accept general coordinate matrices with integer or real values, as Cell Ranger and Parse write them; other Matrix Market variants, such as symmetric or pattern matrices, are now an error. They now import files whose entries are not sorted by cell; previously, counts from such files could be lost or assigned to the wrong cell or feature. Files sorted by cell and then by feature, such as the bundled example files, give the same result as before.
 
 -   `import_data_from_cellranger()` (with `use_ondisc = FALSE`) and `import_data_from_parse()` now stop with an error, naming the file and line, when a matrix file is malformed: for example, when an entry lies outside the dimensions declared in the file's header or a coordinate is not an integer (such as `2.0`). Previously such entries could be dropped or moved silently to another cell. Both functions also stop when a matrix file lists the same (cell, feature) entry more than once, and `import_data_from_cellranger()` stops when a matrix file and its `features.tsv` file have different numbers of rows.

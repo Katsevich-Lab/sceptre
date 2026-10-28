@@ -89,7 +89,7 @@ run_perm_test_in_memory <- function(
     # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+        covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
     # 2. define function to loop subset of response IDs
@@ -304,7 +304,7 @@ run_crt_in_memory_v2 <- function(
     # applicable)
     covariate_matrix <- covariate_matrix[cells_in_use, , drop = FALSE]
     if (subset_to_nt_cells) {
-        covariate_matrix <- covariate_matrix[all_nt_idxs, ]
+        covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
     # 2. define the run precomputation function
