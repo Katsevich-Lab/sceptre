@@ -507,7 +507,7 @@ import_data_from_cellranger_memory <- function(
         rm(mat)
         gc() |> invisible()
         out_list[[i]] <- subsetted_mats
-        message(crayon::green(" \u2713"))
+        message(cli::col_green(" \u2713"))
     }
 
     # 6. combine the matrices via do.call cbind
@@ -519,7 +519,7 @@ import_data_from_cellranger_memory <- function(
     })
     rm(out_list)
     gc() |> invisible()
-    message(crayon::green(" \u2713"))
+    message(cli::col_green(" \u2713"))
 
     # 7. collect metadata pieces
     cell_ids <- if (retain_cell_barcodes) {
@@ -573,7 +573,7 @@ import_data_from_cellranger_memory <- function(
         response_names = gene_names
     )
     gc() |> invisible()
-    message(crayon::green(" \u2713"))
+    message(cli::col_green(" \u2713"))
     return(sceptre_object)
 }
 

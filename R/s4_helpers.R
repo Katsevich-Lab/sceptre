@@ -19,31 +19,31 @@ setMethod("show", signature = signature("sceptre_object"), function(object) {
     moi <- ifelse(object@low_moi, "Low", "High")
     cat(paste0(
         "An object of class ",
-        crayon::blue("sceptre_object"),
+        cli::col_blue("sceptre_object"),
         ".\n\nAttributes of the data:\n\t\U2022 ",
-        crayon::blue(n_cells),
+        cli::col_blue(n_cells),
         " cells",
         if (funct_run_vect["run_qc"]) {
             paste0(
                 " (",
-                crayon::blue(length(object@cells_in_use)),
+                cli::col_blue(length(object@cells_in_use)),
                 " after cellwise QC)"
             )
         } else {
             NULL
         },
         "\n\t\U2022 ",
-        crayon::blue(n_responses),
+        cli::col_blue(n_responses),
         " responses\n\t\U2022 ",
-        crayon::blue(moi),
+        cli::col_blue(moi),
         " multiplicity-of-infection \n\t\U2022 ",
-        crayon::blue(n_targeting_grnas),
+        cli::col_blue(n_targeting_grnas),
         " targeting gRNAs (distributed across ",
-        crayon::blue(n_targeting_grna_targets),
+        cli::col_blue(n_targeting_grna_targets),
         " targets) \n\t\U2022 ",
-        crayon::blue(n_nt_grnas),
+        cli::col_blue(n_nt_grnas),
         " non-targeting gRNAs \n\t\U2022 ",
-        crayon::blue(n_covariates),
+        cli::col_blue(n_covariates),
         " covariates (",
         covariates,
         ")"
@@ -86,7 +86,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     # 1. print analysis status
     funct_run_vect <- x@functs_called
     get_mark <- function(bool) {
-        ifelse(bool, crayon::green("\u2713"), crayon::red("\u2717"))
+        ifelse(bool, cli::col_green("\u2713"), cli::col_red("\u2717"))
     }
     cat("\n\nAnalysis status:\n")
     for (i in seq_along(funct_run_vect)) {
@@ -115,12 +115,12 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             } else {
                 paste0(
                     " data frame with ",
-                    crayon::blue(n_discovery_pairs),
+                    cli::col_blue(n_discovery_pairs),
                     " pairs",
                     if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
                         paste0(
                             " (",
-                            crayon::blue(x@n_ok_discovery_pairs),
+                            cli::col_blue(x@n_ok_discovery_pairs),
                             " after pairwise QC)"
                         )
                     } else {
@@ -135,12 +135,12 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         } else {
             paste0(
                 " data frame with ",
-                crayon::blue(n_pc_pairs),
+                cli::col_blue(n_pc_pairs),
                 " pairs",
                 if (funct_run_vect["run_qc"] && n_pc_pairs >= 1L) {
                     paste0(
                         " (",
-                        crayon::blue(x@n_ok_positive_control_pairs),
+                        cli::col_blue(x@n_ok_positive_control_pairs),
                         " after pairwise QC)"
                     )
                 } else {
@@ -152,7 +152,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         if (length(x@side_code) == 0L) {
             "not specified"
         } else {
-            crayon::blue(c("left", "both", "right")[x@side_code + 2L])
+            cli::col_blue(c("left", "both", "right")[x@side_code + 2L])
         },
         if (!x@low_moi) {
             NULL
@@ -162,7 +162,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
                 if (length(x@control_group_complement) == 0L) {
                     "not specified"
                 } else {
-                    crayon::blue(ifelse(
+                    cli::col_blue(ifelse(
                         x@control_group_complement,
                         "complement set",
                         "non-targeting cells"
@@ -174,7 +174,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         if (length(x@run_permutations) == 0L) {
             "not specified"
         } else {
-            crayon::blue(ifelse(
+            cli::col_blue(ifelse(
                 x@run_permutations,
                 "permutations",
                 "conditional resampling"
@@ -184,13 +184,13 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         if (length(x@grna_integration_strategy) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@grna_integration_strategy)
+            cli::col_blue(x@grna_integration_strategy)
         },
         "\n\t\U2022 Resampling approximation: ",
         if (length(x@resampling_approximation) == 0L) {
             "not specified"
         } else {
-            crayon::blue(gsub(
+            cli::col_blue(gsub(
                 pattern = "_",
                 replacement = " ",
                 fixed = TRUE,
@@ -202,28 +202,28 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             "none"
         } else {
             paste0(
-                crayon::blue(x@multiple_testing_method),
+                cli::col_blue(x@multiple_testing_method),
                 " at level ",
-                crayon::blue(x@multiple_testing_alpha)
+                cli::col_blue(x@multiple_testing_alpha)
             )
         },
         "\n\t\U2022 N nonzero treatment cells threshold: ",
         if (length(x@n_nonzero_trt_thresh) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@n_nonzero_trt_thresh)
+            cli::col_blue(x@n_nonzero_trt_thresh)
         },
         "\n\t\U2022 N nonzero control cells threshold: ",
         if (length(x@n_nonzero_cntrl_thresh) == 0L) {
             "not specified"
         } else {
-            crayon::blue(x@n_nonzero_cntrl_thresh)
+            cli::col_blue(x@n_nonzero_cntrl_thresh)
         },
         "\n\t\U2022 Formula object: ",
         if (length(x@formula_object) == 0L) {
             "not specified"
         } else {
-            crayon::blue(as.character(x@formula_object)[2])
+            cli::col_blue(as.character(x@formula_object)[2])
         }
     ))
 
@@ -235,20 +235,20 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             paste0(
                 "\n\ngRNA-to-cell assignment information:",
                 "\n\t\U2022 Assignment method: ",
-                crayon::blue(x@grna_assignment_method),
+                cli::col_blue(x@grna_assignment_method),
                 "\n\t\U2022 Mean N cells per gRNA: ",
-                crayon::blue(mean_cells_per_grna |> round(2)),
+                cli::col_blue(mean_cells_per_grna |> round(2)),
                 "\n\t\U2022 Mean N gRNAs per cell (MOI): ",
                 if (x@grna_assignment_method == "maximum") {
                     "not computed when using \"maximum\" assignment method"
                 } else {
-                    crayon::blue(x@grnas_per_cell |> mean() |> round(2))
+                    cli::col_blue(x@grnas_per_cell |> mean() |> round(2))
                 }
             ),
             if (x@grna_assignment_method == "mixture") {
                 paste0(
                     "\n\t\U2022 gRNA assignment formula object: ",
-                    crayon::blue(as.character(
+                    cli::col_blue(as.character(
                         x@grna_assignment_hyperparameters$formula_object
                     )[2])
                 )
@@ -271,22 +271,22 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         n_calib_pairs <- nrow(x@calibration_result)
         cat(paste0(
             "\n\t\U2022 N",
-            crayon::red(" negative control "),
+            cli::col_red(" negative control "),
             "pairs called as significant: ",
-            crayon::blue(paste0(n_false_rejections, "/", n_calib_pairs)),
+            cli::col_blue(paste0(n_false_rejections, "/", n_calib_pairs)),
             "\n\t\U2022 Mean log-2 FC for",
-            crayon::red(" negative control "),
+            cli::col_red(" negative control "),
             "pairs: ",
-            crayon::blue(mean_lfc)
+            cli::col_blue(mean_lfc)
         ))
     }
     if (power_check_run) {
         median_pc_p_value <- stats::median(x@power_result$p_value, na.rm = TRUE)
         cat(paste0(
             "\n\t\U2022 Median",
-            crayon::green(" positive control "),
+            cli::col_green(" positive control "),
             "p-value: ",
-            crayon::blue(signif(median_pc_p_value, 2))
+            cli::col_blue(signif(median_pc_p_value, 2))
         ))
     }
     if (discovery_analysis_run) {
@@ -294,9 +294,9 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         n_discovery_pairs <- x@n_ok_discovery_pairs
         cat(paste0(
             "\n\t\U2022 N",
-            crayon::yellow(" discovery pairs "),
+            cli::col_yellow(" discovery pairs "),
             "called as significant: ",
-            crayon::blue(paste0(n_discoveries, "/", n_discovery_pairs))
+            cli::col_blue(paste0(n_discoveries, "/", n_discovery_pairs))
         ))
     }
 })

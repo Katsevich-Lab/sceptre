@@ -701,7 +701,7 @@ check_discovery_analysis_inputs <- function(
             ifelse(pc_analysis, "power check", "discovery analysis"),
             "."
         )
-        message(crayon::red(warn_text))
+        message(cli::col_red(warn_text))
     }
 
     # 4. check that at least one pair passes qc

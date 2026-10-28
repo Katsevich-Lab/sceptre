@@ -9,7 +9,7 @@ assign_grnas_to_cells_mixture <- function(
     grna_ids
 ) {
     if (!parallel) {
-        message(crayon::red(
+        message(cli::col_red(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
@@ -100,9 +100,9 @@ assign_grnas_to_cells_mixture <- function(
         if (print_progress) {
             message(
                 "Change directories to ",
-                crayon::blue(get_log_dir(log_dir)),
+                cli::col_blue(get_log_dir(log_dir)),
                 " and view the files ",
-                crayon::blue("assign_grnas_*.out"),
+                cli::col_blue("assign_grnas_*.out"),
                 " for progress updates."
             )
         }

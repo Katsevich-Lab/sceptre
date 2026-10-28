@@ -30,8 +30,8 @@ LinkingTo: Rcpp, BH, assorthead (>= 1.4.0)
 SystemRequirements: zlib
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
+    cli (>= 1.1.0),
     cowplot,
-    crayon,
     data.table,
     dplyr,
     ggplot2,

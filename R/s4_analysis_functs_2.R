@@ -104,7 +104,7 @@ run_calibration_check_pt_1 <- function(
         "run_calibration_check"
     )
     if (!parallel) {
-        message(crayon::red(
+        message(cli::col_red(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
@@ -268,7 +268,7 @@ run_power_check <- function(
         "run_power_check"
     )
     if (!parallel) {
-        message(crayon::red(
+        message(cli::col_red(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
@@ -371,7 +371,7 @@ run_discovery_analysis <- function(
         "run_discovery_analysis"
     )
     if (!parallel) {
-        message(crayon::red(
+        message(cli::col_red(
             "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
         ))
     }
@@ -450,7 +450,7 @@ run_sceptre_analysis_high_level <- function(
             calibration_group_size = sceptre_object@calibration_group_size,
             n_cells = length(sceptre_object@cells_in_use)
         )
-        message(crayon::green(" \u2713"))
+        message(cli::col_green(" \u2713"))
     }
     gc() |> invisible()
 
@@ -798,7 +798,7 @@ skip_assign_grnas_and_run_qc <- function(
         functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]
     ) {
         if (!functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
-            message(crayon::red(
+            message(cli::col_red(
                 "Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments."
             ))
             sceptre_object <- assign_grnas(
@@ -809,7 +809,7 @@ skip_assign_grnas_and_run_qc <- function(
                 run_qc() # advance by two
         }
         if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {
-            message(crayon::red(
+            message(cli::col_red(
                 "Note: Automatically running `run_qc()` with default arguments."
             ))
             sceptre_object <- sceptre_object |> run_qc() # advance by one
