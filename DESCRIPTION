@@ -35,7 +35,7 @@ Imports:
     data.table,
     dplyr,
     ggplot2,
-    Matrix,
+    Matrix (>= 1.6-2),
     methods,
     Rcpp (>= 1.0.9),
     scales,

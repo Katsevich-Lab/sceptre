@@ -1,3 +1,11 @@
+# sceptre (development version)
+
+-   `import_data()` now combines repeated (row, column) entries of a triplet-form response or gRNA matrix as the Matrix package does: the values of a `dgTMatrix` are summed, and an `lgTMatrix` entry is `TRUE` if any repeat is `TRUE`. Previously the repeats were kept as separate entries, which gave an invalid matrix, and the analysis could use only one of them.
+
+-   `import_data()` now reads the stored values of a logical sparse gRNA matrix (`lgTMatrix`, `lgCMatrix` or `lgRMatrix`) as numbers: `TRUE` as 1, `FALSE` as 0 and `NA` as `NA`, as for a numeric matrix. Previously every stored entry was read as 1, so a stored `FALSE` or `NA` counted as the gRNA being present.
+
+-   `import_data()` now accepts a dense (base R) logical response or gRNA matrix; previously it failed with an error.
+
 # sceptre 0.99.1
 
 -   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged. With `grna_integration_strategy = "bonferroni"`, if two or more of a target's gRNAs have p-values capped at 1, the combined result now takes its fold change and nonzero-cell counts from the first of these gRNAs rather than from the one with the smallest uncapped p-value; its p-value (1) and significance call are unchanged.
