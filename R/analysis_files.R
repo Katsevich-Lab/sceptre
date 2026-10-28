@@ -17,12 +17,17 @@
 #' Write an Analysis to a directory, or read it back
 #'
 #' @param analysis an `Analysis`
-#' @param directory the directory to write to or read from
+#' @param directory the directory to write to, which must be empty or not
+#'   exist yet, or to read from
 #' @return `write_analysis()` returns `directory`, invisibly; `read_analysis()`
 #'   returns an `Analysis`
 #' @keywords internal
 write_analysis <- function(analysis, directory) {
     check_file_packages()
+    # files left from an earlier analysis would be read back as part of this one
+    if (length(list.files(directory, all.files = TRUE, no.. = TRUE)) > 0L) {
+        stop("`directory` must be empty or not exist yet.", call. = FALSE)
+    }
     for (folder in c("tables", "results")) {
         dir.create(
             file.path(directory, folder),
@@ -43,7 +48,7 @@ write_analysis <- function(analysis, directory) {
                 value,
                 file.path(directory, "tables", paste0(name, ".parquet"))
             )
-        } else if (name %in% cell_slots && length(value) > 0L) {
+        } else if (name %in% cell_slots && is_cell_column(name, value)) {
             obs[[name]] <- if (name %in% cell_index_slots) {
                 seq_len(n_cells) %in% value
             } else {
@@ -83,6 +88,7 @@ write_analysis <- function(analysis, directory) {
             file.path(directory, "fits.parquet")
         )
     }
+    write_checksums(directory)
     invisible(directory)
 }
 
@@ -90,6 +96,7 @@ write_analysis <- function(analysis, directory) {
 #' @keywords internal
 read_analysis <- function(directory) {
     check_file_packages()
+    check_checksums(directory)
     screen <- read_screen(directory)
     file <- strict(anndataR::read_h5ad(
         file.path(directory, "state.h5ad"),
@@ -163,13 +170,51 @@ state_slots <- function() {
     )
 }
 
-# Per-cell slots, stored as obs columns; index slots as logical columns.
+# An MD5 checksum of every file, so that reading stops at a changed file.
+write_checksums <- function(directory) {
+    files <- setdiff(
+        list.files(directory, recursive = TRUE),
+        "checksums.tsv"
+    )
+    sums <- tools::md5sum(file.path(directory, files))
+    utils::write.table(
+        data.frame(file = files, md5 = unname(sums)),
+        file.path(directory, "checksums.tsv"),
+        sep = "\t",
+        quote = FALSE,
+        row.names = FALSE
+    )
+}
+
+check_checksums <- function(directory) {
+    expected <- utils::read.delim(
+        file.path(directory, "checksums.tsv"),
+        colClasses = "character"
+    )
+    actual <- unname(tools::md5sum(file.path(directory, expected$file)))
+    changed <- expected$file[is.na(actual) | actual != expected$md5]
+    if (length(changed) > 0L) {
+        stop(
+            "Analysis files are missing or changed since they were written: ",
+            paste(changed, collapse = ", "),
+            call. = FALSE
+        )
+    }
+}
+
+# Per-cell slots, stored as obs columns; index slots as logical columns, which
+# hold sorted, distinct cell indices exactly. Anything else goes to the JSON.
 cell_slots <- c(
     "grnas_per_cell",
     "cells_in_use",
     "cells_w_zero_or_twoplus_grnas"
 )
 cell_index_slots <- c("cells_in_use", "cells_w_zero_or_twoplus_grnas")
+
+is_cell_column <- function(name, value) {
+    length(value) > 0L &&
+        (!name %in% cell_index_slots || !is.unsorted(value, strictly = TRUE))
+}
 
 cell_names <- function(screen) {
     names <- colnames(screen)
@@ -242,10 +287,10 @@ formulas_from_text <- function(x) {
 
 # --- Screen -----------------------------------------------------------------
 
-# MuData 1.16 reads missing values in cell covariates back changed: NA in a
-# text column becomes the string "NA" (a categorical column keeps it), and NA
-# in a numeric column becomes NaN. Until that is fixed upstream, text columns
-# are written as categoricals and both are restored on reading.
+# Missing cell covariates: MuData 1.16 reads NA in a text column back as an
+# empty string (a categorical column keeps it), so text columns are written as
+# categoricals until that is fixed upstream; and h5mu stores a missing number as
+# NaN, the AnnData convention, which is read back as NA.
 write_screen <- function(screen, directory) {
     write_table(
         S4Vectors::metadata(screen)$grna_target_data_frame,
@@ -327,22 +372,26 @@ read_screen <- function(directory) {
 
 # --- Fits -------------------------------------------------------------------
 
-# One row per response and term; "theta" is the negative binomial size.
+# One row per response and term; the negative binomial size (theta) is the row
+# whose term is missing, so it cannot clash with a coefficient's name.
 fits_table <- function(fits) {
-    rows <- lapply(fits, function(fit) c(fit$fitted_coefs, theta = fit$theta))
+    terms <- lapply(fits, function(fit) c(names(fit$fitted_coefs), NA))
     data.frame(
         response_id = factor(
-            rep(names(fits), lengths(rows)),
+            rep(names(fits), lengths(terms)),
             levels = names(fits)
         ),
-        term = unlist(lapply(rows, names), use.names = FALSE),
-        value = unlist(rows, use.names = FALSE)
+        term = unlist(terms, use.names = FALSE),
+        value = unlist(
+            lapply(fits, function(fit) c(unname(fit$fitted_coefs), fit$theta)),
+            use.names = FALSE
+        )
     )
 }
 
 fits_list <- function(table) {
     lapply(split(table, table$response_id), function(rows) {
-        is_theta <- rows$term == "theta"
+        is_theta <- is.na(rows$term)
         list(
             fitted_coefs = stats::setNames(
                 rows$value[!is_theta],

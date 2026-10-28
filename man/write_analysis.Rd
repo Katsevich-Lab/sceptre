@@ -12,7 +12,8 @@ read_analysis(directory)
 \arguments{
 \item{analysis}{an \code{Analysis}}
 
-\item{directory}{the directory to write to or read from}
+\item{directory}{the directory to write to, which must be empty or not
+exist yet, or to read from}
 }
 \value{
 \code{write_analysis()} returns \code{directory}, invisibly; \code{read_analysis()}

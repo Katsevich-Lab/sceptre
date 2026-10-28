@@ -97,12 +97,22 @@ test_that("an analysis read back from files is the same at every stage", {
     skip_without_file_packages()
     workflow <- analysis_workflow()
     object <- workflow$start
-    directory <- withr::local_tempdir()
     for (step in c(list(identity), workflow$steps)) {
         object <- suppressMessages(step(object))
+        directory <- withr::local_tempfile()
         write_analysis(as_analysis(object), directory)
         expect_same_object(as_sceptre_object(read_analysis(directory)), object)
     }
+    # a changed file is detected before anything is read
+    arrow::write_parquet(
+        data.frame(changed = 1L),
+        file.path(directory, "results", "discovery.parquet")
+    )
+    expect_error(read_analysis(directory), "results/discovery.parquet")
+    expect_error(
+        write_analysis(as_analysis(object), directory),
+        "must be empty"
+    )
 })
 
 test_that("an analysis saved before discovery finishes with the same results", {

@@ -27,9 +27,29 @@ yet, and every analysis function still works on `sceptre_object`.
   low-MOI workflow (thresholding) and a high-MOI one (mixture assignment,
   calibration with `output_amount = 3`, power check), and resuming from any
   stage gives identical discovery results.
-- Files cannot hold a formula's environment, data.table's internal pointer, or
-  whether a table was a tibble (it comes back as a data.frame). None affects
-  results.
+- `write_analysis()` writes only to an empty or new directory, and records an
+  MD5 checksum of every file; `read_analysis()` stops if any file is missing or
+  changed.
+- The frozen behavior suite (#246) passes on this branch except one public
+  snapshot, `api`: importing `SingleCellExperiment` brings in Bioconductor's
+  `plot` generic, which dispatches on `x` and `y`, so the recorded methods of
+  `plot` change (`sceptre_object` becomes `sceptre_object#ANY`, and stats4's
+  `profile.mle` method appears). `plot(sceptre_object)` behaves as before. The
+  same change renames the help file `plot-sceptre_object-method.Rd`.
+
+## Known limits
+
+Files cannot hold:
+- a formula's environment (formulas are read back in the global environment);
+- data.table's internal pointer (data.table restores it when the table is used);
+- whether a table was a tibble (it comes back as a data.frame);
+- custom row names of plain data.frames, and `integer64` or list columns
+  (arrow drops or converts them; sceptre's own tables have none);
+- Screen `metadata` other than the MOI, the gRNA table and the covariate row
+  names.
+
+Every anndataR warning is treated as an error, so that nothing is dropped
+silently; a harmless warning added in a later anndataR would also stop writing.
 - Python reads every file: the Screen with `mudata`, the state with `anndata`,
   the tables with `pandas`.
 
@@ -67,10 +87,10 @@ yet, and every analysis function still works on `sceptre_object`.
 
 ## Gaps found upstream
 
-- **MuData 1.16** reads a missing value in a text column back as `"NA"`, and
-  in a numeric column as `NaN`. `read_screen()` works around both for cell
-  covariates; the fix belongs in MuData. A draft issue is in the overnight
-  summary.
+- **MuData 1.16** reads `NA` in a text column back as an empty string; the
+  fix belongs in MuData, and a draft issue is in the overnight summary. Missing
+  numbers become `NaN`, the AnnData convention. `read_screen()` handles both
+  for cell covariates.
 - **anndataR 1.2** returns vectors as one-dimensional arrays, sorts list
   entries by name, and drops values it cannot write with only a warning.
   Storing settings as one JSON text avoids the first two; warnings are turned
