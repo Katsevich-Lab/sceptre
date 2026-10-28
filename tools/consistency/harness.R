@@ -7,7 +7,7 @@
 #   summaries, written outputs, errors, warnings and the RNG state);
 # - internal: `sceptre_object` slots, stored under elements named `internal`.
 #
-# tests/test-frozen.R snapshots the two parts separately, so a restructuring
+# tests/helper-frozen.R snapshots the two parts separately, so a restructuring
 # that moves slots can waive the internal snapshots explicitly. Nothing here
 # writes outside `tempdir()`.
 
@@ -1331,20 +1331,81 @@ consistency_public <- function(x) {
     out
 }
 
-# Every double rounded to 8 significant digits. The snapshots then compare
-# each value to that relative precision at any magnitude; testthat's own
-# tolerance is relative to the average, so it would not notice a p-value
-# moving from 1e-25 to 1e-14.
-consistency_round <- function(x) {
-    if (is.list(x)) {
-        rounded <- lapply(x, consistency_round)
-        attributes(rounded) <- attributes(x)
-        return(rounded)
+# Differences between two observations, as readable paths. Doubles agree when
+# |actual - expected| <= tolerance * |expected| elementwise (an expected exact
+# zero allows |actual| <= 1e-12), with the same NA/NaN/Inf positions. The
+# comparison is relative at every magnitude, so a p-value of 1e-25 that moves
+# to 1e-14 is a difference. Every other value must be identical.
+consistency_differences <- function(
+    actual,
+    expected,
+    tolerance,
+    path = "observation"
+) {
+    if (!identical(class(actual), class(expected))) {
+        return(paste0(path, ": class differs"))
     }
-    if (is.double(x)) {
-        return(signif(x, 8L))
+    if (is.list(expected)) {
+        if (!identical(names(actual), names(expected))) {
+            return(paste0(path, ": names differ"))
+        }
+        if (length(actual) != length(expected)) {
+            return(paste0(path, ": length differs"))
+        }
+        keys <- if (is.null(names(expected))) {
+            paste0("[[", seq_along(expected), "]]")
+        } else {
+            paste0("$", names(expected))
+        }
+        return(unlist(lapply(seq_along(expected), function(k) {
+            consistency_differences(
+                actual[[k]],
+                expected[[k]],
+                tolerance,
+                paste0(path, keys[[k]])
+            )
+        })))
     }
-    x
+    if (!is.double(expected)) {
+        if (identical(actual, expected)) {
+            return(character())
+        }
+        return(paste0(path, ": value differs"))
+    }
+    if (!identical(attributes(actual), attributes(expected))) {
+        return(paste0(path, ": attributes differ"))
+    }
+    special <- function(x) {
+        ifelse(
+            is.nan(x),
+            "NaN",
+            ifelse(
+                is.na(x),
+                "NA",
+                ifelse(is.infinite(x), ifelse(x > 0, "Inf", "-Inf"), "finite")
+            )
+        )
+    }
+    if (!identical(special(actual), special(expected))) {
+        return(paste0(path, ": NA/NaN/Inf pattern differs"))
+    }
+    finite <- is.finite(expected)
+    a <- actual[finite]
+    e <- expected[finite]
+    gap <- abs(a - e)
+    allowed <- ifelse(e == 0, 1e-12, tolerance * abs(e))
+    bad <- gap > allowed
+    if (any(bad)) {
+        worst <- which.max(gap / allowed)
+        return(sprintf(
+            "%s: %d value(s) differ (worst: actual %.17g, expected %.17g)",
+            path,
+            sum(bad),
+            a[worst],
+            e[worst]
+        ))
+    }
+    character()
 }
 
 # The `internal` elements of an observation, keyed by their path.

@@ -1,6 +1,7 @@
-# The inputs are part of what the snapshots record: a changed input would
-# otherwise look like changed behavior.
-test_that("inputs are unchanged", {
+# The inputs and the list of cases are part of what the snapshots record: a
+# changed input would otherwise look like changed behavior, and a dropped case
+# would silently stop being checked.
+test_that("inputs and cases are unchanged", {
     extdata <- c(
         "highmoi_example/gem_group_1/barcodes.tsv.gz",
         "highmoi_example/gem_group_1/features.tsv.gz",
@@ -13,17 +14,23 @@ test_that("inputs are unchanged", {
         "parse_example/gene_mat.mtx",
         "parse_example/grna_mat.mtx"
     )
-    expect_snapshot_value(
+    saved_object <- file.path(
+        input_dir,
+        "saved-objects",
+        consistency_saved_object_file
+    )
+    expect_frozen(
         list(
-            synthetic = consistency_round(consistency_synthetic_inputs()),
+            cases = vapply(consistency_cases(), `[[`, "", "group"),
+            synthetic = consistency_synthetic_inputs(),
             example_data = lapply(consistency_example_data(), consistency_md5),
             extdata = stats::setNames(
                 unname(tools::md5sum(vapply(extdata, consistency_extdata, ""))),
                 extdata
-            )
+            ),
+            saved_object = unname(tools::md5sum(saved_object))
         ),
-        style = "deparse",
-        tolerance = 0
+        "inputs"
     )
 })
 
@@ -34,10 +41,15 @@ test_that("two workers give the serial results", {
         observation <- consistency_seeded(function() {
             consistency_run_workflow(setting, parallel = parallel)
         })
-        observation <- consistency_round(
-            consistency_sort_precomputations(observation)
-        )
+        observation <- consistency_sort_precomputations(observation)
         if (waive_internal) consistency_public(observation) else observation
     }
-    expect_identical(run(parallel = TRUE), run(parallel = FALSE))
+    expect_length(
+        consistency_differences(
+            run(parallel = TRUE),
+            run(parallel = FALSE),
+            tolerance
+        ),
+        0L
+    )
 })

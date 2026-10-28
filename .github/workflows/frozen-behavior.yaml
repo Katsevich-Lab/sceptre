@@ -3,7 +3,8 @@
 # separate from R CMD check, and runs on pull requests or when started by hand.
 #
 # The snapshots were recorded on macOS arm64 with R 4.6.0. macOS runs that R
-# version and must pass. Linux is informational until it has passed here.
+# version at a relative tolerance of 1e-8 and must pass. Linux runs at 1e-6 and
+# is informational until it has passed here.
 on:
   pull_request:
   workflow_dispatch:
@@ -25,11 +26,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest, informational: false}
-          - {os: ubuntu-latest, informational: true}
+          - {os: macos-latest, tolerance: '1e-8', informational: false}
+          - {os: ubuntu-latest, tolerance: '1e-6', informational: true}
 
     env:
       NOT_CRAN: true
+      # Run every case, so a broad change records every changed snapshot.
+      TESTTHAT_MAX_FAILS: Inf
+      SCEPTRE_FROZEN_TOLERANCE: ${{ matrix.config.tolerance }}
       LANGUAGE: en
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1

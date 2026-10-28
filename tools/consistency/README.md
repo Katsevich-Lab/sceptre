@@ -16,24 +16,31 @@ platform's last-digit differences. It runs in CI on pull requests
 
 ## Running
 
-Install the version to check, then run the tests against it:
+Install the version to check, then run the tests against it with the settings
+CI uses:
 
 ```sh
 R CMD INSTALL .
-NOT_CRAN=true Rscript -e 'testthat::test_dir("tools/consistency/tests", package = "sceptre", load_package = "installed")'
+export NOT_CRAN=true TESTTHAT_MAX_FAILS=Inf LANGUAGE=en \
+  OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+  VECLIB_MAXIMUM_THREADS=1 R_DATATABLE_NUM_THREADS=1
+Rscript -e 'testthat::test_dir("tools/consistency/tests", package = "sceptre", load_package = "installed")'
 ```
 
-`NOT_CRAN=true` is needed because testthat skips snapshot tests otherwise. CI
-also sets one thread for BLAS, OpenMP and data.table, and `LANGUAGE=en`, since
-errors and warnings are recorded as text.
+The tests use whichever sceptre is installed first on the library path, so
+install the version you mean to check. testthat skips snapshot tests unless
+`NOT_CRAN=true`. `LANGUAGE=en` matters because errors and warnings are recorded
+as text, and single threads keep results reproducible.
 
 ## Layout
 
 - `harness.R`: the inputs, the cases and how each case is observed.
 - `tests/helper-frozen.R`: runs a group of cases and snapshots each one.
 - `tests/test-<group>.R`: one file per group of cases, snapshotted in
-  `tests/_snaps/<group>.md`.
-- `tests/test-inputs.R`: the inputs themselves, and serial against parallel.
+  `tests/_snaps/<group>/<case>.R` (public outputs) and
+  `<case>-internal.R` (internal state).
+- `tests/test-inputs.R`: the inputs and the list of cases, and serial against
+  parallel.
 - `tests/inputs/saved-objects/`: a saved 0.99.0 object, a file-format input.
 
 ## Cases
@@ -77,8 +84,9 @@ and moves with floating-point round-off, which changed p-values between
 platforms. The covariate `z` is rounded to 6 digits, so the inputs are
 bit-identical on every platform. The example-data cases use the data sets
 shipped in `data/` and `inst/extdata/`. `test-inputs.R` snapshots the synthetic
-inputs and the digests of the shipped ones, so a changed input is reported as
-such rather than as changed behavior.
+inputs, the digests of the shipped ones and of the saved 0.99.0 object, and the
+list of cases. A changed input is then reported as such rather than as changed
+behavior, and a dropped case cannot silently stop being checked.
 
 ### Public outputs and internal state
 
@@ -102,18 +110,30 @@ the internal checks.
 
 ## Comparison
 
-Every double is rounded to 8 significant digits before it is snapshotted, and
-snapshots are compared exactly. Each value is therefore checked to that
-relative precision at any magnitude: a p-value of 1e-25 that becomes 1e-14 is
-a difference, while a relative change of 1e-10 is not. (testthat's own
-`tolerance` is relative to the average size of the values, so it would miss the
-first.) Everything else must be identical: integers, logicals, strings, factors
-with their levels, names, dimensions, classes, row names, row order, error
-messages, warnings, and the random number generator state after each case.
+Each snapshot is the observation written as R code with 17 significant digits,
+so it reads back exactly and shows in a diff which values changed. testthat
+stores the snapshots, reports new and changed ones, and fails them in CI;
+`consistency_differences()` in `harness.R` decides whether an observation
+matches its snapshot:
 
-**Platforms.** CI runs macOS with R 4.6.0, the recording platform, and it must
-pass. Ubuntu runs as an informational job (`continue-on-error`) until it has
-passed in CI.
+- **Doubles** are compared elementwise and relatively:
+  |actual − expected| ≤ tolerance · |expected|. This holds at every magnitude,
+  so a p-value of 1e-25 that becomes 1e-14 is a difference. An expected value
+  of exactly 0 allows |actual| ≤ 1e-12. The positions of `NA`, `NaN` and `Inf`
+  must match. (testthat's own `tolerance` is relative to the average size of
+  the values, so it would miss the p-value above.)
+- **Everything else must be identical:** integers, logicals, strings, factors
+  with their levels, names, dimensions, classes, row names, row order, error
+  messages, warnings, and the random number generator state after each case.
+
+A failure lists the differing paths, for example
+`observation$value$tables$discovery_result$columns$p_value`.
+
+**Platforms.** The tolerance is `SCEPTRE_FROZEN_TOLERANCE`, 1e-8 by default.
+CI runs macOS with R 4.6.0, the recording platform, at 1e-8, and it must pass.
+Ubuntu runs at 1e-6 as an informational job (`continue-on-error`) until it has
+passed in CI. Every decision (QC, significance, pair identity, assignments)
+must be identical under both.
 
 ## Updating the snapshots
 
