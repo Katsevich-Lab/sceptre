@@ -1,0 +1,73 @@
+# Frozen behavior suite (tools/consistency): checks that sceptre reproduces the
+# outputs recorded in tools/consistency/tests/_snaps. It is a developer lane,
+# separate from R CMD check, and runs on pull requests or when started by hand.
+#
+# The snapshots were recorded on macOS arm64 with R 4.6.0. macOS runs that R
+# version at a relative tolerance of 1e-8 and must pass. Linux runs at 1e-6 and
+# is informational until it has passed here.
+on:
+  pull_request:
+  workflow_dispatch:
+
+name: frozen-behavior
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-behavior:
+    runs-on: ${{ matrix.config.os }}
+
+    name: frozen behavior (${{ matrix.config.os }})
+
+    continue-on-error: ${{ matrix.config.informational }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest, tolerance: '1e-8', informational: false}
+          - {os: ubuntu-latest, tolerance: '1e-6', informational: true}
+
+    env:
+      NOT_CRAN: true
+      # Run every case, so a broad change records every changed snapshot.
+      TESTTHAT_MAX_FAILS: Inf
+      SCEPTRE_FROZEN_TOLERANCE: ${{ matrix.config.tolerance }}
+      LANGUAGE: en
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
+      VECLIB_MAXIMUM_THREADS: 1
+      R_DATATABLE_NUM_THREADS: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          # The R version the snapshots were recorded with.
+          r-version: '4.6.0'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          dependencies: '"hard"'
+          extra-packages: |
+            any::testthat
+            any::withr
+            any::R.utils
+
+      - name: Install sceptre
+        run: R CMD INSTALL --no-docs .
+
+      - name: Run the frozen behavior suite
+        run: |
+          Rscript -e 'testthat::test_dir("tools/consistency/tests", package = "sceptre", load_package = "installed", stop_on_failure = TRUE)'
+
+      - name: Upload changed snapshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frozen-behavior-snapshots-${{ matrix.config.os }}
+          path: tools/consistency/tests/_snaps
