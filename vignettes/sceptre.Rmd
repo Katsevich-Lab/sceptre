@@ -727,9 +727,15 @@ a BiocParallel back end as the argument `BPPARAM`; for example,
 `parallel = TRUE` (Linux and macOS) runs the function with
 `BiocParallel::MulticoreParam(n_processors)`. The results do not depend on the
 back end or the number of workers: below, the power check run on two workers
-gives the same results as the serial run above with the same seed.
+gives the same results as the serial run above with the same seed. (Windows
+cannot fork processes, so there the example runs serially.)
 
 ```{r bpparam, message=FALSE, results='hide'}
+BPPARAM <- if (.Platform$OS.type == "windows") {
+    BiocParallel::SerialParam()
+} else {
+    BiocParallel::MulticoreParam(workers = 2)
+}
 sceptre_object_parallel <- sceptre_object |>
     set_analysis_parameters(
         positive_control_pairs = positive_control_pairs,
@@ -738,7 +744,7 @@ sceptre_object_parallel <- sceptre_object |>
     ) |>
     run_power_check(
         print_progress = FALSE,
-        BPPARAM = BiocParallel::SnowParam(workers = 2)
+        BPPARAM = BPPARAM
     )
 ```
 
