@@ -228,7 +228,10 @@ test_that("set_analysis_parameters", {
     expect_equal(
         sceptre_object_post_all_defaults_low_moi,
         sceptre_object_post_all_defaults_low_moi |>
-            set_analysis_parameters(discovery_pairs = disc_pairs_empty)
+            set_analysis_parameters(
+                discovery_pairs = disc_pairs_empty,
+                seed = sceptre_object_post_all_defaults_low_moi@seed
+            )
     )
 
     ## 1. do default values get set correctly based on MOI?

@@ -131,7 +131,7 @@ test_that("a parallel worker that exits without replying cannot drop results", {
             n_processors = 2,
             print_progress = FALSE
         ))),
-        "Parallel worker [12] returned no result"
+        "a worker may have exited unexpectedly"
     )
 })
 

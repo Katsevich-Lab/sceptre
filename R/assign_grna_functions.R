@@ -5,7 +5,7 @@ assign_grnas_to_cells <- function(
     sceptre_object,
     print_progress,
     parallel,
-    n_processors,
+    BPPARAM,
     log_dir
 ) {
     # extract pieces from sceptre_object
@@ -30,9 +30,10 @@ assign_grnas_to_cells <- function(
             grna_assignment_hyperparameters = grna_assignment_hyperparameters,
             print_progress = print_progress,
             parallel = parallel,
-            n_processors = n_processors,
+            BPPARAM = BPPARAM,
             log_dir = log_dir,
-            grna_ids = grnas_in_use
+            grna_ids = grnas_in_use,
+            seed = sceptre_object@seed
         )
     }
     if (grna_assignment_method == "thresholding") {

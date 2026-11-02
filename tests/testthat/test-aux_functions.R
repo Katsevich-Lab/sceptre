@@ -148,16 +148,24 @@ test_that("seeded internal helpers preserve the caller's RNG state", {
     seed_before <- .Random.seed
     partitioned_response_ids <- partition_response_ids(
         response_ids = response_ids,
-        parallel = TRUE,
-        n_processors = 3
+        BPPARAM = BiocParallel::SnowParam(3)
     )
     expect_equal(.Random.seed, seed_before)
     expect_length(partitioned_response_ids, 3)
+    # the IDs are dealt out in turn
+    expect_identical(
+        partitioned_response_ids$group_1,
+        response_ids[c(1, 4, 7, 10)]
+    )
     expect_setequal(unlist(partitioned_response_ids), response_ids)
+    expect_identical(
+        partition_response_ids(response_ids, BPPARAM = NULL),
+        list(group_1 = response_ids)
+    )
 
     set.seed(102)
     seed_before <- .Random.seed
-    starting_guesses <- get_random_starting_guesses(n_em_rep = 3)
+    starting_guesses <- get_random_starting_guesses(n_em_rep = 3, seed = 4L)
     expect_equal(.Random.seed, seed_before)
     expect_length(starting_guesses$pi_guesses, 3)
     expect_length(starting_guesses$g_pert_guesses, 3)

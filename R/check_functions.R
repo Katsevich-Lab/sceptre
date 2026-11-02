@@ -433,7 +433,7 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
     if (parallel && identical(os_type, "windows")) {
         stop(
             "`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. ",
-            "Please set `parallel = FALSE`.",
+            "Please set `parallel = FALSE`, or pass a back end that does not fork, such as `BPPARAM = BiocParallel::SnowParam()`.",
             call. = FALSE
         )
     }

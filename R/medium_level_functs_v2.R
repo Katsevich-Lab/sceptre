@@ -61,7 +61,7 @@ run_perm_test_in_memory <- function(
     cells_in_use,
     print_progress,
     parallel,
-    n_processors,
+    BPPARAM,
     log_dir,
     analysis_type
 ) {
@@ -105,6 +105,12 @@ run_perm_test_in_memory <- function(
             file.create(f_name) |> invisible()
         } else {
             f_name <- NULL
+        }
+        if (is.list(synthetic_idxs)) {
+            synthetic_idxs <- do.call(
+                get_synthetic_permutation_idxs,
+                synthetic_idxs
+            )
         }
         precomp_out_list <- list()
         result_out_list <- vector(
@@ -206,8 +212,7 @@ run_perm_test_in_memory <- function(
     # 3. partition the response IDs
     partitioned_response_ids <- partition_response_ids(
         response_ids = response_ids,
-        parallel = parallel,
-        n_processors = n_processors
+        BPPARAM = BPPARAM
     )
 
     # 4. run the analysis
@@ -225,7 +230,7 @@ run_perm_test_in_memory <- function(
                 " for progress updates."
             )
         }
-        res <- parallel::mclapply(
+        res <- bplapply_checked(
             seq_along(partitioned_response_ids),
             function(proc_id) {
                 analyze_given_response_ids(
@@ -233,9 +238,8 @@ run_perm_test_in_memory <- function(
                     proc_id
                 )
             },
-            mc.cores = length(partitioned_response_ids)
+            BPPARAM = BPPARAM
         )
-        check_worker_results(res)
         message(crayon::green(" \u2713"))
     }
 
@@ -246,6 +250,13 @@ run_perm_test_in_memory <- function(
         chunk[["precomp_out_list"]]
     }) |>
         purrr::flatten()
+    if (length(res) >= 2L) {
+        # put the precomputations in serial order
+        precomp_out_list <- precomp_out_list[intersect(
+            response_ids,
+            names(precomp_out_list)
+        )]
+    }
     response_precomputations <- c(response_precomputations, precomp_out_list)
 
     return(list(
@@ -276,9 +287,10 @@ run_crt_in_memory_v2 <- function(
     cells_in_use,
     print_progress,
     parallel,
-    n_processors,
+    BPPARAM,
     log_dir,
-    analysis_type
+    analysis_type,
+    seed
 ) {
     # 0. define several variables
     subset_to_nt_cells <- calibration_check && !control_group_complement
@@ -368,8 +380,7 @@ run_crt_in_memory_v2 <- function(
     if (run_outer_regression) {
         partitioned_response_ids <- partition_response_ids(
             response_ids = response_ids,
-            parallel = parallel,
-            n_processors = n_processors
+            BPPARAM = BPPARAM
         )
         if (!parallel) {
             res <- lapply(
@@ -388,7 +399,7 @@ run_crt_in_memory_v2 <- function(
                     " for progress updates."
                 )
             }
-            res <- parallel::mclapply(
+            res <- bplapply_checked(
                 seq_along(partitioned_response_ids),
                 function(proc_id) {
                     run_precomp_on_given_responses(
@@ -396,11 +407,17 @@ run_crt_in_memory_v2 <- function(
                         proc_id
                     )
                 },
-                mc.cores = length(partitioned_response_ids)
+                BPPARAM = BPPARAM
             )
-            check_worker_results(res)
         }
         precomp_out_list <- purrr::flatten(res)
+        if (length(res) >= 2L) {
+            # put the precomputations in serial order
+            precomp_out_list <- precomp_out_list[intersect(
+                response_ids,
+                names(precomp_out_list)
+            )]
+        }
         response_precomputations <- c(
             response_precomputations,
             precomp_out_list
@@ -451,7 +468,8 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    seed
                 )
             } else {
                 curr_response_result <- discovery_ntcells_crt(
@@ -467,7 +485,8 @@ run_crt_in_memory_v2 <- function(
                     all_nt_idxs,
                     response_matrix,
                     side_code,
-                    cells_in_use
+                    cells_in_use,
+                    seed
                 )
             }
             result_out_list[[grna_group_idx]] <- construct_data_frame_v2(
@@ -484,13 +503,12 @@ run_crt_in_memory_v2 <- function(
     grna_groups <- unique(response_grna_group_pairs$grna_group)
     partitioned_grna_group_ids <- partition_response_ids(
         response_ids = grna_groups,
-        parallel = parallel,
-        n_processors = n_processors
+        BPPARAM = BPPARAM
     )
     if (!parallel) {
         res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
     } else {
-        res <- parallel::mclapply(
+        res <- bplapply_checked(
             seq_along(partitioned_grna_group_ids),
             function(proc_id) {
                 perform_association_analysis(
@@ -498,12 +516,23 @@ run_crt_in_memory_v2 <- function(
                     proc_id
                 )
             },
-            mc.cores = length(partitioned_grna_group_ids)
+            BPPARAM = BPPARAM
         )
-        check_worker_results(res)
         message(crayon::green(" \u2713"))
     }
     result <- res |> data.table::rbindlist(fill = TRUE)
+    if (length(res) >= 2L) {
+        # put the rows in the serial order of the gRNA groups, which the
+        # workers receive interleaved, so that ties in the sorted result break
+        # as in a serial run
+        data.table::set(
+            result,
+            j = "grna_group_order",
+            value = match(result$grna_group, grna_groups)
+        )
+        data.table::setorderv(result, "grna_group_order")
+        data.table::set(result, j = "grna_group_order", value = NULL)
+    }
 
     return(list(
         result = result,

@@ -158,71 +158,167 @@ auto_compute_cell_covariates <- function(
 }
 
 
-partition_response_ids <- function(response_ids, parallel, n_processors) {
-    groups_set <- FALSE
-    if (parallel) {
-        if (identical(n_processors, "auto")) {
-            # Read the user's preferred fraction (default 0.5 = half cores),
-            # then
-            # neutralize that option on the parallelly call so parallelly's own
-            # option-aware default does not apply the same fraction a second
-            # time.
-            # parallelly's `fraction` arg defaults to getOption(
-            # "parallelly.availableCores.fraction", 1), so omitting it would
-            # silently double-scale when the user has set that option. The arg
-            # itself was only added in 1.47.0, so passing `fraction = 1`
-            # directly
-            # would break parallelly < 1.47.0 -- `withr::with_options`
-            # neutralizes
-            # the option for the call on any parallelly >= 1.23.0.
-            frac <- getOption("parallelly.availableCores.fraction", 0.5)
-            n_processors <- max(
-                1L,
-                floor(
-                    withr::with_options(
-                        list(parallelly.availableCores.fraction = 1),
-                        parallelly::availableCores(logical = FALSE)
-                    ) *
-                        frac
-                )
-            )
-        }
-        if (length(response_ids) >= 2 * n_processors) {
-            s <- withr::with_seed(4, sample(response_ids))
-            out <- split(
-                s,
-                cut(
-                    seq_along(s),
-                    n_processors,
-                    labels = paste0("group_", seq(1, n_processors))
-                )
-            )
-            groups_set <- TRUE
-        }
+# Return the seed of an analysis: `seed` itself, checked, or, when `seed` is
+# NULL, a seed drawn from R's random number generator, so that set.seed()
+# governs it.
+resolve_seed <- function(seed) {
+    if (is.null(seed)) {
+        return(sample.int(.Machine$integer.max, 1L))
     }
-    if (!groups_set) {
+    if (
+        !is.numeric(seed) ||
+            length(seed) != 1L ||
+            !is.finite(seed) ||
+            seed != round(seed) ||
+            seed < 0 ||
+            seed > .Machine$integer.max
+    ) {
+        stop(
+            "`seed` must be NULL or a single whole number between 0 and ",
+            .Machine$integer.max,
+            ".",
+            call. = FALSE
+        )
+    }
+    as.integer(seed)
+}
+
+
+# Return the BiocParallel backend for an analysis function, or NULL to run
+# serially. A user-supplied `BPPARAM` takes precedence; otherwise
+# `parallel = TRUE` forks `n_processors` workers, as in earlier versions.
+get_bpparam <- function(parallel, n_processors, BPPARAM) {
+    if (!is.null(BPPARAM)) {
+        if (!methods::is(BPPARAM, "BiocParallelParam")) {
+            stop(
+                "`BPPARAM` should be a `BiocParallelParam` object, such as ",
+                "`BiocParallel::MulticoreParam()` or ",
+                "`BiocParallel::SnowParam()`."
+            )
+        }
+        if (BiocParallel::bpnworkers(BPPARAM) < 2L) {
+            return(NULL)
+        }
+        return(BPPARAM)
+    }
+    check_parallel_supported(parallel)
+    if (!parallel) {
+        return(NULL)
+    }
+    if (
+        !(identical(n_processors, "auto") ||
+            (is.numeric(n_processors) && n_processors >= 2))
+    ) {
+        stop(
+            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
+        )
+    }
+    if (identical(n_processors, "auto")) {
+        # Read the user's preferred fraction (default 0.5 = half cores), then
+        # neutralize that option on the parallelly call so parallelly's own
+        # option-aware default does not apply the same fraction a second
+        # time.
+        # parallelly's `fraction` arg defaults to getOption(
+        # "parallelly.availableCores.fraction", 1), so omitting it would
+        # silently double-scale when the user has set that option. The arg
+        # itself was only added in 1.47.0, so passing `fraction = 1` directly
+        # would break parallelly < 1.47.0 -- `withr::with_options`
+        # neutralizes the option for the call on any parallelly >= 1.23.0.
+        frac <- getOption("parallelly.availableCores.fraction", 0.5)
+        n_processors <- max(
+            1L,
+            floor(
+                withr::with_options(
+                    list(parallelly.availableCores.fraction = 1),
+                    parallelly::availableCores(logical = FALSE)
+                ) *
+                    frac
+            )
+        )
+    }
+    BiocParallel::MulticoreParam(workers = as.integer(n_processors))
+}
+
+
+# Split the IDs into one group per worker of `BPPARAM` (a single group when
+# running serially). The IDs are dealt out in turn, so that neighboring IDs,
+# which may have similar workloads, go to different workers.
+partition_response_ids <- function(response_ids, BPPARAM) {
+    n_processors <- if (is.null(BPPARAM)) {
+        1L
+    } else {
+        BiocParallel::bpnworkers(BPPARAM)
+    }
+    if (n_processors >= 2L && length(response_ids) >= 2 * n_processors) {
+        group <- (seq_along(response_ids) - 1L) %% n_processors + 1L
+        out <- split(
+            response_ids,
+            factor(
+                paste0("group_", group),
+                levels = paste0("group_", seq(1, n_processors))
+            )
+        )
+    } else {
         out <- list(group_1 = response_ids)
     }
     return(out)
 }
 
 
-# parallel::mclapply() returns a "try-error" object for a worker that failed
-# and NULL for a worker that exited without returning a result. Stop with the
-# worker's original error before its result is combined with the others. A
-# successful worker never returns NULL here: every caller's worker function
-# returns a list or a data.table, possibly empty.
-check_worker_results <- function(res) {
-    for (i in seq_along(res)) {
-        if (inherits(res[[i]], "try-error")) {
-            cause <- attr(res[[i]], "condition")
-            detail <- if (inherits(cause, "condition")) {
-                conditionMessage(cause)
-            } else {
-                as.character(res[[i]])
-            }
-            stop("Parallel worker ", i, " failed: ", detail, call. = FALSE)
+# Run `FUN` on each element of `X` with the BiocParallel backend `BPPARAM`,
+# and stop with a worker's original error if any worker failed.
+bplapply_checked <- function(X, FUN, BPPARAM) {
+    res <- tryCatch(
+        BiocParallel::bptry(BiocParallel::bplapply(X, FUN, BPPARAM = BPPARAM)),
+        # BiocParallel itself fails, for example, when a worker is killed
+        error = function(cnd) {
+            stop(
+                "Parallel processing failed; a worker may have exited ",
+                "unexpectedly. Underlying error: ",
+                conditionMessage(cnd),
+                call. = FALSE
+            )
         }
+    )
+    check_worker_results(res)
+}
+
+
+# BiocParallel::bptry() returns an error condition for a worker that failed
+# (and for the elements it did not evaluate after that failure), and NULL for a
+# worker that exited without returning a result. Stop with the worker's
+# original error before its result is combined with the others. A successful
+# worker never returns NULL here: every caller's worker function returns a
+# list or a data.table, possibly empty.
+check_worker_results <- function(res) {
+    failed <- which(vapply(
+        res,
+        inherits,
+        what = c("error", "try-error"),
+        FUN.VALUE = logical(1)
+    ))
+    if (length(failed) >= 1L) {
+        # report a failure itself rather than an element left unevaluated
+        unevaluated <- vapply(
+            res[failed],
+            inherits,
+            what = "unevaluated_error",
+            FUN.VALUE = logical(1)
+        )
+        i <- c(failed[!unevaluated], failed[unevaluated])[1]
+        cause <- if (inherits(res[[i]], "try-error")) {
+            attr(res[[i]], "condition")
+        } else {
+            res[[i]]
+        }
+        detail <- if (inherits(cause, "condition")) {
+            conditionMessage(cause)
+        } else {
+            as.character(res[[i]])
+        }
+        stop("Parallel worker ", i, " failed: ", detail, call. = FALSE)
+    }
+    for (i in seq_along(res)) {
         if (is.null(res[[i]])) {
             stop(
                 "Parallel worker ",

@@ -12,7 +12,8 @@ run_calibration_check(
   parallel = FALSE,
   n_processors = "auto",
   log_dir = tempdir(),
-  output_amount = 1
+  output_amount = 1,
+  BPPARAM = NULL
 )
 }
 \arguments{
@@ -42,6 +43,15 @@ directory in which to write the log files (ignored if \code{parallel = FALSE})}
 \item{output_amount}{(optional; default \code{1}) an integer taking values 1, 2,
 or 3 specifying the amount of information to return. \code{1} returns the least
 amount of information and \code{3} the most.}
+
+\item{BPPARAM}{(optional; default \code{NULL}) a
+\link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} object specifying the parallel back end,
+for example \code{BiocParallel::SnowParam(4)}. If supplied, it overrides
+\code{parallel} and \code{n_processors}; the default, \code{NULL}, runs the function with
+\code{BiocParallel::MulticoreParam(n_processors)} if \code{parallel = TRUE} and
+serially otherwise. Windows cannot fork processes, so there \code{parallel = TRUE}
+is not available; use \code{BPPARAM = BiocParallel::SnowParam(n_processors)}
+instead. Results do not depend on the back end or the number of workers.}
 }
 \value{
 an updated \code{sceptre_object} in which the calibration check has been

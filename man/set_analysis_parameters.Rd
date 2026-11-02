@@ -16,7 +16,8 @@ set_analysis_parameters(
   control_group = "default",
   resampling_mechanism = "default",
   multiple_testing_method = "BH",
-  multiple_testing_alpha = 0.1
+  multiple_testing_alpha = 0.1,
+  seed = NULL
 )
 }
 \arguments{
@@ -58,6 +59,16 @@ options}
 
 \item{multiple_testing_alpha}{(optional; default \code{0.1}) a numeric specifying
 the nominal level of the multiple testing correction method}
+
+\item{seed}{(optional; default \code{NULL}) a whole number between 0 and
+\code{.Machine$integer.max} that seeds the random draws of the analysis: the
+starting values of the mixture method in \code{assign_grnas()}, the negative
+control pairs of \code{run_calibration_check()}, and the permutation and
+conditional resampling draws. The default, \code{NULL}, draws the seed from R's
+random number generator, so that \code{set.seed()} called beforehand makes the
+analysis reproducible. The seed is recorded in the \code{sceptre_object}, and
+\code{print()} shows it. The results of earlier versions of sceptre are
+reproduced with \code{seed = 4}.}
 }
 \value{
 an updated \code{sceptre_object} in which the analysis parameters have

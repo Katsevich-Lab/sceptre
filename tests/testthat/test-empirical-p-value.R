@@ -1,5 +1,5 @@
 test_that("empirical p-values cap only the doubled two-sided tail at one", {
-    draws <- fisher_yates_sampler(n_tot = 5L, M = 1L, B = 4L)
+    draws <- fisher_yates_sampler(n_tot = 5L, M = 1L, B = 4L, seed = 4L)
     scores <- list(
         rep(0, 5),
         c(0, -2, -1, 1, 2),
