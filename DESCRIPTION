@@ -59,6 +59,7 @@ Imports:
 Depends: 
     R (>= 4.6.0)
 Suggests:
+    BiocStyle,
     R.utils,
     sessioninfo,
     rmarkdown,

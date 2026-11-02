@@ -280,7 +280,7 @@ bplapply_checked <- function(X, FUN, BPPARAM) {
         error = function(cnd) {
             stop(
                 "Parallel processing failed; a worker may have exited ",
-                "unexpectedly. Underlying error: ",
+                "unexpectedly: ",
                 conditionMessage(cnd),
                 call. = FALSE
             )
