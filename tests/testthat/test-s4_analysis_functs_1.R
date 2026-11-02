@@ -267,7 +267,7 @@ test_that("set_analysis_parameters", {
 })
 
 
-test_that("set_analysis_parameters rejects NT cells as the control group in high MOI", {
+test_that("set_analysis_parameters warns that NT cells become the complement in high MOI", {
     data("highmoi_example_data")
     data("grna_target_data_frame_highmoi")
     sceptre_object <- suppressMessages(import_data(
@@ -279,15 +279,16 @@ test_that("set_analysis_parameters rejects NT cells as the control group in high
         response_names = highmoi_example_data$gene_names
     ))
     discovery_pairs <- construct_trans_pairs(sceptre_object)[1:5, ]
-    expect_error(
-        set_analysis_parameters(
+    expect_warning(
+        nt_cells <- suppressMessages(set_analysis_parameters(
             sceptre_object,
             discovery_pairs = discovery_pairs,
             control_group = "nt_cells"
-        ),
-        regexp = "The control group cannot be the NT cells in high MOI.",
+        )),
+        regexp = "the complement set is used as the control group instead",
         fixed = TRUE
     )
+    expect_true(nt_cells@control_group_complement)
     sceptre_object <- suppressMessages(set_analysis_parameters(
         sceptre_object,
         discovery_pairs = discovery_pairs

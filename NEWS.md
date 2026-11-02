@@ -36,7 +36,7 @@
 
 -   The maximum gRNA assignment method requires `min_grna_n_umis_threshold` to be at least 1; 0 assigned gRNAs to cells with no gRNA UMIs.
 
--   In high MOI, `set_analysis_parameters(control_group = "nt_cells")` is an error; it was silently replaced by the complement.
+-   In high MOI, `set_analysis_parameters(control_group = "nt_cells")` gives a warning that the complement set is used as the control group; previously the complement was used silently.
 
 -   Importing a response or gRNA matrix with missing, negative, infinite or non-integer entries is an error; previously such counts were accepted (non-integer counts then gave many warnings in the analysis).
 

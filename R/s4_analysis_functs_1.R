@@ -28,7 +28,8 @@
 #' test statistics, either `"skew_normal"` or `"no_approximation"`
 #' @param control_group (optional) a string specifying the control group to use
 #' in the differential expression analysis, either `"complement"` or
-#' `"nt_cells"`; `"nt_cells"` is available in low MOI only
+#' `"nt_cells"`; in high MOI the complement set is always used, and
+#' `"nt_cells"` gives a warning
 #' @param resampling_mechanism (optional) a string specifying the resampling
 #' mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying
@@ -104,9 +105,14 @@ set_analysis_parameters <- function(
     # 1. handle default arguments
     seed <- resolve_seed(seed)
     if (!sceptre_object@low_moi) {
-        if (control_group == "default") {
-            control_group <- "complement"
+        if (control_group == "nt_cells") {
+            warning(
+                "`control_group = \"nt_cells\"` is not available in high MOI; ",
+                "the complement set is used as the control group instead.",
+                call. = FALSE
+            )
         }
+        control_group <- "complement"
         if (resampling_mechanism == "default") resampling_mechanism <- "crt"
     }
     if (sceptre_object@low_moi) {
