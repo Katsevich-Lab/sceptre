@@ -23,9 +23,8 @@ To get started, users should install `sceptre` from Bioconductor via
 `BiocManager::install()`.
 
 ```{r install, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
+if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-}
 BiocManager::install("sceptre")
 ```
 
