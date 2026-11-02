@@ -40,7 +40,7 @@ library(sceptre)
 The standard pipeline involved in applying `sceptre` to analyze a dataset
 consists of several steps, which we summarize in the following schematic.
 
-```{r schematic, out.width = "650px", fig.align="center", echo = FALSE, fig.cap=c("Standard `sceptre` pipeline")}
+```{r schematic, out.width = "100%", fig.align="center", echo = FALSE, fig.cap=c("Standard `sceptre` pipeline")}
 knitr::include_graphics("pipeline_schematic.png")
 ```
 
@@ -340,7 +340,7 @@ randomly selected gRNAs via a call to the function
 set.seed(2)
 ```
 
-```{r plot-grna-counts, out.width = "650px", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Histograms of the gRNA count distributions")}
+```{r plot-grna-counts, out.width = "100%", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Histograms of the gRNA count distributions")}
 plot_grna_count_distributions(sceptre_object)
 ```
 
@@ -387,7 +387,7 @@ summarizing the output of the gRNA-to-cell assignment step.
 set.seed(3)
 ```
 
-```{r plot-assignments, out.width = "650px", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("gRNA-to-cell assignments")}
+```{r plot-assignments, out.width = "100%", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("gRNA-to-cell assignments")}
 plot(sceptre_object)
 ```
 
@@ -445,7 +445,7 @@ print(sceptre_object) # output suppressed for brevity
 We can visualize the output of the QC step by calling `plot()` on the updated
 `sceptre_object`.
 
-```{r plot-qc, out.width = "450px", fig.align="center", fig.width = 4.4, fig.height = 4.95, fig.cap=c("Cellwise and pairwise quality control")}
+```{r plot-qc, out.width = "70%", fig.align="center", fig.width = 4.4, fig.height = 4.95, fig.cap=c("Cellwise and pairwise quality control")}
 plot(sceptre_object)
 ```
 
@@ -497,7 +497,7 @@ resulting `sceptre_object`.
 set.seed(3)
 ```
 
-```{r plot-calibration, out.width = "650px", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Calibration check results")}
+```{r plot-calibration, out.width = "100%", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Calibration check results")}
 plot(sceptre_object)
 ```
 
@@ -549,7 +549,7 @@ resulting `sceptre_object`.
 set.seed(3)
 ```
 
-```{r plot-power, out.width = "550px", fig.align="center", fig.width = 4.4, fig.height = 3.3, fig.cap=c("Power check results")}
+```{r plot-power, out.width = "85%", fig.align="center", fig.width = 4.4, fig.height = 3.3, fig.cap=c("Power check results")}
 plot(sceptre_object)
 ```
 
@@ -578,7 +578,7 @@ the resulting `sceptre_object`.
 set.seed(3)
 ```
 
-```{r plot-discovery, out.width = "650px", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Discovery analysis results")}
+```{r plot-discovery, out.width = "100%", fig.align="center", fig.width = 5.5, fig.height = 4.4, fig.cap=c("Discovery analysis results")}
 plot(sceptre_object)
 ```
 
