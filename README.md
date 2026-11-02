@@ -19,9 +19,8 @@ principles:
   let you verify that false positives are controlled and that real
   effects are detectable — on your own data.
 - **Massive scalability.** Optimized C++ routines improve performance.
-  Optional [disk-backed data
-  structures](https://cran.r-project.org/package=ondisc) allow the
-  analysis of datasets too large to fit in memory. The companion
+  Optional disk-backed data structures (MuData files read through
+  HDF5Array) allow the analysis of datasets too large to fit in memory. The companion
   [`sceptre` Nextflow
   pipeline](https://github.com/timothy-barry/sceptre-pipeline)
   distributes analyses across hundreds of processors on a cluster or

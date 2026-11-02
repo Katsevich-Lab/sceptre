@@ -35,13 +35,18 @@ Imports:
     cowplot,
     crayon,
     data.table,
+    DelayedArray,
     dplyr,
     GenomicRanges,
     ggplot2,
+    HDF5Array,
     IRanges,
     Matrix,
     methods,
+    MultiAssayExperiment,
+    MuData,
     Rcpp (>= 1.0.9),
+    rhdf5,
     S4Vectors,
     scales,
     SingleCellExperiment,
@@ -53,7 +58,6 @@ Imports:
 Depends: 
     R (>= 4.1)
 Suggests:
-    ondisc,
     R.utils,
     sessioninfo,
     rmarkdown,

@@ -4,9 +4,9 @@
 #' Import data
 #'
 #' `import_data()` imports data from a collection of R objects to create a
-#' `sceptre_object`. Users can create either a standard `sceptre` object or an
-#' `ondisc`-backed `sceptre` object; the latter is more appropriate for
-#' large-scale data. See
+#' `sceptre_object`. Users can create either a standard `sceptre` object or a
+#' disk-backed `sceptre` object, whose response counts stay on disk; the latter
+#' is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual}
 #' for more detailed information about this function.
 #'
@@ -46,12 +46,19 @@
 #' @param response_names (optional) a vector of human-readable response names;
 #' names with the prefix "MT-" are taken as mitochondrial genes and are used to
 #' compute the covariate `response_p_mito`.
-#' @param use_ondisc (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`)
-#' indicating whether to create an `ondisc`-backed `sceptre_object` (`TRUE`) or
-#' a standard `sceptre_object` (`FALSE`).
+#' @param backed (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`)
+#' indicating whether to create a disk-backed `sceptre_object` (`TRUE`), whose
+#' response counts stay on disk in the file `screen.h5mu` in
+#' `directory_to_write` and are read as they are needed, or a standard
+#' `sceptre_object` (`FALSE`), which holds them in memory. The gRNA counts and
+#' the cell covariates are held in memory either way. The analysis of a
+#' disk-backed `sceptre_object` uses permutations (`resampling_mechanism =
+#' "permutations"` in [set_analysis_parameters()]).
 #' @param directory_to_write (optional) a file path to a directory in which to
-#' write the backing `.odm` files for the response and gRNA expression matrices.
-#' Must be supplied if `use_ondisc` is set to `TRUE`.
+#' write `screen.h5mu`, a MuData file holding the response and gRNA counts and
+#' the cell covariates. Must be supplied if `backed` is set to `TRUE`. Save
+#' the `sceptre_object` in the same directory with [write_sceptre_object()].
+#' @param use_ondisc deprecated; use `backed`.
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -66,14 +73,14 @@
 #'   moi = "low"
 #' )
 #'
-#' # 2. initialize an ondisc-backed sceptre_object from R objects
+#' # 2. initialize a disk-backed sceptre_object from R objects
 #' sceptre_object <- import_data(
 #'   response_matrix = lowmoi_example_data$response_matrix,
 #'   grna_matrix = lowmoi_example_data$grna_matrix,
 #'   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
 #'   extra_covariates = lowmoi_example_data$extra_covariates,
 #'   moi = "low",
-#'   use_ondisc = TRUE,
+#'   backed = TRUE,
 #'   directory_to_write = tempdir()
 #' )
 import_data <- function(
@@ -83,9 +90,14 @@ import_data <- function(
     moi,
     extra_covariates = data.frame(),
     response_names = NA_character_,
-    use_ondisc = FALSE,
-    directory_to_write = NULL
+    backed = FALSE,
+    directory_to_write = NULL,
+    use_ondisc = NULL
 ) {
+    backed <- resolve_backed(backed, use_ondisc)
+    if (backed) {
+        directory_to_write <- prepare_directory_to_write(directory_to_write)
+    }
     if (
         methods::is(grna_target_data_frame, "GRanges") ||
             methods::is(grna_target_data_frame, "GRangesList")
@@ -94,28 +106,50 @@ import_data <- function(
             grna_target_data_frame
         )
     }
-    if (use_ondisc) {
-        # use ondisc
-        import_data_use_ondisc(
-            response_matrix,
-            grna_matrix,
-            grna_target_data_frame,
-            moi,
-            extra_covariates,
-            response_names,
+    sceptre_object <- import_data_memory(
+        response_matrix,
+        grna_matrix,
+        grna_target_data_frame,
+        moi,
+        extra_covariates,
+        response_names
+    )
+    if (backed) {
+        sceptre_object <- back_response_counts(
+            sceptre_object,
             directory_to_write
         )
-    } else {
-        # do not use ondisc
-        import_data_memory(
-            response_matrix,
-            grna_matrix,
-            grna_target_data_frame,
-            moi,
-            extra_covariates,
-            response_names
-        )
     }
+    return(sceptre_object)
+}
+
+
+# `use_ondisc`, the argument of 0.99.1 and earlier, is deprecated in favor of
+# `backed`
+resolve_backed <- function(backed, use_ondisc) {
+    if (!is.null(use_ondisc)) {
+        warning(
+            "The argument `use_ondisc` is deprecated; use `backed` instead.",
+            call. = FALSE
+        )
+        backed <- use_ondisc
+    }
+    if (!(isTRUE(backed) || isFALSE(backed))) {
+        stop("`backed` must be TRUE or FALSE.")
+    }
+    return(backed)
+}
+
+
+# Writes the data of an in-memory sceptre_object to `directory/screen.h5mu`
+# and keeps its response counts there, on disk.
+back_response_counts <- function(sceptre_object, directory) {
+    file <- file.path(directory, "screen.h5mu")
+    write_screen(sceptre_object@data, file)
+    response_matrix <- get_response_matrix(sceptre_object)
+    backed_counts <- read_screen(file, backed = TRUE)$response
+    dimnames(backed_counts) <- dimnames(response_matrix)
+    set_response_matrix(sceptre_object, backed_counts)
 }
 
 # convert a GRanges or GRangesList of gRNAs, whose metadata columns hold
@@ -203,63 +237,6 @@ import_data_memory <- function(
     )
 }
 
-# 1. ondisc
-import_data_use_ondisc <- function(
-    response_matrix,
-    grna_matrix,
-    grna_target_data_frame,
-    moi,
-    extra_covariates,
-    response_names,
-    directory_to_write
-) {
-    #  perform initial check
-    check_import_data_inputs(
-        response_matrix,
-        grna_matrix,
-        grna_target_data_frame,
-        moi,
-        extra_covariates
-    ) |>
-        invisible()
-    # check directory_to_write
-    directory_to_write <- prepare_directory_to_write(directory_to_write)
-
-    # process covariates and matrices
-    processed_inputs <- process_covariates_and_matrices(
-        response_matrix = response_matrix,
-        grna_matrix = grna_matrix,
-        extra_covariates = extra_covariates,
-        response_names = response_names
-    )
-    response_matrix <- processed_inputs$response_matrix
-    grna_matrix <- processed_inputs$grna_matrix
-    covariate_data_frame <- processed_inputs$covariate_data_frame
-
-    # write matrices to disk
-    integer_id <- sample(x = seq(0L, .Machine$integer.max), size = 1L)
-    out <- write_matrices_to_disk(
-        response_matrix = response_matrix,
-        grna_matrix = grna_matrix,
-        directory_to_write = directory_to_write,
-        integer_id = integer_id
-    )
-
-    # initialize the sceptre_object
-    sceptre_object <- init_sceptre_object(
-        response_matrix = out$response_matrix,
-        grna_matrix = out$grna_matrix,
-        covariate_data_frame = covariate_data_frame,
-        moi = moi,
-        grna_target_data_frame = grna_target_data_frame
-    )
-
-    # add integer id
-    sceptre_object@integer_id <- integer_id
-    return(sceptre_object)
-}
-
-
 ############
 # CELLRANGER
 ############
@@ -269,8 +246,7 @@ import_data_use_ondisc <- function(
 #' calls to Cell Ranger count. Each directory supplied as an input to this
 #' function should be in feature-barcode format, containing the files
 #' `features.tsv.gz` and `matrix.mtx.gz` (and optionally `barcodes.tsv.gz`).
-#' For standard in-memory objects, when every supplied directory contains a
-#' barcode file, the cell barcodes are retained as the column names of the
+#' When every supplied directory contains a barcode file, the cell barcodes are retained as the column names of the
 #' response and gRNA matrices and the row names of the cell covariate data frame.
 #' When multiple directories are supplied, the retained cell barcodes are
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
@@ -281,13 +257,13 @@ import_data_use_ondisc <- function(
 #' factor that enters the default formula as a covariate. Columns of
 #' `extra_covariates`, including one named `batch`, are kept as supplied; a
 #' column of `extra_covariates` named `cellranger_directory` is an error.
-#' For standard in-memory objects, a malformed matrix file (for example, one
-#' with an entry outside the dimensions declared in its header), a matrix file
+#' A malformed matrix file (for example, one with an entry outside the dimensions declared in its header), a matrix file
 #' that lists the same (feature, cell) entry more than once, or a matrix file
 #' whose number of rows differs from the number of rows of `features.tsv`, is an
 #' error.
-#' Users can create either a standard `sceptre` object or an `ondisc`-backed
-#' `sceptre` object; the latter is more appropriate for large-scale data. See
+#' Users can create either a standard `sceptre` object or a disk-backed
+#' `sceptre` object, whose response counts stay on disk; the latter is more
+#' appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
 #' or
 #' \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
@@ -310,12 +286,7 @@ import_data_use_ondisc <- function(
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #' If row names are supplied and cell barcodes are retained, the row names must
 #' match the retained (and, for multiple directories, batch-prefixed) cell IDs.
-#' @param use_ondisc (optional; default `FALSE`) a logical indicating whether to
-#' store the expression data in a disk-backed `ondisc` matrix (`TRUE`) or an
-#' in-memory sparse matrix (`FALSE`).
-#' @param directory_to_write (optional) a string indicating the directory in
-#' which to write the backing `.odm` files (must be specified if `use_ondisc` is
-#' set to `TRUE`).
+#' @inheritParams import_data
 #'
 #' @return an initialized `sceptre_object`
 #' @export
@@ -333,12 +304,12 @@ import_data_use_ondisc <- function(
 #'   grna_target_data_frame = grna_target_data_frame_highmoi,
 #' )
 #'
-#' # 2. create an ondisc-backed sceptre_object from Cell Ranger output
+#' # 2. create a disk-backed sceptre_object from Cell Ranger output
 #' sceptre_object <- import_data_from_cellranger(
 #'   directories = directories,
 #'   moi = "high",
 #'   grna_target_data_frame = grna_target_data_frame_highmoi,
-#'   use_ondisc = TRUE,
+#'   backed = TRUE,
 #'   directory_to_write = tempdir()
 #' )
 import_data_from_cellranger <- function(
@@ -346,36 +317,37 @@ import_data_from_cellranger <- function(
     moi,
     grna_target_data_frame,
     extra_covariates = data.frame(),
-    use_ondisc = FALSE,
-    directory_to_write = NULL
+    backed = FALSE,
+    directory_to_write = NULL,
+    use_ondisc = NULL
 ) {
+    backed <- resolve_backed(backed, use_ondisc)
+    if (backed) {
+        directory_to_write <- prepare_directory_to_write(directory_to_write)
+    }
     # the directory of each cell is recorded in `cellranger_directory`; do not
     # overwrite a user's column of that name
     if (
-        (use_ondisc || length(directories) >= 2L) &&
+        length(directories) >= 2L &&
             "cellranger_directory" %in% colnames(extra_covariates)
     ) {
         stop(
             "`extra_covariates` contains a column named `cellranger_directory`, which `import_data_from_cellranger()` uses to record the directory from which each cell was loaded. Rename that column."
         )
     }
-    # take cases on use_ondisc
-    if (!use_ondisc) {
-        import_data_from_cellranger_memory(
-            directories,
-            moi,
-            grna_target_data_frame,
-            extra_covariates
-        )
-    } else {
-        import_data_from_cellranger_use_ondisc(
-            directories,
-            moi,
-            grna_target_data_frame,
-            extra_covariates,
+    sceptre_object <- import_data_from_cellranger_memory(
+        directories,
+        moi,
+        grna_target_data_frame,
+        extra_covariates
+    )
+    if (backed) {
+        sceptre_object <- back_response_counts(
+            sceptre_object,
             directory_to_write
         )
     }
+    return(sceptre_object)
 }
 
 # 1. memory
@@ -653,76 +625,6 @@ import_data_from_cellranger_memory <- function(
 }
 
 
-# 2. disk
-import_data_from_cellranger_use_ondisc <- function(
-    directories,
-    moi,
-    grna_target_data_frame,
-    extra_covariates,
-    directory_to_write
-) {
-    # 0. check that directory_to_write has been supplied
-    directory_to_write <- prepare_directory_to_write(directory_to_write)
-
-    # 1. call the corresponding ondisc function
-    vector_supplied <- "vector_id" %in% colnames(grna_target_data_frame)
-    out <- ondisc::create_odm_from_cellranger(
-        directories_to_load = directories,
-        directory_to_write = directory_to_write,
-        write_cellwise_covariates = FALSE,
-        grna_target_data_frame = if (vector_supplied) {
-            grna_target_data_frame
-        } else {
-            NULL
-        }
-    )
-
-    # 1.5. update grna_target_data_frame, if vector supplied
-    if (vector_supplied) {
-        grna_target_data_frame <- collapse_grna_target_data_frame(
-            grna_target_data_frame
-        )
-    }
-
-    # 2. check data imports
-    check_import_data_inputs(
-        out$gene,
-        out$grna,
-        grna_target_data_frame,
-        moi,
-        extra_covariates
-    ) |>
-        invisible()
-
-    # 3. process the cellwise covariates
-    covariate_df <- out$cellwise_covariates
-    colnames(covariate_df) <- gsub(
-        pattern = "gene",
-        replacement = "response",
-        fixed = TRUE,
-        x = colnames(covariate_df)
-    )
-    colnames(covariate_df)[colnames(covariate_df) == "batch"] <-
-        "cellranger_directory"
-    if (nrow(extra_covariates) >= 1L) {
-        covariate_df <- cbind(extra_covariates, covariate_df)
-    }
-
-    # 4. initialize the sceptre_object
-    sceptre_object <- init_sceptre_object(
-        response_matrix = out$gene,
-        grna_matrix = out$grna,
-        covariate_data_frame = covariate_df,
-        moi = moi,
-        grna_target_data_frame = grna_target_data_frame
-    )
-
-    # 5. add integer id
-    sceptre_object@integer_id <- out$gene@integer_id
-    return(sceptre_object)
-}
-
-
 #######
 # PARSE
 #######
@@ -886,9 +788,6 @@ init_sceptre_object <- function(
             grna_target = as.character(grna_target)
         )
     # 5. initialize flags
-    sceptre_object@elements_to_analyze <- NA_character_
-    sceptre_object@nf_pipeline <- FALSE
-    sceptre_object@nuclear <- FALSE
     sceptre_object@last_function_called <- "import_data"
     sceptre_object@functs_called <- c(
         import_data = TRUE,
@@ -900,27 +799,6 @@ init_sceptre_object <- function(
         run_discovery_analysis = FALSE
     )
     return(sceptre_object)
-}
-
-
-write_matrices_to_disk <- function(
-    response_matrix,
-    grna_matrix,
-    directory_to_write,
-    integer_id
-) {
-    directory_to_write <- prepare_directory_to_write(directory_to_write)
-    response_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = response_matrix,
-        file_to_write = file.path(directory_to_write, "response.odm"),
-        integer_id = integer_id
-    )
-    grna_matrix <- ondisc:::create_odm_from_r_matrix_internal(
-        mat = grna_matrix,
-        file_to_write = file.path(directory_to_write, "grna.odm"),
-        integer_id = integer_id
-    )
-    return(list(response_matrix = response_matrix, grna_matrix = grna_matrix))
 }
 
 

@@ -32,10 +32,9 @@ test_that("leading ~/ paths are accepted (expanded before the tilde check)", {
     expect_false(grepl("~", prepared, fixed = TRUE))
 })
 
-test_that("import_data can create ondisc-backed objects in a normalized directory", {
-    testthat::skip_if_not_installed("ondisc")
+test_that("import_data can create disk-backed objects in a normalized directory", {
     data("lowmoi_example_data")
-    directory_to_write <- file.path(tempdir(), "sceptre ondisc import")
+    directory_to_write <- file.path(tempdir(), "sceptre backed import")
 
     sceptre_object <- import_data(
         response_matrix = lowmoi_example_data$response_matrix,
@@ -43,13 +42,12 @@ test_that("import_data can create ondisc-backed objects in a normalized director
         grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
         extra_covariates = lowmoi_example_data$extra_covariates,
         moi = "low",
-        use_ondisc = TRUE,
+        backed = TRUE,
         directory_to_write = directory_to_write
     )
 
     prepared_directory <- prepare_directory_to_write(directory_to_write)
-    expect_true(file.exists(file.path(prepared_directory, "response.odm")))
-    expect_true(file.exists(file.path(prepared_directory, "grna.odm")))
-    expect_true(methods::is(get_response_matrix(sceptre_object), "odm"))
-    expect_true(methods::is(get_grna_matrix(sceptre_object), "odm"))
+    expect_true(file.exists(file.path(prepared_directory, "screen.h5mu")))
+    expect_s4_class(get_response_matrix(sceptre_object), "DelayedMatrix")
+    expect_s4_class(get_grna_matrix(sceptre_object), "dgRMatrix")
 })

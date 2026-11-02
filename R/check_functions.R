@@ -75,7 +75,7 @@ check_import_data_inputs <- function(
     check_matrix_class(
         response_matrix,
         "response_matrix",
-        c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "odm")
+        c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix")
     )
     check_matrix_class(
         grna_matrix,
@@ -87,8 +87,7 @@ check_import_data_inputs <- function(
             "dgRMatrix",
             "lgTMatrix",
             "lgCMatrix",
-            "lgRMatrix",
-            "odm"
+            "lgRMatrix"
         )
     )
 
@@ -96,8 +95,7 @@ check_import_data_inputs <- function(
     # (logical gRNA matrices pass)
     check_integer_counts <- function(input_matrix, input_matrix_name) {
         if (
-            methods::is(input_matrix, "odm") ||
-                methods::is(input_matrix, "lsparseMatrix") ||
+            methods::is(input_matrix, "lsparseMatrix") ||
                 is.integer(input_matrix) ||
                 is.logical(input_matrix)
         ) {
@@ -413,14 +411,14 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 10. if using a backing .odm file, verify that resampling mechanism is
-    # permutations
+    # 10. if the response counts are on disk, verify that resampling mechanism
+    # is permutations
     if (
-        methods::is(get_response_matrix(sceptre_object), "odm") &&
+        is_backed(get_response_matrix(sceptre_object)) &&
             (resampling_mechanism != "permutations")
     ) {
         stop(
-            "`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object."
+            "`resampling_mechanism` must be set to 'permutations' when using a disk-backed sceptre_object."
         )
     }
 

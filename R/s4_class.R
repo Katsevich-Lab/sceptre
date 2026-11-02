@@ -113,11 +113,6 @@ NULL
 #' @slot calibration_result the results of the calibration check
 #' @slot power_result the results of the power check
 #' @slot discovery_result the results of the discovery analysis
-#' @slot nuclear used by the Nextflow pipeline
-#' @slot nf_pipeline used by the Nextflow pipeline
-#' @slot integer_id the identifier linking an `ondisc`-backed object to its
-#' backing files
-#' @slot elements_to_analyze used by the Nextflow pipeline
 #'
 #' @exportClass sceptre_object
 #' @name sceptre_object-class
@@ -188,13 +183,7 @@ setClass(
         # results
         calibration_result = "data.frame",
         power_result = "data.frame",
-        discovery_result = "data.frame",
-
-        # odm-related entries
-        nuclear = "logical",
-        nf_pipeline = "logical",
-        integer_id = "integer",
-        elements_to_analyze = "character"
+        discovery_result = "data.frame"
     )
 )
 

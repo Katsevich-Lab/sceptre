@@ -169,24 +169,6 @@ test_that("seeded internal helpers preserve the caller's RNG state", {
     expect_equal(.Random.seed, seed_before)
     expect_length(starting_guesses$pi_guesses, 3)
     expect_length(starting_guesses$g_pert_guesses, 3)
-
-    grna_target_data_frame <- data.frame(
-        grna_id = c(paste0("grna_", seq_len(35)), "nt_1"),
-        grna_target = c(paste0("target_", seq_len(35)), "non-targeting")
-    )
-    sceptre_object <- methods::new("sceptre_object")
-    sceptre_object@grna_target_data_frame <- grna_target_data_frame
-    sceptre_object@nuclear <- TRUE
-
-    set.seed(103)
-    seed_before <- .Random.seed
-    grnas_in_use <- determine_grnas_in_use(
-        sceptre_object = sceptre_object,
-        restricted_grnas = TRUE
-    )
-    expect_equal(.Random.seed, seed_before)
-    expect_length(grnas_in_use, 31)
-    expect_true("nt_1" %in% grnas_in_use)
 })
 
 # `auto_construct_formula_object` is used by `set_analysis_parameters` when

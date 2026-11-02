@@ -87,11 +87,7 @@ test_that("import_data", {
         "functs_called",
         "calibration_result",
         "power_result",
-        "discovery_result",
-        "nuclear",
-        "nf_pipeline",
-        "integer_id",
-        "elements_to_analyze"
+        "discovery_result"
     )
     expect_equal(
         slotNames(sceptre_object_low_no_ec_with_response_names),

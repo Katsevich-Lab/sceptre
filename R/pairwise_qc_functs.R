@@ -33,54 +33,19 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     to_analyze_response_idxs <- dt$response_idx
     to_analyze_grna_idxs <- dt$grna_idx
 
-    # take cases on odm
-    if (methods::is(response_matrix, "odm")) {
-        if (sceptre_object@nuclear) {
-            out <- ondisc:::compute_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use,
-                unique_response_idxs = sort(unique(to_analyze_response_idxs))
-            )
-            out$n_nonzero_mat <- matrix()
-            out$n_nonzero_tot <- integer()
+    # count the nonzero cells; disk-backed counts are read in blocks of
+    # responses, each with the pairs of its responses
+    blocks <- row_blocks(response_matrix, function(block, offset) {
+        in_block <- if (is_backed(response_matrix)) {
+            to_analyze_response_idxs > offset &
+                to_analyze_response_idxs <= offset + nrow(block)
         } else {
-            out <- ondisc:::compute_nt_nonzero_matrix_and_n_ok_pairs_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
-                n_genes = nrow(response_matrix),
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                grna_group_idxs = grna_group_idxs,
-                indiv_nt_grna_idxs = grna_assignments$indiv_nt_grna_idxs,
-                all_nt_idxs = if (!control_group_complement) {
-                    grna_assignments$all_nt_idxs
-                } else {
-                    integer()
-                },
-                to_analyze_response_idxs = to_analyze_response_idxs,
-                to_analyze_grna_idxs = to_analyze_grna_idxs,
-                control_group_complement = control_group_complement,
-                cells_in_use = cells_in_use
-            )
+            TRUE
         }
-    } else {
-        response_csr <- compressed_sparse_components(response_matrix)
-        out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
-            j = response_csr$j,
-            p = response_csr$p,
+        block_csr <- compressed_sparse_components(block)
+        compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
+            j = block_csr$j,
+            p = block_csr$p,
             n_cells_orig = ncol(response_matrix),
             n_cells_sub = length(cells_in_use),
             grna_group_idxs = grna_group_idxs,
@@ -90,10 +55,21 @@ compute_pairwise_qc_information <- function(sceptre_object) {
             } else {
                 integer()
             },
-            to_analyze_response_idxs = to_analyze_response_idxs,
-            to_analyze_grna_idxs = to_analyze_grna_idxs,
+            to_analyze_response_idxs = to_analyze_response_idxs[in_block] -
+                as.integer(offset),
+            to_analyze_grna_idxs = to_analyze_grna_idxs[in_block],
             control_group_complement = control_group_complement,
             cells_in_use = cells_in_use
+        )
+    })
+    out <- if (length(blocks) == 1L) {
+        blocks[[1L]]
+    } else {
+        list(
+            n_nonzero_mat = do.call(cbind, lapply(blocks, `[[`, "n_nonzero_mat")),
+            n_nonzero_tot = unlist(lapply(blocks, `[[`, "n_nonzero_tot")),
+            n_nonzero_trt = unlist(lapply(blocks, `[[`, "n_nonzero_trt")),
+            n_nonzero_cntrl = unlist(lapply(blocks, `[[`, "n_nonzero_cntrl"))
         )
     }
 

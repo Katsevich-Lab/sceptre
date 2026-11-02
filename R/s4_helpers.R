@@ -107,27 +107,23 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     cat(paste0(
         "\nAnalysis parameters: \n",
         "\t\U2022 Discovery pairs:",
-        if (x@nuclear) {
-            " trans"
+        if (length(n_discovery_pairs) == 0) {
+            " not specified"
         } else {
-            if (length(n_discovery_pairs) == 0) {
-                " not specified"
-            } else {
-                paste0(
-                    " data frame with ",
-                    crayon::blue(n_discovery_pairs),
-                    " pairs",
-                    if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
-                        paste0(
-                            " (",
-                            crayon::blue(x@n_ok_discovery_pairs),
-                            " after pairwise QC)"
-                        )
-                    } else {
-                        NULL
-                    }
-                )
-            }
+            paste0(
+                " data frame with ",
+                crayon::blue(n_discovery_pairs),
+                " pairs",
+                if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
+                    paste0(
+                        " (",
+                        crayon::blue(x@n_ok_discovery_pairs),
+                        " after pairwise QC)"
+                    )
+                } else {
+                    NULL
+                }
+            )
         },
         "\n\t\U2022 Positive control pairs:",
         if (length(n_pc_pairs) == 0) {
@@ -198,7 +194,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             ))
         },
         "\n\t\U2022 Multiple testing adjustment: ",
-        if (x@nuclear || length(x@multiple_testing_method) == 0L) {
+        if (length(x@multiple_testing_method) == 0L) {
             "none"
         } else {
             paste0(
@@ -408,8 +404,8 @@ perform_status_check_and_update <- function(sceptre_object, curr_funct) {
 
 
 load_row <- function(mat, id) {
-    if (methods::is(mat, "odm")) {
-        mat[id, ]
+    if (is_backed(mat)) {
+        backed_row(mat, id)
     } else if (methods::is(mat, "dgRMatrix")) {
         csr <- compressed_sparse_components(mat)
         load_csr_row(

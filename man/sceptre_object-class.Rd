@@ -152,15 +152,6 @@ analyses}
 \item{\code{power_result}}{the results of the power check}
 
 \item{\code{discovery_result}}{the results of the discovery analysis}
-
-\item{\code{nuclear}}{used by the Nextflow pipeline}
-
-\item{\code{nf_pipeline}}{used by the Nextflow pipeline}
-
-\item{\code{integer_id}}{the identifier linking an \code{ondisc}-backed object to its
-backing files}
-
-\item{\code{elements_to_analyze}}{used by the Nextflow pipeline}
 }}
 
 \section{Accessors}{

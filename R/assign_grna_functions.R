@@ -15,11 +15,7 @@ assign_grnas_to_cells <- function(
     grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
 
     # determine the gRNAs to analyze
-    if (sceptre_object@nf_pipeline) {
-        grnas_in_use <- sceptre_object@elements_to_analyze
-    } else {
-        grnas_in_use <- determine_grnas_in_use(sceptre_object)
-    }
+    grnas_in_use <- determine_grnas_in_use(sceptre_object)
 
     # assign grnas via the selected strategy; obtain the grna
     # assignments and cells containing multiple grnas
@@ -72,9 +68,7 @@ assign_grnas_to_cells <- function(
     }
 
     # process the initial assignment list
-    if (!sceptre_object@nf_pipeline) {
-        sceptre_object <- process_initial_assignment_list(sceptre_object)
-    }
+    sceptre_object <- process_initial_assignment_list(sceptre_object)
     return(sceptre_object)
 }
 
@@ -87,39 +81,26 @@ assign_grnas_to_cells_thresholding <- function(
     grna_assign_threshold,
     grna_ids
 ) {
-    # take cases on the class of grna_matrix
-    if (methods::is(grna_matrix, "odm")) {
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            ondisc:::threshold_count_matrix_cpp(
-                file_name_in = grna_matrix@h5_file,
-                f_row_ptr = grna_matrix@ptr,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    } else {
-        # 1. make the grna expression matrix row-accessible; ensure threshold is
-        # numeric
-        grna_matrix <- set_matrix_accessibility(
-            grna_matrix,
-            make_row_accessible = TRUE
-        )
-        grna_assign_threshold <- as.numeric(grna_assign_threshold)
+    # 1. make the grna expression matrix row-accessible; ensure threshold is
+    # numeric
+    grna_matrix <- set_matrix_accessibility(
+        grna_matrix,
+        make_row_accessible = TRUE
+    )
+    grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
-        # 2. perform the assignments
-        grna_csr <- compressed_sparse_components(grna_matrix)
-        initial_assignment_list <- lapply(grna_ids, function(grna_id) {
-            threshold_count_matrix(
-                j = grna_csr$j,
-                p = grna_csr$p,
-                x = grna_csr$x,
-                row_idx = which(grna_id == rownames(grna_matrix)),
-                threshold = grna_assign_threshold
-            )
-        }) |>
-            stats::setNames(grna_ids)
-    }
+    # 2. perform the assignments
+    grna_csr <- compressed_sparse_components(grna_matrix)
+    initial_assignment_list <- lapply(grna_ids, function(grna_id) {
+        threshold_count_matrix(
+            j = grna_csr$j,
+            p = grna_csr$p,
+            x = grna_csr$x,
+            row_idx = which(grna_id == rownames(grna_matrix)),
+            threshold = grna_assign_threshold
+        )
+    }) |>
+        stats::setNames(grna_ids)
 
     return(initial_assignment_list)
 }
@@ -229,23 +210,11 @@ process_initial_assignment_list <- function(sceptre_object) {
 determine_grnas_in_use <- function(sceptre_object, restricted_grnas = FALSE) {
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
     if (restricted_grnas) {
-        if (!sceptre_object@nuclear) {
-            all_grna_targets <- unique(c(
-                sceptre_object@positive_control_pairs$grna_target,
-                sceptre_object@discovery_pairs$grna_target,
-                "non-targeting"
-            ))
-        } else {
-            all_grna_targets <- c(
-                withr::with_seed(4, {
-                    grna_target_data_frame |>
-                        dplyr::filter(grna_target != "non-targeting") |>
-                        dplyr::sample_n(min(dplyr::n(), 30)) |>
-                        dplyr::pull(grna_target)
-                }),
-                "non-targeting"
-            )
-        }
+        all_grna_targets <- unique(c(
+            sceptre_object@positive_control_pairs$grna_target,
+            sceptre_object@discovery_pairs$grna_target,
+            "non-targeting"
+        ))
         grnas_in_use <- dplyr::filter(
             grna_target_data_frame,
             grna_target %in% all_grna_targets

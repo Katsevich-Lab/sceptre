@@ -202,11 +202,10 @@ run_calibration_check_pt_2 <- function(
     )
 
     # 6. update fields of sceptre object with results
-    sceptre_object@calibration_result <- if (!sceptre_object@nf_pipeline) {
-        process_calibration_result(out$result, sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@calibration_result <- process_calibration_result(
+        out$result,
+        sceptre_object
+    )
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }
@@ -321,11 +320,8 @@ run_power_check <- function(
     )
 
     # 4. update fields of sceptre object with results
-    sceptre_object@power_result <- if (!sceptre_object@nf_pipeline) {
-        out$result |> apply_grouping_to_result(sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@power_result <- out$result |>
+        apply_grouping_to_result(sceptre_object)
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }
@@ -427,11 +423,10 @@ run_discovery_analysis <- function(
     )
 
     # 4. update fields of sceptre object with results
-    sceptre_object@discovery_result <- if (!sceptre_object@nf_pipeline) {
-        process_discovery_result(out$result, sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@discovery_result <- process_discovery_result(
+        out$result,
+        sceptre_object
+    )
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }

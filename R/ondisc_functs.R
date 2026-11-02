@@ -1,94 +1,72 @@
 ##########################
 # READ AND WRITE FUNCTIONS
 ##########################
-#' Write or read an `ondisc`-backed `sceptre_object`
+#' Write or read an `ondisc`-backed `sceptre_object` (deprecated)
 #'
 #' `write_ondisc_backed_sceptre_object()` and
-#' `read_ondisc_backed_sceptre_object()` enable the writing and reading of
-#' `ondisc`-backed `sceptre_object`s, respectively. First,
-#' `write_ondisc_backed_sceptre_object()` writes an `ondisc`-backed
-#' `sceptre_object` to disk, creating a file `sceptre_object.rds` in the
-#' specified directory. Next, `read_ondisc_backed_sceptre_object()` reads and
-#' initializes a `sceptre_object` from a `sceptre_object.rds` file,
-#' `response.odm` file, and `grna.odm` file stored on disk.
+#' `read_ondisc_backed_sceptre_object()` are deprecated; use
+#' [write_sceptre_object()] and [read_sceptre_object()]. `sceptre` no longer
+#' uses `ondisc`: a disk-backed `sceptre_object` keeps its response counts in
+#' the MuData file `screen.h5mu` (see [import_data()]).
+#' `write_ondisc_backed_sceptre_object()` calls [write_sceptre_object()], and
+#' `read_ondisc_backed_sceptre_object()` reads the `sceptre_object` written
+#' to the directory of `sceptre_object_fp` with [read_sceptre_object()], its
+#' response counts left on disk. The `.odm` files of earlier versions of
+#' `sceptre` cannot be read; re-import the data.
 #'
 #' @param sceptre_object a `sceptre_object`
 #' @param directory_to_write the directory in which to write the
-#' `sceptre_object.rds` file
-#' @param sceptre_object_fp file path to a `sceptre_object.rds` file
-#' @param response_odm_file_fp file path to the backing `.odm` file for the
-#' response modality
-#' @param grna_odm_file_fp file path to the backing `.odm` file for the gRNA
-#' modality
+#' `sceptre_object`
+#' @param sceptre_object_fp file path to the `sceptre_object.rds` file written
+#' by `write_ondisc_backed_sceptre_object()` or [write_sceptre_object()]
+#' @param response_odm_file_fp,grna_odm_file_fp ignored
 #'
-#' @return `write_ondisc_backed_sceptre_object()` returns NULL, and
-#' `read_ondisc_backed_sceptre_object()` returns an `ondisc`-backed
+#' @return `write_ondisc_backed_sceptre_object()` returns `NULL` invisibly, and
+#' `read_ondisc_backed_sceptre_object()` returns a disk-backed
 #' `sceptre_object`
 #' @export
 #' @examples
 #' data(lowmoi_example_data)
-#' # 1. create ondisc-backed sceptre_object
 #' sceptre_object <- import_data(
 #'   response_matrix = lowmoi_example_data$response_matrix,
 #'   grna_matrix = lowmoi_example_data$grna_matrix,
 #'   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
 #'   extra_covariates = lowmoi_example_data$extra_covariates,
-#'   moi = "low",
-#'   use_ondisc = TRUE,
-#'   directory_to_write = tempdir()
+#'   moi = "low"
 #' )
-#'
-#' # 2. write
-#' write_ondisc_backed_sceptre_object(
-#'   sceptre_object = sceptre_object,
-#'   directory_to_write = tempdir()
-#' )
-#'
-#' # 3. read
-#' rm(sceptre_object)
-#' sceptre_object <- read_ondisc_backed_sceptre_object(
-#'   sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
-#'   response_odm_file_fp = paste0(tempdir(), "/response.odm"),
-#'   grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
-#' )
+#' directory <- file.path(tempdir(), "deprecated_example")
+#' # instead of write_ondisc_backed_sceptre_object()
+#' write_sceptre_object(sceptre_object, directory)
+#' # instead of read_ondisc_backed_sceptre_object()
+#' sceptre_object <- read_sceptre_object(directory, backed = TRUE)
 read_ondisc_backed_sceptre_object <- function(
     sceptre_object_fp,
-    response_odm_file_fp,
-    grna_odm_file_fp
+    response_odm_file_fp = NULL,
+    grna_odm_file_fp = NULL
 ) {
-    # read in objects
+    .Deprecated("read_sceptre_object")
+    if (!is.null(response_odm_file_fp) || !is.null(grna_odm_file_fp)) {
+        warning(
+            "`response_odm_file_fp` and `grna_odm_file_fp` are ignored; ",
+            "the counts are read from screen.h5mu.",
+            call. = FALSE
+        )
+    }
     sceptre_object_fp <- prepare_ondisc_file_path(
         sceptre_object_fp,
         "`sceptre_object_fp`"
     )
-    response_odm_file_fp <- prepare_ondisc_file_path(
-        response_odm_file_fp,
-        "`response_odm_file_fp`"
-    )
-    grna_odm_file_fp <- prepare_ondisc_file_path(
-        grna_odm_file_fp,
-        "`grna_odm_file_fp`"
-    )
-    sceptre_object <- readRDS(sceptre_object_fp)
-    response_odm <- ondisc::initialize_odm_from_backing_file(
-        response_odm_file_fp
-    )
-    grna_odm <- ondisc::initialize_odm_from_backing_file(grna_odm_file_fp)
-    # check for concordance of integer ids
-    if (sceptre_object@integer_id != response_odm@integer_id) {
+    directory <- dirname(sceptre_object_fp)
+    if (!file.exists(file.path(directory, "screen.h5mu"))) {
         stop(
-            "The `sceptre_object` and `response_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."
+            "The directory ",
+            directory,
+            " contains no screen.h5mu file. sceptre no longer reads the ",
+            ".odm files of `ondisc`-backed objects; re-import the data, for ",
+            "example with `import_data(..., backed = TRUE)`."
         )
     }
-    if (sceptre_object@integer_id != grna_odm@integer_id) {
-        stop(
-            "The `sceptre_object` and `grna_odm` have distinct IDs. The `sceptre_object` likely is associated with a different backing .odm file."
-        )
-    }
-    # update response_odm and grna_odm and return
-    sceptre_object <- set_response_matrix(sceptre_object, response_odm)
-    sceptre_object <- set_grna_matrix(sceptre_object, grna_odm)
-    return(sceptre_object)
+    read_sceptre_object(directory, backed = TRUE)
 }
 
 
@@ -98,9 +76,8 @@ write_ondisc_backed_sceptre_object <- function(
     sceptre_object,
     directory_to_write
 ) {
-    # check that dir exists
-    directory_to_write <- prepare_directory_to_write(directory_to_write)
-    saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))
+    .Deprecated("write_sceptre_object")
+    write_sceptre_object(sceptre_object, directory_to_write)
 }
 
 

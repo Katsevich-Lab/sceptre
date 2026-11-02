@@ -1,7 +1,4 @@
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
-    if (methods::is(matrix_in, "odm")) {
-        return(matrix_in)
-    }
     # a numeric (double) general sparse matrix, compressed by row or by column;
     # a logical matrix becomes the corresponding numeric matrix
     target_class <- if (make_row_accessible) "dgRMatrix" else "dgCMatrix"
