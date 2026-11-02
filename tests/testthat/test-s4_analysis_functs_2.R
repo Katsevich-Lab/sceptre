@@ -526,3 +526,48 @@ test_that("run_discovery_analysis", {
         "significant"
     ]))
 })
+
+
+test_that("run_calibration_check does not change a later discovery analysis under no_approximation", {
+    data("lowmoi_example_data")
+    targets <- intersect(
+        unique(lowmoi_example_data$grna_target_data_frame$grna_target),
+        rownames(lowmoi_example_data$response_matrix)
+    )
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        extra_covariates = lowmoi_example_data$extra_covariates,
+        moi = "low"
+    ) |>
+        set_analysis_parameters(
+            discovery_pairs = data.frame(
+                grna_target = targets,
+                response_id = targets
+            ),
+            resampling_approximation = "no_approximation"
+        ) |>
+        assign_grnas(parallel = FALSE) |>
+        run_qc())
+    B3 <- sceptre_object@B3
+
+    direct <- suppressMessages(run_discovery_analysis(
+        sceptre_object,
+        parallel = FALSE
+    ))
+    calibrated <- suppressMessages(run_calibration_check(
+        sceptre_object,
+        n_calibration_pairs = 2L,
+        parallel = FALSE
+    ))
+    expect_identical(calibrated@B3, B3)
+    after_calibration <- suppressMessages(run_discovery_analysis(
+        calibrated,
+        parallel = FALSE
+    ))
+    expect_identical(
+        get_result(after_calibration, "run_discovery_analysis"),
+        get_result(direct, "run_discovery_analysis")
+    )
+})

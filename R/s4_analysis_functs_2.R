@@ -126,18 +126,6 @@ run_calibration_check_pt_1 <- function(
     if (is.null(n_calibration_pairs)) {
         n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
     }
-    if (
-        !is.null(n_calibration_pairs) &&
-            sceptre_object@resampling_approximation == "no_approximation"
-    ) {
-        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-        sceptre_object@B3 <- ceiling(
-            mult_fact *
-                n_calibration_pairs /
-                sceptre_object@multiple_testing_alpha
-        ) |>
-            as.integer()
-    }
 
     # 2. check inputs
     check_calibration_check_inputs(
@@ -171,11 +159,26 @@ run_calibration_check_pt_2 <- function(
     n_processors = "auto",
     log_dir = tempdir()
 ) {
-    # 5. run the sceptre analysis (high-level function call)
+    # 5. run the sceptre analysis (high-level function call); under
+    # no_approximation, the number of resamples B3 is set by the number of
+    # calibration pairs, for this analysis only (sceptre_object@B3, set in
+    # run_qc(), is left for the discovery and power analyses)
     response_grna_group_pairs <- sceptre_object@negative_control_pairs
+    B3 <- if (sceptre_object@resampling_approximation == "no_approximation") {
+        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+        ceiling(
+            mult_fact *
+                sceptre_object@n_calibration_pairs /
+                sceptre_object@multiple_testing_alpha
+        ) |>
+            as.integer()
+    } else {
+        sceptre_object@B3
+    }
     out <- run_sceptre_analysis_high_level(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
+        B3 = B3,
         calibration_check = TRUE,
         analysis_type = "calibration_check",
         output_amount = output_amount,
@@ -431,6 +434,7 @@ process_discovery_result <- function(result, sceptre_object) {
 run_sceptre_analysis_high_level <- function(
     sceptre_object,
     response_grna_group_pairs,
+    B3 = sceptre_object@B3,
     calibration_check,
     analysis_type,
     output_amount,
@@ -444,7 +448,7 @@ run_sceptre_analysis_high_level <- function(
         message("Generating permutation resamples.")
         synthetic_idxs <- get_synthetic_permutation_idxs(
             grna_assignments = sceptre_object@grna_assignments,
-            B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+            B = sceptre_object@B1 + sceptre_object@B2 + B3,
             calibration_check = calibration_check,
             control_group_complement = sceptre_object@control_group_complement,
             calibration_group_size = sceptre_object@calibration_group_size,
@@ -465,7 +469,7 @@ run_sceptre_analysis_high_level <- function(
         resampling_approximation = sceptre_object@resampling_approximation,
         B1 = sceptre_object@B1,
         B2 = sceptre_object@B2,
-        B3 = sceptre_object@B3,
+        B3 = B3,
         calibration_check = calibration_check,
         control_group_complement = sceptre_object@control_group_complement,
         n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
