@@ -53,6 +53,14 @@ analysis is to confidently link enhancers to genes by testing for changes in
 gene expression in response to the CRISPR perturbations of the candidate
 enhancers.
 
+```{css, echo = FALSE}
+/* BiocStyle shows figures as blocks, so center them with their margins */
+.figure img {
+    margin-left: auto;
+    margin-right: auto;
+}
+```
+
 ```{r setup, echo = FALSE}
 library(Matrix)
 set.seed(1)
