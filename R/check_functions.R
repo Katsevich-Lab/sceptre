@@ -461,7 +461,7 @@ check_assign_grna_inputs <- function(
                 "`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0."
             )
         }
-        if (hyperparameters[["min_grna_n_umis_threshold"]] < 0L) {
+        if (hyperparameters[["min_grna_n_umis_threshold"]] < 1L) {
             stop(
                 "`min_grna_n_umis_threshold` should be an integer greater than 0."
             )
