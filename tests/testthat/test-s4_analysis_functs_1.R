@@ -295,3 +295,38 @@ test_that("set_analysis_parameters rejects NT cells as the control group in high
     ))
     expect_true(sceptre_object@control_group_complement)
 })
+
+
+test_that("set_analysis_parameters names covariates left out of the default formula", {
+    set.seed(1)
+    data("lowmoi_example_data")
+    extra_covariates <- lowmoi_example_data$extra_covariates
+    extra_covariates$score <- stats::rnorm(nrow(extra_covariates))
+    extra_covariates$donor <- factor(
+        sample(paste0("d", 1:20), nrow(extra_covariates), TRUE)
+    )
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        extra_covariates = extra_covariates,
+        moi = "low"
+    ))
+    messages <- character()
+    sceptre_object <- withCallingHandlers(
+        set_analysis_parameters(sceptre_object),
+        message = function(m) {
+            messages <<- c(messages, conditionMessage(m))
+            invokeRestart("muffleMessage")
+        }
+    )
+    expect_identical(
+        all.vars(sceptre_object@formula_object),
+        c("response_n_nonzero", "response_n_umis", "batch")
+    )
+    expect_true(any(grepl(
+        "The default formula leaves out the following covariates, which have 15 or more distinct values: `score`, `donor`.",
+        messages,
+        fixed = TRUE
+    )))
+})

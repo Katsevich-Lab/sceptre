@@ -101,7 +101,19 @@ auto_construct_formula_object <- function(
             return(out)
         },
         FUN.VALUE = character(1)
-    ) |>
+    )
+    left_out <- names(form_str)[is.na(form_str)]
+    if (length(left_out) >= 1L) {
+        message(
+            "The default formula leaves out the following covariates, which ",
+            "have ",
+            MAX_N_LEVELS_ALLOWED,
+            " or more distinct values: ",
+            paste0("`", left_out, "`", collapse = ", "),
+            ". To include them, supply a `formula_object`."
+        )
+    }
+    form_str <- form_str |>
         stats::na.omit() |>
         paste0(collapse = " + ")
     form <- paste0("~ ", form_str) |> stats::as.formula()

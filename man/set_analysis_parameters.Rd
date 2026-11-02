@@ -37,7 +37,9 @@ specifying the gRNA integration strategy, either \code{"singleton"}, \code{"unio
 \code{"bonferroni"}}
 
 \item{formula_object}{(optional) a formula object specifying how to adjust
-for the covariates in the model}
+for the covariates in the model. Covariates that are not count-based and
+have 15 or more distinct values are left out of the default formula, with a
+message naming them.}
 
 \item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string
 indicating the resampling approximation to make to the null distribution of

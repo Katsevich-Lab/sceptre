@@ -15,7 +15,9 @@
 #' `grna_target` and `response_id` specifying the positive control pairs to
 #' analyze
 #' @param formula_object (optional) a formula object specifying how to adjust
-#' for the covariates in the model
+#' for the covariates in the model. Covariates that are not count-based and
+#' have 15 or more distinct values are left out of the default formula, with a
+#' message naming them.
 #' @param side (optional; default `"both"`) the sidedness of the test, one of
 #' `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string
