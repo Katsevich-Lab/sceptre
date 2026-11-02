@@ -142,11 +142,13 @@ import_data_from_sce <- function(
 #' * the cell covariates (those computed by `sceptre` and the extra
 #'   covariates) in `colData`;
 #' * the gRNA UMI counts in the `counts` assay of the alternative experiment
-#'   `"gRNA"`, with the gRNA targets in the `grna_target` column of its
-#'   `rowData` (`NA` for gRNAs absent from the gRNA target data frame), the
-#'   other columns of the gRNA target data frame (such as `vector_id`) in its
-#'   other `rowData` columns, and the gRNA positions, if any, in its
-#'   `rowRanges` (one range per gRNA, none for gRNAs without a position).
+#'   `"gRNA"`, with the gRNA IDs and targets in the `grna_id` and
+#'   `grna_target` columns of its `rowData` (`grna_target` is `NA` for gRNAs
+#'   absent from the gRNA target data frame), the other columns of the gRNA
+#'   target data frame (such as `vector_id`) in its other `rowData` columns,
+#'   and the gRNA positions, if any, in its `rowRanges` (one range per gRNA,
+#'   none for gRNAs without a position). This `rowRanges` is a
+#'   `GRangesList` that [import_data()] takes as `grna_target_data_frame`.
 #'
 #' Sparse counts are returned in column-compressed (`dgCMatrix`) format.
 #' [import_data_from_sce()] imports the result.
@@ -249,8 +251,8 @@ grna_targets_from_experiment <- function(grna_experiment) {
 
 # The positions of the gRNAs `grna_ids` given by the columns `chr`, `start` and
 # `end` of the gRNA target data frame, as a GRangesList (one element per gRNA,
-# empty for gRNAs without a position), with the other columns as metadata
-# columns
+# named by gRNA ID, empty for gRNAs without a position), with the gRNA IDs and
+# the other columns as metadata columns
 grna_ranges_from_target_data_frame <- function(
     grna_target_data_frame,
     grna_ids
@@ -270,6 +272,7 @@ grna_ranges_from_target_data_frame <- function(
         drop = FALSE
     ]
     rownames(targets) <- NULL
+    targets <- cbind(data.frame(grna_id = grna_ids), targets)
     chr <- character(length(grna_ids))
     start <- end <- integer(length(grna_ids))
     has_position <- rep(FALSE, length(grna_ids))

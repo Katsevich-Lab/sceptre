@@ -20,11 +20,13 @@ a \code{SingleCellExperiment}
 \item the cell covariates (those computed by \code{sceptre} and the extra
 covariates) in \code{colData};
 \item the gRNA UMI counts in the \code{counts} assay of the alternative experiment
-\code{"gRNA"}, with the gRNA targets in the \code{grna_target} column of its
-\code{rowData} (\code{NA} for gRNAs absent from the gRNA target data frame), the
-other columns of the gRNA target data frame (such as \code{vector_id}) in its
-other \code{rowData} columns, and the gRNA positions, if any, in its
-\code{rowRanges} (one range per gRNA, none for gRNAs without a position).
+\code{"gRNA"}, with the gRNA IDs and targets in the \code{grna_id} and
+\code{grna_target} columns of its \code{rowData} (\code{grna_target} is \code{NA} for gRNAs
+absent from the gRNA target data frame), the other columns of the gRNA
+target data frame (such as \code{vector_id}) in its other \code{rowData} columns,
+and the gRNA positions, if any, in its \code{rowRanges} (one range per gRNA,
+none for gRNAs without a position). This \code{rowRanges} is a
+\code{GRangesList} that \code{\link[=import_data]{import_data()}} takes as \code{grna_target_data_frame}.
 }
 }
 \details{

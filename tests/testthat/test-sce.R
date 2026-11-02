@@ -78,6 +78,23 @@ test_that("import_data_from_sce() imports what as_singlecellexperiment() exports
         construct_cis_pairs(reimported),
         construct_cis_pairs(sceptre_object)
     )
+
+    # the exported gRNA ranges are a gRNA target data frame for import_data()
+    from_ranges <- import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = SummarizedExperiment::rowRanges(
+            SingleCellExperiment::altExp(
+                as_singlecellexperiment(sceptre_object),
+                "gRNA"
+            )
+        ),
+        moi = "high"
+    )
+    expect_identical(
+        construct_cis_pairs(from_ranges),
+        construct_cis_pairs(sceptre_object)
+    )
 })
 
 test_that("import_data_from_sce() reads targets without positions", {
