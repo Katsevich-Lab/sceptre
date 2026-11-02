@@ -38,6 +38,7 @@ Imports:
     dplyr,
     GenomicRanges,
     ggplot2,
+    IRanges,
     Matrix,
     methods,
     Rcpp (>= 1.0.9),
