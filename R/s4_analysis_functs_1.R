@@ -36,6 +36,15 @@
 #' options
 #' @param multiple_testing_alpha (optional; default `0.1`) a numeric specifying
 #' the nominal level of the multiple testing correction method
+#' @param seed (optional; default `NULL`) a whole number between 0 and
+#' `.Machine$integer.max` that seeds the random draws of the analysis: the
+#' starting values of the mixture method in `assign_grnas()`, the negative
+#' control pairs of `run_calibration_check()`, and the permutation and
+#' conditional resampling draws. The default, `NULL`, draws the seed from R's
+#' random number generator, so that `set.seed()` called beforehand makes the
+#' analysis reproducible. The seed is recorded in the `sceptre_object`, and
+#' `print()` shows it. The results of earlier versions of sceptre are
+#' reproduced with `seed = 4`.
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set
@@ -83,7 +92,8 @@ set_analysis_parameters <- function(
     control_group = "default",
     resampling_mechanism = "default",
     multiple_testing_method = "BH",
-    multiple_testing_alpha = 0.1
+    multiple_testing_alpha = 0.1,
+    seed = NULL
 ) {
     # 0. verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(
@@ -92,6 +102,7 @@ set_analysis_parameters <- function(
     )
 
     # 1. handle default arguments
+    seed <- resolve_seed(seed)
     if (!sceptre_object@low_moi) {
         if (control_group == "default") {
             control_group <- "complement"
@@ -184,6 +195,8 @@ set_analysis_parameters <- function(
     sceptre_object@multiple_testing_method <- multiple_testing_method
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
     sceptre_object@covariate_matrix <- covariate_matrix
+    sceptre_object@seed <- seed
+    sceptre_object@rng_protocol <- "mt19937-1"
 
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
@@ -243,6 +256,14 @@ set_analysis_parameters <- function(
 #' `parallelly.availableCores.fraction` R option.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the
 #' directory in which to write the log files (ignored if `parallel = FALSE`)
+#' @param BPPARAM (optional; default `NULL`) a
+#' [BiocParallel::BiocParallelParam] object specifying the parallel back end,
+#' for example `BiocParallel::SnowParam(4)`. If supplied, it overrides
+#' `parallel` and `n_processors`; the default, `NULL`, runs the function with
+#' `BiocParallel::MulticoreParam(n_processors)` if `parallel = TRUE` and
+#' serially otherwise. Windows cannot fork processes, so there `parallel = TRUE`
+#' is not available; use `BPPARAM = BiocParallel::SnowParam(n_processors)`
+#' instead. Results do not depend on the back end or the number of workers.
 #' @param ... optional method-specific additional arguments
 #'
 #' @return an updated `sceptre_object` in which the gRNA assignments have been
@@ -270,10 +291,12 @@ assign_grnas <- function(
     parallel = FALSE,
     n_processors = "auto",
     log_dir = tempdir(),
+    BPPARAM = NULL,
     ...
 ) {
     # 0. verify that function called in correct order
-    check_parallel_supported(parallel) |> invisible()
+    BPPARAM <- get_bpparam(parallel, n_processors, BPPARAM)
+    parallel <- !is.null(BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "assign_grnas"
@@ -344,7 +367,7 @@ assign_grnas <- function(
         sceptre_object,
         print_progress,
         parallel,
-        n_processors,
+        BPPARAM,
         log_dir
     )
 

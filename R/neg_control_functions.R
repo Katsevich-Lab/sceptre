@@ -45,7 +45,8 @@ construct_negative_control_pairs_v2 <- function(
             n_nt_grnas,
             as.numeric(n_genes),
             N_POSSIBLE_GROUPS_THRESHOLD,
-            p_hat
+            p_hat,
+            sceptre_object@seed
         )
     }
 
@@ -60,7 +61,8 @@ construct_negative_control_pairs_v2 <- function(
             n_genes = n_genes,
             n_calibration_pairs = n_calibration_pairs,
             n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+            seed = sceptre_object@seed
         )
     } else {
         nt_grna_group_idxs <- lapply(
@@ -104,7 +106,8 @@ construct_negative_control_pairs_v2 <- function(
             n_genes = n_genes,
             n_calibration_pairs = n_calibration_pairs,
             n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+            seed = sceptre_object@seed
         )
     }
 

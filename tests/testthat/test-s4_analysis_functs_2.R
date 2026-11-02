@@ -395,7 +395,8 @@ test_that("run_power_check", {
         set_analysis_parameters(
             positive_control_pairs = positive_control_pairs,
             discovery_pairs = discovery_pairs,
-            control_group = "nt_cells"
+            control_group = "nt_cells",
+            seed = 4L
         ) |>
         assign_grnas(method = "thresholding", threshold = 40) |>
         run_qc(
@@ -490,7 +491,8 @@ test_that("run_discovery_analysis", {
         set_analysis_parameters(
             positive_control_pairs = positive_control_pairs,
             discovery_pairs = discovery_pairs,
-            control_group = "nt_cells"
+            control_group = "nt_cells",
+            seed = 4L
         ) |>
         assign_grnas(method = "thresholding", threshold = 40) |>
         # don't want to remove any cells for this one

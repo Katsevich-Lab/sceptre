@@ -23,7 +23,6 @@ test_that("plot_run_qc() forwards its pairwise plot options", {
     object <- plot_fix_object()
     before <- serialize(object, NULL)
     set.seed(829L)
-    seed <- .Random.seed
     panels <- plot_run_qc(
         object,
         downsample_pairs = 2L,
@@ -32,7 +31,8 @@ test_that("plot_run_qc() forwards its pairwise plot options", {
         return_indiv_plots = TRUE
     )
     expect_length(panels, 2L)
-    expected_rows <- withr::with_seed(4, sample.int(6L, 2L))
+    # the pairs are subsampled with R's random number generator
+    expected_rows <- withr::with_seed(829L, sample.int(6L, 2L))
     expect_identical(
         panels[[2L]]$data$response_id,
         object@discovery_pairs_with_info$response_id[expected_rows]
@@ -53,7 +53,6 @@ test_that("plot_run_qc() forwards its pairwise plot options", {
     ]
     single <- plot_run_qc(object, return_indiv_plots = TRUE)
     expect_s3_class(single, "ggplot")
-    expect_identical(.Random.seed, seed)
     object@discovery_pairs_with_info <- unserialize(
         before
     )@discovery_pairs_with_info
@@ -133,7 +132,6 @@ test_that("QQ bands keep one group separately in every panel", {
         p = rep(values, 4L)
     )
     set.seed(114L)
-    seed <- .Random.seed
     for (panels in list(data, data[data$panel == "A", ])) {
         plot <- ggplot2::ggplot(panels, ggplot2::aes(y = p, group = group)) +
             stat_qq_band() +
@@ -161,5 +159,4 @@ test_that("QQ bands keep one group separately in every panel", {
             )
         }
     }
-    expect_identical(.Random.seed, seed)
 })

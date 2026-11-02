@@ -175,7 +175,8 @@ get_synthetic_permutation_idxs <- function(
     calibration_check,
     control_group_complement,
     calibration_group_size,
-    n_cells
+    n_cells,
+    seed
 ) {
     if (calibration_check && !control_group_complement) {
         # 1. calibration check, nt cells (low MOI only)
@@ -187,7 +188,12 @@ get_synthetic_permutation_idxs <- function(
             sort(decreasing = TRUE)
         M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
         n_control_cells <- length(grna_assignments$all_nt_idxs)
-        out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
+        out <- fisher_yates_sampler(
+            n_tot = n_control_cells,
+            M = M,
+            B = B,
+            seed = seed
+        )
     } else if (calibration_check && control_group_complement) {
         # 2. calibration check, complement (low and high MOI)
         indiv_nt_sizes <- vapply(
@@ -199,7 +205,7 @@ get_synthetic_permutation_idxs <- function(
         # in high MOI, NT gRNA groups can overlap, so the sum of their sizes
         # can exceed the number of cells; a union never does
         M <- min(sum(indiv_nt_sizes[seq(1, calibration_group_size)]), n_cells)
-        out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
+        out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B, seed = seed)
     } else if (!calibration_check && !control_group_complement) {
         # 3. discovery, nt cells (low MOI only)
         grna_group_sizes <- vapply(
@@ -214,7 +220,8 @@ get_synthetic_permutation_idxs <- function(
             N = n_control_cells,
             m = range_grna_group_sizes[1],
             M = range_grna_group_sizes[2],
-            B = B
+            B = B,
+            seed = seed
         )
     } else if (!calibration_check && control_group_complement) {
         # 4. discovery, complement (low and high MOI)
@@ -227,7 +234,8 @@ get_synthetic_permutation_idxs <- function(
         out <- fisher_yates_sampler(
             n_tot = n_cells,
             M = max_cells_per_grna_group,
-            B = B
+            B = B,
+            seed = seed
         )
     }
 

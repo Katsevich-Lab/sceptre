@@ -75,13 +75,11 @@ plot_grna_count_distributions <- function(
         threshold <- round(threshold)
     }
     if (is.null(grnas_to_plot)) {
-        grnas_to_plot <- withr::with_seed(4, {
-            sample(
-                x = rownames(grna_matrix),
-                size = min(nrow(grna_matrix), n_grnas_to_plot),
-                replace = FALSE
-            )
-        })
+        grnas_to_plot <- sample(
+            x = rownames(grna_matrix),
+            size = min(nrow(grna_matrix), n_grnas_to_plot),
+            replace = FALSE
+        )
     } else {
         if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) {
             stop(
@@ -300,13 +298,11 @@ plot_assign_grnas <- function(
     grna_ids <- grna_ids[assigned]
     # sample grnas to plot
     if (is.null(grnas_to_plot)) {
-        grnas_to_plot <- withr::with_seed(4, {
-            sample(
-                x = grna_ids,
-                size = min(length(grna_ids), n_grnas_to_plot),
-                replace = FALSE
-            )
-        })
+        grnas_to_plot <- sample(
+            x = grna_ids,
+            size = min(length(grna_ids), n_grnas_to_plot),
+            replace = FALSE
+        )
     } else {
         if (!(all(grnas_to_plot %in% grna_ids))) {
             stop(
@@ -338,12 +334,10 @@ plot_assign_grnas <- function(
         data.table::rbindlist()
 
     # downsample the unperturbed cells
-    to_plot_a <- withr::with_seed(4, {
-        to_plot_a |>
-            dplyr::group_by(g) |>
-            dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
-            dplyr::ungroup()
-    })
+    to_plot_a <- to_plot_a |>
+        dplyr::group_by(g) |>
+        dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
+        dplyr::ungroup()
 
     # plot a
     p_a <- ggplot2::ggplot(
@@ -370,15 +364,13 @@ plot_assign_grnas <- function(
     # plot b
     n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
     mean_c_cells_per_grna <- mean(n_cells_per_grna)
-    to_plot_b <- withr::with_seed(4, {
-        data.frame(
-            x = n_cells_per_grna,
-            y = names(n_cells_per_grna)
-        ) |>
-            dplyr::arrange(n_cells_per_grna) |>
-            dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
-            dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
-    })
+    to_plot_b <- data.frame(
+        x = n_cells_per_grna,
+        y = names(n_cells_per_grna)
+    ) |>
+        dplyr::arrange(n_cells_per_grna) |>
+        dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
+        dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
     p_b <- ggplot2::ggplot(
         data = to_plot_b,
         mapping = ggplot2::aes(x = x, y = y)
@@ -1226,10 +1218,8 @@ plot_pairwise_qc <- function(
         dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
         dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
     if (nrow(discovery_pairs) >= downsample_pairs) {
-        discovery_pairs <- withr::with_seed(
-            4,
-            discovery_pairs |> dplyr::sample_n(downsample_pairs)
-        )
+        discovery_pairs <- discovery_pairs |>
+            dplyr::sample_n(downsample_pairs)
     }
 
     p_b <- ggplot2::ggplot(
@@ -1395,14 +1385,12 @@ plot_run_power_check <- function(
 
 
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
-    withr::with_seed(4, {
-        result_df |>
-            dplyr::mutate(
-                bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))
-            ) |>
-            dplyr::group_by(bin) |>
-            dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
-    })
+    result_df |>
+        dplyr::mutate(
+            bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))
+        ) |>
+        dplyr::group_by(bin) |>
+        dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
 }
 
 
@@ -1564,12 +1552,10 @@ plot_response_grna_target_pair <- function(
     ) |>
         as.character()
     # create the plot
-    to_plot_downsample <- withr::with_seed(4, {
-        to_plot |>
-            dplyr::mutate(is_zero = (normalized_count == 0)) |>
-            dplyr::group_by(is_zero, treatment) |>
-            dplyr::sample_n(size = min(dplyr::n(), 1000))
-    })
+    to_plot_downsample <- to_plot |>
+        dplyr::mutate(is_zero = (normalized_count == 0)) |>
+        dplyr::group_by(is_zero, treatment) |>
+        dplyr::sample_n(size = min(dplyr::n(), 1000))
     p_out <- ggplot2::ggplot(
         data = to_plot,
         mapping = ggplot2::aes(

@@ -172,7 +172,8 @@ crt_glm_factored_out <- function(
     all_nt_idxs,
     response_matrix,
     side_code,
-    cells_in_use
+    cells_in_use,
+    seed
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # precomputation on grna
@@ -186,7 +187,8 @@ crt_glm_factored_out <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = B1 + B2 + B3,
+        seed = seed
     )
     # loop over genes
     for (i in seq_along(response_ids)) {
@@ -249,7 +251,8 @@ discovery_ntcells_crt <- function(
     all_nt_idxs,
     response_matrix,
     side_code,
-    cells_in_use
+    cells_in_use,
+    seed
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # initialize the idxs
@@ -267,7 +270,8 @@ discovery_ntcells_crt <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = B1 + B2 + B3,
+        seed = seed
     )
     # loop over the response ids
     for (i in seq_along(response_ids)) {

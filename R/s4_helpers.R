@@ -224,6 +224,17 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             "not specified"
         } else {
             crayon::blue(as.character(x@formula_object)[2])
+        },
+        "\n\t\U2022 Seed: ",
+        if (length(x@seed) == 0L) {
+            "not specified"
+        } else {
+            paste0(
+                crayon::blue(x@seed),
+                " (RNG protocol ",
+                crayon::blue(x@rng_protocol),
+                ")"
+            )
         }
     ))
 

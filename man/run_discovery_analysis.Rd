@@ -10,7 +10,8 @@ run_discovery_analysis(
   print_progress = TRUE,
   parallel = FALSE,
   n_processors = "auto",
-  log_dir = tempdir()
+  log_dir = tempdir(),
+  BPPARAM = NULL
 )
 }
 \arguments{
@@ -34,6 +35,15 @@ number of processors to use if \code{parallel} is set to \code{TRUE}. The defaul
 
 \item{log_dir}{(optional; default \code{tempdir()}) a string indicating the
 directory in which to write the log files (ignored if \code{parallel = FALSE})}
+
+\item{BPPARAM}{(optional; default \code{NULL}) a
+\link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} object specifying the parallel back end,
+for example \code{BiocParallel::SnowParam(4)}. If supplied, it overrides
+\code{parallel} and \code{n_processors}; the default, \code{NULL}, runs the function with
+\code{BiocParallel::MulticoreParam(n_processors)} if \code{parallel = TRUE} and
+serially otherwise. Windows cannot fork processes, so there \code{parallel = TRUE}
+is not available; use \code{BPPARAM = BiocParallel::SnowParam(n_processors)}
+instead. Results do not depend on the back end or the number of workers.}
 }
 \value{
 an updated \code{sceptre_object} in which the discovery analysis has been

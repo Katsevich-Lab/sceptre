@@ -10,9 +10,10 @@ estimate_theta <- function(y, mu, dfr, limit, eps) {
 #' @param n_tot the total number of cells
 #' @param M the maximum number of cells in a given gRNA group
 #' @param B the number of WOR samples to generate
+#' @param seed the seed of the random number generator
 #' @noRd
-fisher_yates_sampler <- function(n_tot, M, B) {
-    .Call(`_sceptre_fisher_yates_sampler`, n_tot, M, B)
+fisher_yates_sampler <- function(n_tot, M, B, seed) {
+    .Call(`_sceptre_fisher_yates_sampler`, n_tot, M, B, seed)
 }
 
 #' @title Hybrid Fisher-Yates/IWOR sampler
@@ -21,17 +22,18 @@ fisher_yates_sampler <- function(n_tot, M, B) {
 #' @param m the minumum number of cells in a given gRNA group
 #' @param M the maximum number of cells in a given gRNA group
 #' @param B the number of WOR samples to generate
+#' @param seed the seed of the random number generator
 #' @noRd
-hybrid_fisher_iwor_sampler <- function(N, m, M, B) {
-    .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B)
+hybrid_fisher_iwor_sampler <- function(N, m, M, B, seed) {
+    .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B, seed)
 }
 
-crt_index_sampler <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B)
+crt_index_sampler <- function(fitted_probabilities, B, seed) {
+    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B, seed)
 }
 
-crt_index_sampler_fast <- function(fitted_probabilities, B) {
-    .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B)
+crt_index_sampler_fast <- function(fitted_probabilities, B, seed) {
+    .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B, seed)
 }
 
 run_low_level_test_full_v4 <- function(y, mu, a, w, D, trt_idxs, n_trt, use_all_cells, synthetic_idxs, B1, B2, B3, fit_parametric_curve, return_resampling_dist, side_code) {
@@ -42,8 +44,8 @@ run_reduced_em_algo_cpp <- function(pi_guesses, g_pert_guesses, g, g_mus_pert0, 
     .Call(`_sceptre_run_reduced_em_algo_cpp`, pi_guesses, g_pert_guesses, g, g_mus_pert0, log_g_factorial)
 }
 
-sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat) {
-    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat)
+sample_combinations_v2 <- function(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat, seed) {
+    .Call(`_sceptre_sample_combinations_v2`, calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat, seed)
 }
 
 iterate_over_combinations <- function(n_nt_grnas, undercover_group_size, n_possible_groups) {
@@ -54,8 +56,8 @@ increment_matrix <- function(m) {
     invisible(.Call(`_sceptre_increment_matrix`, m))
 }
 
-sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh) {
-    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh)
+sample_undercover_pairs_v2 <- function(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, seed) {
+    .Call(`_sceptre_sample_undercover_pairs_v2`, n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, seed)
 }
 
 compute_n_trt_cells_matrix <- function(j, p, n_cells_orig, n_cells_sub, n_genes, nt_grna_group_idxs, cells_in_use) {
