@@ -29,6 +29,12 @@
 #' giving the chromosome, start coordinate, and end coordiante, respectively, of
 #' each gRNA. Additionally, `grna_target_data_frame` can contain the column
 #' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `grna_target_data_frame` can instead be a `GRanges` object, one range per
+#' gRNA, or a `GRangesList` object, one element per gRNA, empty for gRNAs
+#' without a position (such as non-targeting gRNAs), as in the `rowRanges` of
+#' a `SummarizedExperiment`; the ranges give the positions (`chr`, `start`, and
+#' `end`), and the metadata columns give `grna_id`, `grna_target`, and
+#' optionally `vector_id`.
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param extra_covariates (optional) a data frame containing extra covariates
@@ -80,6 +86,14 @@ import_data <- function(
     use_ondisc = FALSE,
     directory_to_write = NULL
 ) {
+    if (
+        methods::is(grna_target_data_frame, "GRanges") ||
+            methods::is(grna_target_data_frame, "GRangesList")
+    ) {
+        grna_target_data_frame <- grna_target_data_frame_from_granges(
+            grna_target_data_frame
+        )
+    }
     if (use_ondisc) {
         # use ondisc
         import_data_use_ondisc(
@@ -102,6 +116,44 @@ import_data <- function(
             response_names
         )
     }
+}
+
+# convert a GRanges or GRangesList of gRNAs, whose metadata columns hold
+# `grna_id`, `grna_target` (and optionally `vector_id`), to a gRNA target data
+# frame; an empty GRangesList element is a gRNA without a position
+grna_target_data_frame_from_granges <- function(grna_ranges) {
+    grna_target_data_frame <- GenomicRanges::as.data.frame(
+        GenomicRanges::mcols(grna_ranges)
+    )
+    if (
+        !all(c("grna_id", "grna_target") %in% colnames(grna_target_data_frame))
+    ) {
+        stop(
+            "A `GRanges` or `GRangesList` `grna_target_data_frame` must have metadata columns `grna_id` and `grna_target`."
+        )
+    }
+    positioned <- rep(TRUE, length(grna_ranges))
+    if (methods::is(grna_ranges, "GRangesList")) {
+        n_ranges <- lengths(grna_ranges)
+        if (any(n_ranges >= 2L)) {
+            stop(
+                "Each element of a `GRangesList` `grna_target_data_frame` must contain at most one range (none for a gRNA without a position)."
+            )
+        }
+        positioned <- n_ranges == 1L
+        grna_ranges <- unlist(grna_ranges, use.names = FALSE)
+    }
+    grna_target_data_frame$chr <- NA_character_
+    grna_target_data_frame$start <- NA_integer_
+    grna_target_data_frame$end <- NA_integer_
+    grna_target_data_frame$chr[positioned] <- as.character(
+        GenomicRanges::seqnames(grna_ranges)
+    )
+    grna_target_data_frame$start[positioned] <- GenomicRanges::start(
+        grna_ranges
+    )
+    grna_target_data_frame$end[positioned] <- GenomicRanges::end(grna_ranges)
+    return(grna_target_data_frame)
 }
 
 # memory

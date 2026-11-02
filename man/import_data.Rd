@@ -36,7 +36,13 @@ should be assigned a label of "non-targeting". Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
 giving the chromosome, start coordinate, and end coordiante, respectively, of
 each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
-\code{vector_id} specifying the vector to which a given gRNA belongs.}
+\code{vector_id} specifying the vector to which a given gRNA belongs.
+\code{grna_target_data_frame} can instead be a \code{GRanges} object, one range per
+gRNA, or a \code{GRangesList} object, one element per gRNA, empty for gRNAs
+without a position (such as non-targeting gRNAs), as in the \code{rowRanges} of
+a \code{SummarizedExperiment}; the ranges give the positions (\code{chr}, \code{start}, and
+\code{end}), and the metadata columns give \code{grna_id}, \code{grna_target}, and
+optionally \code{vector_id}.}
 
 \item{moi}{a string indicating the MOI of the dataset, either "low" or
 "high".}
