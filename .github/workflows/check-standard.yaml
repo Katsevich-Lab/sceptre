@@ -2,8 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, bioc-3.24]
   pull_request:
+  workflow_dispatch:
 
 name: R-CMD-check
 
@@ -19,7 +20,6 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
           - {os: windows-latest, r: 'release'}
 
     env:
@@ -27,7 +27,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install system dependencies
         shell: bash
@@ -59,16 +59,9 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install ondisc R package (macOS only)
-        if: ${{ matrix.config.os == 'macOS-latest' }}
-        run: |
-          Rscript -e "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
-          Rscript -e "install.packages('BiocManager')"
-          Rscript -e "BiocManager::install('Rhdf5lib', type = 'source')"
-          Rscript -e "remotes::install_github('timothy-barry/ondisc')"
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck
 
+      # builds and checks the vignette too (the default build arguments)
       - uses: r-lib/actions/check-r-package@v2
