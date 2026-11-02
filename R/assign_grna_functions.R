@@ -108,11 +108,12 @@ assign_grnas_to_cells_thresholding <- function(
         grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
         # 2. perform the assignments
+        grna_csr <- compressed_sparse_components(grna_matrix)
         initial_assignment_list <- lapply(grna_ids, function(grna_id) {
             threshold_count_matrix(
-                j = grna_matrix@j,
-                p = grna_matrix@p,
-                x = grna_matrix@x,
+                j = grna_csr$j,
+                p = grna_csr$p,
+                x = grna_csr$x,
                 row_idx = which(grna_id == rownames(grna_matrix)),
                 threshold = grna_assign_threshold
             )

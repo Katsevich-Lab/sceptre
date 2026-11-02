@@ -411,10 +411,11 @@ load_row <- function(mat, id) {
     if (methods::is(mat, "odm")) {
         mat[id, ]
     } else if (methods::is(mat, "dgRMatrix")) {
+        csr <- compressed_sparse_components(mat)
         load_csr_row(
-            j = mat@j,
-            p = mat@p,
-            x = mat@x,
+            j = csr$j,
+            p = csr$p,
+            x = csr$x,
             row_idx = which(id == rownames(mat)),
             n_cells = ncol(mat)
         )

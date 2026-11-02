@@ -77,9 +77,10 @@ compute_pairwise_qc_information <- function(sceptre_object) {
             )
         }
     } else {
+        response_csr <- compressed_sparse_components(response_matrix)
         out <- compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
-            j = response_matrix@j,
-            p = response_matrix@p,
+            j = response_csr$j,
+            p = response_csr$p,
             n_cells_orig = ncol(response_matrix),
             n_cells_sub = length(cells_in_use),
             grna_group_idxs = grna_group_idxs,

@@ -127,18 +127,19 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
     grna_ids <- names(initial_grna_assignment_list)
     names(initial_grna_assignment_list) <- NULL
-    j <- unlist(initial_grna_assignment_list)
-    increment_vector(j, -1L)
+    j <- as.integer(unlist(initial_grna_assignment_list))
     l <- vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1))
     p <- c(0L, cumsum(l))
-    mat <- Matrix::sparseMatrix(j = 1, p = c(0, 1), repr = "R")
-    mat@j <- j
-    mat@p <- p
-    mat@Dim <- c(
-        length(initial_grna_assignment_list),
-        get_grna_matrix(sceptre_object) |> ncol()
+    mat <- Matrix::sparseMatrix(
+        j = j,
+        p = p,
+        dims = c(
+            length(initial_grna_assignment_list),
+            get_grna_matrix(sceptre_object) |> ncol()
+        ),
+        dimnames = list(grna_ids, NULL),
+        repr = "R"
     )
-    rownames(mat) <- grna_ids
     if (apply_cellwise_qc) {
         if (!sceptre_object@functs_called[["run_qc"]]) {
             stop("QC has not yet been called on this sceptre_object.")

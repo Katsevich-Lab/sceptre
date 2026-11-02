@@ -85,9 +85,10 @@ construct_negative_control_pairs_v2 <- function(
                 cells_in_use = cells_in_use
             )
         } else {
+            response_csr <- compressed_sparse_components(response_matrix)
             n_nonzero_m <- compute_n_trt_cells_matrix(
-                j = response_matrix@j,
-                p = response_matrix@p,
+                j = response_csr$j,
+                p = response_csr$p,
                 n_cells_orig = ncol(response_matrix),
                 n_cells_sub = length(cells_in_use),
                 n_genes = n_genes,

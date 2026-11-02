@@ -194,12 +194,9 @@ crt_glm_factored_out <- function(
     for (i in seq_along(response_ids)) {
         curr_response_id <- response_ids[i]
         # load gene expressions
-        expression_vector <- load_csr_row(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            x = response_matrix@x,
-            row_idx = which(rownames(response_matrix) == curr_response_id),
-            n_cells = ncol(response_matrix)
+        expression_vector <- load_row(
+            mat = response_matrix,
+            id = curr_response_id
         )[cells_in_use]
         if (subset_to_nt_cells) {
             expression_vector <- expression_vector[all_nt_idxs]
@@ -277,12 +274,9 @@ discovery_ntcells_crt <- function(
     for (i in seq_along(response_ids)) {
         curr_response_id <- response_ids[i]
         # load gene expressions
-        curr_expression_vector <- load_csr_row(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            x = response_matrix@x,
-            row_idx = which(rownames(response_matrix) == curr_response_id),
-            n_cells = ncol(response_matrix)
+        curr_expression_vector <- load_row(
+            mat = response_matrix,
+            id = curr_response_id
         )[cells_in_use]
         curr_expression_vector <- curr_expression_vector[combined_idxs]
         # perform the response precomputation
