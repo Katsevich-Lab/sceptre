@@ -221,6 +221,10 @@ import_data_use_ondisc <- function(
 #' prefixed with their batch identifiers (for example, `b1_` and `b2_`) to keep
 #' the cell IDs unique and stable across imports.
 #' Supplying barcode files for only some directories is an error.
+#' When multiple directories are supplied, the directory from which each cell
+#' was loaded is recorded in the cell covariate `cellranger_directory`, a
+#' factor that enters the default formula as a covariate. Columns of
+#' `extra_covariates`, including one named `batch`, are kept as supplied.
 #' For standard in-memory objects, a malformed matrix file (for example, one
 #' with an entry outside the dimensions declared in its header), a matrix file
 #' that lists the same (feature, cell) entry more than once, or a matrix file
@@ -549,17 +553,22 @@ import_data_from_cellranger_memory <- function(
     }
     gene_names <- feature_df$feature_name[modality_idxs[["Gene Expression"]]]
 
-    # 8. set up the extra covariates
-    batch <- if (length(directories) >= 2L) {
-        rep(paste0("b", seq_along(n_cells_per_matrix)), n_cells_per_matrix) |>
+    # 8. set up the extra covariates; with multiple directories, record the
+    # directory of each cell in `cellranger_directory`, keeping the user's
+    # columns (including any named `batch`)
+    if (length(directories) >= 2L) {
+        cellranger_directory <- rep(
+            paste0("b", seq_along(n_cells_per_matrix)),
+            n_cells_per_matrix
+        ) |>
             factor()
-    } else {
-        NULL
-    }
-    if (nrow(extra_covariates) == 0L) {
-        extra_covariates <- data.frame(batch = batch)
-    } else {
-        extra_covariates$batch <- batch
+        if (nrow(extra_covariates) == 0L) {
+            extra_covariates <- data.frame(
+                cellranger_directory = cellranger_directory
+            )
+        } else {
+            extra_covariates$cellranger_directory <- cellranger_directory
+        }
     }
 
     # 9. initialize the sceptre object
@@ -627,6 +636,8 @@ import_data_from_cellranger_use_ondisc <- function(
         fixed = TRUE,
         x = colnames(covariate_df)
     )
+    colnames(covariate_df)[colnames(covariate_df) == "batch"] <-
+        "cellranger_directory"
     if (nrow(extra_covariates) >= 1L) {
         covariate_df <- cbind(extra_covariates, covariate_df)
     }

@@ -233,8 +233,9 @@ also automatically computes the following cell-specific covariates:
 `response_n_nonzero` (i.e., the number of responses expressed in the cell),
 `response_n_umis` (i.e., the number of response UMIs sequenced in the cell),
 `response_p_mito` (i.e., the fraction of transcripts mapping to mitochondrial
-genes), and `batch`. (Cells loaded from different directories are assumed to
-come from different batches.)
+genes), and `cellranger_directory` (i.e., the directory from which the cell was
+loaded). (Cells loaded from different directories are assumed to come from
+different batches.)
 
 ## 2. Set analysis parameters
 

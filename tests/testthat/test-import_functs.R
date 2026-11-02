@@ -280,3 +280,46 @@ test_that("Cell Ranger barcode counts must match matrix cell counts", {
         fixed = TRUE
     )
 })
+
+
+test_that("Cell Ranger import keeps a user's batch column", {
+    inputs <- get_cellranger_test_inputs()
+    n_cells <- vapply(
+        inputs$directories,
+        function(directory) {
+            nrow(data.table::fread(
+                file.path(directory, "barcodes.tsv.gz"),
+                header = FALSE
+            ))
+        },
+        FUN.VALUE = integer(1)
+    )
+
+    # two directories: the user's batch is kept; the directory index is
+    # recorded in cellranger_directory
+    user_batch <- rep(c("lane_A", "lane_B", "lane_C"), length.out = sum(n_cells))
+    sceptre_object <- suppressMessages(import_data_from_cellranger(
+        directories = inputs$directories,
+        moi = "high",
+        grna_target_data_frame = inputs$grna_target_data_frame,
+        extra_covariates = data.frame(batch = user_batch)
+    ))
+    covariates <- get_cell_covariates(sceptre_object)
+    expect_identical(as.character(covariates$batch), user_batch)
+    expect_identical(
+        covariates$cellranger_directory,
+        factor(rep(c("b1", "b2"), n_cells))
+    )
+
+    # one directory: the user's batch is kept and no directory index is added
+    user_batch <- rep(c("lane_A", "lane_B"), length.out = n_cells[1L])
+    sceptre_object <- suppressMessages(import_data_from_cellranger(
+        directories = inputs$directories[1L],
+        moi = "high",
+        grna_target_data_frame = inputs$grna_target_data_frame,
+        extra_covariates = data.frame(batch = user_batch)
+    ))
+    covariates <- get_cell_covariates(sceptre_object)
+    expect_identical(as.character(covariates$batch), user_batch)
+    expect_false("cellranger_directory" %in% colnames(covariates))
+})
