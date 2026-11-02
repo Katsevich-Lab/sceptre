@@ -322,6 +322,20 @@ test_that("Cell Ranger import keeps a user's batch column", {
     covariates <- get_cell_covariates(sceptre_object)
     expect_identical(as.character(covariates$batch), user_batch)
     expect_false("cellranger_directory" %in% colnames(covariates))
+
+    # a user's column named cellranger_directory is an error, not overwritten
+    expect_error(
+        import_data_from_cellranger(
+            directories = inputs$directories,
+            moi = "high",
+            grna_target_data_frame = inputs$grna_target_data_frame,
+            extra_covariates = data.frame(
+                cellranger_directory = seq_len(sum(n_cells))
+            )
+        ),
+        regexp = "`extra_covariates` contains a column named `cellranger_directory`",
+        fixed = TRUE
+    )
 })
 
 

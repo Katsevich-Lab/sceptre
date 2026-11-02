@@ -225,7 +225,8 @@ import_data_use_ondisc <- function(
 #' When multiple directories are supplied, the directory from which each cell
 #' was loaded is recorded in the cell covariate `cellranger_directory`, a
 #' factor that enters the default formula as a covariate. Columns of
-#' `extra_covariates`, including one named `batch`, are kept as supplied.
+#' `extra_covariates`, including one named `batch`, are kept as supplied; a
+#' column of `extra_covariates` named `cellranger_directory` is an error.
 #' For standard in-memory objects, a malformed matrix file (for example, one
 #' with an entry outside the dimensions declared in its header), a matrix file
 #' that lists the same (feature, cell) entry more than once, or a matrix file
@@ -294,6 +295,16 @@ import_data_from_cellranger <- function(
     use_ondisc = FALSE,
     directory_to_write = NULL
 ) {
+    # the directory of each cell is recorded in `cellranger_directory`; do not
+    # overwrite a user's column of that name
+    if (
+        (use_ondisc || length(directories) >= 2L) &&
+            "cellranger_directory" %in% colnames(extra_covariates)
+    ) {
+        stop(
+            "`extra_covariates` contains a column named `cellranger_directory`, which `import_data_from_cellranger()` uses to record the directory from which each cell was loaded. Rename that column."
+        )
+    }
     # take cases on use_ondisc
     if (!use_ondisc) {
         import_data_from_cellranger_memory(

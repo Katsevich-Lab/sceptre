@@ -61,7 +61,8 @@ Supplying barcode files for only some directories is an error.
 When multiple directories are supplied, the directory from which each cell
 was loaded is recorded in the cell covariate \code{cellranger_directory}, a
 factor that enters the default formula as a covariate. Columns of
-\code{extra_covariates}, including one named \code{batch}, are kept as supplied.
+\code{extra_covariates}, including one named \code{batch}, are kept as supplied; a
+column of \code{extra_covariates} named \code{cellranger_directory} is an error.
 For standard in-memory objects, a malformed matrix file (for example, one
 with an entry outside the dimensions declared in its header), a matrix file
 that lists the same (feature, cell) entry more than once, or a matrix file
