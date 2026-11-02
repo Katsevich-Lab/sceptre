@@ -156,6 +156,29 @@ test_that("a disk-backed object is written without copying its counts", {
     )
 })
 
+test_that("read_sceptre_object() checks the cells of screen.h5mu", {
+    inputs <- backed_test_inputs()
+    original <- suppressMessages(do.call(import_data, inputs))
+    order <- rev(seq_len(ncol(inputs$response_matrix)))
+    inputs$response_matrix <- inputs$response_matrix[, order]
+    inputs$grna_matrix <- inputs$grna_matrix[, order]
+    inputs$extra_covariates <- inputs$extra_covariates[order, , drop = FALSE]
+    reordered <- suppressMessages(do.call(import_data, inputs))
+    directory <- file.path(tempdir(), "original cells")
+    other <- file.path(tempdir(), "reordered cells")
+    write_sceptre_object(original, directory)
+    write_sceptre_object(reordered, other)
+    file.copy(
+        file.path(other, "screen.h5mu"),
+        file.path(directory, "screen.h5mu"),
+        overwrite = TRUE
+    )
+    expect_error(
+        read_sceptre_object(directory),
+        "does not hold the data"
+    )
+})
+
 test_that("read_sceptre_object() checks the directory", {
     directory <- file.path(tempdir(), "incomplete analysis")
     dir.create(directory, showWarnings = FALSE)

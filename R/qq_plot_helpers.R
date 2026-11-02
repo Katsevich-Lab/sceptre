@@ -39,7 +39,8 @@ StatQQBand <- ggplot2::ggproto(
         scales,
         distribution = "unif",
         max_pts_to_plot = 500,
-        ci_level = 0.95
+        ci_level = 0.95,
+        seed = NULL
     ) {
         # get the quantile function from the stats package
         quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
@@ -51,7 +52,7 @@ StatQQBand <- ggplot2::ggproto(
             scales$y$trans <- scales::identity_trans()
         }
         # compute the upper and lower confidence bands
-        data |>
+        bands <- data |>
             # the given y is already transformed, so transform it back first
             dplyr::mutate(y = scales$y$trans$inverse(y)) |>
             # apply the formulas for the confidence bands
@@ -75,14 +76,8 @@ StatQQBand <- ggplot2::ggproto(
                 y = scales$y$trans$transform(y),
                 ymin = scales$y$trans$transform(ymin),
                 ymax = scales$y$trans$transform(ymax)
-            ) |> # downsample
-            dplyr::mutate(
-                x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
-                y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
-            ) |>
-            dplyr::group_by(x_int, y_int) |>
-            dplyr::slice_sample(n = 1) |>
-            dplyr::ungroup()
+            )
+        downsample_qq(bands, max_pts_to_plot, seed)
     }
 )
 
@@ -120,6 +115,7 @@ stat_qq_band <- function(
             distribution = distribution,
             max_pts_to_plot = max_pts_to_plot,
             ci_level = ci_level,
+            seed = draw_plot_seed(),
             ...
         )
     )
@@ -136,7 +132,8 @@ StatQQPoints <- ggplot2::ggproto(
         distribution = "unif",
         max_pts_to_plot = 500,
         ymin = -Inf,
-        ymax = Inf
+        ymax = Inf,
+        seed = NULL
     ) {
         # set x and y transformations to identity if they are not given
         if (is.null(scales$x$trans)) {
@@ -147,7 +144,7 @@ StatQQPoints <- ggplot2::ggproto(
         }
         # get the quantile function from the stats package
         quantile_fun <- eval(parse(text = sprintf("stats::q%s", distribution)))
-        data |>
+        points <- data |>
             # the given y is already transformed, so transform it back first
             dplyr::mutate(
                 y = scales$y$trans$inverse(y),
@@ -161,8 +158,21 @@ StatQQPoints <- ggplot2::ggproto(
                 # transform
                 x = scales$x$trans$transform(x),
                 y = scales$y$trans$transform(y)
-            ) |>
-            # downsample
+            )
+        downsample_qq(points, max_pts_to_plot, seed)
+    }
+)
+
+
+# Keep one point, chosen at random, in each cell of a max_pts_to_plot x
+# max_pts_to_plot grid over (x, y). The choice is drawn with `seed`, which the
+# layer drew from R's random number generator when the plot was made, so that
+# set.seed() before plotting fixes the points and every rendering of the same
+# plot shows the same points; the caller's random number stream is left as it
+# was.
+downsample_qq <- function(data, max_pts_to_plot, seed) {
+    withr::with_seed(seed, {
+        data |>
             dplyr::mutate(
                 x_int = ggplot2::cut_interval(x, n = max_pts_to_plot),
                 y_int = ggplot2::cut_interval(y, n = max_pts_to_plot)
@@ -170,8 +180,15 @@ StatQQPoints <- ggplot2::ggproto(
             dplyr::group_by(x_int, y_int) |>
             dplyr::slice_sample(n = 1) |>
             dplyr::ungroup()
-    }
-)
+    })
+}
+
+
+# The seed with which a QQ layer subsamples its points, drawn from R's random
+# number generator when the layer is made.
+draw_plot_seed <- function() {
+    sample.int(.Machine$integer.max, 1L)
+}
 
 #' Add points for a QQ plot
 #'
@@ -211,6 +228,7 @@ stat_qq_points <- function(
             max_pts_to_plot = max_pts_to_plot,
             ymin = ymin,
             ymax = ymax,
+            seed = draw_plot_seed(),
             ...
         )
     )

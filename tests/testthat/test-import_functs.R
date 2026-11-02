@@ -360,6 +360,47 @@ test_that("import_data rejects non-integer response counts", {
 })
 
 
+test_that("import_data rejects missing, negative and infinite counts", {
+    data("lowmoi_example_data")
+    for (case in list(
+        list(value = NA, message = "missing (NA) entries"),
+        list(value = -3, message = "negative entries"),
+        list(value = Inf, message = "infinite entries")
+    )) {
+        response_matrix <- lowmoi_example_data$response_matrix
+        response_matrix[1L, 1L] <- case$value
+        for (input in list(
+            response_matrix,
+            methods::as(response_matrix, "CsparseMatrix")
+        )) {
+            expect_error(
+                import_data(
+                    response_matrix = input,
+                    grna_matrix = lowmoi_example_data$grna_matrix,
+                    grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+                    moi = "low"
+                ),
+                regexp = case$message,
+                fixed = TRUE
+            )
+        }
+    }
+    grna_matrix <- as.matrix(lowmoi_example_data$grna_matrix)
+    storage.mode(grna_matrix) <- "integer"
+    grna_matrix[1L, 1L] <- -1L
+    expect_error(
+        import_data(
+            response_matrix = lowmoi_example_data$response_matrix,
+            grna_matrix = grna_matrix,
+            grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+            moi = "low"
+        ),
+        regexp = "The `grna_matrix` must contain counts",
+        fixed = TRUE
+    )
+})
+
+
 test_that("import_data rejects non-integer gRNA counts", {
     data("lowmoi_example_data")
     expect_error(

@@ -38,7 +38,7 @@
 
 -   In high MOI, `set_analysis_parameters(control_group = "nt_cells")` is an error; it was silently replaced by the complement.
 
--   Importing a response or gRNA matrix with non-integer entries is an error; previously such counts were accepted, and the analysis then gave many warnings.
+-   Importing a response or gRNA matrix with missing, negative, infinite or non-integer entries is an error; previously such counts were accepted (non-integer counts then gave many warnings in the analysis).
 
 ## Deprecated and removed
 

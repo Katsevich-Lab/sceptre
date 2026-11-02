@@ -281,7 +281,8 @@ grna_ranges_from_target_data_frame <- function(
         chr <- as.character(grna_target_data_frame$chr[idx])
         start <- grna_target_data_frame$start[idx]
         end <- grna_target_data_frame$end[idx]
-        has_position <- !is.na(chr) & !is.na(start) & !is.na(end)
+        # a missing or empty chromosome marks a gRNA without a position
+        has_position <- !is.na(chr) & nzchar(chr) & !is.na(start) & !is.na(end)
     }
     ranges <- GenomicRanges::GRanges(
         seqnames = chr[has_position],

@@ -95,9 +95,16 @@ read_sceptre_object <- function(directory, backed = FALSE) {
             get_grna_matrix(sceptre_object)
         }
         counts <- screen[[modality]]
+        # screen.h5mu names the cells by their indices when the sceptre_object
+        # has no cell names (see write_screen())
+        cell_ids <- colnames(stored)
+        if (is.null(cell_ids)) {
+            cell_ids <- as.character(seq_len(ncol(stored)))
+        }
         if (
             !identical(dim(counts), dim(stored)) ||
-                !identical(rownames(counts), rownames(stored))
+                !identical(rownames(counts), rownames(stored)) ||
+                !identical(as.character(colnames(counts)), cell_ids)
         ) {
             stop(
                 files[2L],

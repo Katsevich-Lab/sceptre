@@ -1,11 +1,31 @@
-# The response and gRNA matrices hold integer counts (a logical matrix passes);
-# anything else is an error.
+# A matrix of counts has no missing, negative or infinite entries, and its
+# entries are integers (a logical matrix passes); anything else is an error.
 check_integer_counts <- function(input_matrix, input_matrix_name) {
     if (
         methods::is(input_matrix, "lsparseMatrix") ||
-            is.integer(input_matrix) ||
             is.logical(input_matrix)
     ) {
+        return(invisible())
+    }
+    problem <- if (anyNA(input_matrix)) {
+        "missing (NA) entries"
+    } else if (any(input_matrix < 0)) {
+        "negative entries"
+    } else if (!is.integer(input_matrix) && any(is.infinite(input_matrix))) {
+        "infinite entries"
+    } else {
+        NULL
+    }
+    if (!is.null(problem)) {
+        stop(
+            "The `",
+            input_matrix_name,
+            "` must contain counts (for example, UMI counts); it has ",
+            problem,
+            "."
+        )
+    }
+    if (is.integer(input_matrix)) {
         return(invisible())
     }
     non_integer <- input_matrix != round(input_matrix)
@@ -21,6 +41,7 @@ check_integer_counts <- function(input_matrix, input_matrix_name) {
             "."
         )
     }
+    invisible()
 }
 
 

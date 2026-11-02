@@ -166,6 +166,18 @@ test_that("a disk-backed import rejects what the in-memory import rejects", {
         ),
         "must contain integer counts"
     )
+    negative <- write_small_cellranger_directory(
+        tempfile("negative"),
+        rbind(c(1, 1, 3), c(3, 2, -1), c(2, 1, 1), c(4, 2, 2))
+    )
+    expect_error(
+        import_backed(
+            negative,
+            moi = "low",
+            grna_target_data_frame = small_grna_target_data_frame
+        ),
+        "has negative entries"
+    )
     repeated <- write_small_cellranger_directory(
         tempfile("repeated"),
         rbind(c(1, 1, 3), c(3, 2, 1), c(2, 1, 1), c(4, 2, 2), c(1, 1, 2))

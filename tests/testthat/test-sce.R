@@ -150,3 +150,25 @@ test_that("import_data_from_sce() reads targets without positions", {
         "no column `lane`"
     )
 })
+
+
+test_that("as_singlecellexperiment() treats an empty chromosome as no position", {
+    data(lowmoi_example_data)
+    targets <- lowmoi_example_data$grna_target_data_frame
+    targets$chr <- ifelse(targets$grna_target == "non-targeting", "", "chr1")
+    targets$start <- 100L
+    targets$end <- 120L
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = targets,
+        moi = "low"
+    ))
+    positions <- SummarizedExperiment::rowRanges(
+        SingleCellExperiment::altExp(as_singlecellexperiment(sceptre_object), "gRNA")
+    )
+    nt <- names(positions) %in%
+        targets$grna_id[targets$grna_target == "non-targeting"]
+    expect_true(all(lengths(positions)[nt] == 0L))
+    expect_true(all(lengths(positions)[!nt] == 1L))
+})

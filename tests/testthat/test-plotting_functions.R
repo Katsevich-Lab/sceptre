@@ -226,3 +226,33 @@ test_that("test all plots", {
     expect_equal(plt$labels$x, "Treatment status")
     expect_equal(plt$labels$y, "Normalized expression")
 })
+
+
+test_that("QQ points are drawn when the plot is made, not when it is rendered", {
+    p_values <- data.frame(p = stats::runif(5000))
+    make_plot <- function() {
+        ggplot2::ggplot(p_values, ggplot2::aes(y = p)) +
+            stat_qq_points(max_pts_to_plot = 50) +
+            stat_qq_band(max_pts_to_plot = 50)
+    }
+    set.seed(1)
+    first <- make_plot()
+    set.seed(1)
+    second <- make_plot()
+    for (layer in 1:2) {
+        # every rendering of a plot shows the same points
+        expect_identical(
+            ggplot2::layer_data(first, layer),
+            ggplot2::layer_data(first, layer)
+        )
+        # set.seed() before plotting fixes them
+        expect_identical(
+            ggplot2::layer_data(first, layer),
+            ggplot2::layer_data(second, layer)
+        )
+    }
+    # rendering leaves the caller's random number stream as it was
+    seed_before <- .Random.seed
+    ggplot2::layer_data(first, 1)
+    expect_identical(.Random.seed, seed_before)
+})
