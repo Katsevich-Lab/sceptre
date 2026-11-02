@@ -26,7 +26,7 @@
 #' test statistics, either `"skew_normal"` or `"no_approximation"`
 #' @param control_group (optional) a string specifying the control group to use
 #' in the differential expression analysis, either `"complement"` or
-#' `"nt_cells"`
+#' `"nt_cells"`; `"nt_cells"` is available in low MOI only
 #' @param resampling_mechanism (optional) a string specifying the resampling
 #' mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying
@@ -91,7 +91,9 @@ set_analysis_parameters <- function(
 
     # 1. handle default arguments
     if (!sceptre_object@low_moi) {
-        control_group <- "complement"
+        if (control_group == "default") {
+            control_group <- "complement"
+        }
         if (resampling_mechanism == "default") resampling_mechanism <- "crt"
     }
     if (sceptre_object@low_moi) {

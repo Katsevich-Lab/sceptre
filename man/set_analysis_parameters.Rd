@@ -45,7 +45,7 @@ test statistics, either \code{"skew_normal"} or \code{"no_approximation"}}
 
 \item{control_group}{(optional) a string specifying the control group to use
 in the differential expression analysis, either \code{"complement"} or
-\code{"nt_cells"}}
+\code{"nt_cells"}; \code{"nt_cells"} is available in low MOI only}
 
 \item{resampling_mechanism}{(optional) a string specifying the resampling
 mechanism to use, either \code{"permutations"} or \code{"crt"}}

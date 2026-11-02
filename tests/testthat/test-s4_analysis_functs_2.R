@@ -25,8 +25,7 @@ test_that("run_calibration_check", {
         moi = "high"
     ) |>
         set_analysis_parameters(
-            discovery_pairs = discovery_pairs,
-            control_group = "nt_cells"
+            discovery_pairs = discovery_pairs
         ) |>
         assign_grnas(method = "thresholding", threshold = 5) |>
         run_qc(

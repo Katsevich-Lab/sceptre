@@ -266,3 +266,32 @@ test_that("set_analysis_parameters", {
         "aaa"
     )
 })
+
+
+test_that("set_analysis_parameters rejects NT cells as the control group in high MOI", {
+    data("highmoi_example_data")
+    data("grna_target_data_frame_highmoi")
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = grna_target_data_frame_highmoi,
+        extra_covariates = highmoi_example_data$extra_covariates,
+        moi = "high",
+        response_names = highmoi_example_data$gene_names
+    ))
+    discovery_pairs <- construct_trans_pairs(sceptre_object)[1:5, ]
+    expect_error(
+        set_analysis_parameters(
+            sceptre_object,
+            discovery_pairs = discovery_pairs,
+            control_group = "nt_cells"
+        ),
+        regexp = "The control group cannot be the NT cells in high MOI.",
+        fixed = TRUE
+    )
+    sceptre_object <- suppressMessages(set_analysis_parameters(
+        sceptre_object,
+        discovery_pairs = discovery_pairs
+    ))
+    expect_true(sceptre_object@control_group_complement)
+})
