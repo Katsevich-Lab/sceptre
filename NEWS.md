@@ -1,3 +1,51 @@
+# sceptre 0.99.2
+
+## New features
+
+-   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"gRNA"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions.
+
+-   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets in its `rowData` and positions in its `rowRanges`); new `as_singlecellexperiment()` exports a `sceptre_object`'s data in that layout.
+
+-   `import_data()` accepts gRNA positions as a `GRangesList` or `GRanges`, and `construct_cis_pairs()` accepts response positions as a `GRanges` (genes are placed at their transcription start sites).
+
+-   Disk-backed analysis no longer uses `ondisc`: with `backed = TRUE` and `directory_to_write`, `import_data()`, `import_data_from_cellranger()` and `import_data_from_sce()` keep the response counts on disk in `screen.h5mu`, a MuData file that Bioconductor's MuData and Python's mudata can read. New `write_sceptre_object()` and `read_sceptre_object()` save and load a `sceptre_object`, standard or disk-backed, as a directory holding `screen.h5mu` and `sceptre_object.rds`.
+
+-   With `backed = TRUE`, `import_data_from_cellranger()` streams the response counts to disk through temporary files, so Cell Ranger output larger than memory can be imported.
+
+-   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. `seed = 4` reproduces the results of earlier versions, which used the fixed seed 4.
+
+-   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel and gain `BPPARAM`; results do not depend on the back end or number of workers. `parallel = TRUE` uses `BiocParallel::MulticoreParam()`; on Windows, use `BPPARAM = BiocParallel::SnowParam()`.
+
+-   The `sceptre_object` class is documented (`?"sceptre_object-class"`) and has a validity method.
+
+-   The vignette uses BiocStyle and has new sections on reproducibility, BiocParallel, `SingleCellExperiment` input and output, and disk-backed analysis.
+
+## Changes
+
+-   Plots that show a random subset of points or gRNAs now draw it from R's random number generator, so `set.seed()` makes them reproducible; previously they always used the seed 4.
+
+-   The default formula gives a message naming each covariate it leaves out (non-count covariates with 15 or more distinct values).
+
+-   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `cellranger_directory` (previously `batch`); a user column named `cellranger_directory` is an error.
+
+-   sceptre now requires R 4.6.0 or later.
+
+## Bug fixes
+
+-   With `resampling_approximation = "no_approximation"`, `run_calibration_check()` no longer changes the number of resamples used by a later `run_discovery_analysis()` or `run_power_check()`, so their p-values no longer depend on whether the calibration check ran first.
+
+-   The maximum gRNA assignment method requires `min_grna_n_umis_threshold` to be at least 1; 0 assigned gRNAs to cells with no gRNA UMIs.
+
+-   In high MOI, `set_analysis_parameters(control_group = "nt_cells")` is an error; it was silently replaced by the complement.
+
+-   Importing a response or gRNA matrix with non-integer entries is an error; previously such counts were accepted, and the analysis then gave many warnings.
+
+## Deprecated and removed
+
+-   The argument `use_ondisc` is deprecated in favor of `backed`, and `read_ondisc_backed_sceptre_object()` and `write_ondisc_backed_sceptre_object()` in favor of `read_sceptre_object()` and `write_sceptre_object()`; `.odm` files written by earlier versions cannot be read, so re-import the data. The `ondisc` package is no longer used.
+
+-   The `sceptre_object` slots used by the Nextflow pipeline (`nf_pipeline`, `nuclear`, `integer_id`, `elements_to_analyze`) are removed.
+
 # sceptre 0.99.1
 
 -   Two-sided empirical p-values are now capped at 1. Previously, when the observed test statistic tied with many of the resampled statistics (for example, a response with the same count in every cell), the reported p-value could exceed 1, up to 2 ([issue #237](https://github.com/Katsevich-Lab/sceptre/issues/237)). One-sided p-values, p-values at or below 1 and significance calls are unchanged. With `grna_integration_strategy = "bonferroni"`, if two or more of a target's gRNAs have p-values capped at 1, the combined result now takes its fold change and nonzero-cell counts from the first of these gRNAs rather than from the one with the smallest uncapped p-value; its p-value (1) and significance call are unchanged.
