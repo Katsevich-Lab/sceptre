@@ -36,6 +36,8 @@ setClass(
         grna_assignment_hyperparameters = "list",
         multiple_testing_alpha = "numeric",
         multiple_testing_method = "character",
+        seed = "integer",
+        rng_protocol = "character",
         cell_removal_metrics = "integer",
         cellwise_qc_thresholds = "list",
 

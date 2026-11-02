@@ -60,6 +60,8 @@ test_that("import_data", {
         "grna_assignment_hyperparameters",
         "multiple_testing_alpha",
         "multiple_testing_method",
+        "seed",
+        "rng_protocol",
         "cell_removal_metrics",
         "cellwise_qc_thresholds",
         "mitochondrial_gene",
