@@ -1,5 +1,7 @@
 utils::globalVariables(c(
     "n_nonzero_trt",
+    "x_int",
+    "y_int",
     "n_nonzero_cntrl",
     "pair_str",
     "assignment",
