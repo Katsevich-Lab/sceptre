@@ -93,12 +93,14 @@ test_that("BPPARAM is checked and selects the back end", {
     expect_null(get_bpparam(FALSE, "auto", BiocParallel::SerialParam()))
     snow <- BiocParallel::SnowParam(2)
     expect_identical(get_bpparam(FALSE, "auto", snow), snow)
+    # parallel = TRUE is an error on Windows (it forks), checked in
+    # test-parallel_windows.R
+    skip_on_os("windows")
     expect_error(
         get_bpparam(TRUE, 1, NULL),
         "`n_processors` should be set to the string 'auto'",
         fixed = TRUE
     )
-    skip_on_os("windows")
     bpparam <- get_bpparam(TRUE, 2, NULL)
     expect_s4_class(bpparam, "MulticoreParam")
     expect_identical(BiocParallel::bpnworkers(bpparam), 2L)

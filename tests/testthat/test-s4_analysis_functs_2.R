@@ -25,7 +25,8 @@ test_that("run_calibration_check", {
         moi = "high"
     ) |>
         set_analysis_parameters(
-            discovery_pairs = discovery_pairs
+            discovery_pairs = discovery_pairs,
+            seed = 4L
         ) |>
         assign_grnas(method = "thresholding", threshold = 5) |>
         run_qc(
@@ -54,7 +55,8 @@ test_that("run_calibration_check", {
         rep(3, nrow(discovery_pairs))
     )
 
-    # with this seed all nulls are false for both objects
+    # with these seeds (set.seed(2) for the data, seed = 4 for the analysis,
+    # the seed of earlier versions) all nulls are false for both objects
     expect_false(any(scep_calib_1@calibration_result$significant))
     expect_false(any(scep_calib_3@calibration_result$significant))
 })
