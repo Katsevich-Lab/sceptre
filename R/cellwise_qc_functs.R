@@ -10,25 +10,26 @@ determine_cells_to_retain <- function(
     n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
 
     # 2. compute the cells to retain based on n_umis and n_nonzero
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     exclude_cells_by_clipping_counts <- function(v, percentile_range) {
         cutoffs <- stats::quantile(x = v, probs = percentile_range)
         which(v < cutoffs[1] | v > cutoffs[2])
     }
     cells_to_exclude_n_umis <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_umis,
+        covariate_data_frame$response_n_umis,
         response_n_umis_range
     )
     n_cells_rm_n_umis <- length(cells_to_exclude_n_umis)
     cells_to_exclude_n_responses <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_nonzero,
+        covariate_data_frame$response_n_nonzero,
         response_n_nonzero_range
     )
     n_cells_rm_n_responses <- length(cells_to_exclude_n_responses)
 
     # 3. compute cells to retain based on p_mito
-    if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
+    if ("response_p_mito" %in% colnames(covariate_data_frame)) {
         cells_to_exclude_p_mito <- which(
-            sceptre_object@covariate_data_frame$response_p_mito >
+            covariate_data_frame$response_p_mito >
                 p_mito_threshold
         )
         n_cells_rm_p_mito <- length(cells_to_exclude_p_mito)

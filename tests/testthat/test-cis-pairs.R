@@ -9,7 +9,9 @@ cis_pair_object <- function(response_ids, metadata) {
     )
     methods::new(
         "sceptre_object",
-        response_matrix = list(response),
+        data = SingleCellExperiment::SingleCellExperiment(
+            assays = list(counts = response)
+        ),
         grna_target_data_frame = metadata
     )
 }

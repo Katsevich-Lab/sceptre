@@ -1,10 +1,9 @@
 plot_fix_object <- function() {
     object <- methods::new("sceptre_object")
-    object <- set_grna_matrix(
-        object,
-        matrix(c(0, 1, 11, 15), 1L, dimnames = list("g", NULL))
+    object@data <- new_screen(
+        response_matrix = matrix(1, 1L, 4L),
+        grna_matrix = matrix(c(0, 1, 11, 15), 1L, dimnames = list("g", NULL))
     )
-    object <- set_response_matrix(object, matrix(1, 1L, 4L))
     object@low_moi <- FALSE
     object@cell_removal_metrics <- rep(0L, 6L)
     object@functs_called <- c(run_qc = TRUE)

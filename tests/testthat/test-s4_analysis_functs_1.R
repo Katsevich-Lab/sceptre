@@ -36,9 +36,7 @@ test_that("import_data", {
     # most of the slots are so simple that only cursory tests are done, mostly to confirm
     # that future changes do not change the API
     all_slots <- c(
-        "response_matrix",
-        "grna_matrix",
-        "covariate_data_frame",
+        "data",
         "covariate_matrix",
         "grna_target_data_frame",
         "low_moi",
@@ -115,14 +113,14 @@ test_that("import_data", {
     expect_false(sceptre_object_high_with_ec@low_moi)
 
     expect_equal(
-        sceptre_object_low_no_ec_with_response_names@covariate_data_frame |>
+        get_cell_covariates(sceptre_object_low_no_ec_with_response_names) |>
             rownames(),
         as.character(seq_len(num_cells))
     )
 
     expect_equal(
         names(
-            sceptre_object_low_no_ec_with_response_names@covariate_data_frame
+            get_cell_covariates(sceptre_object_low_no_ec_with_response_names)
         ),
         c(
             "response_n_nonzero",
@@ -132,7 +130,7 @@ test_that("import_data", {
         )
     )
     expect_equal(
-        names(sceptre_object_high_with_ec@covariate_data_frame),
+        names(get_cell_covariates(sceptre_object_high_with_ec)),
         c(
             "response_n_nonzero",
             "response_n_umis",
@@ -142,7 +140,7 @@ test_that("import_data", {
         )
     )
     expect_equal(
-        sceptre_object_high_with_ec@covariate_data_frame$x,
+        get_cell_covariates(sceptre_object_high_with_ec)$x,
         extra_covariates$x
     )
 

@@ -98,8 +98,6 @@ write_ondisc_backed_sceptre_object <- function(
     sceptre_object,
     directory_to_write
 ) {
-    sceptre_object <- set_grna_matrix(sceptre_object, list())
-    sceptre_object <- set_response_matrix(sceptre_object, list())
     # check that dir exists
     directory_to_write <- prepare_directory_to_write(directory_to_write)
     saveRDS(sceptre_object, file.path(directory_to_write, "sceptre_object.rds"))

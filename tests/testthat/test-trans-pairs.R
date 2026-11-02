@@ -11,7 +11,9 @@ test_that("construct_trans_pairs() leaves the caller's positive control table un
     )
     object <- methods::new(
         "sceptre_object",
-        response_matrix = list(response),
+        data = SingleCellExperiment::SingleCellExperiment(
+            assays = list(counts = response)
+        ),
         grna_target_data_frame = metadata
     )
     targets <- c("target-z", "pc-target", "target-y")

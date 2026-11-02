@@ -265,7 +265,7 @@ check_set_analysis_parameters <- function(
 ) {
     response_matrix <- get_response_matrix(sceptre_object)
     grna_matrix <- get_grna_matrix(sceptre_object)
-    covariate_data_frame <- sceptre_object@covariate_data_frame
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
     # 1. if response_grna_target_pairs has been supplied, check its

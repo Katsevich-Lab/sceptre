@@ -35,7 +35,11 @@
 #' grna_matrix <- get_grna_matrix(sceptre_object)
 #' cell_covariates <- get_cell_covariates(sceptre_object)
 get_response_matrix <- function(sceptre_object) {
-    return(sceptre_object@response_matrix[[1]])
+    return(SummarizedExperiment::assay(
+        sceptre_object@data,
+        "counts",
+        withDimnames = FALSE
+    ))
 }
 
 #' Get gRNA matrix
@@ -43,7 +47,15 @@ get_response_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_grna_matrix <- function(sceptre_object) {
-    return(sceptre_object@grna_matrix[[1]])
+    return(SummarizedExperiment::assay(
+        SingleCellExperiment::altExp(
+            sceptre_object@data,
+            "gRNA",
+            withDimnames = FALSE
+        ),
+        "counts",
+        withDimnames = FALSE
+    ))
 }
 
 #' Get cell covariates
@@ -51,7 +63,10 @@ get_grna_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_cell_covariates <- function(sceptre_object) {
-    return(sceptre_object@covariate_data_frame)
+    return(as.data.frame(
+        SummarizedExperiment::colData(sceptre_object@data),
+        optional = TRUE
+    ))
 }
 
 
@@ -133,12 +148,31 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     return(mat)
 }
 
+# the setters replace a matrix by one of the same dimensions
 set_response_matrix <- function(sceptre_object, response_matrix) {
-    sceptre_object@response_matrix[[1]] <- response_matrix
+    SummarizedExperiment::assay(
+        sceptre_object@data,
+        "counts",
+        withDimnames = FALSE
+    ) <- response_matrix
     return(sceptre_object)
 }
 
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
-    sceptre_object@grna_matrix[[1]] <- grna_matrix
+    grna_experiment <- SingleCellExperiment::altExp(
+        sceptre_object@data,
+        "gRNA",
+        withDimnames = FALSE
+    )
+    SummarizedExperiment::assay(
+        grna_experiment,
+        "counts",
+        withDimnames = FALSE
+    ) <- grna_matrix
+    SingleCellExperiment::altExp(
+        sceptre_object@data,
+        "gRNA",
+        withDimnames = FALSE
+    ) <- grna_experiment
     return(sceptre_object)
 }

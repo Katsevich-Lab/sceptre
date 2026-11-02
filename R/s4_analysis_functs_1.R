@@ -119,7 +119,7 @@ set_analysis_parameters <- function(
     }
     if (identical(formula_object, "default")) {
         formula_object <- auto_construct_formula_object(
-            cell_covariates = sceptre_object@covariate_data_frame,
+            cell_covariates = get_cell_covariates(sceptre_object),
             include_grna_covariates = !sceptre_object@low_moi
         )
     }
@@ -153,7 +153,7 @@ set_analysis_parameters <- function(
     # the design matrix (not only the formula, as factor contrasts can change
     # it) and on the cells used to fit them (NT cells or the complement)
     covariate_matrix <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = sceptre_object@covariate_data_frame,
+        covariate_data_frame = get_cell_covariates(sceptre_object),
         formula_object = formula_object
     )
     reset_response_precomps <- !identical(
@@ -322,7 +322,7 @@ assign_grnas <- function(
             backup_threshold = 5L,
             probability_threshold = 0.8,
             formula_object = auto_construct_formula_object(
-                cell_covariates = sceptre_object@covariate_data_frame,
+                cell_covariates = get_cell_covariates(sceptre_object),
                 include_grna_covariates = TRUE
             )
         )
@@ -513,7 +513,7 @@ run_qc_pt_1 <- function(
     frac_cells_removed_2p_grna <- sceptre_object@cell_removal_metrics[[
         "n_cells_rm_zero_twoplus_grnas"
     ]] /
-        nrow(sceptre_object@covariate_data_frame)
+        ncol(sceptre_object@data)
     if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@low_moi) {
         warning(
             "A large percentage of cells (",

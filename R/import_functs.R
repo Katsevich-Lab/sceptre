@@ -873,9 +873,11 @@ init_sceptre_object <- function(
     covariate_data_frame$grna_feature_w_max_expression <- covariate_data_frame$grna_frac_umis_max_feature <- NULL
 
     # set data fields
-    sceptre_object <- set_response_matrix(sceptre_object, response_matrix)
-    sceptre_object <- set_grna_matrix(sceptre_object, grna_matrix)
-    sceptre_object@covariate_data_frame <- covariate_data_frame
+    sceptre_object@data <- new_screen(
+        response_matrix = response_matrix,
+        grna_matrix = grna_matrix,
+        covariate_data_frame = covariate_data_frame
+    )
     sceptre_object@low_moi <- (moi == "low")
     sceptre_object@covariate_names <- sort(colnames(covariate_data_frame))
     sceptre_object@grna_target_data_frame <- grna_target_data_frame |>

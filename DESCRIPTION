@@ -30,6 +30,7 @@ LinkingTo: Rcpp, BH, assorthead (>= 1.4.0)
 SystemRequirements: zlib
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
+    BiocGenerics,
     BiocParallel,
     cowplot,
     crayon,
@@ -40,8 +41,11 @@ Imports:
     Matrix,
     methods,
     Rcpp (>= 1.0.9),
+    S4Vectors,
     scales,
+    SingleCellExperiment,
     stats,
+    SummarizedExperiment,
     purrr,
     parallelly (>= 1.23.0),
     withr

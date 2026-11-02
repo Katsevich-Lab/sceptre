@@ -11,7 +11,7 @@ assign_grnas_to_cells <- function(
     # extract pieces from sceptre_object
     grna_matrix <- get_grna_matrix(sceptre_object)
     grna_assignment_method <- sceptre_object@grna_assignment_method
-    cell_covariate_data_frame <- sceptre_object@covariate_data_frame
+    cell_covariate_data_frame <- get_cell_covariates(sceptre_object)
     grna_assignment_hyperparameters <- sceptre_object@grna_assignment_hyperparameters
 
     # determine the gRNAs to analyze

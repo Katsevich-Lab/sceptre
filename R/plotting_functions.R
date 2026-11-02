@@ -1002,7 +1002,7 @@ plot_covariates <- function(
         response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
         p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
     }
-    covariate_data_frame <- sceptre_object@covariate_data_frame
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
             stats::quantile(v, probs = curr_range)
@@ -1481,7 +1481,7 @@ plot_response_grna_target_pair <- function(
     y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
 
     # get the sequencing depths; filter for cells in use
-    response_n_umis <- sceptre_object@covariate_data_frame$response_n_umis[
+    response_n_umis <- get_cell_covariates(sceptre_object)$response_n_umis[
         cells_in_use
     ]
 
