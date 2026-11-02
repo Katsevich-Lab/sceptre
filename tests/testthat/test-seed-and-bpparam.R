@@ -84,25 +84,76 @@ test_that("set.seed() reproduces an analysis run with the default seed", {
 
 test_that("BPPARAM is checked and selects the back end", {
     expect_error(
-        get_bpparam(FALSE, "auto", BPPARAM = 2),
+        get_bpparam(2),
         "`BPPARAM` should be a `BiocParallelParam` object",
         fixed = TRUE
     )
-    expect_null(get_bpparam(FALSE, "auto", NULL))
-    expect_null(get_bpparam(FALSE, "auto", BiocParallel::SerialParam()))
+    expect_null(get_bpparam(NULL))
+    expect_null(get_bpparam(BiocParallel::SerialParam()))
     snow <- BiocParallel::SnowParam(2)
-    expect_identical(get_bpparam(FALSE, "auto", snow), snow)
+    expect_identical(get_bpparam(snow), snow)
     # parallel = TRUE is an error on Windows (it forks), checked in
     # test-parallel_windows.R
     skip_on_os("windows")
-    expect_error(
-        get_bpparam(TRUE, 1, NULL),
-        "`n_processors` should be set to the string 'auto'",
-        fixed = TRUE
+    expect_warning(
+        expect_error(
+            get_bpparam(BiocParallel::SerialParam(), TRUE, 1),
+            "`n_processors` should be set to the string 'auto'",
+            fixed = TRUE
+        ),
+        "`parallel` and `n_processors` are deprecated"
     )
-    bpparam <- get_bpparam(TRUE, 2, NULL)
+    expect_warning(
+        bpparam <- get_bpparam(BiocParallel::SerialParam(), TRUE, 2),
+        "`parallel` and `n_processors` are deprecated"
+    )
     expect_s4_class(bpparam, "MulticoreParam")
     expect_identical(BiocParallel::bpnworkers(bpparam), 2L)
+    # a BPPARAM with several workers takes precedence
+    expect_warning(
+        expect_identical(get_bpparam(snow, TRUE, 4), snow),
+        "deprecated"
+    )
+})
+
+test_that("the deprecated parallel = TRUE gives the results of BPPARAM", {
+    skip_on_os("windows")
+    object <- refactor_import(
+        refactor_make_inputs(),
+        refactor_case_definitions()[["low_complement_perm"]]
+    ) |>
+        set_analysis_parameters(
+            discovery_pairs = refactor_make_inputs()$discovery_pairs,
+            control_group = "complement",
+            resampling_mechanism = "permutations",
+            seed = 4L
+        ) |>
+        assign_grnas(
+            method = "thresholding",
+            threshold = 40,
+            print_progress = FALSE
+        ) |>
+        run_qc(
+            response_n_umis_range = c(0, 1),
+            response_n_nonzero_range = c(0, 1),
+            n_nonzero_trt_thresh = 7L,
+            n_nonzero_cntrl_thresh = 7L
+        )
+    expect_warning(
+        deprecated <- suppressMessages(run_discovery_analysis(
+            object,
+            print_progress = FALSE,
+            parallel = TRUE,
+            n_processors = 2
+        )),
+        "`parallel` and `n_processors` are deprecated"
+    )
+    current <- suppressMessages(run_discovery_analysis(
+        object,
+        print_progress = FALSE,
+        BPPARAM = BiocParallel::MulticoreParam(2)
+    ))
+    expect_identical(deprecated@discovery_result, current@discovery_result)
 })
 
 test_that("parallel results equal serial results", {

@@ -14,7 +14,7 @@
 
 -   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. `seed = 4` reproduces the results of earlier versions, which used the fixed seed 4.
 
--   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel and gain `BPPARAM`; results do not depend on the back end or number of workers. `parallel = TRUE` uses `BiocParallel::MulticoreParam()`; on Windows, use `BPPARAM = BiocParallel::SnowParam()`.
+-   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel: the new argument `BPPARAM` takes a BiocParallel back end (for example `BiocParallel::MulticoreParam(4)`, or `BiocParallel::SnowParam(4)` on Windows); results do not depend on the back end or number of workers.
 
 -   The `sceptre_object` class is documented (`?"sceptre_object-class"`) and has a validity method.
 
@@ -41,6 +41,8 @@
 -   Importing a response or gRNA matrix with missing, negative, infinite or non-integer entries is an error; previously such counts were accepted (non-integer counts then gave many warnings in the analysis).
 
 ## Deprecated and removed
+
+-   The arguments `parallel` and `n_processors` of `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` are deprecated in favor of `BPPARAM`; `parallel = TRUE` still runs on `n_processors` forked workers, with a warning.
 
 -   The argument `use_ondisc` is deprecated in favor of `backed`, and `read_ondisc_backed_sceptre_object()` and `write_ondisc_backed_sceptre_object()` in favor of `read_sceptre_object()` and `write_sceptre_object()`; `.odm` files written by earlier versions cannot be read, so re-import the data. The `ondisc` package is no longer used.
 

@@ -191,58 +191,73 @@ resolve_seed <- function(seed) {
 
 
 # Return the BiocParallel backend for an analysis function, or NULL to run
-# serially. A user-supplied `BPPARAM` takes precedence; otherwise
-# `parallel = TRUE` forks `n_processors` workers, as in earlier versions.
-get_bpparam <- function(parallel, n_processors, BPPARAM) {
-    if (!is.null(BPPARAM)) {
-        if (!methods::is(BPPARAM, "BiocParallelParam")) {
+# serially. `parallel` and `n_processors`, the arguments of 0.99.1 and earlier,
+# are deprecated: `parallel = TRUE` forks `n_processors` workers unless
+# `BPPARAM` itself has several workers.
+get_bpparam <- function(BPPARAM, parallel = NULL, n_processors = NULL) {
+    if (!is.null(parallel) || !is.null(n_processors)) {
+        warning(
+            "The arguments `parallel` and `n_processors` are deprecated; use ",
+            "`BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)`.",
+            call. = FALSE
+        )
+    }
+    if (is.null(BPPARAM)) {
+        BPPARAM <- BiocParallel::SerialParam()
+    }
+    if (!methods::is(BPPARAM, "BiocParallelParam")) {
+        stop(
+            "`BPPARAM` should be a `BiocParallelParam` object, such as ",
+            "`BiocParallel::MulticoreParam()` or ",
+            "`BiocParallel::SnowParam()`."
+        )
+    }
+    if (!is.null(parallel)) {
+        check_parallel_supported(parallel)
+    }
+    if (isTRUE(parallel) && BiocParallel::bpnworkers(BPPARAM) < 2L) {
+        if (is.null(n_processors)) {
+            n_processors <- "auto"
+        }
+        if (
+            !(identical(n_processors, "auto") ||
+                (is.numeric(n_processors) && n_processors >= 2))
+        ) {
             stop(
-                "`BPPARAM` should be a `BiocParallelParam` object, such as ",
-                "`BiocParallel::MulticoreParam()` or ",
-                "`BiocParallel::SnowParam()`."
+                "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
             )
         }
-        if (BiocParallel::bpnworkers(BPPARAM) < 2L) {
-            return(NULL)
+        if (identical(n_processors, "auto")) {
+            # Read the user's preferred fraction (default 0.5 = half cores), then
+            # neutralize that option on the parallelly call so parallelly's own
+            # option-aware default does not apply the same fraction a second
+            # time.
+            # parallelly's `fraction` arg defaults to getOption(
+            # "parallelly.availableCores.fraction", 1), so omitting it would
+            # silently double-scale when the user has set that option. The arg
+            # itself was only added in 1.47.0, so passing `fraction = 1` directly
+            # would break parallelly < 1.47.0 -- `withr::with_options`
+            # neutralizes the option for the call on any parallelly >= 1.23.0.
+            frac <- getOption("parallelly.availableCores.fraction", 0.5)
+            n_processors <- max(
+                1L,
+                floor(
+                    withr::with_options(
+                        list(parallelly.availableCores.fraction = 1),
+                        parallelly::availableCores(logical = FALSE)
+                    ) *
+                        frac
+                )
+            )
         }
-        return(BPPARAM)
+        BPPARAM <- BiocParallel::MulticoreParam(
+            workers = as.integer(n_processors)
+        )
     }
-    check_parallel_supported(parallel)
-    if (!parallel) {
+    if (BiocParallel::bpnworkers(BPPARAM) < 2L) {
         return(NULL)
     }
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
-    if (identical(n_processors, "auto")) {
-        # Read the user's preferred fraction (default 0.5 = half cores), then
-        # neutralize that option on the parallelly call so parallelly's own
-        # option-aware default does not apply the same fraction a second
-        # time.
-        # parallelly's `fraction` arg defaults to getOption(
-        # "parallelly.availableCores.fraction", 1), so omitting it would
-        # silently double-scale when the user has set that option. The arg
-        # itself was only added in 1.47.0, so passing `fraction = 1` directly
-        # would break parallelly < 1.47.0 -- `withr::with_options`
-        # neutralizes the option for the call on any parallelly >= 1.23.0.
-        frac <- getOption("parallelly.availableCores.fraction", 0.5)
-        n_processors <- max(
-            1L,
-            floor(
-                withr::with_options(
-                    list(parallelly.availableCores.fraction = 1),
-                    parallelly::availableCores(logical = FALSE)
-                ) *
-                    frac
-            )
-        )
-    }
-    BiocParallel::MulticoreParam(workers = as.integer(n_processors))
+    BPPARAM
 }
 
 

@@ -463,8 +463,8 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
     }
     if (parallel && identical(os_type, "windows")) {
         stop(
-            "`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. ",
-            "Please set `parallel = FALSE`, or pass a back end that does not fork, such as `BPPARAM = BiocParallel::SnowParam()`.",
+            "`parallel = TRUE` is not supported on Windows because it forks processes. ",
+            "Use `BPPARAM = BiocParallel::SnowParam()` instead.",
             call. = FALSE
         )
     }
@@ -475,8 +475,7 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 check_assign_grna_inputs <- function(
     sceptre_object,
     assignment_method,
-    hyperparameters,
-    n_processors
+    hyperparameters
 ) {
     if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
         stop(
@@ -598,15 +597,6 @@ check_assign_grna_inputs <- function(
         }
     }
 
-    # 3. check n_processors argument
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
 
     return(NULL)
 }
@@ -661,7 +651,6 @@ check_run_qc_inputs <- function(
 check_calibration_check_inputs <- function(
     sceptre_object,
     n_calibration_pairs,
-    n_processors,
     calibration_group_size
 ) {
     control_group_complement <- sceptre_object@control_group_complement
@@ -696,15 +685,6 @@ check_calibration_check_inputs <- function(
             "). Set `calibration_group_size` to a smaller value."
         )
     }
-    # 3. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
     return(NULL)
 }
 
@@ -716,8 +696,7 @@ check_discovery_analysis_inputs <- function(
     calibration_check_run,
     pc_analysis,
     calibration_result,
-    n_ok_pairs,
-    n_processors
+    n_ok_pairs
 ) {
     # 1. check that positive control pairs are available
     if (nrow(response_grna_group_pairs) == 0L) {
@@ -759,15 +738,6 @@ check_discovery_analysis_inputs <- function(
         stop("Zero pairs pass pairwise QC. Cannot run analysis.")
     }
 
-    # 5. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
 
     return(NULL)
 }

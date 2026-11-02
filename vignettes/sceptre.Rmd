@@ -730,9 +730,8 @@ and `run_discovery_analysis()` can run in parallel via
 [BiocParallel](https://bioconductor.org/packages/BiocParallel). To do so, pass
 a BiocParallel back end as the argument `BPPARAM`; for example,
 `BiocParallel::MulticoreParam()` (Linux and macOS) or
-`BiocParallel::SnowParam()` (all platforms, including Windows). Alternatively,
-`parallel = TRUE` (Linux and macOS) runs the function with
-`BiocParallel::MulticoreParam(n_processors)`. The results do not depend on the
+`BiocParallel::SnowParam()` (all platforms, including Windows); the default,
+`BiocParallel::SerialParam()`, runs serially. The results do not depend on the
 back end or the number of workers: below, the power check run on two workers
 gives the same results as the serial run above with the same seed. (Windows
 cannot fork processes, so there the example runs serially.)

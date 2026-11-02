@@ -552,23 +552,20 @@ test_that("run_calibration_check does not change a later discovery analysis unde
             ),
             resampling_approximation = "no_approximation"
         ) |>
-        assign_grnas(parallel = FALSE) |>
+        assign_grnas() |>
         run_qc())
     B3 <- sceptre_object@B3
 
     direct <- suppressMessages(run_discovery_analysis(
-        sceptre_object,
-        parallel = FALSE
+        sceptre_object
     ))
     calibrated <- suppressMessages(run_calibration_check(
         sceptre_object,
-        n_calibration_pairs = 2L,
-        parallel = FALSE
+        n_calibration_pairs = 2L
     ))
     expect_identical(calibrated@B3, B3)
     after_calibration <- suppressMessages(run_discovery_analysis(
-        calibrated,
-        parallel = FALSE
+        calibrated
     ))
     expect_identical(
         get_result(after_calibration, "run_discovery_analysis"),

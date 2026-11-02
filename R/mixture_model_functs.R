@@ -11,7 +11,7 @@ assign_grnas_to_cells_mixture <- function(
 ) {
     if (!parallel) {
         message(crayon::red(
-            "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
+            "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
     }
     # 0. get random starting guesses for pi and g_pert
