@@ -63,6 +63,10 @@ set, \code{FALSE} if it is the non-targeting cells}
 
 \item{\code{multiple_testing_method}}{the multiple testing correction method}
 
+\item{\code{seed}}{the seed of the random draws of the analysis}
+
+\item{\code{rng_protocol}}{the protocol of the random draws of the analysis}
+
 \item{\code{n_nonzero_trt_thresh}}{the minimum number of treatment cells with
 nonzero expression of a pair passing pairwise quality control}
 

@@ -21,7 +21,9 @@ a \code{sceptre_object} of the current class definition
 \code{sceptre} (0.99.1 or earlier, which held the response matrix, gRNA matrix
 and cell covariates in separate slots) to the current class definition,
 which holds them in a \code{SingleCellExperiment}. The analysis state and results
-are carried over unchanged. Current objects are returned unchanged.
+are carried over unchanged; an analysis continued on the updated object
+draws its random numbers as the earlier version did (seed 4). Current
+objects are returned unchanged.
 }
 \examples{
 data(lowmoi_example_data)

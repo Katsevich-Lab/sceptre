@@ -57,6 +57,8 @@ NULL
 #' @slot grna_integration_strategy the gRNA integration strategy
 #' @slot multiple_testing_alpha the level of the multiple testing correction
 #' @slot multiple_testing_method the multiple testing correction method
+#' @slot seed the seed of the random draws of the analysis
+#' @slot rng_protocol the protocol of the random draws of the analysis
 #' @slot n_nonzero_trt_thresh the minimum number of treatment cells with
 #' nonzero expression of a pair passing pairwise quality control
 #' @slot n_nonzero_cntrl_thresh the minimum number of control cells with
@@ -319,7 +321,9 @@ new_screen <- function(
 #' `sceptre` (0.99.1 or earlier, which held the response matrix, gRNA matrix
 #' and cell covariates in separate slots) to the current class definition,
 #' which holds them in a `SingleCellExperiment`. The analysis state and results
-#' are carried over unchanged. Current objects are returned unchanged.
+#' are carried over unchanged; an analysis continued on the updated object
+#' draws its random numbers as the earlier version did (seed 4). Current
+#' objects are returned unchanged.
 #'
 #' @param object a `sceptre_object`
 #' @param ... additional arguments (ignored)
@@ -389,5 +393,10 @@ update_sceptre_object <- function(object) {
         grna_matrix = grna_matrix[[1]],
         covariate_data_frame = old_slots$covariate_data_frame
     )
+    # 0.99.1 and earlier drew their random numbers with the fixed seed 4
+    if (isTRUE(updated@functs_called["set_analysis_parameters"])) {
+        updated@seed <- 4L
+        updated@rng_protocol <- "mt19937-1"
+    }
     return(updated)
 }

@@ -6,6 +6,8 @@ old_layout_object <- function(sceptre_object) {
     attr(old, "grna_matrix") <- list(get_grna_matrix(sceptre_object))
     attr(old, "covariate_data_frame") <- get_cell_covariates(sceptre_object)
     attr(old, "data") <- NULL
+    attr(old, "seed") <- NULL
+    attr(old, "rng_protocol") <- NULL
     old
 }
 
@@ -35,6 +37,8 @@ test_that("updateObject() converts an object of the 0.99.1 layout", {
     )
     expect_identical(updated@formula_object, sceptre_object@formula_object)
     expect_identical(updated@functs_called, sceptre_object@functs_called)
+    expect_identical(updated@seed, 4L)
+    expect_identical(updated@rng_protocol, "mt19937-1")
     expect_identical(updateObject(sceptre_object), sceptre_object)
 })
 
