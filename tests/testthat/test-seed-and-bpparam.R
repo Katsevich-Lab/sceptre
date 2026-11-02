@@ -139,3 +139,37 @@ test_that("parallel results equal serial results", {
         }
     }
 })
+
+test_that("results on SnowParam workers equal serial results", {
+    # SnowParam is the parallel back end on Windows; its workers are fresh R
+    # sessions that load the installed package
+    skip_on_cran()
+    object <- refactor_import(
+        refactor_make_inputs(),
+        refactor_case_definitions()[["low_complement_perm"]]
+    ) |>
+        set_analysis_parameters(
+            discovery_pairs = refactor_make_inputs()$discovery_pairs,
+            control_group = "complement",
+            resampling_mechanism = "permutations",
+            seed = 4L
+        )
+    serial <- suppressWarnings(suppressMessages(
+        seed_test_analysis(object)
+    ))
+    snow <- suppressWarnings(suppressMessages(seed_test_analysis(
+        object,
+        BPPARAM = BiocParallel::SnowParam(2)
+    )))
+    for (slot_name in c(
+        "negative_control_pairs",
+        "calibration_result",
+        "discovery_result"
+    )) {
+        expect_identical(
+            methods::slot(snow, slot_name),
+            methods::slot(serial, slot_name),
+            info = slot_name
+        )
+    }
+})
