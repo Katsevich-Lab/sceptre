@@ -14,7 +14,8 @@
 #' rows and cells in columns. The matrix should be of type `"matrix"`,
 #' `"dgCMatrix"`, `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix
 #' should give the response IDs. The column names, when supplied, should give
-#' the cell IDs.
+#' the cell IDs. The entries must be integer counts; a matrix with non-integer
+#' entries (for example, normalized expression values) is an error.
 #' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells
 #' in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`,
 #' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the

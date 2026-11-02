@@ -323,3 +323,24 @@ test_that("Cell Ranger import keeps a user's batch column", {
     expect_identical(as.character(covariates$batch), user_batch)
     expect_false("cellranger_directory" %in% colnames(covariates))
 })
+
+
+test_that("import_data rejects non-integer response counts", {
+    data("lowmoi_example_data")
+    for (response_matrix in list(
+        lowmoi_example_data$response_matrix * 1.5,
+        as.matrix(lowmoi_example_data$response_matrix) * 1.5
+    )) {
+        expect_error(
+            import_data(
+                response_matrix = response_matrix,
+                grna_matrix = lowmoi_example_data$grna_matrix,
+                grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+                extra_covariates = lowmoi_example_data$extra_covariates,
+                moi = "low"
+            ),
+            regexp = "The `response_matrix` must contain integer counts",
+            fixed = TRUE
+        )
+    }
+})

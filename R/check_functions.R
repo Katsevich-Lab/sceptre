@@ -92,6 +92,25 @@ check_import_data_inputs <- function(
         )
     )
 
+    # 7b. check that the response matrix holds integer counts
+    if (!methods::is(response_matrix, "odm") && !is.integer(response_matrix)) {
+        response_values <- if (methods::is(response_matrix, "sparseMatrix")) {
+            response_matrix@x
+        } else {
+            as.vector(response_matrix)
+        }
+        non_integer <- which(response_values != round(response_values))
+        if (length(non_integer) >= 1L) {
+            stop(
+                "The `response_matrix` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
+                length(non_integer),
+                " of its entries are not integers, for example ",
+                format(response_values[non_integer[1L]]),
+                "."
+            )
+        }
+    }
+
     # 8. check for agreement in number of cells
     check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
     if (nrow(extra_covariates) >= 1L) {
