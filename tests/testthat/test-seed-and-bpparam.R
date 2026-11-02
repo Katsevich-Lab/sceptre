@@ -99,9 +99,9 @@ test_that("BPPARAM is checked and selects the back end", {
         fixed = TRUE
     )
     skip_on_os("windows")
-    bpparam <- get_bpparam(TRUE, 3, NULL)
+    bpparam <- get_bpparam(TRUE, 2, NULL)
     expect_s4_class(bpparam, "MulticoreParam")
-    expect_identical(BiocParallel::bpnworkers(bpparam), 3L)
+    expect_identical(BiocParallel::bpnworkers(bpparam), 2L)
 })
 
 test_that("parallel results equal serial results", {
