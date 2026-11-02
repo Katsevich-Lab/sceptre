@@ -358,3 +358,30 @@ test_that("import_data rejects non-integer response counts", {
         )
     }
 })
+
+
+test_that("import_data rejects non-integer gRNA counts", {
+    data("lowmoi_example_data")
+    expect_error(
+        import_data(
+            response_matrix = lowmoi_example_data$response_matrix,
+            grna_matrix = lowmoi_example_data$grna_matrix * 1.5,
+            grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+            extra_covariates = lowmoi_example_data$extra_covariates,
+            moi = "low"
+        ),
+        regexp = "The `grna_matrix` must contain integer counts",
+        fixed = TRUE
+    )
+    # 0/1 gRNA matrices are accepted
+    expect_s4_class(
+        suppressMessages(import_data(
+            response_matrix = lowmoi_example_data$response_matrix,
+            grna_matrix = (lowmoi_example_data$grna_matrix >= 1) * 1,
+            grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+            extra_covariates = lowmoi_example_data$extra_covariates,
+            moi = "low"
+        )),
+        "sceptre_object"
+    )
+})

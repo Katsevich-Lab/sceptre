@@ -44,7 +44,7 @@ test_that("Cell Ranger import sorts entries and maps interleaved feature types",
             "4 2 4",
             "3 1 2",
             "1 1 5",
-            "2 2 1.5",
+            "2 2 9",
             "4 1 6",
             "3 2 7"
         )
@@ -66,7 +66,7 @@ test_that("Cell Ranger import sorts entries and maps interleaved feature types",
     expect_identical(response@x, c(5, 0, 2, 7, 3))
     expect_identical(guides@p, c(0L, 2L, 4L))
     expect_identical(guides@j, c(0L, 1L, 0L, 1L))
-    expect_identical(guides@x, c(8, 1.5, 6, 4))
+    expect_identical(guides@x, c(8, 9, 6, 4))
 
     # The same coordinate in a different directory is a different cell.
     batches <- suppressMessages(import_data_from_cellranger(
@@ -92,7 +92,7 @@ test_that("Parse import sorts entries and reads cells from rows", {
         "2 2 4"
     )
     writeLines(c(header, "2 2 7", "1 1 5", "2 1 0", "1 2 2"), gene)
-    writeLines(c(header, "2 1 1.5", "1 2 6", "2 2 4", "1 1 8"), guide)
+    writeLines(c(header, "2 1 9", "1 2 6", "2 2 4", "1 1 8"), guide)
     writeLines(
         c("feature_id,feature_name,genome", "gene-z,Z,human", "gene-a,A,human"),
         gene_ids
@@ -118,7 +118,7 @@ test_that("Parse import sorts entries and reads cells from rows", {
     expect_identical(response@j, c(0L, 1L, 0L, 1L))
     expect_identical(response@x, c(5, 0, 2, 7))
     expect_identical(rownames(response), c("gene-z", "gene-a"))
-    expect_identical(get_grna_matrix(object)@x, c(8, 1.5, 6, 4))
+    expect_identical(get_grna_matrix(object)@x, c(8, 9, 6, 4))
 })
 
 test_that("import rejects repeated entries and malformed matrix files", {

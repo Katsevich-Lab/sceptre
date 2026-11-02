@@ -19,7 +19,9 @@
 #' @param grna_matrix a matrix of gRNA UMI counts, with gRNAs in rows and cells
 #' in columns. The matrix should be of type `"matrix"`, `"dgCMatrix"`,
 #' `"dgRMatrix"`, or `"dgTMatrix"`. The row names of the matrix should give the
-#' gRNA IDs. The column names, when supplied, should give the cell IDs.
+#' gRNA IDs. The column names, when supplied, should give the cell IDs. The
+#' entries must be integer counts; a matrix with non-integer entries is an
+#' error.
 #' @param grna_target_data_frame a data frame containing columns `grna_id` and
 #' `grna_target` mapping each individual gRNA to its target. Non-targeting gRNAs
 #' should be assigned a label of "non-targeting". Optionally,

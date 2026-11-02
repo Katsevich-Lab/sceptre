@@ -92,24 +92,37 @@ check_import_data_inputs <- function(
         )
     )
 
-    # 7b. check that the response matrix holds integer counts
-    if (!methods::is(response_matrix, "odm") && !is.integer(response_matrix)) {
-        response_values <- if (methods::is(response_matrix, "sparseMatrix")) {
-            response_matrix@x
-        } else {
-            as.vector(response_matrix)
+    # 7b. check that the response and gRNA matrices hold integer counts
+    # (logical gRNA matrices pass)
+    check_integer_counts <- function(input_matrix, input_matrix_name) {
+        if (
+            methods::is(input_matrix, "odm") ||
+                methods::is(input_matrix, "lsparseMatrix") ||
+                is.integer(input_matrix) ||
+                is.logical(input_matrix)
+        ) {
+            return(invisible())
         }
-        non_integer <- which(response_values != round(response_values))
+        values <- if (methods::is(input_matrix, "sparseMatrix")) {
+            input_matrix@x
+        } else {
+            as.vector(input_matrix)
+        }
+        non_integer <- which(values != round(values))
         if (length(non_integer) >= 1L) {
             stop(
-                "The `response_matrix` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
+                "The `",
+                input_matrix_name,
+                "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
                 length(non_integer),
                 " of its entries are not integers, for example ",
-                format(response_values[non_integer[1L]]),
+                format(values[non_integer[1L]]),
                 "."
             )
         }
     }
+    check_integer_counts(response_matrix, "response_matrix")
+    check_integer_counts(grna_matrix, "grna_matrix")
 
     # 8. check for agreement in number of cells
     check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
