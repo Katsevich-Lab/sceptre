@@ -96,10 +96,16 @@ new_screen <- function(
         assays = list(counts = response_matrix)
     )
     if (!is.null(covariate_data_frame)) {
-        SummarizedExperiment::colData(screen) <- S4Vectors::DataFrame(
+        covariates <- S4Vectors::DataFrame(
             covariate_data_frame,
             check.names = FALSE
         )
+        # DataFrame() drops row names stored as integers (for example, those
+        # of a subset of a data frame); keep them, as character row names
+        if (.row_names_info(covariate_data_frame) > 0L) {
+            rownames(covariates) <- rownames(covariate_data_frame)
+        }
+        SummarizedExperiment::colData(screen) <- covariates
     }
     SingleCellExperiment::altExp(screen, "gRNA", withDimnames = FALSE) <-
         SummarizedExperiment::SummarizedExperiment(
@@ -150,7 +156,9 @@ update_sceptre_object <- function(object) {
         return(object)
     }
     # 0.99.1 and earlier: the matrices in one-element lists, the covariates in
-    # their own slot
+    # their own slot. Some slots may hold data.tables, which validObject()
+    # recognizes as data frames once data.table is loaded.
+    requireNamespace("data.table", quietly = TRUE)
     response_matrix <- old_slots$response_matrix
     grna_matrix <- old_slots$grna_matrix
     if (
