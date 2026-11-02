@@ -44,7 +44,11 @@ read_ondisc_backed_sceptre_object <- function(
     response_odm_file_fp = NULL,
     grna_odm_file_fp = NULL
 ) {
-    .Deprecated("read_sceptre_object")
+    warning(
+        "`read_ondisc_backed_sceptre_object()` is deprecated; use ",
+        "`read_sceptre_object()` instead.",
+        call. = FALSE
+    )
     if (!is.null(response_odm_file_fp) || !is.null(grna_odm_file_fp)) {
         warning(
             "`response_odm_file_fp` and `grna_odm_file_fp` are ignored; ",
@@ -76,7 +80,11 @@ write_ondisc_backed_sceptre_object <- function(
     sceptre_object,
     directory_to_write
 ) {
-    .Deprecated("write_sceptre_object")
+    warning(
+        "`write_ondisc_backed_sceptre_object()` is deprecated; use ",
+        "`write_sceptre_object()` instead.",
+        call. = FALSE
+    )
     write_sceptre_object(sceptre_object, directory_to_write)
 }
 

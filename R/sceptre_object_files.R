@@ -255,14 +255,14 @@ read_screen <- function(file, backed = FALSE) {
 
 
 check_screen_format <- function(stamp, file) {
-    format <- suppressWarnings(as.integer(sub(
-        "^\\{\"format\":([0-9]+).*$",
-        "\\1",
-        as.vector(stamp)
-    )))
-    if (length(format) != 1L || is.na(format)) {
+    stamp <- as.vector(stamp)
+    pattern <- "^\\{\"format\":([0-9]+)[,}].*$"
+    if (
+        !is.character(stamp) || length(stamp) != 1L || !grepl(pattern, stamp)
+    ) {
         stop(file, " is not a screen.h5mu file written by sceptre.")
     }
+    format <- as.integer(sub(pattern, "\\1", stamp))
     if (format > 3L) {
         stop(
             file,
