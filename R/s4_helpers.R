@@ -329,6 +329,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
 #' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
+#' @aliases plot,sceptre_object-method
 #' @export
 #' @examples
 #'

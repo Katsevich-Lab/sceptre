@@ -2,6 +2,7 @@
 % Please edit documentation in R/s4_helpers.R
 \name{plot,sceptre_object,ANY-method}
 \alias{plot,sceptre_object,ANY-method}
+\alias{plot,sceptre_object-method}
 \title{Plot}
 \usage{
 \S4method{plot}{sceptre_object,ANY}(x, y, ...)
