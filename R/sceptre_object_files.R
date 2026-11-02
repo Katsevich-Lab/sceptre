@@ -73,7 +73,7 @@ read_sceptre_object <- function(directory, backed = FALSE) {
     if (!(isTRUE(backed) || isFALSE(backed))) {
         stop("`backed` must be TRUE or FALSE.")
     }
-    directory <- prepare_ondisc_file_path(directory, "`directory`")
+    directory <- prepare_file_path(directory, "`directory`")
     files <- file.path(directory, c("sceptre_object.rds", "screen.h5mu"))
     if (!all(file.exists(files))) {
         stop(

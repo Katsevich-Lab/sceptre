@@ -225,3 +225,26 @@ test_that("screen.h5mu requires unique cell IDs", {
         "cell IDs must be unique"
     )
 })
+
+test_that("pairwise QC handles an analysis without pairs", {
+    inputs <- backed_test_inputs()
+    for (backed in c(FALSE, TRUE)) {
+        sceptre_object <- do.call(
+            import_data,
+            c(
+                inputs,
+                backed = backed,
+                directory_to_write = file.path(tempdir(), "backed no pairs")
+            )
+        ) |>
+            set_analysis_parameters(resampling_mechanism = "permutations") |>
+            assign_grnas() |>
+            run_qc() |>
+            suppressMessages()
+        expect_identical(nrow(sceptre_object@discovery_pairs_with_info), 0L)
+        expect_length(
+            sceptre_object@n_nonzero_tot_vector,
+            nrow(inputs$response_matrix)
+        )
+    }
+})

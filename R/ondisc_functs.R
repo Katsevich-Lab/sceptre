@@ -52,7 +52,7 @@ read_ondisc_backed_sceptre_object <- function(
             call. = FALSE
         )
     }
-    sceptre_object_fp <- prepare_ondisc_file_path(
+    sceptre_object_fp <- prepare_file_path(
         sceptre_object_fp,
         "`sceptre_object_fp`"
     )

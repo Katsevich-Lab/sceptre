@@ -959,7 +959,7 @@ prepare_directory_to_write <- function(directory_to_write) {
 }
 
 
-prepare_ondisc_file_path <- function(file_path, arg_name) {
+prepare_file_path <- function(file_path, arg_name) {
     if (is.null(file_path)) {
         stop(arg_name, " must be supplied.")
     }

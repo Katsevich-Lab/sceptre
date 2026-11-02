@@ -36,11 +36,13 @@ compute_pairwise_qc_information <- function(sceptre_object) {
     # count the nonzero cells; disk-backed counts are read in blocks of
     # responses, each with the pairs of its responses
     blocks <- row_blocks(response_matrix, function(block, offset) {
-        in_block <- if (is_backed(response_matrix)) {
-            to_analyze_response_idxs > offset &
-                to_analyze_response_idxs <= offset + nrow(block)
-        } else {
-            TRUE
+        response_idxs <- to_analyze_response_idxs
+        grna_idxs <- to_analyze_grna_idxs
+        if (is_backed(response_matrix)) {
+            in_block <- response_idxs > offset &
+                response_idxs <= offset + nrow(block)
+            response_idxs <- response_idxs[in_block] - as.integer(offset)
+            grna_idxs <- grna_idxs[in_block]
         }
         block_csr <- compressed_sparse_components(block)
         compute_nt_nonzero_matrix_and_n_ok_pairs_v3(
@@ -55,9 +57,8 @@ compute_pairwise_qc_information <- function(sceptre_object) {
             } else {
                 integer()
             },
-            to_analyze_response_idxs = to_analyze_response_idxs[in_block] -
-                as.integer(offset),
-            to_analyze_grna_idxs = to_analyze_grna_idxs[in_block],
+            to_analyze_response_idxs = response_idxs,
+            to_analyze_grna_idxs = grna_idxs,
             control_group_complement = control_group_complement,
             cells_in_use = cells_in_use
         )
