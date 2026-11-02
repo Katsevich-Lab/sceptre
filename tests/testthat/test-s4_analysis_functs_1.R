@@ -59,7 +59,6 @@ test_that("import_data", {
         "multiple_testing_alpha",
         "multiple_testing_method",
         "seed",
-        "rng_protocol",
         "cell_removal_metrics",
         "cellwise_qc_thresholds",
         "mitochondrial_gene",

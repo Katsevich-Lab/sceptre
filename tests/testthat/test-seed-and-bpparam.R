@@ -36,10 +36,9 @@ test_that("the seed is checked, recorded and printed", {
     }
     object <- set_analysis_parameters(object, seed = 4)
     expect_identical(object@seed, 4L)
-    expect_identical(object@rng_protocol, "mt19937-1")
     expect_output(
         print(object),
-        "Seed: 4 (RNG protocol mt19937-1)",
+        "Seed: 4",
         fixed = TRUE
     )
 })

@@ -225,12 +225,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
         if (length(x@seed) == 0L) {
             "not specified"
         } else {
-            paste0(
-                crayon::blue(x@seed),
-                " (RNG protocol ",
-                crayon::blue(x@rng_protocol),
-                ")"
-            )
+            crayon::blue(x@seed)
         }
     ))
 

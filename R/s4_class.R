@@ -58,7 +58,6 @@ NULL
 #' @slot multiple_testing_alpha the level of the multiple testing correction
 #' @slot multiple_testing_method the multiple testing correction method
 #' @slot seed the seed of the random draws of the analysis
-#' @slot rng_protocol the protocol of the random draws of the analysis
 #' @slot n_nonzero_trt_thresh the minimum number of treatment cells with
 #' nonzero expression of a pair passing pairwise quality control
 #' @slot n_nonzero_cntrl_thresh the minimum number of control cells with
@@ -147,7 +146,6 @@ setClass(
         multiple_testing_alpha = "numeric",
         multiple_testing_method = "character",
         seed = "integer",
-        rng_protocol = "character",
         cell_removal_metrics = "integer",
         cellwise_qc_thresholds = "list",
 
@@ -385,7 +383,6 @@ update_sceptre_object <- function(object) {
     # 0.99.1 and earlier drew their random numbers with the fixed seed 4
     if (isTRUE(updated@functs_called["set_analysis_parameters"])) {
         updated@seed <- 4L
-        updated@rng_protocol <- "mt19937-1"
     }
     return(updated)
 }

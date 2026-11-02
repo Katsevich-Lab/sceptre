@@ -202,7 +202,6 @@ set_analysis_parameters <- function(
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
     sceptre_object@covariate_matrix <- covariate_matrix
     sceptre_object@seed <- seed
-    sceptre_object@rng_protocol <- "mt19937-1"
 
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
