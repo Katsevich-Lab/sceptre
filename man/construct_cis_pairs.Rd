@@ -24,7 +24,11 @@ included in the \emph{cis} discovery set.}
 
 \item{response_position_data_frame}{(optional) a data frame with columns
 \code{response_id}, \code{chr}, and \code{position} giving the genomic coordinate of each
-response; by default, the packaged GRCh38 gene position data frame is used.}
+response, or a \code{GRanges} object named by response ID; by default, the
+packaged GRCh38 gene position data frame is used. The position of a range
+wider than one base (for example, a gene) is its transcription start site,
+that is, its 5' end given its strand (its start for unstranded ranges), as
+computed by \code{GenomicRanges::resize(x, width = 1, fix = "start")}.}
 }
 \value{
 a data frame with columns \code{grna_target} and \code{response_id} containing
@@ -38,7 +42,7 @@ close physical proximity to one another. \code{construct_cis_pairs()} is a usefu
 pair constructor function for screens that aim to map noncoding regulatory
 elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 \emph{cis}. \code{construct_cis_pairs()} assumes that the columns \code{chr}, \code{start}, and
-\code{stop} are present in the \code{grna_target_data_frame}, giving the chromosome,
+\code{end} are present in the \code{grna_target_data_frame}, giving the chromosome,
 start position, and end position, respectively, of the region that each gRNA
 targets. \code{construct_cis_pairs()} takes several arguments: \code{sceptre_object}
 (required), \code{distance_threshold} (optional), \code{positive_control_pairs}

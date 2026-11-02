@@ -34,6 +34,7 @@ Imports:
     crayon,
     data.table,
     dplyr,
+    GenomicRanges,
     ggplot2,
     Matrix,
     methods,

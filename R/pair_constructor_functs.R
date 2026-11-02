@@ -7,7 +7,7 @@
 #' pair constructor function for screens that aim to map noncoding regulatory
 #' elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 #' *cis*. `construct_cis_pairs()` assumes that the columns `chr`, `start`, and
-#' `stop` are present in the `grna_target_data_frame`, giving the chromosome,
+#' `end` are present in the `grna_target_data_frame`, giving the chromosome,
 #' start position, and end position, respectively, of the region that each gRNA
 #' targets. `construct_cis_pairs()` takes several arguments: `sceptre_object`
 #' (required), `distance_threshold` (optional), `positive_control_pairs`
@@ -33,7 +33,11 @@
 #' supplied, the positive control targets are excluded from the *cis* pairs.
 #' @param response_position_data_frame (optional) a data frame with columns
 #' `response_id`, `chr`, and `position` giving the genomic coordinate of each
-#' response; by default, the packaged GRCh38 gene position data frame is used.
+#' response, or a `GRanges` object named by response ID; by default, the
+#' packaged GRCh38 gene position data frame is used. The position of a range
+#' wider than one base (for example, a gene) is its transcription start site,
+#' that is, its 5' end given its strand (its start for unstranded ranges), as
+#' computed by `GenomicRanges::resize(x, width = 1, fix = "start")`.
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing
 #' the *cis* pairs
@@ -68,6 +72,11 @@ construct_cis_pairs <- function(
             envir = environment()
         )
         response_position_data_frame <- gene_position_data_frame_grch38
+    }
+    if (methods::is(response_position_data_frame, "GRanges")) {
+        response_position_data_frame <- response_positions_from_granges(
+            response_position_data_frame
+        )
     }
     if (
         !all(
@@ -161,6 +170,23 @@ construct_cis_pairs <- function(
         dplyr::select(grna_target, response_id)
 
     return(out_pairs)
+}
+
+
+# convert a GRanges of responses, named by response ID, to a response position
+# data frame; the position of each response is the 5' end of its range
+response_positions_from_granges <- function(response_ranges) {
+    if (is.null(names(response_ranges))) {
+        stop(
+            "A `GRanges` `response_position_data_frame` must be named by response ID."
+        )
+    }
+    tss <- GenomicRanges::resize(response_ranges, width = 1L, fix = "start")
+    data.frame(
+        response_id = names(tss),
+        chr = as.character(GenomicRanges::seqnames(tss)),
+        position = GenomicRanges::start(tss)
+    )
 }
 
 
