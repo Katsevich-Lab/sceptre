@@ -12,7 +12,7 @@
 
 -   With `backed = TRUE`, `import_data_from_cellranger()` holds the matrix of one directory in memory at a time and writes the response counts to `screen.h5mu` through temporary files in `directory_to_write`, so the whole screen is never in memory at once.
 
--   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. `seed = 4` reproduces the results of earlier versions, which used the fixed seed 4.
+-   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. In sceptre 0.99.2, `seed = 4` reproduces the results of 0.99.1 and earlier, which used the fixed seed 4.
 
 -   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel: the new argument `BPPARAM` takes a BiocParallel back end (for example `BiocParallel::MulticoreParam(4)`, or `BiocParallel::SnowParam(4)` on Windows); results do not depend on the back end or number of workers.
 

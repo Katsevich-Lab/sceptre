@@ -44,8 +44,8 @@
 #' conditional resampling draws. The default, `NULL`, draws the seed from R's
 #' random number generator, so that `set.seed()` called beforehand makes the
 #' analysis reproducible. The seed is recorded in the `sceptre_object`, and
-#' `print()` shows it. The results of earlier versions of sceptre are
-#' reproduced with `seed = 4`.
+#' `print()` shows it. In sceptre 0.99.2, `seed = 4` reproduces the results
+#' of 0.99.1 and earlier, which used the fixed seed 4.
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set

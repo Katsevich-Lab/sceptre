@@ -308,9 +308,9 @@ new_screen <- function(
 #' `sceptre` (0.99.1 or earlier, which held the response matrix, gRNA matrix
 #' and cell covariates in separate slots) to the current class definition,
 #' which holds them in a `SingleCellExperiment`. The analysis state and results
-#' are carried over unchanged; an analysis continued on the updated object
-#' draws its random numbers as the earlier version did (seed 4). Current
-#' objects are returned unchanged.
+#' are carried over unchanged; in sceptre 0.99.2, an analysis continued on the
+#' updated object draws its random numbers as 0.99.1 and earlier did (the
+#' fixed seed 4). Current objects are returned unchanged.
 #'
 #' @param object a `sceptre_object`
 #' @param ... additional arguments (ignored)

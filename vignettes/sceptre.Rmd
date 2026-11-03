@@ -721,8 +721,8 @@ identical(
 
 Alternatively, the seed can be passed to `set_analysis_parameters()` directly.
 The seed is recorded in the `sceptre_object`, and `print()` displays it among
-the analysis parameters. Earlier versions of `sceptre` used the fixed seed 4;
-`seed = 4` reproduces their results.
+the analysis parameters. In `sceptre` 0.99.2, `seed = 4` reproduces the
+results of 0.99.1 and earlier, which used the fixed seed 4.
 
 ```{r seed-argument, message=FALSE, results='hide'}
 sceptre_object_seed <- sceptre_object |>
