@@ -75,7 +75,7 @@ reference:
   - get_grna_matrix
   - get_cell_covariates
   - get_grna_assignments
-  - as_singlecellexperiment
+  - as_sce
 
 - title: "The `sceptre_object` class and its files"
   contents:

@@ -59,7 +59,7 @@ an initialized \code{sceptre_object}
 the response UMI counts in its \code{counts} assay and the gRNA UMI counts in the
 \code{counts} assay of an alternative experiment (\code{altExp}), the Bioconductor
 convention for a second feature type and the layout that
-\code{\link[=as_singlecellexperiment]{as_singlecellexperiment()}} returns. It is otherwise the same as
+\code{\link[=as_sce]{as_sce()}} returns. It is otherwise the same as
 \code{\link[=import_data]{import_data()}}.
 }
 \details{
@@ -97,5 +97,5 @@ sceptre_object <- import_data_from_sce(
 )
 }
 \seealso{
-\code{\link[=as_singlecellexperiment]{as_singlecellexperiment()}} for the reverse direction
+\code{\link[=as_sce]{as_sce()}} for the reverse direction
 }

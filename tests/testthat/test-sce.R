@@ -1,4 +1,4 @@
-test_that("as_singlecellexperiment() exports the data in the SCE layout", {
+test_that("as_sce() exports the data in the SCE layout", {
     data(grna_target_data_frame_highmoi)
     data(highmoi_example_data)
     sceptre_object <- import_data(
@@ -8,7 +8,7 @@ test_that("as_singlecellexperiment() exports the data in the SCE layout", {
         moi = "high",
         extra_covariates = highmoi_example_data$extra_covariates
     )
-    sce <- as_singlecellexperiment(sceptre_object)
+    sce <- as_sce(sceptre_object)
     expect_s4_class(sce, "SingleCellExperiment")
     expect_identical(
         as.matrix(SummarizedExperiment::assay(sce, "counts")),
@@ -40,7 +40,7 @@ test_that("as_singlecellexperiment() exports the data in the SCE layout", {
     )
 })
 
-test_that("import_data_from_sce() imports what as_singlecellexperiment() exports", {
+test_that("import_data_from_sce() imports what as_sce() exports", {
     data(grna_target_data_frame_highmoi)
     data(highmoi_example_data)
     sceptre_object <- import_data(
@@ -51,7 +51,7 @@ test_that("import_data_from_sce() imports what as_singlecellexperiment() exports
         extra_covariates = highmoi_example_data$extra_covariates
     )
     reimported <- import_data_from_sce(
-        as_singlecellexperiment(sceptre_object),
+        as_sce(sceptre_object),
         moi = "high",
         extra_covariates = "batch"
     )
@@ -85,7 +85,7 @@ test_that("import_data_from_sce() imports what as_singlecellexperiment() exports
         grna_matrix = highmoi_example_data$grna_matrix,
         grna_target_data_frame = SummarizedExperiment::rowRanges(
             SingleCellExperiment::altExp(
-                as_singlecellexperiment(sceptre_object),
+                as_sce(sceptre_object),
                 "gRNA"
             )
         ),
@@ -152,7 +152,22 @@ test_that("import_data_from_sce() reads targets without positions", {
 })
 
 
-test_that("as_singlecellexperiment() treats an empty chromosome as no position", {
+test_that("as(x, \"SingleCellExperiment\") is as_sce(x)", {
+    data(lowmoi_example_data)
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        moi = "low"
+    ))
+    expect_identical(
+        methods::as(sceptre_object, "SingleCellExperiment"),
+        as_sce(sceptre_object)
+    )
+})
+
+
+test_that("as_sce() treats an empty chromosome as no position", {
     data(lowmoi_example_data)
     targets <- lowmoi_example_data$grna_target_data_frame
     targets$chr <- ifelse(targets$grna_target == "non-targeting", "", "chr1")
@@ -165,7 +180,7 @@ test_that("as_singlecellexperiment() treats an empty chromosome as no position",
         moi = "low"
     ))
     positions <- SummarizedExperiment::rowRanges(
-        SingleCellExperiment::altExp(as_singlecellexperiment(sceptre_object), "gRNA")
+        SingleCellExperiment::altExp(as_sce(sceptre_object), "gRNA")
     )
     nt <- names(positions) %in%
         targets$grna_id[targets$grna_target == "non-targeting"]

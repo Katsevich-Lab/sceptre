@@ -4,7 +4,7 @@
 #' the response UMI counts in its `counts` assay and the gRNA UMI counts in the
 #' `counts` assay of an alternative experiment (`altExp`), the Bioconductor
 #' convention for a second feature type and the layout that
-#' [as_singlecellexperiment()] returns. It is otherwise the same as
+#' [as_sce()] returns. It is otherwise the same as
 #' [import_data()].
 #'
 #' Unless `grna_target_data_frame` is supplied, the gRNA targets are read from
@@ -38,7 +38,7 @@
 #' @inheritParams import_data
 #'
 #' @return an initialized `sceptre_object`
-#' @seealso [as_singlecellexperiment()] for the reverse direction
+#' @seealso [as_sce()] for the reverse direction
 #' @export
 #' @examples
 #' data(lowmoi_example_data)
@@ -140,7 +140,7 @@ import_data_from_sce <- function(
 
 #' Export the data of a sceptre_object as a SingleCellExperiment
 #'
-#' `as_singlecellexperiment()` returns the data of a `sceptre_object` as a
+#' `as_sce()` returns the data of a `sceptre_object` as a
 #' `SingleCellExperiment`, for use with other Bioconductor packages:
 #' * the response UMI counts in the `counts` assay;
 #' * the cell covariates (those computed by `sceptre` and the extra
@@ -155,7 +155,8 @@ import_data_from_sce <- function(
 #'   `GRangesList` that [import_data()] takes as `grna_target_data_frame`.
 #'
 #' Sparse counts are returned in column-compressed (`dgCMatrix`) format.
-#' [import_data_from_sce()] imports the result.
+#' [import_data_from_sce()] imports the result. The coercion
+#' `as(sceptre_object, "SingleCellExperiment")` returns the same.
 #'
 #' @param sceptre_object a `sceptre_object`
 #'
@@ -171,10 +172,10 @@ import_data_from_sce <- function(
 #'   extra_covariates = lowmoi_example_data$extra_covariates,
 #'   moi = "low"
 #' )
-#' sce <- as_singlecellexperiment(sceptre_object)
+#' sce <- as_sce(sceptre_object)
 #' # the gRNA targets
 #' SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "gRNA"))
-as_singlecellexperiment <- function(sceptre_object) {
+as_sce <- function(sceptre_object) {
     if (!methods::is(sceptre_object, "sceptre_object")) {
         stop("`sceptre_object` must be a `sceptre_object`.")
     }
@@ -196,6 +197,14 @@ as_singlecellexperiment <- function(sceptre_object) {
         grna_experiment
     return(sce)
 }
+
+#' @rdname as_sce
+#' @name coerce,sceptre_object,SingleCellExperiment-method
+#' @aliases coerce,sceptre_object,SingleCellExperiment-method
+#' @exportMethod coerce
+methods::setAs("sceptre_object", "SingleCellExperiment", function(from) {
+    as_sce(from)
+})
 
 
 # the counts assay of a SummarizedExperiment, a delayed (for example,
