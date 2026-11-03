@@ -1,6 +1,8 @@
-# MuData 1.16 omits the standard encoding attributes on these global mapping
-# elements. Add only the metadata of our newly owned two-modality screen;
-# references and in-place analysis updates never pass through this writer.
+# MuData 1.16 omits the AnnData encoding attributes on the global mapping
+# elements (`obsm` and `obsmap`) that Python's mudata expects. Add the missing
+# attributes to the elements that are present; elements that MuData did not
+# write, and attributes it did write, are left alone, so that a later MuData
+# that writes them itself needs nothing from this function.
 write_h5mu_mapping_encodings <- function(file) {
     groups <- c("/obsm", "/obsmap")
     arrays <- c(
@@ -42,40 +44,13 @@ write_h5mu_mapping_encodings <- function(file) {
             )
         }
     }
-    check_attribute <- function(object, path, name, expected) {
-        if (!rhdf5::H5Aexists(object, name)) {
-            return(FALSE)
-        }
-        attribute <- rhdf5::H5Aopen(object, name)
-        space <- rhdf5::H5Aget_space(attribute)
-        on.exit(
-            {
-                rhdf5::H5Sclose(space)
-                rhdf5::H5Aclose(attribute)
-            },
-            add = TRUE
-        )
-        if (
-            rhdf5::H5Sget_simple_extent_dims(space)$rank != 0L ||
-                !identical(rhdf5::H5Aread(attribute), expected)
-        ) {
-            stop(
-                sprintf("Contradictory H5MU %s metadata at %s.", name, path),
-                call. = FALSE
-            )
-        }
-        TRUE
-    }
 
-    # Validate all six elements before changing any of them. Unknown groups
-    # and datasets are deliberately outside this format-specific repair.
+    # Validate the elements before changing any of them. Unknown groups and
+    # datasets are deliberately outside this format-specific repair.
     pending <- list()
     for (path in paths) {
         if (!rhdf5::H5Lexists(fid, path)) {
-            stop(
-                sprintf("Missing H5MU mapping element %s.", path),
-                call. = FALSE
-            )
+            next
         }
         object <- rhdf5::H5Oopen(fid, path)
         objects[[path]] <- object
@@ -96,9 +71,7 @@ write_h5mu_mapping_encodings <- function(file) {
         )
         present <- vapply(
             names(expected),
-            function(name) {
-                check_attribute(object, path, name, expected[[name]])
-            },
+            function(name) rhdf5::H5Aexists(object, name),
             logical(1)
         )
         pending[[path]] <- expected[!present]

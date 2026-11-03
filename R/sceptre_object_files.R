@@ -127,16 +127,18 @@ read_sceptre_object <- function(directory, backed = FALSE) {
 
 # --- screen.h5mu ---------------------------------------------------------------
 
-# The format stamp of screen.h5mu, which the sceptre3 file format shares.
+# The format stamp of screen.h5mu; a reader refuses a stamp of a later format.
 sceptre_format_stamp <- "{\"format\":3}"
 
 # Writes the data of a sceptre_object (its `data` slot) to `file`, a MuData
 # file with two modalities, "response" and "grna", each holding its counts as
 # X and the feature names as var names; the cell covariates are the obs of
 # the response modality. The counts are written feature-contiguous (AnnData
-# csc_matrix; see backed_counts.R): MuData writes in-memory counts in that
-# layout from a dgRMatrix, and backed response counts are copied into the
-# file after MuData has written everything else around an empty placeholder.
+# csc_matrix; see backed_counts.R): MuData writes the gRNA counts in that
+# layout from a dgRMatrix, and the response counts, in memory or on disk, are
+# copied into the file block by block (write_backed_counts()) after MuData has
+# written everything else around an empty placeholder; for in-memory counts
+# this is several times faster than MuData's writer.
 #
 # MuData 1.16 reads NA in a text column back as an empty string (a
 # categorical column keeps it), so text covariates are written as categoricals
@@ -150,7 +152,6 @@ sceptre_format_stamp <- "{\"format\":3}"
 # (see import_data_backed()).
 write_screen <- function(screen, file, response_source = NULL) {
     counts <- SummarizedExperiment::assay(screen, "counts", withDimnames = FALSE)
-    backed <- is_backed(counts) || !is.null(response_source)
     if (
         is_backed(counts) &&
             normalizePath(file, winslash = "/", mustWork = FALSE) %in%
@@ -184,13 +185,7 @@ write_screen <- function(screen, file, response_source = NULL) {
     meta$covariate_text_columns <- text
     rownames(covariates) <- cell_ids
     response <- SingleCellExperiment::SingleCellExperiment(
-        assays = list(
-            counts = if (backed) {
-                empty_counts(counts)
-            } else {
-                as_row_counts(counts)
-            }
-        ),
+        assays = list(counts = empty_counts(counts)),
         colData = S4Vectors::DataFrame(covariates, check.names = FALSE)
     )
     grna <- SingleCellExperiment::SingleCellExperiment(
@@ -222,14 +217,12 @@ write_screen <- function(screen, file, response_source = NULL) {
     )
     write_h5mu_mapping_encodings(temporary_file)
     write_nullable_boolean_arrays(temporary_file)
-    if (backed) {
-        rhdf5::h5delete(temporary_file, response_counts_group)
-        write_backed_counts(
-            if (is.null(response_source)) counts else response_source,
-            temporary_file,
-            response_counts_group
-        )
-    }
+    rhdf5::h5delete(temporary_file, response_counts_group)
+    write_backed_counts(
+        if (is.null(response_source)) counts else response_source,
+        temporary_file,
+        response_counts_group
+    )
     if (!file.rename(temporary_file, file)) {
         stop("Could not write ", file, ".")
     }

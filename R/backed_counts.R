@@ -22,6 +22,12 @@
 # elements, and are read from the file's index and value arrays directly:
 # realizing them through DelayedArray's sparse coercions costs several times
 # the read itself.
+#
+# The blocks are assembled from their compressed sparse components with
+# methods::new() on the slots that Matrix documents for dgRMatrix and
+# dgCMatrix (?"dgRMatrix-class"), rather than with Matrix::sparseMatrix(),
+# which would expand and re-validate every block; the components are read
+# back only through compressed_sparse_components().
 
 # the group of screen.h5mu holding the response counts
 response_counts_group <- "/mod/response/X"

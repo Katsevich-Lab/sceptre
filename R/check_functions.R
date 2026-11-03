@@ -1,5 +1,7 @@
 # A matrix of counts has no missing, negative or infinite entries, and its
 # entries are integers (a logical matrix passes); anything else is an error.
+# The checks run on the stored values (the nonzero entries of a sparse
+# matrix), not on a copy of the matrix.
 check_integer_counts <- function(input_matrix, input_matrix_name) {
     if (
         methods::is(input_matrix, "lsparseMatrix") ||
@@ -7,11 +9,18 @@ check_integer_counts <- function(input_matrix, input_matrix_name) {
     ) {
         return(invisible())
     }
-    problem <- if (anyNA(input_matrix)) {
+    values <- if (methods::is(input_matrix, "sparseMatrix")) {
+        compressed_sparse_components(
+            methods::as(methods::as(input_matrix, "CsparseMatrix"), "dMatrix")
+        )$x
+    } else {
+        as.vector(input_matrix)
+    }
+    problem <- if (anyNA(values)) {
         "missing (NA) entries"
-    } else if (any(input_matrix < 0)) {
+    } else if (any(values < 0)) {
         "negative entries"
-    } else if (!is.integer(input_matrix) && any(is.infinite(input_matrix))) {
+    } else if (any(is.infinite(values))) {
         "infinite entries"
     } else {
         NULL
@@ -25,19 +34,18 @@ check_integer_counts <- function(input_matrix, input_matrix_name) {
             "."
         )
     }
-    if (is.integer(input_matrix)) {
+    if (is.integer(values)) {
         return(invisible())
     }
-    non_integer <- input_matrix != round(input_matrix)
-    n_non_integer <- sum(non_integer, na.rm = TRUE)
-    if (n_non_integer >= 1L) {
+    non_integer <- which(values != round(values))
+    if (length(non_integer) >= 1L) {
         stop(
             "The `",
             input_matrix_name,
             "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
-            n_non_integer,
+            length(non_integer),
             " of its entries are not integers, for example ",
-            format(input_matrix[which(non_integer)[1L]]),
+            format(values[non_integer[1L]]),
             "."
         )
     }

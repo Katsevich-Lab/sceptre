@@ -7,6 +7,8 @@
 write_nullable_boolean_arrays <- function(file) {
     entries <- rhdf5::h5ls(file, recursive = TRUE)
     groups <- entries[entries$otype == "H5I_GROUP", , drop = FALSE]
+    # rhdf5 exports no H5Tclose(); the datatype handle is released with the
+    # other handles when rhdf5 closes them (h5closeAll())
     boolean_type <- NULL
     for (i in seq_len(nrow(groups))) {
         path <- paste0(sub("/$", "", groups$group[[i]]), "/", groups$name[[i]])
@@ -40,14 +42,20 @@ write_nullable_boolean_arrays <- function(file) {
                 rhdf5::H5Tenum_insert(boolean_type, "FALSE", 0L)
                 rhdf5::H5Tenum_insert(boolean_type, "TRUE", 1L)
             }
+            # the handles are closed in reverse order of opening (`after =
+            # FALSE`), so that the file is closed last
             replace_dataset <- function() {
                 fid <- rhdf5::H5Fopen(file)
                 on.exit(rhdf5::H5Fclose(fid), add = TRUE)
                 rhdf5::H5Ldelete(fid, target)
                 space <- rhdf5::H5Screate_simple(dimensions)
-                on.exit(rhdf5::H5Sclose(space), add = TRUE)
+                on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
                 settings <- rhdf5::H5Pcreate("H5P_DATASET_CREATE")
-                on.exit(rhdf5::H5Pclose(settings), add = TRUE)
+                on.exit(
+                    rhdf5::H5Pclose(settings),
+                    add = TRUE,
+                    after = FALSE
+                )
                 if (length(value)) {
                     chunk <- rep.int(1L, length(dimensions))
                     chunk[[1L]] <- min(dimensions[[1L]], 65536L)
@@ -61,7 +69,7 @@ write_nullable_boolean_arrays <- function(file) {
                     space,
                     dcpl = settings
                 )
-                on.exit(rhdf5::H5Dclose(dataset), add = TRUE)
+                on.exit(rhdf5::H5Dclose(dataset), add = TRUE, after = FALSE)
                 rhdf5::H5Dwrite(
                     dataset,
                     as.raw(as.integer(value)),
