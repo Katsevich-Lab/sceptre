@@ -21,7 +21,7 @@ version.
 \describe{
 \item{\code{data}}{a \code{SingleCellExperiment} holding the response UMI counts (assay
 \code{"counts"}), the gRNA UMI counts (assay \code{"counts"} of the alternative
-experiment \code{"gRNA"}) and the cell covariates (\code{colData})}
+experiment \code{"grna"}) and the cell covariates (\code{colData})}
 
 \item{\code{covariate_matrix}}{the design matrix of the cell covariates given by
 \code{formula_object}}

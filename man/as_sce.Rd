@@ -21,7 +21,7 @@ a \code{SingleCellExperiment}
 \item the cell covariates (those computed by \code{sceptre} and the extra
 covariates) in \code{colData};
 \item the gRNA UMI counts in the \code{counts} assay of the alternative experiment
-\code{"gRNA"}, with the gRNA IDs and targets in the \code{grna_id} and
+\code{"grna"}, with the gRNA IDs and targets in the \code{grna_id} and
 \code{grna_target} columns of its \code{rowData} (\code{grna_target} is \code{NA} for gRNAs
 absent from the gRNA target data frame), the other columns of the gRNA
 target data frame (such as \code{vector_id}) in its other \code{rowData} columns,
@@ -46,7 +46,7 @@ sceptre_object <- import_data(
 )
 sce <- as_sce(sceptre_object)
 # the gRNA targets
-SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "gRNA"))
+SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "grna"))
 }
 \seealso{
 \code{\link[=import_data_from_sce]{import_data_from_sce()}} for the reverse direction

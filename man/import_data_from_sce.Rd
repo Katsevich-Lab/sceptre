@@ -8,7 +8,7 @@ import_data_from_sce(
   sce,
   moi,
   grna_target_data_frame = NULL,
-  grna_altexp = "gRNA",
+  grna_altexp = "grna",
   extra_covariates = character(),
   response_names = NA_character_,
   backed = FALSE,
@@ -27,7 +27,7 @@ columns}
 \code{grna_altexp} as described above}
 
 \item{grna_altexp}{the name of the alternative experiment holding the gRNA
-counts (default \code{"gRNA"})}
+counts (default \code{"grna"})}
 
 \item{extra_covariates}{(optional) the names of columns of \code{colData(sce)} to
 use as extra covariates (e.g., batch); by default none. The covariates that
@@ -88,7 +88,7 @@ SummarizedExperiment::rowData(grna_experiment)$grna_target <-
 sce <- SingleCellExperiment::SingleCellExperiment(
   assays = list(counts = lowmoi_example_data$response_matrix),
   colData = lowmoi_example_data$extra_covariates,
-  altExps = list(gRNA = grna_experiment)
+  altExps = list(grna = grna_experiment)
 )
 sceptre_object <- import_data_from_sce(
   sce,

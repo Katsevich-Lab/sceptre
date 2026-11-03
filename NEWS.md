@@ -2,7 +2,7 @@
 
 ## New features
 
--   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"gRNA"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions and the accessors stop with a message naming it.
+-   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"grna"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions and the accessors stop with a message naming it.
 
 -   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets in its `rowData` and positions in its `rowRanges`); new `as_sce()` exports a `sceptre_object`'s data in that layout.
 

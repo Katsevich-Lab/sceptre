@@ -781,7 +781,7 @@ identical(
 A `sceptre_object` stores its data in a
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment):
 the response UMI counts in the `counts` assay, the gRNA UMI counts in the
-alternative experiment `"gRNA"`, and the cell covariates in `colData`.
+alternative experiment `"grna"`, and the cell covariates in `colData`.
 `as_sce()` returns these data as a `SingleCellExperiment`, for
 use with other Bioconductor packages. The gRNA targets are stored in the
 `rowData` of the gRNA alternative experiment (and the gRNA positions, if any,
@@ -790,7 +790,7 @@ in its `rowRanges`).
 ```{r as-sce}
 sce <- as_sce(sceptre_object)
 sce
-SingleCellExperiment::altExp(sce, "gRNA")
+SingleCellExperiment::altExp(sce, "grna")
 ```
 
 Conversely, `import_data_from_sce()` creates a `sceptre_object` from a

@@ -193,7 +193,7 @@ write_screen <- function(screen, file, response_source = NULL) {
             counts = as_row_counts(SummarizedExperiment::assay(
                 SingleCellExperiment::altExp(
                     screen,
-                    "gRNA",
+                    "grna",
                     withDimnames = FALSE
                 ),
                 "counts",

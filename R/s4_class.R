@@ -33,7 +33,7 @@ NULL
 #'
 #' @slot data a `SingleCellExperiment` holding the response UMI counts (assay
 #' `"counts"`), the gRNA UMI counts (assay `"counts"` of the alternative
-#' experiment `"gRNA"`) and the cell covariates (`colData`)
+#' experiment `"grna"`) and the cell covariates (`colData`)
 #' @slot covariate_matrix the design matrix of the cell covariates given by
 #' `formula_object`
 #' @slot grna_target_data_frame the data frame mapping each gRNA to its target
@@ -120,7 +120,7 @@ setClass(
     "sceptre_object",
     slots = list(
         # raw data: response counts in assay "counts", gRNA counts in assay
-        # "counts" of altExp "gRNA", cell covariates in colData
+        # "counts" of altExp "grna", cell covariates in colData
         data = "SingleCellExperiment",
         covariate_matrix = "matrix",
         grna_target_data_frame = "data.frame",
@@ -196,8 +196,8 @@ setValidity("sceptre_object", function(object) {
                 "`data` must hold the response counts in assay \"counts\"."
             )
         }
-        if ("gRNA" %in% SingleCellExperiment::altExpNames(screen)) {
-            grna_experiment <- SingleCellExperiment::altExp(screen, "gRNA")
+        if ("grna" %in% SingleCellExperiment::altExpNames(screen)) {
+            grna_experiment <- SingleCellExperiment::altExp(screen, "grna")
             if (
                 !("counts" %in%
                     SummarizedExperiment::assayNames(grna_experiment))
@@ -206,7 +206,7 @@ setValidity("sceptre_object", function(object) {
                     problems,
                     paste0(
                         "`data` must hold the gRNA counts in assay \"counts\" ",
-                        "of the alternative experiment \"gRNA\"."
+                        "of the alternative experiment \"grna\"."
                     )
                 )
             }
@@ -272,7 +272,7 @@ setValidity("sceptre_object", function(object) {
 
 
 # Builds the SingleCellExperiment held in the `data` slot: the response counts
-# in assay "counts", the gRNA counts in assay "counts" of altExp "gRNA" and the
+# in assay "counts", the gRNA counts in assay "counts" of altExp "grna" and the
 # cell covariates in colData. The matrices are stored as given.
 new_screen <- function(
     response_matrix,
@@ -294,7 +294,7 @@ new_screen <- function(
         }
         SummarizedExperiment::colData(screen) <- covariates
     }
-    SingleCellExperiment::altExp(screen, "gRNA", withDimnames = FALSE) <-
+    SingleCellExperiment::altExp(screen, "grna", withDimnames = FALSE) <-
         SummarizedExperiment::SummarizedExperiment(
             assays = list(counts = grna_matrix)
         )

@@ -52,7 +52,7 @@ get_grna_matrix <- function(sceptre_object) {
     return(SummarizedExperiment::assay(
         SingleCellExperiment::altExp(
             sceptre_object@data,
-            "gRNA",
+            "grna",
             withDimnames = FALSE
         ),
         "counts",
@@ -165,7 +165,7 @@ set_response_matrix <- function(sceptre_object, response_matrix) {
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
     grna_experiment <- SingleCellExperiment::altExp(
         sceptre_object@data,
-        "gRNA",
+        "grna",
         withDimnames = FALSE
     )
     SummarizedExperiment::assay(
@@ -175,7 +175,7 @@ set_grna_matrix <- function(sceptre_object, grna_matrix) {
     ) <- grna_matrix
     SingleCellExperiment::altExp(
         sceptre_object@data,
-        "gRNA",
+        "grna",
         withDimnames = FALSE
     ) <- grna_experiment
     return(sceptre_object)

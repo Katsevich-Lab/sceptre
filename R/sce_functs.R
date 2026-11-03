@@ -27,7 +27,7 @@
 #' [import_data()]; by default, read from the alternative experiment
 #' `grna_altexp` as described above
 #' @param grna_altexp the name of the alternative experiment holding the gRNA
-#' counts (default `"gRNA"`)
+#' counts (default `"grna"`)
 #' @param extra_covariates (optional) the names of columns of `colData(sce)` to
 #' use as extra covariates (e.g., batch); by default none. The covariates that
 #' `sceptre` computes are always computed anew.
@@ -53,7 +53,7 @@
 #' sce <- SingleCellExperiment::SingleCellExperiment(
 #'   assays = list(counts = lowmoi_example_data$response_matrix),
 #'   colData = lowmoi_example_data$extra_covariates,
-#'   altExps = list(gRNA = grna_experiment)
+#'   altExps = list(grna = grna_experiment)
 #' )
 #' sceptre_object <- import_data_from_sce(
 #'   sce,
@@ -64,7 +64,7 @@ import_data_from_sce <- function(
     sce,
     moi,
     grna_target_data_frame = NULL,
-    grna_altexp = "gRNA",
+    grna_altexp = "grna",
     extra_covariates = character(),
     response_names = NA_character_,
     backed = FALSE,
@@ -146,7 +146,7 @@ import_data_from_sce <- function(
 #' * the cell covariates (those computed by `sceptre` and the extra
 #'   covariates) in `colData`;
 #' * the gRNA UMI counts in the `counts` assay of the alternative experiment
-#'   `"gRNA"`, with the gRNA IDs and targets in the `grna_id` and
+#'   `"grna"`, with the gRNA IDs and targets in the `grna_id` and
 #'   `grna_target` columns of its `rowData` (`grna_target` is `NA` for gRNAs
 #'   absent from the gRNA target data frame), the other columns of the gRNA
 #'   target data frame (such as `vector_id`) in its other `rowData` columns,
@@ -174,7 +174,7 @@ import_data_from_sce <- function(
 #' )
 #' sce <- as_sce(sceptre_object)
 #' # the gRNA targets
-#' SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "gRNA"))
+#' SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "grna"))
 as_sce <- function(sceptre_object) {
     if (!methods::is(sceptre_object, "sceptre_object")) {
         stop("`sceptre_object` must be a `sceptre_object`.")
@@ -193,7 +193,7 @@ as_sce <- function(sceptre_object) {
         ),
         colData = SummarizedExperiment::colData(sceptre_object@data)
     )
-    SingleCellExperiment::altExp(sce, "gRNA", withDimnames = FALSE) <-
+    SingleCellExperiment::altExp(sce, "grna", withDimnames = FALSE) <-
         grna_experiment
     return(sce)
 }
