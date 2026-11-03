@@ -28,7 +28,7 @@
 
 -   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `sample` (previously `batch`), whose values are `names(directories)` when `directories` is named and the directory paths otherwise, and a user column named `sample` is an error. A `formula_object` that refers to the directory as `batch` must now name `sample`.
 
--   sceptre now requires R 4.6.0 or later.
+-   sceptre now requires R 4.5.0 or later (its dependencies do).
 
 ## Bug fixes
 
