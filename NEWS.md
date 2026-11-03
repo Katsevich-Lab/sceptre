@@ -42,6 +42,8 @@
 
 ## Deprecated and removed
 
+The deprecated arguments and functions below warn in this version; they will be made defunct in the next Bioconductor release and removed in the one after.
+
 -   The arguments `parallel` and `n_processors` of `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` are deprecated in favor of `BPPARAM`; `parallel = TRUE` still runs on `n_processors` forked workers, with a warning.
 
 -   The argument `use_ondisc` is deprecated in favor of `backed`, and `read_ondisc_backed_sceptre_object()` and `write_ondisc_backed_sceptre_object()` in favor of `read_sceptre_object()` and `write_sceptre_object()`; `.odm` files written by earlier versions cannot be read, so re-import the data. The `ondisc` package is no longer used.

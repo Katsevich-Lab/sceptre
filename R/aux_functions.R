@@ -228,6 +228,7 @@ get_bpparam <- function(BPPARAM, parallel = NULL, n_processors = NULL) {
             )
         }
         if (identical(n_processors, "auto")) {
+            # parallelly is kept for the deprecated `n_processors = "auto"` and leaves with it.
             # Read the user's preferred fraction (default 0.5 = half cores), then
             # neutralize that option on the parallelly call so parallelly's own
             # option-aware default does not apply the same fraction a second
