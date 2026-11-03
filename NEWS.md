@@ -2,7 +2,7 @@
 
 ## New features
 
--   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"gRNA"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions.
+-   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"gRNA"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions and the accessors stop with a message naming it.
 
 -   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets in its `rowData` and positions in its `rowRanges`); new `as_singlecellexperiment()` exports a `sceptre_object`'s data in that layout.
 
@@ -10,7 +10,7 @@
 
 -   Disk-backed analysis no longer uses `ondisc`: with `backed = TRUE` and `directory_to_write`, `import_data()`, `import_data_from_cellranger()` and `import_data_from_sce()` keep the response counts on disk in `screen.h5mu`, a MuData file that Bioconductor's MuData and Python's mudata can read. New `write_sceptre_object()` and `read_sceptre_object()` save and load a `sceptre_object`, standard or disk-backed, as a directory holding `screen.h5mu` and `sceptre_object.rds`.
 
--   With `backed = TRUE`, `import_data_from_cellranger()` streams the response counts to disk through temporary files, so Cell Ranger output larger than memory can be imported.
+-   With `backed = TRUE`, `import_data_from_cellranger()` holds the matrix of one directory in memory at a time and writes the response counts to `screen.h5mu` through temporary files in `directory_to_write`, so the whole screen is never in memory at once.
 
 -   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. `seed = 4` reproduces the results of earlier versions, which used the fixed seed 4.
 
@@ -26,7 +26,7 @@
 
 -   The default formula gives a message naming each covariate it leaves out (non-count covariates with 15 or more distinct values).
 
--   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `cellranger_directory` (previously `batch`); a user column named `cellranger_directory` is an error.
+-   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `cellranger_directory` (previously `batch`), and a user column named `cellranger_directory` is an error. A `formula_object` that refers to the directory as `batch` must now name `cellranger_directory`.
 
 -   sceptre now requires R 4.6.0 or later.
 

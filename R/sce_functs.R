@@ -15,6 +15,10 @@
 #' without a position, such as non-targeting gRNAs). Other columns of the
 #' `rowData` are kept in the gRNA target data frame.
 #'
+#' The counts of `sce` are read into memory, also with `backed = TRUE`, in
+#' which case they are then written to `screen.h5mu` in `directory_to_write`;
+#' a `SingleCellExperiment` too large for memory cannot be imported.
+#'
 #' @param sce a `SingleCellExperiment`, with responses in rows and cells in
 #' columns
 #' @param moi a string indicating the MOI of the dataset, either "low" or

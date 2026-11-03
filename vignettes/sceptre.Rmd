@@ -14,8 +14,23 @@ vignette: >
 # Introduction
 
 `sceptre` is an R package that facilitates statistically rigorous, massively
-scalable, and user-friendly single-cell CRISPR screen data analysis. This
-vignette walks through a complete analysis of an example dataset.
+scalable, and user-friendly single-cell CRISPR screen data analysis. Given the
+gene and gRNA UMI counts of a screen, `sceptre` assigns gRNAs to cells, tests
+each perturbation for an effect on the expression of each of its candidate
+target genes, and returns the significant perturbation-gene pairs. Its tests
+are resampling-based (permutations or conditional resampling), which keeps the
+false positive rate under control on the sparse, heavy-tailed counts of
+single-cell data, and are implemented in C++ so that screens of hundreds of
+thousands of cells and millions of pairs can be analyzed. Two features set
+`sceptre` apart: a *calibration check*, which verifies on the dataset at hand
+that `sceptre` controls false positives, and a *power check*, which verifies
+that it detects known effects; both run on the same data before the discovery
+analysis, so that its results come with evidence of their reliability. The
+pipeline consists of eight steps, from data import to writing the outputs,
+each of which is a single function call on a `sceptre_object`. This vignette
+walks through a complete analysis of an example dataset; the
+[sceptre manual](https://timothy-barry.github.io/sceptre-book/) describes
+each step in depth.
 
 # Installation
 
@@ -802,9 +817,9 @@ counts on disk. Setting `backed = TRUE` in `import_data()`,
 the file `screen.h5mu` in the directory `directory_to_write`, a
 [MuData](https://bioconductor.org/packages/MuData) file that Bioconductor's
 `MuData` and Python's `mudata` packages can read; the response counts are then
-read from the file as they are needed. `import_data_from_cellranger()` streams
-the counts to the file, so Cell Ranger outputs larger than memory can be
-imported. The gRNA counts and the cell covariates are held in memory. The
+read from the file as they are needed. `import_data_from_cellranger()` holds
+the matrix of one directory in memory at a time, so the whole screen is never
+in memory at once. The gRNA counts and the cell covariates are held in memory. The
 analysis of a disk-backed `sceptre_object` uses permutations
 (`resampling_mechanism = "permutations"`).
 

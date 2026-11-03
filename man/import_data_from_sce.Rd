@@ -70,6 +70,10 @@ analyzed), the vectors, if any, from the \code{vector_id} column, and the gRNA
 positions, if any, from its \code{rowRanges} (one range per gRNA, none for gRNAs
 without a position, such as non-targeting gRNAs). Other columns of the
 \code{rowData} are kept in the gRNA target data frame.
+
+The counts of \code{sce} are read into memory, also with \code{backed = TRUE}, in
+which case they are then written to \code{screen.h5mu} in \code{directory_to_write};
+a \code{SingleCellExperiment} too large for memory cannot be imported.
 }
 \examples{
 data(lowmoi_example_data)
