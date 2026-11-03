@@ -208,12 +208,27 @@ write_screen <- function(screen, file, response_source = NULL) {
         fileext = ".h5mu"
     )
     on.exit(unlink(temporary_file), add = TRUE)
-    MuData::writeH5MU(
-        MultiAssayExperiment::MultiAssayExperiment(
-            list(response = response, grna = grna),
-            metadata = meta
+    # rhdf5 2.57 warns when a dataset that exists is written with the
+    # arguments MuData 1.17 passes for every dataset; nothing is lost
+    withCallingHandlers(
+        MuData::writeH5MU(
+            MultiAssayExperiment::MultiAssayExperiment(
+                list(response = response, grna = grna),
+                metadata = meta
+            ),
+            temporary_file
         ),
-        temporary_file
+        warning = function(w) {
+            if (
+                grepl(
+                    "Dataset already exists. Arguments",
+                    conditionMessage(w),
+                    fixed = TRUE
+                )
+            ) {
+                invokeRestart("muffleWarning")
+            }
+        }
     )
     write_h5mu_mapping_encodings(temporary_file)
     write_nullable_boolean_arrays(temporary_file)

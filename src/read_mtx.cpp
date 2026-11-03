@@ -50,7 +50,9 @@ S4 read_mtx(const std::string& path, bool transpose) {
   }
 
   // sort the entries by column, then by row, and get the column pointers
-  auto p = tatami::compress_sparse_triplets<std::vector<double>, int>(n_cols, vals, cols, rows);
+  // the template parameters are deduced: their order differs between the
+  // tatami versions of assorthead 1.6 and 1.7
+  auto p = tatami::compress_sparse_triplets(n_cols, vals, cols, rows);
   // a dgCMatrix may not repeat a row within a column: Matrix functions would
   // then disagree about the value, so reject repeated entries
   for (int c = 0; c < n_cols; c ++) {
