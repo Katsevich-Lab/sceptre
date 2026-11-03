@@ -94,10 +94,9 @@ outputs to a temporary directory.
 
 ```{r minimal-example, message=FALSE, results="hide"}
 # load the data, creating a sceptre_object
-directories <- paste0(
-    system.file("extdata", package = "sceptre"),
-    "/highmoi_example/gem_group_",
-    1:2
+directories <- c(
+    gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
+    gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
 )
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data_from_cellranger(
@@ -160,12 +159,11 @@ arguments: `directories`, `grna_target_data_frame`, and `moi`.
     example CRISPRi data on disk.
 
     ```{r directories}
-    directories <- paste0(
-        system.file("extdata", package = "sceptre"),
-        "/highmoi_example/gem_group_",
-        1:2
+    directories <- c(
+        gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
+        gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
     )
-    directories # file paths to the example data on your computer
+    directories # file paths to the example data on your computer, named
     ```
 
     `directories` points to two directories, both of which store the expression
@@ -244,7 +242,8 @@ also automatically computes the following cell-specific covariates:
 `response_n_nonzero` (i.e., the number of responses expressed in the cell),
 `response_n_umis` (i.e., the number of response UMIs sequenced in the cell),
 `response_p_mito` (i.e., the fraction of transcripts mapping to mitochondrial
-genes), and `sample` (i.e., the directory from which the cell was loaded). (Cells loaded from different directories are assumed to come from
+genes), and `sample` (i.e., the directory from which the cell was loaded, by the
+name given in `directories`, here `gem_group_1` or `gem_group_2`). (Cells loaded from different directories are assumed to come from
 different batches.)
 
 ## 2. Set analysis parameters

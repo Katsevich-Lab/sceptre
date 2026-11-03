@@ -117,9 +117,9 @@ utils::globalVariables(c(
 #' # High-MOI CRISPRi example
 #' ##########################
 #' # 1. create the sceptre object from cellranger output
-#' directories <- paste0(
-#'   system.file("extdata", package = "sceptre"),
-#'   "/highmoi_example/gem_group_", c(1, 2)
+#' directories <- c(
+#'   gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
+#'   gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
 #' )
 #' data(grna_target_data_frame_highmoi)
 #' sceptre_object <- import_data_from_cellranger(
