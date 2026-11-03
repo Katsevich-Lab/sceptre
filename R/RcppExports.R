@@ -28,10 +28,6 @@ hybrid_fisher_iwor_sampler <- function(N, m, M, B, seed) {
     .Call(`_sceptre_hybrid_fisher_iwor_sampler`, N, m, M, B, seed)
 }
 
-crt_index_sampler <- function(fitted_probabilities, B, seed) {
-    .Call(`_sceptre_crt_index_sampler`, fitted_probabilities, B, seed)
-}
-
 crt_index_sampler_fast <- function(fitted_probabilities, B, seed) {
     .Call(`_sceptre_crt_index_sampler_fast`, fitted_probabilities, B, seed)
 }
@@ -80,20 +76,12 @@ load_csr_row <- function(j, p, x, row_idx, n_cells) {
     .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }
 
-obtain_pointer_vector <- function(i, dim) {
-    .Call(`_sceptre_obtain_pointer_vector`, i, dim)
-}
-
 compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature) {
     .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
 }
 
 compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
     .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
-}
-
-increment_vector <- function(x, value) {
-    invisible(.Call(`_sceptre_increment_vector`, x, value))
 }
 
 threshold_count_matrix <- function(j, p, x, row_idx, threshold) {

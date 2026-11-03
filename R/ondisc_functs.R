@@ -87,23 +87,3 @@ write_ondisc_backed_sceptre_object <- function(
     )
     write_sceptre_object(sceptre_object, directory_to_write)
 }
-
-
-###########################
-# PIPELINE HELPER FUNCTIONS
-###########################
-get_id_vect <- function(v, pod_size) {
-    n_elements <- length(v)
-    breaks <- round(n_elements / pod_size)
-    if (breaks >= 2) {
-        as.integer(cut(seq(1, n_elements), breaks))
-    } else {
-        rep(1L, n_elements)
-    }
-}
-
-write_vector <- function(vector, file_name) {
-    file_con <- file(file_name)
-    on.exit(close(file_con), add = TRUE)
-    writeLines(as.character(vector), file_con)
-}
