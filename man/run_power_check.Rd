@@ -32,7 +32,10 @@ when the function runs serially)}
 \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} object specifying how to run the function
 in parallel, for example \code{BiocParallel::MulticoreParam(4)} (Linux and macOS)
 or \code{BiocParallel::SnowParam(4)} (all platforms, including Windows). Results
-do not depend on the back end or the number of workers.}
+do not depend on the back end or the number of workers. On a shared machine
+or in a cluster job, choose the number of workers from the cores allotted
+to you, for example
+\code{BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))}.}
 
 \item{parallel, n_processors}{deprecated; use \code{BPPARAM}. \code{parallel = TRUE}
 runs the function with \code{BiocParallel::MulticoreParam(n_processors)}

@@ -147,32 +147,37 @@ We describe each step of the pipeline in greater detail below.
 ## 1. Import data
 
 The first step is to import the data. **Data can be imported into `sceptre` from
-10x Cell Ranger or Parse outputs, as well as from R matrices.** The simplest way
-to import the data is to read the output of one or more calls to
-`cellranger_count` into `sceptre` via the function
-`import_data_from_cellranger()`. `import_data_from_cellranger()` requires three
+10x Cell Ranger or Parse outputs, from a `SingleCellExperiment`, or from R
+matrices** (`import_data_from_cellranger()`, `import_data_from_parse()`,
+`import_data_from_sce()` and `import_data()`). The simplest way to import the
+data is to read the output of one or more calls to `cellranger count` into
+`sceptre` via the function `import_data_from_cellranger()`. `import_data_from_cellranger()` requires three
 arguments: `directories`, `grna_target_data_frame`, and `moi`.
 
 1.  `directories` is a character vector specifying the locations of the
-    directories outputted by one or more calls to `cellranger_count`. Below, we
-    set the variable `directories` to the (machine-dependent) location of the
-    example CRISPRi data on disk.
+    directories outputted by one or more calls to `cellranger count`. We
+    recommend naming the vector: with several directories, the names become the
+    values of the cell covariate `sample`, which records the directory from
+    which each cell was loaded (the `--id` of the `cellranger count` run is a
+    natural name). Below, we set the variable `directories` to the
+    (machine-dependent) location of the example CRISPRi data on disk; the
+    example's two directories are the two GEM groups of one experiment, so we
+    name them accordingly.
 
     ```{r directories}
     directories <- c(
         gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
         gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
     )
-    directories # file paths to the example data on your computer, named
+    names(directories)
     ```
 
-    `directories` points to two directories, both of which store the expression
-    data in matrix market format and contain the files `barcodes.tsv.gz`,
-    `features.tsv.gz`, and `matrix.mtx.gz`.
+    `directories` points to two directories, each of which stores the
+    expression data in matrix market format and contains the files
+    `barcodes.tsv.gz`, `features.tsv.gz`, and `matrix.mtx.gz`.
 
     ```{r list-files}
     list.files(directories[1])
-    list.files(directories[2])
     ```
 
 2.  `grna_target_data_frame` is a data frame mapping each individual gRNA to the
@@ -348,10 +353,10 @@ sceptre_object <- set_analysis_parameters(
 print(sceptre_object) # output suppressed for brevity
 ```
 
-## 3. Assign gRNAs to cells (optional)
+## 3. Assign gRNAs to cells
 
-The third step is to assign gRNAs to cells. This step can be skipped, in which
-case gRNAs are assigned to cells automatically using default options. The gRNA
+The third step is to assign gRNAs to cells. If you skip this call, the next
+step assigns gRNAs to cells with the default method and settings. The gRNA
 assignment step involves using the gRNA UMI counts to determine which cells
 contain which gRNAs. We begin by plotting the UMI count distribution of several
 randomly selected gRNAs via a call to the function
@@ -423,11 +428,10 @@ Finally, the bottom right panel is a histogram of the number of gRNAs contained
 in each cell. The mean number of gRNAs per cell --- i.e., the MOI --- is
 displayed in purple text.
 
-## 4. Run quality control (optional)
+## 4. Run quality control
 
-The fourth step is to run quality control (QC). This step likewise can be
-skipped, in which case QC is applied automatically using default options.
-**`sceptre` implements two kinds of QC: cellwise QC and pairwise QC. The former
+The fourth step is to run quality control (QC). If you skip this call, the next
+step runs QC with the default settings. **`sceptre` implements two kinds of QC: cellwise QC and pairwise QC. The former
 aims to remove low-quality cells, while the latter aims to remove low-quality
 target-response pairs.**
 
@@ -487,7 +491,9 @@ while the remaining pairs are retained (green).
 
 ## 5. Run calibration check
 
-The fifth step is to run the calibration check. **The calibration check is an
+The fifth step is to run the calibration check. It can be skipped, but we
+recommend it: it is how you know that the discovery results can be trusted.
+**The calibration check is an
 analysis that verifies that `sceptre` controls the rate of false discoveries on
 the dataset under analysis.** The calibration check proceeds as follows. First,
 negative control target-response pairs are constructed (automatically) by
@@ -548,9 +554,9 @@ The visualization consists of four panels, which we describe below.
 [book](https://timothy-barry.github.io/sceptre-book/) for strategies for
 improving calibration.
 
-## 6. Run power check (optional)
+## 6. Run power check
 
-The sixth step --- which is optional --- is to run the power check. The power
+The sixth step is to run the power check; it can be skipped. The power
 check involves applying `sceptre` to analyze the positive control pairs. Given
 that the positive control pairs are known to contain signal, `sceptre` should
 produce significant (i.e., small) p-values on the positive control pairs. **The
@@ -674,213 +680,6 @@ as significant). The p-value contained within the `p_value` column is a raw
 
 ```{r head-result}
 head(result)
-```
-
-# Further topics
-
-## Reproducibility
-
-`sceptre` uses random numbers in several steps: the starting values of the
-mixture method in `assign_grnas()`, the construction of the negative control
-pairs in `run_calibration_check()`, and the permutation and conditional
-resampling draws of the calibration check, power check and discovery analysis.
-All of these draws are seeded by a single seed, the `seed` argument of
-`set_analysis_parameters()`. By default (`seed = NULL`), the seed is drawn from
-R's random number generator, so calling `set.seed()` before
-`set_analysis_parameters()` makes an analysis reproducible. Below, we run the
-power check twice after the same call to `set.seed()` and obtain identical
-results. (gRNAs are assigned to cells and QC is run automatically, with the
-default options, when these steps are skipped.)
-
-```{r seed-set-seed, message=FALSE, results='hide'}
-set.seed(1)
-sceptre_object_1 <- sceptre_object |>
-    set_analysis_parameters(
-        positive_control_pairs = positive_control_pairs,
-        side = side
-    ) |>
-    run_power_check(print_progress = FALSE)
-
-set.seed(1)
-sceptre_object_2 <- sceptre_object |>
-    set_analysis_parameters(
-        positive_control_pairs = positive_control_pairs,
-        side = side
-    ) |>
-    run_power_check(print_progress = FALSE)
-```
-
-```{r seed-set-seed-compare}
-identical(
-    get_result(sceptre_object_1, "run_power_check"),
-    get_result(sceptre_object_2, "run_power_check")
-)
-```
-
-Alternatively, the seed can be passed to `set_analysis_parameters()` directly.
-The seed is recorded in the `sceptre_object`, and `print()` displays it among
-the analysis parameters. In `sceptre` 0.99.2, `seed = 4` reproduces the
-results of 0.99.1 and earlier, which used the fixed seed 4.
-
-```{r seed-argument, message=FALSE, results='hide'}
-sceptre_object_seed <- sceptre_object |>
-    set_analysis_parameters(
-        positive_control_pairs = positive_control_pairs,
-        side = side,
-        seed = 1234
-    ) |>
-    run_power_check(print_progress = FALSE)
-```
-
-Plotting functions that display a random subset of the points (for example,
-`plot_grna_count_distributions()`) draw it from R's random number generator,
-so calling `set.seed()` before plotting makes the plot reproducible.
-
-## Parallel computation with BiocParallel
-
-The functions `assign_grnas()`, `run_calibration_check()`, `run_power_check()`,
-and `run_discovery_analysis()` can run in parallel via
-[BiocParallel](https://bioconductor.org/packages/BiocParallel). To do so, pass
-a BiocParallel back end as the argument `BPPARAM`; for example,
-`BiocParallel::MulticoreParam()` (Linux and macOS) or
-`BiocParallel::SnowParam()` (all platforms, including Windows); the default,
-`BiocParallel::SerialParam()`, runs serially. On a shared machine or in a
-cluster job, choose the number of workers from the cores actually allotted,
-for example `BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))`.
-The results do not depend on the
-back end or the number of workers: below, the power check run on two workers
-gives the same results as the serial run above with the same seed. (Windows
-cannot fork processes, so there the example runs serially.)
-
-```{r bpparam, message=FALSE, results='hide'}
-BPPARAM <- if (.Platform$OS.type == "windows") {
-    BiocParallel::SerialParam()
-} else {
-    BiocParallel::MulticoreParam(workers = 2)
-}
-sceptre_object_parallel <- sceptre_object |>
-    set_analysis_parameters(
-        positive_control_pairs = positive_control_pairs,
-        side = side,
-        seed = 1234
-    ) |>
-    run_power_check(
-        print_progress = FALSE,
-        BPPARAM = BPPARAM
-    )
-```
-
-```{r bpparam-compare}
-identical(
-    get_result(sceptre_object_seed, "run_power_check"),
-    get_result(sceptre_object_parallel, "run_power_check")
-)
-```
-
-## Interoperability with SingleCellExperiment
-
-A `sceptre_object` stores its data in a
-[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment):
-the response UMI counts in the `counts` assay, the gRNA UMI counts in the
-alternative experiment `"grna"`, and the cell covariates in `colData`.
-`as_sce()` returns these data as a `SingleCellExperiment`, for
-use with other Bioconductor packages. The gRNA targets are stored in the
-`rowData` of the gRNA alternative experiment (and the gRNA positions, if any,
-in its `rowRanges`).
-
-```{r as-sce}
-sce <- as_sce(sceptre_object)
-sce
-SingleCellExperiment::altExp(sce, "grna")
-```
-
-Conversely, `import_data_from_sce()` creates a `sceptre_object` from a
-`SingleCellExperiment` in this layout. The gRNA targets are read from the
-`rowData` of the gRNA alternative experiment (or can be supplied via the
-argument `grna_target_data_frame`), and `extra_covariates` names the columns of
-`colData` to use as additional covariates. The covariates that `sceptre`
-computes are computed anew.
-
-```{r import-sce}
-sceptre_object_from_sce <- import_data_from_sce(
-    sce = sce,
-    moi = "high",
-    extra_covariates = "sample"
-)
-sceptre_object_from_sce
-```
-
-## Disk-backed analysis and saving a sceptre_object
-
-For data too large to hold in memory, `sceptre` can keep the response UMI
-counts on disk. Setting `backed = TRUE` in `import_data()`,
-`import_data_from_cellranger()`, or `import_data_from_sce()` writes the data to
-the file `screen.h5mu` in the directory `directory_to_write`, a
-[MuData](https://bioconductor.org/packages/MuData) file that Bioconductor's
-`MuData` and Python's `mudata` packages can read; the response counts are then
-read from the file as they are needed. `import_data_from_cellranger()` holds
-the matrix of one directory in memory at a time, so the whole screen is never
-in memory at once. The gRNA counts and the cell covariates are held in memory. The
-analysis of a disk-backed `sceptre_object` uses permutations
-(`resampling_mechanism = "permutations"`).
-
-```{r backed-import, message=FALSE, results='hide'}
-backed_directory <- file.path(tempdir(), "sceptre_backed")
-sceptre_object_backed <- import_data_from_cellranger(
-    directories = directories,
-    grna_target_data_frame = grna_target_data_frame_highmoi,
-    moi = "high",
-    backed = TRUE,
-    directory_to_write = backed_directory
-)
-```
-
-```{r backed-files}
-list.files(backed_directory)
-```
-
-The disk-backed `sceptre_object` is analyzed with the same functions as a
-standard `sceptre_object`, and gives the same results.
-
-```{r backed-analysis, message=FALSE, results='hide'}
-run_permutation_power_check <- function(sceptre_object) {
-    sceptre_object |>
-        set_analysis_parameters(
-            positive_control_pairs = positive_control_pairs,
-            side = side,
-            resampling_mechanism = "permutations",
-            seed = 1234
-        ) |>
-        run_power_check(print_progress = FALSE)
-}
-sceptre_object_backed <- run_permutation_power_check(sceptre_object_backed)
-sceptre_object_in_memory <- run_permutation_power_check(sceptre_object)
-```
-
-```{r backed-compare}
-identical(
-    get_result(sceptre_object_backed, "run_power_check"),
-    get_result(sceptre_object_in_memory, "run_power_check")
-)
-```
-
-`write_sceptre_object()` saves a `sceptre_object`, standard or disk-backed, to
-a directory holding two files: `screen.h5mu` (the data) and
-`sceptre_object.rds` (the analysis parameters, intermediate values, and
-results). `read_sceptre_object()` reads it back, holding the response counts
-in memory (`backed = FALSE`, the default) or leaving them on disk
-(`backed = TRUE`). Below, we save the `sceptre_object` analyzed in the previous
-sections and read it back.
-
-```{r write-read}
-saved_directory <- file.path(tempdir(), "sceptre_saved")
-write_sceptre_object(sceptre_object, saved_directory)
-list.files(saved_directory)
-sceptre_object_read <- read_sceptre_object(saved_directory)
-all.equal(
-    get_result(sceptre_object_read, "run_discovery_analysis"),
-    get_result(sceptre_object, "run_discovery_analysis")
-)
 ```
 
 # Further reading

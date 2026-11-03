@@ -18,7 +18,7 @@
 
 -   The `sceptre_object` class is documented (`?"sceptre_object-class"`) and has a validity method.
 
--   The vignette uses BiocStyle and has new sections on reproducibility, BiocParallel, `SingleCellExperiment` input and output, and disk-backed analysis.
+-   The vignette uses BiocStyle.
 
 ## Changes
 

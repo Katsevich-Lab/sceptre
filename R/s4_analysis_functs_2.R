@@ -26,7 +26,10 @@
 #' [BiocParallel::BiocParallelParam] object specifying how to run the function
 #' in parallel, for example `BiocParallel::MulticoreParam(4)` (Linux and macOS)
 #' or `BiocParallel::SnowParam(4)` (all platforms, including Windows). Results
-#' do not depend on the back end or the number of workers.
+#' do not depend on the back end or the number of workers. On a shared machine
+#' or in a cluster job, choose the number of workers from the cores allotted
+#' to you, for example
+#' `BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))`.
 #' @param parallel,n_processors deprecated; use `BPPARAM`. `parallel = TRUE`
 #' runs the function with `BiocParallel::MulticoreParam(n_processors)`
 #' (`n_processors = "auto"` uses half the physical cores).
