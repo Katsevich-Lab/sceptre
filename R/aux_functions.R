@@ -125,15 +125,21 @@ auto_compute_cell_covariates <- function(
     response_matrix,
     grna_matrix,
     extra_covariates,
-    response_names
+    response_names,
+    response_covariates = NULL
 ) {
-    # compute the response covariates
-    covariate_df <- compute_cell_covariates(
-        matrix_in = response_matrix,
-        feature_names = response_names,
-        compute_p_mito = TRUE,
-        compute_max_feature = FALSE
-    )
+    # compute the response covariates (unless computed already, as for
+    # response counts held on disk)
+    covariate_df <- if (is.null(response_covariates)) {
+        compute_cell_covariates(
+            matrix_in = response_matrix,
+            feature_names = response_names,
+            compute_p_mito = TRUE,
+            compute_max_feature = FALSE
+        )
+    } else {
+        response_covariates
+    }
     colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
 
     # compute the grna covariates

@@ -112,6 +112,18 @@ test_that("import_data_from_sce() reads targets without positions", {
         from_sce@grna_target_data_frame[c("grna_id", "grna_target")],
         expected_targets
     )
+    backed <- import_data_from_sce(
+        sce,
+        moi = "low",
+        extra_covariates = "batch",
+        backed = TRUE,
+        directory_to_write = file.path(tempdir(), "sce backed")
+    )
+    expect_s4_class(get_response_matrix(backed), "DelayedMatrix")
+    expect_identical(
+        as.matrix(get_response_matrix(backed)),
+        as.matrix(get_response_matrix(direct))
+    )
     expect_error(
         import_data_from_sce(sce, moi = "low", grna_altexp = "guides"),
         "`grna_altexp` must name"

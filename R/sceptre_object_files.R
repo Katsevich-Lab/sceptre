@@ -137,12 +137,15 @@ sceptre_format_stamp <- "{\"format\":3}"
 # missing number as NaN, the AnnData convention. MultiAssayExperiment needs
 # cell names, so a screen without them is written with the cell indices as
 # names and the metadata entry `cell_names_absent`. The file is written next
-# to its destination and moved there once complete.
-write_screen <- function(screen, file) {
+# to its destination and moved there once complete. `response_source`, if
+# given, holds the response counts to write in place of the counts of
+# `screen`, which are then an empty matrix with their dimensions and names
+# (see import_data_backed()).
+write_screen <- function(screen, file, response_source = NULL) {
     counts <- SummarizedExperiment::assay(screen, "counts", withDimnames = FALSE)
-    backed <- is_backed(counts)
+    backed <- is_backed(counts) || !is.null(response_source)
     if (
-        backed &&
+        is_backed(counts) &&
             normalizePath(file, winslash = "/", mustWork = FALSE) %in%
                 backing_files(counts)
     ) {
@@ -214,7 +217,11 @@ write_screen <- function(screen, file) {
     write_nullable_boolean_arrays(temporary_file)
     if (backed) {
         rhdf5::h5delete(temporary_file, response_counts_group)
-        write_backed_counts(counts, temporary_file, response_counts_group)
+        write_backed_counts(
+            if (is.null(response_source)) counts else response_source,
+            temporary_file,
+            response_counts_group
+        )
     }
     if (!file.rename(temporary_file, file)) {
         stop("Could not write ", file, ".")

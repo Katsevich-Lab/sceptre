@@ -1,3 +1,29 @@
+# The response and gRNA matrices hold integer counts (a logical matrix passes);
+# anything else is an error.
+check_integer_counts <- function(input_matrix, input_matrix_name) {
+    if (
+        methods::is(input_matrix, "lsparseMatrix") ||
+            is.integer(input_matrix) ||
+            is.logical(input_matrix)
+    ) {
+        return(invisible())
+    }
+    non_integer <- input_matrix != round(input_matrix)
+    n_non_integer <- sum(non_integer, na.rm = TRUE)
+    if (n_non_integer >= 1L) {
+        stop(
+            "The `",
+            input_matrix_name,
+            "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
+            n_non_integer,
+            " of its entries are not integers, for example ",
+            format(input_matrix[which(non_integer)[1L]]),
+            "."
+        )
+    }
+}
+
+
 check_import_data_inputs <- function(
     response_matrix,
     grna_matrix,
@@ -91,30 +117,7 @@ check_import_data_inputs <- function(
         )
     )
 
-    # 7b. check that the response and gRNA matrices hold integer counts
-    # (logical gRNA matrices pass)
-    check_integer_counts <- function(input_matrix, input_matrix_name) {
-        if (
-            methods::is(input_matrix, "lsparseMatrix") ||
-                is.integer(input_matrix) ||
-                is.logical(input_matrix)
-        ) {
-            return(invisible())
-        }
-        non_integer <- input_matrix != round(input_matrix)
-        n_non_integer <- sum(non_integer, na.rm = TRUE)
-        if (n_non_integer >= 1L) {
-            stop(
-                "The `",
-                input_matrix_name,
-                "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
-                n_non_integer,
-                " of its entries are not integers, for example ",
-                format(input_matrix[which(non_integer)[1L]]),
-                "."
-            )
-        }
-    }
+    # 7b. check that the response and gRNA matrices hold counts
     check_integer_counts(response_matrix, "response_matrix")
     check_integer_counts(grna_matrix, "grna_matrix")
 

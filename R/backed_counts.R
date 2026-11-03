@@ -51,7 +51,7 @@ as_row_counts <- function(x) {
         p = tx$p,
         x = tx$x,
         Dim = dim(x),
-        Dimnames = dimnames(x)
+        Dimnames = if (is.null(dimnames(x))) list(NULL, NULL) else dimnames(x)
     )
 }
 
@@ -61,6 +61,11 @@ viewport_range <- function(viewport, along) {
         DelayedArray::start(viewport)[along],
         DelayedArray::end(viewport)[along]
     )
+}
+
+# Rows of a DelayedMatrix, or of an in-memory dgRMatrix, as a dgRMatrix.
+row_slice <- function(mat, rows) {
+    as_row_counts(mat[rows, , drop = FALSE])
 }
 
 # Calls f(block, offset) on consecutive blocks of rows of `mat`, each an
@@ -77,7 +82,7 @@ row_blocks <- function(mat, f) {
     grid <- DelayedArray::rowAutoGrid(mat)
     lapply(seq_len(length(grid)), function(k) {
         rows <- viewport_range(grid[[k, 1L]], 1L)
-        f(as_row_counts(mat[rows, , drop = FALSE]), rows[1L] - 1L)
+        f(row_slice(mat, rows), rows[1L] - 1L)
     })
 }
 
@@ -87,7 +92,8 @@ row_blocks <- function(mat, f) {
 # other counts. The group's shape and number of entries must be the counts'.
 h5_counts_location <- function(mat) {
     if (
-        !DelayedArray::isPristine(mat, ignore.dimnames = TRUE) ||
+        !is_backed(mat) ||
+            !DelayedArray::isPristine(mat, ignore.dimnames = TRUE) ||
             !methods::is(DelayedArray::seed(mat), "CSR_H5ADMatrixSeed")
     ) {
         return(NULL)
@@ -171,14 +177,20 @@ h5_row_blocks <- function(mat, location, f) {
 
 # Writes counts (features x cells; any matrix that DelayedArray can read) into
 # an existing HDF5 file as the AnnData csc_matrix group `group`, block by
-# block, so that the counts are never all in memory at once.
-write_backed_counts <- function(counts, file, group) {
-    counts <- DelayedArray::DelayedArray(counts)
+# block, so that the counts are never all in memory at once. In-memory counts
+# are sliced as a dgRMatrix, several times faster than through DelayedArray.
+# `level` is the deflate level (HDF5Array's default; 0 for a temporary file).
+write_backed_counts <- function(counts, file, group, level = NULL) {
+    if (!is_backed(counts)) {
+        counts <- set_matrix_accessibility(counts, make_row_accessible = TRUE)
+    }
+    template <- DelayedArray::DelayedArray(counts)
     sink <- HDF5Array::TENxRealizationSink(
         dim = rev(dim(counts)),
-        type = DelayedArray::type(counts),
+        type = DelayedArray::type(template),
         filepath = file,
-        group = group
+        group = group,
+        level = if (is.null(level)) HDF5Array::getHDF5DumpCompressionLevel() else level
     )
     # blocks of consecutive features; each block's transpose (cells x
     # features) is the same CSR data read as a dgCMatrix
@@ -186,9 +198,7 @@ write_backed_counts <- function(counts, file, group) {
     for (k in seq_len(ncol(grid))) {
         viewport <- grid[[1L, k]]
         rows <- viewport_range(viewport, 2L)
-        block <- compressed_sparse_components(
-            as_row_counts(counts[rows, , drop = FALSE])
-        )
+        block <- compressed_sparse_components(row_slice(counts, rows))
         DelayedArray::write_block(
             sink,
             viewport,
@@ -226,17 +236,23 @@ write_backed_counts <- function(counts, file, group) {
     invisible(file)
 }
 
-# An empty dgRMatrix with the dimensions and names of `counts`: the counts
-# written by MuData in place of backed counts, which are then written
-# separately, and the counts kept in sceptre_object.rds in place of those in
-# screen.h5mu.
-empty_counts <- function(counts) {
-    methods::new(
-        "dgRMatrix",
-        Dim = dim(counts),
-        Dimnames = dimnames(counts),
-        p = integer(nrow(counts) + 1L)
+# An empty dgRMatrix of the given dimensions and names: the placeholder that
+# stands for the response counts while they are written separately
+# (write_screen()), kept in sceptre_object.rds in place of the counts in
+# screen.h5mu, or combined with the other matrices of a backed import.
+empty_row_counts <- function(dim, dimnames = NULL) {
+    Matrix::sparseMatrix(
+        i = integer(),
+        j = integer(),
+        x = numeric(),
+        dims = dim,
+        dimnames = dimnames,
+        repr = "R"
     )
+}
+
+empty_counts <- function(counts) {
+    empty_row_counts(dim(counts), dimnames(counts))
 }
 
 # The HDF5 files that back `x`, if any.
@@ -250,3 +266,4 @@ backing_files <- function(x) {
     )
     unique(normalizePath(files, winslash = "/", mustWork = FALSE))
 }
+

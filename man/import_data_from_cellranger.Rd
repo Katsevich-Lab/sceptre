@@ -68,15 +68,19 @@ Supplying barcode files for only some directories is an error.
 When multiple directories are supplied, the directory from which each cell
 was loaded is recorded in the cell covariate \code{cellranger_directory}, a
 factor that enters the default formula as a covariate. Columns of
-\code{extra_covariates}, including one named \code{batch}, are kept as supplied; a
-column of \code{extra_covariates} named \code{cellranger_directory} is an error.
+\code{extra_covariates}, including one named \code{batch}, are kept as supplied; with
+multiple directories, a column of \code{extra_covariates} named
+\code{cellranger_directory} is an error.
 A malformed matrix file (for example, one with an entry outside the dimensions declared in its header), a matrix file
 that lists the same (feature, cell) entry more than once, or a matrix file
 whose number of rows differs from the number of rows of \code{features.tsv}, is an
 error.
 Users can create either a standard \code{sceptre} object or a disk-backed
 \code{sceptre} object, whose response counts stay on disk; the latter is more
-appropriate for large-scale data. See
+appropriate for large-scale data. A disk-backed import holds the matrix of
+one directory in memory at a time and writes the response counts to
+\code{screen.h5mu} through temporary files in \code{directory_to_write} (a
+subdirectory named \code{sceptre_import_...}, removed when the import ends). See
 \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
 or
 \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}

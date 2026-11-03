@@ -31,6 +31,7 @@
 #' for example `SummarizedExperiment::rowData(sce)$Symbol`; names with the
 #' prefix "MT-" are taken as mitochondrial genes and are used to compute the
 #' covariate `response_p_mito`. By default, the row names of `sce`.
+#' @inheritParams import_data
 #'
 #' @return an initialized `sceptre_object`
 #' @seealso [as_singlecellexperiment()] for the reverse direction
@@ -61,7 +62,9 @@ import_data_from_sce <- function(
     grna_target_data_frame = NULL,
     grna_altexp = "gRNA",
     extra_covariates = character(),
-    response_names = NA_character_
+    response_names = NA_character_,
+    backed = FALSE,
+    directory_to_write = NULL
 ) {
     if (!methods::is(sce, "SingleCellExperiment")) {
         stop("`sce` must be a SingleCellExperiment.")
@@ -124,7 +127,9 @@ import_data_from_sce <- function(
                 optional = TRUE
             )
         },
-        response_names = response_names
+        response_names = response_names,
+        backed = backed,
+        directory_to_write = directory_to_write
     )
 }
 
