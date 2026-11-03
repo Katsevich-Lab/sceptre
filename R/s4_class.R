@@ -7,6 +7,9 @@ NULL
 # setClassUnion("response_matrix_class", c("matrix", "dgCMatrix", "dgRMatrix",
 # "dgTMatrix"))
 
+# package_version is an S3 class; register it so that it can be a slot class
+methods::setOldClass(c("package_version", "numeric_version"))
+
 #' The sceptre_object class
 #'
 #' A `sceptre_object` holds the data of a single-cell CRISPR screen together
@@ -31,6 +34,10 @@ NULL
 #'   run last; [write_outputs_to_directory()] writes the results, plots and a
 #'   summary to a directory.
 #'
+#' @slot version the version of `sceptre` that created the object, a
+#' `package_version`; [updateObject()] sets it to `0.99.1` on an object
+#' converted from an earlier version. An object created by a later version of
+#' `sceptre` than the one installed is refused with a message to upgrade.
 #' @slot data a `SingleCellExperiment` holding the response UMI counts (assay
 #' `"counts"`), the gRNA UMI counts (assay `"counts"` of the alternative
 #' experiment `"grna"`) and the cell covariates (`colData`)
@@ -119,6 +126,11 @@ NULL
 setClass(
     "sceptre_object",
     slots = list(
+        # the version of sceptre that created the object, set where objects
+        # are created (init_sceptre_object(), update_sceptre_object()); a
+        # blank object has an empty version
+        version = "package_version",
+
         # raw data: response counts in assay "counts", gRNA counts in assay
         # "counts" of altExp "grna", cell covariates in colData
         data = "SingleCellExperiment",
@@ -182,12 +194,16 @@ setClass(
         calibration_result = "data.frame",
         power_result = "data.frame",
         discovery_result = "data.frame"
-    )
+    ),
+    prototype = methods::prototype(version = package_version(character()))
 )
 
 
 setValidity("sceptre_object", function(object) {
     problems <- character()
+    if (length(object@version) > 1L) {
+        problems <- c(problems, "`version` must be a single package version.")
+    }
     screen <- object@data
     if (length(SummarizedExperiment::assayNames(screen)) >= 1L) {
         if (!("counts" %in% SummarizedExperiment::assayNames(screen))) {
@@ -310,7 +326,8 @@ new_screen <- function(
 #' which holds them in a `SingleCellExperiment`. The analysis state and results
 #' are carried over unchanged; in sceptre 0.99.2, an analysis continued on the
 #' updated object draws its random numbers as 0.99.1 and earlier did (the
-#' fixed seed 4). Current objects are returned unchanged.
+#' fixed seed 4). The `version` slot of the updated object is `0.99.1`.
+#' Current objects are returned unchanged.
 #'
 #' @param object a `sceptre_object`
 #' @param ... additional arguments (ignored)
@@ -341,12 +358,29 @@ setMethod(
 
 # Stops, naming updateObject(), when `object` was saved by a version of sceptre
 # whose class definition had no `data` slot (0.99.1 and earlier); such an
-# object cannot be used until it is updated.
+# object cannot be used until it is updated. Stops, asking to upgrade sceptre,
+# when `object` was created by a later version of sceptre than the one
+# installed.
 check_object_version <- function(object) {
     if (!methods::.hasSlot(object, "data")) {
         stop(
             "This `sceptre_object` was saved by an earlier version of sceptre; ",
             "convert it with `updateObject()` before using it.",
+            call. = FALSE
+        )
+    }
+    installed <- utils::packageVersion("sceptre")
+    if (
+        methods::.hasSlot(object, "version") &&
+            length(object@version) == 1L &&
+            object@version > installed
+    ) {
+        stop(
+            "This `sceptre_object` was created by sceptre ",
+            as.character(object@version),
+            ", later than the installed sceptre ",
+            as.character(installed),
+            "; upgrade sceptre to use it.",
             call. = FALSE
         )
     }
@@ -357,6 +391,12 @@ check_object_version <- function(object) {
 update_sceptre_object <- function(object) {
     old_slots <- attributes(object)
     if ("data" %in% names(old_slots)) {
+        if (!("version" %in% names(old_slots))) {
+            # an object with `data` but no `version` was created by a
+            # pre-release 0.99.2; it is stamped 0.99.1 like the objects of
+            # the released versions that lack the slot
+            attr(object, "version") <- package_version("0.99.1")
+        }
         return(object)
     }
     # 0.99.1 and earlier: the matrices in one-element lists, the covariates in
@@ -399,5 +439,7 @@ update_sceptre_object <- function(object) {
     if (isTRUE(updated@functs_called["set_analysis_parameters"])) {
         updated@seed <- 4L
     }
+    # 0.99.1 and earlier recorded no version
+    updated@version <- package_version("0.99.1")
     return(updated)
 }

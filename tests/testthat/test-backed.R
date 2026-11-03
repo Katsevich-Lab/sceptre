@@ -109,6 +109,7 @@ test_that("write_sceptre_object() and read_sceptre_object() round trip", {
     )
 
     reread <- read_sceptre_object(directory)
+    expect_identical(reread@version, in_memory@version)
     expect_identical(
         get_response_matrix(reread),
         get_response_matrix(in_memory)

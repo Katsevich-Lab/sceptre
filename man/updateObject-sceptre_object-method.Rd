@@ -23,7 +23,8 @@ and cell covariates in separate slots) to the current class definition,
 which holds them in a \code{SingleCellExperiment}. The analysis state and results
 are carried over unchanged; in sceptre 0.99.2, an analysis continued on the
 updated object draws its random numbers as 0.99.1 and earlier did (the
-fixed seed 4). Current objects are returned unchanged.
+fixed seed 4). The \code{version} slot of the updated object is \verb{0.99.1}.
+Current objects are returned unchanged.
 }
 \examples{
 data(lowmoi_example_data)

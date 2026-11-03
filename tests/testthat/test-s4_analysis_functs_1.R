@@ -36,6 +36,7 @@ test_that("import_data", {
     # most of the slots are so simple that only cursory tests are done, mostly to confirm
     # that future changes do not change the API
     all_slots <- c(
+        "version",
         "data",
         "covariate_matrix",
         "grna_target_data_frame",

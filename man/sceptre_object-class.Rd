@@ -19,6 +19,11 @@ version.
 \section{Slots}{
 
 \describe{
+\item{\code{version}}{the version of \code{sceptre} that created the object, a
+\code{package_version}; \code{\link[BiocGenerics:updateObject]{BiocGenerics::updateObject()}} sets it to \verb{0.99.1} on an object
+converted from an earlier version. An object created by a later version of
+\code{sceptre} than the one installed is refused with a message to upgrade.}
+
 \item{\code{data}}{a \code{SingleCellExperiment} holding the response UMI counts (assay
 \code{"counts"}), the gRNA UMI counts (assay \code{"counts"} of the alternative
 experiment \code{"grna"}) and the cell covariates (\code{colData})}

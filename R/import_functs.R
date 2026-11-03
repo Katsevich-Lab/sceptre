@@ -919,6 +919,7 @@ init_sceptre_object <- function(
 ) {
     # create sceptre_object
     sceptre_object <- methods::new("sceptre_object")
+    sceptre_object@version <- utils::packageVersion("sceptre")
 
     # process the covariate data frame
     sceptre_object@import_grna_assignment_info <- list(
