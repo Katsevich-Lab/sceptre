@@ -339,6 +339,21 @@ setMethod(
 )
 
 
+# Stops, naming updateObject(), when `object` was saved by a version of sceptre
+# whose class definition had no `data` slot (0.99.1 and earlier); such an
+# object cannot be used until it is updated.
+check_object_version <- function(object) {
+    if (!methods::.hasSlot(object, "data")) {
+        stop(
+            "This `sceptre_object` was saved by an earlier version of sceptre; ",
+            "convert it with `updateObject()` before using it.",
+            call. = FALSE
+        )
+    }
+    invisible(object)
+}
+
+
 update_sceptre_object <- function(object) {
     old_slots <- attributes(object)
     if ("data" %in% names(old_slots)) {

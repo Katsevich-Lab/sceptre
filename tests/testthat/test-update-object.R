@@ -40,6 +40,20 @@ test_that("updateObject() converts an object of the 0.99.1 layout", {
     expect_identical(updateObject(sceptre_object), sceptre_object)
 })
 
+test_that("an object of the 0.99.1 layout is refused until it is updated", {
+    data(lowmoi_example_data)
+    sceptre_object <- import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        moi = "low"
+    )
+    old <- old_layout_object(sceptre_object)
+    expect_error(get_response_matrix(old), "updateObject()", fixed = TRUE)
+    expect_error(get_cell_covariates(old), "updateObject()", fixed = TRUE)
+    expect_error(set_analysis_parameters(old), "updateObject()", fixed = TRUE)
+})
+
 test_that("updateObject() asks to re-import an object without its matrices", {
     data(lowmoi_example_data)
     sceptre_object <- import_data(

@@ -364,6 +364,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 
 
 perform_status_check_and_update <- function(sceptre_object, curr_funct) {
+    check_object_version(sceptre_object)
     rank_vector <- c(
         import_data = 1L,
         set_analysis_parameters = 2L,
@@ -410,6 +411,14 @@ load_row <- function(mat, id) {
             x = csr$x,
             row_idx = which(id == rownames(mat)),
             n_cells = ncol(mat)
+        )
+    } else {
+        stop(
+            "Counts of class `",
+            class(mat)[1L],
+            "` cannot be read by row; a `dgRMatrix` or a `DelayedMatrix` ",
+            "is expected.",
+            call. = FALSE
         )
     }
 }

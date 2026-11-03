@@ -35,6 +35,7 @@
 #' grna_matrix <- get_grna_matrix(sceptre_object)
 #' cell_covariates <- get_cell_covariates(sceptre_object)
 get_response_matrix <- function(sceptre_object) {
+    check_object_version(sceptre_object)
     return(SummarizedExperiment::assay(
         sceptre_object@data,
         "counts",
@@ -47,6 +48,7 @@ get_response_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_grna_matrix <- function(sceptre_object) {
+    check_object_version(sceptre_object)
     return(SummarizedExperiment::assay(
         SingleCellExperiment::altExp(
             sceptre_object@data,
@@ -63,6 +65,7 @@ get_grna_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_cell_covariates <- function(sceptre_object) {
+    check_object_version(sceptre_object)
     return(as.data.frame(
         SummarizedExperiment::colData(sceptre_object@data),
         optional = TRUE
