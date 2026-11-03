@@ -143,8 +143,9 @@ test_that("batch prefixes disambiguate duplicate Cell Ranger barcodes", {
         paste0("b2_", barcodes)
     )
 
+    # the same directory twice, named: the values of `sample` must be distinct
     sceptre_object <- suppressMessages(import_data_from_cellranger(
-        directories = rep(directory, 2L),
+        directories = c(first = directory, second = directory),
         moi = "high",
         grna_target_data_frame = inputs$grna_target_data_frame
     ))
@@ -295,8 +296,9 @@ test_that("Cell Ranger import keeps a user's batch column", {
         FUN.VALUE = integer(1)
     )
 
-    # two directories: the user's batch is kept; the directory index is
-    # recorded in cellranger_directory
+    # two unnamed directories: the user's batch is kept; the directory of each
+    # cell is recorded in `sample` as the path supplied, the first directory
+    # being the reference level
     user_batch <- rep(c("lane_A", "lane_B", "lane_C"), length.out = sum(n_cells))
     sceptre_object <- suppressMessages(import_data_from_cellranger(
         directories = inputs$directories,
@@ -307,8 +309,45 @@ test_that("Cell Ranger import keeps a user's batch column", {
     covariates <- get_cell_covariates(sceptre_object)
     expect_identical(as.character(covariates$batch), user_batch)
     expect_identical(
-        covariates$cellranger_directory,
-        factor(rep(c("b1", "b2"), n_cells))
+        covariates$sample,
+        factor(
+            rep(inputs$directories, n_cells),
+            levels = inputs$directories
+        )
+    )
+
+    # two named directories: the names are the values of `sample`
+    sceptre_object <- suppressMessages(import_data_from_cellranger(
+        directories = c(gem_2 = inputs$directories[2L], gem_1 = inputs$directories[1L]),
+        moi = "high",
+        grna_target_data_frame = inputs$grna_target_data_frame
+    ))
+    expect_identical(
+        get_cell_covariates(sceptre_object)$sample,
+        factor(
+            rep(c("gem_2", "gem_1"), n_cells[c(2L, 1L)]),
+            levels = c("gem_2", "gem_1")
+        )
+    )
+
+    # the values of `sample` must be distinct
+    expect_error(
+        import_data_from_cellranger(
+            directories = inputs$directories[c(1L, 2L, 1L)],
+            moi = "high",
+            grna_target_data_frame = inputs$grna_target_data_frame
+        ),
+        regexp = paste0("\"", inputs$directories[1L], "\" occurs more than once"),
+        fixed = TRUE
+    )
+    expect_error(
+        import_data_from_cellranger(
+            directories = c(a = inputs$directories[1L], a = inputs$directories[2L]),
+            moi = "high",
+            grna_target_data_frame = inputs$grna_target_data_frame
+        ),
+        regexp = "\"a\" occurs more than once",
+        fixed = TRUE
     )
 
     # one directory: the user's batch is kept and no directory index is added
@@ -321,19 +360,19 @@ test_that("Cell Ranger import keeps a user's batch column", {
     ))
     covariates <- get_cell_covariates(sceptre_object)
     expect_identical(as.character(covariates$batch), user_batch)
-    expect_false("cellranger_directory" %in% colnames(covariates))
+    expect_false("sample" %in% colnames(covariates))
 
-    # a user's column named cellranger_directory is an error, not overwritten
+    # a user's column named sample is an error, not overwritten
     expect_error(
         import_data_from_cellranger(
             directories = inputs$directories,
             moi = "high",
             grna_target_data_frame = inputs$grna_target_data_frame,
             extra_covariates = data.frame(
-                cellranger_directory = seq_len(sum(n_cells))
+                sample = seq_len(sum(n_cells))
             )
         ),
-        regexp = "`extra_covariates` contains a column named `cellranger_directory`",
+        regexp = "`extra_covariates` contains a column named `sample`",
         fixed = TRUE
     )
 })

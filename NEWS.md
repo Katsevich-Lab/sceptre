@@ -26,7 +26,7 @@
 
 -   The default formula gives a message naming each covariate it leaves out (non-count covariates with 15 or more distinct values).
 
--   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `cellranger_directory` (previously `batch`), and a user column named `cellranger_directory` is an error. A `formula_object` that refers to the directory as `batch` must now name `cellranger_directory`.
+-   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `sample` (previously `batch`), whose values are `names(directories)` when `directories` is named and the directory paths otherwise, and a user column named `sample` is an error. A `formula_object` that refers to the directory as `batch` must now name `sample`.
 
 -   sceptre now requires R 4.6.0 or later.
 

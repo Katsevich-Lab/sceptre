@@ -244,8 +244,7 @@ also automatically computes the following cell-specific covariates:
 `response_n_nonzero` (i.e., the number of responses expressed in the cell),
 `response_n_umis` (i.e., the number of response UMIs sequenced in the cell),
 `response_p_mito` (i.e., the fraction of transcripts mapping to mitochondrial
-genes), and `cellranger_directory` (i.e., the directory from which the cell was
-loaded). (Cells loaded from different directories are assumed to come from
+genes), and `sample` (i.e., the directory from which the cell was loaded). (Cells loaded from different directories are assumed to come from
 different batches.)
 
 ## 2. Set analysis parameters
@@ -380,7 +379,7 @@ method," the "maximum method," and the "thresholding method")**, all of which
 account for background contamination. The default method for high-MOI data is
 the historical "mixture method." In the intended model, the gRNA counts are
 regressed onto the (unobserved) gRNA presence/absence indicator and the cell-
-specific covariates (e.g., `grna_n_umis`, `cellranger_directory`) via a latent variable Poisson
+specific covariates (e.g., `grna_n_umis`, `sample`) via a latent variable Poisson
 GLM. The historical implementation yields fitted posterior membership
 probabilities that each cell contains the gRNA, and these probabilities are
 thresholded to assign the gRNA to cells. Because of a known inconsistency in its
@@ -804,7 +803,7 @@ computes are computed anew.
 sceptre_object_from_sce <- import_data_from_sce(
     sce = sce,
     moi = "high",
-    extra_covariates = "cellranger_directory"
+    extra_covariates = "sample"
 )
 sceptre_object_from_sce
 ```

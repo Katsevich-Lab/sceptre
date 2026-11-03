@@ -89,7 +89,7 @@ test_that("a disk-backed Cell Ranger import equals the in-memory import", {
     )
     expect_same_import(backed, in_memory)
     expect_true(all(
-        c("batch", "cellranger_directory") %in%
+        c("batch", "sample") %in%
             colnames(get_cell_covariates(backed))
     ))
 
