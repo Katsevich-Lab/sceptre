@@ -262,6 +262,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_cell_covariates_by_feature_cpp
+List compute_cell_covariates_by_feature_cpp(IntegerVector i, IntegerVector p, NumericVector x, IntegerVector feature_cols, int n_cells, IntegerVector mt_feature_idxs, bool compute_p_mito);
+RcppExport SEXP _sceptre_compute_cell_covariates_by_feature_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP feature_colsSEXP, SEXP n_cellsSEXP, SEXP mt_feature_idxsSEXP, SEXP compute_p_mitoSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type feature_cols(feature_colsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type mt_feature_idxs(mt_feature_idxsSEXP);
+    Rcpp::traits::input_parameter< bool >::type compute_p_mito(compute_p_mitoSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_by_feature_cpp(i, p, x, feature_cols, n_cells, mt_feature_idxs, compute_p_mito));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_n_grnas_per_cell_vector
 IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells);
 RcppExport SEXP _sceptre_compute_n_grnas_per_cell_vector(SEXP grna_assignmentsSEXP, SEXP n_cellsSEXP) {
@@ -289,6 +306,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// stack_csc_rows
+List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_offsets, int n_cols);
+RcppExport SEXP _sceptre_stack_csc_rows(SEXP i_listSEXP, SEXP x_listSEXP, SEXP p_listSEXP, SEXP row_offsetsSEXP, SEXP n_colsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type i_list(i_listSEXP);
+    Rcpp::traits::input_parameter< List >::type x_list(x_listSEXP);
+    Rcpp::traits::input_parameter< List >::type p_list(p_listSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type row_offsets(row_offsetsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cols(n_colsSEXP);
+    rcpp_result_gen = Rcpp::wrap(stack_csc_rows(i_list, x_list, p_list, row_offsets, n_cols));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
@@ -307,8 +339,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
+    {"_sceptre_compute_cell_covariates_by_feature_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_by_feature_cpp, 7},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
+    {"_sceptre_stack_csc_rows", (DL_FUNC) &_sceptre_stack_csc_rows, 5},
     {NULL, NULL, 0}
 };
 

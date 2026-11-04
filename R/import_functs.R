@@ -532,9 +532,11 @@ import_data_from_cellranger_files <- function(
             stop("The features.tsv files must match across directories.")
         }
 
-        # process the matrix
-        mat <- read_mtx(matrix_fps[i], transpose = FALSE)
-        mat_dim <- dim(mat)
+        # process the matrix; when backed, it is read as cells x features, so
+        # that each feature's counts are contiguous and the response counts
+        # are written from it without a copy
+        mat <- read_mtx(matrix_fps[i], transpose = backed)
+        mat_dim <- if (backed) rev(dim(mat)) else dim(mat)
         if (mat_dim[1L] != nrow(feature_df)) {
             stop(
                 "The matrix file in directory ",
@@ -591,26 +593,32 @@ import_data_from_cellranger_files <- function(
         }
         # split the rows by feature type; the features of a type need not be
         # contiguous in features.tsv
-        subsetted_mats <- lapply(modality_idxs, function(idxs) {
-            mat[idxs, , drop = FALSE]
-        })
-        rm(mat)
         if (backed) {
-            # the response counts of this directory are checked and summarized
-            # per cell as the in-memory import checks and summarizes the
+            # the response counts of this directory are summarized per cell and
+            # checked as the in-memory import summarizes and checks the
             # combined counts, then written to their temporary file
-            response <- subsetted_mats[["Gene Expression"]]
-            check_integer_counts(response, "response_matrix")
-            response_covariates[[i]] <- compute_cell_covariates(
-                matrix_in = response,
-                feature_names = gene_names,
-                compute_p_mito = TRUE,
-                compute_max_feature = FALSE
+            response_cols <- modality_idxs[["Gene Expression"]]
+            response_covariates[[i]] <- compute_cell_covariates_by_feature(
+                t_matrix_in = mat,
+                feature_cols = response_cols,
+                feature_names = gene_names
             )
-            write_backed_counts(response, response_files[i], "counts", level = 0L)
-            subsetted_mats[["Gene Expression"]] <- NULL
-            rm(response)
+            write_backed_counts(
+                t_counts_source(mat, response_cols, check_name = "response_matrix"),
+                response_files[i],
+                "counts",
+                level = 0L
+            )
+            other_idxs <- modality_idxs[names(modality_idxs) != "Gene Expression"]
+            subsetted_mats <- lapply(other_idxs, function(idxs) {
+                Matrix::t(mat[, idxs, drop = FALSE])
+            })
+        } else {
+            subsetted_mats <- lapply(modality_idxs, function(idxs) {
+                mat[idxs, , drop = FALSE]
+            })
         }
+        rm(mat)
         gc() |> invisible()
         out_list[[i]] <- subsetted_mats
         message(crayon::green(" \u2713"))
@@ -680,18 +688,9 @@ import_data_from_cellranger_files <- function(
     # 9. initialize the sceptre object
     message("Creating the sceptre object.")
     sceptre_object <- if (backed) {
-        response_source <- do.call(
-            BiocGenerics::cbind,
-            lapply(response_files, function(file) {
-                DelayedArray::DelayedArray(
-                    HDF5Array::H5SparseMatrixSeed(file, "counts")
-                )
-            })
-        )
-        dimnames(response_source) <- dimnames(out_mats[["Gene Expression"]])
         import_data_backed(
             response_matrix = out_mats[["Gene Expression"]],
-            response_source = response_source,
+            response_source = gathered_counts_source(response_files, "counts"),
             response_covariates = do.call(rbind, response_covariates),
             grna_matrix = out_mats[["CRISPR Guide Capture"]],
             grna_target_data_frame = grna_target_data_frame,
@@ -717,7 +716,7 @@ import_data_from_cellranger_files <- function(
 
 
 # As import_data_memory(), for response counts held in temporary files
-# (`response_source`, a DelayedMatrix reading them; `response_matrix` is an
+# (`response_source`, a counts source reading them; `response_matrix` is an
 # empty matrix with their dimensions and names) whose per-cell covariates
 # (`response_covariates`) were computed as the files were written: the counts
 # are copied from the temporary files to `directory_to_write/screen.h5mu`,

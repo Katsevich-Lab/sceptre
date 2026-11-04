@@ -21,41 +21,39 @@ NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, in
 List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector x, int n_genes,
                                  int n_cells, IntegerVector mt_gene_idxs, bool compute_p_mito, bool compute_max_feature) {
   IntegerVector n_nonzero(n_cells), max_feature(n_cells);
-  NumericVector n_umi(n_cells), p_mito(n_cells), y(n_genes), frac_umis_max_feature(n_cells);
+  NumericVector n_umi(n_cells), p_mito(n_cells), frac_umis_max_feature(n_cells);
   List out;
 
-  int n_nonzero_count, curr_max_feature;
-  double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature;
-  for (int k = 0; k < mt_gene_idxs.size(); k ++) mt_gene_idxs[k] --;
+  // visit only the stored entries of each column, in increasing row order; as
+  // the counts are nonnegative, the sums, the first maximum and so every
+  // covariate equal those over the full (dense) column
+  vector<bool> is_mt(n_genes, false);
+  for (int k = 0; k < mt_gene_idxs.size(); k ++) is_mt[mt_gene_idxs[k] - 1] = true;
 
+  int n_nonzero_count, curr_max_feature;
+  double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature, y;
   for (int k = 0; k < n_cells; k ++) {
     curr_max_feature = 0;
     umi_count_curr_max_feature = 0;
     n_umi_count = 0;
+    n_umi_count_mito = 0;
     n_nonzero_count = 0;
-    load_sparse_vector(i, p, x, k, n_genes, y);
-    for (int r = 0; r < n_genes; r ++) {
-      n_umi_count += y[r];
-      if (y[r] > 0.5) n_nonzero_count ++;
+    for (int l = p[k]; l < p[k + 1]; l ++) {
+      y = x[l];
+      n_umi_count += y;
+      if (y > 0.5) n_nonzero_count ++;
+      if (is_mt[i[l]]) n_umi_count_mito += y;
+      if (y > umi_count_curr_max_feature) {
+        curr_max_feature = i[l];
+        umi_count_curr_max_feature = y;
+      }
     }
 
     // compute p mito
-    if (compute_p_mito) {
-      n_umi_count_mito = 0;
-      for (int r = 0; r < mt_gene_idxs.size(); r ++) n_umi_count_mito += y[mt_gene_idxs[r]];
-      p_mito[k] = n_umi_count_mito/n_umi_count;
-    }
+    if (compute_p_mito) p_mito[k] = n_umi_count_mito/n_umi_count;
 
     // compute max feature, fraction expressed
     if (compute_max_feature) {
-      curr_max_feature = 0;
-      umi_count_curr_max_feature = 0;
-      for (int r = 0; r < n_genes; r ++) {
-        if (y[r] > umi_count_curr_max_feature) {
-          curr_max_feature = r;
-          umi_count_curr_max_feature = y[r];
-        }
-      }
       max_feature[k] = curr_max_feature;
       frac_umis_max_feature[k] = umi_count_curr_max_feature/n_umi_count;
     }
@@ -67,6 +65,34 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
   out = List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito,
                      Named("max_feature") = max_feature, Named("frac_umis_max_feature") = frac_umis_max_feature);
   return out;
+}
+
+
+// compute_cell_covariates_cpp() (without the maximum feature) for counts held
+// as cells x features, column-compressed: the features are the columns
+// `feature_cols` (1-based, increasing) and `mt_feature_idxs` (1-based) indexes
+// into them. Each cell's entries are visited in increasing feature order, as
+// compute_cell_covariates_cpp() visits them, so the covariates are the same.
+// [[Rcpp::export]]
+List compute_cell_covariates_by_feature_cpp(IntegerVector i, IntegerVector p, NumericVector x, IntegerVector feature_cols,
+                                            int n_cells, IntegerVector mt_feature_idxs, bool compute_p_mito) {
+  IntegerVector n_nonzero(n_cells);
+  NumericVector n_umi(n_cells), n_umi_mito(n_cells), p_mito(n_cells);
+  vector<bool> is_mt(feature_cols.size(), false);
+  for (int k = 0; k < mt_feature_idxs.size(); k ++) is_mt[mt_feature_idxs[k] - 1] = true;
+
+  double y;
+  for (int k = 0; k < feature_cols.size(); k ++) {
+    int col = feature_cols[k] - 1;
+    for (int l = p[col]; l < p[col + 1]; l ++) {
+      y = x[l];
+      n_umi[i[l]] += y;
+      if (y > 0.5) n_nonzero[i[l]] ++;
+      if (is_mt[k]) n_umi_mito[i[l]] += y;
+    }
+  }
+  if (compute_p_mito) for (int c = 0; c < n_cells; c ++) p_mito[c] = n_umi_mito[c]/n_umi[c];
+  return List::create(Named("n_nonzero") = n_nonzero, Named("n_umi") = n_umi, Named("p_mito") = p_mito);
 }
 
 
@@ -115,4 +141,37 @@ IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVe
   out = IntegerVector(n_gte_threshold);
   for (int k = start; k < end; k ++) if (x[k] >= threshold) out[counter ++] = j[k] + 1;
   return out;
+}
+
+
+// The columns of several column-compressed matrices with the same columns,
+// stacked by row: matrix k (row indices i_list[[k]], values x_list[[k]],
+// column pointers p_list[[k]]) supplies rows row_offsets[k] + 1, ...; within a
+// column, the entries of each matrix follow those of the matrices before it.
+// [[Rcpp::export]]
+List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_offsets, int n_cols) {
+  int n_matrices = i_list.size();
+  std::vector<IntegerVector> is(n_matrices), ps(n_matrices);
+  std::vector<NumericVector> xs(n_matrices);
+  long long n_entries = 0;
+  for (int k = 0; k < n_matrices; k ++) {
+    is[k] = i_list[k];
+    xs[k] = x_list[k];
+    ps[k] = p_list[k];
+    n_entries += is[k].size();
+  }
+  IntegerVector i(n_entries), p(n_cols + 1);
+  NumericVector x(n_entries);
+  int l = 0;
+  for (int c = 0; c < n_cols; c ++) {
+    for (int k = 0; k < n_matrices; k ++) {
+      for (int m = ps[k][c]; m < ps[k][c + 1]; m ++) {
+        i[l] = is[k][m] + row_offsets[k];
+        x[l] = xs[k][m];
+        l ++;
+      }
+    }
+    p[c + 1] = l;
+  }
+  return List::create(Named("i") = i, Named("p") = p, Named("x") = x);
 }

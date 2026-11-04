@@ -80,11 +80,19 @@ compute_cell_covariates_cpp <- function(i, p, x, n_genes, n_cells, mt_gene_idxs,
     .Call(`_sceptre_compute_cell_covariates_cpp`, i, p, x, n_genes, n_cells, mt_gene_idxs, compute_p_mito, compute_max_feature)
 }
 
+compute_cell_covariates_by_feature_cpp <- function(i, p, x, feature_cols, n_cells, mt_feature_idxs, compute_p_mito) {
+    .Call(`_sceptre_compute_cell_covariates_by_feature_cpp`, i, p, x, feature_cols, n_cells, mt_feature_idxs, compute_p_mito)
+}
+
 compute_n_grnas_per_cell_vector <- function(grna_assignments, n_cells) {
     .Call(`_sceptre_compute_n_grnas_per_cell_vector`, grna_assignments, n_cells)
 }
 
 threshold_count_matrix <- function(j, p, x, row_idx, threshold) {
     .Call(`_sceptre_threshold_count_matrix`, j, p, x, row_idx, threshold)
+}
+
+stack_csc_rows <- function(i_list, x_list, p_list, row_offsets, n_cols) {
+    .Call(`_sceptre_stack_csc_rows`, i_list, x_list, p_list, row_offsets, n_cols)
 }
 

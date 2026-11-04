@@ -127,18 +127,49 @@ h5_counts_location <- function(mat) {
     list(file = file, group = group, indptr = indptr)
 }
 
+# Blocks of consecutive features, given the number of entries of each
+# (`widths`): each block holds about as many entries as a block of
+# DelayedArray's automatic size holds elements, or a single feature.
+entry_blocks <- function(widths) {
+    if (length(widths) == 0L) {
+        return(list())
+    }
+    budget <- max(1, DelayedArray::getAutoBlockSize() / 8)
+    first <- c(0, cumsum(as.numeric(widths)))[seq_along(widths)]
+    block_of_row <- c(0, cumsum(diff(floor(first / budget)) > 0))
+    unname(split(seq_along(widths), block_of_row))
+}
+
+# Entries start, ..., start + count - 1 of an open HDF5 dataset, as a vector
+# of `type`; read with H5Dread(), since h5read() copies the values to drop
+# their dimension and scans them for missing values.
+h5_read_entries <- function(dataset, start, count, type) {
+    if (count == 0) {
+        return(vector(type))
+    }
+    space <- rhdf5::H5Dget_space(dataset)
+    on.exit(rhdf5::H5Sclose(space), add = TRUE)
+    rhdf5::H5Sselect_hyperslab(space, start = start, count = count)
+    memory <- rhdf5::H5Screate_simple(count)
+    on.exit(rhdf5::H5Sclose(memory), add = TRUE)
+    values <- rhdf5::H5Dread(
+        dataset,
+        h5spaceFile = space,
+        h5spaceMem = memory,
+        drop = TRUE
+    )
+    if (typeof(values) == type) values else methods::as(values, type)
+}
+
 # row_blocks() for counts read from screen.h5mu (location:
-# h5_counts_location(mat)): blocks of consecutive rows holding about as many
-# entries as a block of DelayedArray's automatic size holds elements (or one
-# row), each read with one read of the indices and one of the values.
+# h5_counts_location(mat)): blocks of consecutive rows (entry_blocks()), each
+# read with one read of the indices and one of the values.
 h5_row_blocks <- function(mat, location, f) {
     widths <- diff(location$indptr)
     if (length(widths) == 0L) {
         return(list())
     }
-    budget <- max(1, DelayedArray::getAutoBlockSize() / 8)
     first <- location$indptr[-length(location$indptr)]
-    block_of_row <- c(0, cumsum(diff(floor(first / budget)) > 0))
     file <- rhdf5::H5Fopen(location$file, flags = "H5F_ACC_RDONLY")
     on.exit(rhdf5::H5Fclose(file), add = TRUE)
     datasets <- lapply(
@@ -146,34 +177,14 @@ h5_row_blocks <- function(mat, location, f) {
         function(name) rhdf5::H5Dopen(file, paste0(location$group, "/", name))
     )
     on.exit(lapply(datasets, rhdf5::H5Dclose), add = TRUE, after = FALSE)
-    # entries start, ..., start + count - 1 of a dataset, as a vector of
-    # `type`; read with H5Dread(), since h5read() copies the values to drop
-    # their dimension and scans them for missing values
-    read <- function(dataset, start, count, type) {
-        if (count == 0) {
-            return(vector(type))
-        }
-        space <- rhdf5::H5Dget_space(dataset)
-        on.exit(rhdf5::H5Sclose(space), add = TRUE)
-        rhdf5::H5Sselect_hyperslab(space, start = start, count = count)
-        memory <- rhdf5::H5Screate_simple(count)
-        on.exit(rhdf5::H5Sclose(memory), add = TRUE)
-        values <- rhdf5::H5Dread(
-            dataset,
-            h5spaceFile = space,
-            h5spaceMem = memory,
-            drop = TRUE
-        )
-        if (typeof(values) == type) values else methods::as(values, type)
-    }
-    lapply(unname(split(seq_along(widths), block_of_row)), function(rows) {
+    lapply(entry_blocks(widths), function(rows) {
         start <- first[rows[1L]] + 1
         count <- sum(widths[rows])
         block <- methods::new(
             "dgRMatrix",
-            j = read(datasets$indices, start, count, "integer"),
+            j = h5_read_entries(datasets$indices, start, count, "integer"),
             p = as.integer(c(0, cumsum(widths[rows]))),
-            x = read(datasets$data, start, count, "double"),
+            x = h5_read_entries(datasets$data, start, count, "double"),
             Dim = c(length(rows), ncol(mat)),
             Dimnames = list(rownames(mat)[rows], colnames(mat))
         )
@@ -181,40 +192,174 @@ h5_row_blocks <- function(mat, location, f) {
     })
 }
 
-# Writes counts (features x cells; any matrix that DelayedArray can read) into
-# an existing HDF5 file as the AnnData csc_matrix group `group`, block by
-# block, so that the counts are never all in memory at once. In-memory counts
-# are sliced as a dgRMatrix, several times faster than through DelayedArray.
+# Counts to write with write_backed_counts(), other than a matrix: `dim`
+# (features x cells), `type`, the number of entries of each feature
+# (`widths`), and `block(rows)`, the counts of the consecutive features `rows`
+# as a cells x features dgCMatrix.
+counts_source <- function(dim, widths, block, type = "double") {
+    structure(
+        list(dim = dim, type = type, widths = widths, block = block),
+        class = "sceptre_counts_source"
+    )
+}
+
+# A matrix as a counts source. In-memory counts are sliced as a dgRMatrix,
+# whose rows are the columns of the transpose, several times faster than
+# through DelayedArray; other counts are realized through DelayedArray, in
+# blocks of its automatic grid (`widths` NULL).
+matrix_counts_source <- function(counts) {
+    if (is_backed(counts)) {
+        return(counts_source(
+            dim = dim(counts),
+            type = DelayedArray::type(counts),
+            widths = NULL,
+            block = function(rows) {
+                block <- compressed_sparse_components(row_slice(counts, rows))
+                methods::new(
+                    "dgCMatrix",
+                    i = block$j,
+                    p = block$p,
+                    x = block$x,
+                    Dim = c(ncol(counts), length(rows))
+                )
+            }
+        ))
+    }
+    counts <- set_matrix_accessibility(counts, make_row_accessible = TRUE)
+    csr <- compressed_sparse_components(counts)
+    counts_source(
+        dim = dim(counts),
+        widths = diff(csr$p),
+        block = function(rows) {
+            first <- csr$p[rows[1L]]
+            entries <- seq_len(csr$p[rows[length(rows)] + 1L] - first) + first
+            methods::new(
+                "dgCMatrix",
+                i = csr$j[entries],
+                p = csr$p[c(rows, rows[length(rows)] + 1L)] - first,
+                x = csr$x[entries],
+                Dim = c(ncol(counts), length(rows))
+            )
+        }
+    )
+}
+
+# The columns `feature_cols` (increasing) of in-memory counts held as cells x
+# features (a dgCMatrix, `t_counts`) as a counts source of their features.
+# With `check_name`, each block is checked to hold counts
+# (check_integer_counts()) under that name.
+t_counts_source <- function(t_counts, feature_cols, check_name = NULL) {
+    csc <- compressed_sparse_components(t_counts)
+    counts_source(
+        dim = c(length(feature_cols), nrow(t_counts)),
+        widths = diff(csc$p)[feature_cols],
+        block = function(rows) {
+            block <- t_counts[, feature_cols[rows], drop = FALSE]
+            if (!is.null(check_name)) {
+                check_integer_counts(block, check_name)
+            }
+            block
+        }
+    )
+}
+
+# Counts held in HDF5 files written by write_backed_counts() (group `group`),
+# one per set of cells, as a counts source of all the cells, the cells of each
+# file following those of the files before it. Each block is read from the
+# files' index and value arrays directly.
+gathered_counts_source <- function(files, group) {
+    indptrs <- lapply(files, function(file) {
+        as.numeric(rhdf5::h5read(
+            file,
+            paste0(group, "/indptr"),
+            bit64conversion = "double"
+        ))
+    })
+    n_cells <- vapply(
+        files,
+        function(file) as.integer(rhdf5::h5readAttributes(file, group)$shape[1L]),
+        integer(1)
+    )
+    cell_offsets <- c(0L, cumsum(n_cells))[seq_along(files)]
+    n_features <- length(indptrs[[1L]]) - 1L
+    counts_source(
+        dim = c(n_features, sum(n_cells)),
+        widths = Reduce(`+`, lapply(indptrs, diff)),
+        block = function(rows) {
+            pieces <- Map(
+                function(file, indptr) {
+                    h5 <- rhdf5::H5Fopen(file, flags = "H5F_ACC_RDONLY")
+                    on.exit(rhdf5::H5Fclose(h5), add = TRUE)
+                    first <- indptr[rows[1L]]
+                    count <- indptr[rows[length(rows)] + 1L] - first
+                    read <- function(name, type) {
+                        dataset <- rhdf5::H5Dopen(h5, paste0(group, "/", name))
+                        on.exit(rhdf5::H5Dclose(dataset), add = TRUE)
+                        h5_read_entries(dataset, first + 1, count, type)
+                    }
+                    list(
+                        i = read("indices", "integer"),
+                        x = read("data", "double"),
+                        p = as.integer(indptr[c(rows, rows[length(rows)] + 1L)] - first)
+                    )
+                },
+                files,
+                indptrs
+            )
+            # within a feature, the cells of each file in turn
+            stacked <- stack_csc_rows(
+                i_list = lapply(pieces, `[[`, "i"),
+                x_list = lapply(pieces, `[[`, "x"),
+                p_list = lapply(pieces, `[[`, "p"),
+                row_offsets = cell_offsets,
+                n_cols = length(rows)
+            )
+            rm(pieces)
+            methods::new(
+                "dgCMatrix",
+                i = stacked$i,
+                p = stacked$p,
+                x = stacked$x,
+                Dim = c(sum(n_cells), length(rows))
+            )
+        }
+    )
+}
+
+# Writes counts (features x cells: any matrix that DelayedArray can read, or a
+# counts source) into an existing HDF5 file as the AnnData csc_matrix group
+# `group`, block by block, so that the counts are never all in memory at once.
+# Blocks of consecutive features hold a bounded number of entries
+# (entry_blocks()) when the number of entries of each feature is known.
 # `level` is the deflate level (HDF5Array's default; 0 for a temporary file).
 write_backed_counts <- function(counts, file, group, level = NULL) {
-    if (!is_backed(counts)) {
-        counts <- set_matrix_accessibility(counts, make_row_accessible = TRUE)
+    source <- if (inherits(counts, "sceptre_counts_source")) {
+        counts
+    } else {
+        matrix_counts_source(counts)
     }
-    template <- DelayedArray::DelayedArray(counts)
+    dim <- source$dim
     sink <- HDF5Array::TENxRealizationSink(
-        dim = rev(dim(counts)),
-        type = DelayedArray::type(template),
+        dim = rev(dim),
+        type = source$type,
         filepath = file,
         group = group,
         level = if (is.null(level)) HDF5Array::getHDF5DumpCompressionLevel() else level
     )
-    # blocks of consecutive features; each block's transpose (cells x
-    # features) is the same CSR data read as a dgCMatrix
-    grid <- DelayedArray::colAutoGrid(sink)
+    grid <- if (is.null(source$widths)) {
+        DelayedArray::colAutoGrid(sink)
+    } else {
+        DelayedArray::ArbitraryArrayGrid(list(
+            dim[2L],
+            cumsum(lengths(entry_blocks(source$widths)))
+        ))
+    }
     for (k in seq_len(ncol(grid))) {
         viewport <- grid[[1L, k]]
-        rows <- viewport_range(viewport, 2L)
-        block <- compressed_sparse_components(row_slice(counts, rows))
         DelayedArray::write_block(
             sink,
             viewport,
-            methods::new(
-                "dgCMatrix",
-                i = block$j,
-                p = block$p,
-                x = block$x,
-                Dim = c(ncol(counts), length(rows))
-            )
+            source$block(viewport_range(viewport, 2L))
         )
     }
     DelayedArray::close(sink)
@@ -238,7 +383,7 @@ write_backed_counts <- function(counts, file, group, level = NULL) {
         variableLengthString = TRUE,
         asScalar = TRUE
     )
-    rhdf5::h5writeAttribute(rev(dim(counts)), x, "shape")
+    rhdf5::h5writeAttribute(rev(dim), x, "shape")
     invisible(file)
 }
 

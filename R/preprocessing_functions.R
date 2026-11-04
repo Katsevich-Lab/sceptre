@@ -135,6 +135,38 @@ compute_cell_covariates <- function(
 }
 
 
+# compute_cell_covariates() (with p_mito, without the maximum feature) for
+# counts held as cells x features (a dgCMatrix, `t_matrix_in`), of the features
+# in the columns `feature_cols` (increasing), named `feature_names`.
+compute_cell_covariates_by_feature <- function(
+    t_matrix_in,
+    feature_cols,
+    feature_names
+) {
+    mt_feature_idxs <- grep(
+        pattern = "^MT-",
+        x = feature_names,
+        ignore.case = TRUE
+    )
+    compute_p_mito <- length(mt_feature_idxs) >= 1
+    csc <- compressed_sparse_components(t_matrix_in)
+    out <- compute_cell_covariates_by_feature_cpp(
+        i = csc$i,
+        p = csc$p,
+        x = csc$x,
+        feature_cols = as.integer(feature_cols),
+        n_cells = nrow(t_matrix_in),
+        mt_feature_idxs = mt_feature_idxs,
+        compute_p_mito = compute_p_mito
+    )
+    ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
+    if (compute_p_mito) {
+        ret$p_mito <- out$p_mito
+    }
+    return(ret)
+}
+
+
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
     B,
