@@ -264,15 +264,28 @@ get_bpparam <- function(BPPARAM, parallel = NULL, n_processors = NULL) {
 
 # Split the IDs into one group per worker of `BPPARAM` (a single group when
 # running serially). The IDs are dealt out in turn, so that neighboring IDs,
-# which may have similar workloads, go to different workers.
-partition_response_ids <- function(response_ids, BPPARAM) {
+# which may have similar workloads, go to different workers. With `positions`
+# (the rows of the IDs' counts), the IDs are first put in the order of their
+# rows and dealt out in blocks of consecutive rows, so that each worker reads
+# runs of neighboring rows, which share the chunks of disk-backed counts.
+partition_response_ids <- function(response_ids, BPPARAM, positions = NULL) {
     n_processors <- if (is.null(BPPARAM)) {
         1L
     } else {
         BiocParallel::bpnworkers(BPPARAM)
     }
-    if (n_processors >= 2L && length(response_ids) >= 2 * n_processors) {
-        group <- (seq_along(response_ids) - 1L) %% n_processors + 1L
+    unit <- seq_along(response_ids)
+    if (!is.null(positions)) {
+        response_ids <- response_ids[order(positions)]
+        # at least four blocks per worker, of at most 64 rows
+        block_length <- max(
+            1L,
+            min(64L, ceiling(length(response_ids) / (4L * n_processors)))
+        )
+        unit <- (seq_along(response_ids) - 1L) %/% block_length + 1L
+    }
+    if (n_processors >= 2L && max(unit) >= 2L * n_processors) {
+        group <- (unit - 1L) %% n_processors + 1L
         out <- split(
             response_ids,
             factor(

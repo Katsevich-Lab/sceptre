@@ -42,6 +42,7 @@ utils::globalVariables(c(
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
+#' @importFrom beachmat.hdf5 initializeCpp
 #' @keywords package
 #' @examples
 #' ##########################

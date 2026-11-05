@@ -72,6 +72,14 @@ read_mtx <- function(path, transpose) {
     .Call(`_sceptre_read_mtx`, path, transpose)
 }
 
+make_row_extractor <- function(matrix) {
+    .Call(`_sceptre_make_row_extractor`, matrix)
+}
+
+read_extractor_row <- function(row_extractor, row) {
+    .Call(`_sceptre_read_extractor_row`, row_extractor, row)
+}
+
 load_csr_row <- function(j, p, x, row_idx, n_cells) {
     .Call(`_sceptre_load_csr_row`, j, p, x, row_idx, n_cells)
 }

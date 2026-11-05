@@ -94,6 +94,7 @@ run_perm_test_in_memory <- function(
 
     # 2. define function to loop subset of response IDs
     analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
+        reader <- row_reader(response_matrix)
         if (parallel && print_progress) {
             f_name <- paste0(
                 get_log_dir(log_dir),
@@ -128,10 +129,7 @@ run_perm_test_in_memory <- function(
             )
 
             # 3. load the expressions of the current response
-            expression_vector <- load_row(
-                mat = response_matrix,
-                id = response_id
-            )[cells_in_use]
+            expression_vector <- reader$read(response_id)[cells_in_use]
             if (subset_to_nt_cells) {
                 expression_vector <- expression_vector[all_nt_idxs]
             }
@@ -212,7 +210,8 @@ run_perm_test_in_memory <- function(
     # 3. partition the response IDs
     partitioned_response_ids <- partition_response_ids(
         response_ids = response_ids,
-        BPPARAM = BPPARAM
+        BPPARAM = BPPARAM,
+        positions = match(response_ids, rownames(response_matrix))
     )
 
     # 4. run the analysis
@@ -243,20 +242,28 @@ run_perm_test_in_memory <- function(
         message(crayon::green(" \u2713"))
     }
 
-    # 5. combine and sort result
+    # 5. combine and sort result; the responses were analyzed in the order of
+    # their rows, so put the results and precomputations in the order of
+    # `response_ids` (keeping the order of each response's pairs)
     result <- lapply(res, function(chunk) chunk[["ret_pass_qc"]]) |>
         data.table::rbindlist(fill = TRUE)
+    if (nrow(result) >= 1L) {
+        data.table::set(
+            result,
+            j = "response_order",
+            value = match(result$response_id, response_ids)
+        )
+        data.table::setorderv(result, "response_order")
+        data.table::set(result, j = "response_order", value = NULL)
+    }
     precomp_out_list <- lapply(res, function(chunk) {
         chunk[["precomp_out_list"]]
     }) |>
         purrr::flatten()
-    if (length(res) >= 2L) {
-        # put the precomputations in serial order
-        precomp_out_list <- precomp_out_list[intersect(
-            response_ids,
-            names(precomp_out_list)
-        )]
-    }
+    precomp_out_list <- precomp_out_list[intersect(
+        response_ids,
+        names(precomp_out_list)
+    )]
     response_precomputations <- c(response_precomputations, precomp_out_list)
 
     return(list(
@@ -324,6 +331,7 @@ run_crt_in_memory_v2 <- function(
         curr_response_ids,
         proc_id = NULL
     ) {
+        reader <- row_reader(response_matrix)
         if (parallel && print_progress) {
             f_name <- paste0(
                 get_log_dir(log_dir),
@@ -349,10 +357,7 @@ run_crt_in_memory_v2 <- function(
             )
 
             # 3. load the expressions of the current response
-            expression_vector <- load_row(
-                mat = response_matrix,
-                id = response_id
-            )[cells_in_use]
+            expression_vector <- reader$read(response_id)[cells_in_use]
             if (subset_to_nt_cells) {
                 expression_vector <- expression_vector[all_nt_idxs]
             }
@@ -377,7 +382,8 @@ run_crt_in_memory_v2 <- function(
     if (run_outer_regression) {
         partitioned_response_ids <- partition_response_ids(
             response_ids = response_ids,
-            BPPARAM = BPPARAM
+            BPPARAM = BPPARAM,
+            positions = match(response_ids, rownames(response_matrix))
         )
         if (!parallel) {
             res <- lapply(
@@ -407,14 +413,13 @@ run_crt_in_memory_v2 <- function(
                 BPPARAM = BPPARAM
             )
         }
+        # the responses were read in the order of their rows; put the
+        # precomputations in the order of `response_ids`
         precomp_out_list <- purrr::flatten(res)
-        if (length(res) >= 2L) {
-            # put the precomputations in serial order
-            precomp_out_list <- precomp_out_list[intersect(
-                response_ids,
-                names(precomp_out_list)
-            )]
-        }
+        precomp_out_list <- precomp_out_list[intersect(
+            response_ids,
+            names(precomp_out_list)
+        )]
         response_precomputations <- c(
             response_precomputations,
             precomp_out_list
@@ -423,6 +428,7 @@ run_crt_in_memory_v2 <- function(
 
     # 6. define the function to analyze the pairs
     perform_association_analysis <- function(curr_grna_groups, proc_id) {
+        reader <- row_reader(response_matrix)
         result_out_list <- vector(
             mode = "list",
             length = length(curr_grna_groups)
@@ -463,7 +469,7 @@ run_crt_in_memory_v2 <- function(
                     curr_grna_group,
                     subset_to_nt_cells,
                     all_nt_idxs,
-                    response_matrix,
+                    reader,
                     side_code,
                     cells_in_use,
                     seed
@@ -480,7 +486,7 @@ run_crt_in_memory_v2 <- function(
                     covariate_matrix,
                     curr_grna_group,
                     all_nt_idxs,
-                    response_matrix,
+                    reader,
                     side_code,
                     cells_in_use,
                     seed

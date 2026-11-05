@@ -400,6 +400,42 @@ perform_status_check_and_update <- function(sceptre_object, curr_funct) {
 }
 
 
+# A reader of counts by response, for loops that read many responses: a list
+# of `read(id)`, the counts of response `id` across all cells as a numeric
+# vector (as load_row() gives them), and `position(ids)`, the rows of the
+# responses `ids` (the order in which reads are cheapest). Disk-backed counts
+# are read through one tatami extractor (beachmat), which keeps the file's
+# decompressed chunks between reads; in-memory counts from their CSR slots.
+# Response IDs are looked up in a hash table. A reader holds C++ state, so each
+# worker creates its own from the counts.
+row_reader <- function(mat) {
+    rows <- list2env(
+        as.list(stats::setNames(seq_len(nrow(mat)), rownames(mat))),
+        hash = TRUE
+    )
+    position <- function(ids) match(ids, rownames(mat))
+    if (is_backed(mat)) {
+        extractor <- make_row_extractor(initializeCpp(mat))
+        read <- function(id) read_extractor_row(extractor, rows[[id]])
+    } else if (methods::is(mat, "dgRMatrix")) {
+        csr <- compressed_sparse_components(mat)
+        n_cells <- ncol(mat)
+        read <- function(id) {
+            load_csr_row(
+                j = csr$j,
+                p = csr$p,
+                x = csr$x,
+                row_idx = rows[[id]],
+                n_cells = n_cells
+            )
+        }
+    } else {
+        read <- function(id) load_row(mat, id)
+    }
+    list(read = read, position = position)
+}
+
+
 load_row <- function(mat, id) {
     if (is_backed(mat)) {
         backed_row(mat, id)

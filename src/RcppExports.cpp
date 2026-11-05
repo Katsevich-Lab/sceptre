@@ -229,6 +229,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// make_row_extractor
+SEXP make_row_extractor(SEXP matrix);
+RcppExport SEXP _sceptre_make_row_extractor(SEXP matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type matrix(matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(make_row_extractor(matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// read_extractor_row
+NumericVector read_extractor_row(SEXP row_extractor, int row);
+RcppExport SEXP _sceptre_read_extractor_row(SEXP row_extractorSEXP, SEXP rowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type row_extractor(row_extractorSEXP);
+    Rcpp::traits::input_parameter< int >::type row(rowSEXP);
+    rcpp_result_gen = Rcpp::wrap(read_extractor_row(row_extractor, row));
+    return rcpp_result_gen;
+END_RCPP
+}
 // load_csr_row
 NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells);
 RcppExport SEXP _sceptre_load_csr_row(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP) {
@@ -350,6 +373,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
+    {"_sceptre_make_row_extractor", (DL_FUNC) &_sceptre_make_row_extractor, 1},
+    {"_sceptre_read_extractor_row", (DL_FUNC) &_sceptre_read_extractor_row, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
     {"_sceptre_compute_cell_covariates_by_feature_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_by_feature_cpp, 7},
