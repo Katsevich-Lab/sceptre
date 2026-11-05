@@ -36,7 +36,7 @@ check_count_values <- function(
     } else {
         scan <- scan_count_values(as.double(values), from, count)
     }
-    if (scan$problem %in% 1:3) {
+    if (scan$problem %in% c(1L, 2L, 3L)) {
         stop(
             "The `",
             input_matrix_name,
