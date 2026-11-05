@@ -358,7 +358,7 @@ gathered_counts_source <- function(files, group) {
 # one write each, and HDF5 converts the values to 32-bit integers (as Cell
 # Ranger stores counts) as it writes them. Values not already known to be
 # counts are checked first, as `counts_name`. `level` is the deflate level
-# (HDF5Array's default; 0 for a temporary file).
+# (HDF5Array's default; 1 for a temporary file).
 write_backed_counts <- function(
     counts,
     file,

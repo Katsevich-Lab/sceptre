@@ -607,7 +607,9 @@ import_data_from_cellranger_files <- function(
                 t_counts_source(mat, response_cols, check_name = "response_matrix"),
                 response_files[i],
                 "counts",
-                level = 0L
+                # the fastest deflate level: the temporary files take about a
+                # seventh of the disk of uncompressed ones, for a small cost
+                level = 1L
             )
             other_idxs <- modality_idxs[names(modality_idxs) != "Gene Expression"]
             subsetted_mats <- lapply(other_idxs, function(idxs) {
