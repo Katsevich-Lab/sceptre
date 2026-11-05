@@ -16,36 +16,45 @@ check_integer_counts <- function(input_matrix, input_matrix_name) {
     } else {
         as.vector(input_matrix)
     }
-    problem <- if (anyNA(values)) {
-        "missing (NA) entries"
-    } else if (any(values < 0)) {
-        "negative entries"
-    } else if (any(is.infinite(values))) {
-        "infinite entries"
+    check_count_values(values, input_matrix_name)
+}
+
+# Stops unless values[from + 1], ..., values[from + count] are counts: not
+# missing, negative or infinite, and integers. Doubles are checked in one pass
+# in C++, without copying them.
+check_count_values <- function(
+    values,
+    input_matrix_name,
+    from = 0,
+    count = length(values)
+) {
+    if (is.integer(values)) {
+        values <- values[from + seq_len(count)]
+        scan <- list(
+            problem = if (anyNA(values)) 1L else if (any(values < 0L)) 2L else 0L
+        )
     } else {
-        NULL
+        scan <- scan_count_values(as.double(values), from, count)
     }
-    if (!is.null(problem)) {
+    if (scan$problem %in% 1:3) {
         stop(
             "The `",
             input_matrix_name,
             "` must contain counts (for example, UMI counts); it has ",
-            problem,
+            c("missing (NA) entries", "negative entries", "infinite entries")[
+                scan$problem
+            ],
             "."
         )
     }
-    if (is.integer(values)) {
-        return(invisible())
-    }
-    non_integer <- which(values != round(values))
-    if (length(non_integer) >= 1L) {
+    if (scan$problem == 4L) {
         stop(
             "The `",
             input_matrix_name,
             "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
-            length(non_integer),
+            scan$n_non_integer,
             " of its entries are not integers, for example ",
-            format(values[non_integer[1L]]),
+            format(scan$example),
             "."
         )
     }

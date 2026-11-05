@@ -128,12 +128,13 @@ h5_counts_location <- function(mat) {
 
 # Blocks of consecutive features, given the number of entries of each
 # (`widths`): each block holds about as many entries as a block of
-# DelayedArray's automatic size holds elements, or a single feature.
-entry_blocks <- function(widths) {
+# DelayedArray's automatic size holds bytes, at `bytes_per_entry` bytes per
+# entry, or a single feature.
+entry_blocks <- function(widths, bytes_per_entry = 8) {
     if (length(widths) == 0L) {
         return(list())
     }
-    budget <- max(1, DelayedArray::getAutoBlockSize() / 8)
+    budget <- max(1, DelayedArray::getAutoBlockSize() / bytes_per_entry)
     first <- c(0, cumsum(as.numeric(widths)))[seq_along(widths)]
     block_of_row <- c(0, cumsum(diff(floor(first / budget)) > 0))
     unname(split(seq_along(widths), block_of_row))
@@ -192,20 +193,34 @@ h5_row_blocks <- function(mat, location, f) {
 }
 
 # Counts to write with write_backed_counts(), other than a matrix: `dim`
-# (features x cells), the number of entries of each feature (`widths`), and
-# `block(rows)`, the counts of the consecutive features `rows` as a cells x
-# features dgCMatrix.
-counts_source <- function(dim, widths, block) {
+# (features x cells), the number of entries of each feature (`widths`, NULL
+# when unknown), and `block(rows)`, the counts of the consecutive features
+# `rows`: their number of entries per feature (`widths`) and `segments`, the
+# runs of their entries in order. A segment refers to entries from + 1, ...,
+# from + count of the index and value vectors `i` and `x` (cell indices and
+# counts), which are not copied; `checked` says whether its values are known
+# to be counts. Blocks hold about as many bytes as DelayedArray's automatic
+# block size at `bytes_per_entry` bytes per entry (entry_blocks()).
+counts_source <- function(dim, widths, block, bytes_per_entry = 8) {
     structure(
-        list(dim = dim, widths = widths, block = block),
+        list(
+            dim = dim,
+            widths = widths,
+            block = block,
+            bytes_per_entry = bytes_per_entry
+        ),
         class = "sceptre_counts_source"
     )
 }
 
-# A matrix as a counts source. In-memory counts are sliced as a dgRMatrix,
-# whose rows are the columns of the transpose, several times faster than
-# through DelayedArray; other counts are realized through DelayedArray, in
-# blocks of its automatic grid (`widths` NULL).
+counts_segment <- function(i, x, from = 0, count = length(x), checked = FALSE) {
+    list(i = i, x = x, from = from, count = count, checked = checked)
+}
+
+# A matrix as a counts source. In-memory counts are written from the slots of
+# their dgRMatrix form, whose rows are the columns of the transpose; other
+# counts are realized through DelayedArray, in blocks of its automatic grid
+# (`widths` NULL).
 matrix_counts_source <- function(counts) {
     if (is_backed(counts)) {
         return(counts_source(
@@ -213,12 +228,9 @@ matrix_counts_source <- function(counts) {
             widths = NULL,
             block = function(rows) {
                 block <- compressed_sparse_components(row_slice(counts, rows))
-                methods::new(
-                    "dgCMatrix",
-                    i = block$j,
-                    p = block$p,
-                    x = block$x,
-                    Dim = c(ncol(counts), length(rows))
+                list(
+                    widths = diff(block$p),
+                    segments = list(counts_segment(block$j, block$x))
                 )
             }
         ))
@@ -230,33 +242,48 @@ matrix_counts_source <- function(counts) {
         widths = diff(csr$p),
         block = function(rows) {
             first <- csr$p[rows[1L]]
-            entries <- seq_len(csr$p[rows[length(rows)] + 1L] - first) + first
-            methods::new(
-                "dgCMatrix",
-                i = csr$j[entries],
-                p = csr$p[c(rows, rows[length(rows)] + 1L)] - first,
-                x = csr$x[entries],
-                Dim = c(ncol(counts), length(rows))
+            list(
+                widths = diff(csr$p)[rows],
+                segments = list(counts_segment(
+                    csr$j,
+                    csr$x,
+                    from = first,
+                    count = csr$p[rows[length(rows)] + 1L] - first
+                ))
             )
         }
     )
 }
 
 # The columns `feature_cols` (increasing) of in-memory counts held as cells x
-# features (a dgCMatrix, `t_counts`) as a counts source of their features.
-# With `check_name`, each block is checked to hold counts
-# (check_integer_counts()) under that name.
+# features (a dgCMatrix, `t_counts`) as a counts source of their features,
+# written from its slots. With `check_name`, the counts are checked (under that
+# name) as they are written.
 t_counts_source <- function(t_counts, feature_cols, check_name = NULL) {
     csc <- compressed_sparse_components(t_counts)
+    widths <- diff(csc$p)
     counts_source(
         dim = c(length(feature_cols), nrow(t_counts)),
-        widths = diff(csc$p)[feature_cols],
+        widths = widths[feature_cols],
         block = function(rows) {
-            block <- t_counts[, feature_cols[rows], drop = FALSE]
-            if (!is.null(check_name)) {
-                check_integer_counts(block, check_name)
-            }
-            block
+            cols <- feature_cols[rows]
+            # runs of consecutive columns, whose entries are consecutive
+            runs <- split(cols, cumsum(c(1L, diff(cols) != 1L)))
+            segments <- lapply(unname(runs), function(run) {
+                first <- csc$p[run[1L]]
+                count <- csc$p[run[length(run)] + 1L] - first
+                if (!is.null(check_name)) {
+                    check_count_values(csc$x, check_name, first, count)
+                }
+                counts_segment(
+                    csc$i,
+                    csc$x,
+                    from = first,
+                    count = count,
+                    checked = !is.null(check_name)
+                )
+            })
+            list(widths = widths[cols], segments = segments)
         }
     )
 }
@@ -264,7 +291,8 @@ t_counts_source <- function(t_counts, feature_cols, check_name = NULL) {
 # Counts held in HDF5 files written by write_backed_counts() (group `group`),
 # one per set of cells, as a counts source of all the cells, the cells of each
 # file following those of the files before it. Each block is read from the
-# files' index and value arrays directly.
+# files' index and value arrays directly, as integers, and stacked in C++; it
+# holds 16 bytes per entry (its pieces and their stack).
 gathered_counts_source <- function(files, group) {
     indptrs <- lapply(files, function(file) {
         as.numeric(rhdf5::h5read(
@@ -280,9 +308,11 @@ gathered_counts_source <- function(files, group) {
     )
     cell_offsets <- c(0L, cumsum(n_cells))[seq_along(files)]
     n_features <- length(indptrs[[1L]]) - 1L
+    widths <- Reduce(`+`, lapply(indptrs, diff))
     counts_source(
         dim = c(n_features, sum(n_cells)),
-        widths = Reduce(`+`, lapply(indptrs, diff)),
+        widths = widths,
+        bytes_per_entry = 16,
         block = function(rows) {
             pieces <- Map(
                 function(file, indptr) {
@@ -290,14 +320,14 @@ gathered_counts_source <- function(files, group) {
                     on.exit(rhdf5::H5Fclose(h5), add = TRUE)
                     first <- indptr[rows[1L]]
                     count <- indptr[rows[length(rows)] + 1L] - first
-                    read <- function(name, type) {
+                    read <- function(name) {
                         dataset <- rhdf5::H5Dopen(h5, paste0(group, "/", name))
                         on.exit(rhdf5::H5Dclose(dataset), add = TRUE)
-                        h5_read_entries(dataset, first + 1, count, type)
+                        h5_read_entries(dataset, first + 1, count, "integer")
                     }
                     list(
-                        i = read("indices", "integer"),
-                        x = read("data", "double"),
+                        i = read("indices"),
+                        x = read("data"),
                         p = as.integer(indptr[c(rows, rows[length(rows)] + 1L)] - first)
                     )
                 },
@@ -312,13 +342,9 @@ gathered_counts_source <- function(files, group) {
                 row_offsets = cell_offsets,
                 n_cols = length(rows)
             )
-            rm(pieces)
-            methods::new(
-                "dgCMatrix",
-                i = stacked$i,
-                p = stacked$p,
-                x = stacked$x,
-                Dim = c(sum(n_cells), length(rows))
+            list(
+                widths = widths[rows],
+                segments = list(counts_segment(stacked$i, stacked$x))
             )
         }
     )
@@ -327,13 +353,19 @@ gathered_counts_source <- function(files, group) {
 # Writes counts (features x cells: any matrix that DelayedArray can read, or a
 # counts source) into an existing HDF5 file as the AnnData csc_matrix group
 # `group`, block by block, so that the counts are never all in memory at once.
-# Blocks of consecutive features hold a bounded number of entries
-# (entry_blocks()) when the number of entries of each feature is known, and
-# follow DelayedArray's automatic grid otherwise. Each block's indices and
-# values are appended to the group's datasets with one write each; the values
-# are counts, stored as 32-bit integers (as Cell Ranger stores them). `level`
-# is the deflate level (HDF5Array's default; 0 for a temporary file).
-write_backed_counts <- function(counts, file, group, level = NULL) {
+# Each segment of entries is written from the vectors that hold it, without a
+# copy: its indices and its values are appended to the group's datasets with
+# one write each, and HDF5 converts the values to 32-bit integers (as Cell
+# Ranger stores counts) as it writes them. Values not already known to be
+# counts are checked first, as `counts_name`. `level` is the deflate level
+# (HDF5Array's default; 0 for a temporary file).
+write_backed_counts <- function(
+    counts,
+    file,
+    group,
+    level = NULL,
+    counts_name = "response_matrix"
+) {
     source <- if (inherits(counts, "sceptre_counts_source")) {
         counts
     } else {
@@ -345,7 +377,7 @@ write_backed_counts <- function(counts, file, group, level = NULL) {
         grid <- DelayedArray::rowAutoGrid(counts)
         lapply(seq_len(nrow(grid)), function(k) viewport_range(grid[[k, 1L]], 1L))
     } else {
-        entry_blocks(source$widths)
+        entry_blocks(source$widths, source$bytes_per_entry)
     }
     if (!file.exists(file)) {
         rhdf5::h5createFile(file)
@@ -363,16 +395,29 @@ write_backed_counts <- function(counts, file, group, level = NULL) {
     widths <- numeric(dim[1L])
     n_entries <- 0
     for (rows in blocks) {
-        block <- compressed_sparse_components(source$block(rows))
-        values <- block$x
-        if (any(values != round(values)) || any(abs(values) > .Machine$integer.max)) {
-            stop("Only integer counts can be written to screen.h5mu.")
+        block <- source$block(rows)
+        for (segment in block$segments) {
+            if (!segment$checked && !is.integer(segment$x)) {
+                check_count_values(
+                    segment$x,
+                    counts_name,
+                    segment$from,
+                    segment$count
+                )
+            }
+            for (part in c("indices", "data")) {
+                h5_append_entries(
+                    datasets[[part]],
+                    if (part == "indices") segment$i else segment$x,
+                    offset = n_entries,
+                    count = segment$count,
+                    from = segment$from
+                )
+            }
+            n_entries <- n_entries + segment$count
         }
-        n <- length(values)
-        h5_append_entries(datasets$indices, block$i, n_entries, n)
-        h5_append_entries(datasets$data, as.integer(values), n_entries, n)
-        widths[rows] <- diff(block$p)
-        n_entries <- n_entries + n
+        widths[rows] <- block$widths
+        rm(block)
     }
     rhdf5::h5createDataset(
         h5,
@@ -417,8 +462,10 @@ h5_create_extendible <- function(h5, name, H5type, level, chunk = 16384) {
     rhdf5::H5Dopen(h5, name)
 }
 
-# Appends `count` values to an open one-dimensional dataset holding `offset`.
-h5_append_entries <- function(dataset, values, offset, count) {
+# Appends values[from + 1], ..., values[from + count] to an open
+# one-dimensional dataset holding `offset` entries. The values are written from
+# `values` itself (a selection of the memory they occupy), not from a copy.
+h5_append_entries <- function(dataset, values, offset, count, from = 0) {
     if (count == 0) {
         return(invisible())
     }
@@ -426,8 +473,9 @@ h5_append_entries <- function(dataset, values, offset, count) {
     space <- rhdf5::H5Dget_space(dataset)
     on.exit(rhdf5::H5Sclose(space), add = TRUE)
     rhdf5::H5Sselect_hyperslab(space, start = offset + 1, count = count)
-    memory <- rhdf5::H5Screate_simple(count)
+    memory <- rhdf5::H5Screate_simple(length(values))
     on.exit(rhdf5::H5Sclose(memory), add = TRUE)
+    rhdf5::H5Sselect_hyperslab(memory, start = from + 1, count = count)
     rhdf5::H5Dwrite(dataset, values, h5spaceMem = memory, h5spaceFile = space)
     invisible()
 }

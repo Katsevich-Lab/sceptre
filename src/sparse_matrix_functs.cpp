@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <cmath>
 using namespace Rcpp;
 using namespace std;
 
@@ -148,11 +149,11 @@ IntegerVector threshold_count_matrix(IntegerVector j, IntegerVector p, NumericVe
 // stacked by row: matrix k (row indices i_list[[k]], values x_list[[k]],
 // column pointers p_list[[k]]) supplies rows row_offsets[k] + 1, ...; within a
 // column, the entries of each matrix follow those of the matrices before it.
+// The values are integer counts.
 // [[Rcpp::export]]
 List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_offsets, int n_cols) {
   int n_matrices = i_list.size();
-  std::vector<IntegerVector> is(n_matrices), ps(n_matrices);
-  std::vector<NumericVector> xs(n_matrices);
+  std::vector<IntegerVector> is(n_matrices), xs(n_matrices), ps(n_matrices);
   long long n_entries = 0;
   for (int k = 0; k < n_matrices; k ++) {
     is[k] = i_list[k];
@@ -160,8 +161,7 @@ List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_off
     ps[k] = p_list[k];
     n_entries += is[k].size();
   }
-  IntegerVector i(n_entries), p(n_cols + 1);
-  NumericVector x(n_entries);
+  IntegerVector i(n_entries), x(n_entries), p(n_cols + 1);
   int l = 0;
   for (int c = 0; c < n_cols; c ++) {
     for (int k = 0; k < n_matrices; k ++) {
@@ -174,4 +174,33 @@ List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_off
     p[c + 1] = l;
   }
   return List::create(Named("i") = i, Named("p") = p, Named("x") = x);
+}
+
+
+// Whether the values x[from], ..., x[from + count - 1] are counts, in one pass
+// and without copying them: the first problem found, in the order that
+// check_integer_counts() reports them (1: missing, 2: negative, 3: infinite,
+// 4: not an integer, 0: none), the number of non-integer values and the first
+// of them.
+// [[Rcpp::export]]
+List scan_count_values(NumericVector x, double from, double count) {
+  bool missing = false, negative = false, infinite = false;
+  double n_non_integer = 0, example = NA_REAL;
+  R_xlen_t start = static_cast<R_xlen_t>(from), end = start + static_cast<R_xlen_t>(count);
+  for (R_xlen_t k = start; k < end; k ++) {
+    double v = x[k];
+    if (std::isnan(v)) {
+      missing = true;
+    } else if (v < 0) {
+      negative = true;
+    } else if (std::isinf(v)) {
+      infinite = true;
+    } else if (v != std::round(v)) {
+      if (n_non_integer == 0) example = v;
+      n_non_integer ++;
+    }
+  }
+  int problem = missing ? 1 : negative ? 2 : infinite ? 3 : n_non_integer > 0 ? 4 : 0;
+  return List::create(Named("problem") = problem, Named("n_non_integer") = n_non_integer,
+                      Named("example") = example);
 }

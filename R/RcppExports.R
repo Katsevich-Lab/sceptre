@@ -96,3 +96,7 @@ stack_csc_rows <- function(i_list, x_list, p_list, row_offsets, n_cols) {
     .Call(`_sceptre_stack_csc_rows`, i_list, x_list, p_list, row_offsets, n_cols)
 }
 
+scan_count_values <- function(x, from, count) {
+    .Call(`_sceptre_scan_count_values`, x, from, count)
+}
+

@@ -321,6 +321,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scan_count_values
+List scan_count_values(NumericVector x, double from, double count);
+RcppExport SEXP _sceptre_scan_count_values(SEXP xSEXP, SEXP fromSEXP, SEXP countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< double >::type count(countSEXP);
+    rcpp_result_gen = Rcpp::wrap(scan_count_values(x, from, count));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
@@ -343,6 +356,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
     {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
     {"_sceptre_stack_csc_rows", (DL_FUNC) &_sceptre_stack_csc_rows, 5},
+    {"_sceptre_scan_count_values", (DL_FUNC) &_sceptre_scan_count_values, 3},
     {NULL, NULL, 0}
 };
 
