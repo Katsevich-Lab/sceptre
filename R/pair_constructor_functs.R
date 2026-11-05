@@ -38,7 +38,10 @@
 #' [as_sce()] of the `sceptre_object`); by default, the packaged GRCh38 gene
 #' position data frame is used. The chromosomes must be named as in
 #' `grna_target_data_frame` (for example, `"chr1"` in both, not `"chr1"` in one
-#' and `"1"` in the other). The position of a range
+#' and `"1"` in the other), and the positions must be relative to the same
+#' reference genome as the gRNA target coordinates: for coordinates relative to
+#' GRCh37, pass `gene_position_data_frame_grch37`. Coordinates relative to
+#' different genomes give wrong pairs without an error. The position of a range
 #' wider than one base (for example, a gene) is its transcription start site,
 #' that is, its 5' end given its strand (its start for unstranded ranges), as
 #' computed by `GenomicRanges::resize(x, width = 1, fix = "start")`.
