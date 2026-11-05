@@ -32,6 +32,13 @@ none for gRNAs without a position). This \code{rowRanges} is a
 }
 \details{
 Sparse counts are returned in column-compressed (\code{dgCMatrix}) format.
+For a disk-backed \code{sceptre_object} (\code{backed = TRUE}), the response counts
+are instead a \code{DelayedMatrix} that reads \code{screen.h5mu}, which stores the
+counts one response at a time. Functions that read the matrix through
+tatami, such as \code{scrapper::computeRnaQcMetrics()}, process it efficiently
+both by cell and by response; functions that process a \code{DelayedMatrix}
+block by block, such as \code{scuttle::perCellQCMetrics()}, are much slower
+when they summarize cells.
 \code{\link[=import_data_from_sce]{import_data_from_sce()}} imports the result. The coercion
 \code{as(sceptre_object, "SingleCellExperiment")} returns the same.
 }
