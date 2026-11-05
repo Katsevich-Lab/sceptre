@@ -68,10 +68,9 @@ test_that("Cell Ranger import sorts entries and maps interleaved feature types",
     expect_identical(guides@j, c(0L, 1L, 0L, 1L))
     expect_identical(guides@x, c(8, 9, 6, 4))
 
-    # The same coordinate in a different directory is a different cell (the
-    # directories are named, as the values of `sample` must be distinct).
+    # The same coordinate in a different directory is a different cell.
     batches <- suppressMessages(import_data_from_cellranger(
-        c(first = directory, second = directory),
+        c(directory, directory),
         "low",
         cellranger_metadata
     ))

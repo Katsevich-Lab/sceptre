@@ -253,14 +253,11 @@ import_data_memory <- function(
 #' the cell IDs unique and stable across imports.
 #' Supplying barcode files for only some directories is an error.
 #' When multiple directories are supplied, the directory from which each cell
-#' was loaded is recorded in the cell covariate `sample`, a factor that enters
-#' the default formula as a covariate. Its values are `names(directories)` when
-#' `directories` is named, and otherwise the directory paths as supplied; they
-#' must be distinct across directories, and the first directory is the
-#' reference level. (`DropletUtils::read10xCounts()` names the same covariate
-#' `Sample`.) Columns of `extra_covariates`, including one named `batch`, are
-#' kept as supplied; with multiple directories, a column of `extra_covariates`
-#' named `sample` is an error.
+#' was loaded is recorded in the cell covariate `batch`, a factor with levels
+#' `b1`, `b2`, ... (in the order of `directories`) that enters the default
+#' formula as a covariate; a column of `extra_covariates` named `batch` is then
+#' an error. With one directory, the columns of `extra_covariates`, including
+#' one named `batch`, are kept as supplied.
 #' A malformed matrix file (for example, one with an entry outside the dimensions declared in its header), a matrix file
 #' that lists the same (feature, cell) entry more than once, or a matrix file
 #' whose number of rows differs from the number of rows of `features.tsv`, is an
@@ -299,9 +296,9 @@ import_data_memory <- function(
 #' @export
 #' @examples
 #' data(grna_target_data_frame_highmoi)
-#' directories <- c(
-#'   gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
-#'   gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
+#' directories <- paste0(
+#'   system.file("extdata", package = "sceptre"),
+#'   "/highmoi_example/gem_group_", c(1, 2)
 #' )
 #'
 #' # 1. create a standard sceptre_object from Cell Ranger output
@@ -333,14 +330,11 @@ import_data_from_cellranger <- function(
         directory_to_write <- prepare_directory_to_write(directory_to_write)
     }
     # with several directories, the directory of each cell is recorded in
-    # `sample`; do not overwrite a user's column of that name
-    if (length(directories) >= 2L) {
-        if ("sample" %in% colnames(extra_covariates)) {
-            stop(
-                "`extra_covariates` contains a column named `sample`, which `import_data_from_cellranger()` uses to record the directory from which each cell was loaded when several directories are supplied. Rename that column."
-            )
-        }
-        cellranger_sample_names(directories)
+    # `batch`; do not overwrite a user's column of that name
+    if (length(directories) >= 2L && "batch" %in% colnames(extra_covariates)) {
+        stop(
+            "`extra_covariates` contains a column named `batch`, which `import_data_from_cellranger()` uses to record the directory from which each cell was loaded when several directories are supplied. Rename that column."
+        )
     }
     import_data_from_cellranger_files(
         directories,
@@ -349,26 +343,6 @@ import_data_from_cellranger <- function(
         extra_covariates,
         directory_to_write = if (backed) directory_to_write else NULL
     )
-}
-
-# The value of the `sample` covariate for each of several Cell Ranger
-# directories: their names when `directories` is named, and otherwise the paths
-# as supplied (the convention of DropletUtils::read10xCounts()). The values
-# must be distinct, as they identify the directory of each cell.
-cellranger_sample_names <- function(directories) {
-    samples <- names(directories)
-    if (is.null(samples) || !all(nzchar(samples))) {
-        samples <- as.character(directories)
-    }
-    samples <- unname(samples)
-    if (anyDuplicated(samples)) {
-        stop(
-            "The `sample` covariate records the directory from which each cell was loaded, so `directories` (or their names) must be distinct; \"",
-            samples[anyDuplicated(samples)],
-            "\" occurs more than once."
-        )
-    }
-    return(samples)
 }
 
 # Reads the matrices into memory; or, given `directory_to_write`, holds one
@@ -672,18 +646,17 @@ import_data_from_cellranger_files <- function(
     }
 
     # 8. set up the extra covariates; with multiple directories, record the
-    # directory of each cell in `sample`, keeping the user's columns
-    # (including any named `batch`)
+    # directory of each cell in `batch`, keeping the user's columns
     if (length(directories) >= 2L) {
-        samples <- cellranger_sample_names(directories)
-        sample <- factor(
-            rep(samples, n_cells_per_matrix),
-            levels = unique(samples)
+        batch_ids <- paste0("b", seq_along(n_cells_per_matrix))
+        batch <- factor(
+            rep(batch_ids, n_cells_per_matrix),
+            levels = batch_ids
         )
         if (nrow(extra_covariates) == 0L) {
-            extra_covariates <- data.frame(sample = sample)
+            extra_covariates <- data.frame(batch = batch)
         } else {
-            extra_covariates$sample <- sample
+            extra_covariates$batch <- batch
         }
     }
 

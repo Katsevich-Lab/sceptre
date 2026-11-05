@@ -26,8 +26,6 @@
 
 -   The default formula gives a message naming each covariate it leaves out (non-count covariates with 15 or more distinct values).
 
--   `import_data_from_cellranger()` keeps a user-supplied `batch` covariate; with several directories, the directory of each cell is recorded in the new covariate `sample` (previously `batch`), whose values are `names(directories)` when `directories` is named and the directory paths otherwise, and a user column named `sample` is an error. A `formula_object` that refers to the directory as `batch` must now name `sample`.
-
 -   sceptre now requires R 4.5.0 or later (its dependencies do).
 
 ## Bug fixes
@@ -37,6 +35,8 @@
 -   The maximum gRNA assignment method requires `min_grna_n_umis_threshold` to be at least 1; 0 assigned gRNAs to cells with no gRNA UMIs.
 
 -   In high MOI, `set_analysis_parameters(control_group = "nt_cells")` gives a warning that the complement set is used as the control group; previously the complement was used silently.
+
+-   `import_data_from_cellranger()` no longer discards a user-supplied `batch` column of `extra_covariates`: with one directory it is kept (previously it was dropped), and with several directories, where `batch` records the directory of each cell, it is an error (previously it was overwritten). The levels of `batch` (`b1`, `b2`, ...) follow the order of `directories`; previously, with ten or more directories, they were sorted as text.
 
 -   Importing a response or gRNA matrix with missing, negative, infinite or non-integer entries is an error; previously such counts were accepted (non-integer counts then gave many warnings in the analysis).
 

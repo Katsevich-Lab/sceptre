@@ -66,14 +66,11 @@ prefixed with their batch identifiers (for example, \code{b1_} and \code{b2_}) t
 the cell IDs unique and stable across imports.
 Supplying barcode files for only some directories is an error.
 When multiple directories are supplied, the directory from which each cell
-was loaded is recorded in the cell covariate \code{sample}, a factor that enters
-the default formula as a covariate. Its values are \code{names(directories)} when
-\code{directories} is named, and otherwise the directory paths as supplied; they
-must be distinct across directories, and the first directory is the
-reference level. (\code{DropletUtils::read10xCounts()} names the same covariate
-\code{Sample}.) Columns of \code{extra_covariates}, including one named \code{batch}, are
-kept as supplied; with multiple directories, a column of \code{extra_covariates}
-named \code{sample} is an error.
+was loaded is recorded in the cell covariate \code{batch}, a factor with levels
+\code{b1}, \code{b2}, ... (in the order of \code{directories}) that enters the default
+formula as a covariate; a column of \code{extra_covariates} named \code{batch} is then
+an error. With one directory, the columns of \code{extra_covariates}, including
+one named \code{batch}, are kept as supplied.
 A malformed matrix file (for example, one with an entry outside the dimensions declared in its header), a matrix file
 that lists the same (feature, cell) entry more than once, or a matrix file
 whose number of rows differs from the number of rows of \code{features.tsv}, is an
@@ -91,9 +88,9 @@ of the manual for more information about this function.
 }
 \examples{
 data(grna_target_data_frame_highmoi)
-directories <- c(
-  gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
-  gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
+directories <- paste0(
+  system.file("extdata", package = "sceptre"),
+  "/highmoi_example/gem_group_", c(1, 2)
 )
 
 # 1. create a standard sceptre_object from Cell Ranger output

@@ -94,9 +94,10 @@ outputs to a temporary directory.
 
 ```{r minimal-example, message=FALSE, results="hide"}
 # load the data, creating a sceptre_object
-directories <- c(
-    gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
-    gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
+directories <- paste0(
+    system.file("extdata", package = "sceptre"),
+    "/highmoi_example/gem_group_",
+    1:2
 )
 data(grna_target_data_frame_highmoi)
 sceptre_object <- import_data_from_cellranger(
@@ -155,21 +156,17 @@ data is to read the output of one or more calls to `cellranger count` into
 arguments: `directories`, `grna_target_data_frame`, and `moi`.
 
 1.  `directories` is a character vector specifying the locations of the
-    directories outputted by one or more calls to `cellranger count`. We
-    recommend naming the vector: with several directories, the names become the
-    values of the cell covariate `sample`, which records the directory from
-    which each cell was loaded (the `--id` of the `cellranger count` run is a
-    natural name). Below, we set the variable `directories` to the
-    (machine-dependent) location of the example CRISPRi data on disk; the
-    example's two directories are the two GEM groups of one experiment, so we
-    name them accordingly.
+    directories outputted by one or more calls to `cellranger count`. Below, we
+    set the variable `directories` to the (machine-dependent) location of the
+    example CRISPRi data on disk.
 
     ```{r directories}
-    directories <- c(
-        gem_group_1 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_1"),
-        gem_group_2 = paste0(system.file("extdata", package = "sceptre"), "/highmoi_example/gem_group_2")
+    directories <- paste0(
+        system.file("extdata", package = "sceptre"),
+        "/highmoi_example/gem_group_",
+        1:2
     )
-    names(directories)
+    directories # file paths to the example data on your computer
     ```
 
     `directories` points to two directories, each of which stores the
@@ -247,9 +244,8 @@ also automatically computes the following cell-specific covariates:
 `response_n_nonzero` (i.e., the number of responses expressed in the cell),
 `response_n_umis` (i.e., the number of response UMIs sequenced in the cell),
 `response_p_mito` (i.e., the fraction of transcripts mapping to mitochondrial
-genes), and `sample` (i.e., the directory from which the cell was loaded, by the
-name given in `directories`, here `gem_group_1` or `gem_group_2`). (Cells loaded from different directories are assumed to come from
-different batches.)
+genes), and `batch`. (Cells loaded from different directories are assumed to
+come from different batches.)
 
 ## 2. Set analysis parameters
 
@@ -383,7 +379,7 @@ method," the "maximum method," and the "thresholding method")**, all of which
 account for background contamination. The default method for high-MOI data is
 the historical "mixture method." In the intended model, the gRNA counts are
 regressed onto the (unobserved) gRNA presence/absence indicator and the cell-
-specific covariates (e.g., `grna_n_umis`, `sample`) via a latent variable Poisson
+specific covariates (e.g., `grna_n_umis`, `batch`) via a latent variable Poisson
 GLM. The historical implementation yields fitted posterior membership
 probabilities that each cell contains the gRNA, and these probabilities are
 thresholded to assign the gRNA to cells. Because of a known inconsistency in its

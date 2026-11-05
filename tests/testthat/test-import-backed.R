@@ -72,7 +72,7 @@ test_that("a disk-backed Cell Ranger import equals the in-memory import", {
         c(1, 2)
     )
     extra_covariates <- data.frame(
-        batch = rep(c("x", "y"), length.out = 500L)
+        lane = rep(c("x", "y"), length.out = 500L)
     )
     in_memory <- import_data_from_cellranger(
         directories = directories,
@@ -89,7 +89,7 @@ test_that("a disk-backed Cell Ranger import equals the in-memory import", {
     )
     expect_same_import(backed, in_memory)
     expect_true(all(
-        c("batch", "sample") %in%
+        c("lane", "batch") %in%
             colnames(get_cell_covariates(backed))
     ))
 
