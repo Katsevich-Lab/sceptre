@@ -7,12 +7,12 @@
 #' `mudata` packages can read, and `sceptre_object.rds`, which holds the
 #' parameters, the intermediate values and the results of the analysis. The
 #' directory has the same layout for a standard and a disk-backed
-#' `sceptre_object`; a disk-backed `sceptre_object` whose response counts are
+#' `sceptre_object`; a disk-backed `sceptre_object` whose counts are
 #' already in `screen.h5mu` in the directory (for example, one imported with
 #' `backed = TRUE` and `directory_to_write` set to the directory) is written
 #' without copying them.
 #'
-#' `read_sceptre_object()` reads the response counts into memory
+#' `read_sceptre_object()` reads the response and gRNA counts into memory
 #' (`backed = FALSE`) or leaves them on disk (`backed = TRUE`), in which case
 #' the directory must stay in place while the `sceptre_object` is used. Either
 #' way, a `sceptre_object` written by `write_sceptre_object()` can be read as
@@ -21,7 +21,8 @@
 #' @param sceptre_object a `sceptre_object`
 #' @param directory a file path to a directory
 #' @param backed (default `FALSE`) a logical value indicating whether to leave
-#' the response counts on disk (`TRUE`) or to read them into memory (`FALSE`)
+#' the response and gRNA counts on disk (`TRUE`) or to read them into memory
+#' (`FALSE`)
 #'
 #' @return `write_sceptre_object()` returns `NULL` invisibly, and
 #' `read_sceptre_object()` returns a `sceptre_object`.
@@ -246,8 +247,8 @@ write_screen <- function(screen, file, response_source = NULL) {
 
 
 # Reads the counts in screen.h5mu: list(response, grna), features x cells.
-# With `backed = TRUE` the response counts stay on disk, as a DelayedMatrix
-# read through HDF5Array; the gRNA counts are read into memory either way.
+# With `backed = TRUE` the counts stay on disk, as DelayedMatrix objects read
+# through HDF5Array.
 read_screen <- function(file, backed = FALSE) {
     # MultiAssayExperiment warns that it rebuilds the sample map read from the
     # file; that is expected
@@ -264,7 +265,10 @@ read_screen <- function(file, backed = FALSE) {
     if (!backed) {
         response <- as_row_counts(response)
     }
-    grna <- as_row_counts(SummarizedExperiment::assay(mae[["grna"]], 1L))
+    grna <- SummarizedExperiment::assay(mae[["grna"]], 1L)
+    if (!backed) {
+        grna <- as_row_counts(grna)
+    }
     list(response = response, grna = grna)
 }
 

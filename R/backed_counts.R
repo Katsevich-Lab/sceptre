@@ -1,7 +1,7 @@
-# Response counts kept on disk ("backed"): the counts stay in screen.h5mu and
-# are read through a DelayedMatrix (HDF5Array) as they are needed, instead of
-# being loaded into memory. The gRNA counts, which are much smaller and are
-# scanned whole by every gRNA assignment method, are always held in memory.
+# Counts kept on disk ("backed"): the response and gRNA counts stay in
+# screen.h5mu and are read through DelayedMatrix objects (HDF5Array) as they
+# are needed, instead of being loaded into memory, as the response and gRNA
+# .odm files of earlier versions were.
 #
 # Layout. AnnData stores a modality's X as cells x features. sceptre reads one
 # response's counts across all cells at a time, so X is stored as
@@ -39,6 +39,15 @@ is_backed <- function(x) {
 backed_row <- function(mat, id) {
     i <- match(id, rownames(mat))
     as.numeric(DelayedArray::extract_array(mat, list(i, NULL)))
+}
+
+# Counts that load_row() and row_reader() read by row: disk-backed counts as
+# they are, in-memory counts as a dgRMatrix.
+row_accessible_counts <- function(x) {
+    if (is_backed(x)) {
+        return(x)
+    }
+    set_matrix_accessibility(x, make_row_accessible = TRUE)
 }
 
 # Counts as an in-memory dgRMatrix. A DelayedMatrix is realized through its

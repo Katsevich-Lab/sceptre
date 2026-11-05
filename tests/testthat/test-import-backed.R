@@ -49,7 +49,11 @@ expect_same_import <- function(backed, in_memory) {
         dimnames(get_response_matrix(backed)),
         dimnames(get_response_matrix(in_memory))
     )
-    expect_identical(get_grna_matrix(backed), get_grna_matrix(in_memory))
+    expect_s4_class(get_grna_matrix(backed), "DelayedMatrix")
+    expect_identical(
+        as.matrix(get_grna_matrix(backed)),
+        as.matrix(get_grna_matrix(in_memory))
+    )
     expect_identical(
         get_cell_covariates(backed),
         get_cell_covariates(in_memory)

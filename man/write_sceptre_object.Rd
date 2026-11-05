@@ -15,7 +15,8 @@ read_sceptre_object(directory, backed = FALSE)
 \item{directory}{a file path to a directory}
 
 \item{backed}{(default \code{FALSE}) a logical value indicating whether to leave
-the response counts on disk (\code{TRUE}) or to read them into memory (\code{FALSE})}
+the response and gRNA counts on disk (\code{TRUE}) or to read them into memory
+(\code{FALSE})}
 }
 \value{
 \code{write_sceptre_object()} returns \code{NULL} invisibly, and
@@ -29,13 +30,13 @@ counts and the cell covariates), which Bioconductor's \code{MuData} and Python's
 \code{mudata} packages can read, and \code{sceptre_object.rds}, which holds the
 parameters, the intermediate values and the results of the analysis. The
 directory has the same layout for a standard and a disk-backed
-\code{sceptre_object}; a disk-backed \code{sceptre_object} whose response counts are
+\code{sceptre_object}; a disk-backed \code{sceptre_object} whose counts are
 already in \code{screen.h5mu} in the directory (for example, one imported with
 \code{backed = TRUE} and \code{directory_to_write} set to the directory) is written
 without copying them.
 }
 \details{
-\code{read_sceptre_object()} reads the response counts into memory
+\code{read_sceptre_object()} reads the response and gRNA counts into memory
 (\code{backed = FALSE}) or leaves them on disk (\code{backed = TRUE}), in which case
 the directory must stay in place while the \code{sceptre_object} is used. Either
 way, a \code{sceptre_object} written by \code{write_sceptre_object()} can be read as

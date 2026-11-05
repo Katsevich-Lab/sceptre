@@ -38,9 +38,9 @@ themselves, are empty.
 }
 \details{
 Sparse counts are returned in column-compressed (\code{dgCMatrix}) format.
-For a disk-backed \code{sceptre_object} (\code{backed = TRUE}), the response counts
-are instead a \code{DelayedMatrix} that reads \code{screen.h5mu}, which stores the
-counts one response at a time. Functions that read the matrix through
+For a disk-backed \code{sceptre_object} (\code{backed = TRUE}), the response and gRNA
+counts are instead \code{DelayedMatrix} objects that read \code{screen.h5mu}, which
+stores the counts one response (or gRNA) at a time. Functions that read the matrix through
 tatami, such as \code{scrapper::computeRnaQcMetrics()}, process it efficiently
 both by cell and by response; functions that process a \code{DelayedMatrix}
 block by block, such as \code{scuttle::perCellQCMetrics()}, are much slower

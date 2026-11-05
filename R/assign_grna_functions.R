@@ -81,13 +81,24 @@ assign_grnas_to_cells_thresholding <- function(
     grna_assign_threshold,
     grna_ids
 ) {
-    # 1. make the grna expression matrix row-accessible; ensure threshold is
-    # numeric
+    grna_assign_threshold <- as.numeric(grna_assign_threshold)
+    # disk-backed counts are read one gRNA at a time, in the order of the file
+    if (is_backed(grna_matrix)) {
+        reader <- row_reader(grna_matrix)
+        initial_assignment_list <- vector("list", length(grna_ids))
+        for (i in order(reader$position(grna_ids))) {
+            initial_assignment_list[[i]] <- which(
+                reader$read(grna_ids[i]) >= grna_assign_threshold
+            )
+        }
+        return(stats::setNames(initial_assignment_list, grna_ids))
+    }
+
+    # 1. make the grna expression matrix row-accessible
     grna_matrix <- set_matrix_accessibility(
         grna_matrix,
         make_row_accessible = TRUE
     )
-    grna_assign_threshold <- as.numeric(grna_assign_threshold)
 
     # 2. perform the assignments
     grna_csr <- compressed_sparse_components(grna_matrix)

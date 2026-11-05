@@ -47,10 +47,7 @@ assign_grnas_to_cells_mixture <- function(
     )
 
     # 2. make the grna expression matrix row-accessible
-    grna_matrix <- set_matrix_accessibility(
-        grna_matrix,
-        make_row_accessible = TRUE
-    )
+    grna_matrix <- row_accessible_counts(grna_matrix)
 
     # 3. define the function to perform assignments for a set of grnas
     analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
@@ -65,6 +62,7 @@ assign_grnas_to_cells_mixture <- function(
         } else {
             f_name <- NULL
         }
+        reader <- row_reader(grna_matrix)
         initial_assignment_list <- lapply(
             seq_along(curr_grna_ids),
             function(i) {
@@ -77,7 +75,7 @@ assign_grnas_to_cells_mixture <- function(
                     parallel = parallel,
                     f_name = f_name
                 )
-                g <- load_row(grna_matrix, grna_id)
+                g <- reader$read(grna_id)
                 assignments <- obtain_em_assignments(
                     pi_guesses = starting_guesses$pi_guesses,
                     g_pert_guesses = starting_guesses$g_pert_guesses,

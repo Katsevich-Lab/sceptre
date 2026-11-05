@@ -5,7 +5,7 @@
 #'
 #' `import_data()` imports data from a collection of R objects to create a
 #' `sceptre_object`. Users can create either a standard `sceptre` object or a
-#' disk-backed `sceptre` object, whose response counts stay on disk; the latter
+#' disk-backed `sceptre` object, whose response and gRNA counts stay on disk; the latter
 #' is more appropriate for large-scale data. See
 #' \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual}
 #' for more detailed information about this function.
@@ -42,10 +42,10 @@
 #' compute the covariate `response_p_mito`.
 #' @param backed (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`)
 #' indicating whether to create a disk-backed `sceptre_object` (`TRUE`), whose
-#' response counts stay on disk in the file `screen.h5mu` in
+#' response and gRNA counts stay on disk in the file `screen.h5mu` in
 #' `directory_to_write` and are read as they are needed, or a standard
-#' `sceptre_object` (`FALSE`), which holds them in memory. The gRNA counts and
-#' the cell covariates are held in memory either way. The analysis of a
+#' `sceptre_object` (`FALSE`), which holds them in memory. The cell covariates
+#' are held in memory either way. The analysis of a
 #' disk-backed `sceptre_object` uses permutations (`resampling_mechanism =
 #' "permutations"` in [set_analysis_parameters()]).
 #' @param directory_to_write (optional) a file path to a directory in which to
@@ -128,14 +128,22 @@ resolve_backed <- function(backed, use_ondisc) {
 
 
 # Writes the data of an in-memory sceptre_object to `directory/screen.h5mu`
-# and keeps its response counts there, on disk.
+# and keeps its counts there, on disk.
 back_response_counts <- function(sceptre_object, directory) {
     file <- file.path(directory, "screen.h5mu")
     write_screen(sceptre_object@data, file)
-    response_matrix <- get_response_matrix(sceptre_object)
-    backed_counts <- read_screen(file, backed = TRUE)$response
-    dimnames(backed_counts) <- dimnames(response_matrix)
-    set_response_matrix(sceptre_object, backed_counts)
+    use_backed_counts(sceptre_object, file)
+}
+
+
+# The sceptre_object with its response and gRNA counts read from `file`, the
+# screen.h5mu written from its data, which stay on disk
+use_backed_counts <- function(sceptre_object, file) {
+    screen <- read_screen(file, backed = TRUE)
+    dimnames(screen$response) <- dimnames(get_response_matrix(sceptre_object))
+    dimnames(screen$grna) <- dimnames(get_grna_matrix(sceptre_object))
+    sceptre_object <- set_response_matrix(sceptre_object, screen$response)
+    set_grna_matrix(sceptre_object, screen$grna)
 }
 
 # memory
@@ -211,7 +219,7 @@ import_data_memory <- function(
 #' whose number of rows differs from the number of rows of `features.tsv`, is an
 #' error.
 #' Users can create either a standard `sceptre` object or a disk-backed
-#' `sceptre` object, whose response counts stay on disk; the latter is more
+#' `sceptre` object, whose response and gRNA counts stay on disk; the latter is more
 #' appropriate for large-scale data. A disk-backed import holds the matrix of
 #' one directory in memory at a time and writes the response counts to
 #' `screen.h5mu` through temporary files in `directory_to_write` (a
@@ -643,7 +651,7 @@ import_data_from_cellranger_files <- function(
 # empty matrix with their dimensions and names) whose per-cell covariates
 # (`response_covariates`) were computed as the files were written: the counts
 # are copied from the temporary files to `directory_to_write/screen.h5mu`,
-# from which the returned sceptre_object reads them.
+# from which the returned sceptre_object reads them and the gRNA counts.
 import_data_backed <- function(
     response_matrix,
     response_source,
@@ -694,9 +702,7 @@ import_data_backed <- function(
     )
     file <- file.path(directory_to_write, "screen.h5mu")
     write_screen(sceptre_object@data, file, response_source = response_source)
-    backed_counts <- read_screen(file, backed = TRUE)$response
-    dimnames(backed_counts) <- dimnames(response_matrix)
-    set_response_matrix(sceptre_object, backed_counts)
+    use_backed_counts(sceptre_object, file)
 }
 
 

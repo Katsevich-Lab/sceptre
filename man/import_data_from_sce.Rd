@@ -40,10 +40,10 @@ covariate \code{response_p_mito}. By default, the row names of \code{sce}.}
 
 \item{backed}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
 indicating whether to create a disk-backed \code{sceptre_object} (\code{TRUE}), whose
-response counts stay on disk in the file \code{screen.h5mu} in
+response and gRNA counts stay on disk in the file \code{screen.h5mu} in
 \code{directory_to_write} and are read as they are needed, or a standard
-\code{sceptre_object} (\code{FALSE}), which holds them in memory. The gRNA counts and
-the cell covariates are held in memory either way. The analysis of a
+\code{sceptre_object} (\code{FALSE}), which holds them in memory. The cell covariates
+are held in memory either way. The analysis of a
 disk-backed \code{sceptre_object} uses permutations (\code{resampling_mechanism = "permutations"} in \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}).}
 
 \item{directory_to_write}{(optional) a file path to a directory in which to

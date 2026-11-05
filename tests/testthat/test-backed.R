@@ -59,7 +59,11 @@ test_that("a disk-backed analysis gives the in-memory results", {
         response_values(backed),
         response_values(in_memory)
     )
-    expect_identical(get_grna_matrix(backed), get_grna_matrix(in_memory))
+    expect_s4_class(get_grna_matrix(backed), "DelayedMatrix")
+    expect_identical(
+        as.matrix(get_grna_matrix(backed)),
+        as.matrix(get_grna_matrix(in_memory))
+    )
     expect_identical(get_cell_covariates(backed), get_cell_covariates(in_memory))
     expect_false(is.null(h5_counts_location(get_response_matrix(backed))))
 
@@ -82,6 +86,48 @@ test_that("a disk-backed analysis gives the in-memory results", {
         backed@discovery_pairs_with_info,
         in_memory@discovery_pairs_with_info
     )
+})
+
+test_that("gRNAs are assigned from disk-backed gRNA counts", {
+    inputs <- backed_test_inputs()
+    in_memory <- do.call(import_data, inputs)
+    backed <- do.call(
+        import_data,
+        c(inputs, backed = TRUE, directory_to_write = file.path(tempdir(), "backed grna"))
+    )
+    expect_s4_class(get_grna_matrix(backed), "DelayedMatrix")
+    assign_with <- function(sceptre_object, ...) {
+        sceptre_object |>
+            set_analysis_parameters(
+                resampling_mechanism = "permutations",
+                seed = 4L
+            ) |>
+            assign_grnas(print_progress = FALSE, ...) |>
+            suppressMessages()
+    }
+    for (method in c("thresholding", "mixture", "maximum")) {
+        expected <- if (method == "thresholding") {
+            assign_with(in_memory, method = method, threshold = 3)
+        } else {
+            assign_with(in_memory, method = method)
+        }
+        actual <- if (method == "thresholding") {
+            assign_with(backed, method = method, threshold = 3)
+        } else {
+            assign_with(backed, method = method)
+        }
+        expect_identical(
+            actual@initial_grna_assignment_list,
+            expected@initial_grna_assignment_list
+        )
+        expect_identical(actual@grna_assignments_raw, expected@grna_assignments_raw)
+    }
+    # the plots read gRNA counts from disk too
+    expect_no_error(plot_grna_count_distributions(
+        backed,
+        grnas_to_plot = rownames(get_grna_matrix(backed))[1:2]
+    ))
+    expect_no_error(plot_assign_grnas(assign_with(backed, method = "maximum")))
 })
 
 test_that("a disk-backed analysis requires permutations", {
@@ -124,6 +170,11 @@ test_that("write_sceptre_object() and read_sceptre_object() round trip", {
 
     reread_backed <- read_sceptre_object(directory, backed = TRUE)
     expect_s4_class(get_response_matrix(reread_backed), "DelayedMatrix")
+    expect_s4_class(get_grna_matrix(reread_backed), "DelayedMatrix")
+    expect_identical(
+        as.matrix(get_grna_matrix(reread_backed)),
+        as.matrix(get_grna_matrix(in_memory))
+    )
     expect_identical(
         response_values(reread_backed),
         response_values(in_memory)

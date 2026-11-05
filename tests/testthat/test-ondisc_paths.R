@@ -49,5 +49,5 @@ test_that("import_data can create disk-backed objects in a normalized directory"
     prepared_directory <- prepare_directory_to_write(directory_to_write)
     expect_true(file.exists(file.path(prepared_directory, "screen.h5mu")))
     expect_s4_class(get_response_matrix(sceptre_object), "DelayedMatrix")
-    expect_s4_class(get_grna_matrix(sceptre_object), "dgRMatrix")
+    expect_s4_class(get_grna_matrix(sceptre_object), "DelayedMatrix")
 })

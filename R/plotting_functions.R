@@ -87,10 +87,7 @@ plot_grna_count_distributions <- function(
             )
         }
     }
-    grna_matrix <- set_matrix_accessibility(
-        grna_matrix,
-        make_row_accessible = TRUE
-    )
+    grna_matrix <- row_accessible_counts(grna_matrix)
     grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
         load_row(grna_matrix, grna_id)
     }) |>
@@ -292,7 +289,7 @@ plot_assign_grnas <- function(
     }
     init_assignments <- sceptre_object@initial_grna_assignment_list
     grna_matrix <- get_grna_matrix(sceptre_object) |>
-        set_matrix_accessibility(make_row_accessible = TRUE)
+        row_accessible_counts()
     grna_ids <- names(init_assignments)
     assigned <- vapply(init_assignments, length, FUN.VALUE = integer(1)) >= 1
     grna_ids <- grna_ids[assigned]

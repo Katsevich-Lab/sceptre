@@ -191,9 +191,9 @@ import_data_from_sce <- function(
 #'   themselves, are empty.
 #'
 #' Sparse counts are returned in column-compressed (`dgCMatrix`) format.
-#' For a disk-backed `sceptre_object` (`backed = TRUE`), the response counts
-#' are instead a `DelayedMatrix` that reads `screen.h5mu`, which stores the
-#' counts one response at a time. Functions that read the matrix through
+#' For a disk-backed `sceptre_object` (`backed = TRUE`), the response and gRNA
+#' counts are instead `DelayedMatrix` objects that read `screen.h5mu`, which
+#' stores the counts one response (or gRNA) at a time. Functions that read the matrix through
 #' tatami, such as `scrapper::computeRnaQcMetrics()`, process it efficiently
 #' both by cell and by response; functions that process a `DelayedMatrix`
 #' block by block, such as `scuttle::perCellQCMetrics()`, are much slower
