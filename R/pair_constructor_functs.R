@@ -33,8 +33,12 @@
 #' supplied, the positive control targets are excluded from the *cis* pairs.
 #' @param response_position_data_frame (optional) a data frame with columns
 #' `response_id`, `chr`, and `position` giving the genomic coordinate of each
-#' response, or a `GRanges` object named by response ID; by default, the
-#' packaged GRCh38 gene position data frame is used. The position of a range
+#' response, or a `GRanges` object named by response ID (for example, the
+#' `rowRanges` of a `SingleCellExperiment` holding the responses, or of
+#' [as_sce()] of the `sceptre_object`); by default, the packaged GRCh38 gene
+#' position data frame is used. The chromosomes must be named as in
+#' `grna_target_data_frame` (for example, `"chr1"` in both, not `"chr1"` in one
+#' and `"1"` in the other). The position of a range
 #' wider than one base (for example, a gene) is its transcription start site,
 #' that is, its 5' end given its strand (its start for unstranded ranges), as
 #' computed by `GenomicRanges::resize(x, width = 1, fix = "start")`.
@@ -119,6 +123,21 @@ construct_cis_pairs <- function(
     if (nrow(response_position_data_frame) == 0L) {
         stop(
             "The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `data(gene_position_data_frame_grch38); head(gene_position_data_frame_grch38)`."
+        )
+    }
+    # the targets and the responses must name chromosomes alike (for example,
+    # "chr1" in both, not "chr1" and "1"); otherwise no pair is found
+    target_chrs <- unique(as.character(grna_target_data_frame$chr))
+    target_chrs <- target_chrs[!is.na(target_chrs) & nzchar(target_chrs)]
+    response_chrs <- unique(as.character(response_position_data_frame$chr))
+    if (length(target_chrs) >= 1L && !any(target_chrs %in% response_chrs)) {
+        stop(
+            "None of the chromosomes of the gRNA targets (for example, \"",
+            target_chrs[1L],
+            "\") is a chromosome of the responses (for example, \"",
+            response_chrs[1L],
+            "\"); the `chr` columns of `grna_target_data_frame` and of the ",
+            "response positions must name chromosomes alike."
         )
     }
 

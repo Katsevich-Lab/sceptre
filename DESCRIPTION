@@ -41,7 +41,6 @@ Imports:
     GenomicRanges,
     ggplot2,
     HDF5Array,
-    IRanges,
     Matrix,
     methods,
     MultiAssayExperiment,

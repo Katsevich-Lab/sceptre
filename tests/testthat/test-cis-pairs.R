@@ -226,3 +226,27 @@ test_that("construct_cis_pairs() takes response positions as a GRanges", {
         fixed = TRUE
     )
 })
+
+test_that("construct_cis_pairs() rejects differently named chromosomes", {
+    data("highmoi_example_data")
+    data("grna_target_data_frame_highmoi")
+    data("gene_position_data_frame_grch38")
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = grna_target_data_frame_highmoi,
+        moi = "high"
+    ))
+    # Ensembl-style names ("1") for the responses, UCSC-style ("chr1") for
+    # the targets
+    positions <- gene_position_data_frame_grch38
+    positions$chr <- sub("^chr", "", positions$chr)
+    expect_error(
+        construct_cis_pairs(
+            sceptre_object,
+            response_position_data_frame = positions
+        ),
+        "must name chromosomes alike",
+        fixed = TRUE
+    )
+})

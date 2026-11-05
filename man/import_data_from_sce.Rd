@@ -66,10 +66,25 @@ convention for a second feature type and the layout that
 Unless \code{grna_target_data_frame} is supplied, the gRNA targets are read from
 the alternative experiment: the gRNA IDs from its row names, the targets from
 the \code{grna_target} column of its \code{rowData} (gRNAs whose target is \code{NA} are not
-analyzed), the vectors, if any, from the \code{vector_id} column, and the gRNA
-positions, if any, from its \code{rowRanges} (one range per gRNA, none for gRNAs
-without a position, such as non-targeting gRNAs). Other columns of the
-\code{rowData} are kept in the gRNA target data frame.
+analyzed), the vectors, if any, from the \code{vector_id} column, and the
+chromosome, start and end of the region that each gRNA targets, if any, from
+the \code{target_chr}, \code{target_start} and \code{target_end} columns (\code{NA} for gRNAs
+without a target region, such as non-targeting gRNAs), which become the
+columns \code{chr}, \code{start} and \code{end} of the gRNA target data frame. Other columns
+of the \code{rowData} are kept in the gRNA target data frame. The \code{rowRanges} of
+the alternative experiment, which would give the positions of the gRNAs
+themselves, are not used.
+
+The \code{rowRanges} of \code{sce}, the positions of the responses (for example, of the
+genes), are kept in the \code{sceptre_object} and returned by \code{\link[=as_sce]{as_sce()}}. They are
+not used by default in \code{\link[=construct_cis_pairs]{construct_cis_pairs()}}; pass them as
+\code{response_position_data_frame} to use them there.
+
+A \code{SingleCellExperiment} made by another package may name the alternative
+experiment of the gRNA counts differently; for example, one made from Cell
+Ranger output with \code{DropletUtils::read10xCounts()} and
+\code{SingleCellExperiment::splitAltExps()} names it after the 10x feature type,
+\code{"CRISPR Guide Capture"}. Set \code{grna_altexp} to that name.
 
 The counts of \code{sce} are read into memory, also with \code{backed = TRUE}, in
 which case they are then written to \code{screen.h5mu} in \code{directory_to_write};
@@ -93,6 +108,16 @@ sce <- SingleCellExperiment::SingleCellExperiment(
 sceptre_object <- import_data_from_sce(
   sce,
   moi = "low",
+  extra_covariates = "batch"
+)
+
+# the gRNA counts in an alternative experiment named after the 10x feature
+# type, as in a SingleCellExperiment made from Cell Ranger output
+SingleCellExperiment::altExpNames(sce) <- "CRISPR Guide Capture"
+sceptre_object <- import_data_from_sce(
+  sce,
+  moi = "low",
+  grna_altexp = "CRISPR Guide Capture",
   extra_covariates = "batch"
 )
 }

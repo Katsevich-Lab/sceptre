@@ -10,10 +10,25 @@
 #' Unless `grna_target_data_frame` is supplied, the gRNA targets are read from
 #' the alternative experiment: the gRNA IDs from its row names, the targets from
 #' the `grna_target` column of its `rowData` (gRNAs whose target is `NA` are not
-#' analyzed), the vectors, if any, from the `vector_id` column, and the gRNA
-#' positions, if any, from its `rowRanges` (one range per gRNA, none for gRNAs
-#' without a position, such as non-targeting gRNAs). Other columns of the
-#' `rowData` are kept in the gRNA target data frame.
+#' analyzed), the vectors, if any, from the `vector_id` column, and the
+#' chromosome, start and end of the region that each gRNA targets, if any, from
+#' the `target_chr`, `target_start` and `target_end` columns (`NA` for gRNAs
+#' without a target region, such as non-targeting gRNAs), which become the
+#' columns `chr`, `start` and `end` of the gRNA target data frame. Other columns
+#' of the `rowData` are kept in the gRNA target data frame. The `rowRanges` of
+#' the alternative experiment, which would give the positions of the gRNAs
+#' themselves, are not used.
+#'
+#' The `rowRanges` of `sce`, the positions of the responses (for example, of the
+#' genes), are kept in the `sceptre_object` and returned by [as_sce()]. They are
+#' not used by default in [construct_cis_pairs()]; pass them as
+#' `response_position_data_frame` to use them there.
+#'
+#' A `SingleCellExperiment` made by another package may name the alternative
+#' experiment of the gRNA counts differently; for example, one made from Cell
+#' Ranger output with `DropletUtils::read10xCounts()` and
+#' `SingleCellExperiment::splitAltExps()` names it after the 10x feature type,
+#' `"CRISPR Guide Capture"`. Set `grna_altexp` to that name.
 #'
 #' The counts of `sce` are read into memory, also with `backed = TRUE`, in
 #' which case they are then written to `screen.h5mu` in `directory_to_write`;
@@ -58,6 +73,16 @@
 #' sceptre_object <- import_data_from_sce(
 #'   sce,
 #'   moi = "low",
+#'   extra_covariates = "batch"
+#' )
+#'
+#' # the gRNA counts in an alternative experiment named after the 10x feature
+#' # type, as in a SingleCellExperiment made from Cell Ranger output
+#' SingleCellExperiment::altExpNames(sce) <- "CRISPR Guide Capture"
+#' sceptre_object <- import_data_from_sce(
+#'   sce,
+#'   moi = "low",
+#'   grna_altexp = "CRISPR Guide Capture",
 #'   extra_covariates = "batch"
 #' )
 import_data_from_sce <- function(
@@ -118,7 +143,7 @@ import_data_from_sce <- function(
     if (is.null(grna_target_data_frame)) {
         grna_target_data_frame <- grna_targets_from_experiment(grna_experiment)
     }
-    import_data(
+    sceptre_object <- import_data(
         response_matrix = sce_counts(sce),
         grna_matrix = sce_counts(grna_experiment),
         grna_target_data_frame = grna_target_data_frame,
@@ -135,6 +160,11 @@ import_data_from_sce <- function(
         backed = backed,
         directory_to_write = directory_to_write
     )
+    # keep the positions of the responses, without the rowData
+    response_ranges <- SummarizedExperiment::rowRanges(sce)
+    S4Vectors::mcols(response_ranges) <- NULL
+    SummarizedExperiment::rowRanges(sceptre_object@data) <- response_ranges
+    return(sceptre_object)
 }
 
 
@@ -142,17 +172,23 @@ import_data_from_sce <- function(
 #'
 #' `as_sce()` returns the data of a `sceptre_object` as a
 #' `SingleCellExperiment`, for use with other Bioconductor packages:
-#' * the response UMI counts in the `counts` assay;
+#' * the response UMI counts in the `counts` assay, and the positions of the
+#'   responses in `rowRanges` when the `sceptre_object` was imported by
+#'   [import_data_from_sce()] from a `SingleCellExperiment` that had them
+#'   (empty otherwise);
 #' * the cell covariates (those computed by `sceptre` and the extra
 #'   covariates) in `colData`;
 #' * the gRNA UMI counts in the `counts` assay of the alternative experiment
 #'   `"grna"`, with the gRNA IDs and targets in the `grna_id` and
 #'   `grna_target` columns of its `rowData` (`grna_target` is `NA` for gRNAs
-#'   absent from the gRNA target data frame), the other columns of the gRNA
-#'   target data frame (such as `vector_id`) in its other `rowData` columns,
-#'   and the gRNA positions, if any, in its `rowRanges` (one range per gRNA,
-#'   none for gRNAs without a position). This `rowRanges` is a
-#'   `GRangesList` that [import_data()] takes as `grna_target_data_frame`.
+#'   absent from the gRNA target data frame) and the other columns of the gRNA
+#'   target data frame (such as `vector_id`) in its other `rowData` columns.
+#'   The columns `chr`, `start` and `end` of the gRNA target data frame, the
+#'   region that each gRNA targets, become the columns `target_chr`,
+#'   `target_start` and `target_end`; `GenomicRanges::makeGRangesFromDataFrame()`
+#'   turns them into a `GRanges` (see the examples). The `rowRanges` of the
+#'   alternative experiment, which would give the positions of the gRNAs
+#'   themselves, are empty.
 #'
 #' Sparse counts are returned in column-compressed (`dgCMatrix`) format.
 #' For a disk-backed `sceptre_object` (`backed = TRUE`), the response counts
@@ -182,6 +218,23 @@ import_data_from_sce <- function(
 #' sce <- as_sce(sceptre_object)
 #' # the gRNA targets
 #' SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "grna"))
+#'
+#' # the regions targeted by the gRNAs, as a GRanges
+#' data(highmoi_example_data)
+#' data(grna_target_data_frame_highmoi)
+#' sceptre_object <- import_data(
+#'   response_matrix = highmoi_example_data$response_matrix,
+#'   grna_matrix = highmoi_example_data$grna_matrix,
+#'   grna_target_data_frame = grna_target_data_frame_highmoi,
+#'   moi = "high"
+#' )
+#' targets <- SummarizedExperiment::rowData(
+#'   SingleCellExperiment::altExp(as_sce(sceptre_object), "grna")
+#' )
+#' GenomicRanges::makeGRangesFromDataFrame(
+#'   targets[!is.na(targets$target_chr), ],
+#'   keep.extra.columns = TRUE
+#' )
 as_sce <- function(sceptre_object) {
     if (!methods::is(sceptre_object, "sceptre_object")) {
         stop("`sceptre_object` must be a `sceptre_object`.")
@@ -189,7 +242,7 @@ as_sce <- function(sceptre_object) {
     grna_matrix <- as_column_sparse(get_grna_matrix(sceptre_object))
     grna_experiment <- SingleCellExperiment::SingleCellExperiment(
         assays = list(counts = grna_matrix),
-        rowRanges = grna_ranges_from_target_data_frame(
+        rowData = grna_row_data(
             sceptre_object@grna_target_data_frame,
             rownames(grna_matrix)
         )
@@ -198,7 +251,8 @@ as_sce <- function(sceptre_object) {
         assays = list(
             counts = as_column_sparse(get_response_matrix(sceptre_object))
         ),
-        colData = SummarizedExperiment::colData(sceptre_object@data)
+        colData = SummarizedExperiment::colData(sceptre_object@data),
+        rowRanges = SummarizedExperiment::rowRanges(sceptre_object@data)
     )
     SingleCellExperiment::altExp(sce, "grna", withDimnames = FALSE) <-
         grna_experiment
@@ -233,9 +287,18 @@ as_column_sparse <- function(mat) {
 }
 
 
-# The gRNA targets held by a gRNA experiment (see import_data_from_sce()), as a
-# GRangesList (one element per gRNA, empty for gRNAs without a position) when
-# the experiment holds positions, and as a data frame otherwise
+# The columns of the gRNA target data frame that give the region each gRNA
+# targets, named as in the rowData of a gRNA experiment (see as_sce())
+target_region_columns <- c(
+    chr = "target_chr",
+    start = "target_start",
+    end = "target_end"
+)
+
+
+# The gRNA target data frame held by a gRNA experiment (see
+# import_data_from_sce()): its rowData, with the gRNA IDs from its row names and
+# the target region columns renamed
 grna_targets_from_experiment <- function(grna_experiment) {
     targets <- SummarizedExperiment::rowData(grna_experiment)
     if (!("grna_target" %in% colnames(targets))) {
@@ -248,35 +311,28 @@ grna_targets_from_experiment <- function(grna_experiment) {
         S4Vectors::DataFrame(grna_id = rownames(grna_experiment)),
         targets[, setdiff(colnames(targets), "grna_id"), drop = FALSE]
     )
+    present <- target_region_columns %in% colnames(targets)
+    if (any(present)) {
+        if (any(names(target_region_columns) %in% colnames(targets))) {
+            stop(
+                "The `rowData` of the gRNA alternative experiment must give ",
+                "the target regions in the columns `target_chr`, ",
+                "`target_start` and `target_end` or in `chr`, `start` and ",
+                "`end`, not both."
+            )
+        }
+        idx <- match(target_region_columns[present], colnames(targets))
+        colnames(targets)[idx] <- names(target_region_columns)[present]
+    }
     keep <- !is.na(targets$grna_target)
-    positions <- if (
-        methods::is(grna_experiment, "RangedSummarizedExperiment")
-    ) {
-        SummarizedExperiment::rowRanges(grna_experiment)
-    } else {
-        NULL
-    }
-    if (methods::is(positions, "GRanges")) {
-        positions <- methods::as(positions, "GRangesList")
-    }
-    if (is.null(positions) || all(lengths(positions) == 0L)) {
-        return(as.data.frame(targets[keep, , drop = FALSE], optional = TRUE))
-    }
-    positions <- positions[keep]
-    S4Vectors::mcols(positions) <- targets[keep, , drop = FALSE]
-    names(positions) <- NULL
-    return(positions)
+    return(as.data.frame(targets[keep, , drop = FALSE], optional = TRUE))
 }
 
 
-# The positions of the gRNAs `grna_ids` given by the columns `chr`, `start` and
-# `end` of the gRNA target data frame, as a GRangesList (one element per gRNA,
-# named by gRNA ID, empty for gRNAs without a position), with the gRNA IDs and
-# the other columns as metadata columns
-grna_ranges_from_target_data_frame <- function(
-    grna_target_data_frame,
-    grna_ids
-) {
+# The rowData of the gRNA experiment of the gRNAs `grna_ids` (see as_sce()):
+# the gRNA target data frame, one row per gRNA (NA for gRNAs absent from it),
+# with the target region columns renamed
+grna_row_data <- function(grna_target_data_frame, grna_ids) {
     if (anyDuplicated(grna_target_data_frame$grna_id)) {
         stop(
             "The gRNA target data frame lists some gRNAs more than once; ",
@@ -285,40 +341,17 @@ grna_ranges_from_target_data_frame <- function(
     }
     targets <- grna_target_data_frame[
         match(grna_ids, grna_target_data_frame$grna_id),
-        setdiff(
-            colnames(grna_target_data_frame),
-            c("grna_id", "chr", "start", "end")
-        ),
+        setdiff(colnames(grna_target_data_frame), "grna_id"),
         drop = FALSE
     ]
     rownames(targets) <- NULL
-    targets <- cbind(data.frame(grna_id = grna_ids), targets)
-    chr <- character(length(grna_ids))
-    start <- end <- integer(length(grna_ids))
-    has_position <- rep(FALSE, length(grna_ids))
-    if (all(c("chr", "start", "end") %in% colnames(grna_target_data_frame))) {
-        idx <- match(grna_ids, grna_target_data_frame$grna_id)
-        chr <- as.character(grna_target_data_frame$chr[idx])
-        start <- grna_target_data_frame$start[idx]
-        end <- grna_target_data_frame$end[idx]
-        # a missing or empty chromosome marks a gRNA without a position
-        has_position <- !is.na(chr) & nzchar(chr) & !is.na(start) & !is.na(end)
-    }
-    ranges <- GenomicRanges::GRanges(
-        seqnames = chr[has_position],
-        ranges = IRanges::IRanges(
-            start = start[has_position],
-            end = end[has_position]
-        )
-    )
-    positions <- S4Vectors::splitAsList(
-        ranges,
-        factor(which(has_position), levels = seq_along(grna_ids))
-    )
-    names(positions) <- grna_ids
-    S4Vectors::mcols(positions) <- S4Vectors::DataFrame(
+    renamed <- colnames(targets) %in% names(target_region_columns)
+    colnames(targets)[renamed] <- target_region_columns[colnames(targets)[
+        renamed
+    ]]
+    return(S4Vectors::DataFrame(
+        grna_id = grna_ids,
         targets,
         check.names = FALSE
-    )
-    return(positions)
+    ))
 }

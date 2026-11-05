@@ -30,13 +30,31 @@ test_that("as_sce() exports the data in the SCE layout", {
         targets$grna_target,
         grna_target_data_frame_highmoi$grna_target[idx]
     )
-    positions <- SummarizedExperiment::rowRanges(grna_experiment)
-    expect_s4_class(positions, "GRangesList")
-    positioned <- !is.na(grna_target_data_frame_highmoi$chr[idx])
-    expect_identical(unname(lengths(positions)), as.integer(positioned))
+    # the target regions are rowData columns; rowRanges (the positions of the
+    # gRNAs themselves) and the response positions are empty
+    for (column in c("chr", "start", "end")) {
+        expect_identical(
+            targets[[paste0("target_", column)]],
+            grna_target_data_frame_highmoi[[column]][idx]
+        )
+    }
+    expect_false(any(c("chr", "start", "end") %in% colnames(targets)))
+    expect_true(all(
+        lengths(SummarizedExperiment::rowRanges(grna_experiment)) == 0L
+    ))
+    expect_true(all(lengths(SummarizedExperiment::rowRanges(sce)) == 0L))
+    positioned <- !is.na(targets$target_chr)
+    target_ranges <- GenomicRanges::makeGRangesFromDataFrame(
+        targets[positioned, ],
+        keep.extra.columns = TRUE
+    )
     expect_identical(
-        GenomicRanges::start(unlist(positions)),
+        GenomicRanges::start(target_ranges),
         as.integer(grna_target_data_frame_highmoi$start[idx][positioned])
+    )
+    expect_identical(
+        target_ranges$grna_id,
+        rownames(grna_experiment)[positioned]
     )
 })
 
@@ -79,21 +97,90 @@ test_that("import_data_from_sce() imports what as_sce() exports", {
         construct_cis_pairs(sceptre_object)
     )
 
-    # the exported gRNA ranges are a gRNA target data frame for import_data()
-    from_ranges <- import_data(
+})
+
+test_that("import_data_from_sce() keeps the response positions", {
+    data(grna_target_data_frame_highmoi)
+    data(highmoi_example_data)
+    data(gene_position_data_frame_grch38)
+    sce <- as_sce(import_data(
         response_matrix = highmoi_example_data$response_matrix,
         grna_matrix = highmoi_example_data$grna_matrix,
-        grna_target_data_frame = SummarizedExperiment::rowRanges(
-            SingleCellExperiment::altExp(
-                as_sce(sceptre_object),
-                "grna"
-            )
-        ),
+        grna_target_data_frame = grna_target_data_frame_highmoi,
+        moi = "high"
+    ))
+    # the genes at their packaged positions, with a rowData column
+    positions <- gene_position_data_frame_grch38[
+        match(rownames(sce), gene_position_data_frame_grch38$response_id),
+    ]
+    gene_ranges <- GenomicRanges::makeGRangesFromDataFrame(data.frame(
+        chr = positions$chr,
+        start = positions$position,
+        end = positions$position
+    ))
+    names(gene_ranges) <- rownames(sce)
+    SummarizedExperiment::rowRanges(sce) <- gene_ranges
+    SummarizedExperiment::rowData(sce)$symbol <- highmoi_example_data$gene_names
+    sceptre_object <- import_data_from_sce(sce, moi = "high")
+    expected_ranges <- gene_ranges
+    expect_identical(
+        SummarizedExperiment::rowRanges(as_sce(sceptre_object)),
+        expected_ranges
+    )
+    # they survive saving and loading
+    directory <- withr::local_tempdir()
+    write_sceptre_object(sceptre_object, directory)
+    expect_identical(
+        SummarizedExperiment::rowRanges(as_sce(read_sceptre_object(directory))),
+        expected_ranges
+    )
+    # they are used in cis pairing when passed, and give the pairs of the
+    # packaged positions (in the order of the genes in `sce`)
+    sorted_pairs <- function(pairs) {
+        pairs <- pairs[order(pairs$grna_target, pairs$response_id), ]
+        rownames(pairs) <- NULL
+        pairs
+    }
+    expected_pairs <- construct_cis_pairs(
+        sceptre_object,
+        distance_threshold = 5e6
+    )
+    expect_gt(nrow(expected_pairs), 0L)
+    expect_identical(
+        sorted_pairs(construct_cis_pairs(
+            sceptre_object,
+            distance_threshold = 5e6,
+            response_position_data_frame = SummarizedExperiment::rowRanges(sce)
+        )),
+        sorted_pairs(expected_pairs)
+    )
+})
+
+test_that("import_data_from_sce() reads target regions named chr, start, end", {
+    data(grna_target_data_frame_highmoi)
+    data(highmoi_example_data)
+    sceptre_object <- import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = grna_target_data_frame_highmoi,
         moi = "high"
     )
+    sce <- as_sce(sceptre_object)
+    grna_experiment <- SingleCellExperiment::altExp(sce, "grna")
+    targets <- SummarizedExperiment::rowData(grna_experiment)
+    colnames(targets) <- sub("^target_", "", colnames(targets))
+    SummarizedExperiment::rowData(grna_experiment) <- targets
+    SingleCellExperiment::altExp(sce, "grna") <- grna_experiment
     expect_identical(
-        construct_cis_pairs(from_ranges),
+        construct_cis_pairs(import_data_from_sce(sce, moi = "high")),
         construct_cis_pairs(sceptre_object)
+    )
+    SummarizedExperiment::rowData(grna_experiment)$target_chr <- targets$chr
+    SingleCellExperiment::altExp(sce, "grna") <- grna_experiment
+    expect_error(
+        import_data_from_sce(sce, moi = "high"),
+        "not both",
+        fixed = TRUE
     )
 })
 
@@ -167,7 +254,7 @@ test_that("as(x, \"SingleCellExperiment\") is as_sce(x)", {
 })
 
 
-test_that("as_sce() treats an empty chromosome as no position", {
+test_that("as_sce() exports the target regions as given", {
     data(lowmoi_example_data)
     targets <- lowmoi_example_data$grna_target_data_frame
     targets$chr <- ifelse(targets$grna_target == "non-targeting", "", "chr1")
@@ -179,11 +266,10 @@ test_that("as_sce() treats an empty chromosome as no position", {
         grna_target_data_frame = targets,
         moi = "low"
     ))
-    positions <- SummarizedExperiment::rowRanges(
+    exported <- SummarizedExperiment::rowData(
         SingleCellExperiment::altExp(as_sce(sceptre_object), "grna")
     )
-    nt <- names(positions) %in%
-        targets$grna_id[targets$grna_target == "non-targeting"]
-    expect_true(all(lengths(positions)[nt] == 0L))
-    expect_true(all(lengths(positions)[!nt] == 1L))
+    idx <- match(exported$grna_id, targets$grna_id)
+    expect_identical(exported$target_chr, targets$chr[idx])
+    expect_identical(exported$target_start, targets$start[idx])
 })
