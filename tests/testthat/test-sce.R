@@ -12,7 +12,7 @@ test_that("as_sce() exports the data in the SCE layout", {
     expect_s4_class(sce, "SingleCellExperiment")
     expect_identical(
         as.matrix(SummarizedExperiment::assay(sce, "counts")),
-        as.matrix(get_response_matrix(sceptre_object))
+        response_values(sceptre_object)
     )
     expect_s4_class(SummarizedExperiment::assay(sce, "counts"), "dgCMatrix")
     expect_identical(
@@ -138,8 +138,8 @@ test_that("import_data_from_sce() reads targets without positions", {
     )
     expect_s4_class(get_response_matrix(backed), "DelayedMatrix")
     expect_identical(
-        as.matrix(get_response_matrix(backed)),
-        as.matrix(get_response_matrix(direct))
+        response_values(backed),
+        response_values(direct)
     )
     expect_error(
         import_data_from_sce(sce, moi = "low", grna_altexp = "guides"),

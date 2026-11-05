@@ -42,8 +42,8 @@ import_backed <- function(directories, ...) {
 expect_same_import <- function(backed, in_memory) {
     expect_s4_class(get_response_matrix(backed), "DelayedMatrix")
     expect_identical(
-        as.matrix(get_response_matrix(backed)),
-        as.matrix(get_response_matrix(in_memory))
+        response_values(backed),
+        response_values(in_memory)
     )
     expect_identical(
         dimnames(get_response_matrix(backed)),

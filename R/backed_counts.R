@@ -9,9 +9,8 @@
 # backed reader opens this as a features x cells CSR_H5ADMatrixSeed, whose row
 # reads touch only that row's entries, and Python's anndata and mudata read the
 # same file, in memory or backed. MuData writes this layout from a dgRMatrix;
-# backed counts are copied into it block by block with HDF5Array's 10x
-# writer (TENxRealizationSink), whose column-compressed groups are AnnData's
-# csc_matrix once the AnnData encoding attributes are added.
+# the response counts are written into it block by block with rhdf5
+# (write_backed_counts()), as 32-bit integer counts.
 #
 # Analysis code reads backed counts in two ways: one response at a time
 # (load_row()), and in blocks of consecutive responses realized as in-memory
@@ -193,12 +192,12 @@ h5_row_blocks <- function(mat, location, f) {
 }
 
 # Counts to write with write_backed_counts(), other than a matrix: `dim`
-# (features x cells), `type`, the number of entries of each feature
-# (`widths`), and `block(rows)`, the counts of the consecutive features `rows`
-# as a cells x features dgCMatrix.
-counts_source <- function(dim, widths, block, type = "double") {
+# (features x cells), the number of entries of each feature (`widths`), and
+# `block(rows)`, the counts of the consecutive features `rows` as a cells x
+# features dgCMatrix.
+counts_source <- function(dim, widths, block) {
     structure(
-        list(dim = dim, type = type, widths = widths, block = block),
+        list(dim = dim, widths = widths, block = block),
         class = "sceptre_counts_source"
     )
 }
@@ -211,7 +210,6 @@ matrix_counts_source <- function(counts) {
     if (is_backed(counts)) {
         return(counts_source(
             dim = dim(counts),
-            type = DelayedArray::type(counts),
             widths = NULL,
             block = function(rows) {
                 block <- compressed_sparse_components(row_slice(counts, rows))
@@ -330,8 +328,11 @@ gathered_counts_source <- function(files, group) {
 # counts source) into an existing HDF5 file as the AnnData csc_matrix group
 # `group`, block by block, so that the counts are never all in memory at once.
 # Blocks of consecutive features hold a bounded number of entries
-# (entry_blocks()) when the number of entries of each feature is known.
-# `level` is the deflate level (HDF5Array's default; 0 for a temporary file).
+# (entry_blocks()) when the number of entries of each feature is known, and
+# follow DelayedArray's automatic grid otherwise. Each block's indices and
+# values are appended to the group's datasets with one write each; the values
+# are counts, stored as 32-bit integers (as Cell Ranger stores them). `level`
+# is the deflate level (HDF5Array's default; 0 for a temporary file).
 write_backed_counts <- function(counts, file, group, level = NULL) {
     source <- if (inherits(counts, "sceptre_counts_source")) {
         counts
@@ -339,34 +340,49 @@ write_backed_counts <- function(counts, file, group, level = NULL) {
         matrix_counts_source(counts)
     }
     dim <- source$dim
-    sink <- HDF5Array::TENxRealizationSink(
-        dim = rev(dim),
-        type = source$type,
-        filepath = file,
-        group = group,
-        level = if (is.null(level)) HDF5Array::getHDF5DumpCompressionLevel() else level
-    )
-    grid <- if (is.null(source$widths)) {
-        DelayedArray::colAutoGrid(sink)
+    level <- if (is.null(level)) HDF5Array::getHDF5DumpCompressionLevel() else level
+    blocks <- if (is.null(source$widths)) {
+        grid <- DelayedArray::rowAutoGrid(counts)
+        lapply(seq_len(nrow(grid)), function(k) viewport_range(grid[[k, 1L]], 1L))
     } else {
-        DelayedArray::ArbitraryArrayGrid(list(
-            dim[2L],
-            cumsum(lengths(entry_blocks(source$widths)))
-        ))
+        entry_blocks(source$widths)
     }
-    for (k in seq_len(ncol(grid))) {
-        viewport <- grid[[1L, k]]
-        DelayedArray::write_block(
-            sink,
-            viewport,
-            source$block(viewport_range(viewport, 2L))
-        )
+    if (!file.exists(file)) {
+        rhdf5::h5createFile(file)
     }
-    DelayedArray::close(sink)
-    # the 10x layout keeps the shape in a dataset; AnnData in attributes
-    rhdf5::h5delete(file, paste0(group, "/shape"))
     h5 <- rhdf5::H5Fopen(file)
     on.exit(rhdf5::H5Fclose(h5), add = TRUE)
+    rhdf5::h5createGroup(h5, group)
+    datasets <- lapply(
+        c(indices = "indices", data = "data"),
+        function(name) {
+            h5_create_extendible(h5, paste0(group, "/", name), "H5T_NATIVE_INT32", level)
+        }
+    )
+    on.exit(lapply(datasets, rhdf5::H5Dclose), add = TRUE, after = FALSE)
+    widths <- numeric(dim[1L])
+    n_entries <- 0
+    for (rows in blocks) {
+        block <- compressed_sparse_components(source$block(rows))
+        values <- block$x
+        if (any(values != round(values)) || any(abs(values) > .Machine$integer.max)) {
+            stop("Only integer counts can be written to screen.h5mu.")
+        }
+        n <- length(values)
+        h5_append_entries(datasets$indices, block$i, n_entries, n)
+        h5_append_entries(datasets$data, as.integer(values), n_entries, n)
+        widths[rows] <- diff(block$p)
+        n_entries <- n_entries + n
+    }
+    rhdf5::h5createDataset(
+        h5,
+        paste0(group, "/indptr"),
+        dims = dim[1L] + 1,
+        H5type = "H5T_NATIVE_INT64",
+        chunk = min(4096, dim[1L] + 1),
+        level = level
+    )
+    rhdf5::h5write(c(0, cumsum(widths)), h5, paste0(group, "/indptr"))
     x <- rhdf5::H5Gopen(h5, group)
     on.exit(rhdf5::H5Gclose(x), add = TRUE, after = FALSE)
     rhdf5::h5writeAttribute(
@@ -385,6 +401,35 @@ write_backed_counts <- function(counts, file, group, level = NULL) {
     )
     rhdf5::h5writeAttribute(rev(dim), x, "shape")
     invisible(file)
+}
+
+# An empty, extendible, chunked one-dimensional dataset of `H5type`, open.
+h5_create_extendible <- function(h5, name, H5type, level, chunk = 16384) {
+    rhdf5::h5createDataset(
+        h5,
+        name,
+        dims = 0,
+        maxdims = rhdf5::H5Sunlimited(),
+        H5type = H5type,
+        chunk = chunk,
+        level = level
+    )
+    rhdf5::H5Dopen(h5, name)
+}
+
+# Appends `count` values to an open one-dimensional dataset holding `offset`.
+h5_append_entries <- function(dataset, values, offset, count) {
+    if (count == 0) {
+        return(invisible())
+    }
+    rhdf5::H5Dset_extent(dataset, offset + count)
+    space <- rhdf5::H5Dget_space(dataset)
+    on.exit(rhdf5::H5Sclose(space), add = TRUE)
+    rhdf5::H5Sselect_hyperslab(space, start = offset + 1, count = count)
+    memory <- rhdf5::H5Screate_simple(count)
+    on.exit(rhdf5::H5Sclose(memory), add = TRUE)
+    rhdf5::H5Dwrite(dataset, values, h5spaceMem = memory, h5spaceFile = space)
+    invisible()
 }
 
 # An empty dgRMatrix of the given dimensions and names: the placeholder that

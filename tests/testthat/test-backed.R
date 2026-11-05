@@ -54,9 +54,10 @@ test_that("a disk-backed analysis gives the in-memory results", {
     )
     expect_s4_class(get_response_matrix(backed), "DelayedMatrix")
     expect_true(file.exists(file.path(directory, "screen.h5mu")))
+    expect_identical(DelayedArray::type(get_response_matrix(backed)), "integer")
     expect_identical(
-        as.matrix(get_response_matrix(backed)),
-        as.matrix(get_response_matrix(in_memory))
+        response_values(backed),
+        response_values(in_memory)
     )
     expect_identical(get_grna_matrix(backed), get_grna_matrix(in_memory))
     expect_identical(get_cell_covariates(backed), get_cell_covariates(in_memory))
@@ -124,8 +125,8 @@ test_that("write_sceptre_object() and read_sceptre_object() round trip", {
     reread_backed <- read_sceptre_object(directory, backed = TRUE)
     expect_s4_class(get_response_matrix(reread_backed), "DelayedMatrix")
     expect_identical(
-        as.matrix(get_response_matrix(reread_backed)),
-        as.matrix(get_response_matrix(in_memory))
+        response_values(reread_backed),
+        response_values(in_memory)
     )
     expect_same_results(reread_backed, in_memory)
 })
@@ -143,8 +144,8 @@ test_that("a disk-backed object is written without copying its counts", {
     expect_identical(file.mtime(screen_file), modified)
     reread <- read_sceptre_object(directory, backed = TRUE)
     expect_identical(
-        as.matrix(get_response_matrix(reread)),
-        as.matrix(get_response_matrix(backed))
+        response_values(reread),
+        response_values(backed)
     )
 
     # written elsewhere, the counts are copied from the backing file
