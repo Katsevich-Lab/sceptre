@@ -65,10 +65,7 @@ test_that("a disk-backed analysis gives the in-memory results", {
         as.matrix(get_grna_matrix(in_memory))
     )
     expect_identical(get_cell_covariates(backed), get_cell_covariates(in_memory))
-    expect_false(is.null(h5_counts_location(
-        get_response_matrix(backed),
-        response_counts_group
-    )))
+    expect_false(is.null(h5_counts_location(get_response_matrix(backed))))
 
     # small blocks, so that the counts are read in many blocks of responses
     old_block_size <- DelayedArray::getAutoBlockSize()

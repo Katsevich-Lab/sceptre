@@ -104,7 +104,11 @@ assign_grnas_to_cells_mixture <- function(
                 " for progress updates."
             )
         }
-        grna_ids_partitioned <- partition_response_ids(grna_ids, BPPARAM)
+        grna_ids_partitioned <- partition_response_ids(
+            grna_ids,
+            BPPARAM,
+            positions = match(grna_ids, rownames(grna_matrix))
+        )
         res <- bplapply_checked(
             seq_along(grna_ids_partitioned),
             function(proc_id) {

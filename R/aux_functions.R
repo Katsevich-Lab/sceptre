@@ -284,7 +284,7 @@ partition_response_ids <- function(response_ids, BPPARAM, positions = NULL) {
         )
         unit <- (seq_along(response_ids) - 1L) %/% block_length + 1L
     }
-    if (n_processors >= 2L && length(unit) >= 2L * n_processors &&
+    if (n_processors >= 2L && length(unit) > 0L &&
         max(unit) >= 2L * n_processors) {
         group <- (unit - 1L) %% n_processors + 1L
         out <- split(

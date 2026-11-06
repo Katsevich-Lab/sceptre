@@ -87,9 +87,9 @@ row_slice <- function(mat, rows) {
 # offset + 1, ..., offset + index$n_rows: list(j, p, n_rows), their column
 # indices and row pointers as in a dgRMatrix, without their values, for code
 # that needs only which entries are nonzero. An in-memory dgRMatrix is passed
-# whole. Disk-backed counts read from `group` of screen.h5mu (for example,
-# response_counts_group) are read from the file directly, indices only.
-row_index_blocks <- function(mat, group, f) {
+# whole. Disk-backed response counts read from screen.h5mu are read from the
+# file directly, indices only.
+row_index_blocks <- function(mat, f) {
     row_index <- function(csr_mat) {
         csr <- compressed_sparse_components(csr_mat)
         list(j = csr$j, p = csr$p, n_rows = nrow(csr_mat))
@@ -97,7 +97,7 @@ row_index_blocks <- function(mat, group, f) {
     if (!is_backed(mat)) {
         return(list(f(row_index(mat), 0L)))
     }
-    location <- h5_counts_location(mat, group)
+    location <- h5_counts_location(mat)
     if (!is.null(location)) {
         return(h5_row_index_blocks(location, f))
     }
@@ -108,11 +108,12 @@ row_index_blocks <- function(mat, group, f) {
     })
 }
 
-# Where in screen.h5mu backed counts read from its `group` are: a modality's
-# X, an AnnData csc_matrix that MuData's backed reader opens as a features x
+# Where in screen.h5mu backed response counts are: the response modality's X,
+# an AnnData csc_matrix that MuData's backed reader opens as a features x
 # cells CSR_H5ADMatrixSeed, under no delayed operation but names; NULL for
 # other counts. The group's shape and number of entries must be the counts'.
-h5_counts_location <- function(mat, group) {
+h5_counts_location <- function(mat) {
+    group <- response_counts_group
     if (
         !is_backed(mat) ||
             !DelayedArray::isPristine(mat, ignore.dimnames = TRUE) ||

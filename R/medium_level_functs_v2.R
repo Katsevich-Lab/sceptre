@@ -491,10 +491,18 @@ run_crt_in_memory_v2 <- function(
     }
 
     # 10. perform the association analyses
+    # each gRNA group is placed at the first row of its responses, so that
+    # workers receive runs of groups whose responses are neighboring rows
     grna_groups <- unique(response_grna_group_pairs$grna_group)
+    group_positions <- tapply(
+        match(response_grna_group_pairs$response_id, rownames(response_matrix)),
+        response_grna_group_pairs$grna_group,
+        min
+    )
     partitioned_grna_group_ids <- partition_response_ids(
         response_ids = grna_groups,
-        BPPARAM = BPPARAM
+        BPPARAM = BPPARAM,
+        positions = group_positions[as.character(grna_groups)]
     )
     if (is.null(BPPARAM)) {
         res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
@@ -512,10 +520,10 @@ run_crt_in_memory_v2 <- function(
         message(crayon::green(" \u2713"))
     }
     result <- res |> data.table::rbindlist(fill = TRUE)
-    if (length(res) >= 2L) {
-        # put the rows in the serial order of the gRNA groups, which the
-        # workers receive interleaved, so that ties in the sorted result break
-        # as in a serial run
+    if (nrow(result) >= 1L) {
+        # the gRNA groups were analyzed in the order of their responses' rows;
+        # put the rows in the order of `grna_groups`, so that ties in the
+        # sorted result break as before
         data.table::set(
             result,
             j = "grna_group_order",

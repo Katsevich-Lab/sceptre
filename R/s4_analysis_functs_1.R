@@ -150,7 +150,6 @@ set_analysis_parameters <- function(
         control_group = control_group,
         resampling_mechanism = resampling_mechanism,
         side = side,
-        low_moi = sceptre_object@low_moi,
         grna_integration_strategy = grna_integration_strategy,
         resampling_approximation = resampling_approximation
     ) |>

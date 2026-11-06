@@ -62,11 +62,7 @@ compute_pairwise_qc_information <- function(sceptre_object) {
             cells_in_use = cells_in_use
         )
     }
-    blocks <- row_index_blocks(
-        response_matrix,
-        response_counts_group,
-        count_block
-    )
+    blocks <- row_index_blocks(response_matrix, count_block)
     out <- if (length(blocks) == 1L) {
         blocks[[1L]]
     } else {

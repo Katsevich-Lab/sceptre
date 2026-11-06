@@ -90,11 +90,7 @@ construct_negative_control_pairs_v2 <- function(
                 cells_in_use = cells_in_use
             )
         }
-        n_nonzero_m <- row_index_blocks(
-            response_matrix,
-            response_counts_group,
-            count_block
-        ) |>
+        n_nonzero_m <- row_index_blocks(response_matrix, count_block) |>
             do.call(what = cbind)
         dummy_possibly_groups_m <- matrix(
             seq_along(nt_grna_group_idxs) - 1L,

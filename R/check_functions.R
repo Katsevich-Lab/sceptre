@@ -296,7 +296,6 @@ check_set_analysis_parameters <- function(
     control_group,
     resampling_mechanism,
     side,
-    low_moi,
     grna_integration_strategy,
     resampling_approximation
 ) {
@@ -419,12 +418,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 6. verify that the moi is consistent with the control group
-    if (!low_moi && control_group == "nt_cells") {
-        stop("The control group cannot be the NT cells in high MOI.")
-    }
-
-    # 7. verify that, if the control_group is NT cells, there are NT gRNAs
+    # 6. verify that, if the control_group is NT cells, there are NT gRNAs
     # present
     if (control_group == "nt_cells") {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
@@ -435,12 +429,12 @@ check_set_analysis_parameters <- function(
         }
     }
 
-    # 8. verify that "side" is among "both", "left", or "right"
+    # 7. verify that "side" is among "both", "left", or "right"
     if (!(side %in% c("both", "left", "right"))) {
         stop("`side` must be one of 'both', 'left', or 'right'.")
     }
 
-    # 9. verify that "grna_integration_strategy" is union or singleton
+    # 8. verify that "grna_integration_strategy" is union or singleton
     if (
         !(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))
     ) {
@@ -449,7 +443,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 10. if the response counts are on disk, verify that resampling mechanism
+    # 9. if the response counts are on disk, verify that resampling mechanism
     # is permutations
     if (
         is_backed(get_response_matrix(sceptre_object)) &&
@@ -460,7 +454,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 11. verify resampling_approximation acceptable
+    # 10. verify resampling_approximation acceptable
     if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
         stop(
             "`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'."
