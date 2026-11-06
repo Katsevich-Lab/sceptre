@@ -85,11 +85,13 @@ row_slice <- function(mat, rows) {
 # Calls f(block, offset) on consecutive blocks of rows of `mat`, each an
 # in-memory dgRMatrix holding rows offset + 1, ..., offset + nrow(block), and
 # returns the results as a list. An in-memory dgRMatrix is passed whole.
-row_blocks <- function(mat, f) {
+# Disk-backed counts read from `group` of screen.h5mu (for example,
+# response_counts_group) are read from the file directly.
+row_blocks <- function(mat, group, f) {
     if (!is_backed(mat)) {
         return(list(f(mat, 0L)))
     }
-    location <- h5_counts_location(mat)
+    location <- h5_counts_location(mat, group)
     if (!is.null(location)) {
         return(h5_row_blocks(mat, location, f))
     }
@@ -100,11 +102,11 @@ row_blocks <- function(mat, f) {
     })
 }
 
-# Where in screen.h5mu backed counts read from it are: the response modality's
+# Where in screen.h5mu backed counts read from its `group` are: a modality's
 # X, an AnnData csc_matrix that MuData's backed reader opens as a features x
 # cells CSR_H5ADMatrixSeed, under no delayed operation but names; NULL for
 # other counts. The group's shape and number of entries must be the counts'.
-h5_counts_location <- function(mat) {
+h5_counts_location <- function(mat, group) {
     if (
         !is_backed(mat) ||
             !DelayedArray::isPristine(mat, ignore.dimnames = TRUE) ||
@@ -113,7 +115,6 @@ h5_counts_location <- function(mat) {
         return(NULL)
     }
     file <- DelayedArray::path(mat)
-    group <- response_counts_group
     indptr <- tryCatch(
         {
             shape <- rhdf5::h5readAttributes(file, group)$shape

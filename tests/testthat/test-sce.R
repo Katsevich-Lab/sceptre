@@ -134,3 +134,25 @@ test_that("import_data_from_sce() reads targets without positions", {
     )
 })
 
+
+test_that("import_data_from_sce() reads counts in other matrix classes", {
+    # for example SparseArray's SVT_SparseMatrix
+    sce <- highmoi_sce()
+    direct <- import_data_from_sce(sce, moi = "high")
+    SummarizedExperiment::assay(sce, "counts") <- methods::as(
+        SummarizedExperiment::assay(sce, "counts"),
+        "SVT_SparseMatrix"
+    )
+    grna_experiment <- SingleCellExperiment::altExp(sce, "grna")
+    SummarizedExperiment::assay(grna_experiment, "counts") <- methods::as(
+        SummarizedExperiment::assay(grna_experiment, "counts"),
+        "SVT_SparseMatrix"
+    )
+    SingleCellExperiment::altExp(sce, "grna") <- grna_experiment
+    from_svt <- import_data_from_sce(sce, moi = "high")
+    expect_identical(response_values(from_svt), response_values(direct))
+    expect_identical(
+        as.matrix(get_grna_matrix(from_svt)),
+        as.matrix(get_grna_matrix(direct))
+    )
+})

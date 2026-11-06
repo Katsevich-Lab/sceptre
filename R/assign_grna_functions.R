@@ -4,7 +4,6 @@
 assign_grnas_to_cells <- function(
     sceptre_object,
     print_progress,
-    parallel,
     BPPARAM,
     log_dir
 ) {
@@ -25,7 +24,6 @@ assign_grnas_to_cells <- function(
             cell_covariate_data_frame = cell_covariate_data_frame,
             grna_assignment_hyperparameters = grna_assignment_hyperparameters,
             print_progress = print_progress,
-            parallel = parallel,
             BPPARAM = BPPARAM,
             log_dir = log_dir,
             grna_ids = grnas_in_use,

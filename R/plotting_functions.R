@@ -1145,8 +1145,7 @@ plot_run_qc <- function(
             sceptre_object,
             downsample_pairs = downsample_pairs,
             point_size = point_size,
-            transparency = transparency,
-            return_indiv_plots = FALSE
+            transparency = transparency
         )
         # combine the plots
         if (return_indiv_plots) {
@@ -1206,8 +1205,7 @@ plot_pairwise_qc <- function(
     sceptre_object,
     downsample_pairs = 10000L,
     point_size = 0.55,
-    transparency = 0.8,
-    return_indiv_plots = FALSE
+    transparency = 0.8
 ) {
     my_cols <- c("mediumseagreen", "indianred2")
     my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)

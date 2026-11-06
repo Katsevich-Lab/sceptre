@@ -14,8 +14,9 @@ methods::setOldClass(c("package_version", "numeric_version"))
 #'
 #' A `sceptre_object` holds the data of a single-cell CRISPR screen together
 #' with the parameters, intermediate values and results of its analysis. It is
-#' created by [import_data()], [import_data_from_cellranger()] or
-#' [import_data_from_parse()] and updated by the pipeline functions
+#' created by [import_data()], [import_data_from_cellranger()],
+#' [import_data_from_parse()] or [import_data_from_sce()], or read by
+#' [read_sceptre_object()], and updated by the pipeline functions
 #' [set_analysis_parameters()], [assign_grnas()], [run_qc()],
 #' [run_calibration_check()], [run_power_check()] and
 #' [run_discovery_analysis()]. Read a `sceptre_object` through the accessors

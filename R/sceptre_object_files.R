@@ -10,7 +10,8 @@
 #' `sceptre_object`; a disk-backed `sceptre_object` whose counts are
 #' already in `screen.h5mu` in the directory (for example, one imported with
 #' `backed = TRUE` and `directory_to_write` set to the directory) is written
-#' without copying them.
+#' without copying them. Otherwise, the directory must not already hold a
+#' `screen.h5mu`, which another disk-backed `sceptre_object` may be reading.
 #'
 #' `read_sceptre_object()` reads the response and gRNA counts into memory
 #' (`backed = FALSE`) or leaves them on disk (`backed = TRUE`), in which case
@@ -153,19 +154,14 @@ sceptre_format_stamp <- "{\"format\":3}"
 # (see import_data_backed()).
 write_screen <- function(screen, file, response_source = NULL) {
     counts <- SummarizedExperiment::assay(screen, "counts", withDimnames = FALSE)
-    if (
-        is_backed(counts) &&
-            normalizePath(file, winslash = "/", mustWork = FALSE) %in%
-                backing_files(counts)
-    ) {
-        stop(
-            "The counts are read from ",
-            file,
-            ", which cannot be overwritten."
-        )
-    }
+    check_no_screen(file)
     meta <- list(sceptre_format = sceptre_format_stamp)
+    # the cell names are the column names of the data, or else of the counts
+    # (an object updated from an early version may have them only there)
     cell_ids <- colnames(screen)
+    if (is.null(cell_ids)) {
+        cell_ids <- colnames(counts)
+    }
     if (is.null(cell_ids)) {
         meta$cell_names_absent <- TRUE
         cell_ids <- as.character(seq_len(ncol(screen)))
@@ -243,6 +239,21 @@ write_screen <- function(screen, file, response_source = NULL) {
         stop("Could not write ", file, ".")
     }
     invisible(file)
+}
+
+
+# Stops if `file`, a screen.h5mu, exists: a disk-backed sceptre_object may be
+# reading its counts, which replacing the file would change under it.
+check_no_screen <- function(file) {
+    if (file.exists(file)) {
+        stop(
+            "`",
+            dirname(file),
+            "` already holds a screen.h5mu, which a disk-backed ",
+            "sceptre_object may be reading. Write to another directory, or ",
+            "delete screen.h5mu first."
+        )
+    }
 }
 
 

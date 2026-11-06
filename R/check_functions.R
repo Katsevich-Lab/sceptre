@@ -1,15 +1,13 @@
 # A matrix of counts has no missing, negative or infinite entries, and its
-# entries are integers (a logical matrix passes); anything else is an error.
-# The checks run on the stored values (the nonzero entries of a sparse
-# matrix), not on a copy of the matrix.
+# entries are integers (a logical matrix without missing entries passes);
+# anything else is an error. The checks run on the stored values (the nonzero
+# entries of a sparse matrix), read without a copy from a dgCMatrix or
+# dgRMatrix.
 check_integer_counts <- function(input_matrix, input_matrix_name) {
-    if (
-        methods::is(input_matrix, "lsparseMatrix") ||
-            is.logical(input_matrix)
-    ) {
-        return(invisible())
-    }
-    values <- if (methods::is(input_matrix, "sparseMatrix")) {
+    values <- if (methods::is(input_matrix, "dgCMatrix") ||
+        methods::is(input_matrix, "dgRMatrix")) {
+        compressed_sparse_components(input_matrix)$x
+    } else if (methods::is(input_matrix, "sparseMatrix")) {
         compressed_sparse_components(
             methods::as(methods::as(input_matrix, "CsparseMatrix"), "dMatrix")
         )$x
@@ -303,7 +301,6 @@ check_set_analysis_parameters <- function(
     resampling_approximation
 ) {
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_matrix <- get_grna_matrix(sceptre_object)
     covariate_data_frame <- get_cell_covariates(sceptre_object)
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
@@ -710,7 +707,6 @@ check_discovery_analysis_inputs <- function(
     response_grna_group_pairs,
     control_group_complement,
     grna_target_data_frame,
-    calibration_check_run,
     pc_analysis,
     calibration_result,
     n_ok_pairs

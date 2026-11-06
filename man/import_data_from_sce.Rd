@@ -48,8 +48,10 @@ disk-backed \code{sceptre_object} uses permutations (\code{resampling_mechanism 
 
 \item{directory_to_write}{(optional) a file path to a directory in which to
 write \code{screen.h5mu}, a MuData file holding the response and gRNA counts and
-the cell covariates. Must be supplied if \code{backed} is set to \code{TRUE}. Save
-the \code{sceptre_object} in the same directory with \code{\link[=write_sceptre_object]{write_sceptre_object()}}.}
+the cell covariates. Must be supplied if \code{backed} is set to \code{TRUE}, and must
+not already hold a \code{screen.h5mu}, which another disk-backed \code{sceptre_object}
+may be reading. Save the \code{sceptre_object} in the same directory with
+\code{\link[=write_sceptre_object]{write_sceptre_object()}}.}
 }
 \value{
 an initialized \code{sceptre_object}

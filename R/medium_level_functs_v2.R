@@ -7,7 +7,6 @@ get_id_from_idx <- function(
     gc_multiple = 200L,
     feature = "response",
     str = "Analyzing pairs containing ",
-    parallel = FALSE,
     f_name = NULL
 ) {
     if (
@@ -25,7 +24,7 @@ get_id_from_idx <- function(
             length(response_ids),
             ")\n"
         )
-        if (parallel) {
+        if (!is.null(f_name)) {
             write(x = msg, file = f_name, append = TRUE)
         } else {
             message(msg, appendLF = FALSE)
@@ -53,14 +52,11 @@ run_perm_test_in_memory <- function(
     B3,
     calibration_check,
     control_group_complement,
-    n_nonzero_trt_thresh,
-    n_nonzero_cntrl_thresh,
     side_code,
     low_moi,
     response_precomputations,
     cells_in_use,
     print_progress,
-    parallel,
     BPPARAM,
     log_dir,
     analysis_type
@@ -75,7 +71,6 @@ run_perm_test_in_memory <- function(
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
     indiv_nt_grna_idxs <- grna_assignments$indiv_nt_grna_idxs
-    n_cells_orig <- ncol(response_matrix)
     get_idx_f <- get_idx_vector_factory(
         calibration_check,
         indiv_nt_grna_idxs,
@@ -95,7 +90,7 @@ run_perm_test_in_memory <- function(
     # 2. define function to loop subset of response IDs
     analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
         reader <- row_reader(response_matrix)
-        if (parallel && print_progress) {
+        if (!is.null(BPPARAM) && print_progress) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 analysis_type,
@@ -124,7 +119,6 @@ run_perm_test_in_memory <- function(
                 response_idx,
                 print_progress,
                 curr_response_ids,
-                parallel = parallel,
                 f_name = f_name
             )
 
@@ -215,7 +209,7 @@ run_perm_test_in_memory <- function(
     )
 
     # 4. run the analysis
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         res <- lapply(partitioned_response_ids, analyze_given_response_ids)
     } else {
         message("Running ", analysis_type, " in parallel.")
@@ -286,14 +280,11 @@ run_crt_in_memory_v2 <- function(
     B3,
     calibration_check,
     control_group_complement,
-    n_nonzero_trt_thresh,
-    n_nonzero_cntrl_thresh,
     side_code,
     low_moi,
     response_precomputations,
     cells_in_use,
     print_progress,
-    parallel,
     BPPARAM,
     log_dir,
     analysis_type,
@@ -309,7 +300,6 @@ run_crt_in_memory_v2 <- function(
     }
     grna_group_idxs <- grna_assignments$grna_group_idxs
     indiv_nt_grna_idxs <- grna_assignments$indiv_nt_grna_idxs
-    n_cells_orig <- ncol(response_matrix)
     get_idx_f <- get_idx_vector_factory(
         calibration_check,
         indiv_nt_grna_idxs,
@@ -332,7 +322,7 @@ run_crt_in_memory_v2 <- function(
         proc_id = NULL
     ) {
         reader <- row_reader(response_matrix)
-        if (parallel && print_progress) {
+        if (!is.null(BPPARAM) && print_progress) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 analysis_type,
@@ -352,7 +342,6 @@ run_crt_in_memory_v2 <- function(
                 print_progress,
                 curr_response_ids,
                 str = "Running precomputation on ",
-                parallel = parallel,
                 f_name = f_name
             )
 
@@ -385,7 +374,7 @@ run_crt_in_memory_v2 <- function(
             BPPARAM = BPPARAM,
             positions = match(response_ids, rownames(response_matrix))
         )
-        if (!parallel) {
+        if (is.null(BPPARAM)) {
             res <- lapply(
                 partitioned_response_ids,
                 run_precomp_on_given_responses
@@ -433,7 +422,7 @@ run_crt_in_memory_v2 <- function(
             mode = "list",
             length = length(curr_grna_groups)
         )
-        f_name <- if (parallel && print_progress) {
+        f_name <- if (!is.null(BPPARAM) && print_progress) {
             paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
         } else {
             NULL
@@ -445,7 +434,6 @@ run_crt_in_memory_v2 <- function(
                 print_progress,
                 curr_grna_groups,
                 feature = "gRNA group",
-                parallel = parallel,
                 f_name = f_name
             )
 
@@ -508,7 +496,7 @@ run_crt_in_memory_v2 <- function(
         response_ids = grna_groups,
         BPPARAM = BPPARAM
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
     } else {
         res <- bplapply_checked(

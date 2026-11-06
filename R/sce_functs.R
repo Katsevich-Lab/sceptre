@@ -162,11 +162,12 @@ import_data_from_sce <- function(
 }
 
 
-# the counts assay of a SummarizedExperiment, a delayed (for example,
-# HDF5-backed) matrix read into a sparse matrix
+# the counts assay of a SummarizedExperiment; counts in any other class than
+# a base or Matrix matrix (for example, a SparseArray or a delayed,
+# HDF5-backed matrix) are read into a dgCMatrix
 sce_counts <- function(experiment) {
     counts <- SummarizedExperiment::assay(experiment, "counts")
-    if (methods::is(counts, "DelayedArray")) {
+    if (!(is.matrix(counts) || methods::is(counts, "Matrix"))) {
         counts <- methods::as(counts, "dgCMatrix")
     }
     return(counts)

@@ -25,8 +25,8 @@ panels (if \code{return_indiv_plots} is set to \code{FALSE})
 \details{
 \code{plot()} is "generic" in the sense that it dispatches a specific plotting
 function based on the pipeline function that was most recently called on the
-\code{sceptre_object}. For example, if \code{run_assign_grnas()} is the most recently
-called pipeline function, then \code{plot()} dispatches \code{plot_run_assign_grnas()}.
+\code{sceptre_object}. For example, if \code{assign_grnas()} is the most recently
+called pipeline function, then \code{plot()} dispatches \code{plot_assign_grnas()}.
 Similarly, if \code{run_power_check()} is the most recently called pipeline
 function, then \code{plot()} dispatches \code{plot_run_power_check()}, and so on. Users
 can pass arguments to the function dispatched by \code{plot()} as named arguments

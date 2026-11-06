@@ -310,8 +310,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' `plot()` is "generic" in the sense that it dispatches a specific plotting
 #' function based on the pipeline function that was most recently called on the
-#' `sceptre_object`. For example, if `run_assign_grnas()` is the most recently
-#' called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`.
+#' `sceptre_object`. For example, if `assign_grnas()` is the most recently
+#' called pipeline function, then `plot()` dispatches `plot_assign_grnas()`.
 #' Similarly, if `run_power_check()` is the most recently called pipeline
 #' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
 #' can pass arguments to the function dispatched by `plot()` as named arguments

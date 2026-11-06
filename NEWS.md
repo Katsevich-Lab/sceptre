@@ -2,17 +2,17 @@
 
 ## New features
 
--   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"grna"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions and the accessors stop with a message naming it. A `sceptre_object` records the version of sceptre that created it.
+-   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"grna"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions, `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` stop with a message naming it. A `sceptre_object` records the version of sceptre that created it.
 
 -   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets and the regions they target in its `rowData`, the latter in the columns `target_chr`, `target_start` and `target_end`).
 
 -   `construct_cis_pairs()` stops with an error when the chromosomes of the gRNA targets and of the responses are named differently (for example, `"chr1"` and `"1"`), which previously gave no pairs.
 
--   Disk-backed analysis no longer uses `ondisc`: with `backed = TRUE` and `directory_to_write`, `import_data()`, `import_data_from_cellranger()` and `import_data_from_sce()` keep the response and gRNA counts on disk in `screen.h5mu`, a MuData file that Bioconductor's MuData and Python's mudata can read. New `write_sceptre_object()` and `read_sceptre_object()` save and load a `sceptre_object`, standard or disk-backed, as a directory holding `screen.h5mu` and `sceptre_object.rds`.
+-   Disk-backed analysis no longer uses `ondisc`: with `backed = TRUE` and `directory_to_write`, `import_data()`, `import_data_from_cellranger()` and `import_data_from_sce()` keep the response and gRNA counts on disk in `screen.h5mu`, a MuData file that Bioconductor's MuData and Python's mudata can read. New `write_sceptre_object()` and `read_sceptre_object()` save and load a `sceptre_object`, standard or disk-backed, as a directory holding `screen.h5mu` and `sceptre_object.rds`. An existing `screen.h5mu`, which a disk-backed `sceptre_object` may be reading, is never replaced: the directory must not already hold one, unless the `sceptre_object` being written reads its counts from it.
 
 -   With `backed = TRUE`, `import_data_from_cellranger()` holds the matrix of one directory in memory at a time and writes the response counts to `screen.h5mu` through temporary files in `directory_to_write`, so the whole screen is never in memory at once.
 
--   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. In sceptre 0.99.2, `seed = 4` reproduces the results of 0.99.1 and earlier, which used the fixed seed 4.
+-   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. In sceptre 0.99.2, `seed = 4` reproduces the results of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug fixes below.
 
 -   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel: the new argument `BPPARAM` takes a BiocParallel back end (for example `BiocParallel::MulticoreParam(4)`, or `BiocParallel::SnowParam(4)` on Windows); results do not depend on the back end or number of workers.
 
@@ -42,7 +42,7 @@
 
 ## Deprecated and removed
 
-The deprecated arguments and functions below warn in this version; they will be made defunct in the next Bioconductor release and removed in the one after.
+The deprecated arguments and functions below still work in this version, with a warning; they will be made defunct in the next Bioconductor release and removed in the one after. Reading `.odm` files and the slots of the Nextflow pipeline are removed in this version.
 
 -   The arguments `parallel` and `n_processors` of `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` are deprecated in favor of `BPPARAM`; `parallel = TRUE` still runs on `n_processors` forked workers, with a warning.
 

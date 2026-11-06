@@ -3,13 +3,12 @@ assign_grnas_to_cells_mixture <- function(
     cell_covariate_data_frame,
     grna_assignment_hyperparameters,
     print_progress,
-    parallel,
     BPPARAM,
     log_dir,
     grna_ids,
     seed
 ) {
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
             "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
@@ -51,7 +50,7 @@ assign_grnas_to_cells_mixture <- function(
 
     # 3. define the function to perform assignments for a set of grnas
     analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
-        if (parallel && print_progress) {
+        if (!is.null(BPPARAM) && print_progress) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 "assign_grnas_",
@@ -72,7 +71,6 @@ assign_grnas_to_cells_mixture <- function(
                     response_ids = curr_grna_ids,
                     feature = "gRNA",
                     str = "Performing gRNA-to-cell assignments for ",
-                    parallel = parallel,
                     f_name = f_name
                 )
                 g <- reader$read(grna_id)
@@ -93,7 +91,7 @@ assign_grnas_to_cells_mixture <- function(
     }
 
     # 4. run the analysis
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         initial_assignment_list <- analyze_given_grna_ids(grna_ids)
     } else {
         message("Running gRNA assignments in parallel.")

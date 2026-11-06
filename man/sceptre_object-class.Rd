@@ -7,8 +7,9 @@
 \description{
 A \code{sceptre_object} holds the data of a single-cell CRISPR screen together
 with the parameters, intermediate values and results of its analysis. It is
-created by \code{\link[=import_data]{import_data()}}, \code{\link[=import_data_from_cellranger]{import_data_from_cellranger()}} or
-\code{\link[=import_data_from_parse]{import_data_from_parse()}} and updated by the pipeline functions
+created by \code{\link[=import_data]{import_data()}}, \code{\link[=import_data_from_cellranger]{import_data_from_cellranger()}},
+\code{\link[=import_data_from_parse]{import_data_from_parse()}} or \code{\link[=import_data_from_sce]{import_data_from_sce()}}, or read by
+\code{\link[=read_sceptre_object]{read_sceptre_object()}}, and updated by the pipeline functions
 \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}, \code{\link[=assign_grnas]{assign_grnas()}}, \code{\link[=run_qc]{run_qc()}},
 \code{\link[=run_calibration_check]{run_calibration_check()}}, \code{\link[=run_power_check]{run_power_check()}} and
 \code{\link[=run_discovery_analysis]{run_discovery_analysis()}}. Read a \code{sceptre_object} through the accessors

@@ -33,7 +33,8 @@ directory has the same layout for a standard and a disk-backed
 \code{sceptre_object}; a disk-backed \code{sceptre_object} whose counts are
 already in \code{screen.h5mu} in the directory (for example, one imported with
 \code{backed = TRUE} and \code{directory_to_write} set to the directory) is written
-without copying them.
+without copying them. Otherwise, the directory must not already hold a
+\code{screen.h5mu}, which another disk-backed \code{sceptre_object} may be reading.
 }
 \details{
 \code{read_sceptre_object()} reads the response and gRNA counts into memory

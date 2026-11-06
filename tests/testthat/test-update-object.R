@@ -95,3 +95,24 @@ test_that("updateObject() asks to re-import an object without its matrices", {
     attr(old, "response_matrix") <- list(list())
     expect_error(updateObject(old), "Re-import the data")
 })
+
+test_that("an updated object whose covariates lack cell names can be written", {
+    # early versions could keep the cell names on the matrices only
+    data(lowmoi_example_data)
+    sceptre_object <- import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        moi = "low"
+    )
+    expect_false(is.null(colnames(get_response_matrix(sceptre_object))))
+    old <- old_layout_object(sceptre_object)
+    covariates <- attr(old, "covariate_data_frame")
+    rownames(covariates) <- NULL
+    attr(old, "covariate_data_frame") <- covariates
+    updated <- updateObject(old)
+    directory <- withr::local_tempdir()
+    write_sceptre_object(updated, directory)
+    reread <- read_sceptre_object(directory)
+    expect_identical(response_values(reread), response_values(updated))
+})

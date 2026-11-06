@@ -50,8 +50,10 @@
 #' "permutations"` in [set_analysis_parameters()]).
 #' @param directory_to_write (optional) a file path to a directory in which to
 #' write `screen.h5mu`, a MuData file holding the response and gRNA counts and
-#' the cell covariates. Must be supplied if `backed` is set to `TRUE`. Save
-#' the `sceptre_object` in the same directory with [write_sceptre_object()].
+#' the cell covariates. Must be supplied if `backed` is set to `TRUE`, and must
+#' not already hold a `screen.h5mu`, which another disk-backed `sceptre_object`
+#' may be reading. Save the `sceptre_object` in the same directory with
+#' [write_sceptre_object()].
 #' @param use_ondisc deprecated; use `backed`.
 #'
 #' @return an initialized `sceptre_object`
@@ -75,7 +77,7 @@
 #'   extra_covariates = lowmoi_example_data$extra_covariates,
 #'   moi = "low",
 #'   backed = TRUE,
-#'   directory_to_write = tempdir()
+#'   directory_to_write = file.path(tempdir(), "import_data_example")
 #' )
 import_data <- function(
     response_matrix,
@@ -91,6 +93,7 @@ import_data <- function(
     backed <- resolve_backed(backed, use_ondisc)
     if (backed) {
         directory_to_write <- prepare_directory_to_write(directory_to_write)
+        check_no_screen(file.path(directory_to_write, "screen.h5mu"))
     }
     sceptre_object <- import_data_memory(
         response_matrix,
@@ -270,7 +273,7 @@ import_data_memory <- function(
 #'   moi = "high",
 #'   grna_target_data_frame = grna_target_data_frame_highmoi,
 #'   backed = TRUE,
-#'   directory_to_write = tempdir()
+#'   directory_to_write = file.path(tempdir(), "cellranger_example")
 #' )
 import_data_from_cellranger <- function(
     directories,
@@ -284,6 +287,7 @@ import_data_from_cellranger <- function(
     backed <- resolve_backed(backed, use_ondisc)
     if (backed) {
         directory_to_write <- prepare_directory_to_write(directory_to_write)
+        check_no_screen(file.path(directory_to_write, "screen.h5mu"))
     }
     # with several directories, the directory of each cell is recorded in
     # `batch`; do not overwrite a user's column of that name

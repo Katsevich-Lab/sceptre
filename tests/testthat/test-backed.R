@@ -65,7 +65,10 @@ test_that("a disk-backed analysis gives the in-memory results", {
         as.matrix(get_grna_matrix(in_memory))
     )
     expect_identical(get_cell_covariates(backed), get_cell_covariates(in_memory))
-    expect_false(is.null(h5_counts_location(get_response_matrix(backed))))
+    expect_false(is.null(h5_counts_location(
+        get_response_matrix(backed),
+        response_counts_group
+    )))
 
     # small blocks, so that the counts are read in many blocks of responses
     old_block_size <- DelayedArray::getAutoBlockSize()
@@ -323,4 +326,32 @@ test_that("pairwise QC handles an analysis without pairs", {
             nrow(inputs$response_matrix)
         )
     }
+})
+
+test_that("an existing screen.h5mu is never replaced", {
+    inputs <- backed_test_inputs()
+    directory <- withr::local_tempdir()
+    first <- do.call(
+        import_data,
+        c(inputs, backed = TRUE, directory_to_write = directory)
+    )
+    first_counts <- response_values(first)
+    other <- inputs
+    other$response_matrix[] <- 7
+    expect_error(
+        do.call(
+            import_data,
+            c(other, backed = TRUE, directory_to_write = directory)
+        ),
+        "already holds a screen.h5mu",
+        fixed = TRUE
+    )
+    expect_error(
+        write_sceptre_object(do.call(import_data, other), directory),
+        "already holds a screen.h5mu",
+        fixed = TRUE
+    )
+    expect_identical(response_values(first), first_counts)
+    # the object whose counts the file holds is written without a copy
+    expect_no_error(write_sceptre_object(first, directory))
 })

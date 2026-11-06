@@ -385,7 +385,9 @@ test_that("import_data rejects missing, negative and infinite counts", {
         response_matrix[1L, 1L] <- case$value
         for (input in list(
             response_matrix,
-            methods::as(response_matrix, "CsparseMatrix")
+            methods::as(response_matrix, "CsparseMatrix"),
+            methods::as(response_matrix, "RsparseMatrix"),
+            methods::as(response_matrix, "TsparseMatrix")
         )) {
             expect_error(
                 import_data(
@@ -410,6 +412,19 @@ test_that("import_data rejects missing, negative and infinite counts", {
             moi = "low"
         ),
         regexp = "The `grna_matrix` must contain counts",
+        fixed = TRUE
+    )
+    # a logical matrix passes the check unless it has missing entries
+    grna_matrix <- as.matrix(lowmoi_example_data$grna_matrix) > 0
+    grna_matrix[1L, 1L] <- NA
+    expect_error(
+        import_data(
+            response_matrix = lowmoi_example_data$response_matrix,
+            grna_matrix = grna_matrix,
+            grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+            moi = "low"
+        ),
+        regexp = "The `grna_matrix` must contain counts (for example, UMI counts); it has missing (NA) entries",
         fixed = TRUE
     )
 })

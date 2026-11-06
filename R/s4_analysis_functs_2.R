@@ -74,18 +74,15 @@ run_calibration_check <- function(
     n_processors = NULL
 ) {
     BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
-    parallel <- !is.null(BPPARAM)
     sceptre_object <- sceptre_object |>
         run_calibration_check_pt_1(
             n_calibration_pairs = n_calibration_pairs,
             calibration_group_size = calibration_group_size,
-            parallel = parallel,
             BPPARAM = BPPARAM
         ) |>
         run_calibration_check_pt_2(
             output_amount = output_amount,
             print_progress = print_progress,
-            parallel = parallel,
             BPPARAM = BPPARAM,
             log_dir = log_dir
         )
@@ -97,7 +94,6 @@ run_calibration_check_pt_1 <- function(
     sceptre_object,
     n_calibration_pairs = NULL,
     calibration_group_size = NULL,
-    parallel = FALSE,
     BPPARAM = NULL
 ) {
     # 0. advance function (if necessary), and check function call
@@ -106,7 +102,7 @@ run_calibration_check_pt_1 <- function(
         sceptre_object,
         "run_calibration_check"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
             "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
@@ -157,7 +153,6 @@ run_calibration_check_pt_2 <- function(
     sceptre_object,
     output_amount = 1,
     print_progress = TRUE,
-    parallel = FALSE,
     BPPARAM = NULL,
     log_dir = tempdir()
 ) {
@@ -185,7 +180,6 @@ run_calibration_check_pt_2 <- function(
         analysis_type = "calibration_check",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
         BPPARAM = BPPARAM,
         log_dir = log_dir
     )
@@ -263,13 +257,12 @@ run_power_check <- function(
 ) {
     # 0. verify that function called in correct order
     BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
-    parallel <- !is.null(BPPARAM)
     sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "run_power_check"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
             "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
@@ -297,7 +290,6 @@ run_power_check <- function(
         analysis_type = "power_check",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
         BPPARAM = BPPARAM,
         log_dir = log_dir
     )
@@ -360,13 +352,12 @@ run_discovery_analysis <- function(
 ) {
     # 0. verify that function called in correct order
     BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
-    parallel <- !is.null(BPPARAM)
     sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "run_discovery_analysis"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
             "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
@@ -394,7 +385,6 @@ run_discovery_analysis <- function(
         analysis_type = "discovery_analysis",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
         BPPARAM = BPPARAM,
         log_dir = log_dir
     )
@@ -430,7 +420,6 @@ run_sceptre_analysis_high_level <- function(
     analysis_type,
     output_amount,
     print_progress,
-    parallel,
     BPPARAM,
     log_dir
 ) {
@@ -446,10 +435,13 @@ run_sceptre_analysis_high_level <- function(
             n_cells = length(sceptre_object@cells_in_use),
             seed = sceptre_object@seed
         )
-        # the resamples are held in C++ memory, which only forked workers
-        # share; other workers draw the same resamples from the same seed
+        # the resamples are held in C++ memory, which only workers forked
+        # after they are drawn share (a MulticoreParam that is not yet
+        # started); other workers draw the same resamples from the same seed
         synthetic_idxs <- if (
-            is.null(BPPARAM) || methods::is(BPPARAM, "MulticoreParam")
+            is.null(BPPARAM) ||
+                (methods::is(BPPARAM, "MulticoreParam") &&
+                    !BiocParallel::bpisup(BPPARAM))
         ) {
             do.call(get_synthetic_permutation_idxs, resampling_args)
         } else {
@@ -473,14 +465,11 @@ run_sceptre_analysis_high_level <- function(
         B3 = B3,
         calibration_check = calibration_check,
         control_group_complement = sceptre_object@control_group_complement,
-        n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-        n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
         side_code = sceptre_object@side_code,
         low_moi = sceptre_object@low_moi,
         response_precomputations = sceptre_object@response_precomputations,
         cells_in_use = sceptre_object@cells_in_use,
         print_progress = print_progress,
-        parallel = parallel,
         BPPARAM = BPPARAM,
         log_dir = log_dir,
         analysis_type = analysis_type

@@ -69,7 +69,8 @@ conditional resampling draws. The default, \code{NULL}, draws the seed from R's
 random number generator, so that \code{set.seed()} called beforehand makes the
 analysis reproducible. The seed is recorded in the \code{sceptre_object}, and
 \code{print()} shows it. In sceptre 0.99.2, \code{seed = 4} reproduces the results
-of 0.99.1 and earlier, which used the fixed seed 4.}
+of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
+fixes listed in \code{NEWS.md}.}
 }
 \value{
 an updated \code{sceptre_object} in which the analysis parameters have

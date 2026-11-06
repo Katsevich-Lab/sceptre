@@ -6,8 +6,6 @@ construct_negative_control_pairs_v2 <- function(
     message("Constructing negative control pairs.")
     grna_assignments <- sceptre_object@grna_assignments
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-    low_moi <- sceptre_object@low_moi
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
     n_nonzero_m <- sceptre_object@M_matrix
@@ -77,7 +75,7 @@ construct_negative_control_pairs_v2 <- function(
         # disk-backed counts are read in blocks of responses; the C++
         # function decrements the indices of `nt_grna_group_idxs` in place, so
         # each block gets its own copy
-        n_nonzero_m <- row_blocks(response_matrix, function(block, offset) {
+        count_block <- function(block, offset) {
             block_csr <- compressed_sparse_components(block)
             compute_n_trt_cells_matrix(
                 j = block_csr$j,
@@ -92,7 +90,12 @@ construct_negative_control_pairs_v2 <- function(
                 },
                 cells_in_use = cells_in_use
             )
-        }) |>
+        }
+        n_nonzero_m <- row_blocks(
+            response_matrix,
+            response_counts_group,
+            count_block
+        ) |>
             do.call(what = cbind)
         dummy_possibly_groups_m <- matrix(
             seq_along(nt_grna_group_idxs) - 1L,

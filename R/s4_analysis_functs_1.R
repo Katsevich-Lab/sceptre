@@ -45,7 +45,8 @@
 #' random number generator, so that `set.seed()` called beforehand makes the
 #' analysis reproducible. The seed is recorded in the `sceptre_object`, and
 #' `print()` shows it. In sceptre 0.99.2, `seed = 4` reproduces the results
-#' of 0.99.1 and earlier, which used the fixed seed 4.
+#' of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
+#' fixes listed in `NEWS.md`.
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set
@@ -298,7 +299,6 @@ assign_grnas <- function(
 ) {
     # 0. verify that function called in correct order
     BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
-    parallel <- !is.null(BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "assign_grnas"
@@ -367,7 +367,6 @@ assign_grnas <- function(
     sceptre_object <- assign_grnas_to_cells(
         sceptre_object,
         print_progress,
-        parallel,
         BPPARAM,
         log_dir
     )

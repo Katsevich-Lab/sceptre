@@ -192,6 +192,43 @@ test_that("parallel results equal serial results", {
     }
 })
 
+test_that("a started MulticoreParam gives the serial results", {
+    # workers forked before the analysis cannot share the resamples drawn in
+    # the main process, so they draw them from the seed
+    skip_on_os("windows")
+    object <- refactor_import(
+        refactor_make_inputs(),
+        refactor_case_definitions()[["low_complement_perm"]]
+    ) |>
+        set_analysis_parameters(
+            discovery_pairs = refactor_make_inputs()$discovery_pairs,
+            control_group = "complement",
+            resampling_mechanism = "permutations",
+            seed = 4L
+        )
+    serial <- suppressWarnings(suppressMessages(
+        seed_test_analysis(object)
+    ))
+    BPPARAM <- BiocParallel::MulticoreParam(2)
+    BiocParallel::bpstart(BPPARAM)
+    on.exit(BiocParallel::bpstop(BPPARAM), add = TRUE)
+    started <- suppressWarnings(suppressMessages(seed_test_analysis(
+        object,
+        BPPARAM = BPPARAM
+    )))
+    for (slot_name in c(
+        "negative_control_pairs",
+        "calibration_result",
+        "discovery_result"
+    )) {
+        expect_identical(
+            methods::slot(started, slot_name),
+            methods::slot(serial, slot_name),
+            info = slot_name
+        )
+    }
+})
+
 test_that("results on SnowParam workers equal serial results", {
     # SnowParam is the parallel back end on Windows; its workers are fresh R
     # sessions that load the installed package
