@@ -63,53 +63,6 @@ test_that("import_data_from_sce() imports the data of the SCE layout", {
     expect_identical(construct_cis_pairs(from_sce), construct_cis_pairs(direct))
 })
 
-test_that("import_data_from_sce() does not use the response positions", {
-    data(gene_position_data_frame_grch38)
-    sce <- highmoi_sce()
-    without_positions <- import_data_from_sce(sce, moi = "high")
-    # the genes at their packaged positions, with a rowData column
-    positions <- gene_position_data_frame_grch38[
-        match(rownames(sce), gene_position_data_frame_grch38$response_id),
-    ]
-    gene_ranges <- GenomicRanges::makeGRangesFromDataFrame(data.frame(
-        chr = positions$chr,
-        start = positions$position,
-        end = positions$position
-    ))
-    names(gene_ranges) <- rownames(sce)
-    SummarizedExperiment::rowRanges(sce) <- gene_ranges
-    SummarizedExperiment::rowData(sce)$symbol <- rownames(sce)
-    sceptre_object <- import_data_from_sce(sce, moi = "high")
-    expect_identical(
-        get_response_matrix(sceptre_object),
-        get_response_matrix(without_positions)
-    )
-    expect_identical(
-        construct_cis_pairs(sceptre_object, distance_threshold = 5e6),
-        construct_cis_pairs(without_positions, distance_threshold = 5e6)
-    )
-    # passed to construct_cis_pairs(), they give the pairs of the packaged
-    # positions (in the order of the genes in `sce`)
-    sorted_pairs <- function(pairs) {
-        pairs <- pairs[order(pairs$grna_target, pairs$response_id), ]
-        rownames(pairs) <- NULL
-        pairs
-    }
-    expected_pairs <- construct_cis_pairs(
-        sceptre_object,
-        distance_threshold = 5e6
-    )
-    expect_gt(nrow(expected_pairs), 0L)
-    expect_identical(
-        sorted_pairs(construct_cis_pairs(
-            sceptre_object,
-            distance_threshold = 5e6,
-            response_position_data_frame = SummarizedExperiment::rowRanges(sce)
-        )),
-        sorted_pairs(expected_pairs)
-    )
-})
-
 test_that("import_data_from_sce() reads target regions named chr, start, end", {
     sce <- highmoi_sce(prefix = "")
     expect_identical(

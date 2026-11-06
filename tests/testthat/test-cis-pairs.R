@@ -168,65 +168,6 @@ test_that("construct_cis_pairs() computes the midpoint of large coordinates", {
     )
 })
 
-test_that("construct_cis_pairs() takes response positions as a GRanges", {
-    data("highmoi_example_data")
-    data("grna_target_data_frame_highmoi")
-    data("gene_position_data_frame_grch38")
-    sceptre_object <- suppressMessages(import_data(
-        response_matrix = highmoi_example_data$response_matrix,
-        grna_matrix = highmoi_example_data$grna_matrix,
-        grna_target_data_frame = grna_target_data_frame_highmoi,
-        moi = "high",
-        response_names = highmoi_example_data$gene_names
-    ))
-    positions <- gene_position_data_frame_grch38
-    expected <- construct_cis_pairs(sceptre_object, distance_threshold = 5e6)
-    expect_gt(nrow(expected), 0L)
-
-    # width-1 ranges at the positions
-    tss_ranges <- GenomicRanges::makeGRangesFromDataFrame(data.frame(
-        chr = positions$chr,
-        start = positions$position,
-        end = positions$position
-    ))
-    names(tss_ranges) <- positions$response_id
-    expect_identical(
-        construct_cis_pairs(
-            sceptre_object,
-            distance_threshold = 5e6,
-            response_position_data_frame = tss_ranges
-        ),
-        expected
-    )
-
-    # gene-wide ranges whose 5' ends are the positions, on both strands
-    minus <- seq_len(nrow(positions)) %% 2L == 0L
-    gene_ranges <- GenomicRanges::makeGRangesFromDataFrame(data.frame(
-        chr = positions$chr,
-        start = ifelse(minus, positions$position - 20000L, positions$position),
-        end = ifelse(minus, positions$position, positions$position + 20000L),
-        strand = ifelse(minus, "-", "+")
-    ))
-    names(gene_ranges) <- positions$response_id
-    expect_identical(
-        construct_cis_pairs(
-            sceptre_object,
-            distance_threshold = 5e6,
-            response_position_data_frame = gene_ranges
-        ),
-        expected
-    )
-
-    expect_error(
-        construct_cis_pairs(
-            sceptre_object,
-            response_position_data_frame = unname(gene_ranges)
-        ),
-        regexp = "must be named by response ID",
-        fixed = TRUE
-    )
-})
-
 test_that("construct_cis_pairs() rejects differently named chromosomes", {
     data("highmoi_example_data")
     data("grna_target_data_frame_highmoi")

@@ -38,7 +38,6 @@ Imports:
     data.table,
     DelayedArray,
     dplyr,
-    GenomicRanges,
     ggplot2,
     HDF5Array,
     Matrix,

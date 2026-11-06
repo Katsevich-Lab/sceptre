@@ -75,8 +75,9 @@ the alternative experiment, which would give the positions of the gRNAs
 themselves, are not used.
 
 The \code{rowRanges} of \code{sce}, the positions of the responses (for example, of the
-genes), are not used; to construct \emph{cis} pairs from them, pass them to
-\code{\link[=construct_cis_pairs]{construct_cis_pairs()}} as \code{response_position_data_frame}.
+genes), are not used; \code{\link[=construct_cis_pairs]{construct_cis_pairs()}} takes the position of each
+response, its transcription start site, as a data frame
+(\code{response_position_data_frame}).
 
 A \code{SingleCellExperiment} made by another package may name the alternative
 experiment of the gRNA counts differently; for example, one made from Cell

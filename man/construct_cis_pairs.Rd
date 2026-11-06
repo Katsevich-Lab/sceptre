@@ -24,18 +24,13 @@ included in the \emph{cis} discovery set.}
 
 \item{response_position_data_frame}{(optional) a data frame with columns
 \code{response_id}, \code{chr}, and \code{position} giving the genomic coordinate of each
-response, or a \code{GRanges} object named by response ID (for example, the
-\code{rowRanges} of a \code{SingleCellExperiment} holding the responses); by default,
-the packaged GRCh38 gene position data frame is used. The chromosomes must be
-named as in
-\code{grna_target_data_frame} (for example, \code{"chr1"} in both, not \code{"chr1"} in one
-and \code{"1"} in the other), and the positions must be relative to the same
-reference genome as the gRNA target coordinates: for coordinates relative to
-GRCh37, pass \code{gene_position_data_frame_grch37}. Coordinates relative to
-different genomes give wrong pairs without an error. The position of a range
-wider than one base (for example, a gene) is its transcription start site,
-that is, its 5' end given its strand (its start for unstranded ranges), as
-computed by \code{GenomicRanges::resize(x, width = 1, fix = "start")}.}
+response; by default, the packaged GRCh38 gene position data frame is used.
+The chromosomes must be named as in \code{grna_target_data_frame} (for example,
+\code{"chr1"} in both, not \code{"chr1"} in one and \code{"1"} in the other), and the
+positions must be relative to the same reference genome as the gRNA target
+coordinates: for coordinates relative to GRCh37, pass
+\code{gene_position_data_frame_grch37}. Coordinates relative to different genomes
+give wrong pairs without an error.}
 }
 \value{
 a data frame with columns \code{grna_target} and \code{response_id} containing

@@ -19,8 +19,9 @@
 #' themselves, are not used.
 #'
 #' The `rowRanges` of `sce`, the positions of the responses (for example, of the
-#' genes), are not used; to construct *cis* pairs from them, pass them to
-#' [construct_cis_pairs()] as `response_position_data_frame`.
+#' genes), are not used; [construct_cis_pairs()] takes the position of each
+#' response, its transcription start site, as a data frame
+#' (`response_position_data_frame`).
 #'
 #' A `SingleCellExperiment` made by another package may name the alternative
 #' experiment of the gRNA counts differently; for example, one made from Cell
