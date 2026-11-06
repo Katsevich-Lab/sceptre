@@ -6,8 +6,6 @@
 
 -   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets and the regions they target in its `rowData`, the latter in the columns `target_chr`, `target_start` and `target_end`).
 
--   `construct_cis_pairs()` stops with an error when the chromosomes of the gRNA targets and of the responses are named differently (for example, `"chr1"` and `"1"`), which previously gave no pairs.
-
 -   Disk-backed analysis no longer uses `ondisc`: with `backed = TRUE` and `directory_to_write`, `import_data()`, `import_data_from_cellranger()` and `import_data_from_sce()` keep the response and gRNA counts on disk in `screen.h5mu`, a MuData file that Bioconductor's MuData and Python's mudata can read. New `write_sceptre_object()` and `read_sceptre_object()` save and load a `sceptre_object`, standard or disk-backed, as a directory holding `screen.h5mu` and `sceptre_object.rds`. An existing `screen.h5mu`, which a disk-backed `sceptre_object` may be reading, is never replaced: the directory must not already hold one, unless the `sceptre_object` being written reads its counts from it.
 
 -   With `backed = TRUE`, `import_data_from_cellranger()` holds the matrix of one directory in memory at a time and writes the response counts to `screen.h5mu` through temporary files in `directory_to_write`, so the whole screen is never in memory at once.
@@ -39,6 +37,8 @@
 -   `import_data_from_cellranger()` no longer discards a user-supplied `batch` column of `extra_covariates`: with one directory it is kept (previously it was dropped), and with several directories, where `batch` records the directory of each cell, it is an error (previously it was overwritten). The levels of `batch` (`b1`, `b2`, ...) follow the order of `directories`; previously, with ten or more directories, they were sorted as text.
 
 -   Importing a response or gRNA matrix with missing, negative, infinite or non-integer entries is an error; previously such counts were accepted (non-integer counts then gave many warnings in the analysis).
+
+-   `construct_cis_pairs()` stops with an error when the chromosomes of the gRNA targets and of the responses are named differently (for example, `"chr1"` and `"1"`); previously it returned no pairs.
 
 ## Deprecated and removed
 
