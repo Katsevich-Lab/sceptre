@@ -58,8 +58,7 @@ an initialized \code{sceptre_object}
 \code{import_data_from_sce()} imports data from a \code{SingleCellExperiment} holding
 the response UMI counts in its \code{counts} assay and the gRNA UMI counts in the
 \code{counts} assay of an alternative experiment (\code{altExp}), the Bioconductor
-convention for a second feature type and the layout that
-\code{\link[=as_sce]{as_sce()}} returns. It is otherwise the same as
+convention for a second feature type. It is otherwise the same as
 \code{\link[=import_data]{import_data()}}.
 }
 \details{
@@ -76,9 +75,8 @@ the alternative experiment, which would give the positions of the gRNAs
 themselves, are not used.
 
 The \code{rowRanges} of \code{sce}, the positions of the responses (for example, of the
-genes), are kept in the \code{sceptre_object} and returned by \code{\link[=as_sce]{as_sce()}}. They are
-not used by default in \code{\link[=construct_cis_pairs]{construct_cis_pairs()}}; pass them as
-\code{response_position_data_frame} to use them there.
+genes), are not used; to construct \emph{cis} pairs from them, pass them to
+\code{\link[=construct_cis_pairs]{construct_cis_pairs()}} as \code{response_position_data_frame}.
 
 A \code{SingleCellExperiment} made by another package may name the alternative
 experiment of the gRNA counts differently; for example, one made from Cell
@@ -120,7 +118,4 @@ sceptre_object <- import_data_from_sce(
   grna_altexp = "CRISPR Guide Capture",
   extra_covariates = "batch"
 )
-}
-\seealso{
-\code{\link[=as_sce]{as_sce()}} for the reverse direction
 }

@@ -4,7 +4,7 @@
 
 -   A `sceptre_object` now stores its data in a `SingleCellExperiment` (response counts in the `counts` assay, gRNA counts in the `"grna"` alternative experiment, cell covariates in `colData`), which replaces the slots `response_matrix`, `grna_matrix` and `covariate_data_frame`. `get_response_matrix()`, `get_grna_matrix()` and `get_cell_covariates()` return the same values as before. `updateObject()` converts objects saved by earlier versions; until it is called on such an object, the pipeline functions and the accessors stop with a message naming it. A `sceptre_object` records the version of sceptre that created it.
 
--   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets and the regions they target in its `rowData`, the latter in the columns `target_chr`, `target_start` and `target_end`; the gene positions in `rowRanges` are kept); new `as_sce()` exports a `sceptre_object`'s data in that layout.
+-   New `import_data_from_sce()` imports a `SingleCellExperiment` (gRNA counts in an alternative experiment, gRNA targets and the regions they target in its `rowData`, the latter in the columns `target_chr`, `target_start` and `target_end`).
 
 -   `construct_cis_pairs()` accepts response positions as a `GRanges` (genes are placed at their transcription start sites), and stops with an error when the chromosomes of the gRNA targets and of the responses are named differently (for example, `"chr1"` and `"1"`), which previously gave no pairs.
 

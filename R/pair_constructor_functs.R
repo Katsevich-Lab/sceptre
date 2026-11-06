@@ -34,9 +34,9 @@
 #' @param response_position_data_frame (optional) a data frame with columns
 #' `response_id`, `chr`, and `position` giving the genomic coordinate of each
 #' response, or a `GRanges` object named by response ID (for example, the
-#' `rowRanges` of a `SingleCellExperiment` holding the responses, or of
-#' [as_sce()] of the `sceptre_object`); by default, the packaged GRCh38 gene
-#' position data frame is used. The chromosomes must be named as in
+#' `rowRanges` of a `SingleCellExperiment` holding the responses); by default,
+#' the packaged GRCh38 gene position data frame is used. The chromosomes must be
+#' named as in
 #' `grna_target_data_frame` (for example, `"chr1"` in both, not `"chr1"` in one
 #' and `"1"` in the other), and the positions must be relative to the same
 #' reference genome as the gRNA target coordinates: for coordinates relative to

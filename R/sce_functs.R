@@ -3,8 +3,7 @@
 #' `import_data_from_sce()` imports data from a `SingleCellExperiment` holding
 #' the response UMI counts in its `counts` assay and the gRNA UMI counts in the
 #' `counts` assay of an alternative experiment (`altExp`), the Bioconductor
-#' convention for a second feature type and the layout that
-#' [as_sce()] returns. It is otherwise the same as
+#' convention for a second feature type. It is otherwise the same as
 #' [import_data()].
 #'
 #' Unless `grna_target_data_frame` is supplied, the gRNA targets are read from
@@ -20,9 +19,8 @@
 #' themselves, are not used.
 #'
 #' The `rowRanges` of `sce`, the positions of the responses (for example, of the
-#' genes), are kept in the `sceptre_object` and returned by [as_sce()]. They are
-#' not used by default in [construct_cis_pairs()]; pass them as
-#' `response_position_data_frame` to use them there.
+#' genes), are not used; to construct *cis* pairs from them, pass them to
+#' [construct_cis_pairs()] as `response_position_data_frame`.
 #'
 #' A `SingleCellExperiment` made by another package may name the alternative
 #' experiment of the gRNA counts differently; for example, one made from Cell
@@ -53,7 +51,6 @@
 #' @inheritParams import_data
 #'
 #' @return an initialized `sceptre_object`
-#' @seealso [as_sce()] for the reverse direction
 #' @export
 #' @examples
 #' data(lowmoi_example_data)
@@ -160,112 +157,8 @@ import_data_from_sce <- function(
         backed = backed,
         directory_to_write = directory_to_write
     )
-    # keep the positions of the responses, without the rowData
-    response_ranges <- SummarizedExperiment::rowRanges(sce)
-    S4Vectors::mcols(response_ranges) <- NULL
-    SummarizedExperiment::rowRanges(sceptre_object@data) <- response_ranges
     return(sceptre_object)
 }
-
-
-#' Export the data of a sceptre_object as a SingleCellExperiment
-#'
-#' `as_sce()` returns the data of a `sceptre_object` as a
-#' `SingleCellExperiment`, for use with other Bioconductor packages:
-#' * the response UMI counts in the `counts` assay, and the positions of the
-#'   responses in `rowRanges` when the `sceptre_object` was imported by
-#'   [import_data_from_sce()] from a `SingleCellExperiment` that had them
-#'   (empty otherwise);
-#' * the cell covariates (those computed by `sceptre` and the extra
-#'   covariates) in `colData`;
-#' * the gRNA UMI counts in the `counts` assay of the alternative experiment
-#'   `"grna"`, with the gRNA IDs and targets in the `grna_id` and
-#'   `grna_target` columns of its `rowData` (`grna_target` is `NA` for gRNAs
-#'   absent from the gRNA target data frame) and the other columns of the gRNA
-#'   target data frame (such as `vector_id`) in its other `rowData` columns.
-#'   The columns `chr`, `start` and `end` of the gRNA target data frame, the
-#'   region that each gRNA targets, become the columns `target_chr`,
-#'   `target_start` and `target_end`; `GenomicRanges::makeGRangesFromDataFrame()`
-#'   turns them into a `GRanges` (see the examples). The `rowRanges` of the
-#'   alternative experiment, which would give the positions of the gRNAs
-#'   themselves, are empty.
-#'
-#' Sparse counts are returned in column-compressed (`dgCMatrix`) format.
-#' For a disk-backed `sceptre_object` (`backed = TRUE`), the response and gRNA
-#' counts are instead `DelayedMatrix` objects that read `screen.h5mu`, which
-#' stores the counts one response (or gRNA) at a time. Functions that read the matrix through
-#' tatami, such as `scrapper::computeRnaQcMetrics()`, process it efficiently
-#' both by cell and by response; functions that process a `DelayedMatrix`
-#' block by block, such as `scuttle::perCellQCMetrics()`, are much slower
-#' when they summarize cells.
-#' [import_data_from_sce()] imports the result. The coercion
-#' `as(sceptre_object, "SingleCellExperiment")` returns the same.
-#'
-#' @param sceptre_object a `sceptre_object`
-#'
-#' @return a `SingleCellExperiment`
-#' @seealso [import_data_from_sce()] for the reverse direction
-#' @export
-#' @examples
-#' data(lowmoi_example_data)
-#' sceptre_object <- import_data(
-#'   response_matrix = lowmoi_example_data$response_matrix,
-#'   grna_matrix = lowmoi_example_data$grna_matrix,
-#'   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
-#'   extra_covariates = lowmoi_example_data$extra_covariates,
-#'   moi = "low"
-#' )
-#' sce <- as_sce(sceptre_object)
-#' # the gRNA targets
-#' SummarizedExperiment::rowData(SingleCellExperiment::altExp(sce, "grna"))
-#'
-#' # the regions targeted by the gRNAs, as a GRanges
-#' data(highmoi_example_data)
-#' data(grna_target_data_frame_highmoi)
-#' sceptre_object <- import_data(
-#'   response_matrix = highmoi_example_data$response_matrix,
-#'   grna_matrix = highmoi_example_data$grna_matrix,
-#'   grna_target_data_frame = grna_target_data_frame_highmoi,
-#'   moi = "high"
-#' )
-#' targets <- SummarizedExperiment::rowData(
-#'   SingleCellExperiment::altExp(as_sce(sceptre_object), "grna")
-#' )
-#' GenomicRanges::makeGRangesFromDataFrame(
-#'   targets[!is.na(targets$target_chr), ],
-#'   keep.extra.columns = TRUE
-#' )
-as_sce <- function(sceptre_object) {
-    if (!methods::is(sceptre_object, "sceptre_object")) {
-        stop("`sceptre_object` must be a `sceptre_object`.")
-    }
-    grna_matrix <- as_column_sparse(get_grna_matrix(sceptre_object))
-    grna_experiment <- SingleCellExperiment::SingleCellExperiment(
-        assays = list(counts = grna_matrix),
-        rowData = grna_row_data(
-            sceptre_object@grna_target_data_frame,
-            rownames(grna_matrix)
-        )
-    )
-    sce <- SingleCellExperiment::SingleCellExperiment(
-        assays = list(
-            counts = as_column_sparse(get_response_matrix(sceptre_object))
-        ),
-        colData = SummarizedExperiment::colData(sceptre_object@data),
-        rowRanges = SummarizedExperiment::rowRanges(sceptre_object@data)
-    )
-    SingleCellExperiment::altExp(sce, "grna", withDimnames = FALSE) <-
-        grna_experiment
-    return(sce)
-}
-
-#' @rdname as_sce
-#' @name coerce,sceptre_object,SingleCellExperiment-method
-#' @aliases coerce,sceptre_object,SingleCellExperiment-method
-#' @exportMethod coerce
-methods::setAs("sceptre_object", "SingleCellExperiment", function(from) {
-    as_sce(from)
-})
 
 
 # the counts assay of a SummarizedExperiment, a delayed (for example,
@@ -279,16 +172,9 @@ sce_counts <- function(experiment) {
 }
 
 
-as_column_sparse <- function(mat) {
-    if (methods::is(mat, "sparseMatrix")) {
-        mat <- methods::as(mat, "CsparseMatrix")
-    }
-    return(mat)
-}
-
-
 # The columns of the gRNA target data frame that give the region each gRNA
-# targets, named as in the rowData of a gRNA experiment (see as_sce())
+# targets, named as in the rowData of a gRNA experiment (see
+# import_data_from_sce())
 target_region_columns <- c(
     chr = "target_chr",
     start = "target_start",
@@ -326,32 +212,4 @@ grna_targets_from_experiment <- function(grna_experiment) {
     }
     keep <- !is.na(targets$grna_target)
     return(as.data.frame(targets[keep, , drop = FALSE], optional = TRUE))
-}
-
-
-# The rowData of the gRNA experiment of the gRNAs `grna_ids` (see as_sce()):
-# the gRNA target data frame, one row per gRNA (NA for gRNAs absent from it),
-# with the target region columns renamed
-grna_row_data <- function(grna_target_data_frame, grna_ids) {
-    if (anyDuplicated(grna_target_data_frame$grna_id)) {
-        stop(
-            "The gRNA target data frame lists some gRNAs more than once; ",
-            "the gRNA targets cannot be stored one row per gRNA."
-        )
-    }
-    targets <- grna_target_data_frame[
-        match(grna_ids, grna_target_data_frame$grna_id),
-        setdiff(colnames(grna_target_data_frame), "grna_id"),
-        drop = FALSE
-    ]
-    rownames(targets) <- NULL
-    renamed <- colnames(targets) %in% names(target_region_columns)
-    colnames(targets)[renamed] <- target_region_columns[colnames(targets)[
-        renamed
-    ]]
-    return(S4Vectors::DataFrame(
-        grna_id = grna_ids,
-        targets,
-        check.names = FALSE
-    ))
 }
