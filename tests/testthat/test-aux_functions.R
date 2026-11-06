@@ -207,3 +207,13 @@ test_that("auto_construct_formula_object", {
         "log(aaa_n_umis + 1) + log(n_nonzero_aaa) + x"
     )
 })
+
+test_that("partition_response_ids() handles no IDs", {
+    expect_identical(
+        expect_silent(partition_response_ids(
+            character(),
+            BPPARAM = BiocParallel::SnowParam(2)
+        )),
+        list(group_1 = character())
+    )
+})
