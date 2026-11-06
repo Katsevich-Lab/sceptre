@@ -75,14 +75,13 @@ construct_negative_control_pairs_v2 <- function(
         # disk-backed counts are read in blocks of responses; the C++
         # function decrements the indices of `nt_grna_group_idxs` in place, so
         # each block gets its own copy
-        count_block <- function(block, offset) {
-            block_csr <- compressed_sparse_components(block)
+        count_block <- function(index, offset) {
             compute_n_trt_cells_matrix(
-                j = block_csr$j,
-                p = block_csr$p,
+                j = index$j,
+                p = index$p,
                 n_cells_orig = ncol(response_matrix),
                 n_cells_sub = length(cells_in_use),
-                n_genes = nrow(block),
+                n_genes = index$n_rows,
                 nt_grna_group_idxs = if (is_backed(response_matrix)) {
                     lapply(nt_grna_group_idxs, function(idxs) idxs + 0L)
                 } else {
@@ -91,7 +90,7 @@ construct_negative_control_pairs_v2 <- function(
                 cells_in_use = cells_in_use
             )
         }
-        n_nonzero_m <- row_blocks(
+        n_nonzero_m <- row_index_blocks(
             response_matrix,
             response_counts_group,
             count_block

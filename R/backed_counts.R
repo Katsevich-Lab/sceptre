@@ -13,20 +13,20 @@
 # (write_backed_counts()), as 32-bit integer counts.
 #
 # Analysis code reads backed counts in two ways: one response at a time
-# (load_row()), and in blocks of consecutive responses realized as in-memory
-# dgRMatrix (row_blocks()), so that code written for in-memory CSR counts can
-# scan every response with bounded memory. Block sizes follow DelayedArray's
-# automatic block size (DelayedArray::setAutoBlockSize()). Blocks of counts
-# read straight from screen.h5mu hold as many nonzero entries as a block holds
-# elements, and are read from the file's index and value arrays directly:
-# realizing them through DelayedArray's sparse coercions costs several times
-# the read itself.
+# (row_reader(), through tatami), and, for the passes that count nonzero
+# cells over every response, in blocks of consecutive responses
+# (row_index_blocks()), which read only the column indices of the nonzero
+# entries, so that the in-memory C++ for those passes runs on each block with
+# bounded memory. Block sizes follow DelayedArray's automatic block size
+# (DelayedArray::setAutoBlockSize()). Blocks read straight from screen.h5mu
+# are read from the file's index array directly: going through DelayedArray's
+# sparse coercions costs several times the read itself.
 #
-# The blocks are assembled from their compressed sparse components with
-# methods::new() on the slots that Matrix documents for dgRMatrix and
-# dgCMatrix (?"dgRMatrix-class"), rather than with Matrix::sparseMatrix(),
-# which would expand and re-validate every block; the components are read
-# back only through compressed_sparse_components().
+# A DelayedMatrix realized in memory (as_row_counts()) is assembled from its
+# compressed sparse components with methods::new() on the slots that Matrix
+# documents for dgRMatrix (?"dgRMatrix-class"), rather than with
+# Matrix::sparseMatrix(), which would expand and re-validate it; the
+# components are read back only through compressed_sparse_components().
 
 # the group of screen.h5mu holding the response counts
 response_counts_group <- "/mod/response/X"
@@ -82,23 +82,29 @@ row_slice <- function(mat, rows) {
     as_row_counts(mat[rows, , drop = FALSE])
 }
 
-# Calls f(block, offset) on consecutive blocks of rows of `mat`, each an
-# in-memory dgRMatrix holding rows offset + 1, ..., offset + nrow(block), and
-# returns the results as a list. An in-memory dgRMatrix is passed whole.
-# Disk-backed counts read from `group` of screen.h5mu (for example,
-# response_counts_group) are read from the file directly.
-row_blocks <- function(mat, group, f) {
+# Calls f(index, offset) on consecutive blocks of rows of `mat` and returns
+# the results as a list. `index` locates the nonzero entries of rows
+# offset + 1, ..., offset + index$n_rows: list(j, p, n_rows), their column
+# indices and row pointers as in a dgRMatrix, without their values, for code
+# that needs only which entries are nonzero. An in-memory dgRMatrix is passed
+# whole. Disk-backed counts read from `group` of screen.h5mu (for example,
+# response_counts_group) are read from the file directly, indices only.
+row_index_blocks <- function(mat, group, f) {
+    row_index <- function(csr_mat) {
+        csr <- compressed_sparse_components(csr_mat)
+        list(j = csr$j, p = csr$p, n_rows = nrow(csr_mat))
+    }
     if (!is_backed(mat)) {
-        return(list(f(mat, 0L)))
+        return(list(f(row_index(mat), 0L)))
     }
     location <- h5_counts_location(mat, group)
     if (!is.null(location)) {
-        return(h5_row_blocks(mat, location, f))
+        return(h5_row_index_blocks(location, f))
     }
     grid <- DelayedArray::rowAutoGrid(mat)
     lapply(seq_len(length(grid)), function(k) {
         rows <- viewport_range(grid[[k, 1L]], 1L)
-        f(row_slice(mat, rows), rows[1L] - 1L)
+        f(row_index(row_slice(mat, rows)), rows[1L] - 1L)
     })
 }
 
@@ -171,10 +177,10 @@ h5_read_entries <- function(dataset, start, count, type) {
     if (typeof(values) == type) values else methods::as(values, type)
 }
 
-# row_blocks() for counts read from screen.h5mu (location:
+# row_index_blocks() for counts read from screen.h5mu (location:
 # h5_counts_location(mat)): blocks of consecutive rows (entry_blocks()), each
-# read with one read of the indices and one of the values.
-h5_row_blocks <- function(mat, location, f) {
+# read with one read of the indices; the values are not read.
+h5_row_index_blocks <- function(location, f) {
     widths <- diff(location$indptr)
     if (length(widths) == 0L) {
         return(list())
@@ -182,23 +188,17 @@ h5_row_blocks <- function(mat, location, f) {
     first <- location$indptr[-length(location$indptr)]
     file <- rhdf5::H5Fopen(location$file, flags = "H5F_ACC_RDONLY")
     on.exit(rhdf5::H5Fclose(file), add = TRUE)
-    datasets <- lapply(
-        c(indices = "indices", data = "data"),
-        function(name) rhdf5::H5Dopen(file, paste0(location$group, "/", name))
-    )
-    on.exit(lapply(datasets, rhdf5::H5Dclose), add = TRUE, after = FALSE)
-    lapply(entry_blocks(widths), function(rows) {
+    indices <- rhdf5::H5Dopen(file, paste0(location$group, "/indices"))
+    on.exit(rhdf5::H5Dclose(indices), add = TRUE, after = FALSE)
+    lapply(entry_blocks(widths, bytes_per_entry = 4), function(rows) {
         start <- first[rows[1L]] + 1
         count <- sum(widths[rows])
-        block <- methods::new(
-            "dgRMatrix",
-            j = h5_read_entries(datasets$indices, start, count, "integer"),
+        index <- list(
+            j = h5_read_entries(indices, start, count, "integer"),
             p = as.integer(c(0, cumsum(widths[rows]))),
-            x = h5_read_entries(datasets$data, start, count, "double"),
-            Dim = c(length(rows), ncol(mat)),
-            Dimnames = list(rownames(mat)[rows], colnames(mat))
+            n_rows = length(rows)
         )
-        f(block, rows[1L] - 1L)
+        f(index, rows[1L] - 1L)
     })
 }
 
