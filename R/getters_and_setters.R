@@ -35,7 +35,12 @@
 #' grna_matrix <- get_grna_matrix(sceptre_object)
 #' cell_covariates <- get_cell_covariates(sceptre_object)
 get_response_matrix <- function(sceptre_object) {
-    return(sceptre_object@response_matrix[[1]])
+    check_object_version(sceptre_object)
+    return(SummarizedExperiment::assay(
+        sceptre_object@data,
+        "counts",
+        withDimnames = FALSE
+    ))
 }
 
 #' Get gRNA matrix
@@ -43,7 +48,16 @@ get_response_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_grna_matrix <- function(sceptre_object) {
-    return(sceptre_object@grna_matrix[[1]])
+    check_object_version(sceptre_object)
+    return(SummarizedExperiment::assay(
+        SingleCellExperiment::altExp(
+            sceptre_object@data,
+            "grna",
+            withDimnames = FALSE
+        ),
+        "counts",
+        withDimnames = FALSE
+    ))
 }
 
 #' Get cell covariates
@@ -51,7 +65,11 @@ get_grna_matrix <- function(sceptre_object) {
 #' @rdname get_response_matrix
 #' @export
 get_cell_covariates <- function(sceptre_object) {
-    return(sceptre_object@covariate_data_frame)
+    check_object_version(sceptre_object)
+    return(as.data.frame(
+        SummarizedExperiment::colData(sceptre_object@data),
+        optional = TRUE
+    ))
 }
 
 
@@ -112,18 +130,19 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     initial_grna_assignment_list <- sceptre_object@initial_grna_assignment_list
     grna_ids <- names(initial_grna_assignment_list)
     names(initial_grna_assignment_list) <- NULL
-    j <- unlist(initial_grna_assignment_list)
-    increment_vector(j, -1L)
+    j <- as.integer(unlist(initial_grna_assignment_list))
     l <- vapply(initial_grna_assignment_list, length, FUN.VALUE = integer(1))
     p <- c(0L, cumsum(l))
-    mat <- Matrix::sparseMatrix(j = 1, p = c(0, 1), repr = "R")
-    mat@j <- j
-    mat@p <- p
-    mat@Dim <- c(
-        length(initial_grna_assignment_list),
-        get_grna_matrix(sceptre_object) |> ncol()
+    mat <- Matrix::sparseMatrix(
+        j = j,
+        p = p,
+        dims = c(
+            length(initial_grna_assignment_list),
+            get_grna_matrix(sceptre_object) |> ncol()
+        ),
+        dimnames = list(grna_ids, NULL),
+        repr = "R"
     )
-    rownames(mat) <- grna_ids
     if (apply_cellwise_qc) {
         if (!sceptre_object@functs_called[["run_qc"]]) {
             stop("QC has not yet been called on this sceptre_object.")
@@ -133,12 +152,31 @@ get_grna_assignments <- function(sceptre_object, apply_cellwise_qc = FALSE) {
     return(mat)
 }
 
+# the setters replace a matrix by one of the same dimensions
 set_response_matrix <- function(sceptre_object, response_matrix) {
-    sceptre_object@response_matrix[[1]] <- response_matrix
+    SummarizedExperiment::assay(
+        sceptre_object@data,
+        "counts",
+        withDimnames = FALSE
+    ) <- response_matrix
     return(sceptre_object)
 }
 
 set_grna_matrix <- function(sceptre_object, grna_matrix) {
-    sceptre_object@grna_matrix[[1]] <- grna_matrix
+    grna_experiment <- SingleCellExperiment::altExp(
+        sceptre_object@data,
+        "grna",
+        withDimnames = FALSE
+    )
+    SummarizedExperiment::assay(
+        grna_experiment,
+        "counts",
+        withDimnames = FALSE
+    ) <- grna_matrix
+    SingleCellExperiment::altExp(
+        sceptre_object@data,
+        "grna",
+        withDimnames = FALSE
+    ) <- grna_experiment
     return(sceptre_object)
 }

@@ -75,13 +75,11 @@ plot_grna_count_distributions <- function(
         threshold <- round(threshold)
     }
     if (is.null(grnas_to_plot)) {
-        grnas_to_plot <- withr::with_seed(4, {
-            sample(
-                x = rownames(grna_matrix),
-                size = min(nrow(grna_matrix), n_grnas_to_plot),
-                replace = FALSE
-            )
-        })
+        grnas_to_plot <- sample(
+            x = rownames(grna_matrix),
+            size = min(nrow(grna_matrix), n_grnas_to_plot),
+            replace = FALSE
+        )
     } else {
         if (!(all(grnas_to_plot %in% rownames(grna_matrix)))) {
             stop(
@@ -89,10 +87,7 @@ plot_grna_count_distributions <- function(
             )
         }
     }
-    grna_matrix <- set_matrix_accessibility(
-        grna_matrix,
-        make_row_accessible = TRUE
-    )
+    grna_matrix <- row_accessible_counts(grna_matrix)
     grna_expressions <- lapply(X = grnas_to_plot, function(grna_id) {
         load_row(grna_matrix, grna_id)
     }) |>
@@ -294,19 +289,17 @@ plot_assign_grnas <- function(
     }
     init_assignments <- sceptre_object@initial_grna_assignment_list
     grna_matrix <- get_grna_matrix(sceptre_object) |>
-        set_matrix_accessibility(make_row_accessible = TRUE)
+        row_accessible_counts()
     grna_ids <- names(init_assignments)
     assigned <- vapply(init_assignments, length, FUN.VALUE = integer(1)) >= 1
     grna_ids <- grna_ids[assigned]
     # sample grnas to plot
     if (is.null(grnas_to_plot)) {
-        grnas_to_plot <- withr::with_seed(4, {
-            sample(
-                x = grna_ids,
-                size = min(length(grna_ids), n_grnas_to_plot),
-                replace = FALSE
-            )
-        })
+        grnas_to_plot <- sample(
+            x = grna_ids,
+            size = min(length(grna_ids), n_grnas_to_plot),
+            replace = FALSE
+        )
     } else {
         if (!(all(grnas_to_plot %in% grna_ids))) {
             stop(
@@ -338,12 +331,10 @@ plot_assign_grnas <- function(
         data.table::rbindlist()
 
     # downsample the unperturbed cells
-    to_plot_a <- withr::with_seed(4, {
-        to_plot_a |>
-            dplyr::group_by(g) |>
-            dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
-            dplyr::ungroup()
-    })
+    to_plot_a <- to_plot_a |>
+        dplyr::group_by(g) |>
+        dplyr::sample_n(size = min(n_points_to_plot_per_umi, dplyr::n())) |>
+        dplyr::ungroup()
 
     # plot a
     p_a <- ggplot2::ggplot(
@@ -370,15 +361,13 @@ plot_assign_grnas <- function(
     # plot b
     n_cells_per_grna <- vapply(init_assignments, length, FUN.VALUE = integer(1))
     mean_c_cells_per_grna <- mean(n_cells_per_grna)
-    to_plot_b <- withr::with_seed(4, {
-        data.frame(
-            x = n_cells_per_grna,
-            y = names(n_cells_per_grna)
-        ) |>
-            dplyr::arrange(n_cells_per_grna) |>
-            dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
-            dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
-    })
+    to_plot_b <- data.frame(
+        x = n_cells_per_grna,
+        y = names(n_cells_per_grna)
+    ) |>
+        dplyr::arrange(n_cells_per_grna) |>
+        dplyr::mutate(y = factor(y, labels = y, levels = y)) |>
+        dplyr::sample_n(min(n_grnas_to_plot_panel_b, dplyr::n()))
     p_b <- ggplot2::ggplot(
         data = to_plot_b,
         mapping = ggplot2::aes(x = x, y = y)
@@ -1010,7 +999,7 @@ plot_covariates <- function(
         response_n_nonzero_range <- sceptre_object@cellwise_qc_thresholds$response_n_nonzero_range
         p_mito_threshold <- sceptre_object@cellwise_qc_thresholds$p_mito_threshold
     }
-    covariate_data_frame <- sceptre_object@covariate_data_frame
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     make_histogram <- function(v, curr_range, plot_tit, use_quantile) {
         cutoffs <- if (use_quantile) {
             stats::quantile(v, probs = curr_range)
@@ -1156,8 +1145,7 @@ plot_run_qc <- function(
             sceptre_object,
             downsample_pairs = downsample_pairs,
             point_size = point_size,
-            transparency = transparency,
-            return_indiv_plots = FALSE
+            transparency = transparency
         )
         # combine the plots
         if (return_indiv_plots) {
@@ -1217,8 +1205,7 @@ plot_pairwise_qc <- function(
     sceptre_object,
     downsample_pairs = 10000L,
     point_size = 0.55,
-    transparency = 0.8,
-    return_indiv_plots = FALSE
+    transparency = 0.8
 ) {
     my_cols <- c("mediumseagreen", "indianred2")
     my_breaks <- c(0, 1, 3, 7, 50, 500, 5000, 50000)
@@ -1226,10 +1213,8 @@ plot_pairwise_qc <- function(
         dplyr::mutate(pass_qc = ifelse(pass_qc, "Pass", "Fail")) |>
         dplyr::mutate(pass_qc = factor(pass_qc, levels = c("Pass", "Fail")))
     if (nrow(discovery_pairs) >= downsample_pairs) {
-        discovery_pairs <- withr::with_seed(
-            4,
-            discovery_pairs |> dplyr::sample_n(downsample_pairs)
-        )
+        discovery_pairs <- discovery_pairs |>
+            dplyr::sample_n(downsample_pairs)
     }
 
     p_b <- ggplot2::ggplot(
@@ -1395,14 +1380,12 @@ plot_run_power_check <- function(
 
 
 downsample_result_data_frame <- function(result_df, downsample_pairs = 1000) {
-    withr::with_seed(4, {
-        result_df |>
-            dplyr::mutate(
-                bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))
-            ) |>
-            dplyr::group_by(bin) |>
-            dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
-    })
+    result_df |>
+        dplyr::mutate(
+            bin = cut(p_value, breaks = c(10^(-seq(0, 20)), 0))
+        ) |>
+        dplyr::group_by(bin) |>
+        dplyr::sample_n(size = min(dplyr::n(), downsample_pairs))
 }
 
 
@@ -1493,7 +1476,7 @@ plot_response_grna_target_pair <- function(
     y <- load_row(mat = response_matrix, id = response_id)[cells_in_use]
 
     # get the sequencing depths; filter for cells in use
-    response_n_umis <- sceptre_object@covariate_data_frame$response_n_umis[
+    response_n_umis <- get_cell_covariates(sceptre_object)$response_n_umis[
         cells_in_use
     ]
 
@@ -1564,12 +1547,10 @@ plot_response_grna_target_pair <- function(
     ) |>
         as.character()
     # create the plot
-    to_plot_downsample <- withr::with_seed(4, {
-        to_plot |>
-            dplyr::mutate(is_zero = (normalized_count == 0)) |>
-            dplyr::group_by(is_zero, treatment) |>
-            dplyr::sample_n(size = min(dplyr::n(), 1000))
-    })
+    to_plot_downsample <- to_plot |>
+        dplyr::mutate(is_zero = (normalized_count == 0)) |>
+        dplyr::group_by(is_zero, treatment) |>
+        dplyr::sample_n(size = min(dplyr::n(), 1000))
     p_out <- ggplot2::ggplot(
         data = to_plot,
         mapping = ggplot2::aes(

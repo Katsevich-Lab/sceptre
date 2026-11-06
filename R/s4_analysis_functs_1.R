@@ -15,7 +15,9 @@
 #' `grna_target` and `response_id` specifying the positive control pairs to
 #' analyze
 #' @param formula_object (optional) a formula object specifying how to adjust
-#' for the covariates in the model
+#' for the covariates in the model. Covariates that are not count-based and
+#' have 15 or more distinct values are left out of the default formula, with a
+#' message naming them.
 #' @param side (optional; default `"both"`) the sidedness of the test, one of
 #' `"left"`, `"right"`, or `"both"`
 #' @param grna_integration_strategy (optional; default `"union"`) a string
@@ -26,7 +28,8 @@
 #' test statistics, either `"skew_normal"` or `"no_approximation"`
 #' @param control_group (optional) a string specifying the control group to use
 #' in the differential expression analysis, either `"complement"` or
-#' `"nt_cells"`
+#' `"nt_cells"`; in high MOI the complement set is always used, and
+#' `"nt_cells"` gives a warning
 #' @param resampling_mechanism (optional) a string specifying the resampling
 #' mechanism to use, either `"permutations"` or `"crt"`
 #' @param multiple_testing_method (optional; default `"BH"`) a string specifying
@@ -34,6 +37,16 @@
 #' options
 #' @param multiple_testing_alpha (optional; default `0.1`) a numeric specifying
 #' the nominal level of the multiple testing correction method
+#' @param seed (optional; default `NULL`) a whole number between 0 and
+#' `.Machine$integer.max` that seeds the random draws of the analysis: the
+#' starting values of the mixture method in `assign_grnas()`, the negative
+#' control pairs of `run_calibration_check()`, and the permutation and
+#' conditional resampling draws. The default, `NULL`, draws the seed from R's
+#' random number generator, so that `set.seed()` called beforehand makes the
+#' analysis reproducible. The seed is recorded in the `sceptre_object`, and
+#' `print()` shows it. In sceptre 0.99.2, `seed = 4` reproduces the results
+#' of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
+#' fixes listed in `NEWS.md`.
 #'
 #' @return an updated `sceptre_object` in which the analysis parameters have
 #' been set
@@ -81,7 +94,8 @@ set_analysis_parameters <- function(
     control_group = "default",
     resampling_mechanism = "default",
     multiple_testing_method = "BH",
-    multiple_testing_alpha = 0.1
+    multiple_testing_alpha = 0.1,
+    seed = NULL
 ) {
     # 0. verify that function called in correct order
     sceptre_object <- perform_status_check_and_update(
@@ -90,7 +104,15 @@ set_analysis_parameters <- function(
     )
 
     # 1. handle default arguments
+    seed <- resolve_seed(seed)
     if (!sceptre_object@low_moi) {
+        if (control_group == "nt_cells") {
+            warning(
+                "`control_group = \"nt_cells\"` is not available in high MOI; ",
+                "the complement set is used as the control group instead.",
+                call. = FALSE
+            )
+        }
         control_group <- "complement"
         if (resampling_mechanism == "default") resampling_mechanism <- "crt"
     }
@@ -104,7 +126,7 @@ set_analysis_parameters <- function(
     }
     if (identical(formula_object, "default")) {
         formula_object <- auto_construct_formula_object(
-            cell_covariates = sceptre_object@covariate_data_frame,
+            cell_covariates = get_cell_covariates(sceptre_object),
             include_grna_covariates = !sceptre_object@low_moi
         )
     }
@@ -128,7 +150,6 @@ set_analysis_parameters <- function(
         control_group = control_group,
         resampling_mechanism = resampling_mechanism,
         side = side,
-        low_moi = sceptre_object@low_moi,
         grna_integration_strategy = grna_integration_strategy,
         resampling_approximation = resampling_approximation
     ) |>
@@ -138,7 +159,7 @@ set_analysis_parameters <- function(
     # the design matrix (not only the formula, as factor contrasts can change
     # it) and on the cells used to fit them (NT cells or the complement)
     covariate_matrix <- convert_covariate_df_to_design_matrix(
-        covariate_data_frame = sceptre_object@covariate_data_frame,
+        covariate_data_frame = get_cell_covariates(sceptre_object),
         formula_object = formula_object
     )
     reset_response_precomps <- !identical(
@@ -180,6 +201,7 @@ set_analysis_parameters <- function(
     sceptre_object@multiple_testing_method <- multiple_testing_method
     sceptre_object@grna_integration_strategy <- grna_integration_strategy
     sceptre_object@covariate_matrix <- covariate_matrix
+    sceptre_object@seed <- seed
 
     # 5. modify the grna target df and response grna target dfs
     sceptre_object <- update_dfs_based_on_grouping_strategy(sceptre_object)
@@ -230,15 +252,20 @@ set_analysis_parameters <- function(
 #' default is `"maximum"` in low MOI and `"mixture"` in high MOI.
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether
 #' to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to
-#' run the function in parallel. `parallel = TRUE` is recommended only on Mac;
-#' it is not supported on Windows and may behave unreliably on Linux clusters.
-#' @param n_processors (optional; default `"auto"`) an integer specifying the
-#' number of processors to use if `parallel` is set to `TRUE`. The default,
-#' `"auto"`, uses half the physical cores. The fraction may be tuned via the
-#' `parallelly.availableCores.fraction` R option.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the
-#' directory in which to write the log files (ignored if `parallel = FALSE`)
+#' directory in which to write the log files of the parallel workers (ignored
+#' when the function runs serially)
+#' @param BPPARAM (optional; default `BiocParallel::SerialParam()`) a
+#' [BiocParallel::BiocParallelParam] object specifying how to run the function
+#' in parallel, for example `BiocParallel::MulticoreParam(4)` (Linux and macOS)
+#' or `BiocParallel::SnowParam(4)` (all platforms, including Windows). Results
+#' do not depend on the back end or the number of workers. On a shared machine
+#' or in a cluster job, choose the number of workers from the cores allotted
+#' to you, for example
+#' `BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))`.
+#' @param parallel,n_processors deprecated; use `BPPARAM`. `parallel = TRUE`
+#' runs the function with `BiocParallel::MulticoreParam(n_processors)`
+#' (`n_processors = "auto"` uses half the physical cores).
 #' @param ... optional method-specific additional arguments
 #'
 #' @return an updated `sceptre_object` in which the gRNA assignments have been
@@ -263,13 +290,14 @@ assign_grnas <- function(
     sceptre_object,
     method = "default",
     print_progress = TRUE,
-    parallel = FALSE,
-    n_processors = "auto",
     log_dir = tempdir(),
-    ...
+    BPPARAM = BiocParallel::SerialParam(),
+    ...,
+    parallel = NULL,
+    n_processors = NULL
 ) {
     # 0. verify that function called in correct order
-    check_parallel_supported(parallel) |> invisible()
+    BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "assign_grnas"
@@ -295,7 +323,7 @@ assign_grnas <- function(
             backup_threshold = 5L,
             probability_threshold = 0.8,
             formula_object = auto_construct_formula_object(
-                cell_covariates = sceptre_object@covariate_data_frame,
+                cell_covariates = get_cell_covariates(sceptre_object),
                 include_grna_covariates = TRUE
             )
         )
@@ -315,8 +343,7 @@ assign_grnas <- function(
     check_assign_grna_inputs(
         sceptre_object,
         method,
-        hyperparameters,
-        n_processors
+        hyperparameters
     ) |>
         invisible()
 
@@ -339,8 +366,7 @@ assign_grnas <- function(
     sceptre_object <- assign_grnas_to_cells(
         sceptre_object,
         print_progress,
-        parallel,
-        n_processors,
+        BPPARAM,
         log_dir
     )
 
@@ -486,7 +512,7 @@ run_qc_pt_1 <- function(
     frac_cells_removed_2p_grna <- sceptre_object@cell_removal_metrics[[
         "n_cells_rm_zero_twoplus_grnas"
     ]] /
-        nrow(sceptre_object@covariate_data_frame)
+        ncol(sceptre_object@data)
     if (frac_cells_removed_2p_grna >= 0.5 && sceptre_object@low_moi) {
         warning(
             "A large percentage of cells (",

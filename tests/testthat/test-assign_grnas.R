@@ -557,3 +557,37 @@ test_that("assign_grnas method=mixture reports invalid assignment formulas", {
     )
     expect_false(is.null(conditionCall(missing_covariate_error)))
 })
+
+
+test_that("assign_grnas method=maximum requires min_grna_n_umis_threshold >= 1", {
+    data("lowmoi_example_data")
+    grna_matrix <- lowmoi_example_data$grna_matrix
+    zero_cells <- 1:30
+    grna_matrix[, zero_cells] <- 0L
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        extra_covariates = lowmoi_example_data$extra_covariates,
+        moi = "low"
+    ) |>
+        set_analysis_parameters())
+
+    expect_error(
+        assign_grnas(
+            sceptre_object,
+            method = "maximum",
+            min_grna_n_umis_threshold = 0L
+        ),
+        regexp = "`min_grna_n_umis_threshold` should be an integer greater than 0.",
+        fixed = TRUE
+    )
+    sceptre_object <- suppressMessages(assign_grnas(
+        sceptre_object,
+        method = "maximum",
+        min_grna_n_umis_threshold = 1L
+    ))
+    expect_true(all(
+        zero_cells %in% sceptre_object@cells_w_zero_or_twoplus_grnas
+    ))
+})

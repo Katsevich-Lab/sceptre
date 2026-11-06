@@ -66,7 +66,6 @@ plot_diagnostic_data <- function(panels, core) {
 
 test_that("diagnostic output amounts retain the same discovery plot family", {
     withr::local_seed(581L)
-    seed <- .Random.seed
     plot_discovery <- plot_run_discovery_analysis
     core <- plot_diagnostic_object()@discovery_result
     built_by_class <- list()
@@ -77,12 +76,13 @@ test_that("diagnostic output amounts retain the same discovery plot family", {
             retained_result <- object@discovery_result
             before <- serialize(object, NULL)
             result_before <- serialize(retained_result, NULL)
+            # the plots subsample points with R's random number generator
+            set.seed(581L)
             panels <- plot_discovery(object, return_indiv_plots = TRUE)
             expect_length(panels, 4L)
             built[[amount]] <- plot_diagnostic_data(panels, core)
             expect_identical(serialize(object, NULL), before)
             expect_identical(serialize(retained_result, NULL), result_before)
-            expect_identical(.Random.seed, seed)
         }
         # Compare actual QQ points/bands, volcano points/threshold and text data,
         # not just the input result count or the unbuilt ggplot definitions.
@@ -95,7 +95,6 @@ test_that("diagnostic output amounts retain the same discovery plot family", {
 
 test_that("missing primary plot fields still exclude unplottable discovery rows", {
     withr::local_seed(852L)
-    seed <- .Random.seed
     core <- plot_diagnostic_object(3L)@discovery_result
     extra <- core[rep(2L, 4L), ]
     extra$response_id <- c(
@@ -126,6 +125,5 @@ test_that("missing primary plot fields still exclude unplottable discovery rows"
         plot_diagnostic_data(panels, core)
         expect_identical(serialize(object, NULL), before)
         expect_identical(serialize(retained_result, NULL), result_before)
-        expect_identical(.Random.seed, seed)
     }
 })

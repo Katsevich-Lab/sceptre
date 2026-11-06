@@ -7,7 +7,7 @@
 #' pair constructor function for screens that aim to map noncoding regulatory
 #' elements (e.g., enhancers or noncoding GWAS variants) to target genes in
 #' *cis*. `construct_cis_pairs()` assumes that the columns `chr`, `start`, and
-#' `stop` are present in the `grna_target_data_frame`, giving the chromosome,
+#' `end` are present in the `grna_target_data_frame`, giving the chromosome,
 #' start position, and end position, respectively, of the region that each gRNA
 #' targets. `construct_cis_pairs()` takes several arguments: `sceptre_object`
 #' (required), `distance_threshold` (optional), `positive_control_pairs`
@@ -34,6 +34,12 @@
 #' @param response_position_data_frame (optional) a data frame with columns
 #' `response_id`, `chr`, and `position` giving the genomic coordinate of each
 #' response; by default, the packaged GRCh38 gene position data frame is used.
+#' The chromosomes must be named as in `grna_target_data_frame` (for example,
+#' `"chr1"` in both, not `"chr1"` in one and `"1"` in the other), and the
+#' positions must be relative to the same reference genome as the gRNA target
+#' coordinates: for coordinates relative to GRCh37, pass
+#' `gene_position_data_frame_grch37`. Coordinates relative to different genomes
+#' give wrong pairs without an error.
 #'
 #' @return a data frame with columns `grna_target` and `response_id` containing
 #' the *cis* pairs
@@ -110,6 +116,21 @@ construct_cis_pairs <- function(
     if (nrow(response_position_data_frame) == 0L) {
         stop(
             "The response IDs (i.e., the rownames of `response_matrix`) must be a subset of the `response_id` column of `gene_position_data_frame_grch38`. You can view the first few rows of `gene_position_data_frame_grch38` via `data(gene_position_data_frame_grch38); head(gene_position_data_frame_grch38)`."
+        )
+    }
+    # the targets and the responses must name chromosomes alike (for example,
+    # "chr1" in both, not "chr1" and "1"); otherwise no pair is found
+    target_chrs <- unique(as.character(grna_target_data_frame$chr))
+    target_chrs <- target_chrs[!is.na(target_chrs) & nzchar(target_chrs)]
+    response_chrs <- unique(as.character(response_position_data_frame$chr))
+    if (length(target_chrs) >= 1L && !any(target_chrs %in% response_chrs)) {
+        stop(
+            "None of the chromosomes of the gRNA targets (for example, \"",
+            target_chrs[1L],
+            "\") is a chromosome of the responses (for example, \"",
+            response_chrs[1L],
+            "\"); the `chr` columns of `grna_target_data_frame` and of the ",
+            "response positions must name chromosomes alike."
         )
     }
 

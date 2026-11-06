@@ -1,7 +1,7 @@
 test_that("complement calibration bounds the permutation sample size by the cell count", {
     # Record the sampler request instead of drawing. Two overlapping NT gRNAs
     # of four cells each cover five cells; their sizes sum to eight.
-    local_mocked_bindings(fisher_yates_sampler = function(n_tot, M, B) {
+    local_mocked_bindings(fisher_yates_sampler = function(n_tot, M, B, seed) {
         list(n_tot = n_tot, M = M, B = B)
     })
     assignments <- list(indiv_nt_grna_idxs = list(nt1 = 1:4, nt2 = 2:5))
@@ -11,12 +11,21 @@ test_that("complement calibration bounds the permutation sample size by the cell
         TRUE,
         TRUE,
         2L,
-        5L
+        5L,
+        4L
     )
     expect_identical(request, list(n_tot = 5L, M = 5L, B = 7L))
     # Without overlap, the request is unchanged
     disjoint <- list(indiv_nt_grna_idxs = list(nt1 = 1:2, nt2 = 3:5))
-    request <- get_synthetic_permutation_idxs(disjoint, 7L, TRUE, TRUE, 2L, 10L)
+    request <- get_synthetic_permutation_idxs(
+        disjoint,
+        7L,
+        TRUE,
+        TRUE,
+        2L,
+        10L,
+        4L
+    )
     expect_identical(request, list(n_tot = 10L, M = 5L, B = 7L))
 })
 
@@ -65,7 +74,7 @@ test_that("public high-MOI calibration accepts overlapping NT unions", {
 
 test_that("the Fisher-Yates sampler rejects a sample larger than its population", {
     expect_error(
-        fisher_yates_sampler(n_tot = 1L, M = 2L, B = 1L),
+        fisher_yates_sampler(n_tot = 1L, M = 2L, B = 1L, seed = 4L),
         "M must not exceed n_tot",
         fixed = TRUE
     )

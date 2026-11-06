@@ -6,8 +6,6 @@ construct_negative_control_pairs_v2 <- function(
     message("Constructing negative control pairs.")
     grna_assignments <- sceptre_object@grna_assignments
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_target_data_frame <- sceptre_object@grna_target_data_frame
-    low_moi <- sceptre_object@low_moi
     n_nonzero_trt_thresh <- sceptre_object@n_nonzero_trt_thresh
     n_nonzero_cntrl_thresh <- sceptre_object@n_nonzero_cntrl_thresh
     n_nonzero_m <- sceptre_object@M_matrix
@@ -45,7 +43,8 @@ construct_negative_control_pairs_v2 <- function(
             n_nt_grnas,
             as.numeric(n_genes),
             N_POSSIBLE_GROUPS_THRESHOLD,
-            p_hat
+            p_hat,
+            sceptre_object@seed
         )
     }
 
@@ -60,7 +59,8 @@ construct_negative_control_pairs_v2 <- function(
             n_genes = n_genes,
             n_calibration_pairs = n_calibration_pairs,
             n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+            seed = sceptre_object@seed
         )
     } else {
         nt_grna_group_idxs <- lapply(
@@ -72,27 +72,26 @@ construct_negative_control_pairs_v2 <- function(
                     unique()
             }
         )
-        if (methods::is(response_matrix, "odm")) {
-            n_nonzero_m <- ondisc:::compute_n_trt_cells_matrix_ondisc(
-                file_name_in = response_matrix@h5_file,
-                f_row_ptr = response_matrix@ptr,
+        # disk-backed counts are read in blocks of responses; the C++
+        # function decrements the indices of `nt_grna_group_idxs` in place, so
+        # each block gets its own copy
+        count_block <- function(index, offset) {
+            compute_n_trt_cells_matrix(
+                j = index$j,
+                p = index$p,
                 n_cells_orig = ncol(response_matrix),
                 n_cells_sub = length(cells_in_use),
-                n_genes = n_genes,
-                nt_grna_group_idxs = nt_grna_group_idxs,
-                cells_in_use = cells_in_use
-            )
-        } else {
-            n_nonzero_m <- compute_n_trt_cells_matrix(
-                j = response_matrix@j,
-                p = response_matrix@p,
-                n_cells_orig = ncol(response_matrix),
-                n_cells_sub = length(cells_in_use),
-                n_genes = n_genes,
-                nt_grna_group_idxs = nt_grna_group_idxs,
+                n_genes = index$n_rows,
+                nt_grna_group_idxs = if (is_backed(response_matrix)) {
+                    lapply(nt_grna_group_idxs, function(idxs) idxs + 0L)
+                } else {
+                    nt_grna_group_idxs
+                },
                 cells_in_use = cells_in_use
             )
         }
+        n_nonzero_m <- row_index_blocks(response_matrix, count_block) |>
+            do.call(what = cbind)
         dummy_possibly_groups_m <- matrix(
             seq_along(nt_grna_group_idxs) - 1L,
             ncol = 1L
@@ -104,7 +103,8 @@ construct_negative_control_pairs_v2 <- function(
             n_genes = n_genes,
             n_calibration_pairs = n_calibration_pairs,
             n_nonzero_trt_thresh = n_nonzero_trt_thresh,
-            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh
+            n_nonzero_cntrl_thresh = n_nonzero_cntrl_thresh,
+            seed = sceptre_object@seed
         )
     }
 

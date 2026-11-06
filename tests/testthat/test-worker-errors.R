@@ -44,8 +44,7 @@ test_that("a failing parallel worker reports its original error", {
         expect_error(
             suppressWarnings(suppressMessages(run_discovery_analysis(
                 object,
-                parallel = TRUE,
-                n_processors = 2,
+                BPPARAM = BiocParallel::MulticoreParam(2),
                 print_progress = FALSE
             ))),
             "Parallel worker 1 failed: Controlled worker failure",
@@ -72,8 +71,7 @@ test_that("a failing CRT association worker reports its original error", {
     expect_error(
         suppressWarnings(suppressMessages(run_discovery_analysis(
             object,
-            parallel = TRUE,
-            n_processors = 2,
+            BPPARAM = BiocParallel::MulticoreParam(2),
             print_progress = FALSE
         ))),
         "Parallel worker 1 failed: Controlled association failure",
@@ -102,8 +100,7 @@ test_that("a failing mixture assignment worker reports its original error", {
             object,
             method = "mixture",
             formula_object = ~ log(response_n_umis),
-            parallel = TRUE,
-            n_processors = 2,
+            BPPARAM = BiocParallel::MulticoreParam(2),
             print_progress = FALSE
         ))),
         "Parallel worker 1 failed: Controlled mixture failure",
@@ -127,11 +124,10 @@ test_that("a parallel worker that exits without replying cannot drop results", {
     expect_error(
         suppressWarnings(suppressMessages(run_discovery_analysis(
             object,
-            parallel = TRUE,
-            n_processors = 2,
+            BPPARAM = BiocParallel::MulticoreParam(2),
             print_progress = FALSE
         ))),
-        "Parallel worker [12] returned no result"
+        "a worker may have exited unexpectedly"
     )
 })
 
@@ -144,8 +140,7 @@ test_that("parallel and serial discovery results agree", {
     ))
     parallel <- suppressMessages(run_discovery_analysis(
         object,
-        parallel = TRUE,
-        n_processors = 2,
+        BPPARAM = BiocParallel::MulticoreParam(2),
         print_progress = FALSE
     ))
     expect_equal(parallel@discovery_result, serial@discovery_result)

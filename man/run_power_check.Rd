@@ -8,9 +8,10 @@ run_power_check(
   sceptre_object,
   output_amount = 1,
   print_progress = TRUE,
-  parallel = FALSE,
-  n_processors = "auto",
-  log_dir = tempdir()
+  log_dir = tempdir(),
+  BPPARAM = BiocParallel::SerialParam(),
+  parallel = NULL,
+  n_processors = NULL
 )
 }
 \arguments{
@@ -23,17 +24,22 @@ amount of information and \code{3} the most.}
 \item{print_progress}{(optional; default \code{TRUE}) a logical indicating whether
 to print progress updates}
 
-\item{parallel}{(optional; default \code{FALSE}) a logical indicating whether to
-run the function in parallel. \code{parallel = TRUE} is recommended only on Mac;
-it is not supported on Windows and may behave unreliably on Linux clusters.}
-
-\item{n_processors}{(optional; default \code{"auto"}) an integer specifying the
-number of processors to use if \code{parallel} is set to \code{TRUE}. The default,
-\code{"auto"}, uses half the physical cores. The fraction may be tuned via the
-\code{parallelly.availableCores.fraction} R option.}
-
 \item{log_dir}{(optional; default \code{tempdir()}) a string indicating the
-directory in which to write the log files (ignored if \code{parallel = FALSE})}
+directory in which to write the log files of the parallel workers (ignored
+when the function runs serially)}
+
+\item{BPPARAM}{(optional; default \code{BiocParallel::SerialParam()}) a
+\link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} object specifying how to run the function
+in parallel, for example \code{BiocParallel::MulticoreParam(4)} (Linux and macOS)
+or \code{BiocParallel::SnowParam(4)} (all platforms, including Windows). Results
+do not depend on the back end or the number of workers. On a shared machine
+or in a cluster job, choose the number of workers from the cores allotted
+to you, for example
+\code{BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))}.}
+
+\item{parallel, n_processors}{deprecated; use \code{BPPARAM}. \code{parallel = TRUE}
+runs the function with \code{BiocParallel::MulticoreParam(n_processors)}
+(\code{n_processors = "auto"} uses half the physical cores).}
 }
 \value{
 an updated \code{sceptre_object} in which the power check has been carried

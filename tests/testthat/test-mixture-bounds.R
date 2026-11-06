@@ -15,22 +15,17 @@ test_that("mixture perturbation bounds use the documented perturbation range", {
     for (upper in c(19.9, 20)) {
         parameters <- mixture_parameters()
         parameters$g_pert_guess_range[2L] <- upper
-        expect_null(check_assign_grna_inputs(
-            object,
-            "mixture",
-            parameters,
-            "auto"
-        ))
+        expect_null(check_assign_grna_inputs(object, "mixture", parameters))
     }
     parameters$g_pert_guess_range[2L] <- 20.1
     expect_error(
-        check_assign_grna_inputs(object, "mixture", parameters, "auto"),
+        check_assign_grna_inputs(object, "mixture", parameters),
         "`g_pert_guess_range` should be a numeric vector of length 2",
         fixed = TRUE
     )
     parameters$pi_guess_range[2L] <- 2
     expect_error(
-        check_assign_grna_inputs(object, "mixture", parameters, "auto"),
+        check_assign_grna_inputs(object, "mixture", parameters),
         "`pi_guess_range` should be a numeric vector of length 2",
         fixed = TRUE
     )

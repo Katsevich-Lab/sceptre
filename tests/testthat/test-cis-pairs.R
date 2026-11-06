@@ -9,7 +9,9 @@ cis_pair_object <- function(response_ids, metadata) {
     )
     methods::new(
         "sceptre_object",
-        response_matrix = list(response),
+        data = SingleCellExperiment::SingleCellExperiment(
+            assays = list(counts = response)
+        ),
         grna_target_data_frame = metadata
     )
 }
@@ -163,5 +165,29 @@ test_that("construct_cis_pairs() computes the midpoint of large coordinates", {
     expect_identical(
         actual,
         data.frame(grna_target = "target-wide", response_id = "near")
+    )
+})
+
+test_that("construct_cis_pairs() rejects differently named chromosomes", {
+    data("highmoi_example_data")
+    data("grna_target_data_frame_highmoi")
+    data("gene_position_data_frame_grch38")
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = grna_target_data_frame_highmoi,
+        moi = "high"
+    ))
+    # Ensembl-style names ("1") for the responses, UCSC-style ("chr1") for
+    # the targets
+    positions <- gene_position_data_frame_grch38
+    positions$chr <- sub("^chr", "", positions$chr)
+    expect_error(
+        construct_cis_pairs(
+            sceptre_object,
+            response_position_data_frame = positions
+        ),
+        "must name chromosomes alike",
+        fixed = TRUE
     )
 })

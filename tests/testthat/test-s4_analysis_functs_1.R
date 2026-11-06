@@ -36,9 +36,8 @@ test_that("import_data", {
     # most of the slots are so simple that only cursory tests are done, mostly to confirm
     # that future changes do not change the API
     all_slots <- c(
-        "response_matrix",
-        "grna_matrix",
-        "covariate_data_frame",
+        "version",
+        "data",
         "covariate_matrix",
         "grna_target_data_frame",
         "low_moi",
@@ -60,6 +59,7 @@ test_that("import_data", {
         "grna_assignment_hyperparameters",
         "multiple_testing_alpha",
         "multiple_testing_method",
+        "seed",
         "cell_removal_metrics",
         "cellwise_qc_thresholds",
         "mitochondrial_gene",
@@ -87,11 +87,7 @@ test_that("import_data", {
         "functs_called",
         "calibration_result",
         "power_result",
-        "discovery_result",
-        "nuclear",
-        "nf_pipeline",
-        "integer_id",
-        "elements_to_analyze"
+        "discovery_result"
     )
     expect_equal(
         slotNames(sceptre_object_low_no_ec_with_response_names),
@@ -113,14 +109,14 @@ test_that("import_data", {
     expect_false(sceptre_object_high_with_ec@low_moi)
 
     expect_equal(
-        sceptre_object_low_no_ec_with_response_names@covariate_data_frame |>
+        get_cell_covariates(sceptre_object_low_no_ec_with_response_names) |>
             rownames(),
         as.character(seq_len(num_cells))
     )
 
     expect_equal(
         names(
-            sceptre_object_low_no_ec_with_response_names@covariate_data_frame
+            get_cell_covariates(sceptre_object_low_no_ec_with_response_names)
         ),
         c(
             "response_n_nonzero",
@@ -130,7 +126,7 @@ test_that("import_data", {
         )
     )
     expect_equal(
-        names(sceptre_object_high_with_ec@covariate_data_frame),
+        names(get_cell_covariates(sceptre_object_high_with_ec)),
         c(
             "response_n_nonzero",
             "response_n_umis",
@@ -140,7 +136,7 @@ test_that("import_data", {
         )
     )
     expect_equal(
-        sceptre_object_high_with_ec@covariate_data_frame$x,
+        get_cell_covariates(sceptre_object_high_with_ec)$x,
         extra_covariates$x
     )
 
@@ -226,7 +222,10 @@ test_that("set_analysis_parameters", {
     expect_equal(
         sceptre_object_post_all_defaults_low_moi,
         sceptre_object_post_all_defaults_low_moi |>
-            set_analysis_parameters(discovery_pairs = disc_pairs_empty)
+            set_analysis_parameters(
+                discovery_pairs = disc_pairs_empty,
+                seed = sceptre_object_post_all_defaults_low_moi@seed
+            )
     )
 
     ## 1. do default values get set correctly based on MOI?
@@ -265,4 +264,69 @@ test_that("set_analysis_parameters", {
         as.character(sceptre_object_nonsense_formula@formula_object)[2],
         "aaa"
     )
+})
+
+
+test_that("set_analysis_parameters warns that NT cells become the complement in high MOI", {
+    data("highmoi_example_data")
+    data("grna_target_data_frame_highmoi")
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = highmoi_example_data$response_matrix,
+        grna_matrix = highmoi_example_data$grna_matrix,
+        grna_target_data_frame = grna_target_data_frame_highmoi,
+        extra_covariates = highmoi_example_data$extra_covariates,
+        moi = "high",
+        response_names = highmoi_example_data$gene_names
+    ))
+    discovery_pairs <- construct_trans_pairs(sceptre_object)[1:5, ]
+    expect_warning(
+        nt_cells <- suppressMessages(set_analysis_parameters(
+            sceptre_object,
+            discovery_pairs = discovery_pairs,
+            control_group = "nt_cells"
+        )),
+        regexp = "the complement set is used as the control group instead",
+        fixed = TRUE
+    )
+    expect_true(nt_cells@control_group_complement)
+    sceptre_object <- suppressMessages(set_analysis_parameters(
+        sceptre_object,
+        discovery_pairs = discovery_pairs
+    ))
+    expect_true(sceptre_object@control_group_complement)
+})
+
+
+test_that("set_analysis_parameters names covariates left out of the default formula", {
+    set.seed(1)
+    data("lowmoi_example_data")
+    extra_covariates <- lowmoi_example_data$extra_covariates
+    extra_covariates$score <- stats::rnorm(nrow(extra_covariates))
+    extra_covariates$donor <- factor(
+        sample(paste0("d", 1:20), nrow(extra_covariates), TRUE)
+    )
+    sceptre_object <- suppressMessages(import_data(
+        response_matrix = lowmoi_example_data$response_matrix,
+        grna_matrix = lowmoi_example_data$grna_matrix,
+        grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
+        extra_covariates = extra_covariates,
+        moi = "low"
+    ))
+    messages <- character()
+    sceptre_object <- withCallingHandlers(
+        set_analysis_parameters(sceptre_object),
+        message = function(m) {
+            messages <<- c(messages, conditionMessage(m))
+            invokeRestart("muffleMessage")
+        }
+    )
+    expect_identical(
+        all.vars(sceptre_object@formula_object),
+        c("response_n_nonzero", "response_n_umis", "batch")
+    )
+    expect_true(any(grepl(
+        "The default formula leaves out the following covariates, which have 15 or more distinct values: `score`, `donor`.",
+        messages,
+        fixed = TRUE
+    )))
 })

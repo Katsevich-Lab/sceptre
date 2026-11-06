@@ -1,10 +1,10 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
-Version: 0.99.1
+Version: 0.99.2
 Authors@R:
     c(person(given = "Timothy",
            family = "Barry",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "tbarry@hsph.harvard.edu",
            comment=c(ORCID="0000-0002-4356-627X")),
            person(given = "Louis",
@@ -12,7 +12,7 @@ Authors@R:
            role = c("aut")),
            person(given = "Eugene",
            family = "Katsevich",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "ekatsevi@wharton.upenn.edu",
            comment = c(ORCID = "0000-0003-0598-2050")),
            person(given = "Wharton Analytics",
@@ -26,27 +26,39 @@ License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-LinkingTo: Rcpp, BH, assorthead (>= 1.4.0)
+LinkingTo: Rcpp, BH, assorthead (>= 1.4.0), beachmat
 SystemRequirements: zlib
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
+    beachmat.hdf5,
+    BiocGenerics,
+    BiocParallel,
     cowplot,
     crayon,
     data.table,
+    DelayedArray,
     dplyr,
     ggplot2,
+    HDF5Array,
     Matrix,
     methods,
+    MultiAssayExperiment,
+    MuData,
     Rcpp (>= 1.0.9),
+    rhdf5,
+    S4Vectors,
     scales,
+    SingleCellExperiment,
     stats,
+    SummarizedExperiment,
     purrr,
+    utils,
     parallelly (>= 1.23.0),
     withr
 Depends: 
-    R (>= 4.1)
+    R (>= 4.5.0)
 Suggests:
-    ondisc,
+    BiocStyle,
     R.utils,
     sessioninfo,
     rmarkdown,

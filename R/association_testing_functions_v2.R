@@ -170,9 +170,10 @@ crt_glm_factored_out <- function(
     curr_grna_group,
     subset_to_nt_cells,
     all_nt_idxs,
-    response_matrix,
+    reader,
     side_code,
-    cells_in_use
+    cells_in_use,
+    seed
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # precomputation on grna
@@ -186,19 +187,15 @@ crt_glm_factored_out <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = B1 + B2 + B3,
+        seed = seed
     )
-    # loop over genes
-    for (i in seq_along(response_ids)) {
+    # loop over genes, in the order of their rows (each result is stored at
+    # the gene's index)
+    for (i in order(reader$position(response_ids))) {
         curr_response_id <- response_ids[i]
         # load gene expressions
-        expression_vector <- load_csr_row(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            x = response_matrix@x,
-            row_idx = which(rownames(response_matrix) == curr_response_id),
-            n_cells = ncol(response_matrix)
-        )[cells_in_use]
+        expression_vector <- reader$read(curr_response_id)[cells_in_use]
         if (subset_to_nt_cells) {
             expression_vector <- expression_vector[all_nt_idxs]
         }
@@ -247,9 +244,10 @@ discovery_ntcells_crt <- function(
     covariate_matrix,
     curr_grna_group,
     all_nt_idxs,
-    response_matrix,
+    reader,
     side_code,
-    cells_in_use
+    cells_in_use,
+    seed
 ) {
     result_list_inner <- vector(mode = "list", length = length(response_ids))
     # initialize the idxs
@@ -267,19 +265,15 @@ discovery_ntcells_crt <- function(
     )
     synthetic_idxs <- crt_index_sampler_fast(
         fitted_probabilities = fitted_probabilities,
-        B = B1 + B2 + B3
+        B = B1 + B2 + B3,
+        seed = seed
     )
-    # loop over the response ids
-    for (i in seq_along(response_ids)) {
+    # loop over the response ids, in the order of their rows (each result is
+    # stored at the response's index)
+    for (i in order(reader$position(response_ids))) {
         curr_response_id <- response_ids[i]
         # load gene expressions
-        curr_expression_vector <- load_csr_row(
-            j = response_matrix@j,
-            p = response_matrix@p,
-            x = response_matrix@x,
-            row_idx = which(rownames(response_matrix) == curr_response_id),
-            n_cells = ncol(response_matrix)
-        )[cells_in_use]
+        curr_expression_vector <- reader$read(curr_response_id)[cells_in_use]
         curr_expression_vector <- curr_expression_vector[combined_idxs]
         # perform the response precomputation
         response_precomp <- perform_response_precomputation(
