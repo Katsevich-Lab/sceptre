@@ -128,6 +128,19 @@ auto_compute_cell_covariates <- function(
     response_names,
     response_covariates = NULL
 ) {
+    # the names pick out the mitochondrial genes (prefix "MT-"), so they must
+    # be those of the rows of the response matrix (NA_character_: not given)
+    if (
+        !is.null(response_names) &&
+            !identical(response_names, NA_character_) &&
+            length(response_names) != nrow(response_matrix)
+    ) {
+        stop(
+            "`response_names` must have one element per response (row of the ",
+            "response matrix, ", nrow(response_matrix), "); it has ",
+            length(response_names), "."
+        )
+    }
     # compute the response covariates (unless computed already, as for
     # response counts held on disk)
     covariate_df <- if (is.null(response_covariates)) {

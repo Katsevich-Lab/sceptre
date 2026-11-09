@@ -52,9 +52,10 @@ The rows should follow the same cell ordering as the columns of
 When cell IDs are supplied for at least two of these three objects, they must
 be identical.}
 
-\item{response_names}{(optional) a vector of human-readable response names;
-names with the prefix "MT-" are taken as mitochondrial genes and are used to
-compute the covariate \code{response_p_mito}.}
+\item{response_names}{(optional) a vector of human-readable response names,
+one per response in the order of the rows of \code{response_matrix}; names with
+the prefix "MT-" (in any case) are taken as mitochondrial genes and are used
+to compute the covariate \code{response_p_mito}.}
 
 \item{backed}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
 indicating whether to create a disk-backed \code{sceptre_object} (\code{TRUE}), whose

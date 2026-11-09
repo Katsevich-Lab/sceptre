@@ -29,7 +29,10 @@ List compute_cell_covariates_cpp(IntegerVector i, IntegerVector p, NumericVector
   // the counts are nonnegative, the sums, the first maximum and so every
   // covariate equal those over the full (dense) column
   vector<bool> is_mt(n_genes, false);
-  for (int k = 0; k < mt_gene_idxs.size(); k ++) is_mt[mt_gene_idxs[k] - 1] = true;
+  for (int k = 0; k < mt_gene_idxs.size(); k ++) {
+    if (mt_gene_idxs[k] < 1 || mt_gene_idxs[k] > n_genes) Rcpp::stop("A mitochondrial gene index is out of range.");
+    is_mt[mt_gene_idxs[k] - 1] = true;
+  }
 
   int n_nonzero_count, curr_max_feature;
   double n_umi_count, n_umi_count_mito, umi_count_curr_max_feature, y;
@@ -80,7 +83,10 @@ List compute_cell_covariates_by_feature_cpp(IntegerVector i, IntegerVector p, Nu
   IntegerVector n_nonzero(n_cells);
   NumericVector n_umi(n_cells), n_umi_mito(n_cells), p_mito(n_cells);
   vector<bool> is_mt(feature_cols.size(), false);
-  for (int k = 0; k < mt_feature_idxs.size(); k ++) is_mt[mt_feature_idxs[k] - 1] = true;
+  for (int k = 0; k < mt_feature_idxs.size(); k ++) {
+    if (mt_feature_idxs[k] < 1 || mt_feature_idxs[k] > (int) is_mt.size()) Rcpp::stop("A mitochondrial gene index is out of range.");
+    is_mt[mt_feature_idxs[k] - 1] = true;
+  }
 
   double y;
   for (int k = 0; k < feature_cols.size(); k ++) {

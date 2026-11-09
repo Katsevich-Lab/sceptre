@@ -34,9 +34,10 @@ use as extra covariates (e.g., batch); by default none. The covariates that
 \code{sceptre} computes are always computed anew.}
 
 \item{response_names}{(optional) a vector of human-readable response names,
-for example \code{SummarizedExperiment::rowData(sce)$Symbol}; names with the
-prefix "MT-" are taken as mitochondrial genes and are used to compute the
-covariate \code{response_p_mito}. By default, the row names of \code{sce}.}
+one per row of \code{sce}, for example \code{SummarizedExperiment::rowData(sce)$Symbol};
+names with the prefix "MT-" (in any case) are taken as mitochondrial genes
+and are used to compute the covariate \code{response_p_mito}. By default, the row
+names of \code{sce}.}
 
 \item{backed}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
 indicating whether to create a disk-backed \code{sceptre_object} (\code{TRUE}), whose

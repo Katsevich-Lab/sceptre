@@ -46,6 +46,8 @@
 
 -   `run_qc(additional_cells_to_remove =)` checks its argument: it must be a vector of integer indices between 1 and the number of cells, and a logical vector or cell IDs are an error. Previously a logical vector was read as the indices 0 and 1, so it removed only the first cell while the QC metrics reported every cell marked `TRUE` as removed, and out-of-range indices were silently ignored.
 
+-   `import_data()` and `import_data_from_sce()` require `response_names` to have one element per response. Previously a vector of another length was accepted: a shorter one computed `response_p_mito` from the wrong responses, and a longer one with mitochondrial names beyond the last response could crash R.
+
 ## Deprecated and removed
 
 The deprecated arguments and functions below still work in this version, with a warning; they will be made defunct in the next Bioconductor release and removed in the one after. Reading `.odm` files and the slots of the Nextflow pipeline are removed in this version.

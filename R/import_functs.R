@@ -40,9 +40,10 @@
 #' `response_matrix` and `grna_matrix`. Cell IDs may be supplied as row names.
 #' When cell IDs are supplied for at least two of these three objects, they must
 #' be identical.
-#' @param response_names (optional) a vector of human-readable response names;
-#' names with the prefix "MT-" are taken as mitochondrial genes and are used to
-#' compute the covariate `response_p_mito`.
+#' @param response_names (optional) a vector of human-readable response names,
+#' one per response in the order of the rows of `response_matrix`; names with
+#' the prefix "MT-" (in any case) are taken as mitochondrial genes and are used
+#' to compute the covariate `response_p_mito`.
 #' @param backed (default `FALSE`) a logical value (i.e., `TRUE` or `FALSE`)
 #' indicating whether to create a disk-backed `sceptre_object` (`TRUE`), whose
 #' response and gRNA counts stay on disk in the file `screen.h5mu` in

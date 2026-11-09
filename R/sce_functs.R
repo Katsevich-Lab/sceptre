@@ -48,9 +48,10 @@
 #' use as extra covariates (e.g., batch); by default none. The covariates that
 #' `sceptre` computes are always computed anew.
 #' @param response_names (optional) a vector of human-readable response names,
-#' for example `SummarizedExperiment::rowData(sce)$Symbol`; names with the
-#' prefix "MT-" are taken as mitochondrial genes and are used to compute the
-#' covariate `response_p_mito`. By default, the row names of `sce`.
+#' one per row of `sce`, for example `SummarizedExperiment::rowData(sce)$Symbol`;
+#' names with the prefix "MT-" (in any case) are taken as mitochondrial genes
+#' and are used to compute the covariate `response_p_mito`. By default, the row
+#' names of `sce`.
 #' @inheritParams import_data
 #'
 #' @return an initialized `sceptre_object`
