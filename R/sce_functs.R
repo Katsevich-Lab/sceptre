@@ -45,8 +45,11 @@
 #' @param grna_altexp the name of the alternative experiment holding the gRNA
 #' counts (default `"grna"`)
 #' @param extra_covariates (optional) the names of columns of `colData(sce)` to
-#' use as extra covariates (e.g., batch); by default none. The covariates that
-#' `sceptre` computes are always computed anew.
+#' use as extra covariates (e.g., batch); by default none. Unlike the other
+#' import functions, which take the extra covariates as a data frame, this one
+#' names columns, since a `SingleCellExperiment` already holds its cell
+#' covariates in `colData`. The covariates that `sceptre` computes are always
+#' computed anew.
 #' @param response_names (optional) a vector of human-readable response names,
 #' one per row of `sce`, for example `SummarizedExperiment::rowData(sce)$Symbol`;
 #' names with the prefix "MT-" (in any case) are taken as mitochondrial genes
