@@ -340,6 +340,12 @@ bplapply_checked <- function(X, FUN, BPPARAM) {
 # parallel back end that serializes the function it runs (SnowParam, or a
 # started cluster) would send all of that to every worker.
 isolate_function <- function(f, objects) {
+    # source references (kept when the package is installed with
+    # R_KEEP_PKG_SOURCE=yes, as in CI) carry the text of whole source files
+    # and would be serialized with the function; they are dropped from it and
+    # from any function among `objects`
+    objects <- lapply(objects, function(x) if (is.function(x)) utils::removeSource(x) else x)
+    f <- utils::removeSource(f)
     environment(f) <- list2env(objects, parent = asNamespace("sceptre"))
     f
 }
