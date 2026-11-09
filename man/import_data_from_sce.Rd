@@ -72,7 +72,9 @@ chromosome, start and end of the region that each gRNA targets, if any, from
 the \code{target_chr}, \code{target_start} and \code{target_end} columns (\code{NA} for gRNAs
 without a target region, such as non-targeting gRNAs), which become the
 columns \code{chr}, \code{start} and \code{end} of the gRNA target data frame. Other columns
-of the \code{rowData} are kept in the gRNA target data frame. The \code{rowRanges} of
+of the \code{rowData} are kept in the gRNA target data frame (with \code{vector_id}, as
+described for \code{\link[=import_data]{import_data()}}: the gRNAs of a vector become one unit, and
+columns whose values differ between them are dropped). The \code{rowRanges} of
 the alternative experiment, which would give the positions of the gRNAs
 themselves, are not used.
 

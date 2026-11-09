@@ -14,7 +14,9 @@
 #' the `target_chr`, `target_start` and `target_end` columns (`NA` for gRNAs
 #' without a target region, such as non-targeting gRNAs), which become the
 #' columns `chr`, `start` and `end` of the gRNA target data frame. Other columns
-#' of the `rowData` are kept in the gRNA target data frame. The `rowRanges` of
+#' of the `rowData` are kept in the gRNA target data frame (with `vector_id`, as
+#' described for [import_data()]: the gRNAs of a vector become one unit, and
+#' columns whose values differ between them are dropped). The `rowRanges` of
 #' the alternative experiment, which would give the positions of the gRNAs
 #' themselves, are not used.
 #'

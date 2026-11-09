@@ -28,7 +28,10 @@
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordinate, respectively, of
 #' the region that each gRNA targets. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. The gRNAs of
+#' each vector are then combined into one unit, whose region spans those of its
+#' gRNAs; they must target one chromosome, and other columns whose values differ
+#' between them are dropped.
 #' @param moi a string indicating the MOI of the dataset, either "low" or
 #' "high".
 #' @param extra_covariates (optional) a data frame containing extra covariates
@@ -244,7 +247,10 @@ import_data_memory <- function(
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordinate, respectively, of
 #' the region that each gRNA targets. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. The gRNAs of
+#' each vector are then combined into one unit, whose region spans those of its
+#' gRNAs; they must target one chromosome, and other columns whose values differ
+#' between them are dropped.
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #' If row names are supplied and cell barcodes are retained, the row names must
@@ -746,7 +752,10 @@ import_data_backed <- function(
 #' `grna_target_data_frame` can contain columns `chr`, `start`, and `end`,
 #' giving the chromosome, start coordinate, and end coordinate, respectively, of
 #' the region that each gRNA targets. Additionally, `grna_target_data_frame` can contain the column
-#' `vector_id` specifying the vector to which a given gRNA belongs.
+#' `vector_id` specifying the vector to which a given gRNA belongs. The gRNAs of
+#' each vector are then combined into one unit, whose region spans those of its
+#' gRNAs; they must target one chromosome, and other columns whose values differ
+#' between them are dropped.
 #' @param extra_covariates (optional) a data frame containing extra covariates
 #' (e.g., batch, biological replicate) beyond those that `sceptre` can compute.
 #'
@@ -995,10 +1004,43 @@ collapse_grna_target_data_frame <- function(grna_target_data_frame) {
         stop("`vector_id` must be nested within `grna_target`.")
     }
 
-    grna_target_data_frame |>
+    # one row per vector. The gRNAs of a vector target different coordinates,
+    # so the region of the vector spans those of its gRNAs (the region of a
+    # target, used by construct_cis_pairs(), spans those of its rows either
+    # way). The gRNAs of a vector must target one chromosome; other columns
+    # whose values differ between the gRNAs of a vector (for example, their
+    # spacer sequences) describe the gRNAs rather than the vector and are
+    # dropped.
+    collapsed <- grna_target_data_frame |>
         dplyr::select(-grna_id) |>
-        dplyr::rename(grna_id = vector_id) |>
-        dplyr::distinct()
+        dplyr::rename(grna_id = vector_id)
+    if (all(c("start", "end") %in% colnames(collapsed))) {
+        collapsed$start <- stats::ave(collapsed$start, collapsed$grna_id, FUN = min)
+        collapsed$end <- stats::ave(collapsed$end, collapsed$grna_id, FUN = max)
+    }
+    df <- as.data.frame(collapsed)
+    n_vectors <- length(unique(df$grna_id))
+    varying <- Filter(
+        function(column) nrow(unique(df[, c("grna_id", column)])) > n_vectors,
+        setdiff(colnames(df), c("grna_id", "grna_target"))
+    )
+    if ("chr" %in% varying) {
+        stop(
+            "The gRNAs of a vector must target regions on one chromosome (the ",
+            "column `chr`, or `target_chr` in `import_data_from_sce()`)."
+        )
+    }
+    if (length(varying) > 0L) {
+        message(
+            "The column(s) ",
+            paste0("`", varying, "`", collapse = ", "),
+            " of the gRNA targets differ between the gRNAs of a vector and are ",
+            "dropped: with `vector_id`, the gRNA target data frame has one row ",
+            "per vector."
+        )
+        collapsed <- dplyr::select(collapsed, -dplyr::all_of(varying))
+    }
+    dplyr::distinct(collapsed)
 }
 
 
@@ -1006,7 +1048,7 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
     # temporary function; we may rewrite this function to improve its
     # speed and memory efficiency if multiguide vector data become more
     # prevalent.
-    vector_ids <- grna_target_data_frame$vector_id |> unique()
+    vector_ids <- as.character(unique(grna_target_data_frame$vector_id))
     grna_matrix <- as.matrix(grna_matrix)
     n_cells <- ncol(grna_matrix)
     grna_matrix_collapsed <- vapply(
