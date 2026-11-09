@@ -43,7 +43,9 @@
 #' control pairs of `run_calibration_check()`, and the permutation and
 #' conditional resampling draws. The default, `NULL`, draws the seed from R's
 #' random number generator, so that `set.seed()` called beforehand makes the
-#' analysis reproducible. The seed is recorded in the `sceptre_object`, and
+#' analysis reproducible on a given platform (for the same seed, the
+#' negative control pairs of the calibration check can differ between
+#' operating systems). The seed is recorded in the `sceptre_object`, and
 #' `print()` shows it. In sceptre 0.99.2, `seed = 4` reproduces the results
 #' of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
 #' fixes listed in `NEWS.md`.

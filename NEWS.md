@@ -10,7 +10,7 @@
 
 -   With `backed = TRUE`, `import_data_from_cellranger()` holds the matrix of one directory in memory at a time and writes the response counts to `screen.h5mu` through temporary files in `directory_to_write`, so the whole screen is never in memory at once.
 
--   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. In sceptre 0.99.2, `seed = 4` reproduces the results of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug fixes below.
+-   `set_analysis_parameters()` gains `seed` (default `NULL`: drawn from R's random number generator, so `set.seed()` makes an analysis reproducible on a given platform; for the same seed, the negative control pairs of `run_calibration_check()` can differ between operating systems); the seed is recorded and printed by `print()` and in `analysis_summary.txt`. In sceptre 0.99.2, `seed = 4` reproduces the results of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug fixes below.
 
 -   `assign_grnas()`, `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` run in parallel through BiocParallel: the new argument `BPPARAM` takes a BiocParallel back end (for example `BiocParallel::MulticoreParam(4)`, or `BiocParallel::SnowParam(4)` on Windows); results do not depend on the back end or number of workers.
 
@@ -20,11 +20,19 @@
 
 ## Changes
 
--   Plots that show a random subset of points or gRNAs now draw it from R's random number generator, so `set.seed()` makes them reproducible; previously they always used the seed 4.
+-   Plots that show a random subset of points or gRNAs now draw it from R's random number generator, so `set.seed()` makes them reproducible; previously they always used the seed 4. Drawing such a plot now advances R's random number stream.
 
 -   The default formula gives a message naming each covariate it leaves out (non-count covariates with 15 or more distinct values).
 
 -   sceptre now requires R 4.5.0 or later (its dependencies do).
+
+-   The results of `run_calibration_check()`, `run_power_check()` and `run_discovery_analysis()` come back in the same order whether the analysis runs serially or in parallel.
+
+-   A disk-backed Cell Ranger import gives the same cell covariates, cell names and results as the in-memory import. In 0.99.1, the `ondisc`-backed import stored the UMI covariates as integers, named the batches `batch_1`, `batch_2`, ..., kept no cell names, and gave p-values that could differ from the in-memory import's by up to 4e-14.
+
+-   `import_data_from_cellranger()` stops with an error when `features.tsv` lacks the `Gene Expression` or the `CRISPR Guide Capture` modality.
+
+-   Eugene Katsevich is now the package maintainer.
 
 ## Bug fixes
 

@@ -67,7 +67,9 @@ starting values of the mixture method in \code{assign_grnas()}, the negative
 control pairs of \code{run_calibration_check()}, and the permutation and
 conditional resampling draws. The default, \code{NULL}, draws the seed from R's
 random number generator, so that \code{set.seed()} called beforehand makes the
-analysis reproducible. The seed is recorded in the \code{sceptre_object}, and
+analysis reproducible on a given platform (for the same seed, the
+negative control pairs of the calibration check can differ between
+operating systems). The seed is recorded in the \code{sceptre_object}, and
 \code{print()} shows it. In sceptre 0.99.2, \code{seed = 4} reproduces the results
 of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
 fixes listed in \code{NEWS.md}.}
