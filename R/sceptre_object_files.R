@@ -13,6 +13,11 @@
 #' without copying them. Otherwise, the directory must not already hold a
 #' `screen.h5mu`, which another disk-backed `sceptre_object` may be reading.
 #'
+#' The layout of `screen.h5mu` is experimental in sceptre 0.99.2: it may change
+#' in a later release, and each file carries a format stamp by which later
+#' versions recognize it. Logical cell covariates are stored in the file as
+#' integers (0 and 1).
+#'
 #' `read_sceptre_object()` reads the response and gRNA counts into memory
 #' (`backed = FALSE`) or leaves them on disk (`backed = TRUE`), in which case
 #' the directory must stay in place while the `sceptre_object` is used. Either
@@ -130,8 +135,12 @@ read_sceptre_object <- function(directory, backed = FALSE) {
 
 # --- screen.h5mu ---------------------------------------------------------------
 
-# The format stamp of screen.h5mu; a reader refuses a stamp of a later format.
-sceptre_format_stamp <- "{\"format\":3}"
+# The format stamp of screen.h5mu, a JSON object whose `format` names the
+# layout (1: the first public layout, written by sceptre 0.99.2; the registry
+# is contracts/file-formats.md in sceptre-hub). A reader refuses a later
+# format.
+sceptre_file_format <- 1L
+sceptre_format_stamp <- sprintf("{\"format\":%d}", sceptre_file_format)
 
 # Writes the data of a sceptre_object (its `data` slot) to `file`, a MuData
 # file with two modalities, "response" and "grna", each holding its counts as
@@ -287,18 +296,21 @@ read_screen <- function(file, backed = FALSE) {
 
 check_screen_format <- function(stamp, file) {
     stamp <- as.vector(stamp)
-    pattern <- "^\\{\"format\":([0-9]+)[,}].*$"
+    # the stamp is JSON; its `format` member is read without requiring an
+    # exact spelling of the rest (a later version may add members or spaces)
+    pattern <- "^\\s*\\{\\s*\"format\"\\s*:\\s*([0-9]+)\\s*[,}]"
     if (
         !is.character(stamp) || length(stamp) != 1L || !grepl(pattern, stamp)
     ) {
         stop(file, " is not a screen.h5mu file written by sceptre.")
     }
-    format <- as.integer(sub(pattern, "\\1", stamp))
-    if (format > 3L) {
+    format <- as.integer(regmatches(stamp, regexec(pattern, stamp))[[1]][2])
+    if (format > sceptre_file_format) {
         stop(
             file,
-            " was written by a newer version of sceptre; upgrade sceptre to ",
-            "read it."
+            " was written by a newer version of sceptre (file format ",
+            format,
+            "); upgrade sceptre to read it."
         )
     }
     invisible(NULL)
