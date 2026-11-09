@@ -7,8 +7,8 @@
 \usage{
 read_ondisc_backed_sceptre_object(
   sceptre_object_fp,
-  response_odm_file_fp = NULL,
-  grna_odm_file_fp = NULL
+  response_odm_file_fp,
+  grna_odm_file_fp
 )
 
 write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)

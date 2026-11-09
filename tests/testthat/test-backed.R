@@ -258,21 +258,17 @@ test_that("use_ondisc and the ondisc functions are deprecated", {
         write_ondisc_backed_sceptre_object(sceptre_object, directory),
         "deprecated"
     )
-    expect_warning(
-        reread <- read_ondisc_backed_sceptre_object(
-            file.path(directory, "sceptre_object.rds")
-        ),
-        "deprecated"
-    )
-    expect_s4_class(get_response_matrix(reread), "DelayedMatrix")
+    # the signature of 0.99.1 is kept; the .odm paths are ignored with a warning
     warnings <- testthat::capture_warnings(
-        read_ondisc_backed_sceptre_object(
+        reread <- read_ondisc_backed_sceptre_object(
             file.path(directory, "sceptre_object.rds"),
             response_odm_file_fp = file.path(directory, "response.odm"),
             grna_odm_file_fp = file.path(directory, "grna.odm")
         )
     )
+    expect_true(any(grepl("deprecated", warnings)))
     expect_true(any(grepl("are ignored", warnings)))
+    expect_s4_class(get_response_matrix(reread), "DelayedMatrix")
 
     # the files of an ondisc-backed object of an earlier version
     old_directory <- file.path(tempdir(), "old ondisc")
@@ -280,7 +276,9 @@ test_that("use_ondisc and the ondisc functions are deprecated", {
     saveRDS(list(), file.path(old_directory, "sceptre_object.rds"))
     expect_error(
         suppressWarnings(read_ondisc_backed_sceptre_object(
-            file.path(old_directory, "sceptre_object.rds")
+            file.path(old_directory, "sceptre_object.rds"),
+            file.path(old_directory, "response.odm"),
+            file.path(old_directory, "grna.odm")
         )),
         "re-import the data"
     )

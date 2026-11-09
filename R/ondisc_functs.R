@@ -41,15 +41,17 @@
 #' sceptre_object <- read_sceptre_object(directory, backed = TRUE)
 read_ondisc_backed_sceptre_object <- function(
     sceptre_object_fp,
-    response_odm_file_fp = NULL,
-    grna_odm_file_fp = NULL
+    response_odm_file_fp,
+    grna_odm_file_fp
 ) {
     warning(
         "`read_ondisc_backed_sceptre_object()` is deprecated; use ",
         "`read_sceptre_object()` instead.",
         call. = FALSE
     )
-    if (!is.null(response_odm_file_fp) || !is.null(grna_odm_file_fp)) {
+    # the .odm paths are never evaluated: the signature of 0.99.1 is kept, and
+    # a call that passes them is told they are ignored
+    if (!missing(response_odm_file_fp) || !missing(grna_odm_file_fp)) {
         warning(
             "`response_odm_file_fp` and `grna_odm_file_fp` are ignored; ",
             "the counts are read from screen.h5mu.",
