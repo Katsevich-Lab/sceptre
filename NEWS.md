@@ -48,6 +48,8 @@
 
 -   `import_data()` and `import_data_from_sce()` require `response_names` to have one element per response. Previously a vector of another length was accepted: a shorter one computed `response_p_mito` from the wrong responses, and a longer one with mitochondrial names beyond the last response could crash R.
 
+-   The conditional randomization test no longer indexes an empty vector when a resample contains no treated cells, which aborted R where C++ standard library assertions are enabled (for example, R as built on Fedora). How such a resample enters the null distribution is unchanged: its statistic is undefined and counts as not extreme.
+
 ## Deprecated and removed
 
 The deprecated arguments and functions below still work in this version, with a warning; they will be made defunct in the next Bioconductor release and removed in the one after. Reading `.odm` files and the slots of the Nextflow pipeline are removed in this version.
