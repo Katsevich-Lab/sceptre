@@ -26,21 +26,22 @@ BEGIN_RCPP
 END_RCPP
 }
 // fisher_yates_sampler
-SEXP fisher_yates_sampler(int n_tot, int M, int B);
-RcppExport SEXP _sceptre_fisher_yates_sampler(SEXP n_totSEXP, SEXP MSEXP, SEXP BSEXP) {
+SEXP fisher_yates_sampler(int n_tot, int M, int B, int seed);
+RcppExport SEXP _sceptre_fisher_yates_sampler(SEXP n_totSEXP, SEXP MSEXP, SEXP BSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type n_tot(n_totSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(fisher_yates_sampler(n_tot, M, B));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(fisher_yates_sampler(n_tot, M, B, seed));
     return rcpp_result_gen;
 END_RCPP
 }
 // hybrid_fisher_iwor_sampler
-SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B);
-RcppExport SEXP _sceptre_hybrid_fisher_iwor_sampler(SEXP NSEXP, SEXP mSEXP, SEXP MSEXP, SEXP BSEXP) {
+SEXP hybrid_fisher_iwor_sampler(int N, int m, int M, int B, int seed);
+RcppExport SEXP _sceptre_hybrid_fisher_iwor_sampler(SEXP NSEXP, SEXP mSEXP, SEXP MSEXP, SEXP BSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -48,31 +49,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type m(mSEXP);
     Rcpp::traits::input_parameter< int >::type M(MSEXP);
     Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(hybrid_fisher_iwor_sampler(N, m, M, B));
-    return rcpp_result_gen;
-END_RCPP
-}
-// crt_index_sampler
-SEXP crt_index_sampler(NumericVector fitted_probabilities, int B);
-RcppExport SEXP _sceptre_crt_index_sampler(SEXP fitted_probabilitiesSEXP, SEXP BSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type fitted_probabilities(fitted_probabilitiesSEXP);
-    Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(crt_index_sampler(fitted_probabilities, B));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(hybrid_fisher_iwor_sampler(N, m, M, B, seed));
     return rcpp_result_gen;
 END_RCPP
 }
 // crt_index_sampler_fast
-SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B);
-RcppExport SEXP _sceptre_crt_index_sampler_fast(SEXP fitted_probabilitiesSEXP, SEXP BSEXP) {
+SEXP crt_index_sampler_fast(NumericVector fitted_probabilities, int B, int seed);
+RcppExport SEXP _sceptre_crt_index_sampler_fast(SEXP fitted_probabilitiesSEXP, SEXP BSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type fitted_probabilities(fitted_probabilitiesSEXP);
     Rcpp::traits::input_parameter< int >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(crt_index_sampler_fast(fitted_probabilities, B));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(crt_index_sampler_fast(fitted_probabilities, B, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -117,8 +108,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sample_combinations_v2
-IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups, int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat);
-RcppExport SEXP _sceptre_sample_combinations_v2(SEXP calibration_group_sizeSEXP, SEXP n_calibration_pairsSEXP, SEXP n_possible_groupsSEXP, SEXP n_nt_grnasSEXP, SEXP n_genesSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP, SEXP p_hatSEXP) {
+IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups, int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat, int seed);
+RcppExport SEXP _sceptre_sample_combinations_v2(SEXP calibration_group_sizeSEXP, SEXP n_calibration_pairsSEXP, SEXP n_possible_groupsSEXP, SEXP n_nt_grnasSEXP, SEXP n_genesSEXP, SEXP N_POSSIBLE_GROUPS_THRESHOLDSEXP, SEXP p_hatSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -129,7 +120,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type n_genes(n_genesSEXP);
     Rcpp::traits::input_parameter< int >::type N_POSSIBLE_GROUPS_THRESHOLD(N_POSSIBLE_GROUPS_THRESHOLDSEXP);
     Rcpp::traits::input_parameter< double >::type p_hat(p_hatSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_combinations_v2(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_combinations_v2(calibration_group_size, n_calibration_pairs, n_possible_groups, n_nt_grnas, n_genes, N_POSSIBLE_GROUPS_THRESHOLD, p_hat, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -157,8 +149,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // sample_undercover_pairs_v2
-List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh);
-RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP) {
+List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m, int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, int seed);
+RcppExport SEXP _sceptre_sample_undercover_pairs_v2(SEXP n_nonzero_mSEXP, SEXP n_nonzero_totSEXP, SEXP possible_groups_mSEXP, SEXP n_genesSEXP, SEXP n_calibration_pairsSEXP, SEXP n_nonzero_trt_threshSEXP, SEXP n_nonzero_cntrl_threshSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -169,7 +161,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_calibration_pairs(n_calibration_pairsSEXP);
     Rcpp::traits::input_parameter< int >::type n_nonzero_trt_thresh(n_nonzero_trt_threshSEXP);
     Rcpp::traits::input_parameter< int >::type n_nonzero_cntrl_thresh(n_nonzero_cntrl_threshSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs_v2(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh));
+    Rcpp::traits::input_parameter< int >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(sample_undercover_pairs_v2(n_nonzero_m, n_nonzero_tot, possible_groups_m, n_genes, n_calibration_pairs, n_nonzero_trt_thresh, n_nonzero_cntrl_thresh, seed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -236,6 +229,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// make_row_extractor
+SEXP make_row_extractor(SEXP matrix);
+RcppExport SEXP _sceptre_make_row_extractor(SEXP matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type matrix(matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(make_row_extractor(matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// read_extractor_row
+NumericVector read_extractor_row(SEXP row_extractor, int row);
+RcppExport SEXP _sceptre_read_extractor_row(SEXP row_extractorSEXP, SEXP rowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type row_extractor(row_extractorSEXP);
+    Rcpp::traits::input_parameter< int >::type row(rowSEXP);
+    rcpp_result_gen = Rcpp::wrap(read_extractor_row(row_extractor, row));
+    return rcpp_result_gen;
+END_RCPP
+}
 // load_csr_row
 NumericVector load_csr_row(IntegerVector j, IntegerVector p, NumericVector x, int row_idx, int n_cells);
 RcppExport SEXP _sceptre_load_csr_row(SEXP jSEXP, SEXP pSEXP, SEXP xSEXP, SEXP row_idxSEXP, SEXP n_cellsSEXP) {
@@ -248,18 +264,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type row_idx(row_idxSEXP);
     Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
     rcpp_result_gen = Rcpp::wrap(load_csr_row(j, p, x, row_idx, n_cells));
-    return rcpp_result_gen;
-END_RCPP
-}
-// obtain_pointer_vector
-IntegerVector obtain_pointer_vector(IntegerVector i, int dim);
-RcppExport SEXP _sceptre_obtain_pointer_vector(SEXP iSEXP, SEXP dimSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
-    Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
-    rcpp_result_gen = Rcpp::wrap(obtain_pointer_vector(i, dim));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -281,6 +285,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_cell_covariates_by_feature_cpp
+List compute_cell_covariates_by_feature_cpp(IntegerVector i, IntegerVector p, NumericVector x, IntegerVector feature_cols, int n_cells, IntegerVector mt_feature_idxs, bool compute_p_mito);
+RcppExport SEXP _sceptre_compute_cell_covariates_by_feature_cpp(SEXP iSEXP, SEXP pSEXP, SEXP xSEXP, SEXP feature_colsSEXP, SEXP n_cellsSEXP, SEXP mt_feature_idxsSEXP, SEXP compute_p_mitoSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type feature_cols(feature_colsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type mt_feature_idxs(mt_feature_idxsSEXP);
+    Rcpp::traits::input_parameter< bool >::type compute_p_mito(compute_p_mitoSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_cell_covariates_by_feature_cpp(i, p, x, feature_cols, n_cells, mt_feature_idxs, compute_p_mito));
+    return rcpp_result_gen;
+END_RCPP
+}
 // compute_n_grnas_per_cell_vector
 IntegerVector compute_n_grnas_per_cell_vector(List grna_assignments, int n_cells);
 RcppExport SEXP _sceptre_compute_n_grnas_per_cell_vector(SEXP grna_assignmentsSEXP, SEXP n_cellsSEXP) {
@@ -291,17 +312,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n_cells(n_cellsSEXP);
     rcpp_result_gen = Rcpp::wrap(compute_n_grnas_per_cell_vector(grna_assignments, n_cells));
     return rcpp_result_gen;
-END_RCPP
-}
-// increment_vector
-void increment_vector(IntegerVector x, int value);
-RcppExport SEXP _sceptre_increment_vector(SEXP xSEXP, SEXP valueSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type value(valueSEXP);
-    increment_vector(x, value);
-    return R_NilValue;
 END_RCPP
 }
 // threshold_count_matrix
@@ -319,29 +329,59 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// stack_csc_rows
+List stack_csc_rows(List i_list, List x_list, List p_list, IntegerVector row_offsets, int n_cols);
+RcppExport SEXP _sceptre_stack_csc_rows(SEXP i_listSEXP, SEXP x_listSEXP, SEXP p_listSEXP, SEXP row_offsetsSEXP, SEXP n_colsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type i_list(i_listSEXP);
+    Rcpp::traits::input_parameter< List >::type x_list(x_listSEXP);
+    Rcpp::traits::input_parameter< List >::type p_list(p_listSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type row_offsets(row_offsetsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_cols(n_colsSEXP);
+    rcpp_result_gen = Rcpp::wrap(stack_csc_rows(i_list, x_list, p_list, row_offsets, n_cols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scan_count_values
+List scan_count_values(NumericVector x, double from, double count);
+RcppExport SEXP _sceptre_scan_count_values(SEXP xSEXP, SEXP fromSEXP, SEXP countSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< double >::type count(countSEXP);
+    rcpp_result_gen = Rcpp::wrap(scan_count_values(x, from, count));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_sceptre_estimate_theta", (DL_FUNC) &_sceptre_estimate_theta, 5},
-    {"_sceptre_fisher_yates_sampler", (DL_FUNC) &_sceptre_fisher_yates_sampler, 3},
-    {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 4},
-    {"_sceptre_crt_index_sampler", (DL_FUNC) &_sceptre_crt_index_sampler, 2},
-    {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 2},
+    {"_sceptre_fisher_yates_sampler", (DL_FUNC) &_sceptre_fisher_yates_sampler, 4},
+    {"_sceptre_hybrid_fisher_iwor_sampler", (DL_FUNC) &_sceptre_hybrid_fisher_iwor_sampler, 5},
+    {"_sceptre_crt_index_sampler_fast", (DL_FUNC) &_sceptre_crt_index_sampler_fast, 3},
     {"_sceptre_run_low_level_test_full_v4", (DL_FUNC) &_sceptre_run_low_level_test_full_v4, 15},
     {"_sceptre_run_reduced_em_algo_cpp", (DL_FUNC) &_sceptre_run_reduced_em_algo_cpp, 5},
-    {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 7},
+    {"_sceptre_sample_combinations_v2", (DL_FUNC) &_sceptre_sample_combinations_v2, 8},
     {"_sceptre_iterate_over_combinations", (DL_FUNC) &_sceptre_iterate_over_combinations, 3},
     {"_sceptre_increment_matrix", (DL_FUNC) &_sceptre_increment_matrix, 1},
-    {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 7},
+    {"_sceptre_sample_undercover_pairs_v2", (DL_FUNC) &_sceptre_sample_undercover_pairs_v2, 8},
     {"_sceptre_compute_n_trt_cells_matrix", (DL_FUNC) &_sceptre_compute_n_trt_cells_matrix, 7},
     {"_sceptre_compute_genes_within_distance", (DL_FUNC) &_sceptre_compute_genes_within_distance, 3},
     {"_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3", (DL_FUNC) &_sceptre_compute_nt_nonzero_matrix_and_n_ok_pairs_v3, 11},
     {"_sceptre_read_mtx", (DL_FUNC) &_sceptre_read_mtx, 2},
+    {"_sceptre_make_row_extractor", (DL_FUNC) &_sceptre_make_row_extractor, 1},
+    {"_sceptre_read_extractor_row", (DL_FUNC) &_sceptre_read_extractor_row, 2},
     {"_sceptre_load_csr_row", (DL_FUNC) &_sceptre_load_csr_row, 5},
-    {"_sceptre_obtain_pointer_vector", (DL_FUNC) &_sceptre_obtain_pointer_vector, 2},
     {"_sceptre_compute_cell_covariates_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_cpp, 8},
+    {"_sceptre_compute_cell_covariates_by_feature_cpp", (DL_FUNC) &_sceptre_compute_cell_covariates_by_feature_cpp, 7},
     {"_sceptre_compute_n_grnas_per_cell_vector", (DL_FUNC) &_sceptre_compute_n_grnas_per_cell_vector, 2},
-    {"_sceptre_increment_vector", (DL_FUNC) &_sceptre_increment_vector, 2},
     {"_sceptre_threshold_count_matrix", (DL_FUNC) &_sceptre_threshold_count_matrix, 5},
+    {"_sceptre_stack_csc_rows", (DL_FUNC) &_sceptre_stack_csc_rows, 5},
+    {"_sceptre_scan_count_values", (DL_FUNC) &_sceptre_scan_count_values, 3},
     {NULL, NULL, 0}
 };
 

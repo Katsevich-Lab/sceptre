@@ -27,14 +27,14 @@ std::vector<int> draw_wor_sample(int n, int k, std::mt19937& generator, std::uni
 
 // [[Rcpp::export]]
 IntegerMatrix sample_combinations_v2(int calibration_group_size, double n_calibration_pairs, double n_possible_groups,
-                                     int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat) {
+                                     int n_nt_grnas, double n_genes, int N_POSSIBLE_GROUPS_THRESHOLD, double p_hat, int seed) {
   // 0. initialize set to store sampled vectors
   std::unordered_set<std::vector<int>, boost::hash<std::vector<int>>> H;
   std::vector<int> sample;
   double MULT_FACTOR = 5.0;
 
   // 1. initialize random number generator
-  std::mt19937 generator(4);
+  std::mt19937 generator(seed);
   std::uniform_real_distribution<double> distribution(0, 1);
 
   // 2. estimate the number of grna groups to generate
@@ -97,7 +97,7 @@ void increment_matrix(IntegerMatrix m) {
 
 // [[Rcpp::export]]
 List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonzero_tot, IntegerMatrix possible_groups_m,
-                                int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh) {
+                                int n_genes, int n_calibration_pairs, int n_nonzero_trt_thresh, int n_nonzero_cntrl_thresh, int seed) {
   // 0.1 define a few variables
   int n_grna_groups = possible_groups_m.nrow(), undercover_grp_size = possible_groups_m.ncol(), n_nonzero_trt, n_nonzero_cntrl;
   int n_possible_pairs = n_grna_groups * n_genes;
@@ -109,7 +109,7 @@ List sample_undercover_pairs_v2(IntegerMatrix n_nonzero_m, IntegerVector n_nonze
   for (int i = 0; i < n_possible_pairs; i ++) x[i] = i;
 
   // 0.4 initialize random number generator and variables related to random number generation
-  std::mt19937 generator(4);
+  std::mt19937 generator(seed);
   std::uniform_real_distribution<double> distribution(0, 1);
   double u;
   int r, idx, grna_group_idx, gene_idx;

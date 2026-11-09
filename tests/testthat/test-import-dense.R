@@ -47,27 +47,33 @@ test_that("dense import retains both triangles and correct cell totals", {
         grna_id = c("g1", "g2"),
         grna_target = c("non-targeting", "target")
     )
-    for (lower in c(2, 2 + 4 * .Machine$double.eps)) {
-        response[2L, 1L] <- lower
-        before <- serialize(list(response, guides, targets), NULL)
-        object <- import_data(
-            response,
-            guides,
-            targets,
-            "low",
-            response_names = c("MT-first", "second")
-        )
-        covariates <- get_cell_covariates(object)
-        expect_identical(as.matrix(get_response_matrix(object)), response)
-        expect_identical(covariates$response_n_umis, unname(colSums(response)))
-        expect_identical(covariates$response_n_nonzero, c(2L, 2L))
-        expect_equal(
-            covariates$response_p_mito,
-            unname(response[1L, ] / colSums(response))
-        )
-        expect_identical(
-            serialize(list(response, guides, targets), NULL),
-            before
-        )
-    }
+    # a response matrix symmetric only up to numerical tolerance is not
+    # integer-valued, so it is rejected at import
+    response[2L, 1L] <- 2 + 4 * .Machine$double.eps
+    expect_error(
+        import_data(response, guides, targets, "low"),
+        regexp = "The `response_matrix` must contain integer counts",
+        fixed = TRUE
+    )
+    response[2L, 1L] <- 2
+    before <- serialize(list(response, guides, targets), NULL)
+    object <- import_data(
+        response,
+        guides,
+        targets,
+        "low",
+        response_names = c("MT-first", "second")
+    )
+    covariates <- get_cell_covariates(object)
+    expect_identical(as.matrix(get_response_matrix(object)), response)
+    expect_identical(covariates$response_n_umis, unname(colSums(response)))
+    expect_identical(covariates$response_n_nonzero, c(2L, 2L))
+    expect_equal(
+        covariates$response_p_mito,
+        unname(response[1L, ] / colSums(response))
+    )
+    expect_identical(
+        serialize(list(response, guides, targets), NULL),
+        before
+    )
 })

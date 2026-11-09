@@ -3,7 +3,7 @@
 \name{read_ondisc_backed_sceptre_object}
 \alias{read_ondisc_backed_sceptre_object}
 \alias{write_ondisc_backed_sceptre_object}
-\title{Write or read an \code{ondisc}-backed \code{sceptre_object}}
+\title{Write or read an \code{ondisc}-backed \code{sceptre_object} (deprecated)}
 \usage{
 read_ondisc_backed_sceptre_object(
   sceptre_object_fp,
@@ -14,58 +14,45 @@ read_ondisc_backed_sceptre_object(
 write_ondisc_backed_sceptre_object(sceptre_object, directory_to_write)
 }
 \arguments{
-\item{sceptre_object_fp}{file path to a \code{sceptre_object.rds} file}
+\item{sceptre_object_fp}{file path to the \code{sceptre_object.rds} file written
+by \code{write_ondisc_backed_sceptre_object()} or \code{\link[=write_sceptre_object]{write_sceptre_object()}}}
 
-\item{response_odm_file_fp}{file path to the backing \code{.odm} file for the
-response modality}
-
-\item{grna_odm_file_fp}{file path to the backing \code{.odm} file for the gRNA
-modality}
+\item{response_odm_file_fp, grna_odm_file_fp}{ignored}
 
 \item{sceptre_object}{a \code{sceptre_object}}
 
 \item{directory_to_write}{the directory in which to write the
-\code{sceptre_object.rds} file}
+\code{sceptre_object}}
 }
 \value{
-\code{write_ondisc_backed_sceptre_object()} returns NULL, and
-\code{read_ondisc_backed_sceptre_object()} returns an \code{ondisc}-backed
+\code{write_ondisc_backed_sceptre_object()} returns \code{NULL} invisibly, and
+\code{read_ondisc_backed_sceptre_object()} returns a disk-backed
 \code{sceptre_object}
 }
 \description{
 \code{write_ondisc_backed_sceptre_object()} and
-\code{read_ondisc_backed_sceptre_object()} enable the writing and reading of
-\code{ondisc}-backed \code{sceptre_object}s, respectively. First,
-\code{write_ondisc_backed_sceptre_object()} writes an \code{ondisc}-backed
-\code{sceptre_object} to disk, creating a file \code{sceptre_object.rds} in the
-specified directory. Next, \code{read_ondisc_backed_sceptre_object()} reads and
-initializes a \code{sceptre_object} from a \code{sceptre_object.rds} file,
-\code{response.odm} file, and \code{grna.odm} file stored on disk.
+\code{read_ondisc_backed_sceptre_object()} are deprecated; use
+\code{\link[=write_sceptre_object]{write_sceptre_object()}} and \code{\link[=read_sceptre_object]{read_sceptre_object()}}. \code{sceptre} no longer
+uses \code{ondisc}: a disk-backed \code{sceptre_object} keeps its response counts in
+the MuData file \code{screen.h5mu} (see \code{\link[=import_data]{import_data()}}).
+\code{write_ondisc_backed_sceptre_object()} calls \code{\link[=write_sceptre_object]{write_sceptre_object()}}, and
+\code{read_ondisc_backed_sceptre_object()} reads the \code{sceptre_object} written
+to the directory of \code{sceptre_object_fp} with \code{\link[=read_sceptre_object]{read_sceptre_object()}}, its
+response counts left on disk. The \code{.odm} files of earlier versions of
+\code{sceptre} cannot be read; re-import the data.
 }
 \examples{
 data(lowmoi_example_data)
-# 1. create ondisc-backed sceptre_object
 sceptre_object <- import_data(
   response_matrix = lowmoi_example_data$response_matrix,
   grna_matrix = lowmoi_example_data$grna_matrix,
   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
   extra_covariates = lowmoi_example_data$extra_covariates,
-  moi = "low",
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
+  moi = "low"
 )
-
-# 2. write
-write_ondisc_backed_sceptre_object(
-  sceptre_object = sceptre_object,
-  directory_to_write = tempdir()
-)
-
-# 3. read
-rm(sceptre_object)
-sceptre_object <- read_ondisc_backed_sceptre_object(
-  sceptre_object_fp = paste0(tempdir(), "/sceptre_object.rds"),
-  response_odm_file_fp = paste0(tempdir(), "/response.odm"),
-  grna_odm_file_fp = paste0(tempdir(), "/grna.odm")
-)
+directory <- file.path(tempdir(), "deprecated_example")
+# instead of write_ondisc_backed_sceptre_object()
+write_sceptre_object(sceptre_object, directory)
+# instead of read_ondisc_backed_sceptre_object()
+sceptre_object <- read_sceptre_object(directory, backed = TRUE)
 }

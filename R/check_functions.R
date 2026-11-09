@@ -1,3 +1,65 @@
+# A matrix of counts has no missing, negative or infinite entries, and its
+# entries are integers (a logical matrix without missing entries passes);
+# anything else is an error. The checks run on the stored values (the nonzero
+# entries of a sparse matrix), read without a copy from a dgCMatrix or
+# dgRMatrix.
+check_integer_counts <- function(input_matrix, input_matrix_name) {
+    values <- if (methods::is(input_matrix, "dgCMatrix") ||
+        methods::is(input_matrix, "dgRMatrix")) {
+        compressed_sparse_components(input_matrix)$x
+    } else if (methods::is(input_matrix, "sparseMatrix")) {
+        compressed_sparse_components(
+            methods::as(methods::as(input_matrix, "CsparseMatrix"), "dMatrix")
+        )$x
+    } else {
+        as.vector(input_matrix)
+    }
+    check_count_values(values, input_matrix_name)
+}
+
+# Stops unless values[from + 1], ..., values[from + count] are counts: not
+# missing, negative or infinite, and integers. Doubles are checked in one pass
+# in C++, without copying them.
+check_count_values <- function(
+    values,
+    input_matrix_name,
+    from = 0,
+    count = length(values)
+) {
+    if (is.integer(values)) {
+        values <- values[from + seq_len(count)]
+        scan <- list(
+            problem = if (anyNA(values)) 1L else if (any(values < 0L)) 2L else 0L
+        )
+    } else {
+        scan <- scan_count_values(as.double(values), from, count)
+    }
+    if (scan$problem %in% c(1L, 2L, 3L)) {
+        stop(
+            "The `",
+            input_matrix_name,
+            "` must contain counts (for example, UMI counts); it has ",
+            c("missing (NA) entries", "negative entries", "infinite entries")[
+                scan$problem
+            ],
+            "."
+        )
+    }
+    if (scan$problem == 4L) {
+        stop(
+            "The `",
+            input_matrix_name,
+            "` must contain integer counts (for example, UMI counts), not normalized or transformed values. ",
+            scan$n_non_integer,
+            " of its entries are not integers, for example ",
+            format(scan$example),
+            "."
+        )
+    }
+    invisible()
+}
+
+
 check_import_data_inputs <- function(
     response_matrix,
     grna_matrix,
@@ -75,7 +137,7 @@ check_import_data_inputs <- function(
     check_matrix_class(
         response_matrix,
         "response_matrix",
-        c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix", "odm")
+        c("matrix", "dgTMatrix", "dgCMatrix", "dgRMatrix")
     )
     check_matrix_class(
         grna_matrix,
@@ -87,10 +149,13 @@ check_import_data_inputs <- function(
             "dgRMatrix",
             "lgTMatrix",
             "lgCMatrix",
-            "lgRMatrix",
-            "odm"
+            "lgRMatrix"
         )
     )
+
+    # 7b. check that the response and gRNA matrices hold counts
+    check_integer_counts(response_matrix, "response_matrix")
+    check_integer_counts(grna_matrix, "grna_matrix")
 
     # 8. check for agreement in number of cells
     check_ncells <- ncol(response_matrix) == ncol(grna_matrix)
@@ -231,13 +296,11 @@ check_set_analysis_parameters <- function(
     control_group,
     resampling_mechanism,
     side,
-    low_moi,
     grna_integration_strategy,
     resampling_approximation
 ) {
     response_matrix <- get_response_matrix(sceptre_object)
-    grna_matrix <- get_grna_matrix(sceptre_object)
-    covariate_data_frame <- sceptre_object@covariate_data_frame
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     grna_target_data_frame <- sceptre_object@grna_target_data_frame
 
     # 1. if response_grna_target_pairs has been supplied, check its
@@ -355,12 +418,7 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 6. verify that the moi is consistent with the control group
-    if (!low_moi && control_group == "nt_cells") {
-        stop("The control group cannot be the NT cells in high MOI.")
-    }
-
-    # 7. verify that, if the control_group is NT cells, there are NT gRNAs
+    # 6. verify that, if the control_group is NT cells, there are NT gRNAs
     # present
     if (control_group == "nt_cells") {
         nt_present <- "non-targeting" %in% grna_target_data_frame$grna_target
@@ -371,12 +429,12 @@ check_set_analysis_parameters <- function(
         }
     }
 
-    # 8. verify that "side" is among "both", "left", or "right"
+    # 7. verify that "side" is among "both", "left", or "right"
     if (!(side %in% c("both", "left", "right"))) {
         stop("`side` must be one of 'both', 'left', or 'right'.")
     }
 
-    # 9. verify that "grna_integration_strategy" is union or singleton
+    # 8. verify that "grna_integration_strategy" is union or singleton
     if (
         !(grna_integration_strategy %in% c("union", "singleton", "bonferroni"))
     ) {
@@ -385,18 +443,18 @@ check_set_analysis_parameters <- function(
         )
     }
 
-    # 10. if using a backing .odm file, verify that resampling mechanism is
-    # permutations
+    # 9. if the response counts are on disk, verify that resampling mechanism
+    # is permutations
     if (
-        methods::is(get_response_matrix(sceptre_object), "odm") &&
+        is_backed(get_response_matrix(sceptre_object)) &&
             (resampling_mechanism != "permutations")
     ) {
         stop(
-            "`resampling_mechanism` must be set to 'permutations' when using an ondisc-backed sceptre_object."
+            "`resampling_mechanism` must be set to 'permutations' when using a disk-backed sceptre_object."
         )
     }
 
-    # 11. verify resampling_approximation acceptable
+    # 10. verify resampling_approximation acceptable
     if (!(resampling_approximation %in% c("skew_normal", "no_approximation"))) {
         stop(
             "`resampling_approximation` must be set to 'skew_normal' or 'no_approximation'."
@@ -413,8 +471,8 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
     }
     if (parallel && identical(os_type, "windows")) {
         stop(
-            "`parallel = TRUE` is not supported on Windows because sceptre's parallel mode uses fork-based processing. ",
-            "Please set `parallel = FALSE`.",
+            "`parallel = TRUE` is not supported on Windows because it forks processes. ",
+            "Use `BPPARAM = BiocParallel::SnowParam()` instead.",
             call. = FALSE
         )
     }
@@ -425,8 +483,7 @@ check_parallel_supported <- function(parallel, os_type = .Platform$OS.type) {
 check_assign_grna_inputs <- function(
     sceptre_object,
     assignment_method,
-    hyperparameters,
-    n_processors
+    hyperparameters
 ) {
     if (!(assignment_method %in% c("maximum", "mixture", "thresholding"))) {
         stop(
@@ -461,7 +518,7 @@ check_assign_grna_inputs <- function(
                 "`umi_fraction_threshold` should be a numeric greater than 0.0 and be less than 1.0."
             )
         }
-        if (hyperparameters[["min_grna_n_umis_threshold"]] < 0L) {
+        if (hyperparameters[["min_grna_n_umis_threshold"]] < 1L) {
             stop(
                 "`min_grna_n_umis_threshold` should be an integer greater than 0."
             )
@@ -548,15 +605,6 @@ check_assign_grna_inputs <- function(
         }
     }
 
-    # 3. check n_processors argument
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
 
     return(NULL)
 }
@@ -611,7 +659,6 @@ check_run_qc_inputs <- function(
 check_calibration_check_inputs <- function(
     sceptre_object,
     n_calibration_pairs,
-    n_processors,
     calibration_group_size
 ) {
     control_group_complement <- sceptre_object@control_group_complement
@@ -646,15 +693,6 @@ check_calibration_check_inputs <- function(
             "). Set `calibration_group_size` to a smaller value."
         )
     }
-    # 3. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
     return(NULL)
 }
 
@@ -663,11 +701,9 @@ check_discovery_analysis_inputs <- function(
     response_grna_group_pairs,
     control_group_complement,
     grna_target_data_frame,
-    calibration_check_run,
     pc_analysis,
     calibration_result,
-    n_ok_pairs,
-    n_processors
+    n_ok_pairs
 ) {
     # 1. check that positive control pairs are available
     if (nrow(response_grna_group_pairs) == 0L) {
@@ -709,15 +745,6 @@ check_discovery_analysis_inputs <- function(
         stop("Zero pairs pass pairwise QC. Cannot run analysis.")
     }
 
-    # 5. check n_processors
-    if (
-        !(identical(n_processors, "auto") ||
-            (is.numeric(n_processors) && n_processors >= 2))
-    ) {
-        stop(
-            "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
-        )
-    }
 
     return(NULL)
 }

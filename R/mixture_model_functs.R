@@ -3,21 +3,22 @@ assign_grnas_to_cells_mixture <- function(
     cell_covariate_data_frame,
     grna_assignment_hyperparameters,
     print_progress,
-    parallel,
-    n_processors,
+    BPPARAM,
     log_dir,
-    grna_ids
+    grna_ids,
+    seed
 ) {
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
-            "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
+            "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
     }
     # 0. get random starting guesses for pi and g_pert
     starting_guesses <- get_random_starting_guesses(
         n_em_rep = grna_assignment_hyperparameters$n_em_rep,
         pi_guess_range = grna_assignment_hyperparameters$pi_guess_range,
-        g_pert_guess_range = grna_assignment_hyperparameters$g_pert_guess_range
+        g_pert_guess_range = grna_assignment_hyperparameters$g_pert_guess_range,
+        seed = seed
     )
 
     # 1. obtain the covariate matrix
@@ -45,14 +46,14 @@ assign_grnas_to_cells_mixture <- function(
     )
 
     # 2. make the grna expression matrix row-accessible
-    grna_matrix <- set_matrix_accessibility(
-        grna_matrix,
-        make_row_accessible = TRUE
-    )
+    grna_matrix <- row_accessible_counts(grna_matrix)
+
+    # whether the workers write progress to log files
+    write_logs <- !is.null(BPPARAM) && print_progress
 
     # 3. define the function to perform assignments for a set of grnas
     analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
-        if (parallel && print_progress) {
+        if (write_logs) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 "assign_grnas_",
@@ -63,6 +64,7 @@ assign_grnas_to_cells_mixture <- function(
         } else {
             f_name <- NULL
         }
+        reader <- row_reader(grna_matrix)
         initial_assignment_list <- lapply(
             seq_along(curr_grna_ids),
             function(i) {
@@ -72,10 +74,9 @@ assign_grnas_to_cells_mixture <- function(
                     response_ids = curr_grna_ids,
                     feature = "gRNA",
                     str = "Performing gRNA-to-cell assignments for ",
-                    parallel = parallel,
                     f_name = f_name
                 )
-                g <- load_row(grna_matrix, grna_id)
+                g <- reader$read(grna_id)
                 assignments <- obtain_em_assignments(
                     pi_guesses = starting_guesses$pi_guesses,
                     g_pert_guesses = starting_guesses$g_pert_guesses,
@@ -92,8 +93,27 @@ assign_grnas_to_cells_mixture <- function(
             stats::setNames(curr_grna_ids)
     }
 
-    # 4. run the analysis
-    if (!parallel) {
+    # 4. run the analysis; the function runs with only the objects it uses
+    # (see isolate_function())
+    analyze_given_grna_ids <- isolate_function(
+        analyze_given_grna_ids,
+        list(
+            write_logs = write_logs,
+            log_dir = log_dir,
+            print_progress = print_progress,
+            grna_matrix = grna_matrix,
+            starting_guesses = starting_guesses,
+            covariate_matrix = covariate_matrix,
+            # only the hyperparameters the workers use: the formula among the
+            # others holds, in its environment, the cell covariates
+            grna_assignment_hyperparameters = grna_assignment_hyperparameters[c(
+                "n_nonzero_cells_cutoff",
+                "backup_threshold",
+                "probability_threshold"
+            )]
+        )
+    )
+    if (is.null(BPPARAM)) {
         initial_assignment_list <- analyze_given_grna_ids(grna_ids)
     } else {
         message("Running gRNA assignments in parallel.")
@@ -108,18 +128,24 @@ assign_grnas_to_cells_mixture <- function(
         }
         grna_ids_partitioned <- partition_response_ids(
             grna_ids,
-            parallel,
-            n_processors
+            BPPARAM,
+            positions = match(grna_ids, rownames(grna_matrix))
         )
-        res <- parallel::mclapply(
+        res <- bplapply_checked(
             seq_along(grna_ids_partitioned),
-            function(proc_id) {
-                analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id)
-            },
-            mc.cores = length(grna_ids_partitioned)
+            isolate_function(
+                function(proc_id) {
+                    analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id)
+                },
+                list(
+                    analyze_given_grna_ids = analyze_given_grna_ids,
+                    grna_ids_partitioned = grna_ids_partitioned
+                )
+            ),
+            BPPARAM = BPPARAM
         )
-        check_worker_results(res)
-        initial_assignment_list <- res |> purrr::flatten()
+        # put the assignments in serial order
+        initial_assignment_list <- purrr::flatten(res)[grna_ids]
     }
 
     # return
@@ -188,9 +214,10 @@ obtain_em_assignments <- function(
 get_random_starting_guesses <- function(
     n_em_rep = 5,
     pi_guess_range = c(1e-5, 0.1),
-    g_pert_guess_range = c(10, 5000)
+    g_pert_guess_range = c(10, 5000),
+    seed
 ) {
-    withr::with_seed(4, {
+    withr::with_seed(seed, {
         pi_guesses <- stats::runif(
             n = n_em_rep,
             min = pi_guess_range[1],

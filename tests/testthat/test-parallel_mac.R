@@ -1,9 +1,8 @@
-# Exercise the parallel = TRUE code path on platforms where it is supported
-# (Mac fork-based parallelism). Skipped on Windows because
-# check_parallel_supported() refuses parallel = TRUE there. CI catches
-# regressions that silently break parallel execution on macOS / Linux.
+# Exercise the forked (MulticoreParam) parallel path on platforms where it is
+# supported. Skipped on Windows, which cannot fork. CI catches regressions that
+# silently break parallel execution on macOS / Linux.
 
-test_that("full pipeline runs end-to-end with parallel = TRUE", {
+test_that("full pipeline runs end-to-end on forked workers", {
     skip_on_os("windows")
 
     data(highmoi_example_data)
@@ -38,11 +37,10 @@ test_that("full pipeline runs end-to-end with parallel = TRUE", {
         ) |>
         run_calibration_check(
             calibration_group_size = 1,
-            parallel = TRUE,
-            n_processors = 2
+            BPPARAM = BiocParallel::MulticoreParam(2)
         ) |>
-        run_power_check(parallel = TRUE, n_processors = 2) |>
-        run_discovery_analysis(parallel = TRUE, n_processors = 2)
+        run_power_check(BPPARAM = BiocParallel::MulticoreParam(2)) |>
+        run_discovery_analysis(BPPARAM = BiocParallel::MulticoreParam(2))
 
     expect_s4_class(scep, "sceptre_object")
     expect_true(scep@functs_called[["run_calibration_check"]])
@@ -54,7 +52,7 @@ test_that("full pipeline runs end-to-end with parallel = TRUE", {
 })
 
 
-test_that("assign_grnas mixture method runs with parallel = TRUE", {
+test_that("assign_grnas mixture method runs on forked workers", {
     skip_on_os("windows")
 
     data(highmoi_example_data)
@@ -80,7 +78,10 @@ test_that("assign_grnas mixture method runs with parallel = TRUE", {
             discovery_pairs = discovery_pairs,
             positive_control_pairs = positive_control_pairs
         ) |>
-        assign_grnas(method = "mixture", parallel = TRUE, n_processors = 2)
+        assign_grnas(
+            method = "mixture",
+            BPPARAM = BiocParallel::MulticoreParam(2)
+        )
     expect_true(scep@functs_called[["assign_grnas"]])
     expect_true(length(scep@initial_grna_assignment_list) > 0)
 })

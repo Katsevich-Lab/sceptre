@@ -40,7 +40,10 @@ std::vector<double> compute_null_full_statistics(const NumericVector& a, const N
   // iterate over the B tests
   for (int k = start_pos; k < B + start_pos; k ++) {
     if (use_all_cells) n_trt = (*synth_idx_list)[k].size();
-    curr_vect = &(*synth_idx_list)[k][0];
+    // data() rather than &v[0]: a resample may contain no cells (n_trt is
+    // then 0 and the loops below read nothing), and indexing an empty vector
+    // is undefined (it aborts R where C++ library assertions are enabled)
+    curr_vect = (*synth_idx_list)[k].data();
     lower_right = 0;
     inner_sum = 0;
 

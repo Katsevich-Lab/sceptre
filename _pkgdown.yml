@@ -33,6 +33,7 @@ reference:
   - import_data
   - import_data_from_cellranger
   - import_data_from_parse
+  - import_data_from_sce
   - set_analysis_parameters
   - assign_grnas
   - run_qc
@@ -75,8 +76,11 @@ reference:
   - get_cell_covariates
   - get_grna_assignments
 
-- title: "`ondisc` intput/output functions"
+- title: "The `sceptre_object` class and its files"
   contents:
+  - sceptre_object-class
+  - updateObject,sceptre_object-method
+  - write_sceptre_object
   - read_ondisc_backed_sceptre_object
   - write_ondisc_backed_sceptre_object
 

@@ -1,5 +1,7 @@
 utils::globalVariables(c(
     "n_nonzero_trt",
+    "x_int",
+    "y_int",
     "n_nonzero_cntrl",
     "pair_str",
     "assignment",
@@ -40,6 +42,7 @@ utils::globalVariables(c(
 #'
 #' @useDynLib sceptre, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
+#' @importFrom beachmat.hdf5 initializeCpp
 #' @keywords package
 #' @examples
 #' ##########################

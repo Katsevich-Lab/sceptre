@@ -19,15 +19,20 @@
 #' to randomly assemble to form each negative control target
 #' @param print_progress (optional; default `TRUE`) a logical indicating whether
 #' to print progress updates
-#' @param parallel (optional; default `FALSE`) a logical indicating whether to
-#' run the function in parallel. `parallel = TRUE` is recommended only on Mac;
-#' it is not supported on Windows and may behave unreliably on Linux clusters.
-#' @param n_processors (optional; default `"auto"`) an integer specifying the
-#' number of processors to use if `parallel` is set to `TRUE`. The default,
-#' `"auto"`, uses half the physical cores. The fraction may be tuned via the
-#' `parallelly.availableCores.fraction` R option.
 #' @param log_dir (optional; default `tempdir()`) a string indicating the
-#' directory in which to write the log files (ignored if `parallel = FALSE`)
+#' directory in which to write the log files of the parallel workers (ignored
+#' when the function runs serially)
+#' @param BPPARAM (optional; default `BiocParallel::SerialParam()`) a
+#' [BiocParallel::BiocParallelParam] object specifying how to run the function
+#' in parallel, for example `BiocParallel::MulticoreParam(4)` (Linux and macOS)
+#' or `BiocParallel::SnowParam(4)` (all platforms, including Windows). Results
+#' do not depend on the back end or the number of workers. On a shared machine
+#' or in a cluster job, choose the number of workers from the cores allotted
+#' to you, for example
+#' `BiocParallel::MulticoreParam(parallelly::availableCores(fraction = 0.5))`.
+#' @param parallel,n_processors deprecated; use `BPPARAM`. `parallel = TRUE`
+#' runs the function with `BiocParallel::MulticoreParam(n_processors)`
+#' (`n_processors = "auto"` uses half the physical cores).
 #' @return an updated `sceptre_object` in which the calibration check has been
 #' carried out
 #'
@@ -62,24 +67,23 @@ run_calibration_check <- function(
     n_calibration_pairs = NULL,
     calibration_group_size = NULL,
     print_progress = TRUE,
-    parallel = FALSE,
-    n_processors = "auto",
     log_dir = tempdir(),
-    output_amount = 1
+    output_amount = 1,
+    BPPARAM = BiocParallel::SerialParam(),
+    parallel = NULL,
+    n_processors = NULL
 ) {
-    check_parallel_supported(parallel) |> invisible()
+    BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
     sceptre_object <- sceptre_object |>
         run_calibration_check_pt_1(
             n_calibration_pairs = n_calibration_pairs,
             calibration_group_size = calibration_group_size,
-            parallel = parallel,
-            n_processors = n_processors
+            BPPARAM = BPPARAM
         ) |>
         run_calibration_check_pt_2(
             output_amount = output_amount,
             print_progress = print_progress,
-            parallel = parallel,
-            n_processors = n_processors,
+            BPPARAM = BPPARAM,
             log_dir = log_dir
         )
     return(sceptre_object)
@@ -90,22 +94,17 @@ run_calibration_check_pt_1 <- function(
     sceptre_object,
     n_calibration_pairs = NULL,
     calibration_group_size = NULL,
-    parallel = FALSE,
-    n_processors = "auto"
+    BPPARAM = NULL
 ) {
     # 0. advance function (if necessary), and check function call
-    sceptre_object <- skip_assign_grnas_and_run_qc(
-        sceptre_object,
-        parallel,
-        n_processors
-    )
+    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "run_calibration_check"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
-            "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
+            "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
     }
 
@@ -126,24 +125,11 @@ run_calibration_check_pt_1 <- function(
     if (is.null(n_calibration_pairs)) {
         n_calibration_pairs <- sceptre_object@n_ok_discovery_pairs
     }
-    if (
-        !is.null(n_calibration_pairs) &&
-            sceptre_object@resampling_approximation == "no_approximation"
-    ) {
-        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
-        sceptre_object@B3 <- ceiling(
-            mult_fact *
-                n_calibration_pairs /
-                sceptre_object@multiple_testing_alpha
-        ) |>
-            as.integer()
-    }
 
     # 2. check inputs
     check_calibration_check_inputs(
         sceptre_object,
         n_calibration_pairs,
-        n_processors,
         calibration_group_size
     ) |>
         invisible()
@@ -167,30 +153,42 @@ run_calibration_check_pt_2 <- function(
     sceptre_object,
     output_amount = 1,
     print_progress = TRUE,
-    parallel = FALSE,
-    n_processors = "auto",
+    BPPARAM = NULL,
     log_dir = tempdir()
 ) {
-    # 5. run the sceptre analysis (high-level function call)
+    # 5. run the sceptre analysis (high-level function call); under
+    # no_approximation, the number of resamples B3 is set by the number of
+    # calibration pairs, for this analysis only (sceptre_object@B3, set in
+    # run_qc(), is left for the discovery and power analyses)
     response_grna_group_pairs <- sceptre_object@negative_control_pairs
+    B3 <- if (sceptre_object@resampling_approximation == "no_approximation") {
+        mult_fact <- if (sceptre_object@side_code == 0L) 10 else 5
+        ceiling(
+            mult_fact *
+                sceptre_object@n_calibration_pairs /
+                sceptre_object@multiple_testing_alpha
+        ) |>
+            as.integer()
+    } else {
+        sceptre_object@B3
+    }
     out <- run_sceptre_analysis_high_level(
         sceptre_object = sceptre_object,
         response_grna_group_pairs = response_grna_group_pairs,
+        B3 = B3,
         calibration_check = TRUE,
         analysis_type = "calibration_check",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
-        n_processors = n_processors,
+        BPPARAM = BPPARAM,
         log_dir = log_dir
     )
 
     # 6. update fields of sceptre object with results
-    sceptre_object@calibration_result <- if (!sceptre_object@nf_pipeline) {
-        process_calibration_result(out$result, sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@calibration_result <- process_calibration_result(
+        out$result,
+        sceptre_object
+    )
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }
@@ -252,24 +250,21 @@ run_power_check <- function(
     sceptre_object,
     output_amount = 1,
     print_progress = TRUE,
-    parallel = FALSE,
-    n_processors = "auto",
-    log_dir = tempdir()
+    log_dir = tempdir(),
+    BPPARAM = BiocParallel::SerialParam(),
+    parallel = NULL,
+    n_processors = NULL
 ) {
     # 0. verify that function called in correct order
-    check_parallel_supported(parallel) |> invisible()
-    sceptre_object <- skip_assign_grnas_and_run_qc(
-        sceptre_object,
-        parallel,
-        n_processors
-    )
+    BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
+    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "run_power_check"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
-            "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
+            "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
     }
 
@@ -283,8 +278,7 @@ run_power_check <- function(
         grna_target_data_frame = sceptre_object@grna_target_data_frame,
         pc_analysis = TRUE,
         calibration_result = sceptre_object@calibration_result,
-        n_ok_pairs = sceptre_object@n_ok_positive_control_pairs,
-        n_processors = n_processors
+        n_ok_pairs = sceptre_object@n_ok_positive_control_pairs
     ) |>
         invisible()
 
@@ -296,17 +290,13 @@ run_power_check <- function(
         analysis_type = "power_check",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
-        n_processors = n_processors,
+        BPPARAM = BPPARAM,
         log_dir = log_dir
     )
 
     # 4. update fields of sceptre object with results
-    sceptre_object@power_result <- if (!sceptre_object@nf_pipeline) {
-        out$result |> apply_grouping_to_result(sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@power_result <- out$result |>
+        apply_grouping_to_result(sceptre_object)
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }
@@ -355,24 +345,21 @@ run_discovery_analysis <- function(
     sceptre_object,
     output_amount = 1,
     print_progress = TRUE,
-    parallel = FALSE,
-    n_processors = "auto",
-    log_dir = tempdir()
+    log_dir = tempdir(),
+    BPPARAM = BiocParallel::SerialParam(),
+    parallel = NULL,
+    n_processors = NULL
 ) {
     # 0. verify that function called in correct order
-    check_parallel_supported(parallel) |> invisible()
-    sceptre_object <- skip_assign_grnas_and_run_qc(
-        sceptre_object,
-        parallel,
-        n_processors
-    )
+    BPPARAM <- get_bpparam(BPPARAM, parallel, n_processors)
+    sceptre_object <- skip_assign_grnas_and_run_qc(sceptre_object, BPPARAM)
     sceptre_object <- perform_status_check_and_update(
         sceptre_object,
         "run_discovery_analysis"
     )
-    if (!parallel) {
+    if (is.null(BPPARAM)) {
         message(crayon::red(
-            "Note: If you are on a Mac laptop or desktop, consider setting `parallel = TRUE` to improve speed. Otherwise, keep `parallel = FALSE`."
+            "Note: To run in parallel, set `BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)` (Linux and macOS) or `BiocParallel::SnowParam(4)` (all platforms)."
         ))
     }
 
@@ -386,8 +373,7 @@ run_discovery_analysis <- function(
         grna_target_data_frame = sceptre_object@grna_target_data_frame,
         pc_analysis = FALSE,
         calibration_result = sceptre_object@calibration_result,
-        n_ok_pairs = sceptre_object@n_ok_discovery_pairs,
-        n_processors = n_processors
+        n_ok_pairs = sceptre_object@n_ok_discovery_pairs
     ) |>
         invisible()
 
@@ -399,17 +385,15 @@ run_discovery_analysis <- function(
         analysis_type = "discovery_analysis",
         output_amount = output_amount,
         print_progress = print_progress,
-        parallel = parallel,
-        n_processors = n_processors,
+        BPPARAM = BPPARAM,
         log_dir = log_dir
     )
 
     # 4. update fields of sceptre object with results
-    sceptre_object@discovery_result <- if (!sceptre_object@nf_pipeline) {
-        process_discovery_result(out$result, sceptre_object)
-    } else {
-        out$result
-    }
+    sceptre_object@discovery_result <- process_discovery_result(
+        out$result,
+        sceptre_object
+    )
     sceptre_object@response_precomputations <- out$response_precomputations
     return(sceptre_object)
 }
@@ -431,25 +415,34 @@ process_discovery_result <- function(result, sceptre_object) {
 run_sceptre_analysis_high_level <- function(
     sceptre_object,
     response_grna_group_pairs,
+    B3 = sceptre_object@B3,
     calibration_check,
     analysis_type,
     output_amount,
     print_progress,
-    parallel,
-    n_processors,
+    BPPARAM,
     log_dir
 ) {
     # if running permutations, generate the permutation idxs
     if (sceptre_object@run_permutations) {
         message("Generating permutation resamples.")
-        synthetic_idxs <- get_synthetic_permutation_idxs(
+        resampling_args <- list(
             grna_assignments = sceptre_object@grna_assignments,
-            B = sceptre_object@B1 + sceptre_object@B2 + sceptre_object@B3,
+            B = sceptre_object@B1 + sceptre_object@B2 + B3,
             calibration_check = calibration_check,
             control_group_complement = sceptre_object@control_group_complement,
             calibration_group_size = sceptre_object@calibration_group_size,
-            n_cells = length(sceptre_object@cells_in_use)
+            n_cells = length(sceptre_object@cells_in_use),
+            seed = sceptre_object@seed
         )
+        # the resamples are held in C++ memory, which only workers forked
+        # after they are drawn share (a MulticoreParam that is not yet
+        # started); other workers draw the same resamples from the same seed
+        synthetic_idxs <- if (is.null(BPPARAM) || forks_workers(BPPARAM)) {
+            do.call(get_synthetic_permutation_idxs, resampling_args)
+        } else {
+            resampling_args
+        }
         message(crayon::green(" \u2713"))
     }
     gc() |> invisible()
@@ -465,18 +458,15 @@ run_sceptre_analysis_high_level <- function(
         resampling_approximation = sceptre_object@resampling_approximation,
         B1 = sceptre_object@B1,
         B2 = sceptre_object@B2,
-        B3 = sceptre_object@B3,
+        B3 = B3,
         calibration_check = calibration_check,
         control_group_complement = sceptre_object@control_group_complement,
-        n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
-        n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
         side_code = sceptre_object@side_code,
         low_moi = sceptre_object@low_moi,
         response_precomputations = sceptre_object@response_precomputations,
         cells_in_use = sceptre_object@cells_in_use,
         print_progress = print_progress,
-        parallel = parallel,
-        n_processors = n_processors,
+        BPPARAM = BPPARAM,
         log_dir = log_dir,
         analysis_type = analysis_type
     )
@@ -486,6 +476,7 @@ run_sceptre_analysis_high_level <- function(
         args_to_pass$synthetic_idxs <- synthetic_idxs
         do.call(what = "run_perm_test_in_memory", args = args_to_pass)
     } else {
+        args_to_pass$seed <- sceptre_object@seed
         do.call(what = "run_crt_in_memory_v2", args = args_to_pass)
     }
 
@@ -788,11 +779,7 @@ write_outputs_to_directory <- function(sceptre_object, directory) {
 }
 
 
-skip_assign_grnas_and_run_qc <- function(
-    sceptre_object,
-    parallel,
-    n_processors
-) {
+skip_assign_grnas_and_run_qc <- function(sceptre_object, BPPARAM) {
     functs_run <- sceptre_object@functs_called
     if (
         functs_run[["import_data"]] && functs_run[["set_analysis_parameters"]]
@@ -801,11 +788,7 @@ skip_assign_grnas_and_run_qc <- function(
             message(crayon::red(
                 "Note: Automatically running `assign_grnas()` and `run_qc()` with default arguments."
             ))
-            sceptre_object <- assign_grnas(
-                sceptre_object,
-                parallel = parallel,
-                n_processors = n_processors
-            ) |>
+            sceptre_object <- assign_grnas(sceptre_object, BPPARAM = BPPARAM) |>
                 run_qc() # advance by two
         }
         if (functs_run[["assign_grnas"]] && !functs_run[["run_qc"]]) {

@@ -146,7 +146,8 @@ refactor_prepare <- function(inputs, case, assignment_threshold = 40) {
         grna_integration_strategy = case$integration,
         control_group = case$control,
         resampling_mechanism = case$mechanism,
-        resampling_approximation = case$approximation
+        resampling_approximation = case$approximation,
+        seed = 4L
     )
     object <- sceptre::assign_grnas(
         object,

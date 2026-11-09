@@ -1,91 +1,56 @@
 set_matrix_accessibility <- function(matrix_in, make_row_accessible = TRUE) {
-    # if a logical matrix, convert to the corresponding numeric matrix; consider
-    # more efficient implementation later
-    if (methods::is(matrix_in, "lgRMatrix")) {
-        attr(matrix_in, "class") <- "dgRMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@j))
+    # a numeric (double) general sparse matrix, compressed by row or by column;
+    # a logical matrix becomes the corresponding numeric matrix
+    target_class <- if (make_row_accessible) "dgRMatrix" else "dgCMatrix"
+    if (methods::is(matrix_in, target_class)) {
+        return(matrix_in)
     }
-    if (methods::is(matrix_in, "lgCMatrix")) {
-        attr(matrix_in, "class") <- "dgCMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@i))
+    if (
+        !methods::is(matrix_in, "matrix") && !methods::is(matrix_in, "Matrix")
+    ) {
+        stop("Class not recognized.")
     }
-    if (methods::is(matrix_in, "lgTMatrix")) {
-        attr(matrix_in, "class") <- "dgTMatrix"
-        matrix_in@x <- rep(1.0, length(matrix_in@j))
+    # every stored entry of a logical sparse matrix counts as 1
+    if (methods::is(matrix_in, "lsparseMatrix")) {
+        matrix_in <- methods::as(matrix_in, "nMatrix")
     }
-
-    if (methods::is(matrix_in, "dgRMatrix") && make_row_accessible) {
-        out <- matrix_in
-    } else if (methods::is(matrix_in, "dgCMatrix") && !make_row_accessible) {
-        out <- matrix_in
-    } else if (methods::is(matrix_in, "odm")) {
-        out <- matrix_in
-    } else {
-        # basic info: get matrix_in, n_responses, response_ids, and n_cells
-        n_responses <- nrow(matrix_in)
-        response_ids <- rownames(matrix_in)
-        cell_ids <- colnames(matrix_in)
-        n_cells <- ncol(matrix_in)
-        input_is_dense <- methods::is(matrix_in, "matrix")
-        if (methods::is(matrix_in, "dgTMatrix")) {
-            i <- matrix_in@i
-            j <- matrix_in@j
-        } else if (methods::is(matrix_in, "matrix")) {
-            # Matrix stores a square (nearly) symmetric matrix as one triangle
-            # only, so first coerce a square matrix to a general matrix
-            if (n_responses == n_cells) {
-                matrix_in <- methods::as(matrix_in, "generalMatrix")
-            }
-            matrix_in <- methods::as(matrix_in, "TsparseMatrix")
-            i <- matrix_in@i
-            j <- matrix_in@j
-        } else if (methods::is(matrix_in, "dgCMatrix")) {
-            i <- matrix_in@i
-            j <- convert_pointer_to_index_vector_v2(matrix_in@p)
-        } else if (methods::is(matrix_in, "dgRMatrix")) {
-            i <- convert_pointer_to_index_vector_v2(matrix_in@p)
-            j <- matrix_in@j
-        } else {
-            stop("Class not recognized.")
-        }
-        x <- matrix_in@x
-
-        # perform the sorting operation; sort in place only the triplets created
-        # here from a dense input, never the slots of the caller's matrix
-        sort_in_place <- input_is_dense
-        if (sort_in_place) {
-            l <- list(i = i, j = j, x = x)
-            dt <- data.table::setDT(l) # assign by reference
-        } else {
-            dt <- data.table::data.table(i = i, j = j, x = x) # deep copy
-        }
-
-        # finally, initialize the output
-        if (make_row_accessible) {
-            data.table::setorderv(x = dt, cols = c("i", "j"))
-            p <- obtain_pointer_vector(i = dt$i, dim = n_responses)
-            out <- Matrix::sparseMatrix(j = 1, p = c(0, 1), x = 1, repr = "R")
-            out@j <- dt$j
-        } else {
-            data.table::setorderv(x = dt, cols = c("j", "i"))
-            p <- obtain_pointer_vector(i = dt$j, dim = n_cells)
-            out <- Matrix::sparseMatrix(i = 1, p = c(0, 1), x = 1, repr = "C")
-            out@i <- dt$i
-        }
-        out@p <- p
-        out@x <- dt$x
-        out@Dim <- c(n_responses, n_cells)
-        rownames(out) <- response_ids
-        colnames(out) <- cell_ids
+    # Matrix stores a square (nearly) symmetric matrix as one triangle only, so
+    # first coerce a square matrix to a general matrix
+    if (
+        methods::is(matrix_in, "matrix") && nrow(matrix_in) == ncol(matrix_in)
+    ) {
+        matrix_in <- methods::as(matrix_in, "generalMatrix")
     }
+    out <- methods::as(
+        methods::as(
+            methods::as(
+                matrix_in,
+                if (make_row_accessible) "RsparseMatrix" else "CsparseMatrix"
+            ),
+            "dMatrix"
+        ),
+        "generalMatrix"
+    )
     return(out)
 }
 
 
-convert_pointer_to_index_vector_v2 <- function(p) {
-    l <- diff(p)
-    rep(x = seq(0, length(l) - 1L), times = l)
+# The compressed sparse components of a dgRMatrix (row pointers `p`, column
+# indices `j` and values `x`) or of a dgCMatrix (column pointers `p`, row
+# indices `i` and values `x`), which the C++ routines read without copying the
+# matrix. These are the slots that the Matrix package documents for these
+# classes (?"dgRMatrix-class" and ?"dgCMatrix-class"); this is the only
+# function that reads them.
+compressed_sparse_components <- function(mat) {
+    if (methods::is(mat, "dgRMatrix")) {
+        list(p = mat@p, j = mat@j, x = mat@x)
+    } else if (methods::is(mat, "dgCMatrix")) {
+        list(p = mat@p, i = mat@i, x = mat@x)
+    } else {
+        stop("Class not recognized.")
+    }
 }
+
 
 convert_covariate_df_to_design_matrix <- function(
     covariate_data_frame,
@@ -145,10 +110,11 @@ compute_cell_covariates <- function(
         mt_gene_idxs <- integer()
     }
     # call the low-level function
+    csc <- compressed_sparse_components(matrix_in)
     out <- compute_cell_covariates_cpp(
-        i = matrix_in@i,
-        p = matrix_in@p,
-        x = matrix_in@x,
+        i = csc$i,
+        p = csc$p,
+        x = csc$x,
         n_genes = nrow(matrix_in),
         n_cells = ncol(matrix_in),
         mt_gene_idxs = mt_gene_idxs,
@@ -169,13 +135,46 @@ compute_cell_covariates <- function(
 }
 
 
+# compute_cell_covariates() (with p_mito, without the maximum feature) for
+# counts held as cells x features (a dgCMatrix, `t_matrix_in`), of the features
+# in the columns `feature_cols` (increasing), named `feature_names`.
+compute_cell_covariates_by_feature <- function(
+    t_matrix_in,
+    feature_cols,
+    feature_names
+) {
+    mt_feature_idxs <- grep(
+        pattern = "^MT-",
+        x = feature_names,
+        ignore.case = TRUE
+    )
+    compute_p_mito <- length(mt_feature_idxs) >= 1
+    csc <- compressed_sparse_components(t_matrix_in)
+    out <- compute_cell_covariates_by_feature_cpp(
+        i = csc$i,
+        p = csc$p,
+        x = csc$x,
+        feature_cols = as.integer(feature_cols),
+        n_cells = nrow(t_matrix_in),
+        mt_feature_idxs = mt_feature_idxs,
+        compute_p_mito = compute_p_mito
+    )
+    ret <- data.frame(n_nonzero = out$n_nonzero, n_umis = out$n_umi)
+    if (compute_p_mito) {
+        ret$p_mito <- out$p_mito
+    }
+    return(ret)
+}
+
+
 get_synthetic_permutation_idxs <- function(
     grna_assignments,
     B,
     calibration_check,
     control_group_complement,
     calibration_group_size,
-    n_cells
+    n_cells,
+    seed
 ) {
     if (calibration_check && !control_group_complement) {
         # 1. calibration check, nt cells (low MOI only)
@@ -187,7 +186,12 @@ get_synthetic_permutation_idxs <- function(
             sort(decreasing = TRUE)
         M <- sum(indiv_nt_sizes[seq(1, calibration_group_size)])
         n_control_cells <- length(grna_assignments$all_nt_idxs)
-        out <- fisher_yates_sampler(n_tot = n_control_cells, M = M, B = B)
+        out <- fisher_yates_sampler(
+            n_tot = n_control_cells,
+            M = M,
+            B = B,
+            seed = seed
+        )
     } else if (calibration_check && control_group_complement) {
         # 2. calibration check, complement (low and high MOI)
         indiv_nt_sizes <- vapply(
@@ -199,7 +203,7 @@ get_synthetic_permutation_idxs <- function(
         # in high MOI, NT gRNA groups can overlap, so the sum of their sizes
         # can exceed the number of cells; a union never does
         M <- min(sum(indiv_nt_sizes[seq(1, calibration_group_size)]), n_cells)
-        out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B)
+        out <- fisher_yates_sampler(n_tot = n_cells, M = M, B = B, seed = seed)
     } else if (!calibration_check && !control_group_complement) {
         # 3. discovery, nt cells (low MOI only)
         grna_group_sizes <- vapply(
@@ -214,7 +218,8 @@ get_synthetic_permutation_idxs <- function(
             N = n_control_cells,
             m = range_grna_group_sizes[1],
             M = range_grna_group_sizes[2],
-            B = B
+            B = B,
+            seed = seed
         )
     } else if (!calibration_check && control_group_complement) {
         # 4. discovery, complement (low and high MOI)
@@ -227,7 +232,8 @@ get_synthetic_permutation_idxs <- function(
         out <- fisher_yates_sampler(
             n_tot = n_cells,
             M = max_cells_per_grna_group,
-            B = B
+            B = B,
+            seed = seed
         )
     }
 

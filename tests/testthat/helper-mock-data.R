@@ -200,7 +200,7 @@ make_mock_grna_target_data <- function(
         seq(0, big, length = dims[1]) |> round(),
         seq(big, 1, length = dims[1]) |> round()
     ) |>
-        set_colnames(NULL) # the use of `big` adds a single column name
+        unname() # the use of `big` adds a single column name
 
     # if we have more columns than the deterministic patterns, then
     # duplicate the patterned matrix as many times as we can and

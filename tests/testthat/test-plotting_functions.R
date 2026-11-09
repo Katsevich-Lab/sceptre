@@ -80,21 +80,32 @@ test_that("test all plots", {
         run_power_check() |>
         run_discovery_analysis()
 
-    expect_rng_preserved <- function(expr) {
+    # plots subsample points with R's random number generator, so set.seed()
+    # makes them reproducible
+    expect_rng_reproducible <- function(expr) {
+        expr <- substitute(expr)
+        env <- parent.frame()
         set.seed(123)
-        seed_before <- .Random.seed
-        out <- force(expr)
-        expect_equal(.Random.seed, seed_before)
+        out <- eval(expr, env)
+        set.seed(123)
+        again <- eval(expr, env)
+        plot_data <- function(plots) {
+            if (inherits(plots, "ggplot")) {
+                plots <- list(plots)
+            }
+            lapply(plots, function(p) if (inherits(p, "ggplot")) p$data)
+        }
+        expect_equal(plot_data(out), plot_data(again))
         out
     }
-    expect_plot_build_rng_preserved <- function(plot) {
+    expect_plot_build_rng_reproducible <- function(plot) {
         set.seed(456)
-        seed_before <- .Random.seed
-        ggplot2::ggplot_build(plot)
-        expect_equal(.Random.seed, seed_before)
+        built <- ggplot2::ggplot_build(plot)$data
+        set.seed(456)
+        expect_equal(ggplot2::ggplot_build(plot)$data, built)
     }
 
-    default_grna_plots <- expect_rng_preserved(plot_grna_count_distributions(
+    default_grna_plots <- expect_rng_reproducible(plot_grna_count_distributions(
         scep,
         return_indiv_plots = TRUE
     ))
@@ -116,12 +127,12 @@ test_that("test all plots", {
     expect_equal(pltlist[[1]]$labels$x, "gRNA count")
 
     ## testing `plot_assign_grnas()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pltlist <- expect_rng_preserved(plot_assign_grnas(
+    pltlist <- expect_rng_reproducible(plot_assign_grnas(
         scep,
         grnas_to_plot = c("nt1", "id1"),
         return_indiv_plots = TRUE
     ))
-    expect_plot_build_rng_preserved(pltlist[[1]])
+    expect_plot_build_rng_reproducible(pltlist[[1]])
     expect_equal(length(pltlist), 3)
 
     expect_true(!"title" %in% names(pltlist[[1]]$labels)) # no title for this plot
@@ -137,11 +148,11 @@ test_that("test all plots", {
     expect_equal(pltlist[[3]]$labels$y, "Frequency")
 
     ## testing `plot_run_calibration_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pltlist <- expect_rng_preserved(plot_run_calibration_check(
+    pltlist <- expect_rng_reproducible(plot_run_calibration_check(
         scep,
         return_indiv_plots = TRUE
     ))
-    invisible(lapply(pltlist[1:2], expect_plot_build_rng_preserved))
+    invisible(lapply(pltlist[1:2], expect_plot_build_rng_reproducible))
     expect_equal(length(pltlist), 4)
 
     expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
@@ -160,11 +171,11 @@ test_that("test all plots", {
     expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
     # testing `plot_run_discovery_analysis()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pltlist <- expect_rng_preserved(plot_run_discovery_analysis(
+    pltlist <- expect_rng_reproducible(plot_run_discovery_analysis(
         scep,
         return_indiv_plots = TRUE
     ))
-    invisible(lapply(pltlist[1:2], expect_plot_build_rng_preserved))
+    invisible(lapply(pltlist[1:2], expect_plot_build_rng_reproducible))
     expect_equal(length(pltlist), 4)
 
     expect_equal(pltlist[[1]]$labels$title, "QQ plot (bulk)")
@@ -183,7 +194,7 @@ test_that("test all plots", {
     expect_true(!"title" %in% names(pltlist[[4]]$labels))
 
     # testing `plot_run_qc()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pltlist <- expect_rng_preserved(plot_run_qc(
+    pltlist <- expect_rng_reproducible(plot_run_qc(
         scep,
         return_indiv_plots = TRUE
     ))
@@ -198,20 +209,50 @@ test_that("test all plots", {
     expect_equal(pltlist[[2]]$labels$y, "N nonzero cntrl. cells")
 
     # testing `plot_run_power_check()` ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    plt <- expect_rng_preserved(plot_run_power_check(scep))
-    expect_plot_build_rng_preserved(plt)
+    plt <- expect_rng_reproducible(plot_run_power_check(scep))
+    expect_plot_build_rng_reproducible(plt)
     expect_equal(plt$labels$title, "Positive and negative control p-values")
     expect_equal(plt$labels$x, "Pair type")
     expect_equal(plt$labels$y, "p-value")
 
     # testing `plot_response_grna_target_pair()` ~~~~~~~~~~~~~~~~~~~~~~~~~
-    plt <- expect_rng_preserved(plot_response_grna_target_pair(
+    plt <- expect_rng_reproducible(plot_response_grna_target_pair(
         scep,
         response_id = "response_4",
         grna_target = "t1"
     ))
-    expect_plot_build_rng_preserved(plt)
+    expect_plot_build_rng_reproducible(plt)
     expect_equal(plt$labels$title, "Response: response_4\ngRNA target: t1")
     expect_equal(plt$labels$x, "Treatment status")
     expect_equal(plt$labels$y, "Normalized expression")
+})
+
+
+test_that("QQ points are drawn when the plot is made, not when it is rendered", {
+    p_values <- data.frame(p = stats::runif(5000))
+    make_plot <- function() {
+        ggplot2::ggplot(p_values, ggplot2::aes(y = p)) +
+            stat_qq_points(max_pts_to_plot = 50) +
+            stat_qq_band(max_pts_to_plot = 50)
+    }
+    set.seed(1)
+    first <- make_plot()
+    set.seed(1)
+    second <- make_plot()
+    for (layer in 1:2) {
+        # every rendering of a plot shows the same points
+        expect_identical(
+            ggplot2::layer_data(first, layer),
+            ggplot2::layer_data(first, layer)
+        )
+        # set.seed() before plotting fixes them
+        expect_identical(
+            ggplot2::layer_data(first, layer),
+            ggplot2::layer_data(second, layer)
+        )
+    }
+    # rendering leaves the caller's random number stream as it was
+    seed_before <- .Random.seed
+    ggplot2::layer_data(first, 1)
+    expect_identical(.Random.seed, seed_before)
 })

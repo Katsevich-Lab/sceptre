@@ -11,8 +11,9 @@ import_data(
   moi,
   extra_covariates = data.frame(),
   response_names = NA_character_,
-  use_ondisc = FALSE,
-  directory_to_write = NULL
+  backed = FALSE,
+  directory_to_write = NULL,
+  use_ondisc = NULL
 )
 }
 \arguments{
@@ -20,20 +21,26 @@ import_data(
 rows and cells in columns. The matrix should be of type \code{"matrix"},
 \code{"dgCMatrix"}, \code{"dgRMatrix"}, or \code{"dgTMatrix"}. The row names of the matrix
 should give the response IDs. The column names, when supplied, should give
-the cell IDs.}
+the cell IDs. The entries must be integer counts; a matrix with non-integer
+entries (for example, normalized expression values) is an error.}
 
 \item{grna_matrix}{a matrix of gRNA UMI counts, with gRNAs in rows and cells
 in columns. The matrix should be of type \code{"matrix"}, \code{"dgCMatrix"},
 \code{"dgRMatrix"}, or \code{"dgTMatrix"}. The row names of the matrix should give the
-gRNA IDs. The column names, when supplied, should give the cell IDs.}
+gRNA IDs. The column names, when supplied, should give the cell IDs. The
+entries must be integer counts; a matrix with non-integer entries is an
+error.}
 
 \item{grna_target_data_frame}{a data frame containing columns \code{grna_id} and
 \code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs
 should be assigned a label of "non-targeting". Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
-giving the chromosome, start coordinate, and end coordiante, respectively, of
-each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
-\code{vector_id} specifying the vector to which a given gRNA belongs.}
+giving the chromosome, start coordinate, and end coordinate, respectively, of
+the region that each gRNA targets. Additionally, \code{grna_target_data_frame} can contain the column
+\code{vector_id} specifying the vector to which a given gRNA belongs. The gRNAs of
+each vector are then combined into one unit, whose region spans those of its
+gRNAs; they must target one chromosome, and other columns whose values differ
+between them are dropped.}
 
 \item{moi}{a string indicating the MOI of the dataset, either "low" or
 "high".}
@@ -45,26 +52,40 @@ The rows should follow the same cell ordering as the columns of
 When cell IDs are supplied for at least two of these three objects, they must
 be identical.}
 
-\item{response_names}{(optional) a vector of human-readable response names;
-names with the prefix "MT-" are taken as mitochondrial genes and are used to
-compute the covariate \code{response_p_mito}.}
+\item{response_names}{(optional) a vector of human-readable response names,
+one per response in the order of the rows of \code{response_matrix}; names with
+the prefix "MT-" (in any case) are taken as mitochondrial genes and are used
+to compute the covariate \code{response_p_mito}.}
 
-\item{use_ondisc}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
-indicating whether to create an \code{ondisc}-backed \code{sceptre_object} (\code{TRUE}) or
-a standard \code{sceptre_object} (\code{FALSE}).}
+\item{backed}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
+indicating whether to create a disk-backed \code{sceptre_object} (\code{TRUE}), whose
+response and gRNA counts stay on disk in the file \code{screen.h5mu} in
+\code{directory_to_write} and are read as they are needed, or a standard
+\code{sceptre_object} (\code{FALSE}), which holds them in memory. The cell covariates
+are held in memory either way. The analysis of a
+disk-backed \code{sceptre_object} requires \code{resampling_mechanism = "permutations"} in \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}. Disk backing and the layout
+of \code{screen.h5mu} are experimental in sceptre 0.99.2: the layout may change
+in a later release, and each file carries a format stamp by which later
+versions recognize it. Logical cell covariates are stored in the file as
+integers (0 and 1).}
 
 \item{directory_to_write}{(optional) a file path to a directory in which to
-write the backing \code{.odm} files for the response and gRNA expression matrices.
-Must be supplied if \code{use_ondisc} is set to \code{TRUE}.}
+write \code{screen.h5mu}, a MuData file holding the response and gRNA counts and
+the cell covariates. Must be supplied if \code{backed} is set to \code{TRUE}, and must
+not already hold a \code{screen.h5mu}, which another disk-backed \code{sceptre_object}
+may be reading. Save the \code{sceptre_object} in the same directory with
+\code{\link[=write_sceptre_object]{write_sceptre_object()}}.}
+
+\item{use_ondisc}{deprecated; use \code{backed}.}
 }
 \value{
 an initialized \code{sceptre_object}
 }
 \description{
 \code{import_data()} imports data from a collection of R objects to create a
-\code{sceptre_object}. Users can create either a standard \code{sceptre} object or an
-\code{ondisc}-backed \code{sceptre} object; the latter is more appropriate for
-large-scale data. See
+\code{sceptre_object}. Users can create either a standard \code{sceptre} object or a
+disk-backed \code{sceptre} object, whose response and gRNA counts stay on disk; the latter
+is more appropriate for large-scale data. See
 \href{https://timothy-barry.github.io/sceptre-book/import-data.html#import-data-from-a-collection-of-r-objects}{Chapter 1 of the manual}
 for more detailed information about this function.
 }
@@ -79,14 +100,14 @@ sceptre_object <- import_data(
   moi = "low"
 )
 
-# 2. initialize an ondisc-backed sceptre_object from R objects
+# 2. initialize a disk-backed sceptre_object from R objects
 sceptre_object <- import_data(
   response_matrix = lowmoi_example_data$response_matrix,
   grna_matrix = lowmoi_example_data$grna_matrix,
   grna_target_data_frame = lowmoi_example_data$grna_target_data_frame,
   extra_covariates = lowmoi_example_data$extra_covariates,
   moi = "low",
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
+  backed = TRUE,
+  directory_to_write = file.path(tempdir(), "import_data_example")
 )
 }

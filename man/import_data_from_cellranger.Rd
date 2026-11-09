@@ -9,8 +9,9 @@ import_data_from_cellranger(
   moi,
   grna_target_data_frame,
   extra_covariates = data.frame(),
-  use_ondisc = FALSE,
-  directory_to_write = NULL
+  backed = FALSE,
+  directory_to_write = NULL,
+  use_ondisc = NULL
 )
 }
 \arguments{
@@ -26,22 +27,38 @@ contain the files \code{matrix.mtx.gz} and \code{features.tsv.gz} (and optionall
 \code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs
 should be assigned a label of "non-targeting". Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
-giving the chromosome, start coordinate, and end coordiante, respectively, of
-each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
-\code{vector_id} specifying the vector to which a given gRNA belongs.}
+giving the chromosome, start coordinate, and end coordinate, respectively, of
+the region that each gRNA targets. Additionally, \code{grna_target_data_frame} can contain the column
+\code{vector_id} specifying the vector to which a given gRNA belongs. The gRNAs of
+each vector are then combined into one unit, whose region spans those of its
+gRNAs; they must target one chromosome, and other columns whose values differ
+between them are dropped.}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates
 (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.
 If row names are supplied and cell barcodes are retained, the row names must
 match the retained (and, for multiple directories, batch-prefixed) cell IDs.}
 
-\item{use_ondisc}{(optional; default \code{FALSE}) a logical indicating whether to
-store the expression data in a disk-backed \code{ondisc} matrix (\code{TRUE}) or an
-in-memory sparse matrix (\code{FALSE}).}
+\item{backed}{(default \code{FALSE}) a logical value (i.e., \code{TRUE} or \code{FALSE})
+indicating whether to create a disk-backed \code{sceptre_object} (\code{TRUE}), whose
+response and gRNA counts stay on disk in the file \code{screen.h5mu} in
+\code{directory_to_write} and are read as they are needed, or a standard
+\code{sceptre_object} (\code{FALSE}), which holds them in memory. The cell covariates
+are held in memory either way. The analysis of a
+disk-backed \code{sceptre_object} requires \code{resampling_mechanism = "permutations"} in \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}. Disk backing and the layout
+of \code{screen.h5mu} are experimental in sceptre 0.99.2: the layout may change
+in a later release, and each file carries a format stamp by which later
+versions recognize it. Logical cell covariates are stored in the file as
+integers (0 and 1).}
 
-\item{directory_to_write}{(optional) a string indicating the directory in
-which to write the backing \code{.odm} files (must be specified if \code{use_ondisc} is
-set to \code{TRUE}).}
+\item{directory_to_write}{(optional) a file path to a directory in which to
+write \code{screen.h5mu}, a MuData file holding the response and gRNA counts and
+the cell covariates. Must be supplied if \code{backed} is set to \code{TRUE}, and must
+not already hold a \code{screen.h5mu}, which another disk-backed \code{sceptre_object}
+may be reading. Save the \code{sceptre_object} in the same directory with
+\code{\link[=write_sceptre_object]{write_sceptre_object()}}.}
+
+\item{use_ondisc}{deprecated; use \code{backed}.}
 }
 \value{
 an initialized \code{sceptre_object}
@@ -51,20 +68,28 @@ an initialized \code{sceptre_object}
 calls to Cell Ranger count. Each directory supplied as an input to this
 function should be in feature-barcode format, containing the files
 \code{features.tsv.gz} and \code{matrix.mtx.gz} (and optionally \code{barcodes.tsv.gz}).
-For standard in-memory objects, when every supplied directory contains a
-barcode file, the cell barcodes are retained as the column names of the
+When every supplied directory contains a barcode file, the cell barcodes are retained as the column names of the
 response and gRNA matrices and the row names of the cell covariate data frame.
 When multiple directories are supplied, the retained cell barcodes are
 prefixed with their batch identifiers (for example, \code{b1_} and \code{b2_}) to keep
 the cell IDs unique and stable across imports.
 Supplying barcode files for only some directories is an error.
-For standard in-memory objects, a malformed matrix file (for example, one
-with an entry outside the dimensions declared in its header), a matrix file
+When multiple directories are supplied, the directory from which each cell
+was loaded is recorded in the cell covariate \code{batch}, a factor with levels
+\code{b1}, \code{b2}, ... (in the order of \code{directories}) that enters the default
+formula as a covariate; a column of \code{extra_covariates} named \code{batch} is then
+an error. With one directory, the columns of \code{extra_covariates}, including
+one named \code{batch}, are kept as supplied.
+A malformed matrix file (for example, one with an entry outside the dimensions declared in its header), a matrix file
 that lists the same (feature, cell) entry more than once, or a matrix file
 whose number of rows differs from the number of rows of \code{features.tsv}, is an
 error.
-Users can create either a standard \code{sceptre} object or an \code{ondisc}-backed
-\code{sceptre} object; the latter is more appropriate for large-scale data. See
+Users can create either a standard \code{sceptre} object or a disk-backed
+\code{sceptre} object, whose response and gRNA counts stay on disk; the latter is more
+appropriate for large-scale data. A disk-backed import holds the matrix of
+one directory in memory at a time and writes the response counts to
+\code{screen.h5mu} through temporary files in \code{directory_to_write} (a
+subdirectory named \code{sceptre_import_...}, removed when the import ends). See
 \href{https://timothy-barry.github.io/sceptre-book/sceptre.html#sec-whole_game_import_data}{the introductory chapter}
 or
 \href{https://timothy-barry.github.io/sceptre-book/import-data.html}{Chapter 1}
@@ -84,12 +109,12 @@ sceptre_object <- import_data_from_cellranger(
   grna_target_data_frame = grna_target_data_frame_highmoi,
 )
 
-# 2. create an ondisc-backed sceptre_object from Cell Ranger output
+# 2. create a disk-backed sceptre_object from Cell Ranger output
 sceptre_object <- import_data_from_cellranger(
   directories = directories,
   moi = "high",
   grna_target_data_frame = grna_target_data_frame_highmoi,
-  use_ondisc = TRUE,
-  directory_to_write = tempdir()
+  backed = TRUE,
+  directory_to_write = file.path(tempdir(), "cellranger_example")
 )
 }

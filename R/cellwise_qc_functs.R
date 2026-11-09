@@ -6,29 +6,33 @@ determine_cells_to_retain <- function(
     additional_cells_to_remove
 ) {
     # 1. remove additional cells specified by the user
-    cells_to_exclude_user_specified <- additional_cells_to_remove
+    cells_to_exclude_user_specified <- resolve_cells_to_remove(
+        additional_cells_to_remove,
+        ncol(sceptre_object@data)
+    )
     n_cells_rm_user_specified <- length(cells_to_exclude_user_specified)
 
     # 2. compute the cells to retain based on n_umis and n_nonzero
+    covariate_data_frame <- get_cell_covariates(sceptre_object)
     exclude_cells_by_clipping_counts <- function(v, percentile_range) {
         cutoffs <- stats::quantile(x = v, probs = percentile_range)
         which(v < cutoffs[1] | v > cutoffs[2])
     }
     cells_to_exclude_n_umis <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_umis,
+        covariate_data_frame$response_n_umis,
         response_n_umis_range
     )
     n_cells_rm_n_umis <- length(cells_to_exclude_n_umis)
     cells_to_exclude_n_responses <- exclude_cells_by_clipping_counts(
-        sceptre_object@covariate_data_frame$response_n_nonzero,
+        covariate_data_frame$response_n_nonzero,
         response_n_nonzero_range
     )
     n_cells_rm_n_responses <- length(cells_to_exclude_n_responses)
 
     # 3. compute cells to retain based on p_mito
-    if ("response_p_mito" %in% colnames(sceptre_object@covariate_data_frame)) {
+    if ("response_p_mito" %in% colnames(covariate_data_frame)) {
         cells_to_exclude_p_mito <- which(
-            sceptre_object@covariate_data_frame$response_p_mito >
+            covariate_data_frame$response_p_mito >
                 p_mito_threshold
         )
         n_cells_rm_p_mito <- length(cells_to_exclude_p_mito)
@@ -142,4 +146,31 @@ update_indiv_grna_assignments_for_nt_cells <- function(indiv_nt_grna_idxs) {
     out$indiv_nt_grna_idxs <- indiv_nt_grna_idxs
     out$all_nt_idxs <- all_nt_idxs
     return(out)
+}
+
+
+# Returns the sorted, distinct indices of the cells that `cells` (the
+# `additional_cells_to_remove` argument of run_qc()) specifies: integer
+# indices of the cells, the columns of the imported matrices. Anything else is
+# an error rather than a silent misreading (a logical vector used to be read
+# as the indices 0 and 1, removing only the first cell).
+resolve_cells_to_remove <- function(cells, n_cells) {
+    if (length(cells) == 0L) {
+        return(integer())
+    }
+    if (
+        !is.numeric(cells) ||
+            anyNA(cells) ||
+            any(cells != round(cells)) ||
+            any(cells < 1) ||
+            any(cells > n_cells)
+    ) {
+        stop(
+            "`additional_cells_to_remove` must be a vector of integer indices ",
+            "between 1 and the number of cells (", n_cells, "), the columns of ",
+            "the imported response and gRNA matrices; cell IDs and logical ",
+            "vectors are not accepted."
+        )
+    }
+    sort(unique(as.integer(cells)))
 }

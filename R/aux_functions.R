@@ -101,7 +101,19 @@ auto_construct_formula_object <- function(
             return(out)
         },
         FUN.VALUE = character(1)
-    ) |>
+    )
+    left_out <- names(form_str)[is.na(form_str)]
+    if (length(left_out) >= 1L) {
+        message(
+            "The default formula leaves out the following covariates, which ",
+            "have ",
+            MAX_N_LEVELS_ALLOWED,
+            " or more distinct values: ",
+            paste0("`", left_out, "`", collapse = ", "),
+            ". To include them, supply a `formula_object`."
+        )
+    }
+    form_str <- form_str |>
         stats::na.omit() |>
         paste0(collapse = " + ")
     form <- paste0("~ ", form_str) |> stats::as.formula()
@@ -113,15 +125,34 @@ auto_compute_cell_covariates <- function(
     response_matrix,
     grna_matrix,
     extra_covariates,
-    response_names
+    response_names,
+    response_covariates = NULL
 ) {
-    # compute the response covariates
-    covariate_df <- compute_cell_covariates(
-        matrix_in = response_matrix,
-        feature_names = response_names,
-        compute_p_mito = TRUE,
-        compute_max_feature = FALSE
-    )
+    # the names pick out the mitochondrial genes (prefix "MT-"), so they must
+    # be those of the rows of the response matrix (NA_character_: not given)
+    if (
+        !is.null(response_names) &&
+            !identical(response_names, NA_character_) &&
+            length(response_names) != nrow(response_matrix)
+    ) {
+        stop(
+            "`response_names` must have one element per response (row of the ",
+            "response matrix, ", nrow(response_matrix), "); it has ",
+            length(response_names), "."
+        )
+    }
+    # compute the response covariates (unless computed already, as for
+    # response counts held on disk)
+    covariate_df <- if (is.null(response_covariates)) {
+        compute_cell_covariates(
+            matrix_in = response_matrix,
+            feature_names = response_names,
+            compute_p_mito = TRUE,
+            compute_max_feature = FALSE
+        )
+    } else {
+        response_covariates
+    }
     colnames(covariate_df) <- paste0("response_", colnames(covariate_df))
 
     # compute the grna covariates
@@ -146,23 +177,81 @@ auto_compute_cell_covariates <- function(
 }
 
 
-partition_response_ids <- function(response_ids, parallel, n_processors) {
-    groups_set <- FALSE
-    if (parallel) {
+# Return the seed of an analysis: `seed` itself, checked, or, when `seed` is
+# NULL, a seed drawn from R's random number generator, so that set.seed()
+# governs it.
+resolve_seed <- function(seed) {
+    if (is.null(seed)) {
+        return(sample.int(.Machine$integer.max, 1L))
+    }
+    if (
+        !is.numeric(seed) ||
+            length(seed) != 1L ||
+            !is.finite(seed) ||
+            seed != round(seed) ||
+            seed < 0 ||
+            seed > .Machine$integer.max
+    ) {
+        stop(
+            "`seed` must be NULL or a single whole number between 0 and ",
+            .Machine$integer.max,
+            ".",
+            call. = FALSE
+        )
+    }
+    as.integer(seed)
+}
+
+
+# Return the BiocParallel backend for an analysis function, or NULL to run
+# serially. `parallel` and `n_processors`, the arguments of 0.99.1 and earlier,
+# are deprecated: `parallel = TRUE` forks `n_processors` workers unless
+# `BPPARAM` itself has several workers.
+get_bpparam <- function(BPPARAM, parallel = NULL, n_processors = NULL) {
+    if (!is.null(parallel) || !is.null(n_processors)) {
+        warning(
+            "The arguments `parallel` and `n_processors` are deprecated; use ",
+            "`BPPARAM`, for example `BPPARAM = BiocParallel::MulticoreParam(4)`.",
+            call. = FALSE
+        )
+    }
+    if (is.null(BPPARAM)) {
+        BPPARAM <- BiocParallel::SerialParam()
+    }
+    if (!methods::is(BPPARAM, "BiocParallelParam")) {
+        stop(
+            "`BPPARAM` should be a `BiocParallelParam` object, such as ",
+            "`BiocParallel::MulticoreParam()` or ",
+            "`BiocParallel::SnowParam()`."
+        )
+    }
+    if (!is.null(parallel)) {
+        check_parallel_supported(parallel)
+    }
+    if (isTRUE(parallel) && BiocParallel::bpnworkers(BPPARAM) < 2L) {
+        if (is.null(n_processors)) {
+            n_processors <- "auto"
+        }
+        if (
+            !(identical(n_processors, "auto") ||
+                (is.numeric(n_processors) && n_processors >= 2))
+        ) {
+            stop(
+                "`n_processors` should be set to the string 'auto' or an integer greater than or equal to 2."
+            )
+        }
         if (identical(n_processors, "auto")) {
-            # Read the user's preferred fraction (default 0.5 = half cores),
-            # then
+            # parallelly is kept for the deprecated `n_processors = "auto"` and leaves with it.
+            # Read the user's preferred fraction (default 0.5 = half cores), then
             # neutralize that option on the parallelly call so parallelly's own
             # option-aware default does not apply the same fraction a second
             # time.
             # parallelly's `fraction` arg defaults to getOption(
             # "parallelly.availableCores.fraction", 1), so omitting it would
             # silently double-scale when the user has set that option. The arg
-            # itself was only added in 1.47.0, so passing `fraction = 1`
-            # directly
+            # itself was only added in 1.47.0, so passing `fraction = 1` directly
             # would break parallelly < 1.47.0 -- `withr::with_options`
-            # neutralizes
-            # the option for the call on any parallelly >= 1.23.0.
+            # neutralizes the option for the call on any parallelly >= 1.23.0.
             frac <- getOption("parallelly.availableCores.fraction", 0.5)
             n_processors <- max(
                 1L,
@@ -175,42 +264,159 @@ partition_response_ids <- function(response_ids, parallel, n_processors) {
                 )
             )
         }
-        if (length(response_ids) >= 2 * n_processors) {
-            s <- withr::with_seed(4, sample(response_ids))
-            out <- split(
-                s,
-                cut(
-                    seq_along(s),
-                    n_processors,
-                    labels = paste0("group_", seq(1, n_processors))
-                )
-            )
-            groups_set <- TRUE
-        }
+        BPPARAM <- BiocParallel::MulticoreParam(
+            workers = as.integer(n_processors)
+        )
     }
-    if (!groups_set) {
+    if (BiocParallel::bpnworkers(BPPARAM) < 2L) {
+        return(NULL)
+    }
+    BPPARAM
+}
+
+
+# Split the IDs into one group per worker of `BPPARAM` (a single group when
+# running serially). The IDs are dealt out in turn, so that neighboring IDs,
+# which may have similar workloads, go to different workers. With `positions`
+# (the rows of the IDs' counts), the IDs are first put in the order of their
+# rows and dealt out in blocks of consecutive rows, so that each worker reads
+# runs of neighboring rows, which share the chunks of disk-backed counts.
+partition_response_ids <- function(response_ids, BPPARAM, positions = NULL) {
+    n_processors <- if (is.null(BPPARAM)) {
+        1L
+    } else {
+        BiocParallel::bpnworkers(BPPARAM)
+    }
+    unit <- seq_along(response_ids)
+    if (!is.null(positions)) {
+        response_ids <- response_ids[order(positions)]
+        # at least four blocks per worker, of at most 64 rows
+        block_length <- max(
+            1L,
+            min(64L, ceiling(length(response_ids) / (4L * n_processors)))
+        )
+        unit <- (seq_along(response_ids) - 1L) %/% block_length + 1L
+    }
+    if (n_processors >= 2L && length(unit) > 0L &&
+        max(unit) >= 2L * n_processors) {
+        group <- (unit - 1L) %% n_processors + 1L
+        out <- split(
+            response_ids,
+            factor(
+                paste0("group_", group),
+                levels = paste0("group_", seq(1, n_processors))
+            )
+        )
+    } else {
         out <- list(group_1 = response_ids)
     }
     return(out)
 }
 
 
-# parallel::mclapply() returns a "try-error" object for a worker that failed
-# and NULL for a worker that exited without returning a result. Stop with the
-# worker's original error before its result is combined with the others. A
-# successful worker never returns NULL here: every caller's worker function
-# returns a list or a data.table, possibly empty.
-check_worker_results <- function(res) {
-    for (i in seq_along(res)) {
-        if (inherits(res[[i]], "try-error")) {
-            cause <- attr(res[[i]], "condition")
-            detail <- if (inherits(cause, "condition")) {
-                conditionMessage(cause)
-            } else {
-                as.character(res[[i]])
-            }
-            stop("Parallel worker ", i, " failed: ", detail, call. = FALSE)
+# Run `FUN` on each element of `X` with the BiocParallel backend `BPPARAM`,
+# and stop with a worker's original error if any worker failed.
+bplapply_checked <- function(X, FUN, BPPARAM) {
+    res <- tryCatch(
+        BiocParallel::bptry(BiocParallel::bplapply(X, FUN, BPPARAM = BPPARAM)),
+        # BiocParallel itself fails, for example, when a worker is killed
+        error = function(cnd) {
+            stop(
+                "Parallel processing failed; a worker may have exited ",
+                "unexpectedly: ",
+                conditionMessage(cnd),
+                call. = FALSE
+            )
         }
+    )
+    check_worker_results(res)
+}
+
+
+# Returns `f` with an environment that holds only `objects` (a named list) and
+# whose parent is the sceptre namespace. A function defined inside another
+# function keeps that function's whole frame, which also holds, through its
+# unevaluated arguments, the frame of its caller (and so the sceptre_object). A
+# parallel back end that serializes the function it runs (SnowParam, or a
+# started cluster) would send all of that to every worker.
+isolate_function <- function(f, objects) {
+    # source references (kept when the package is installed with
+    # R_KEEP_PKG_SOURCE=yes, as in CI) carry the text of whole source files
+    # and would be serialized with the function; they are dropped from it and
+    # from any function among `objects`
+    objects <- lapply(objects, function(x) if (is.function(x)) utils::removeSource(x) else x)
+    f <- utils::removeSource(f)
+    environment(f) <- list2env(objects, parent = asNamespace("sceptre"))
+    f
+}
+
+
+# Whether the workers of `BPPARAM` are forked when the work is dispatched (a
+# MulticoreParam not yet started): they then share the memory of the master,
+# and nothing is serialized to them.
+forks_workers <- function(BPPARAM) {
+    methods::is(BPPARAM, "MulticoreParam") && !BiocParallel::bpisup(BPPARAM)
+}
+
+
+# The response counts to send to parallel workers that receive a serialized
+# copy (for example, those of a SnowParam): of in-memory counts, only the rows
+# of `response_ids` (all that the workers read). The counts are returned as
+# they are when nothing is serialized (serial runs, forked workers, which
+# would otherwise hold the subset in addition to the counts), when they are
+# disk-backed (a reference to their file), and when most rows are read (the
+# subset would save little but add a copy in the master).
+counts_for_workers <- function(counts, response_ids, BPPARAM) {
+    if (
+        is.null(BPPARAM) ||
+            forks_workers(BPPARAM) ||
+            !methods::is(counts, "dgRMatrix") ||
+            length(unique(response_ids)) > nrow(counts) / 2
+    ) {
+        return(counts)
+    }
+    methods::as(
+        counts[as.character(response_ids), , drop = FALSE],
+        "RsparseMatrix"
+    )
+}
+
+
+# BiocParallel::bptry() returns an error condition for a worker that failed
+# (and for the elements it did not evaluate after that failure), and NULL for a
+# worker that exited without returning a result. Stop with the worker's
+# original error before its result is combined with the others. A successful
+# worker never returns NULL here: every caller's worker function returns a
+# list or a data.table, possibly empty.
+check_worker_results <- function(res) {
+    failed <- which(vapply(
+        res,
+        inherits,
+        what = c("error", "try-error"),
+        FUN.VALUE = logical(1)
+    ))
+    if (length(failed) >= 1L) {
+        # report a failure itself rather than an element left unevaluated
+        unevaluated <- vapply(
+            res[failed],
+            inherits,
+            what = "unevaluated_error",
+            FUN.VALUE = logical(1)
+        )
+        i <- c(failed[!unevaluated], failed[unevaluated])[1]
+        cause <- if (inherits(res[[i]], "try-error")) {
+            attr(res[[i]], "condition")
+        } else {
+            res[[i]]
+        }
+        detail <- if (inherits(cause, "condition")) {
+            conditionMessage(cause)
+        } else {
+            as.character(res[[i]])
+        }
+        stop("Parallel worker ", i, " failed: ", detail, call. = FALSE)
+    }
+    for (i in seq_along(res)) {
         if (is.null(res[[i]])) {
             stop(
                 "Parallel worker ",

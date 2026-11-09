@@ -107,27 +107,23 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
     cat(paste0(
         "\nAnalysis parameters: \n",
         "\t\U2022 Discovery pairs:",
-        if (x@nuclear) {
-            " trans"
+        if (length(n_discovery_pairs) == 0) {
+            " not specified"
         } else {
-            if (length(n_discovery_pairs) == 0) {
-                " not specified"
-            } else {
-                paste0(
-                    " data frame with ",
-                    crayon::blue(n_discovery_pairs),
-                    " pairs",
-                    if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
-                        paste0(
-                            " (",
-                            crayon::blue(x@n_ok_discovery_pairs),
-                            " after pairwise QC)"
-                        )
-                    } else {
-                        NULL
-                    }
-                )
-            }
+            paste0(
+                " data frame with ",
+                crayon::blue(n_discovery_pairs),
+                " pairs",
+                if (funct_run_vect["run_qc"] && n_discovery_pairs >= 1L) {
+                    paste0(
+                        " (",
+                        crayon::blue(x@n_ok_discovery_pairs),
+                        " after pairwise QC)"
+                    )
+                } else {
+                    NULL
+                }
+            )
         },
         "\n\t\U2022 Positive control pairs:",
         if (length(n_pc_pairs) == 0) {
@@ -198,7 +194,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             ))
         },
         "\n\t\U2022 Multiple testing adjustment: ",
-        if (x@nuclear || length(x@multiple_testing_method) == 0L) {
+        if (length(x@multiple_testing_method) == 0L) {
             "none"
         } else {
             paste0(
@@ -224,6 +220,12 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
             "not specified"
         } else {
             crayon::blue(as.character(x@formula_object)[2])
+        },
+        "\n\t\U2022 Seed: ",
+        if (length(x@seed) == 0L) {
+            "not specified"
+        } else {
+            crayon::blue(x@seed)
         }
     ))
 
@@ -308,8 +310,8 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #'
 #' `plot()` is "generic" in the sense that it dispatches a specific plotting
 #' function based on the pipeline function that was most recently called on the
-#' `sceptre_object`. For example, if `run_assign_grnas()` is the most recently
-#' called pipeline function, then `plot()` dispatches `plot_run_assign_grnas()`.
+#' `sceptre_object`. For example, if `assign_grnas()` is the most recently
+#' called pipeline function, then `plot()` dispatches `plot_assign_grnas()`.
 #' Similarly, if `run_power_check()` is the most recently called pipeline
 #' function, then `plot()` dispatches `plot_run_power_check()`, and so on. Users
 #' can pass arguments to the function dispatched by `plot()` as named arguments
@@ -322,6 +324,7 @@ setMethod("print", signature = signature("sceptre_object"), function(x) {
 #' \code{return_indiv_plots} is set to \code{TRUE}) or a list of the individual
 #' panels (if \code{return_indiv_plots} is set to \code{FALSE})
 #'
+#' @aliases plot,sceptre_object-method
 #' @export
 #' @examples
 #'
@@ -361,6 +364,7 @@ setMethod("plot", signature = signature("sceptre_object"), function(x, y, ...) {
 
 
 perform_status_check_and_update <- function(sceptre_object, curr_funct) {
+    check_object_version(sceptre_object)
     rank_vector <- c(
         import_data = 1L,
         set_analysis_parameters = 2L,
@@ -396,16 +400,61 @@ perform_status_check_and_update <- function(sceptre_object, curr_funct) {
 }
 
 
-load_row <- function(mat, id) {
-    if (methods::is(mat, "odm")) {
-        mat[id, ]
+# A reader of counts by response, for loops that read many responses: a list
+# of `read(id)`, the counts of response `id` across all cells as a numeric
+# vector (as load_row() gives them), and `position(ids)`, the rows of the
+# responses `ids` (the order in which reads are cheapest). Disk-backed counts
+# are read through one tatami extractor (beachmat), which keeps the file's
+# decompressed chunks between reads; in-memory counts from their CSR slots.
+# Response IDs are looked up in a hash table. A reader holds C++ state, so each
+# worker creates its own from the counts.
+row_reader <- function(mat) {
+    rows <- list2env(
+        as.list(stats::setNames(seq_len(nrow(mat)), rownames(mat))),
+        hash = TRUE
+    )
+    position <- function(ids) match(ids, rownames(mat))
+    if (is_backed(mat)) {
+        extractor <- make_row_extractor(initializeCpp(mat))
+        read <- function(id) read_extractor_row(extractor, rows[[id]])
     } else if (methods::is(mat, "dgRMatrix")) {
+        csr <- compressed_sparse_components(mat)
+        n_cells <- ncol(mat)
+        read <- function(id) {
+            load_csr_row(
+                j = csr$j,
+                p = csr$p,
+                x = csr$x,
+                row_idx = rows[[id]],
+                n_cells = n_cells
+            )
+        }
+    } else {
+        read <- function(id) load_row(mat, id)
+    }
+    list(read = read, position = position)
+}
+
+
+load_row <- function(mat, id) {
+    if (is_backed(mat)) {
+        backed_row(mat, id)
+    } else if (methods::is(mat, "dgRMatrix")) {
+        csr <- compressed_sparse_components(mat)
         load_csr_row(
-            j = mat@j,
-            p = mat@p,
-            x = mat@x,
+            j = csr$j,
+            p = csr$p,
+            x = csr$x,
             row_idx = which(id == rownames(mat)),
             n_cells = ncol(mat)
+        )
+    } else {
+        stop(
+            "Counts of class `",
+            class(mat)[1L],
+            "` cannot be read by row; a `dgRMatrix` or a `DelayedMatrix` ",
+            "is expected.",
+            call. = FALSE
         )
     }
 }

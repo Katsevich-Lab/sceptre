@@ -16,7 +16,8 @@ set_analysis_parameters(
   control_group = "default",
   resampling_mechanism = "default",
   multiple_testing_method = "BH",
-  multiple_testing_alpha = 0.1
+  multiple_testing_alpha = 0.1,
+  seed = NULL
 )
 }
 \arguments{
@@ -37,7 +38,9 @@ specifying the gRNA integration strategy, either \code{"singleton"}, \code{"unio
 \code{"bonferroni"}}
 
 \item{formula_object}{(optional) a formula object specifying how to adjust
-for the covariates in the model}
+for the covariates in the model. Covariates that are not count-based and
+have 15 or more distinct values are left out of the default formula, with a
+message naming them.}
 
 \item{resampling_approximation}{(optional; default \code{"skew_normal"}) a string
 indicating the resampling approximation to make to the null distribution of
@@ -45,7 +48,8 @@ test statistics, either \code{"skew_normal"} or \code{"no_approximation"}}
 
 \item{control_group}{(optional) a string specifying the control group to use
 in the differential expression analysis, either \code{"complement"} or
-\code{"nt_cells"}}
+\code{"nt_cells"}; in high MOI the complement set is always used, and
+\code{"nt_cells"} gives a warning}
 
 \item{resampling_mechanism}{(optional) a string specifying the resampling
 mechanism to use, either \code{"permutations"} or \code{"crt"}}
@@ -56,6 +60,19 @@ options}
 
 \item{multiple_testing_alpha}{(optional; default \code{0.1}) a numeric specifying
 the nominal level of the multiple testing correction method}
+
+\item{seed}{(optional; default \code{NULL}) a whole number between 0 and
+\code{.Machine$integer.max} that seeds the random draws of the analysis: the
+starting values of the mixture method in \code{assign_grnas()}, the negative
+control pairs of \code{run_calibration_check()}, and the permutation and
+conditional resampling draws. The default, \code{NULL}, draws the seed from R's
+random number generator, so that \code{set.seed()} called beforehand makes the
+analysis reproducible on a given platform (for the same seed, the
+negative control pairs of the calibration check can differ between
+operating systems). The seed is recorded in the \code{sceptre_object}, and
+\code{print()} shows it. In sceptre 0.99.2, \code{seed = 4} reproduces the results
+of 0.99.1 and earlier, which used the fixed seed 4, apart from the bug
+fixes listed in \code{NEWS.md}.}
 }
 \value{
 an updated \code{sceptre_object} in which the analysis parameters have

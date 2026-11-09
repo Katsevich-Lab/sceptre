@@ -33,9 +33,12 @@ gRNA IDs. The gRNA IDs are assumed to be in the second column (i.e., the
 \code{grna_target} mapping each individual gRNA to its target. Non-targeting gRNAs
 should be assigned a label of "non-targeting". Optionally,
 \code{grna_target_data_frame} can contain columns \code{chr}, \code{start}, and \code{end},
-giving the chromosome, start coordinate, and end coordiante, respectively, of
-each gRNA. Additionally, \code{grna_target_data_frame} can contain the column
-\code{vector_id} specifying the vector to which a given gRNA belongs.}
+giving the chromosome, start coordinate, and end coordinate, respectively, of
+the region that each gRNA targets. Additionally, \code{grna_target_data_frame} can contain the column
+\code{vector_id} specifying the vector to which a given gRNA belongs. The gRNAs of
+each vector are then combined into one unit, whose region spans those of its
+gRNAs; they must target one chromosome, and other columns whose values differ
+between them are dropped.}
 
 \item{extra_covariates}{(optional) a data frame containing extra covariates
 (e.g., batch, biological replicate) beyond those that \code{sceptre} can compute.}

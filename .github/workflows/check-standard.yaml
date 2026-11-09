@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, dev]
   pull_request:
+  workflow_dispatch:
 
 name: R-CMD-check
 
@@ -27,7 +28,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install system dependencies
         shell: bash
@@ -59,16 +60,9 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install ondisc R package (macOS only)
-        if: ${{ matrix.config.os == 'macOS-latest' }}
-        run: |
-          Rscript -e "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes')"
-          Rscript -e "install.packages('BiocManager')"
-          Rscript -e "BiocManager::install('Rhdf5lib', type = 'source')"
-          Rscript -e "remotes::install_github('timothy-barry/ondisc')"
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck
 
+      # builds and checks the vignette too (the default build arguments)
       - uses: r-lib/actions/check-r-package@v2

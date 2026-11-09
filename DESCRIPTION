@@ -1,10 +1,10 @@
 Package: sceptre
 Title: Analysis of Single-Cell CRISPR Screen Data
-Version: 0.99.1
+Version: 0.99.2
 Authors@R:
     c(person(given = "Timothy",
            family = "Barry",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "tbarry@hsph.harvard.edu",
            comment=c(ORCID="0000-0002-4356-627X")),
            person(given = "Louis",
@@ -12,7 +12,7 @@ Authors@R:
            role = c("aut")),
            person(given = "Eugene",
            family = "Katsevich",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "ekatsevi@wharton.upenn.edu",
            comment = c(ORCID = "0000-0003-0598-2050")),
            person(given = "Wharton Analytics",
@@ -21,33 +21,45 @@ Authors@R:
            role = "fnd",
            comment = "Grants DMS-2113072 and DMS-2310654")
            )
-Description: Analysis of single-cell CRISPR screen data. `sceptre` is an R package for statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. The `sceptre` pipeline consists of several distinct steps: (1) import data from 10X CellRanger, Parse CRISPR Detect, or a set of R objects; (2) set the analysis parameters, which are the parameters that govern how the statistical analysis is to be conducted; (3) assign gRNAs to cells using one of three methods; (4) run quality control; (5) run the calibration check, which is an analysis that verifies that `sceptre` controls the rate of false positives on the dataset under analysis; (6) run the power check, which is an analysis that verifies that `sceptre` is capable of discovering true associations on the dataset under analysis; (7) run the discovery analysis to identify high-confidence perturbation-gene links among the set of perturbations and genes whose association status we do not know but seek to learn; (8) write outputs to a specified directory, including results, plots, and a textual summary of the analysis. `sceptre` leverages several novel statistical and computational algorithms to achieve high statistical accuracy and computational speed.
+Description: Analysis of single-cell CRISPR screen data. `sceptre` is an R package for statistically rigorous, massively scalable, and user-friendly single-cell CRISPR screen data analysis. The `sceptre` pipeline consists of several distinct steps: (1) import data from 10X CellRanger, Parse CRISPR Detect, a `SingleCellExperiment`, or a set of R objects; (2) set the analysis parameters, which are the parameters that govern how the statistical analysis is to be conducted; (3) assign gRNAs to cells using one of three methods; (4) run quality control; (5) run the calibration check, which is an analysis that verifies that `sceptre` controls the rate of false positives on the dataset under analysis; (6) run the power check, which is an analysis that verifies that `sceptre` is capable of discovering true associations on the dataset under analysis; (7) run the discovery analysis to identify high-confidence perturbation-gene links among the set of perturbations and genes whose association status we do not know but seek to learn; (8) write outputs to a specified directory, including results, plots, and a textual summary of the analysis. `sceptre` leverages several novel statistical and computational algorithms to achieve high statistical accuracy and computational speed.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-LinkingTo: Rcpp, BH, assorthead (>= 1.4.0)
+LinkingTo: Rcpp, BH, assorthead (>= 1.4.0), beachmat
 SystemRequirements: zlib
 biocViews: CRISPR, SingleCell, DifferentialExpression, GeneRegulation, DataImport, GeneTarget
 Imports:
+    beachmat.hdf5,
+    BiocGenerics,
+    BiocParallel,
     cowplot,
     crayon,
     data.table,
+    DelayedArray,
     dplyr,
     ggplot2,
+    HDF5Array,
     Matrix,
     methods,
+    MultiAssayExperiment,
+    MuData,
     Rcpp (>= 1.0.9),
+    rhdf5,
+    S4Vectors,
     scales,
+    SingleCellExperiment,
     stats,
+    SummarizedExperiment,
     purrr,
+    utils,
     parallelly (>= 1.23.0),
     withr
 Depends: 
-    R (>= 4.1)
+    R (>= 4.5.0)
 Suggests:
-    ondisc,
-    R.utils,
+    BiocStyle,
+    callr,
     sessioninfo,
     rmarkdown,
     knitr,
