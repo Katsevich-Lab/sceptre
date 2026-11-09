@@ -37,8 +37,10 @@ left and right tails of the \code{response_n_nonzero} distribution}
 the location at which to clip the right tail of the \code{response_p_mito}
 distribution}
 
-\item{additional_cells_to_remove}{(optional) a vector of integer indices
-specifying additional cells to remove}
+\item{additional_cells_to_remove}{(optional) a vector of integer indices of
+additional cells to remove, the columns of the imported response and gRNA
+matrices (not only the cells that pass QC); cell IDs and logical vectors are
+not accepted}
 }
 \value{
 an updated \code{sceptre_object} in which cellwise and pairwise QC have

@@ -44,6 +44,8 @@
 
 -   When `grna_target_data_frame` gives `vector_id` together with `chr`, `start` and `end`, each vector is now one unit whose region spans those of its gRNAs. Previously a vector was listed once per gRNA: under every `grna_integration_strategy` the calibration check's default `calibration_group_size` was too large, and in addition, with `"singleton"` the vector's pairs were analyzed and reported repeatedly and with `"bonferroni"` its p-values were too large. The gRNAs of a vector must target one chromosome; other columns whose values differ between them are dropped, with a message. A factor `vector_id` no longer leaves the collapsed gRNA counts without row names, which made the analysis fail.
 
+-   `run_qc(additional_cells_to_remove =)` checks its argument: it must be a vector of integer indices between 1 and the number of cells, and a logical vector or cell IDs are an error. Previously a logical vector was read as the indices 0 and 1, so it removed only the first cell while the QC metrics reported every cell marked `TRUE` as removed, and out-of-range indices were silently ignored.
+
 ## Deprecated and removed
 
 The deprecated arguments and functions below still work in this version, with a warning; they will be made defunct in the next Bioconductor release and removed in the one after. Reading `.odm` files and the slots of the Nextflow pipeline are removed in this version.

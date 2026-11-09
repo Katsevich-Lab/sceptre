@@ -408,9 +408,10 @@ assign_grnas <- function(
 #' @param p_mito_threshold (optional; default `0.2`) a numeric value specifying
 #' the location at which to clip the right tail of the `response_p_mito`
 #' distribution
-#' @param additional_cells_to_remove (optional) a vector of integer indices
-#' specifying additional cells to remove
-#'
+#' @param additional_cells_to_remove (optional) a vector of integer indices of
+#' additional cells to remove, the columns of the imported response and gRNA
+#' matrices (not only the cells that pass QC); cell IDs and logical vectors are
+#' not accepted
 #' @return an updated `sceptre_object` in which cellwise and pairwise QC have
 #' been applied
 #' @export
