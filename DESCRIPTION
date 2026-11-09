@@ -59,6 +59,7 @@ Depends:
     R (>= 4.5.0)
 Suggests:
     BiocStyle,
+    callr,
     R.utils,
     sessioninfo,
     rmarkdown,

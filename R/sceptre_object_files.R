@@ -122,6 +122,7 @@ read_sceptre_object <- function(directory, backed = FALSE) {
             set_grna_matrix(sceptre_object, counts)
         }
     }
+    load_data_frame_classes()
     methods::validObject(sceptre_object)
     return(sceptre_object)
 }

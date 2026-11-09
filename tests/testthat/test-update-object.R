@@ -1,16 +1,3 @@
-# An object of 0.99.1 and earlier: the matrices in one-element lists and the
-# covariates in their own slot, in place of the `data` slot.
-old_layout_object <- function(sceptre_object) {
-    old <- sceptre_object
-    attr(old, "response_matrix") <- list(get_response_matrix(sceptre_object))
-    attr(old, "grna_matrix") <- list(get_grna_matrix(sceptre_object))
-    attr(old, "covariate_data_frame") <- get_cell_covariates(sceptre_object)
-    attr(old, "data") <- NULL
-    attr(old, "seed") <- NULL
-    attr(old, "version") <- NULL
-    old
-}
-
 test_that("updateObject() converts an object of the 0.99.1 layout", {
     data(lowmoi_example_data)
     sceptre_object <- import_data(

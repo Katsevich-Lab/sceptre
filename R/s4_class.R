@@ -389,7 +389,22 @@ check_object_version <- function(object) {
 }
 
 
+# The data frame slots of a sceptre_object may hold data.tables (pairs and
+# results) or tibbles (for example, a gRNA target data frame read with readr, or
+# that of the example data). S4 recognizes these as data frames only once
+# data.table and tibble, which register their classes with setOldClass(), are
+# loaded; tibble is loaded with dplyr. Loads both, so that an object read from
+# a file in a fresh R session passes validObject().
+load_data_frame_classes <- function() {
+    loadNamespace("data.table")
+    loadNamespace("dplyr")
+    invisible(NULL)
+}
+
+
 update_sceptre_object <- function(object) {
+    # BiocGenerics::updateObject() validates the object this returns
+    load_data_frame_classes()
     old_slots <- attributes(object)
     if ("data" %in% names(old_slots)) {
         if (!("version" %in% names(old_slots))) {
@@ -401,9 +416,7 @@ update_sceptre_object <- function(object) {
         return(object)
     }
     # 0.99.1 and earlier: the matrices in one-element lists, the covariates in
-    # their own slot. Some slots may hold data.tables, which validObject()
-    # recognizes as data frames once data.table is loaded.
-    requireNamespace("data.table", quietly = TRUE)
+    # their own slot
     response_matrix <- old_slots$response_matrix
     grna_matrix <- old_slots$grna_matrix
     if (
