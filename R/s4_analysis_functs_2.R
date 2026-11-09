@@ -438,11 +438,7 @@ run_sceptre_analysis_high_level <- function(
         # the resamples are held in C++ memory, which only workers forked
         # after they are drawn share (a MulticoreParam that is not yet
         # started); other workers draw the same resamples from the same seed
-        synthetic_idxs <- if (
-            is.null(BPPARAM) ||
-                (methods::is(BPPARAM, "MulticoreParam") &&
-                    !BiocParallel::bpisup(BPPARAM))
-        ) {
+        synthetic_idxs <- if (is.null(BPPARAM) || forks_workers(BPPARAM)) {
             do.call(get_synthetic_permutation_idxs, resampling_args)
         } else {
             resampling_args

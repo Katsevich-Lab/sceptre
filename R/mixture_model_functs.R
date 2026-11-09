@@ -48,9 +48,12 @@ assign_grnas_to_cells_mixture <- function(
     # 2. make the grna expression matrix row-accessible
     grna_matrix <- row_accessible_counts(grna_matrix)
 
+    # whether the workers write progress to log files
+    write_logs <- !is.null(BPPARAM) && print_progress
+
     # 3. define the function to perform assignments for a set of grnas
     analyze_given_grna_ids <- function(curr_grna_ids, proc_id = NULL) {
-        if (!is.null(BPPARAM) && print_progress) {
+        if (write_logs) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 "assign_grnas_",
@@ -90,7 +93,26 @@ assign_grnas_to_cells_mixture <- function(
             stats::setNames(curr_grna_ids)
     }
 
-    # 4. run the analysis
+    # 4. run the analysis; the function runs with only the objects it uses
+    # (see isolate_function())
+    analyze_given_grna_ids <- isolate_function(
+        analyze_given_grna_ids,
+        list(
+            write_logs = write_logs,
+            log_dir = log_dir,
+            print_progress = print_progress,
+            grna_matrix = grna_matrix,
+            starting_guesses = starting_guesses,
+            covariate_matrix = covariate_matrix,
+            # only the hyperparameters the workers use: the formula among the
+            # others holds, in its environment, the cell covariates
+            grna_assignment_hyperparameters = grna_assignment_hyperparameters[c(
+                "n_nonzero_cells_cutoff",
+                "backup_threshold",
+                "probability_threshold"
+            )]
+        )
+    )
     if (is.null(BPPARAM)) {
         initial_assignment_list <- analyze_given_grna_ids(grna_ids)
     } else {
@@ -111,9 +133,15 @@ assign_grnas_to_cells_mixture <- function(
         )
         res <- bplapply_checked(
             seq_along(grna_ids_partitioned),
-            function(proc_id) {
-                analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id)
-            },
+            isolate_function(
+                function(proc_id) {
+                    analyze_given_grna_ids(grna_ids_partitioned[[proc_id]], proc_id)
+                },
+                list(
+                    analyze_given_grna_ids = analyze_given_grna_ids,
+                    grna_ids_partitioned = grna_ids_partitioned
+                )
+            ),
             BPPARAM = BPPARAM
         )
         # put the assignments in serial order

@@ -87,10 +87,13 @@ run_perm_test_in_memory <- function(
         covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
+    # whether the workers write progress to log files
+    write_logs <- !is.null(BPPARAM) && print_progress
+
     # 2. define function to loop subset of response IDs
     analyze_given_response_ids <- function(curr_response_ids, proc_id = NULL) {
         reader <- row_reader(response_matrix)
-        if (!is.null(BPPARAM) && print_progress) {
+        if (write_logs) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 analysis_type,
@@ -208,7 +211,38 @@ run_perm_test_in_memory <- function(
         positions = match(response_ids, rownames(response_matrix))
     )
 
-    # 4. run the analysis
+    # 4. run the analysis; the function runs with only the objects it uses
+    # (see isolate_function())
+    analyze_given_response_ids <- isolate_function(
+        analyze_given_response_ids,
+        list(
+            response_matrix = counts_for_workers(
+                response_matrix,
+                response_ids,
+                BPPARAM
+            ),
+            write_logs = write_logs,
+            log_dir = log_dir,
+            analysis_type = analysis_type,
+            synthetic_idxs = synthetic_idxs,
+            print_progress = print_progress,
+            cells_in_use = cells_in_use,
+            subset_to_nt_cells = subset_to_nt_cells,
+            all_nt_idxs = all_nt_idxs,
+            response_grna_group_pairs = response_grna_group_pairs,
+            run_outer_regression = run_outer_regression,
+            response_precomputations = response_precomputations,
+            covariate_matrix = covariate_matrix,
+            B1 = B1,
+            B2 = B2,
+            B3 = B3,
+            fit_parametric_curve = fit_parametric_curve,
+            output_amount = output_amount,
+            get_idx_f = get_idx_f,
+            side_code = side_code,
+            grna_group_idxs = grna_group_idxs
+        )
+    )
     if (is.null(BPPARAM)) {
         res <- lapply(partitioned_response_ids, analyze_given_response_ids)
     } else {
@@ -225,12 +259,18 @@ run_perm_test_in_memory <- function(
         }
         res <- bplapply_checked(
             seq_along(partitioned_response_ids),
-            function(proc_id) {
-                analyze_given_response_ids(
-                    partitioned_response_ids[[proc_id]],
-                    proc_id
+            isolate_function(
+                function(proc_id) {
+                    analyze_given_response_ids(
+                        partitioned_response_ids[[proc_id]],
+                        proc_id
+                    )
+                },
+                list(
+                    analyze_given_response_ids = analyze_given_response_ids,
+                    partitioned_response_ids = partitioned_response_ids
                 )
-            },
+            ),
             BPPARAM = BPPARAM
         )
         message(crayon::green(" \u2713"))
@@ -316,13 +356,16 @@ run_crt_in_memory_v2 <- function(
         covariate_matrix <- covariate_matrix[all_nt_idxs, , drop = FALSE]
     }
 
+    # whether the workers write progress to log files
+    write_logs <- !is.null(BPPARAM) && print_progress
+
     # 2. define the run precomputation function
     run_precomp_on_given_responses <- function(
         curr_response_ids,
         proc_id = NULL
     ) {
         reader <- row_reader(response_matrix)
-        if (!is.null(BPPARAM) && print_progress) {
+        if (write_logs) {
             f_name <- paste0(
                 get_log_dir(log_dir),
                 analysis_type,
@@ -367,12 +410,32 @@ run_crt_in_memory_v2 <- function(
         return(precomp_out_list)
     }
 
+    # the response counts for the workers, shared by both steps below
+    worker_counts <- counts_for_workers(response_matrix, response_ids, BPPARAM)
+
     # 5. update the response precomputations (if applicable)
     if (run_outer_regression) {
         partitioned_response_ids <- partition_response_ids(
             response_ids = response_ids,
             BPPARAM = BPPARAM,
             positions = match(response_ids, rownames(response_matrix))
+        )
+        # the function runs with only the objects it uses (see
+        # isolate_function())
+        run_precomp_on_given_responses <- isolate_function(
+            run_precomp_on_given_responses,
+            list(
+                response_matrix = worker_counts,
+                write_logs = write_logs,
+                log_dir = log_dir,
+                analysis_type = analysis_type,
+                print_progress = print_progress,
+                cells_in_use = cells_in_use,
+                subset_to_nt_cells = subset_to_nt_cells,
+                all_nt_idxs = all_nt_idxs,
+                response_precomputations = response_precomputations,
+                covariate_matrix = covariate_matrix
+            )
         )
         if (is.null(BPPARAM)) {
             res <- lapply(
@@ -393,12 +456,18 @@ run_crt_in_memory_v2 <- function(
             }
             res <- bplapply_checked(
                 seq_along(partitioned_response_ids),
-                function(proc_id) {
-                    run_precomp_on_given_responses(
-                        partitioned_response_ids[[proc_id]],
-                        proc_id
+                isolate_function(
+                    function(proc_id) {
+                        run_precomp_on_given_responses(
+                            partitioned_response_ids[[proc_id]],
+                            proc_id
+                        )
+                    },
+                    list(
+                        run_precomp_on_given_responses = run_precomp_on_given_responses,
+                        partitioned_response_ids = partitioned_response_ids
                     )
-                },
+                ),
                 BPPARAM = BPPARAM
             )
         }
@@ -422,7 +491,7 @@ run_crt_in_memory_v2 <- function(
             mode = "list",
             length = length(curr_grna_groups)
         )
-        f_name <- if (!is.null(BPPARAM) && print_progress) {
+        f_name <- if (write_logs) {
             paste0(get_log_dir(log_dir), analysis_type, "_", proc_id, ".out")
         } else {
             NULL
@@ -504,17 +573,49 @@ run_crt_in_memory_v2 <- function(
         BPPARAM = BPPARAM,
         positions = group_positions[as.character(grna_groups)]
     )
+    # the function runs with only the objects it uses (see isolate_function())
+    perform_association_analysis <- isolate_function(
+        perform_association_analysis,
+        list(
+            response_matrix = worker_counts,
+            write_logs = write_logs,
+            log_dir = log_dir,
+            analysis_type = analysis_type,
+            print_progress = print_progress,
+            response_grna_group_pairs = response_grna_group_pairs,
+            run_outer_regression = run_outer_regression,
+            B1 = B1,
+            B2 = B2,
+            B3 = B3,
+            fit_parametric_curve = fit_parametric_curve,
+            output_amount = output_amount,
+            response_precomputations = response_precomputations,
+            covariate_matrix = covariate_matrix,
+            get_idx_f = get_idx_f,
+            subset_to_nt_cells = subset_to_nt_cells,
+            all_nt_idxs = all_nt_idxs,
+            side_code = side_code,
+            cells_in_use = cells_in_use,
+            seed = seed
+        )
+    )
     if (is.null(BPPARAM)) {
         res <- lapply(partitioned_grna_group_ids, perform_association_analysis)
     } else {
         res <- bplapply_checked(
             seq_along(partitioned_grna_group_ids),
-            function(proc_id) {
-                perform_association_analysis(
-                    partitioned_grna_group_ids[[proc_id]],
-                    proc_id
+            isolate_function(
+                function(proc_id) {
+                    perform_association_analysis(
+                        partitioned_grna_group_ids[[proc_id]],
+                        proc_id
+                    )
+                },
+                list(
+                    perform_association_analysis = perform_association_analysis,
+                    partitioned_grna_group_ids = partitioned_grna_group_ids
                 )
-            },
+            ),
             BPPARAM = BPPARAM
         )
         message(crayon::green(" \u2713"))

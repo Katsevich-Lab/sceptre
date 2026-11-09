@@ -16,7 +16,17 @@ get_idx_vector_factory <- function(
             get_idx_vector_discovery_analysis(curr_grna_group, grna_group_idxs)
         }
     }
-    return(f)
+    # f holds the values of the arguments, not the frame of the caller (which
+    # a parallel worker would otherwise receive; see isolate_function())
+    isolate_function(
+        f,
+        list(
+            calibration_check = calibration_check,
+            indiv_nt_grna_idxs = indiv_nt_grna_idxs,
+            grna_group_idxs = grna_group_idxs,
+            low_moi = low_moi
+        )
+    )
 }
 
 # helper function 1. calibration check complement set

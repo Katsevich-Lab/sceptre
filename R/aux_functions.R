@@ -333,6 +333,49 @@ bplapply_checked <- function(X, FUN, BPPARAM) {
 }
 
 
+# Returns `f` with an environment that holds only `objects` (a named list) and
+# whose parent is the sceptre namespace. A function defined inside another
+# function keeps that function's whole frame, which also holds, through its
+# unevaluated arguments, the frame of its caller (and so the sceptre_object). A
+# parallel back end that serializes the function it runs (SnowParam, or a
+# started cluster) would send all of that to every worker.
+isolate_function <- function(f, objects) {
+    environment(f) <- list2env(objects, parent = asNamespace("sceptre"))
+    f
+}
+
+
+# Whether the workers of `BPPARAM` are forked when the work is dispatched (a
+# MulticoreParam not yet started): they then share the memory of the master,
+# and nothing is serialized to them.
+forks_workers <- function(BPPARAM) {
+    methods::is(BPPARAM, "MulticoreParam") && !BiocParallel::bpisup(BPPARAM)
+}
+
+
+# The response counts to send to parallel workers that receive a serialized
+# copy (for example, those of a SnowParam): of in-memory counts, only the rows
+# of `response_ids` (all that the workers read). The counts are returned as
+# they are when nothing is serialized (serial runs, forked workers, which
+# would otherwise hold the subset in addition to the counts), when they are
+# disk-backed (a reference to their file), and when most rows are read (the
+# subset would save little but add a copy in the master).
+counts_for_workers <- function(counts, response_ids, BPPARAM) {
+    if (
+        is.null(BPPARAM) ||
+            forks_workers(BPPARAM) ||
+            !methods::is(counts, "dgRMatrix") ||
+            length(unique(response_ids)) > nrow(counts) / 2
+    ) {
+        return(counts)
+    }
+    methods::as(
+        counts[as.character(response_ids), , drop = FALSE],
+        "RsparseMatrix"
+    )
+}
+
+
 # BiocParallel::bptry() returns an error condition for a worker that failed
 # (and for the elements it did not evaluate after that failure), and NULL for a
 # worker that exited without returning a result. Stop with the worker's
