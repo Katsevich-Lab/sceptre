@@ -40,6 +40,8 @@
 
 -   `construct_cis_pairs()` stops with an error when the chromosomes of the gRNA targets and of the responses are named differently (for example, `"chr1"` and `"1"`); previously it returned no pairs.
 
+-   `import_data_from_cellranger()` reads compressed (`.gz`) Cell Ranger files without the R.utils package, which sceptre does not depend on; previously it stopped with an error when R.utils was not installed.
+
 ## Deprecated and removed
 
 The deprecated arguments and functions below still work in this version, with a warning; they will be made defunct in the next Bioconductor release and removed in the one after. Reading `.odm` files and the slots of the Nextflow pipeline are removed in this version.

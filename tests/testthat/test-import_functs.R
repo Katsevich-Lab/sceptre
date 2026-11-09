@@ -28,7 +28,7 @@ test_that("import_data_from_cellranger retains cell barcodes", {
     expected_barcodes <- unlist(
         Map(
             function(directory, batch_id) {
-                barcodes <- data.table::fread(
+                barcodes <- read_delimited_file(
                     file.path(directory, "barcodes.tsv.gz"),
                     header = FALSE,
                     colClasses = "character"
@@ -65,7 +65,7 @@ test_that("import_data_from_cellranger retains cell barcodes", {
 test_that("single-directory Cell Ranger imports retain raw cell barcodes", {
     inputs <- get_cellranger_test_inputs()
     directory <- inputs$directories[1L]
-    expected_barcodes <- data.table::fread(
+    expected_barcodes <- read_delimited_file(
         file.path(directory, "barcodes.tsv.gz"),
         header = FALSE,
         colClasses = "character"
@@ -133,7 +133,7 @@ test_that("Cell Ranger barcode files cannot be supplied only partially", {
 test_that("batch prefixes disambiguate duplicate Cell Ranger barcodes", {
     inputs <- get_cellranger_test_inputs()
     directory <- inputs$directories[1L]
-    barcodes <- data.table::fread(
+    barcodes <- read_delimited_file(
         file.path(directory, "barcodes.tsv.gz"),
         header = FALSE,
         colClasses = "character"
@@ -168,7 +168,7 @@ test_that("batch prefixes disambiguate duplicate Cell Ranger barcodes", {
 test_that("Cell Ranger barcodes agree with named extra covariates", {
     inputs <- get_cellranger_test_inputs()
     directory <- inputs$directories[1L]
-    barcodes <- data.table::fread(
+    barcodes <- read_delimited_file(
         file.path(directory, "barcodes.tsv.gz"),
         header = FALSE,
         colClasses = "character"
@@ -208,7 +208,7 @@ test_that("multi-directory barcodes agree with prefixed extra covariates", {
     inputs <- get_cellranger_test_inputs()
     raw_barcodes <- unlist(
         lapply(inputs$directories, function(directory) {
-            data.table::fread(
+            read_delimited_file(
                 file.path(directory, "barcodes.tsv.gz"),
                 header = FALSE,
                 colClasses = "character"
@@ -219,7 +219,7 @@ test_that("multi-directory barcodes agree with prefixed extra covariates", {
     prefixed_barcodes <- unlist(
         Map(
             function(directory, batch_id) {
-                barcodes <- data.table::fread(
+                barcodes <- read_delimited_file(
                     file.path(directory, "barcodes.tsv.gz"),
                     header = FALSE,
                     colClasses = "character"
@@ -288,7 +288,7 @@ test_that("Cell Ranger import records the directory of each cell in batch", {
     n_cells <- vapply(
         inputs$directories,
         function(directory) {
-            nrow(data.table::fread(
+            nrow(read_delimited_file(
                 file.path(directory, "barcodes.tsv.gz"),
                 header = FALSE
             ))

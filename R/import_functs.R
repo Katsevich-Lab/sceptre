@@ -413,8 +413,8 @@ import_data_from_cellranger_files <- function(
     }
 
     # 4. obtain the feature data frame; determine the ids of each feature
-    feature_df <- data.table::fread(
-        file = feature_fps[1],
+    feature_df <- read_delimited_file(
+        path = feature_fps[1],
         colClasses = c("character", "character", "character"),
         col.names = c("feature_id", "feature_name", "modality"),
         header = FALSE
@@ -456,8 +456,8 @@ import_data_from_cellranger_files <- function(
         message("Processing directory ", i, ".")
         # check that the features df matches
         features_fp <- feature_fps[i]
-        curr_feature_df <- data.table::fread(
-            file = features_fp,
+        curr_feature_df <- read_delimited_file(
+            path = features_fp,
             colClasses = c("character", "character", "character"),
             col.names = c("feature_id", "feature_name", "modality"),
             header = FALSE
@@ -484,8 +484,8 @@ import_data_from_cellranger_files <- function(
         }
         n_cells_per_matrix[i] <- mat_dim[2L]
         if (retain_cell_barcodes) {
-            curr_barcodes <- data.table::fread(
-                file = barcode_fps[i],
+            curr_barcodes <- read_delimited_file(
+                path = barcode_fps[i],
                 header = FALSE,
                 colClasses = "character",
                 showProgress = FALSE
@@ -808,8 +808,8 @@ import_data_from_parse <- function(
     grna_mat <- read_mtx(path.expand(grna_mat_fp), transpose = TRUE)
 
     # 3. load the gene ids; update rownames of gene mat
-    gene_feature_df <- data.table::fread(
-        file = all_genes_fp,
+    gene_feature_df <- read_delimited_file(
+        path = all_genes_fp,
         colClasses = c("character", "character", "character"),
         col.names = c("feature_id", "feature_name", "genome"),
         header = TRUE
@@ -818,8 +818,8 @@ import_data_from_parse <- function(
     gene_names <- gene_feature_df$feature_name[seq(1L, nrow(gene_mat))]
 
     # 4. load the grna ids; update rownames of grna mat
-    grna_feature_df <- data.table::fread(
-        file = all_grnas_fp,
+    grna_feature_df <- read_delimited_file(
+        path = all_grnas_fp,
         colClasses = c("character", "character", "character"),
         col.names = c("feature_id", "feature_name", "genome"),
         header = TRUE
@@ -1021,4 +1021,25 @@ collapse_grna_matrix <- function(grna_matrix, grna_target_data_frame) {
     ) |>
         t()
     return(grna_matrix_collapsed)
+}
+
+
+# Reads a small delimited text file (features.tsv, barcodes.tsv, Parse's gene
+# and gRNA lists) with data.table::fread(), passing `...` on. fread() reads a
+# compressed file only through the R.utils package, which is not a dependency
+# of sceptre, so a compressed file (Cell Ranger writes features.tsv.gz and
+# barcodes.tsv.gz) is decompressed by an R connection and its lines are passed
+# to fread() as text.
+read_delimited_file <- function(path, ...) {
+    if (!grepl("\\.(gz|bz2|xz)$", path, ignore.case = TRUE)) {
+        return(data.table::fread(file = path, ...))
+    }
+    con <- file(path, open = "r")
+    on.exit(close(con), add = TRUE)
+    # warn = FALSE: fread() reads a last line without a newline silently too
+    lines <- readLines(con, warn = FALSE)
+    if (length(lines) == 0L) {
+        stop("File '", path, "' is empty.")
+    }
+    data.table::fread(text = lines, ...)
 }
