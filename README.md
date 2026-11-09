@@ -24,13 +24,20 @@ principles:
   [`sceptre` Nextflow
   pipeline](https://github.com/timothy-barry/sceptre-pipeline)
   distributes analyses across hundreds of processors on a cluster or
-  cloud.
+  cloud (it currently requires `sceptre` 0.99.1 or earlier).
 - **Ease of use.** A small, pipe-friendly set of functions takes you
   from raw count matrices to results in a handful of steps.
 
 ## Installation
 
-Install the development version of `sceptre` from GitHub:
+Install `sceptre` from Bioconductor:
+
+``` r
+# install.packages("BiocManager")
+BiocManager::install("sceptre")
+```
+
+or the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
