@@ -37,6 +37,11 @@ without copying them. Otherwise, the directory must not already hold a
 \code{screen.h5mu}, which another disk-backed \code{sceptre_object} may be reading.
 }
 \details{
+The layout of \code{screen.h5mu} is experimental in sceptre 0.99.2: it may change
+in a later release, and each file carries a format stamp by which later
+versions recognize it. Logical cell covariates are stored in the file as
+integers (0 and 1).
+
 \code{read_sceptre_object()} reads the response and gRNA counts into memory
 (\code{backed = FALSE}) or leaves them on disk (\code{backed = TRUE}), in which case
 the directory must stay in place while the \code{sceptre_object} is used. Either

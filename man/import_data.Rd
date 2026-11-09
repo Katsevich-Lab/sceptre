@@ -63,7 +63,11 @@ response and gRNA counts stay on disk in the file \code{screen.h5mu} in
 \code{directory_to_write} and are read as they are needed, or a standard
 \code{sceptre_object} (\code{FALSE}), which holds them in memory. The cell covariates
 are held in memory either way. The analysis of a
-disk-backed \code{sceptre_object} uses permutations (\code{resampling_mechanism = "permutations"} in \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}).}
+disk-backed \code{sceptre_object} requires \code{resampling_mechanism = "permutations"} in \code{\link[=set_analysis_parameters]{set_analysis_parameters()}}. Disk backing and the layout
+of \code{screen.h5mu} are experimental in sceptre 0.99.2: the layout may change
+in a later release, and each file carries a format stamp by which later
+versions recognize it. Logical cell covariates are stored in the file as
+integers (0 and 1).}
 
 \item{directory_to_write}{(optional) a file path to a directory in which to
 write \code{screen.h5mu}, a MuData file holding the response and gRNA counts and

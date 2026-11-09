@@ -50,8 +50,12 @@
 #' `directory_to_write` and are read as they are needed, or a standard
 #' `sceptre_object` (`FALSE`), which holds them in memory. The cell covariates
 #' are held in memory either way. The analysis of a
-#' disk-backed `sceptre_object` uses permutations (`resampling_mechanism =
-#' "permutations"` in [set_analysis_parameters()]).
+#' disk-backed `sceptre_object` requires `resampling_mechanism =
+#' "permutations"` in [set_analysis_parameters()]. Disk backing and the layout
+#' of `screen.h5mu` are experimental in sceptre 0.99.2: the layout may change
+#' in a later release, and each file carries a format stamp by which later
+#' versions recognize it. Logical cell covariates are stored in the file as
+#' integers (0 and 1).
 #' @param directory_to_write (optional) a file path to a directory in which to
 #' write `screen.h5mu`, a MuData file holding the response and gRNA counts and
 #' the cell covariates. Must be supplied if `backed` is set to `TRUE`, and must
